@@ -11,7 +11,7 @@ var x = 100,
     y = 300,
     start_x,
     start_y,
-    extent = 1,
+    extent = 4,
     max_x = 1260,
     max_y = 800,
     STEP_PER = 100,
@@ -23,18 +23,19 @@ var x = 100,
     ;
 function stepOn(right, up) {
    if (x < start_x + DIS_PER && y < start_y + DIS_PER ){
-        sign_x = right ? 1 : -1;
-        sign_y = up ? 1 : -1;
+        sign_x = right === true ? 1 : (right === false ? -1 : (+right) );
+        sign_y = up === true ? 1 : (up === false ? -1 : (+up) );
         ctx.beginPath();
         ctx.moveTo(x, y);
-        x += extent * sign_x;
-        y += extent * sign_y;
+        x = x + extent * sign_x;
+        y = y + extent * sign_y;
         ctx.lineTo(x, y);
         ctx.stroke();
         //steps++;   
         return;
    }
-   thread && window.clearInterval(thread);
+   window.clearInterval(thread);
+   thread = undefined;
 }
 window.onload = function(){
     canvas = document.getElementById("myCanvas");
@@ -44,14 +45,18 @@ document.onclick =  function () {
     steps = 0;
     start_x = x;
     start_y = y;
+    if (thread) {
+       window.clearInterval(thread);
+       extent <50 && (extent += 1); 
+    }
     thread = window.setInterval(function() {
-        stepOn(true, Math.random()>0.5);
+        stepOn(true, 0);
     }, 50);
 };
 </script>
 </head>
 <body>
-    <canvas id="myCanvas" width="1280" height="600"></canvas>
+<canvas id="myCanvas" width="1280" height="600"></canvas>
 </body>
 </html>
 
