@@ -43,7 +43,9 @@
         .content-chrome-nofs {
             letter-spacing:normal;
         }
-        .comment { position:absolute; }
+        .content-letter {
+            letter-spacing:normal;
+        }
         .content-inline {
         }
         .content-inline span {
@@ -82,5 +84,11 @@
             <li>电影</li>
             <li>生活</li>
         </ul>
+        <p>如果下面出现重叠说明letter-spacing取值过小，绝对值超过间隙大小，会发生错误</p>
+        <div class="content-letter">
+            <span>美食</span>
+            <span>电影</span>
+            <span>生活</span>
+        </div>
     </div>
 </body>
