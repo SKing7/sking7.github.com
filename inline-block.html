@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试页面</title>
+    <link rel="stylesheet" href="" />
+    <style>
+        body {
+            font-family: arial;
+            padding: 5px 20px;
+            background:#fff;
+            font-size:14px;
+        }
+        .mainbox { width:250px; margin:0 auto; position:relative; }
+        .mainbox h2 { text-align:center; }
+        ul {
+            list-style: none;
+            padding:0;
+            margin:5px 0;
+
+        }
+        li ,span {
+            background: #fff;
+            color:#000;
+            border:1px solid #399;
+            padding: 4px;
+        }
+        .content, .content-inline, .content-float {
+            font-size:0;
+            *word-spacing:-1px;
+            letter-spacing:-4px;/*根据上面对照表查询设置*/
+            *letter-spacing:normal;
+        }
+        .content  li, .content-inline span, .content-float span {
+            font-size: 14px;
+            display: inline-block;
+            *display:inline;
+            *zoom:1;
+            letter-spacing: normal;
+            word-spacing: normal;
+            vertical-align:top;
+        }
+        .content-chrome-nofs {
+            letter-spacing:normal;
+        }
+        .comment { position:absolute; }
+        .content-inline {
+        }
+        .content-inline span {
+        }
+    </style>
+</head>
+<body>
+    <div class="mainbox">
+        <p>block元素Li-》inline-block</p>
+        <ul class="content">
+            <li>美食</li>
+            <li>电影</li>
+            <li>生活</li>
+        </ul>
+        <p>inline元素span-》inline-block</p>
+        <div class="content-inline">
+            <span>美食</span>
+            <span>电影</span>
+            <span>生活</span>
+        </div>
+        <p>float的实现</p>
+        <div class="content-float">
+            <span>美食</span>
+            <span>电影</span>
+            <span>生活</span>
+        </div>
+        <p>正常情况下，之间左右之间没有间隙，不会重叠</p>
+        <p>如果你发现下面有间隙并且还是使用的chrome，<br>说明你的浏览器还不支持font-size:0;<br>但是如果上面显示正常则标明，<br>这个问题在上面代码中已经修复</p>
+        <div class="content-chrome-nofs content-inline">
+            <span>美食</span>
+            <span>电影</span>
+            <span>生活</span>
+        </div>
+        <ul class="content content-chrome-nofs">
+            <li>美食</li>
+            <li>电影</li>
+            <li>生活</li>
+        </ul>
+    </div>
+</body>
