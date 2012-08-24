@@ -11,6 +11,7 @@
             background:#fff;
             font-size:14px;
         }
+        strong { color:red; }
         .mainbox { width:250px; margin:0 auto; position:relative; }
         .mainbox h2 { text-align:center; }
         ul {
@@ -25,13 +26,13 @@
             border:1px solid #399;
             padding: 4px;
         }
-        .content, .content-inline, .content-float {
+        .content, .content-inline {
             font-size:0;
-            *word-spacing:-1px;
             letter-spacing:-4px;/*根据上面对照表查询设置*/
+            *word-spacing:-1px;
             *letter-spacing:normal;
         }
-        .content  li, .content-inline span, .content-float span {
+        .content  li, .content-inline span{
             font-size: 14px;
             display: inline-block;
             *display:inline;
@@ -40,15 +41,59 @@
             word-spacing: normal;
             vertical-align:top;
         }
+        .content-blog, .content-inline-blog {
+            font-size:0;
+            *word-spacing:-1px;
+        }
+        .content-blog  li, .content-inline-blog span{
+            font-size: 14px;
+            display: inline-block;
+            *display:inline;
+            *zoom:1;
+            letter-spacing: normal;
+            word-spacing: normal;
+            vertical-align:top;
+        }
+        @media screen and (-webkit-min-device-pixel-ratio:0){
+        /* firefox 中 letter-spacing 会导致脱离普通流的元素水平位移 */
+            .content-blog, .content-inline-blog {
+                letter-spacing:-5px;/* Safari 等不支持字体大小为 0 的浏览器, N 根据父级字体调节*/
+            }
+        }
+        .content-float  {
+            overflow:hidden;
+            *zoom:1;
+        } 
+        .content-float span {
+            float:left;
+        } 
+        .content-float li {
+            float:left;
+        } 
         .content-chrome-nofs {
             letter-spacing:normal;
         }
         .content-letter {
-            letter-spacing:-10px;
+            letter-spacing:-30px;
         }
         .content-inline {
         }
         .content-inline span {
+        }
+
+        .content-yui {
+            letter-spacing:-4px;
+            *letter-spacing:normal;
+            word-spacing:-4px;
+        }
+        .content-yui  li, .content-yui span {
+            font-size: 14px;
+            display: inline-block;
+            *display:inline;
+            *zoom:1;
+            letter-spacing: normal;/*重置*/
+            word-spacing: normal;/*重置*/
+            vertical-align:top;/*设置inline元素的相对于父容器的对其方式*/
         }
     </style>
 </head>
@@ -66,12 +111,18 @@
             <span>电影</span>
             <span>生活</span>
         </div>
-        <p>float的实现</p>
+        <p>float的实现:inline</p>
         <div class="content-float">
-            <span>美食</span>
+            <span>美食</span>a
             <span>电影</span>
             <span>生活</span>
         </div>
+        <p>float-block</p>
+        <ul class="content-float">
+            <li>美食</li>
+            <li>电影</li>
+            <li>生活</li>
+        </ul>
         <p>正常情况下，之间左右之间没有间隙，不会重叠</p>
         <p>inline</p>
         <div class="content-chrome-nofs content-inline">
@@ -91,6 +142,30 @@
             <span>电影</span>
             <span>生活</span>
         </div>
-        <p>如果上面出现了重叠，说明letter-spacing取值过小(-10px)，绝对值超过间隙大小，会发生错误</p>
+        <p>如果上面出现了重叠,或者<strong>偏移</strong>，说明letter-spacing取值过小(-30px)，绝对值超过间隙大小，会发生错误</p>
+        <p>yui inline</p>
+        <div class="content-yui">
+            <span>美食</span>
+            <span>电影</span>
+            <span>生活</span>
+        </div>
+        <p>yui block</p>
+        <ul class="content-yui">
+            <li>美食</li>
+            <li>电影</li>
+            <li>生活</li>
+        </ul>
+        <p>博客中提到的：block元素Li-》inline-block</p>
+        <ul class="content-blog">
+            <li>美食</li>
+            <li>电影</li>
+            <li>生活</li>
+        </ul>
+        <p>inline元素span-》inline-block</p>
+        <div class="content-inline-blog">
+            <span>美食</span>
+            <span>电影</span>
+            <span>生活</span>
+        </div>
     </div>
 </body>
