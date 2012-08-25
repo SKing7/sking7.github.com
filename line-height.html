@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试页面</title>
+    <link rel="stylesheet" href="" />
+    <style>
+        body { font: 14px 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif; margin:0;  }
+        .p1 { position:absolute; left:200px; top:170px; margin:0;  }
+        .p2 { position:absolute; left:200px; top:230px; margin:0;  }
+        .p3 { position:absolute; left:200px; top:280px; margin:0;  }
+        .s1 { line-height:1.1; border:1px solid #333; display:inline-block; }
+        .s2 { line-height:1.2; border:1px solid #333; display:inline-block; }
+        .s3 { line-height:1.3; border:1px solid #333; display:inline-block; }
+        .mainbox { position:relative; width:800px; height:400px; padding:200px; }
+        .canzhao1 { font-size:12px; position:absolute; left:147px; top:200px; width:50px; height:15px; border:1px solid #333; }
+        .canzhao2 { font-size:12px; position:absolute; left:147px; top:250px; width:50px; height:17px; border:1px solid #333; }
+        .canzhao3 { font-size:12px; position:absolute; left:147px; top:300px; width:50px; height:18px; border:1px solid #333; }
+        .br { height:50px; font-size:14px; }
+        .result { font-weight:bold; }
+    </style>
+</head>
+<body>
+    <div class="mainbox">
+        <p class="p1">font-size:14px; line-height:1.1;计算出来为:15.4,所以下面两个“框框”对齐，说明不是向上取整</p>
+        <p class="p2">font-size:14px; line-height:1.2;计算出来为:16.8,所以下面两个“框框对齐，说明不是向下取整</p>
+        <p class="p3">font-size:14px; line-height:1.3;计算出来为：18.2px;所以下面两个框框如果对齐说明不是向上取整</p>
+        <div class="canzhao1">15px高</div>
+        <div class="canzhao2">17px高</div>
+        <div class="canzhao3">18px高</div>
+        <div class="br"><span class="s1">abc</span></div>
+        <div class="br"><span class="s2">abc</span></div>
+        <div class="br"><span class="s3">abc</span></div>
+        <p class="result">如果上述两种情况都底部都对齐：四舍五入; else 满足第二个条件 ：向下取整; else 向上取整; </p>
+        <p class="result">firefox，ie, opera：四舍五入；chrome：向下取整（15.8->15）</p>
+        <p class="result">测试环境：mac:firefox 14.0,chrome 21; xp:firefox 14,chrome 0.4, ie 6/7/8; opera:12.01</p>
+    </div>
+</body>
+</html>
