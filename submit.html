@@ -8,7 +8,7 @@
         .mainbox { width:600px; margin:150px auto; border:10px solid #E4F7F5; border-radius:4px;  padding:0; background:#FFF; } 
         * { padding:0; margin:0; }
         .fix-bug input::-moz-focus-inner {  padding:0; border:0; }
-        .fix-bug input { line-height:22px; }
+        .fix-bug input { line-height:20px; }
         p { margin:5px 0; line-height:18px; }
         input, button { vertical-align:top; }
         .mainbox .green:hover { color:red; cursor:pointer; }
@@ -28,6 +28,10 @@
         <div class="mainbox">
             <input type="button" value="按钮"/>
             <button type="submit" value="">按钮</button>
+            <div class="fix-bug">
+                <input type="button" value="按钮"/>
+                <button type="submit" value="">按钮</button>
+            </div>
             <p>input button { padding:20px; }</p>
             <div class="padding">
                 <input class="" type="text" value="输入"/>
@@ -94,7 +98,7 @@
                <a href="###" class="form-button">取消</a>
             </div>
             <div id="fix-bug" class="fix-bug">
-               <input style="line-height:22px; " class="form-button" type="submit" value="提交">
+               <input class="form-button" type="submit" value="提交">
                <a class="form-button" href="###">取消</a>
             </div>
         </div>
