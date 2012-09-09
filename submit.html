@@ -1,4 +1,7 @@
 <!DOCTYPE HTML>
+<!--混杂模式测试代码
+<!DOCTYPE>
+-->
 <html>
     <head>
     <meta charset="utf-8">
@@ -9,8 +12,8 @@
         .fix-bug input::-moz-focus-inner {  padding:0; border:0; }
         .fix-bug button::-moz-focus-inner {  padding:0; border:0; }
         .fix-bug input { line-height:20px; }
-        p { margin:5px 0; line-height:18px; }
-        input, button { vertical-align:top; }
+        p { border:1px solid black; padding:5px; height:20px; margin:5px 0; line-height:18px; }
+        input, button { vertical-align:top; background:#ccc; }
         .mainbox .green:hover { color:red; cursor:pointer; }
         .padding input, .padding button { padding:20px; }
         .width input, .width button { width:100px; }
@@ -24,10 +27,13 @@
         div { margin-bottom:10px; }
         .all input { height:32px; }
         .all a { height:20px; }
-
+        .border-model input, .border-model button { box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; }
+        .content-model input, .content-model button { box-sizing: content-box; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; }
+        .border input, .border button { padding:0; border:20px solid #ccc; background:#ccc; }
     </style>
     </head>
     <body>
+        <h1 id="h"></h1>
         <div class="mainbox">
             <input type="button" value="按钮"/>
             <input type="submit" value="提交"/>
@@ -55,6 +61,33 @@
             </div>
             <p>input button{ height:60px; padding:20px; border:1px... }</p>
             <div class="padding-border-height">
+                <input class="" type="text" value="输入"/>
+                <input type="submit" value="提交"/>
+                <input type="button" value="按钮"/>
+                <button type="submit" value="">Button-提交</button>
+                <button type="button" value="">Button-button</button>
+            </div>
+            <p>input button{ height:60px; padding:20px; border:1px... }</p>
+            <p>input button{ border-model }</p>
+            <div class="border-model padding-border-height">
+                <input class="" type="text" value="输入"/>
+                <input type="submit" value="提交"/>
+                <input type="button" value="按钮"/>
+                <button type="submit" value="">Button-提交</button>
+                <button type="button" value="">Button-button</button>
+            </div>
+            <p>input button{ height:60px; padding:20px; border:1px... }</p>
+            <p>input button{ content-model }</p>
+            <div class="content-model padding-border-height">
+                <input class="" type="text" value="输入"/>
+                <input type="submit" value="提交"/>
+                <input type="button" value="按钮"/>
+                <button type="submit" value="">Button-提交</button>
+                <button type="button" value="">Button-button</button>
+            </div>
+            <p>input button{ height:60px; padding:20px; border:1px... }</p>
+            <p>input button{ border模拟padding}</p>
+            <div class="border padding-border-height">
                 <input class="" type="text" value="输入"/>
                 <input type="submit" value="提交"/>
                 <input type="button" value="按钮"/>
@@ -113,5 +146,13 @@
                <a class="form-button" href="###">取消</a>
             </div>
         </div>
+        <script>
+            var h = document.getElementById('h');
+            if (document.compatMode == "CSS1Compat") {
+                h.innerHTML = document.compatMode +  " Standards mode";
+            } else {
+                h.innerHTML =  document.compatMode +  "quirk mode";
+            }
+        </script>
     </body>
 </html>
