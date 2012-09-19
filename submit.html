@@ -30,13 +30,18 @@
         .border-model input, .border-model button { box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; }
         .content-model input, .content-model button { box-sizing: content-box; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; }
         .border input, .border button { padding:0; border:20px solid #ccc; background:#ccc; }
+        .base-input { border:none;margin:0;padding:0; font-size:11px; box-sizing:content-box; height:14px; }
+        .base-input input::-moz-focus-inner {  padding:0; border:0; }
     </style>
     </head>
     <body>
         <h1 id="h"></h1>
         <div class="mainbox">
             <input type="button" value="按钮"/>
+            <input class="base-input" type="button" value="按钮"/>
+            <a href="" style="background:#ccc; font-size:11px; text-decoration:none;">按钮</a>
             <input type="submit" value="提交"/>
+            <input class="base-input" type="submit" value="提交"/>
             <button type="button" value="">按钮</button>
             <button type="submit" value="">提交</button>
             <div class="fix-bug">
