@@ -56,7 +56,9 @@
         var getStyle = function( elem, type ){
             return 'getComputedStyle' in window ? getComputedStyle(elem, null)[type] : elem.currentStyle[type];
         }
-        alert(getStyle(document.getElementById('fixed'),'display'));        
+        alert(getStyle(document.getElementById('fixed'),'display'));       
+
+        alert((document.compatMode))
         </script>
 
     </body>
