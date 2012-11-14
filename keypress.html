@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        body { color:#333;  font: 14px 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif; }
+        .mainbox { width:400px; margin:150px auto; border:10px solid #E4F7F5; border-radius:4px;  padding:25px 30px 30px; background:#FFF; } 
+        * { padding:0; margin:0; }
+    </style>
+    </head>
+    <body>
+        <div class="mainbox">
+            <input id="o"/>
+        </div>
+        <script>
+            var o = document.getElementById('o');
+            o.onkeypress = function(e) {
+               o.value = (this.value ); 
+            };
+        </script>
+    </body>
+</html>

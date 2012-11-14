@@ -1,0 +1,30 @@
+<head>
+    <script type="text/javascript">
+        function MoveButton () {
+            var wanderer = document.getElementById ("wanderer");
+            if (window.getSelection) {  // all browsers, except IE before version 9
+                var selection = window.getSelection ();
+                if (selection.rangeCount > 0) {
+                    var range = selection.getRangeAt (0);
+                    range.collapse (false);
+                    range.insertNode (wanderer);
+                }
+            }
+            else {  // Internet Explorer before version 9
+                var textRange = document.selection.createRange ();
+                textRange.collapse (false);
+                textRange.pasteHTML (wanderer.outerHTML);
+                wanderer.parentNode.removeChild (wanderer);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div onmouseup="MoveButton ()" style="width:400px; background-color:#e0f0d0;">
+        Select some text with your mouse within this field.
+        When the left button is released the wanderer button is placed 
+        at the ending of the selection.
+        Left mouse clicks also move the wanderer button in Internet Explorer, Firefox, Google Chrome and Safari.
+    </div>
+    <button id="wanderer">wanderer</button>
+</body>

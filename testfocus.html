@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<html>  
+<head>  
+<title>文本被选中</title>  
+<meta charset="utf-8">
+<script type="text/javascript">  
+</script>  
+</head>  
+<body>  
+    <input id="abc" name="yourForm" rows=3 cols=40 value=" codefans.net 提示：这里是测试文本."/>
+</body>
+<script>
+    selectalldiff('abc');
+function selectalleasy() {
+    var obj = document.getelementbyid('abc');
+    obj.onselect = function () {
+        this.value="selected"
+    }
+    obj.focus();
+    obj.select();
+} 
+function selectalldiff(name) {
+    var target = document.getElementById(name);
+    if (target.createTextRange) {
+        var range = target.createTextRange();
+        range.moveStart('character', 0);
+        range.select();
+    } else if(target.setSelectionRange) {
+        console.log('selectionrange');
+        target.setSelectionRange(0); 
+    } else if (target.selectionStart) {
+        console.log('selectionstart');
+        target.selectionStart = 0;
+    } 
+} 
+function selectitem1(){  
+  var mydiv = document.getelementbyid("mydiv");  
+  var range= document.body.createtextrange();     
+  range.movetoelementtext(mydiv)     
+  range.moveend('character',-1);    
+  range.movestart('character',-1);       
+  range.select();     
+}  
+  
+function selectItem2(self){ 
+    var obj = document.getElementsByName("textRange")[0];     
+    try {
+        var range = obj.createTextRange()     
+        range.moveStart("character",0);     
+        range.select();         
+    } catch (e) {
+        obj.select();
+    } 
+}
+</script>  
+</html> 
