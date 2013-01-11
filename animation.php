@@ -98,8 +98,11 @@ function ImageCode($string = '', $width = 75, $height = 25)
 	}
 	
 	$gif = new GIFEncoder($imagedata);  
-	Header ('Content-type:image/gif');  
-	echo $gif->GetAnimation();  
+	Header ('Content-type: image/gif');  
+	Header ('Cache-Control: max-age=0'); 
+    $ExpStr = "Last-Modified: Fri, 09 Nov 2012 03:48:40 GMT";
+    header($ExpStr);
+	echo $gif->GetAnimation();
 }
 
 

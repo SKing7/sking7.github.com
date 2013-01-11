@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="yui/build/yui/yui-min.js"></script>
+    <style>
+        body { color:#333;  font: 14px 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif; }
+        .mainbox { width:400px; margin:150px auto; border:10px solid #E4F7F5; border-radius:4px;  padding:25px 30px 30px; background:#FFF; } 
+        * { padding:0; margin:0; }
+    </style>
+    </head>
+    <body>
+        <div class="mainbox">
+            <form id="a" method="post" action="template.html">
+                <input type="text" id="i"/>
+               <button type="submit">提交</button> 
+            </form>
+            <script type="text/javascript" charset="utf-8">
+                YUI().use('yui', 'node', 'event', 'io-base',  'json', function(Y) {
+                    window.Y = Y;
+                    Y.one('#i').on('keydown', function(e) {
+                        alert(1);
+                        e.halt();
+
+                    });   
+                   } 
+                );
+            </script>
+        </div>
+    </body>
+</html>
