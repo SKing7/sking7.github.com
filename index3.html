@@ -6,15 +6,16 @@
 
     <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
     <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-         <script>
+         <script id="a">
                (function() {
                    var ga = document.createElement('script'); ga.type = 'text/javascript'; //ga.async = true;
                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
                    console.log(document.getElementsByTagName('script'));
+                   console.log(document.getElementsByTagName('script')[0]);
                })();
          </script>
-    <script type="text/javascript">
+    <script type="text/javascript" id="b">
         var pageTracker = _gat._getTracker('UA-34802167-1');
         pageTracker._setDomainName('github.com');
         pageTracker._trackPageview();
