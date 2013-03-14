@@ -28,17 +28,17 @@
                     return xhr;
                 })();
                 var url = 'http://www.lzmt.dev.sankuai.com/cors.php';
-                log(xhr || '不支持');
+                log2(xhr);
                 if (xhr) {
                     xhr.open('get', url, true);
                     xhr.onreadystatechange = function () {
-                        log(xhr.readyState); 
-                        log(xhr.status); 
-                        log(xhr.responseText); 
+                        log2(xhr.readyState); 
+                        log2(xhr.status); 
+                        log2(xhr.responseText); 
                     };
                     xhr.send();
                 }
-                function log(text) {
+                function log2(text) {
                     alert(text);
                 }
             }
