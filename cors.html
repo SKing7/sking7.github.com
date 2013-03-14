@@ -23,7 +23,7 @@
                 log(xhr);
                 if (xhr) {
                     xhr.open('get', url, true);
-                    xhr.onreadystatechage = function () {
+                    xhr.onreadystatechange = function () {
                         log(xhr.readyState); 
                         log(xhr.status); 
                         log(xhr.responseText); 
