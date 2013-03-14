@@ -10,19 +10,18 @@
            var ga = document.createElement('script'); ga.type = 'text/javascript'; //ga.async = true;
            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
            ga.src = 'test.js';
+           console.log('inserted');
      </script>
-    <script type="text/javascript" id="b">
-       alert(test);//test.js里的一个变量
-        var pageTracker = _gat._getTracker('UA-34802167-1');
-        pageTracker._setDomainName('github.com');
-        pageTracker._trackPageview();
-    </script>
     <title>Sking7.github.com</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
     <script type="text/javascript" id="b">
+       window.setTimeout(function () {
+           console.log('timeout');
+           console.log(test);
+        }, 2000)
     </script>
   <div class="wrapper">
     <header>

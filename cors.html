@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <script src="yui/build/yui/yui-min.js"></script>
+    <link type="text/css" rel="stylesheet" href="../css/main.css" media="all" />
+    <title></title>
+    <style>
+        body { color:#333;  font: 14px 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif; }
+        .mainbox { width:400px; margin:150px auto; border:10px solid #E4F7F5; border-radius:4px;  padding:25px 30px 30px; background:#FFF; } 
+        * { padding:0; margin:0; }
+    </style>
+    </head>
+    <body>
+        <div class="mainbox">
+            <input type="text" id="i"/>
+            <div class="log">
+            </div>
+        <script>
+            YUI().use('yui', 'node', function(Y) {
+                var xhr = new XMLHttpRequest();
+                var url = 'http://www.lzmt.dev.sankuai.com/cors.php';
+                log(xhr);
+                if (xhr) {
+                    xhr.open('get', url, true);
+                    xhr.onreadystatechage = function () {
+                        log(xhr.readyState); 
+                        log(xhr.status); 
+                        log(xhr.responseText); 
+                    };
+                    xhr.send();
+                }
+                function log(text) {
+                    Y.one('.log').appendChild('<p>' + text + '</p>');
+                }
+            }
+        );
+        </script>
+    </body>
+</html>
