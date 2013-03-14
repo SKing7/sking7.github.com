@@ -19,8 +19,10 @@
         <script>
             YUI().use('yui', 'node', function(Y) {
                 var xhr = (function () {
-                    var xhr = new XMLHttpRequest();
-                    if (!xhr) {
+                    var xhr;
+                    try {
+                        xhr = new XMLHttpRequest();
+                    } catch () {
                         xhr = new ActiveXObject("Microsoft.XMLHTTP");
                     }
                     return xhr;
