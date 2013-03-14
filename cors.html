@@ -18,9 +18,15 @@
             </div>
         <script>
             YUI().use('yui', 'node', function(Y) {
-                var xhr = new XMLHttpRequest();
+                var xhr = function () {
+                    var xhr = new XMLHttpRequest();
+                    if (!xhr) {
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    return xhr;
+                }
                 var url = 'http://www.lzmt.dev.sankuai.com/cors.php';
-                log(xhr);
+                log(xhr || '不支持');
                 if (xhr) {
                     xhr.open('get', url, true);
                     xhr.onreadystatechange = function () {
