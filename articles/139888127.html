@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Tutorial: Making annoying rainbows and other color cycles in Javascript</title>
+<meta name="description" content="Javascript Tutorial by KrazyDad">
+<meta name="keywords" content="color,colour,rgb,pastels,convert,color cycles,rainbows,games,colors,javascript,tutorials,sine waves,trig,fun,annoyings">
+<link rel=stylesheet type="text/css" href="/wbase_sm2.css">
+<style>
+pre { font-size:12px; background-color: #EEE; }
+</style>
+<script language="JavaScript">
+<!--
+
+function RGB2Color(r,g,b)
+{
+  return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+}
+
+function byte2Hex(n)
+{
+  var nybHexString = "0123456789ABCDEF";
+  return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+}
+
+
+function roundDecimal(v,n)
+{
+  var isNeg = v < 0;
+  v = Math.abs(v);
+
+  return (isNeg? '-' : '') + String(Math.floor(v)) + '.' + String((1 + Math.abs(v) - Math.floor(Math.abs(v)))*Math.pow(10,n)).substr(1,n);
+}
+
+function colorText(str,phase)
+{
+  if (phase == undefined)
+    phase = 0;
+  center = 128;
+  width = 127;
+  frequency = Math.PI*2/str.length;
+  for (var i = 0; i < str.length; ++i)
+  {
+     red   = Math.sin(frequency*i+2+phase) * width + center;
+     green = Math.sin(frequency*i+0+phase) * width + center;
+     blue  = Math.sin(frequency*i+4+phase) * width + center;
+     document.write( '<font color="' + RGB2Color(red,green,blue) + '">' + str.substr(i,1) + '</font>');
+  }
+}
+
+function makeColorGradient(frequency1, frequency2, frequency3, phase1,phase2,phase3,center,width,len)
+{
+  if (len == undefined)
+    len = 50;
+  if (center == undefined)
+    center = 128;
+  if (width == undefined)
+    width = 127;
+  for (var i = 0; i < len; ++i)
+  {
+     var red = Math.sin(frequency1*i + phase1) * width + center;
+     var grn = Math.sin(frequency2*i + phase2) * width + center;
+     var blu = Math.sin(frequency3*i + phase3) * width + center;
+     document.write( '<font color="' + RGB2Color(red,grn,blu) + '">&#9608;</font>');
+  }
+}
+
+
+// -->
+</script>
+
+</head>
+<body BGCOLOR=white TEXT=black>
+
+<script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-605293-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<div class="outer" align=center>
+<div class="inner">
+<div class="adbar">
+<script type="text/javascript"><!--
+google_ad_client = "pub-1449267043676994";
+//728x90 Puzzle Banners
+google_ad_slot = "6905239361";
+google_ad_width = 728;
+google_ad_height = 90;
+//--></script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div> <!-- adbar -->
+<div >
+<table cellpadding=0 cellspacing=0 border=0 width="100%">
+<tr>
+<td width=549 align=center height=122><a href="/" title="Creator of software toys of wondrous delight."><img src="/img/kz_whitelogo_wood2.jpg" width=549 height=122 border=0 style="position:relative; left:-12px;"></a>
+</td>
+<td width="100%" align=right valign=top style="position:relative; left:-9px;">
+  <table cellpadding=0 cellspacing=0 border=0>
+  <tr><td><img src="/img/dot.gif" width=1 height=8 alt="" />
+  </td></tr>
+  <tr><td align="right">
+  <font size="3">
+  <br/>
+  <a class="outer" href="/blog/" title="Current Events in the land of KrazyDad">Blog</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="outer" href="/pubs/" title="Books, papers and more...">Publications</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="outer" href="/" title="Free Printable Puzzles">Puzzles</a><br />
+  <a class="outer" href="/fungames.php" title="Games and Software Toys">Fun &amp; Games</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="outer" href="/about.php" title="Learn all about me, you curious person.">About</a><br/>
+
+  

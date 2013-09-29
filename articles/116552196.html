@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>
+		  Pushing and Popping with the History API | HTML5 Doctor    </title>
+    <link rel="stylesheet" href="http://html5doctor.com/wp-content/themes/html5doctor2/style.css" media="screen" />
+    <!--[if IE]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+<link rel="alternate" type="application/rss+xml" title="HTML5 Doctor &raquo; Feed" href="http://html5doctor.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="HTML5 Doctor &raquo; Comments Feed" href="http://html5doctor.com/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="HTML5 Doctor &raquo; Pushing and Popping with the History API Comments Feed" href="http://html5doctor.com/history-api/feed/" />
+<link rel='stylesheet' id='contact-form-7-css'  href='http://html5doctor.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=3.5.2' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-pagenavi-css'  href='http://html5doctor.com/wp-content/plugins/wp-pagenavi/pagenavi-css.css?ver=2.70' type='text/css' media='all' />
+<script type='text/javascript' src='http://html5doctor.com/wp-includes/js/jquery/jquery.js?ver=1.10.2'></script>
+<script type='text/javascript' src='http://html5doctor.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://html5doctor.com/xmlrpc.php?rsd" />
+<link rel='prev' title='Goodbye time, datetime, and pubdate. Hello data and value.' href='http://html5doctor.com/time-and-data-element/' />
+<link rel='next' title='Video Subtitling and WebVTT' href='http://html5doctor.com/video-subtitling-and-webvtt/' />
+<link rel='canonical' href='http://html5doctor.com/history-api/' />
+<link rel='shortlink' href='http://html5doctor.com/?p=3897' />
+	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+
+	  
+  
+	</head>
+<body class="single single-post postid-3897 single-format-standard" id="com-html5doctor">
+<header role="banner">
+    <div class="inner group">
+    <a href="http://html5doctor.com" rel="home"><div>
+        <hgroup>
+        <h1>HTML5 Doctor</h1>
+        <h2>Helping you implement HTML5 today</h2>
+        </hgroup><!-- end hgroup -->
+    </div></a><!-- wrapper div for Firefox 3.x ref: http://01i.jp/html5bll -->
+
+ 	<ul id="menu-top-nav" class="semantic-list"><li id="menu-item-3272" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3272"><a href="http://html5doctor.com/about/">About</a></li>
+<li id="menu-item-3275" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3275"><a href="http://feeds2.feedburner.com/html5doctor">RSS</a></li>
+<li id="menu-item-3276" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3276"><a href="http://feeds.feedburner.com/HTML5DoctorComments">Comments RSS</a></li>
+<li id="menu-item-3253" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3253"><a href="#">Doctor Network</a>
+<ul class="sub-menu">
+	<li id="menu-item-3273" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3273"><a href="http://html5gallery.com">HTML5 Gallery</a></li>
+	<li id="menu-item-3580" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3580"><a href="http://docteurhtml5.com/html5/">Docteur HTML5</a></li>
+	<li id="menu-item-3973" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3973"><a href="https://github.com/html5doctor/">HTML5 Doctor on Github</a></li>
+</ul>
+</li>
+</ul>      <!-- end #top-nav -->
+    
+    <nav>
+		<ul id="menu-main_nav" class=""><li id="menu-item-3297" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3297"><a href="/">Home</a></li>
+<li id="menu-item-3250" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3250"><a href="http://html5doctor.com/article-archive/">Article Archive</a></li>
+<li id="menu-item-3291" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3291"><a href="http://html5doctor.com/element-index/">Element Index</a></li>
+<li id="menu-item-3252" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3252"><a href="http://html5doctor.com/ask-the-doctor/">Ask the HTML5 Doctor</a></li>
+<li id="menu-item-3968" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3968"><a href="http://html5doctor.com/resources/">Resources</a></li>
+</ul>    	<!-- end ul -->
+    	<ul>
+    		<li><form id="search-form" action="/search/" role="search"  method="get">
+    <div>
+    <input type="text" name="q" value="" />
+    <input type="submit" id="search-button" value="Search" />
+    </div>
+</form>
+</li>
+    	</ul>
+    	<!-- end ul -->	
+    </nav>
+    <!-- end nav -->
+	</div>
+	<!-- end .inner -->
+</header>
+<!-- end header -->
+<main id="content" class="group" role="main">
+    <div class="main">
+        <article class="post group">
+            <header class="post-3897 post type-post status-publish format-standard hentry category-javascript-apis tag-api tag-history tag-html-5 tag-html5" id="post-3897">
+                 <h1>Pushing and Popping with the History API </h1>
+                <small><time datetime="2011-11-15" pubdate>Tuesday, November 15th, 2011</time> by <a href="http://html5doctor.com/author/miker/" title="Posts by Mike Robinson" rel="author">Mike Robinson</a>.</small>
+                <p class="tweet"><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="html5doctor">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></p>
+            </header>
+            <!-- end header -->
+             <ul class="commentlist">
+                        </ul>
+           
+            <div class="entry">
+
+		
+                <p>Until recently, we developers couldn’t to do much with the state and history of the browser. We could check the number of items in the history and push users forwards and backwards, but this provides little benefit to the user. With the rise of more dynamic web pages, we need more control. Thankfully, HTML5 gives us that control by extending the JavaScript History API.</p>
+<section id="the-point">
+<h2>What’s the point? <a class="permalink" href="#the-point">#</a></h2>
+<p>It goes without saying that URLs are important. They’re <em>the</em> method of accessing the vast collections of information and resources on the web, and more recently, they’ve begun representing the intended state of a web application. You can copy these URLs and share them with your friends or use them to create links from any HTML document. They’re the veins of the web, and they need to be looked after.</p>
+<p>Previously, the JavaScript History API offered some very simple functionality:</p>
+<pre><code>// Check the length of the history stack
+console.log(history.length);
+
+// Send the user agent forward
+console.log(history.forward());
+
+// Send the user agent back
+console.log(history.back());
+
+// Send the user agent back (negative) or forward (positive)
+// by a given number of items
+console.log(history.go(-3));
+</code></pre>
+<p>With dynamic Ajax web applications, where the browser updates the page in parts instead of changing location entirely, it’s difficult to give the user a URL to bookmark or share the current application state. <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/elements.html#the-id-attribute">Fragment identifiers</a>, like those used on this article’s headings via the <code>id</code> attribute, provide some state information, but they’re entirely dependent on client-side scripts.</p>
+<p>The changes to the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/history.html">History API</a> are intended to give developers ways to push history items to the browser so the native back and forward actions can cycle through those items. These history items can also hold data that you can later extract to restore the page state.</p>
+<blockquote>
+<p>Pages can <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/history.html#dom-history-pushstate" title="dom-history-pushState">add</a> <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/history.html#state-object" title="state object">state objects</a> between their entry in the session history and the next (“forward”) entry. These are then <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/history.html#event-popstate" title="event-popstate">returned to the script</a> when the user (or script) goes back in the history, thus enabling authors to use the “navigation” metaphor even in one-page applications.</p>
+<footer>- <cite><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/history.html" title="6.4 Session history and navigation">WHATWG</a></cite></footer>
+</blockquote>
+<p>If the user copies or bookmarks a stateful URL and visits it later, your back-end can be configured to interpret such a URL and jump the user right to the correct page and/or state.</p>
+<p>In this article, I’ll cover the client-side use of the History API, so make sure you set up your server to work with the new URLs. If you’ve already built an accessible website that provide these entry points, you’re laughing!</p>
+<section id="those-fking-hashbangs">
+<h4>Those <em>f#!king</em> hashbangs… <a class="permalink" href="#those-fking-hashbangs">#</a></h4>
+<p>You may have already seen articles fussing over the adoption of the “hashbang” (#!) pattern on sites like <a href="http://twitter.com">Twitter</a>. This technique updates the address bar with a fragment identifier that can then be used by JavaScript to determine which page and state should be displayed.</p>
+<p>This works as a method of creating a bookmarkable, shareable URL for a page’s state in the absense of a standard API. While the Twitter implementation accepts both <code>http://twitter.com/#!/akamike</code> and <code>http://twitter.com/akamike</code>, it has some disadvantages:</p>
+<ul>
+<li>The fragment identifier is only accessible on the client side. This means that only JavaScript can utilise it, so browsers without JavaScript enabled are out of luck.</li>
+<li>As the server does not receive the path following the hashbang, removing that JavaScript drops support for all those URLs. That’s a lot of broken links, so you’re stuck with that JavaScript <em>forever</em>.</li>
+<li>It’s ugly. It’s a hack and it looks like one.</li>
+</ul>
+<p>The hashbang was never intended to be a long-term solution, so don’t rely on it. If you do use hashbangs, be prepared to deal with the consequences (and possible backlash from web purists).</p>
+</section>
+</section>
+<section id="making-history">
+<h2>Making History <a class="permalink" href="#making-history">#</a></h2>
+<p>These examples will build on top of each other. We’ll start with a <a href="http://html5doctor.com/wp-content/uploads/2011/10/history_base.html">basic HTML document</a> with some inline styles and scripts for your convenience.</p>
+<aside class="sidenote">
+<p>For a simple HTTP server, open the command line, <code>cd</code> to the directory you would like to serve, run <code>python -m SimpleHTTPServer 8080</code>, then open <code>localhost:8080</code> in your browser. Alternatively, try a bundled setup like <a href="http://www.apachefriends.org/en/xampp.html">XAMPP</a> or <a href="http://www.mamp.info/en/index.html">MAMP</a>.</p>
+</aside>
+<p>Save this file and open it in your favourite editor. It must be accessed via HTTP, so that means you need either a local server (e.g. <code>http://localhost/</code>) or an online web server you can upload to. <strong>Viewing the file directly using your browser’s Open File function will not work</strong>, since it uses the <code>file://</code> protocol and not HTTP. Also be sure to update the <code>href</code> attributes on each of the navigation links to ensure the correct directory structure is used. Personally, I’m viewing the demo locally at <code>http://localhost/history</code>.</p>
+<p>We’ll be working exclusively within the <code>&lt;script&gt;</code> element at the end of the <code>&lt;body&gt;</code>. The code includes some simple styles and dynamically changes the content as you click the links. In reality, this could be loaded from your server via <code>XMLHttpRequest</code>, but for the purposes of this demonstration I’ve bundled it up into a self-contained file. The important part is that we have a quick-and-dirty dynamic page to work with, so let the fun begin!</p>
+<p>At the moment there, is no bookmarkable URL for the different states of this page. If you click around the navigation items, then click Back in your browser, you won’t be taken back to the previous state and may even be taken away from the page to whatever you viewed before (depending on your browser). It would be nice if you could share “Socks” with your friends, right? We can do that via <code>history.pushState()</code>.</p>
+<p>The <code>history.pushState()</code> method takes three parameters:</p>
+<dl>
+<dt><code>data</code></dt>
+<dd>Some structured data, such as settings or content, assigned to the history item.</dd>
+<dt><code>title</code></dt>
+<dd>The name of the item in the history drop-down shown by the browser’s back and forward buttons. (Note: this is not currently supported by any major browsers.)</dd>
+<dt><code>url</code> <em>(optional)</em></dt>
+<dd>The URL to this state that should be displayed in the address bar.</dd>
+</dl>
+<p>With these parameters, you can define the state of the page, give that state a name, and even provide a bookmarkable address, as if the page had reloaded entirely. Let’s dive right in and add this to the <code>clickHandler</code> function, right above the <code>return</code> statement:</p>
+<figure>
+<pre><code>function clickHandler(e) {
+  /* Snip... */
+
+  // Add an item to the history log
+  history.pushState(data, event.target.textContent, event.target.href);
+
+  return event.preventDefault();
+}
+</code></pre>
+</figure>
+<p>The single line of code we added informs the <code>history</code> object that:</p>
+<ul>
+<li>we want to add an item to the log,</li>
+<li>it should remember the data that we’ve already loaded,</li>
+<li>it should assign a name to this state based on the text of the link we clicked (even though this isn’t used — it’s good to get into the habit of recording a name for the state), and</li>
+<li>it should update the address bar with the <code>href</code> attribute of that link.</li>
+</ul>
+<p>Reload the page in your browser and click a few of the links, keeping an eye on the address bar. Notice how it changes on each click, despite the fact that you aren’t actually navigating away from this page. If you also have a look at your history log, you’ll see a long list of page titles (in this case ”Kittens!” over and over). Provided your server is set up to serve the correct page upon access, the user could copy that URL and paste it into a new browser window to jump straight to that kitten.</p>
+<p>At the moment, clicking the back button will pop you through the history items, but the page won’t react to these changes. That&#8217;s because so far, we’ve only created the history records. How can we allow active users to return to a previous state? We listen to the <code>popstate</code> event.</p>
+</section>
+<section id="historical-events">
+<h2>Historical Events in Navigation <a class="permalink" href="#historical-events">#</a></h2>
+<p>The user agent fires a <code>popstate</code> event when the user navigates through their history, whether backwards or forwards, provided it isn’t taking the user away from the current page. That is, all those <code>pushState</code>s we called will keep the user on the current page, so the <code>popstate</code> event will fire for each history item they pop through.</p>
+<p>Before the closing <code>&lt;/script&gt;</code> tag, add a new listener for the <code>popstate</code> event:</p>
+<figure>
+<pre><code>// Revert to a previously saved state
+window.addEventListener('popstate', 

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>Managing Responsive Breakpoints in Javascript - Jonathan Fielding</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="http://www.jonathanfielding.com/wp-content/themes/main_bs/style.css"/>
+        <link rel="stylesheet" href="http://www.jonathanfielding.com/wp-content/themes/main_bs/print.css" media="print"/>
+        <script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/modernizr.min.js"></script>
+		
+        <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://www.jonathanfielding.com/feed/" />
+		<link rel="alternate" type="text/xml" title="RSS .92" href="http://www.jonathanfielding.com/feed/" />
+		<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="http://www.jonathanfielding.com/feed/atom/" />
+
+		
+<!-- This site is optimized with the Yoast WordPress SEO plugin v1.4.13 - http://yoast.com/wordpress/seo/ -->
+<link rel="canonical" href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" />
+<meta property='og:locale' content='en_US'/>
+<meta property='og:type' content='article'/>
+<meta property='og:title' content='Managing Responsive Breakpoints in Javascript - Jonathan Fielding'/>
+<meta property='og:description' content='Responsive design is increasingly popular with separate mobile/desktop sites being replaced by a hybrid approach where websites are able to respond to the users needs. In responsive design, media queries are used  to allow sites to change the appearance of the page  based on the browser thing like browser width and browser height. To enable support [&hellip;]'/>
+<meta property='og:url' content='http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/'/>
+<meta property='og:site_name' content='Jonathan Fielding'/>
+<meta property='fb:admins' content='557586115'/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:site" content="@jonthanfielding"/>
+<meta name="twitter:domain" content="Jonathan Fielding"/>
+<meta name="twitter:creator" content="@jonthanfielding"/>
+<meta name="twitter:image:src" content=""/>
+<!-- / Yoast WordPress SEO plugin. -->
+
+<link rel="alternate" type="application/rss+xml" title="Jonathan Fielding &raquo; Managing Responsive Design Breakpoints in Javascript Comments Feed" href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/feed/" />
+<script type='text/javascript' src='http://www.jonathanfielding.com/wp-includes/js/jquery/jquery.js?ver=1.10.2'></script>
+<script type='text/javascript' src='http://www.jonathanfielding.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type='text/javascript' src='http://www.jonathanfielding.com/wp-content/plugins/google-analyticator/external-tracking.min.js?ver=6.4.5'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.jonathanfielding.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.jonathanfielding.com/wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress 3.6" />
+<link rel='shortlink' href='http://www.jonathanfielding.com/?p=668' />
+<!-- Google Analytics Tracking by Google Analyticator 6.4.5: http://www.videousermanuals.com/google-analyticator/ -->
+<script type="text/javascript">
+	var analyticsFileTypes = [''];
+	var analyticsEventTracking = 'enabled';
+</script>
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-21770282-1']);
+        _gaq.push(['_addDevId', 'i9k95']); // Google Analyticator App ID with Google 
+        
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+    </head>
+    <body>
+    	<div id="fb-root"></div>
+		<script>(function(d, s, id) {
+		  var js, fjs = d.getElementsByTagName(s)[0];
+		  if (d.getElementById(id)) return;
+		  js = d.createElement(s); js.id = id;
+		  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=156135717777189";
+		  fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));</script>
+	
+    	<header class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+					<a class="brand" href="http://www.jonathanfielding.com">Jonathan Fielding</a>
+					<div class="nav-collapse collapse">
+						<ul id="menu-main-menu" class="nav"><li id="menu-item-504" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-504"><a href="http://www.jonathanfielding.com/portfolio/">Portfolio</a></li>
+<li id="menu-item-506" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-506"><a href="http://www.jonathanfielding.com/contact/">Contact</a></li>
+</ul>
+			            <form action="http://www.jonathanfielding.com/" method="get" class="navbar-form pull-right">
+						    <fieldset>
+								<div class="clearfix">
+									<div>
+										<input type="text" name="s" id="search" placeholder="Search" value="" /> 
+										<button type="submit" class="btn">Search</button>
+									</div>
+						        </div>
+						    </fieldset>
+						</form>
+					</div>
+
+				</div>
+			</div>
+		</header>
+
+		<section class="hoverbar">
+			<div class="container">
+				<div class="row">
+					<div class="span6">
+						<h2>Open Source</h2>
+						<p>I love the spirit of the open source community, without it the web wouldnt be where it is today. My love for open source has led me to develop several of my own open source projects in both javascript and PHP.</p>
+						<ul>
+							<li><a href="https://github.com/jonathan-fielding/jQuery-Hover-Panels">Hover Panels</a></li>
+							<li><a href="https://github.com/jonathan-fielding/jquery-focusgroups">jQuery Focus Groups</a></li>
+							<li><a href="https://github.com/jonathan-fielding/X-Carousel">jQuery X-Carousel</a></li>
+						</ul>
+					</div>
+					<div class="span6">
+						<h2>Portfolio</h2>
+						<p>Through both my professional career and personal endevours I have built many websites. My portfolio consists of my work that I am most proud of including BT global services</p>
+						<ul>
+							
+							<li><a href="http://www.jonathanfielding.com/portfolio/flavour-first/">Flavour First</a></li>
+
+							
+							<li><a href="http://www.jonathanfielding.com/portfolio/brandgurus/">BrandGurus</a></li>
+
+							
+							<li><a href="http://www.jonathanfielding.com/portfolio/virgin-active-landing-pages/">Virgin Active Landing Pages</a></li>
+
+							    <script type="text/javascript">
+    // <![CDATA[
+        var disqus_shortname = 'jonathanfieldingsblog';
+        (function () {
+            var nodes = document.getElementsByTagName('span');
+            for (var i = 0, url; i < nodes.length; i++) {
+                if (nodes[i].className.indexOf('dsq-postid') != -1) {
+                    nodes[i].parentNode.setAttribute('data-disqus-identifier', nodes[i].getAttribute('rel'));
+                    url = nodes[i].parentNode.href.split('#', 1);
+                    if (url.length == 1) { url = url[0]; }
+                    else { url = url[1]; }
+                    nodes[i].parentNode.href = url + '#disqus_thread';
+                }
+            }
+            var s = document.cr

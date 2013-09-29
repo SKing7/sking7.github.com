@@ -1,0 +1,366 @@
+<!doctype html> 
+<!--[if IEMobile 7 ]> <html lang="en-US"class="no-js iem7"> <![endif]-->
+<!--[if lt IE 7 ]> <html lang="en-US" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en-US" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en-US" class="no-js ie8"> <![endif]-->
+<!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html lang="en-US" class="no-js"><!--<![endif]-->
+	
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		
+		<title>
+			  Automatic Inlining in JavaScript Engines 
+		</title>
+				
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<!-- icons & favicons -->
+		<!-- For iPhone 4 -->
+		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/h/apple-touch-icon.png">
+		<!-- For iPad 1-->
+		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/m/apple-touch-icon.png">
+		<!-- For iPhone 3G, iPod Touch and Android -->
+		<link rel="apple-touch-icon-precomposed" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/l/apple-touch-icon-precomposed.png">
+		<!-- For Nokia -->
+		<link rel="shortcut icon" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/l/apple-touch-icon.png">
+		<!-- For everything else -->
+		<!-- <link rel="shortcut icon" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/favicon.ico"> -->
+				
+		<!-- media-queries.js (fallback) -->
+		<!--[if lt IE 9]>
+			<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>			
+		<![endif]-->
+
+		<!-- html5.js -->
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		
+  		<link rel="pingback" href="http://ariya.ofilabs.com/xmlrpc.php">
+
+  		<link rel="stylesheet/less" type="text/css" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/less/bootstrap.less">
+  		<link rel="stylesheet/less" type="text/css" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/less/responsive.less">
+
+		<!-- wordpress head functions -->
+		<link rel='stylesheet' id='wp-syntax-css-css'  href='http://ariya.ofilabs.com/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='jetpack-widgets-css'  href='http://ariya.ofilabs.com/wp-content/plugins/jetpack/modules/widgets/widgets.css?ver=20121003' type='text/css' media='all' />
+<link rel='stylesheet' id='bootstrap-css'  href='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/css/bootstrap.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='bootstrap-responsive-css'  href='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/css/responsive.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-bootstrap-css'  href='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/style.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='sharedaddy-css'  href='http://ariya.ofilabs.com/wp-content/plugins/jetpack/modules/sharedaddy/sharing.css?ver=2.5' type='text/css' media='all' />
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/libs/jquery-1.7.1.min.js?ver=1.7.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/bootstrap.min.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/scripts.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/modernizr.full.min.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-includes/js/comment-reply.min.js?ver=3.6.1'></script>
+<link rel='canonical' href='http://ariya.ofilabs.com/2013/04/automatic-inlining-in-javascript-engines.html' />
+<link rel='shortlink' href='http://wp.me/p2lzjD-gX' />
+<link rel="stylesheet" type="text/css" href="http://ariya.ofilabs.com/wp-content/plugins/microkids-related-posts/microkids-related-posts-default.css" />
+<!-- Simple Google Analytics Begin -->
+<script type="text/javascript">
+var _gaq = [['_setAccount','UA-24809129-1'],['_setDomainName','ariya.ofilabs.com'],['_trackPageLoadTime'],['_trackPageview']];(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+<!-- Simple Google Analytics End -->
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Automatic Inlining in JavaScript Engines" />
+<meta property="og:url" content="http://ariya.ofilabs.com/2013/04/automatic-inlining-in-javascript-engines.html" />
+<meta property="og:description" content="Back when JavaScript interpreters were still slow, avoiding a function call inside a performance-critical code was very much recommended. With the recent improvements to the modern JavaScript engin..." />
+<meta property="og:site_name" content="don&#039;t code today what you can&#039;t debug tomorrow" />
+<meta property="og:image" content="http://ariya.ofilabs.com/wp-content/uploads/2013/04/sportcar.png" />
+<meta name="twitter:site" content="@jetpack" />
+<meta name="twitter:image" content="http://ariya.ofilabs.com/wp-content/uploads/2013/04/sportcar.png" />
+<meta name="twitter:card" content="photo" />
+		<link rel="stylesheet" id="custom-css-css" type="text/css" href="http://ariya.ofilabs.com/?custom-css=1&#038;csblog=1&#038;cscache=6&#038;csrev=31" />
+				<!-- end of wordpress head -->
+
+		<!-- theme options from options panel -->
+		<style>
+        h1, h2, h3, h4, h5, h6{ 
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; 
+          font-weight: bold; 
+          color: #404040; 
+        }
+        body{ 
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; 
+          font-weight: normal; 
+          color: #404040; 
+        }
+        .navbar-inner, .navbar .fill { 
+          background-color: #222222;
+        }#222222
+        .navbar-inner, .navbar .fill {
+          background-image: -khtml-gradient(linear, left top, left bottom, from(#222222), to(#333333));
+          background-image: -moz-linear-gradient(top, #222222, #333333);
+          background-image: -ms-linear-gradient(top, #222222, #333333);
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #222222), color-stop(100%, #333333));
+          background-image: -webkit-linear-gradient(top, #222222, #3333332);
+          background-image: -o-linear-gradient(top, #222222, #333333);
+          background-image: linear-gradient(top, #222222, #333333);
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#222222', endColorstr='#3333332', GradientType=0);
+        }
+        .navbar .nav li a { 
+          color: #BFBFBF;
+        }
+        .navbar .nav li a:hover { 
+          color: #FFFFFF;
+        }
+          .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
+            background-color: #0088CC;
+          }
+        
+          .dropdown-menu a{
+            color: #555555 !important;
+          }
+        
+        .hero-unit { 
+          background-color: #F5F5F5;
+        }
+        #main article {
+          border-bottom: none;
+        }h1.h2 {
+letter-spacing: -1px;
+font-weight: normal;
+}
+
+div.postauthor &gt; div {
+padding-right: 25px;
+}
+
+blockquote p {
+font-size: 13px;
+}
+
+h1.singletitle {
+letter-spacing: -1px;
+font-weight: normal;
+}
+
+pre {
+border: none;
+padding: 2px;
+background-color: transparent;
+}
+
+code {
+color: black;
+}
+
+.related-posts {
+margin-top: 20px;
+}
+        </style>
+						
+	</head>
+	
+	<body class="single single-post postid-1051 single-format-standard">
+				
+		<header role="banner">
+		
+			<div id="inner-header" class="clearfix">
+				
+				<div class="navbar navbar-fixed-top">
+					<div class="navbar-inner">
+						<div class="container-fluid nav-container">
+							<nav role="navigation">
+								<a class="brand" id="logo" title="" href="http://ariya.ofilabs.com">don&#039;t code today what you can&#039;t debug tomorrow</a>
+								
+								<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							        <span class="icon-bar"></span>
+							        <span class="icon-bar"></span>
+							        <span class="icon-bar"></span>
+								</a>
+								
+								<div class="nav-collapse">
+									<ul id="menu-nav" class="nav"><li id="menu-item-970" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/about">About</a></li>
+<li id="menu-item-1025" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/highlights">Highlights</a></li>
+<li id="menu-item-972" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/projects">Projects</a></li>
+<li id="menu-item-971" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/talks">Talks</a></li>
+</ul>								</div>
+								
+							</nav>
+							
+														
+						</div>
+					</div>
+				</div>
+			
+			</div> <!-- end #inner-header -->
+		
+		</header> <!-- end header -->
+		
+		<div class="container-fluid">			
+			<div id="content" class="clearfix row-fluid">
+			
+				<div id="main" class="span8 clearfix" role="main">
+
+										
+					<article id="post-1051" class="post-1051 post type-post status-publish format-standard hentry category-uncategorized tag-javascript tag-optimization tag-v8 clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">
+						
+						<header>
+						
+														
+							<div class="page-header"><h1 class="single-title" itemprop="headline">Automatic Inlining in JavaScript Engines</h1></div>
+							
+							<p class="meta"><time datetime="2013-04-11" pubdate>April 11, 2013</time>.</p>
+							<p class="tags"><span class="tags-title">Tags:</span> <a href="http://ariya.ofilabs.com/tag/javascript" rel="tag">javascript</a> <a href="http://ariya.ofilabs.com/tag/optimization" rel="tag">optimization</a> <a href="http://ariya.ofilabs.com/tag/v8" rel="tag">v8</a></p>							
+
+						
+						</header> <!-- end article header -->
+					
+						<section class="post_content clearfix" itemprop="articleBody">
+							<a href="http://openclipart.org/detail/173690/car-sport-automobilis-by-keistutis-173690" rel="attachment wp-att-1052"><img src="http://ariya.ofilabs.com/wp-content/uploads/2013/04/sportcar.png" alt="sportcar" class="alignright size-full wp-image-1052" /></a>
+<p class="lead">Back when JavaScript interpreters were still slow, avoiding a function call inside a performance-critical code was very much recommended. With the recent improvements to the modern JavaScript engines, this practice becomes less relevant. One important feature which reduces the need to worry about function call overhead is <strong>automatic function inlining</strong>.</p>
+<p>Consider the following code:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">function</span> square<span style="color: #009900;">&#40;</span>x<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> x <span style="color: #339933;">*</span> x<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span>
+ 
+<span style="color: #000066; font-weight: bold;">function</span> f<span style="color: #009900;">&#40;</span>x<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  <span style="color: #000066; font-weight: bold;">var</span> sum <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  <span style="color: #000066; font-weight: bold;">for</span> <span style="color: #009900;">&#40;</span><span style="color: #000066; font-weight: bold;">var</span> i <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span> i <span style="color: #339933;">&lt;</span> x<span style="color: #339933;">;</span> i<span style="color: #339933;">++</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+    sum <span style="color: #339933;">+=</span> square<span style="color: #009900;">&#40;</span>i<span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  <span style="color: #009900;">&#125;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> sum<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span></pre></td></tr></table></div>
+
+<p>If <code>x</code> is a large number, invoking <code>f(x)</code> will cause a lot of function call to <code>square</code>. Even if the overhead is small, it can become significant when accumulated over a bazillion calls. This promotes the best practice of avoiding function calls within such a loop.</p>
+<p>Fortunately, a modern JavaScript engine may sense that this part of the code is pretty <strong>hot</strong> (due to the extensive loop) and decide to optimize it. Among many others optimization, a simple thing to do is not to invoke <code>square</code> for every iteration. Since the implementation of that function is rather <em>simple</em> and it does <em>not</em> have any side effects, it is rather easy to inline it automatically. In other words, your code would be executed as if you would have written it this way:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">function</span> f<span style="color: #009900;">&#40;</span>x<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  <span style="color: #000066; font-weight: bold;">var</span> sum <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  <span style="color: #000066; font-weight: bold;">for</span> <span style="color: #009900;">&#40;</span><span style="color: #000066; font-weight: bold;">var</span> i <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span> i <span style="color: #339933;">&lt;</span> x<span style="color: #339933;">;</span> i<span style="color: #339933;">++</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+    sum <span style="color: #339933;">+=</span> i <span style="color: #339933;">*</span> i<span style="color: #339933;">;</span>
+  <span style="color: #009900;">&#125;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> sum<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span></pre></td></tr></table></div>
+
+<p>How can we verify this? Here is one possible approach: by using V8 debugger shell (as <a href="http://floitsch.blogspot.com/2012/03/optimizing-for-v8-inlining.html">described by Florian Loitsch</a>). First, let add some more lines to the original code for the purpose of stressing the execution:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">for</span> <span style="color: #009900;">&#40;</span><span style="color: #000066; font-weight: bold;">var</span> x <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span> x <span style="color: #339933;">&lt;</span> <span style="color: #CC0000;">10000</span><span style="color: #339933;">;</span> <span style="color: #339933;">++</span>x<span style="color: #009900;">&#41;</span> f<span style="color: #009900;">&#40;</span>1e4<span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Now, if you have <a href="https://developers.google.com/v8/build">built V8</a> and get its debugging shell <code>d8</code>, it's a matter of running:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="bash" style="font-family:monospace;">d8 <span style="color: #660033;">--trace-inlining</span> sum.js</pre></td></tr></table></div>
+
+<p>which will give (among other informational messages):</p>
+<pre>Inlined square called from f.</pre>
+<p>indicating that V8 finally decides not to invoke the function too many times and to just inline it.</p>
+<p>If you always worry about manual function inlining, this is a good time to revisit that thought. Simply write the code to be readable even if it means breaking the code into multiple small functions! In many cases, we can trust the modern JavaScript engines to automatically inline those functions.</p>
+<div class="related-posts">
+<div id="related-posts-MRP_all" class="related-posts-type">
+<h4>Related Posts:</h4>
+<ul>
+<li><a href="http://ariya.ofilabs.com/2012/11/optimization-journey-vs-destination.html">Optimization: Journey vs Destination</a></li>
+<li><a href="http://ariya.ofilabs.com/2012/08/determining-objects-in-a-set-examples-in-javascript.html">Determining Objects in a Set: Examples in JavaScript </a></li>
+<li><a href="http://ariya.ofilabs.com/2012/07/lazy-parsing-in-javascript-engines.html">Lazy Parsing in JavaScript Engines</a></li>
+<li><a href="http://ariya.ofilabs.com/2012/02/javascript-object-structure-speed-matters.html">JavaScript object structure: speed matters</a></li>
+</ul></div>
+</div>							
+												
+						</section> <!-- end article section -->
+						
+						<footer>
+			
+														
+						</footer> <!-- end article footer -->
+					
+					</article> <!-- end article -->
+					
+					
+<div id="disqus_thread">
+                    <div id="dsq-content">
+
+
+            <ul id="dsq-comments">
+                    <li class="comment even thread-even depth-1" id="dsq-comment-4036">
+        <div id="dsq-comment-header-4036" class="dsq-comment-header">
+            <cite id="dsq-cite-4036">
+http://www.facebook.com/BikeAnimal                <span id="dsq-author-user-4036">George White</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-4036" class="dsq-comment-body">
+            <div id="dsq-comment-message-4036" class="dsq-comment-message"><p>Nice theory.</p>
+<p>Who can afford to code to recently improved modern JavaScript engines though?</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-2" id="dsq-comment-4039">
+        <div id="dsq-comment-header-4039" class="dsq-comment-header">
+            <cite id="dsq-cite-4039">
+http://ariya.ofilabs.com/                <span id="dsq-author-user-4039">Ariya Hidayat</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-4039" class="dsq-comment-body">
+            <div id="dsq-comment-message-4039" class="dsq-comment-message"><p>The near-future generation.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even depth-2" id="dsq-comment-4046">
+        <div id="dsq-comment-header-4046" class="dsq-comment-header">
+            <cite id="dsq-cite-4046">
+                <span id="dsq-author-user-4046">Niloy Mondal</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-4046" class="dsq-comment-body">
+            <div id="dsq-comment-message-4046" class="dsq-comment-message"><p>NodeJS</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-4038">
+        <div id="dsq-comment-header-4038" class="dsq-comment-header">
+            <cite id="dsq-cite-4038">
+http://twitter.com/gvidon                <span id="dsq-author-user-4038">gvidon</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-4038" class="dsq-comment-body">
+            <div id="dsq-comment-message-4038" class="dsq-comment-message"><p>Don&#8217;t you think that well formated inline code is more readable? Just imagine many small functions and each one need to be examined when you read/debug code. Each one function call is the reference to _somewhere_ in the code base and you have to find this place or open another source file in editor to know what this function do.</p>
+<p>I would create function if only it is used more than once.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-2" id="dsq-comment-4040">
+        <div id="dsq-comment-header-4040" class="dsq-comment-header">
+            <cite id="dsq-cite-4040">
+http://ariya.ofilabs.com/                <span id="dsq-author-user-4040">Ariya Hidayat</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-4040" class="dsq-comment-body">
+            <div id="dsq-comment-message-4040" class="dsq-comment-message"><p>I am not saying you should split everything into small functions, just do it sensibly. But the typical concern &#8216;I don&#8217;t like to refactor this because inlined is faster&#8217; should not be the main showstopping factor.</p>
+<p>There is also lazy parsing (<a href="http://ariya.ofilabs.com/2012/07/lazy-parsing-in-javascript-engines.html" rel="nofollow">http://ariya.ofilabs.com/2012/07/lazy-parsing-in-javascript-engines.html</a>) which means that if a function may or may not be executed, better separate it to reduce the memory usage.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt depth-2" id="dsq-comment-4041">
+        <div id="dsq-comment-header-4041" class="dsq-comment-header">
+            <cite id="dsq-cite-4041">
+http://twitter.com/marcdix                <span id="dsq-author-user-4041">Marc Dix</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-4041" class="dsq-comment-body">
+            <div id="dsq-comment-message-4041" class="dsq-comment-message"><p>Hi gvidon,</p>
+<p>no it&#8217;s not. </p>
+<p>First of all: it&#8217;s too much detail. It&#8217;s totally sufficient to know that something happens, most of the time it&#8217;s not from interest how it happens.</p>
+<p>Example from a html5 video api project:<br />
+mmhtml5.player.prototype.updateTime = function() {<br />
+ var formattedTime = this._formatTime();<br />
+ this.controls.find(&#8216;.time&#8217;).html(formattedTime);<br />
+}</p>
+<p>I absolutely don&#8217;t care how the time is formatted. I just know, by reading the function name, that this function updates the time with a formatted time. If I want to know what it does in detail (e. g. if I have to improve the formatting) I just trust my IDE and use &#8216;go to declaration&#8217; and check the method. I don&#8217;t care where the function is / search for it. (Of course I literally care, where it is defined &#8211; nice OOP encapsulation is mandatory.)</p>
+<p>Also: The smaller a function is, the more likely you&#8217;ll be able to reuse it later. These moments when you say &#8216;oh, ok, to get this done I got to calculate the oh wait, I did that already, lets plug it in here&#8230; oh, it works&#8230; *backslapping* now for some coffee, what a hard job&#8230; <img src='http://ariya.ofilabs.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' class='wp-smiley' /> &#8217;.</p>
+<p>When using small functions you can also avoid comments by using a descriptive function name that basically consists of the comment.</p>
+<p>I&#8217;d suggest you read clean code (uncle bob), refactoring (martin fowler) and working effectively with legacy code (uncle bob). Those books are awesome and they&#8217;ll help you becoming a much better programmer / improve the quality of your code. I bet you&#8217;ll use small functions after reading at least one of them. <img src='http://ariya.ofilabs.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' class='wp-smiley' /

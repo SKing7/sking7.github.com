@@ -1,0 +1,54 @@
+<!doctype html>
+<!--[if lt IE 7]><html lang="zh-CN" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html lang="zh-CN" class="no-js lt-ie9 lt-ie8"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html lang="zh-CN" class="no-js lt-ie9"><![endif]-->
+<!--[if gt IE 8]><!--> <html lang="zh-CN" class="no-js"><!--<![endif]-->
+<!-- 
+主题地址: http://luolei.org/2013/05/will-box-one-theme/
+作者 will Luo  （ http://luolei.org )
+新浪微博@罗罗磊磊 http://weibo.co/foru17  
+twitter @foru17 https://twitter.com/foru17
+ -->
+<head>
+<meta charset="utf-8">
+<!-- Google Chrome Frame for IE -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript">var NREUMQ=NREUMQ||[];NREUMQ.push(["mark","firstbyte",new Date().getTime()]);</script><title>  Git log diff config高级进阶</title>
+<!-- 预加载优化 HTML5 参考( http://www.mhtml5.com/2011/11/3335.html ) -->
+<link rel="prefetch" href="http://luolei.org">
+<link rel="prerender" href="http://luolei.org">
+<!--关键字优化设置 后台定制功能 可以在管理页面设置 请及时修改 利于SEO -->
+<meta name="keywords" content="git, 教程" />
+<meta name="description" content="前一段时间分享了一篇《更好的 git log》简要介绍怎么美化 git log 命令，其中提到了 alias命令，今天再继续谈谈 git相关， 看看如何通过配置自己的 git config 让自己的 gi" />
+<!-- mobile meta  -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- 图标icons & favicons (参考: http://www.jonathantneal.com/blog/understand-the-favicon/) -->
+<link rel="apple-touch-icon" href="http://luolei.org/wp-content/themes/will-box/library/images/apple-icon-touch.png">
+<link rel="icon" href="http://luolei.org/wp-content/themes/will-box/favicon.png">
+<!-- Google plus连接添加，谷歌搜索显示博主头像 -->
+<link rel="author" href="https://plus.google.com/105790146178074084423/">
+<!--[if IE]>
+<link rel="shortcut icon" href="http://luolei.org/wp-content/themes/will-box/favicon.ico">
+<![endif]-->
+<!-- or, set /favicon.ico for IE10 win -->
+<meta name="msapplication-TileColor" content="#f01d4f">
+<meta name="msapplication-TileImage" content="http://luolei.org/wp-content/themes/will-box/library/images/win8-tile-icon.png">
+<link rel="pingback" href="http://luolei.org/xmlrpc.php">
+<!-- wordpress head functions -->
+<link rel="alternate" type="application/rss+xml" title="罗磊的独立博客 &raquo; Feed" href="http://luolei.org/feed/" />
+<link rel="alternate" type="application/rss+xml" title="罗磊的独立博客 &raquo; 评论Feed" href="http://luolei.org/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="罗磊的独立博客 &raquo; Git log diff config高级进阶评论Feed" href="http://luolei.org/2013/09/git-config-advanced/feed/" />
+<link rel='stylesheet' id='wp-syntax-css-css'  href='http://luolei.org/wp-content/plugins/wp-syntax/css/wp-syntax.css' type='text/css' media='all' />
+<link rel='stylesheet' id='bones-stylesheet-css'  href='http://luolei.org/wp-content/themes/will-box/library/css/style.css' type='text/css' media='all' />
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='bones-ie-only-css'  href='http://luolei.org/wp-content/themes/will-box/library/css/ie.css' type='text/css' media='all' />
+<![endif]-->
+<script type="text/javascript">
+var duoshuoQuery = {"short_name":"luolei","sso":{"login":"http:\/\/luolei.org\/wp-login.php?action=duoshuo_login","logout":"http:\/\/luolei.org\/wp-login.php?action=logout&_wpnonce=26f441c607"},"theme":"default","stylePatch":"wordpress\/Will-Box-One"};
+duoshuoQuery.sso.login += '&redirect_to=' + encodeURIComponent(window.location.href);
+duoshuoQuery.sso.logout += '&redirect_to=' + encodeURIComponent(window.location.href);
+</script>
+<script type="text/javascript" src="http://static.duoshuo.com/embed.js" charset="UTF-8" async="async"></script>
+<script type='text/javascript' src='http://luolei.org/wp-includes/js/comment-reply.mi

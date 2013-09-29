@@ -1,0 +1,478 @@
+<!doctype html> 
+<!--[if IEMobile 7 ]> <html lang="en-US"class="no-js iem7"> <![endif]-->
+<!--[if lt IE 7 ]> <html lang="en-US" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en-US" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en-US" class="no-js ie8"> <![endif]-->
+<!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html lang="en-US" class="no-js"><!--<![endif]-->
+	
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		
+		<title>
+			  Lazy Parsing in JavaScript Engines 
+		</title>
+				
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<!-- icons & favicons -->
+		<!-- For iPhone 4 -->
+		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/h/apple-touch-icon.png">
+		<!-- For iPad 1-->
+		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/m/apple-touch-icon.png">
+		<!-- For iPhone 3G, iPod Touch and Android -->
+		<link rel="apple-touch-icon-precomposed" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/l/apple-touch-icon-precomposed.png">
+		<!-- For Nokia -->
+		<link rel="shortcut icon" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/images/icons/l/apple-touch-icon.png">
+		<!-- For everything else -->
+		<!-- <link rel="shortcut icon" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/favicon.ico"> -->
+				
+		<!-- media-queries.js (fallback) -->
+		<!--[if lt IE 9]>
+			<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>			
+		<![endif]-->
+
+		<!-- html5.js -->
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		
+  		<link rel="pingback" href="http://ariya.ofilabs.com/xmlrpc.php">
+
+  		<link rel="stylesheet/less" type="text/css" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/less/bootstrap.less">
+  		<link rel="stylesheet/less" type="text/css" href="http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/less/responsive.less">
+
+		<!-- wordpress head functions -->
+		<link rel='stylesheet' id='wp-syntax-css-css'  href='http://ariya.ofilabs.com/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='jetpack-widgets-css'  href='http://ariya.ofilabs.com/wp-content/plugins/jetpack/modules/widgets/widgets.css?ver=20121003' type='text/css' media='all' />
+<link rel='stylesheet' id='bootstrap-css'  href='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/css/bootstrap.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='bootstrap-responsive-css'  href='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/css/responsive.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-bootstrap-css'  href='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/style.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='sharedaddy-css'  href='http://ariya.ofilabs.com/wp-content/plugins/jetpack/modules/sharedaddy/sharing.css?ver=2.5' type='text/css' media='all' />
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/libs/jquery-1.7.1.min.js?ver=1.7.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/bootstrap.min.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/scripts.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-content/themes/wordpress-bootstrap/library/js/modernizr.full.min.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://ariya.ofilabs.com/wp-includes/js/comment-reply.min.js?ver=3.6.1'></script>
+<link rel='canonical' href='http://ariya.ofilabs.com/2012/07/lazy-parsing-in-javascript-engines.html' />
+<link rel='shortlink' href='http://wp.me/p2lzjD-dz' />
+<link rel="stylesheet" type="text/css" href="http://ariya.ofilabs.com/wp-content/plugins/microkids-related-posts/microkids-related-posts-default.css" />
+<!-- Simple Google Analytics Begin -->
+<script type="text/javascript">
+var _gaq = [['_setAccount','UA-24809129-1'],['_setDomainName','ariya.ofilabs.com'],['_trackPageLoadTime'],['_trackPageview']];(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+<!-- Simple Google Analytics End -->
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Lazy Parsing in JavaScript Engines" />
+<meta property="og:url" content="http://ariya.ofilabs.com/2012/07/lazy-parsing-in-javascript-engines.html" />
+<meta property="og:description" content="Modern JavaScript engines can defer the parsing process of a function body until it is completely needed. Why is this done and how does this work? The last blog post titled Advances in JavaScript P..." />
+<meta property="og:site_name" content="don&#039;t code today what you can&#039;t debug tomorrow" />
+<meta name="twitter:site" content="@jetpack" />
+<meta name="twitter:card" content="summary" />
+		<link rel="stylesheet" id="custom-css-css" type="text/css" href="http://ariya.ofilabs.com/?custom-css=1&#038;csblog=1&#038;cscache=6&#038;csrev=31" />
+				<!-- end of wordpress head -->
+
+		<!-- theme options from options panel -->
+		<style>
+        h1, h2, h3, h4, h5, h6{ 
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; 
+          font-weight: bold; 
+          color: #404040; 
+        }
+        body{ 
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; 
+          font-weight: normal; 
+          color: #404040; 
+        }
+        .navbar-inner, .navbar .fill { 
+          background-color: #222222;
+        }#222222
+        .navbar-inner, .navbar .fill {
+          background-image: -khtml-gradient(linear, left top, left bottom, from(#222222), to(#333333));
+          background-image: -moz-linear-gradient(top, #222222, #333333);
+          background-image: -ms-linear-gradient(top, #222222, #333333);
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #222222), color-stop(100%, #333333));
+          background-image: -webkit-linear-gradient(top, #222222, #3333332);
+          background-image: -o-linear-gradient(top, #222222, #333333);
+          background-image: linear-gradient(top, #222222, #333333);
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#222222', endColorstr='#3333332', GradientType=0);
+        }
+        .navbar .nav li a { 
+          color: #BFBFBF;
+        }
+        .navbar .nav li a:hover { 
+          color: #FFFFFF;
+        }
+          .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
+            background-color: #0088CC;
+          }
+        
+          .dropdown-menu a{
+            color: #555555 !important;
+          }
+        
+        .hero-unit { 
+          background-color: #F5F5F5;
+        }
+        #main article {
+          border-bottom: none;
+        }h1.h2 {
+letter-spacing: -1px;
+font-weight: normal;
+}
+
+div.postauthor &gt; div {
+padding-right: 25px;
+}
+
+blockquote p {
+font-size: 13px;
+}
+
+h1.singletitle {
+letter-spacing: -1px;
+font-weight: normal;
+}
+
+pre {
+border: none;
+padding: 2px;
+background-color: transparent;
+}
+
+code {
+color: black;
+}
+
+.related-posts {
+margin-top: 20px;
+}
+        </style>
+						
+	</head>
+	
+	<body class="single single-post postid-841 single-format-standard">
+				
+		<header role="banner">
+		
+			<div id="inner-header" class="clearfix">
+				
+				<div class="navbar navbar-fixed-top">
+					<div class="navbar-inner">
+						<div class="container-fluid nav-container">
+							<nav role="navigation">
+								<a class="brand" id="logo" title="" href="http://ariya.ofilabs.com">don&#039;t code today what you can&#039;t debug tomorrow</a>
+								
+								<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							        <span class="icon-bar"></span>
+							        <span class="icon-bar"></span>
+							        <span class="icon-bar"></span>
+								</a>
+								
+								<div class="nav-collapse">
+									<ul id="menu-nav" class="nav"><li id="menu-item-970" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/about">About</a></li>
+<li id="menu-item-1025" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/highlights">Highlights</a></li>
+<li id="menu-item-972" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/projects">Projects</a></li>
+<li id="menu-item-971" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://ariya.ofilabs.com/talks">Talks</a></li>
+</ul>								</div>
+								
+							</nav>
+							
+														
+						</div>
+					</div>
+				</div>
+			
+			</div> <!-- end #inner-header -->
+		
+		</header> <!-- end header -->
+		
+		<div class="container-fluid">			
+			<div id="content" class="clearfix row-fluid">
+			
+				<div id="main" class="span8 clearfix" role="main">
+
+										
+					<article id="post-841" class="post-841 post type-post status-publish format-standard hentry category-uncategorized tag-javascript tag-javascriptcore tag-optimization tag-spidermonkey tag-v8 clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">
+						
+						<header>
+						
+														
+							<div class="page-header"><h1 class="single-title" itemprop="headline">Lazy Parsing in JavaScript Engines</h1></div>
+							
+							<p class="meta"><time datetime="2012-07-3" pubdate>July 3, 2012</time>.</p>
+							<p class="tags"><span class="tags-title">Tags:</span> <a href="http://ariya.ofilabs.com/tag/javascript" rel="tag">javascript</a> <a href="http://ariya.ofilabs.com/tag/javascriptcore" rel="tag">javascriptcore</a> <a href="http://ariya.ofilabs.com/tag/optimization" rel="tag">optimization</a> <a href="http://ariya.ofilabs.com/tag/spidermonkey" rel="tag">spidermonkey</a> <a href="http://ariya.ofilabs.com/tag/v8" rel="tag">v8</a></p>							
+
+						
+						</header> <!-- end article header -->
+					
+						<section class="post_content clearfix" itemprop="articleBody">
+							<p class="lead">Modern JavaScript engines can defer the parsing process of a function body until it is completely needed. Why is this done and how does this work?</p>
+<p>The last blog post titled <a href="http://blogs.msdn.com/b/ie/archive/2012/06/13/advances-in-javascript-performance-in-ie10-and-windows-8.aspx">Advances in JavaScript Performance in IE10 and Windows 8</a> from the Internet Explorer team mentions the use of deferred parsing to improve the performance. In fact, the stable IE 9 already implements such optimization while IE 10 improves it further to take account the popular module pattern. According to team (Chakra refers to the JavaScript engine used in IE):</p>
+<blockquote><p>
+To further reduce the time to first executed instruction, Chakra processes and emits bytecode only for functions that are about to be executed using a mechanism called deferred parsing.
+</p></blockquote>
+<p>Let&#8217;s have a simplified example to see how this works. Supposed your web application looks like the following JavaScript code.</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">function</span> add<span style="color: #009900;">&#40;</span>x<span style="color: #339933;">,</span> y<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span> <span style="color: #000066; font-weight: bold;">return</span> x <span style="color: #339933;">+</span> y<span style="color: #339933;">;</span> <span style="color: #009900;">&#125;</span>
+<span style="color: #000066; font-weight: bold;">function</span> mul<span style="color: #009900;">&#40;</span>x<span style="color: #339933;">,</span> y<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span> <span style="color: #000066; font-weight: bold;">return</span> x <span style="color: #339933;">*</span> y<span style="color: #339933;">;</span> <span style="color: #009900;">&#125;</span>
+alert<span style="color: #009900;">&#40;</span>add<span style="color: #009900;">&#40;</span><span style="color: #CC0000;">40</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">2</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Before the engine can execute the code, it has to feed the source into its <a href="http://en.wikipedia.org/wiki/Parser">parser</a>. The purpose of the parser is to perform the syntactic analysis and to produce an <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax tree</a> (AST). For an illustrative example on how the syntax tree may look like, you can use the online <a href="http://esprima.org/demo/parse.html">parser demo</a> of Esprima (a JavaScript parser project I have <a href="http://ariya.ofilabs.com/2011/12/introducing-esprima.html" title="introducing esprima: blazing-fast javascript parser">started</a> some months ago). The full syntax tree will be quite complex, but if we translate the work of the parser to plain English, this is what happens:</p>
+<blockquote><p>
+Declare a function called <em>add</em>. It accepts x and y as the arguments. It has one statement, a return statement.The return value is a binary operation + of x and y.<br />
+Declare a function called <em>mul</em>. It accepts x and y as the arguments. It has one statement, a return statement. The return value is a binary operation * of x and y.<br />
+Create a function call to <em>alert</em>. The argument is the result of function <em>add</em> with 40 and 2 as the arguments.
+</p></blockquote>
+<p>Based on this syntax tree, some more magic occurs. At the end of the day, when the interpreter executes your code, it pops-up the dialog with <a href="http://en.wikipedia.org/wiki/Phrases_from_The_Hitchhiker's_Guide_to_the_Galaxy#The_number_42">the answer</a>. Now, if you pay attention carefully, there is a wasted step from the above work of the parser, namely the effort to parse function <em>mul</em> because it is not being called at all, the later <em>alert</em> only invokes function <em>add</em>. While this example might be really simple and obvious, in real-world (according to Microsoft <a href="http://research.microsoft.com/en-us/projects/jsmeter/">JSMeter research</a>), a lot of declared functions are never called at all.</p>
+<p>Instead of dutifully parsing everything at one, modern JavaScript engine uses the <strong>lazy parsing</strong> approach. The work of the parser changes into something like:</p>
+<blockquote><p>
+Declare a function call <em>add</em> with the function body &#8220;{ return x + y; }&#8221;.<br />
+Declare a function call <em>mul</em> with the function body &#8220;{ return x * y; }&#8221;.<br />
+Call <em>alert</em> with the result of function add with 40 and 2 as the arguments.
+</p></blockquote>
+<p>Here the parser does not bother to go deep into the statements of each and every function. At the execution stage, the sequence continues:</p>
+<blockquote><p>
+Call function <em>add</em>. Hmm, it is not parsed yet. Call the real parser for &#8220;{ return x + y; }&#8221;.<br />
+  It accepts x and y as the arguments. The return value is a binary operation + of x and y.
+</p></blockquote>
+<p>Basically the task of parsing the source for that function is <em>deferred</em>, it is only carried out when it is necessary, right before executing it. The lazy parser still needs to parse the incoming source because it needs to locate the entire function body. If you see <code>function add(x, y) {</code> then you need to locate the matching <code>}</code> which ends the function body. It can&#8217;t be done by regular expression or any form of scanning, the parser needs to consume the code as if it is a real code. The good news is that the parser does not need to do much beside trying to find that closing curly brace. This means it can optimize a certain thing. For a start, we do not need the syntax tree because it is not going to be processed by anyone. In addition, the code path does not need to use any memory from the heap. Allocating memory eats the system resource, avoiding it will lead to a speed-up.</p>
+<p>Here is an analogy in real-life. You stumble upon a nice article (maybe this blog post) but then you realize that you only want to read it later when you need it. You decide to stash the text (digitally of course) in your note. You still have to scan the blog post to find out where it starts and where it ends, though you can do this scanning rather quickly (faster than reading the entire text). Once you get the start and the end markers, you can just select the text, copy it to the clipboard, switch to the note application, and finally paste the content. When it is finally the time to use the information in to the article, you open the note and complete the reading.</p>
+<p>Let&#8217;s compare some hypothetical code to parse a <em>while</em> statement. As you already know, this statement has the following grammar:</p>
+<blockquote><p>
+&#8216;while&#8217; &#8216;(&#8216; Expression &#8216;)&#8217; Statement
+</p></blockquote>
+<p>The real parser needs to understand this and produce an abstract syntax tree (AST) which represents the construct. The code for doing that, if it would have been in JavaScript, may look like:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">function</span> realParseWhileStatement<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span>
+<span style="color: #009900;">&#123;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'while'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'('</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  <span style="color: #000066; font-weight: bold;">var</span> expression <span style="color: #339933;">=</span> parseExpression<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">')'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  <span style="color: #000066; font-weight: bold;">var</span> statement <span style="color: #339933;">=</span> parseStatement<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+  <span style="color: #006600; font-style: italic;">// node for the AST</span>
+  <span style="color: #000066; font-weight: bold;">return</span> <span style="color: #009900;">&#123;</span>
+    type<span style="color: #339933;">:</span> <span style="color: #3366CC;">'WhileStatement'</span><span style="color: #339933;">,</span>
+    test<span style="color: #339933;">:</span> expression<span style="color: #339933;">,</span>
+    body<span style="color: #339933;">:</span> statement
+  <span style="color: #009900;">&#125;</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span></pre></td></tr></table></div>
+
+<p>In the case of lazy parsing, we don&#8217;t care about the result and thus the code is simplified to:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">function</span> lazyParseWhileStatement<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span>
+<span style="color: #009900;">&#123;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'while'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'('</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  parseExpression<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">')'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+  parseStatement<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span></pre></td></tr></table></div>
+
+<p>Obviously there are other functions to parse various constructs as specified in the grammar. The bottom line is that the parser has to consume all the tokens and advances as farther as it can until the function body is completed. That way, it knows where is the closing curly brace to to match the opening curly brace that starts the function body.</p>
+<p>What if during lazy parsing we stumble upon another nested function declaration? The same rule applies and therefore that function will be lazily parsed. <em>Function Inception</em>, anyone?</p>
+<p>In reality, lazy parser can be slightly complicated, this involves handling strict mode properly, making sure parsing error is taken care, avoiding stack overflow (for recursive descent parser), and many other delicate situations.</p>
+<p>Let&#8217;s see how this lazy parsing approach is implemented in two popular JavaScript engines.</p>
+<p>First, we look at <strong><a href="http://trac.webkit.org/wiki/JavaScriptCore">JavaScriptCore</a></strong> (JSC), the engine used in WebKit and powers the popular Apple Safari browser (desktop and mobile). The source code for JavaScriptCore resides in <code>Source/JavaScriptCore</code> subdirectory, if you check out WebKit code. The files relevant to the lazy parsers are:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="make" style="font-family:monospace;">parser<span style="color: #004400;">/</span>Parser<span style="color: #004400;">.</span>h
+parser<span style="color: #004400;">/</span>Parser<span style="color: #004400;">.</span>cpp
+parser<span style="color: #004400;">/</span>SyntaxChecker<span style="color: #004400;">.</span>h</pre></td></tr></table></div>
+
+<p>The normal parser and the lazy parser in JavaScriptCore are essentially the same code, the specialization is done through C++ template. The parser itself does not construct a syntax tree, the job is delegated to a <code>TreeBuilder</code>. There are two builders available, <code>ASTBuilder</code> and <code>SyntaxChecker</code>. The latter essentially does nothing, but since it is driven by the parser, the parser can go forward and consume the constructs to any point it wants to stop. It acts as some kind of syntax checker, hence the name.</p>
+<p>JSC parser uses the SyntaxChecker builder whenever it needs to parse a function body, see <code>parseFunctionBody</code>, which gets called from <code>parseFunctionInfo</code> (this leads to a funny variable name in the code, <em>FunctionBodyBuilder</em>). After the syntax checker stops at then of the function body, the range which scopes the curly braces will be stored, this is needed when the real parsing kicks in at some later stage, i.e. when that function is invoked. Because JSC keeps the entire source, storing the range is sufficient and there is no need to copy the source string.</p>
+<p>The situation is similar in <strong><a href="https://code.google.com/p/v8/">V8</a></strong>, the JavaScript engine used in Google Chrome and Node.js. Files related to the lazy parsing in V8 source code are:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="make" style="font-family:monospace;">src<span style="color: #004400;">/</span>preparser<span style="color: #004400;">.</span>cc
+src<span style="color: #004400;">/</span>preparser<span style="color: #004400;">.</span>h
+src<span style="color: #004400;">/</span>preparser<span style="color: #004400;">-</span>api<span style="color: #004400;">.</span>cc</pre></td></tr></table></div>
+
+<p>Unlike JSC, V8 has two different code base (but with similar interface) for the normal parser and the lazy parser. The latter is called <em>PreParser</em> in V8 terminology. This PreParser kicks in when V8 encounters a function body during the parsing, i.e <code>Parser::ParseFunctionLiteral</code>. Interesting enough, V8 does an optimization for a special case. This is the case for <a href="http://benalman.com/news/2010/11/immediately-invoked-function-expression/">immediately invoked function expression</a>, a pattern popular to provide better <a href="http://addyosmani.com/blog/essential-js-namespacing/">namespacing</a> without polluting the global and therefore perfect to implement a module, e.g.:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">var</span> foobar <span style="color: #339933;">=</span> <span style="color: #009900;">&#40;</span><span style="color: #000066; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+    <span style="color: #006600; font-style: italic;">//  do something</span>
+    <span style="color: #006600; font-style: italic;">//  return the module object</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Because this pattern is quite common nowadays, V8 detects the usage using a simple heuristic: if there is <code>(</code> before <code>function</code>, then forget the lazy parsing and do the real parsing. In the above example, V8 will produce a syntax tree for the statements inside the function.</p>
+<p>What about <strong><a href="https://developer.mozilla.org/en/SpiderMonkey">SpiderMonkey</a></strong>, Mozilla JavaScript engine used in Firefox? Lazy parsing is not there yet but it is being implemented, just track Mozilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=678037">bug 678037</a>. This will be another awesome move to improve Firefox performance.</p>
+<p>Last but not least, since this blog post is quite long, you might just quickly scan it and read it later. That&#8217;s called deferred reading!</p>
+<div class="related-posts">
+<div id="related-posts-MRP_all" class="related-posts-type">
+<h4>Related Posts:</h4>
+<ul>
+<li><a href="http://ariya.ofilabs.com/2013/04/automatic-inlining-in-javascript-engines.html">Automatic Inlining in JavaScript Engines</a></li>
+<li><a href="http://ariya.ofilabs.com/2012/11/optimization-journey-vs-destination.html">Optimization: Journey vs Destination</a></li>
+<li><a href="http://ariya.ofilabs.com/2012/08/determining-objects-in-a-set-examples-in-javascript.html">Determining Objects in a Set: Examples in JavaScript </a></li>
+<li><a href="http://ariya.ofilabs.com/2011/12/introducing-esprima.html">introducing esprima: blazing-fast javascript parser</a></li>
+<li><a href="http://ariya.ofilabs.com/2011/08/math-evaluator-in-javascript-part-2.html">math expression evaluator in javascript: part 2 (parser)</a></li>
+</ul></div>
+</div>							
+												
+						</section> <!-- end article section -->
+						
+						<footer>
+			
+														
+						</footer> <!-- end article footer -->
+					
+					</article> <!-- end article -->
+					
+					
+<div id="disqus_thread">
+                    <div id="dsq-content">
+
+
+            <ul id="dsq-comments">
+                    <li class="comment even thread-even depth-1" id="dsq-comment-3709">
+        <div id="dsq-comment-header-3709" class="dsq-comment-header">
+            <cite id="dsq-cite-3709">
+                <span id="dsq-author-user-3709">Bertjan</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3709" class="dsq-comment-body">
+            <div id="dsq-comment-message-3709" class="dsq-comment-message"><p>Nitpick:</p>
+<p>Declare a function call mul with the function body “{ return x + y; }”. </p>
+<p>That must be a * in stead of +. Other than that, interesting read!</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-2" id="dsq-comment-3710">
+        <div id="dsq-comment-header-3710" class="dsq-comment-header">
+            <cite id="dsq-cite-3710">
+http://ariya.ofilabs.com/                <span id="dsq-author-user-3710">Ariya Hidayat</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3710" class="dsq-comment-body">
+            <div id="dsq-comment-message-3710" class="dsq-comment-message"><p>Fixed! Thanks for the notice.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-3711">
+        <div id="dsq-comment-header-3711" class="dsq-comment-header">
+            <cite id="dsq-cite-3711">
+                <span id="dsq-author-user-3711">Nicolás Granelli</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3711" class="dsq-comment-body">
+            <div id="dsq-comment-message-3711" class="dsq-comment-message"><p>I will ask you a question somewhat related (I hope you can give me your opinion): </p>
+<p>I started to build a complex javascript application that in some parts needs to generate javascript code. Right now I&#8217;m just doing a prototype, and I found 2 ways of generating the code: the first one is with a simple underscore template, and the second one is using esprima and escodegen. In the second case I think the easiest way is to generate a tree with the parsing demo, and then based on that tree generate the code. </p>
+<p>What do you think? what is the best option in the long run? is any other way I don&#8217;t know about?</p>
+<p>Thanks <img src='http://ariya.ofilabs.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' class='wp-smiley' />  </p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-2" id="dsq-comment-3712">
+        <div id="dsq-comment-header-3712" class="dsq-comment-header">
+            <cite id="dsq-cite-3712">
+http://ariya.ofilabs.com/                <span id="dsq-author-user-3712">Ariya Hidayat</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3712" class="dsq-comment-body">
+            <div id="dsq-comment-message-3712" class="dsq-comment-message"><p>I believe using a syntax tree as an intermediate step will be better. If something is wrong, you can debug it easily.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even thread-even depth-1" id="dsq-comment-3714">
+        <div id="dsq-comment-header-3714" class="dsq-comment-header">
+            <cite id="dsq-cite-3714">
+http://about.me/kpobococ                <span id="dsq-author-user-3714">Anton Suprun</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3714" class="dsq-comment-body">
+            <div id="dsq-comment-message-3714" class="dsq-comment-message"><p>&gt; expect(&#8216;)&#8217;;</p>
+<p>NO! <img src='http://ariya.ofilabs.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' class='wp-smiley' /> </p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-2" id="dsq-comment-3717">
+        <div id="dsq-comment-header-3717" class="dsq-comment-header">
+            <cite id="dsq-cite-3717">
+http://twitter.com/ariyahidayat                <span id="dsq-author-user-3717">Ariya Hidayat</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3717" class="dsq-comment-body">
+            <div id="dsq-comment-message-3717" class="dsq-comment-message"><p>Corrected. Thanks for the notice!</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-3715">
+        <div id="dsq-comment-header-3715" class="dsq-comment-header">
+            <cite id="dsq-cite-3715">
+                <span id="dsq-author-user-3715">Zack</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3715" class="dsq-comment-body">
+            <div id="dsq-comment-message-3715" class="dsq-comment-message"><p>Nitpick:</p>
+<p>Your immediately invoked function expression snippet is missing the invocation, and is merely an expression. You would need something like</p>
+<p>`(function () { /* &#8230; */ })()`</p>
+<p>Or, to avoid the syntax ugliness Crockford calls &#8220;dog balls&#8221;:</p>
+<p>`(function () { /* &#8230; */ }())`</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-2" id="dsq-comment-3716">
+        <div id="dsq-comment-header-3716" class="dsq-comment-header">
+            <cite id="dsq-cite-3716">
+http://twitter.com/ariyahidayat                <span id="dsq-author-user-3716">Ariya Hidayat</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3716" class="dsq-comment-body">
+            <div id="dsq-comment-message-3716" class="dsq-comment-message"><p>Fixed. Thanks for the notice!</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even thread-even depth-1" id="dsq-comment-3802">
+        <div id="dsq-comment-header-3802" class="dsq-comment-header">
+            <cite id="dsq-cite-3802">
+                <span id="dsq-author-user-3802">Peter van der Zee</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3802" class="dsq-comment-body">
+            <div id="dsq-comment-message-3802" class="dsq-comment-message"><p>I would be surprised if they really throw away the results of pre-parsing function bodies. You need to go through the functions (both for validation of early errors and to properly find the range of the function body). This means you&#8217;re already doing some of the hard expensive parts of the code, anyways. If they would throw away that, they&#8217;d have to do the work twice for functions.</p>
+<p>I would instead expect them to cache a simple parse tree and leave out the static analysis until first call (or until such time that the browser is considered idle when not called before). Then the parse tree can be fed to whatever deep analysis/JIT engine and would not have to parse the source code anymore but work with tokens and assume an at least validated structure.</p>
+<p>I&#8217;m always confused by the text in the spec about unparsed functions. You have to parse the source to get to the end. You can&#8217;t just &#8220;guess&#8221; the end. Sigh.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-2" id="dsq-comment-3887">
+        <div id="dsq-comment-header-3887" class="dsq-comment-header">
+            <cite id="dsq-cite-3887">
+http://ariya.ofilabs.com/                <span id="dsq-author-user-3887">Ariya Hidayat</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-3887" class="dsq-comment-body">
+            <div id="dsq-comment-message-3887" class="dsq-comment-message"><p>What I wrote in the blog post is exactly what happens with JavaScriptCore and V8. There is no cached syntax tree. Beside, validating a function body is fast because there is no need to allocate memory from heap. If there is a syntax error, you need to bail out immediately anyway.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-4068">
+        <div id="dsq-comment

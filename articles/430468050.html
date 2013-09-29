@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--[if IE 7]>
+<html class="ie ie7" lang="zh-CN" xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml">
+<![endif]-->
+<!--[if IE 8]>
+<html class="ie ie8" lang="zh-CN" xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml">
+<![endif]-->
+<!--[if !(IE 7) | !(IE 8)  ]><!-->
+<html lang="zh-CN" xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml">
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<title>防御XSS的七条原则 | Web应用安全实验室</title>
+<link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="pingback" href="http://webappsecuritylab.com/xmlrpc.php" />
+<!--[if lt IE 9]>
+<script src="http://webappsecuritylab.com/wp-content/themes/twentytwelve/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+<link rel="alternate" type="application/rss+xml" title="Web应用安全实验室 &raquo; Feed" href="http://webappsecuritylab.com/?feed=rss2" />
+<link rel="alternate" type="application/rss+xml" title="Web应用安全实验室 &raquo; 评论Feed" href="http://webappsecuritylab.com/?feed=comments-rss2" />
+<link rel="alternate" type="application/rss+xml" title="Web应用安全实验室 &raquo; 防御XSS的七条原则评论Feed" href="http://webappsecuritylab.com/?feed=rss2&#038;p=6" />
+<link rel='stylesheet' id='bsuite-default-css'  href='http://webappsecuritylab.com/wp-content/plugins/bsuite/css/default.css?ver=3.6.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentytwelve-fonts-css'  href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700&#038;subset=latin,latin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='twentytwelve-style-css'  href='http://webappsecuritylab.com/wp-content/themes/twentytwelve/style.css?ver=3.6.1' type='text/css' media='all' />
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentytwelve-ie-css'  href='http://webappsecuritylab.com/wp-content/themes/twentytwelve/css/ie.css?ver=20121010' type='text/css' media='all' />
+<![endif]-->
+<script type='text/javascript' src='http://webappsecuritylab.com/wp-includes/js/jquery/jquery.js?ver=1.10.2'></script>
+<script type='text/javascript' src='http://webappsecuritylab.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type='text/javascript' src='http://webappsecuritylab.com/wp-content/plugins/bsuite/components/js/waypoints.min.js?ver=1'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var wtilp = {"ajax_url":"http:\/\/webappsecuritylab.com\/wp-admin\/admin-ajax.php"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://webappsecuritylab.com/wp-content/plugins/wti-like-post/js/wti_like_post.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://webappsecuritylab.com/wp-includes/js/comment-reply.min.js?ver=3.6.1'></script>
+<script type='text/javascript' src='http://webappsecuritylab.com/wp-content/plugins/google-analyticator/external-tracking.min.js?ver=6.4.5'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://webappsecuritylab.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://webappsecuritylab.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='next' title='第三方组件安全' href='http://webappsecuritylab.com/?p=19' />
+<meta name="generator" content="WordPress 3.6.1" />
+<link rel='canonical' href='http://webappsecuritylab.com/?p=6' />
+<meta property="og:title" content="防御XSS的七条原则" />
+<meta property="og:type" content="blog" />
+<meta property="og:url" content="http://webappsecuritylab.com/?p=6" />
+<meta property="og:site_name" content="Web应用安全实验室" />
+<meta property="og:description" content="Web Application Security Lab" />
+<meta property="fb:admins" content="FBJS_ADMINS" />
+<meta property="fb:app_id" content="FBJS_APP_ID" />
+<link rel="stylesheet" type="text/css" href="http://webappsecuritylab.com/wp-content/plugins/wti-like-post/css/wti_like_post.css" media="screen" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+	<style type="text/css" id="twentytwelve-header-css">
+			.site-header h1 a,
+		.site-header h2 {
+			color: #444;
+		}
+		</style>
+	<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #e6e6e6; }
+</style>
+<!-- Google Analytics Tracking by Google Analyticator 6.4.5: http://www.videousermanuals.com/google-analyticator/ -->
+<script type="text/javascript">
+	var analyticsFileTypes = [''];
+	var analyticsEventTracking = 'enabled';
+</script>
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-44172237-1']);
+        _gaq.push(['_addDevId', 'i9k95']); // Google Analyticator App ID with Google 
+        
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</head>
+
+<body class="single single-post postid-6 single-format-standard custom-background custom-font-enabled single-author">
+<div id="page" class="hfeed site">
+	<header id="masthead" class="site-header" role="banner">
+		<hgroup>
+			<h1 class="site-title"><a href="http://webappsecuritylab.com/" title="Web应用安全实验室" rel="home">Web应用安全实验室</a></h1>
+			<h2 class="site-description">Web Application Security Lab</h2>
+		</hgroup>
+
+		<nav id="site-navigation" class="main-navigation" role="navigation">
+			<h3 class="menu-toggle">菜单</h3>
+			<a class="assistive-text" href="#content" title="跳至内容">跳至内容</a>
+			<div class="nav-menu"><ul><li ><a href="http://webappsecuritylab.com/" title="首页">首页</a></li></ul></div>
+		</nav><!-- #site-navigation -->
+
+			</header><!-- #masthead -->
+
+	<div id="main" class="wrapper">
+	<div id="primary" class="site-content">
+		<div id="content" role="main">
+
+			
+				
+	<article id="post-6" class="post-6 post type-post status-publish format-standard hentry category-2 tag-xss tag-4">
+				<header class="entry-header">
+									<h1 class="entry-title">防御XSS的七条原则</h1>
+										<div class="comments-link">
+					<a href="http://webappsecuritylab.com/?p=6#comments" title="《防御XSS的七条原则》上的评论">3条回复</a>				</div><!-- .comments-link -->
+					</header><!-- .entry-header -->
+
+				<div class="entry-content">
+			<div style="clear:both; margin-top:5px; margin-bottom:5px;"></div><div style="float:right"><!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+	<span class="jiathis_txt">分享到：</span>
+	<a class="jiathis_button_qzone">QQ空间</a>
+	<a class="jiathis_button_tsina">新浪微博</a>
+	<a class="jiathis_button_tqq">腾讯微博</a>
+	<a class="jiathis_button_weixin">微信</a>
+	<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=1375793756379309" charset="utf-8"></script>
+<!-- JiaThis Button END --></div><div style="clear:both; margin-top:5px; margin-bottom:5px;"></div><p><fb:like href="http://webappsecuritylab.com/?p=6"></fb:like></p><p><b>前言</b></p>
+<p>本文将会着重介绍防御XSS攻击的一些原则，需要读者对于XSS有所了解，至少知道XSS漏洞的基本原理，如果您对此不是特别清楚，请参考这两篇文章：《<a href="https://www.owasp.org/index.php/XSS#Stored_and_Reflected_XSS_Attacks" target="_blank">Stored and Reflected XSS Attack</a>》《<a href="https://www.owasp.org/index.php/DOM_Based_XSS" target="_blank">DOM Based XSS</a>》</p>
+<p>攻击者可以利用XSS漏洞向用户发送攻击脚本，而用户的浏览器因为没有办法知道这段脚本是不可信的，所以依然会执行它。对于浏览器而言，它认为这段脚本是来自可以信任的服务器的，所以脚本可以光明正大地访问Cookie，或者保存在浏览器里被当前网站所用的敏感信息，甚至可以知道用户电脑安装了哪些软件。这些脚本还可以改写HTML页面，进行钓鱼攻击。</p>
+<p>虽然产生XSS漏洞的原因各种各样，对于漏洞的利用也是花样百出，但是如果我们遵循本文提到防御原则，我们依然可以做到防止XSS攻击的发生。</p>
+<p>有人可能会问，防御XSS的核心不就是在输出不可信数据的时候进行编码，而现如今流行的Web框架（比如Rails）大多都在默认情况下就对不可信数据进行了HTML编码，帮我们做了防御，还用得着我们自己再花时间研究如何防御XSS吗？答案是肯定的，对于将要放置到HTML页面body里的不可信数据，进行HTML编码已经足够防御XSS攻击了，甚至将HTML编码后的数据放到HTML标签（TAG）的属性（attribute）里也不会产生XSS漏洞（但前提是这些属性都正确使用了引号），但是，如果你将HTML编码后的数据放到了&lt;SCRIPT&gt;标签里的任何地方，甚至是HTML标签的事件处理属性里（如onmouseover），又或者是放到了CSS、URL里，XSS攻击依然会发生，在这种情况下，HTML编码不起作用了。所以就算你到处使用了HTML编码，XSS漏洞依然可能存在。下面这几条规则就将告诉你，如何<b>在正确的地方使用正确的编码</b>来消除XSS漏洞。</p>
+<p><span id="more-6"></span></p>
+<p><b>原则1：不要在页面中插入任何不可信数据，除非这些数已经据根据下面几个原则进行了编码</b></p>
+<p>第一条原则其实是“Secure By Default”原则：不要往HTML页面中插入任何不可信数据，除非这些数据已经根据下面几条原则进行了编码。</p>
+<p>之所以有这样一条原则存在，是因为HTML里有太多的地方容易形成XSS漏洞，而且形成漏洞的原因又有差别，比如有些漏洞发生在HTML标签里，有些发生在HTML标签的属性里，还有的发生在页面的&lt;Script&gt;里，甚至有些还出现在CSS里，再加上不同的浏览器对页面的解析或多或少有些不同，使得有些漏洞只在特定浏览器里才会产生。如果想要通过XSS过滤器（XSS Filter）对不可信数据进行转义或替换，那么XSS过滤器的过滤规则将会变得异常复杂，难以维护而且会有被绕过的风险。</p>
+<p>所以实在想不出有什么理由要直接往HTML页面里插入不可信数据，就算是有XSS过滤器帮你做过滤，产生XSS漏洞的风险还是很高。</p>
+<table width="782.0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td valign="top">&lt;script&gt;…不要在这里直接插入不可信数据&#8230;&lt;/script&gt;直接插入到SCRIPT标签里&lt;!&#8211; …不要在这里直接插入不可信数据… &#8211;&gt;</p>
+<p>插入到HTML注释里</p>
+<p>&nbsp;</p>
+<p>&lt;div 不要在这里直接插入不可信数据=&#8221;…&#8221;&gt;&lt;/div&gt;</p>
+<p>插入到HTML标签的属性名里</p>
+<p>&nbsp;</p>
+<p>&lt;div name=&#8221;&#8230;不要在这里直接插入不可信数据…&#8221;&gt;&lt;/div&gt;</p>
+<p>插入到HTML标签的属性值里</p>
+<p>&nbsp;</p>
+<p>&lt;不要在这里直接插入不可信数据 href=&#8221;…&#8221;&gt;&lt;/a&gt;</p>
+<p>作为HTML标签的名字</p>
+<p>&nbsp;</p>
+<p>&lt;style&gt;…不要在这里直接插入不可信数据&#8230;&lt;/style&gt;</p>
+<p>直接插入到CSS里</td>
+</tr>
+</tbody>
+</table>
+<p>最重要的是，千万不要引入任何不可信的第三方JavaScript到页面里，一旦引入了，这些脚本就能够操纵你的HTML页面，窃取敏感信息或者发起钓鱼攻击等等。</p>
+<p>&nbsp;</p>
+<p><b>原则2：在将不可信数据插入到HTML标签之间时，对这些数据进行HTML Entity编码</b></p>
+<p>在这里相当强调是往HTML<b>标签之间</b>插入不可信数据，以区别于往HTML标签<b>属性部分</b>插入不可信数据�

@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en" class="isChrome ver290 isAnonymous " prefix="og: http://ogp.me/ns#" >
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Five Patterns to Help You Tame Asynchronous JavaScript - Tech.Pro</title>
+        <link rel="shortcut icon" href="//tpstatic.com/img/root/techpro/favicon.ico">
+        <link rel="apple-touch-icon" sizes="57x57" href="//tpstatic.com/img/root/techpro/apple-touch-icon-114x114.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="//tpstatic.com/img/root/techpro/apple-touch-icon-114x114.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="//tpstatic.com/img/root/techpro/apple-touch-icon-144x144.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="//tpstatic.com/img/root/techpro/apple-touch-icon-144x144.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="search" type="application/opensearchdescription+xml" title="Tech.Pro" href="/OpenSearch">
+        <script type="text/javascript" src="//use.typekit.net/wsf0avv.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+        <link href="//tpstatic.com/bundles/css/bootstrap?v=pfT5OW9kXDWaj6LD9DsIHJM2wLvIExsAA_6Kl1jBrCg1" rel="stylesheet"/>
+
+        <link href="//tpstatic.com/bundles/css/master?v=EgUAFTmzP56l7SCKeudMfPQ7QTCNXkn8WM9N3ctHSNg1" rel="stylesheet"/>
+
+        
+        
+    <link href="http://tech.pro/blog/1402/five-patterns-to-help-you-tame-asynchronous-javascript" rel="canonical" />
+    <meta name="twitter:card" value="summary" />
+    <meta name="twitter:site" value="@techdotpro" />
+    <meta name="twitter:creator" value="ifandelse" />
+
+    <meta content="article" property="og:type" />
+<meta content="Five Patterns to Help You Tame Asynchronous JavaScript" property="og:title" />
+<meta content="http://tech.pro/blog/1402/five-patterns-to-help-you-tame-asynchronous-javascript" property="og:url" />
+<meta content="//tpstatic.com/img/usermedia/zSvgVinS40ykaVRODOoqzg/original.png" property="og:image" />
+<meta content="248957485211620" property="og:app_id" />
+<meta content="Tech.Pro" property="og:site_name" />
+
+    <meta content="Jim Cowart" property="og:article:author" />
+    <meta content="Blog" property="og:article:section" />
+<meta content="07/01/2013 22:07:34" property="og:article:published_time" />
+    <meta content="Tech.Pro" property="og:site_name" />
+    <meta content="You can hardly write ten lines of JavaScript before you&#39;re confronted with asynchronous behavior. In this post we&#39;re going to look at 5 patterns that can help..." property="og:description" />
+    <meta content="You can hardly write ten lines of JavaScript before you&#39;re confronted with asynchronous behavior. In this post we&#39;re going to look at 5 patterns that can help..." name="description" />
+<link href="https://plus.google.com/111043802019079447961/posts" rel="author" />
+    
+<meta content="JavaScript" property="og:article:tag" /><meta content="Async" property="og:article:tag" /><meta content="Events" property="og:article:tag" /><meta content="Promises" property="og:article:tag" /><meta content="Patterns" property="og:article:tag" />    <meta content="(Tag#744) - JavaScript,(Tag#1350) - Async,(Tag#1180) - Events,(Tag#1482) - Promises,(Tag#1483) - Patterns" name="keywords" />
+    <link href="//tpstatic.com/bundles/css/articles?v=omdQR4zhVx9AN5afLMkhXxVSJ1gjfLbZEeC8sRrTStk1" rel="stylesheet"/>
+
+
+        <script type="text/javascript">window.tprq=[];TP = { ready: function (f) { tprq.push(f); } };</script>
+        <!--[if lt IE 9]>
+        <script src="//tpstatic.com/scripts/ext/html5shiv.js"></script>
+        <![endif]-->
+        
+    </head>
+    <body>
+        
+        
+
+        <div id="tp-alerts">
+            
+        </div>
+        
+        <div class="bg-container">
+            <span id="mobile_menu_link">Menu</span>
+            <div class="container">
+
+                <div id="navbar" class="navbar">
+                    <div id="top-nav">
+    <span itemscope="" itemtype="http://schema.org/Organization" >
+        <a class="logo" href="/" itemprop="url">Tech.Pro</a>
+        <meta itemprop="img" content="http://tech.pro/apple-touch-icon-144x144.png"/>
+    </span>
+    <ul id="nav-tools" class="navigation pull-right">
+        <li>
+            <a id="createProfile" href="/register?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript&amp;returnTitle=Five%20Patterns%20to%20Help%20You%20Tame%20Asynchronous%20JavaScript" rel="nofollow">Create a Profile</a>
+            <span class="muted" style="margin: 0 6px;display: inline-block;">or</span>
+            <a class="-login" href="/login?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript" rel="nofollow">Login</a>
+        </li>
+    </ul>
+    <ul id="tp-main-nav" class="navigation">
+        <li class="dropdown active">
+            <a href="http://tech.pro/">Content</a>
+            <ul class="dropdown-menu">
+                <li><a href="/">Feed</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/blogs">Blogs</a></li>
+                <li><a href="/links">Links</a></li>
+                <li><a href="/questions">Q&amp;A</a></li>
+            </ul>
+            <div class="indicator"></div>
+        </li>
+        <li class="dropdown ">
+            <a href="http://tech.pro/profiles">Network</a>
+            <ul class="dropdown-menu">
+                <li><a href="/profiles">Profiles</a></li>
+                <li><a href="/authors">Authors</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/network">My Network</a></li>
+            </ul>
+            <div class="indicator"></div>
+        </li>
+        
+        <li class="dropdown ">
+            <a href="http://tech.pro/about-us">More</a>
+            <ul class="dropdown-menu">
+                <li><a href="/how-it-works">How Tech.Pro Works</a></li>
+                <li><a href="/about-us">About Us</a></li>
+                <li><a href="/contact-us">Contact Us</a></li>
+                <li><a href="/sitemap">Site Map</a></li>
+            </ul>
+            <div class="indicator"></div>
+        </li>
+            <li class="mobile-nav"><a href="/login?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript">Login</a></li>
+            <li class="mobile-nav"><a href="/register?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript">Create a Profile</a></li>
+    </ul>
+</div>
+<div id="sub-nav">
+    
+    <!-- ko stopBinding: true -->
+    <form class="-global-search" id="global-search-form" data-bind="submit: search">
+        <div id="global-search" class="dropdown">
+                            
+            <input class="search-input -tooltip no-jq-placeholder" placeholder="Search Tech.Pro" title="Search Tech.Pro" type="text" data-bind="value: searchValue, hasfocus: hasfocus" />
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><b class="caret"></b></a>
+            <span class="global-search-button" data-bind=""></span>
+            <ul class="search-options dropdown-menu pull-right" data-bind="foreach: searchOptions">
+                <li>
+                    <label class="radio">
+                        <input type="radio" name="globalsearchRadio" data-bind="value: value, checked: $parent.selectedOption" />&nbsp;
+                        <span data-bind="text: title"></span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <!-- /ko -->
+    
+    <ul class="action-bar horizontal-list">
+        <li class="first">SHARE:</li>
+            <li class="actions-item -tooltip" title="Post a Tutorial" data-tp="tutorial">
+                <i class="tp-post-type smallmedium tutorial">&nbsp;</i>
+            </li>
+            <li class="actions-item -tooltip" title="Post a Blog" data-tp="blog"

@@ -1,0 +1,1030 @@
+<!-- DOCUMENT IS XHTML 1.0 STRICT -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta name="author" content="David Winterbottom (David -DOT- Winterbottom -AT- gmail -DOT- com)" />
+    <meta name="description" content="Exclude grep from your grepped output of ps (alias included in description) - ps aux | grep [h]ttpd - Surround the first letter of what you are grepping with square brackets and you won't have to spawn a second instance of grep -v. You could also use an alias like this (albeit with sed):
+alias psgrep='ps aux | grep $(echo $1 | sed \&quot;s/^\(.\)/[\1]/g\&quot;)'" />
+    <meta name="keywords" content="Exclude grep from your grepped output of ps (alias included in description), " />
+    <meta name="verify-v1" content="hEPILeJT+vssH+kKHD8JrK8sqHYIg4GWIVV8P1I8gsY=" />
+     
+    <script type="text/javascript">var NREUMQ=NREUMQ||[];NREUMQ.push(["mark","firstbyte",new Date().getTime()]);</script>
+<link rel="stylesheet" href="/css/browser_reset.css?2012-03-04-09-53" type="text/css" /> 
+    <link rel="stylesheet" href="/css/styles.css?2012-03-04-09-53" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" type="text/css" >
+    
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    
+    <link rel="search" type="application/opensearchdescription+xml" title="commandlinefu.com search plugin" href="/mozilla_search_plugin.xml" />
+    
+        
+    <title>Exclude grep from your grepped output of ps (alias included in description) | commandlinefu.com</title>
+    
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.0.3/prototype.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/scriptaculous/1.8.2/scriptaculous.js?load=effects,controls"></script>
+    <script type="text/javascript" src="/js/site-behaviour.js?2012-03-04-09-53"></script>
+    <script type="text/javascript" src="/js/Growler.js?2012-03-04-09-53"></script>
+    <script type="text/javascript" src="/js/prettify/prettify.js?2012-03-04-09-53"></script>
+    
+    <link rel="stylesheet" href="/js/prettify/prettify.css?2012-03-04-09-53" type="text/css" />
+    
+</head>
+
+<body>
+    <div id="wrapper">
+        
+        <div id="right-block">
+            
+<div class="box-copy">
+    <a class="visibility-toggle" id="box-copy-intro">Hide</a>
+    <h3>What's this?</h3>
+    <div class="toggleable">
+        <p><strong>commandlinefu.com</strong> is the place to record those command-line gems that you return to again and again.</p>
+        <p>Delete that bloated snippets file you've been using and share your personal repository with the world.  
+        That way others can gain from your <abbr title="Command-line interface">CLI</abbr> wisdom and you from theirs too.  All commands can be commented on, discussed and 
+        voted up or down. </p>
+        <hr />
+        <p>If you have a new feature suggestion or find a bug, please 
+        get in touch via <a href="http://commandlinefu.uservoice.com/"><strong>http://commandlinefu.uservoice.com/</strong></a><p>
+    </div>
+</div>
+<div class="box-copy">
+    <h3>Get involved!</h3>
+    <p>
+    You can sign-in using <strong>OpenID credentials</strong>, or register a traditional username and password.
+    </p>
+    <div class="visitor-options">
+        <a href="/users/openid" id="openid-link" title="I am part of the new-save and would like to use OpenID credentials">OpenID</a> 
+        <div style="float:left;padding:10px 0px;margin:0px 10px 0px 0">or</div> 
+        <a href="/users/signin" id="sign-in-link" title="I've been here before - let me in">Sign in</a> 
+        <a href="/users/register" id="register-link" title="I am Amish and am wary of new technology">Register</a>
+    </div>
+    <p>
+    First-time OpenID users will be automatically assigned a username which can be changed after signing in.
+    </p>
+</div>
+
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9184917282379429";
+/* 300x250, created 08/07/09 */
+google_ad_slot = "6300777981";
+google_ad_width = 300;
+google_ad_height = 250;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+
+<div class="box-copy">
+    <a class="visibility-toggle" id="box-copy-loop">Hide</a>
+    <h3>Stay in the loop&hellip;</h3>
+    <div class="toggleable">
+        <dl>
+            <dt>Follow the Tweets.</dt>  
+            <dd>
+                <a href="http://twitter.com/commandlinefu"><img class="link-img" src="/images/twitter.jpg" /></a>
+                <p>Every new command is wrapped in a tweet and posted
+                to <a href="http://twitter.com">Twitter</a>. Following the stream is a great way of staying abreast of the latest commands.  For the more discerning, 
+                there are Twitter accounts for commands that get a minimum of 3 and 10 votes - that way only the great commands get tweeted.</p>
+                <p>
+                &raquo; <a style="color:white;font-weight:bold;" href="http://twitter.com/commandlinefu">http://twitter.com/commandlinefu</a><br/>
+                &raquo; <a style="color:white;font-weight:bold;" href="http://twitter.com/commandlinefu3">http://twitter.com/commandlinefu3</a><br/>
+                &raquo; <a style="color:white;font-weight:bold;" href="http://twitter.com/commandlinefu10">http://twitter.com/commandlinefu10</a>
+                </p>
+            </dd>
+            <dt>Subscribe to the feeds.</dt>
+            <dd>
+                <a style="color:white;font-weight:bold;" href="http://feeds2.feedburner.com/Command-line-fu"><img class="link-img" src="/images/rss.gif" /></a>
+                <p>Use your favourite RSS aggregator to stay in touch with the latest commands.  There are feeds mirroring the 3 Twitter streams
+                as well as for virtually every other subset (users, tags, functions,&hellip;):</p>
+                <p>Subscribe to the feed for:</p>
+                <ul id="feed-links">
+                <li>&raquo; <a style="color:white;font-weight:bold;" href="http://feeds2.feedburner.com/Command-line-fu">all commands</a></li>
+                <li>&raquo; <a style="color:white;font-weight:bold;" href="/feed/threeup">commands with 3 up-votes</a> (commandlinefu3)</li>
+                <li>&raquo; <a style="color:white;font-weight:bold;" href="/feed/tenup">commands with 10 up-votes</a> (commandlinefu10)</li>
+                                </ul>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="box-copy">
+    <a class="visibility-toggle" id="box-copy-news">Hide</a>
+    <h3>News</h3>
+    <div class="toggleable">
+        <dl id="news">
+                        <dt>2011-03-12 - <strong>Confoo 2011 presentation</strong></dt>
+            <dd>Slides are available from the commandlinefu presentation at Confoo 2011: <a href="http://presentations.codeinthehole.com/confoo2011/" rel="nofollow">http://presentations.codeinthehole.com/confoo2011/</a></dd>
+                        <dt>2011-01-04 - <strong>Moderation now required for new commands</strong></dt>
+            <dd>To try and put and end to the spamming, new commands require moderation before they will appear on the site.</dd>
+                        <dt>2010-12-27 - <strong>Apologies for not banning the trolls sooner</strong></dt>
+            <dd>Have been away from the interwebs over Christmas.  Will be more vigilant henceforth.</dd>
+                        <dt>2010-09-24 - <strong>OAuth and pagination problems fixed</strong></dt>
+            <dd>Apologies for the delay in getting Twitter's OAuth supported.  Annoying pagination gremlin also fixed.</dd>
+                    </dl>
+    </div>
+</div>
+
+<div class="box-copy">
+    <a class="visibility-toggle" id="box-copy-tags">Hide</a>
+    <h3>Tags</h3>
+    <div class="toggleable">
+        <div id="cloud">
+    <ul>
+         
+        <li class="tiny"><a href="/commands/tagged/1539/">!!</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1389/path">$PATH</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1694/date">,Date</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1693/ntp">,NTP</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2320/.bashrc">.bashrc</a></li>
+         
+        <li class="small"><a href="/commands/tagged/907/.bash_profile">.bash_profile</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1293/.svn">.svn</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/719/devmem">/dev/mem</a></li>
+         
+        <li class="small"><a href="/commands/tagged/922/devnull">/dev/null</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2311/devrandom">/dev/random</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2287/devurandom">/dev/urandom</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2019/etcpasswd">/etc/passwd</a></li>
+         
+        <li class="small"><a href="/commands/tagged/717/32">32</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2372/32bit">32bit</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/718/64">64</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2373/64bit">64bit</a></li>
+         
+        <li class="small"><a href="/commands/tagged/626/7z">7z</a></li>
+         
+        <li class="small"><a href="/commands/tagged/627/7zip">7zip</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1086/a2zfa">a2zfa</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1831/access">Access</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1953/accesslog">accesslog</a></li>
+         
+        <li class="small"><a href="/commands/tagged/993/access_log">access_log</a></li>
+         
+        <li class="small"><a href="/commands/tagged/822/ack">ack</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1023/acl">ACL</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1379/acpi">acpi</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/888/active-directory">active directory</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2125/adb">adb</a></li>
+         
+        <li class="small"><a href="/commands/tagged/564/add">add</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/951/address">address</a></li>
+         
+        <li class="small"><a href="/commands/tagged/728/aix">aix</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/591/alarm">alarm</a></li>
+         
+        <li class="small"><a href="/commands/tagged/126/alias">alias</a></li>
+         
+        <li class="small"><a href="/commands/tagged/681/aliases">aliases</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1812/alpha">alpha</a></li>
+         
+        <li class="small"><a href="/commands/tagged/841/alsa">alsa</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2018/amazon">Amazon</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/741/amixer">amixer</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1738/anagram">anagram</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1031/analysis">analysis</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2382/android">android</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1881/annoyatron">annoyatron</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/155/annoying">annoying</a></li>
+         
+        <li class="small"><a href="/commands/tagged/864/ansi">ansi</a></li>
+         
+        <li class="small"><a href="/commands/tagged/548/apache">apache</a></li>
+         
+        <li class="small"><a href="/commands/tagged/642/apache2">apache2</a></li>
+         
+        <li class="small"><a href="/commands/tagged/758/api">api</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1195/aplay">aplay</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/426/apropos">apropos</a></li>
+         
+        <li class="small"><a href="/commands/tagged/49/apt">apt</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1650/apt-cache">apt-cache</a></li>
+         
+        <li class="small"><a href="/commands/tagged/138/apt-get">apt-get</a></li>
+         
+        <li class="small"><a href="/commands/tagged/263/apt-key">apt-key</a></li>
+         
+        <li class="small"><a href="/commands/tagged/403/aptitude">aptitude</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1687/arch-linux">arch linux</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1688/arch.linux">arch.linux</a></li>
+         
+        <li class="small"><a href="/commands/tagged/625/archive">archive</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1552/archlinux">archlinux</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1049/argument">argument</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/725/aria2">aria2</a></li>
+         
+        <li class="small"><a href="/commands/tagged/566/arithmetic">arithmetic</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1015/arp">Arp</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1744/arp-scan">arp-scan</a></li>
+         
+        <li class="small"><a href="/commands/tagged/588/array">array</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/295/art">art</a></li>
+         
+        <li class="small"><a href="/commands/tagged/294/ascii">ascii</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1743/ascii-art">ascii art</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1822/ash">ash</a></li>
+         
+        <li class="small"><a href="/commands/tagged/847/askapache">askapache</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/275/aspell">aspell</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1436/assembly">assembly</a></li>
+         
+        <li class="small"><a href="/commands/tagged/874/asterisk">asterisk</a></li>
+         
+        <li class="small"><a href="/commands/tagged/755/at">at</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1543/atom">atom</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/425/attachment">attachment</a></li>
+         
+        <li class="small"><a href="/commands/tagged/26/audio">audio</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1637/authentication">authentication</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1099/automatically">automatically</a></li>
+         
+        <li class="small"><a href="/commands/tagged/218/automation">automation</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/927/autossh">autossh</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2374/avconv">avconv</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1912/average">average</a></li>
+         
+        <li class="small"><a href="/commands/tagged/249/avi">avi</a></li>
+         
+        <li class="small"><a href="/commands/tagged/432/awesome">awesome</a></li>
+         
+        <li class="normal"><a href="/commands/tagged/112/awk">awk</a></li>
+         
+        <li class="small"><a href="/commands/tagged/948/awk-grep">awk grep</a></li>
+         
+        <li class="small"><a href="/commands/tagged/918/awk-sort">awk, sort</a></li>
+         
+        <li class="small"><a href="/commands/tagged/753/background">background</a></li>
+         
+        <li class="small"><a href="/commands/tagged/62/backup">backup</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1168/bandwidth">bandwidth</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/287/bang">bang</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1038/banner">banner</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1336/base64">base64</a></li>
+         
+        <li class="small"><a href="/commands/tagged/253/basename">basename</a></li>
+         
+        <li class="massive"><a href="/commands/tagged/34/bash">bash</a></li>
+         
+        <li class="small"><a href="/commands/tagged/612/bash-.svn">bash .svn</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1278/bash-string-manipulations">bash String Manipulations</a></li>
+         
+        <li class="small"><a href="/commands/tagged/552/bash-tricks">bash tricks</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1428/bashrc">bashrc</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1626/bash_history">bash_history</a></li>
+         
+        <li class="small"><a href="/commands/tagged/674/batch">batch</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1658/batch-rename">batch rename</a></li>
+         
+        <li class="small"><a href="/commands/tagged/9/batch-utilities">Batch Utilities</a></li>
+         
+        <li class="small"><a href="/commands/tagged/224/battery">battery</a></li>
+         
+        <li class="small"><a href="/commands/tagged/262/bc">bc</a></li>
+         
+        <li class="small"><a href="/commands/tagged/597/bc-l">bc -l</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1737/beautiful">beautiful</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1780/beautify">beautify</a></li>
+         
+        <li class="small"><a href="/commands/tagged/324/beep">beep</a></li>
+         
+        <li class="small"><a href="/commands/tagged/320/bell">bell</a></li>
+         
+        <li class="small"><a href="/commands/tagged/706/benchmark">benchmark</a></li>
+         
+        <li class="small"><a href="/commands/tagged/189/bg">bg</a></li>
+         
+        <li class="small"><a href="/commands/tagged/159/binary">binary</a></li>
+         
+        <li class="small"><a href="/commands/tagged/960/binary-clock">binary clock</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2020/bind">bind</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1401/bios">BIOS</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1968/blkid">blkid</a></li>
+         
+        <li class="small"><a href="/commands/tagged/486/block">block</a></li>
+         
+        <li class="small"><a href="/commands/tagged/39/blockdev">blockdev</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1238/bluetooth">bluetooth</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1798/bofh">BOFH</a></li>
+         
+        <li class="small"><a href="/commands/tagged/344/bookmarks">bookmarks</a></li>
+         
+        <li class="small"><a href="/commands/tagged/168/boot">boot</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1084/boxee">boxee</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1935/branch">branch</a></li>
+         
+        <li class="small"><a href="/commands/tagged/536/branches">branches</a></li>
+         
+        <li class="small"><a href="/commands/tagged/825/break">break</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2473/brew">brew</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1943/brightbox">brightbox</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1582/brightness">brightness</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1803/broken-links">broken links</a></li>
+         
+        <li class="small"><a href="/commands/tagged/497/browser">browser</a></li>
+         
+        <li class="small"><a href="/commands/tagged/439/bsd">bsd</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1377/buffer">buffer</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/606/build">build</a></li>
+         
+        <li class="small"><a href="/commands/tagged/846/built-in">built-in</a></li>
+         
+        <li class="small"><a href="/commands/tagged/845/builtin">builtin</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1757/bzip2">bzip2</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/336/bzip2-gzip-compression">bzip2, gzip, compression,</a></li>
+         
+        <li class="small"><a href="/commands/tagged/7/c-programming">C Programming</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1786/cc">C/C++</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1253/cache">cache</a></li>
+         
+        <li class="small"><a href="/commands/tagged/616/cal">cal</a></li>
+         
+        <li class="small"><a href="/commands/tagged/596/calc">calc</a></li>
+         
+        <li class="small"><a href="/commands/tagged/712/calculation">calculation</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2108/calculator">calculator</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1826/calibre">calibre</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/943/canon">canon</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1327/capistrano">capistrano</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1975/capitalize">capitalize</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/71/capslock">capslock</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1044/capture">capture</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1503/case">case</a></li>
+         
+        <li class="small"><a href="/commands/tagged/31/cat">cat</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1347/ccze">ccze</a></li>
+         
+        <li class="small"><a href="/commands/tagged/203/cd">cd</a></li>
+         
+        <li class="small"><a href="/commands/tagged/985/cdda">CDDA</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1250/cdma">cdma</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/984/cdrdao">cdrdao</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1264/cdrom">cdrom</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2370/centos">centos</a></li>
+         
+        <li class="small"><a href="/commands/tagged/173/certificate">certificate</a></li>
+         
+        <li class="small"><a href="/commands/tagged/541/change">change</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2093/characters">characters</a></li>
+         
+        <li class="small"><a href="/commands/tagged/620/check">check</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1754/checksum">checksum</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1874/check_disk">check_disk</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1237/chgrp">chgrp</a></li>
+         
+        <li class="small"><a href="/commands/tagged/378/chmod">chmod</a></li>
+         
+        <li class="small"><a href="/commands/tagged/527/chown">chown</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1344/chrome">chrome</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1343/chromium">chromium</a></li>
+         
+        <li class="small"><a href="/commands/tagged/996/cifs">cifs</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/844/cipher">cipher</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1548/citrix">citrix</a></li>
+         
+        <li class="small"><a href="/commands/tagged/221/clean">clean</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1768/cleaning">cleaning</a></li>
+         
+        <li class="small"><a href="/commands/tagged/622/clear">clear</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1663/cli">cli</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2491/clients">clients</a></li>
+         
+        <li class="small"><a href="/commands/tagged/572/clipboard">clipboard</a></li>
+         
+        <li class="small"><a href="/commands/tagged/540/clock">clock</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1944/cloud">cloud</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1973/cmd">cmd</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1579/cmdline">cmdline</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1739/cmp">cmp</a></li>
+         
+        <li class="small"><a href="/commands/tagged/385/cobbler">cobbler</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1294/code">code</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1681/code-points">code points</a></li>
+         
+        <li class="small"><a href="/commands/tagged/180/codec">codec</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/557/col">col</a></li>
+         
+        <li class="small"><a href="/commands/tagged/147/color">color</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/881/colordiff">colordiff</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2328/colorize">colorize</a></li>
+         
+        <li class="small"><a href="/commands/tagged/863/colors">colors</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2331/colortest">colortest</a></li>
+         
+        <li class="small"><a href="/commands/tagged/208/column">column</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1386/columns">COLUMNS</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1001/comic">comic</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1288/command">command</a></li>
+         
+        <li class="small"><a href="/commands/tagged/611/commandlinefu">commandlinefu</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2290/commandlinefu.com">commandlinefu.com</a></li>
+         
+        <li class="small"><a href="/commands/tagged/199/comment">comment</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1455/commit">commit</a></li>
+         
+        <li class="small"><a href="/commands/tagged/581/compare">compare</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2369/compile">compile</a></li>
+         
+        <li class="small"><a href="/commands/tagged/463/completion">completion</a></li>
+         
+        <li class="small"><a href="/commands/tagged/629/compress">compress</a></li>
+         
+        <li class="small"><a href="/commands/tagged/525/compression">compression</a></li>
+         
+        <li class="small"><a href="/commands/tagged/47/conffiles">conffiles</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2431/config">config</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1241/connection">connection</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1971/connections">connections</a></li>
+         
+        <li class="small"><a href="/commands/tagged/519/console">console</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1441/contacts">contacts</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1828/conversion">conversion</a></li>
+         
+        <li class="small"><a href="/commands/tagged/675/convert">convert</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1733/converter">converter</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1101/cookies">cookies</a></li>
+         
+        <li class="small"><a href="/commands/tagged/181/copy">copy</a></li>
+         
+        <li class="small"><a href="/commands/tagged/33/copy-paste">copy paste</a></li>
+         
+        <li class="small"><a href="/commands/tagged/676/copy-progress">copy progress</a></li>
+         
+        <li class="small"><a href="/commands/tagged/453/corrupt">corrupt</a></li>
+         
+        <li class="small"><a href="/commands/tagged/504/count">count</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1387/counter">counter</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1366/cowsay">cowsay</a></li>
+         
+        <li class="small"><a href="/commands/tagged/544/cp">cp</a></li>
+         
+        <li class="small"><a href="/commands/tagged/164/cpan">cpan</a></li>
+         
+        <li class="small"><a href="/commands/tagged/408/cpio">cpio</a></li>
+         
+        <li class="small"><a href="/commands/tagged/83/cpu">cpu</a></li>
+         
+        <li class="small"><a href="/commands/tagged/21/cpu-usage">cpu usage</a></li>
+         
+        <li class="small"><a href="/commands/tagged/963/cpuinfo">cpuinfo</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1630/cpulimit">cpulimit</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1070/crash">crash</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2232/crimsonfu">crimsonfu</a></li>
+         
+        <li class="small"><a href="/commands/tagged/187/cronjob">cronjob</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1465/crontab">crontab</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1517/crypt">crypt</a></li>
+         
+        <li class="small"><a href="/commands/tagged/105/csh">csh</a></li>
+         
+        <li class="small"><a href="/commands/tagged/534/css">css</a></li>
+         
+        <li class="small"><a href="/commands/tagged/267/csv">CSV</a></li>
+         
+        <li class="normal"><a href="/commands/tagged/235/curl">curl</a></li>
+         
+        <li class="small"><a href="/commands/tagged/301/cut">cut</a></li>
+         
+        <li class="small"><a href="/commands/tagged/119/cvs">cvs</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1479/cwd">cwd</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/647/cygpath">cygpath</a></li>
+         
+        <li class="small"><a href="/commands/tagged/438/cygwin">cygwin</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1537/daemon">daemon</a></li>
+         
+        <li class="small"><a href="/commands/tagged/904/dangerous">dangerous</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/733/darwin">darwin</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1350/dash">dash</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1958/data-sink">data sink</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/282/database">database</a></li>
+         
+        <li class="small"><a href="/commands/tagged/304/date">date</a></li>
+         
+        <li class="small"><a href="/commands/tagged/10/date-manipulation">Date manipulation</a></li>
+         
+        <li class="small"><a href="/commands/tagged/332/dates">dates</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2245/db2">DB2</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1072/dbus">dbus</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1073/dbus-send">dbus-send</a></li>
+         
+        <li class="small"><a href="/commands/tagged/802/dc">dc</a></li>
+         
+        <li class="small"><a href="/commands/tagged/75/dd">dd</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/735/ddos">ddos</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1959/debconf">debconf</a></li>
+         
+        <li class="small"><a href="/commands/tagged/40/debian">Debian</a></li>
+         
+        <li class="small"><a href="/commands/tagged/419/debug">debug</a></li>
+         
+        <li class="small"><a href="/commands/tagged/587/decimal">decimal</a></li>
+         
+        <li class="small"><a href="/commands/tagged/867/declare">declare</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1860/deduplicate">deduplicate</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2047/default">default</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/722/defunct">defunct</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1444/delay">delay</a></li>
+         
+        <li class="small"><a href="/commands/tagged/139/delete">delete</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2293/deleted">deleted</a></li>
+         
+        <li class="small"><a href="/commands/tagged/343/delicious">delicious</a></li>
+         
+        <li class="small"><a href="/commands/tagged/679/development">development</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1675/devfs">devfs</a></li>
+         
+        <li class="small"><a href="/commands/tagged/54/device">device</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1000/devices">devices</a></li>
+         
+        <li class="small"><a href="/commands/tagged/593/df">df</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2051/diagnostic">diagnostic</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2312/diceware">diceware</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1615/dictionaries">dictionaries</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1198/dictionary">dictionary</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1199/dictionary.com">dictionary.com</a></li>
+         
+        <li class="small"><a href="/commands/tagged/68/diff">diff</a></li>
+         
+        <li class="small"><a href="/commands/tagged/663/dig">dig</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1814/digit">digit</a></li>
+         
+        <li class="small"><a href="/commands/tagged/241/directories">directories</a></li>
+         
+        <li class="small"><a href="/commands/tagged/242/directory">directory</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1368/directory-sizedu">directory size,du</a></li>
+         
+        <li class="small"><a href="/commands/tagged/254/dirname">dirname</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1711/discogs">discogs</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1382/disk">disk</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1721/disk-quota">disk quota</a></li>
+         
+        <li class="small"><a href="/commands/tagged/94/disk-size">disk size</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2410/disk-space">disk space</a></li>
+         
+        <li class="small"><a href="/commands/tagged/96/disk-usage">disk usage</a></li>
+         
+        <li class="small"><a href="/commands/tagged/531/display">display</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/55/distribution">distribution</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/56/distro">distro</a></li>
+         
+        <li class="small"><a href="/commands/tagged/827/divx">divx</a></li>
+         
+        <li class="small"><a href="/commands/tagged/950/dmenu">dmenu</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1229/dmg">dmg</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1252/dmidecode">dmidecode</a></li>
+         
+        <li class="small"><a href="/commands/tagged/666/dns">dns</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1027/do">do</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1228/dock">dock</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1699/domain-name">domain name</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1593/done">done</a></li>
+         
+        <li class="small"><a href="/commands/tagged/766/dos">dos</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1776/dot">dot</a></li>
+         
+        <li class="small"><a href="/commands/tagged/972/dotfiles">dotfiles</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/198/down">down</a></li>
+         
+        <li class="small"><a href="/commands/tagged/689/download">download</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1152/downvotes">downvotes</a></li>
+         
+        <li class="small"><a href="/commands/tagged/299/dpkg">dpkg</a></li>
+         
+        <li class="small"><a href="/commands/tagged/406/dpkg-query">dpkg-query</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1384/drive">drive</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2347/drivespace">drivespace</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1413/dropbox">dropbox</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2227/dsmemberutil">dsmemberutil</a></li>
+         
+        <li class="small"><a href="/commands/tagged/124/du">du</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2105/dummy-file-null-file-test-file">dummy file, null file, test file</a></li>
+         
+        <li class="small"><a href="/commands/tagged/817/dump">dump</a></li>
+         
+        <li class="small"><a href="/commands/tagged/227/duplicate">duplicate</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/632/duplicate-directories">duplicate directories</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/633/duplicate-directory">duplicate directory</a></li>
+         
+        <li class="small"><a href="/commands/tagged/488/dvd">dvd</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1600/easter-egg">easter-egg</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1827/ebook">ebook</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1421/ebuild">ebuild</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1420/ebuilds">ebuilds</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2017/ec2">EC2</a></li>
+         
+        <li class="small"><a href="/commands/tagged/121/echo">echo</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/512/eclipse">eclipse</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1853/ed">ed</a></li>
+         
+        <li class="small"><a href="/commands/tagged/161/edit">edit</a></li>
+         
+        <li class="small"><a href="/commands/tagged/109/egrep">egrep</a></li>
+         
+        <li class="small"><a href="/commands/tagged/673/eix">eix</a></li>
+         
+        <li class="small"><a href="/commands/tagged/114/emacs">emacs</a></li>
+         
+        <li class="small"><a href="/commands/tagged/402/email">email</a></li>
+         
+        <li class="small"><a href="/commands/tagged/370/emerge">emerge</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2229/empty">empty</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1457/emulator">emulator</a></li>
+         
+        <li class="small"><a href="/commands/tagged/450/encoding">encoding</a></li>
+         
+        <li class="small"><a href="/commands/tagged/191/encryption">Encryption</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1196/english">English</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1111/enscript">enscript</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1903/entropy">entropy</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1576/env">env</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1577/environ">environ</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1578/environment">environment</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1515/eol">eol</a></li>
+         
+        <li class="small"><a href="/commands/tagged/789/epoch">epoch</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1829/epub">epub</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1987/errno">errno</a></li>
+         
+        <li class="small"><a href="/commands/tagged/318/error">error</a></li>
+         
+        <li class="small"><a href="/commands/tagged/865/escape">escape</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2092/escape-sequence">escape sequence</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1536/eselect">eselect</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/756/espeak">espeak</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1498/esx">esx</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1240/ethtool">ethtool</a></li>
+         
+        <li class="small"><a href="/commands/tagged/747/eval">eval</a></li>
+         
+        <li class="small"><a href="/commands/tagged/74/exclude">exclude</a></li>
+         
+        <li class="small"><a href="/commands/tagged/871/exclude-binary">exclude binary</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1750/exe">exe</a></li>
+         
+        <li class="small"><a href="/commands/tagged/319/exec">exec</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1431/executable">executable</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/754/execute">execute</a></li>
+         
+        <li class="small"><a href="/commands/tagged/193/exif">exif</a></li>
+         
+        <li class="small"><a href="/commands/tagged/685/exiftool">exiftool</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1075/exim">exim</a></li>
+         
+        <li class="small"><a href="/commands/tagged/292/exit">exit</a></li>
+         
+        <li class="small"><a href="/commands/tagged/445/expand">expand</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1461/expansion">expansion</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1608/expiration">expiration</a></li>
+         
+        <li class="small"><a href="/commands/tagged/646/explorer.exe">explorer.exe</a></li>
+         
+        <li class="small"><a href="/commands/tagged/773/export">export</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/879/expr">expr</a></li>
+         
+        <li class="small"><a href="/commands/tagged/589/ext3">ext3</a></li>
+         
+        <li class="small"><a href="/commands/tagged/590/ext4">ext4</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1564/extension">extension</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1262/extensions">extensions</a></li>
+         
+        <li class="small"><a href="/commands/tagged/959/external">external</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1146/external-ip">external ip</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1297/extglob">extglob</a></li>
+         
+        <li class="small"><a href="/commands/tagged/87/extract">extract</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1105/facebook">facebook</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1409/factorial">factorial</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2107/fat">FAT</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1494/fd">fd</a></li>
+         
+        <li class="small"><a href="/commands/tagged/941/fdisk">fdisk</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2144/festival">festival</a></li>
+         
+        <li class="small"><a href="/commands/tagged/701/fetch">fetch</a></li>
+         
+        <li class="small"><a href="/commands/tagged/76/ffmpeg">ffmpeg</a></li>
+         
+        <li class="small"><a href="/commands/tagged/743/ffmpeg2theora">ffmpeg2theora</a></li>
+         
+        <li class="small"><a href="/commands/tagged/188/fg">fg</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1620/field-separator">field separator</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/925/fields">fields</a></li>
+         
+        <li class="small"><a href="/commands/tagged/431/figlet">figlet</a></li>
+         
+        <li class="small"><a href="/commands/tagged/182/file">file</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1087/file-cop">file cop</a></li>
+         
+        <li class="small"><a href="/commands/tagged/806/file-descriptor">file descriptor</a></li>
+         
+        <li class="small"><a href="/commands/tagged/767/file-format">file format</a></li>
+         
+        <li class="small"><a href="/commands/tagged/595/file-rename">file rename</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2106/file-size">file size</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2120/file-sizes">file sizes</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1348/file-time">file time</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1053/file-transfer">file transfer</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1380/filename">filename</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1381/filepath">filepath</a></li>
+         
+        <li class="small"><a href="/commands/tagged/266/files">files</a></li>
+         
+        <li class="small"><a href="/commands/tagged/543/filesize">filesize</a></li>
+         
+        <li class="small"><a href="/commands/tagged/5/filesystem">Filesystem</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1609/filter">filter</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2153/filtered-stream-feed">filtered stream feed</a></li>
+         
+        <li class="normal"><a href="/commands/tagged/123/find">find</a></li>
+         
+        <li class="small"><a href="/commands/tagged/509/find-text">find text</a></li>
+         
+        <li class="small"><a href="/commands/tagged/550/finder">finder</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1653/finger">finger</a></li>
+         
+        <li class="small"><a href="/commands/tagged/296/firefox">firefox</a></li>
+         
+        <li class="small"><a href="/commands/tagged/768/firewall">firewall</a></li>
+         
+        <li class="small"><a href="/commands/tagged/350/fix">fix</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2005/fizzbuzz">fizzbuzz</a></li>
+         
+        <li class="small"><a href="/commands/tagged/410/flac">flac</a></li>
+         
+        <li class="small"><a href="/commands/tagged/146/flash">flash</a></li>
+         
+        <li class="small"><a href="/commands/tagged/947/flip">flip</a></li>
+         
+        <li class="small"><a href="/commands/tagged/771/floating-point">floating point</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1317/flush">flush</a></li>
+         
+        <li class="small"><a href="/commands/tagged/2022/flush-dns">flush dns</a></li>
+         
+        <li class="small"><a href="/commands/tagged/499/flv">flv</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/1568/focus">focus</a></li>
+         
+        <li class="small"><a href="/commands/tagged/473/fold">fold</a></li>
+         
+        <li class="small"><a href="/commands/tagged/745/folder">folder</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1306/fonts">fonts</a></li>
+         
+        <li class="small"><a href="/commands/tagged/545/for">for</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1513/for-loop">for loop</a></li>
+         
+        <li class="small"><a href="/commands/tagged/939/for-each">for-each</a></li>
+         
+        <li class="small"><a href="/commands/tagged/153/fork-bomb">fork bomb</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1807/format">format</a></li>
+         
+        <li class="small"><a href="/commands/tagged/457/fortune">fortune</a></li>
+         
+        <li class="small"><a href="/commands/tagged/785/foundry">foundry</a></li>
+         
+        <li class="small"><a href="/commands/tagged/1406/free">free</a></li>
+         
+        <li class="small"><a href="/commands/tagged/680/freebsd">FreeBSD</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/2216/friend">friend</a></li>
+         
+        <li class="tiny"><a href="/commands/tagged/329/fstab">fstab</a></li>
+         
+        <li class="small"><a href="/commands
