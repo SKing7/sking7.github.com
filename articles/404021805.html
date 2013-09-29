@@ -70,4 +70,43 @@
 	</div>
 
 	
-<d
+<div id="content">
+
+ <!--BEGIN:LOOP-->
+
+
+	<div class="post-2299 post type-post status-publish format-standard hentry category-uncategorized" >
+
+		<!-- BEGIN: DIFFERENT CONTENT FOR DIFFERENT TEMPLATES-->
+
+		<h2>How HTTPS Secures Connections: What Every Web Dev Should Know</h2>
+		
+		<ul class="meta">
+			<li class="inline"><abbr class='timeago' title='2013-07-25 02:40:22Z'>Wednesday, July 24th, 2013 09:40 pm GMT -5</abbr></li>
+			<li class="inline"></li>
+		</ul> 
+        
+		<div class="post-content">
+			<p><img src="http://blog.hartleybrody.com/wp-content/uploads/2013/07/https-certificate.png" alt="https certificate icon" width="120" class="alignright size-full wp-image-2301" />How does HTTPS <em>actually</em> work? That was the question I set out to solve a few days ago for a project at work. </p>
+<p>As a web developer, I knew that using HTTPS to protect users&#8217; sensitive data was A Very Good Idea, but I didn&#8217;t have much understanding about how it actually worked.</p>
+<p>How was data protected? How can a client and server create a secure connection if someone was already listening in on the wire? What is a security certificate and why do I need to pay someone to get one?</p>
+<h3>A Series of Tubes</h3>
+<p>Before we dive into how it all works, let&#8217;s talk briefly about why it&#8217;s important to secure connections in the first place, and what sorts of things HTTPS guards against.</p>
+<p>When you make a request to visit your favorite website, that request must pass through many different networks &#8212; any of which could be used to potentially eavesdrop or tamper with your connection. </p>
+<p><img src="http://blog.hartleybrody.com/wp-content/uploads/2013/07/series-of-tubes.png" alt="series of tubes" width="500" class="aligncenter size-medium wp-image-2303" /></p>
+<p>From your own computer to other machines on your local network, to the access point itself, through routers and switches all the way to the ISP and through the backbone providers, there are a lot of different organizations who ferry a request along. If a malicious user got into any one of those systems, then they have the potential to see what&#8217;s traveling through the wire.</p>
+<p>Normally, web requests are sent over regular ol&#8217; HTTP, where a client&#8217;s request and the server&#8217;s response are both sent as plain text. There are <a href="http://security.stackexchange.com/a/18861/4327" target="_blank">lots of good reasons why HTTP doesn&#8217;t use secure encryption by default</a>:</p>
+<ul>
+<li>Security requires more computation power</li>
+<li>Security requires more bandwidth</li>
+<li>Security breaks caching</li>
+</ul>
+<p>But sometimes, as the developer of a web application, you know that sensitive information like passwords or credit card data will be going over the connection, so it&#8217;s necessary to take extra precautions against snooping on those pages.</p>
+<p><span id="more-2299"></span><br />
+<h3>Transport Layer Security (TLS)</h3>
+<p>We&#8217;re about to dive into the world of cryptography, but you shouldn&#8217;t need much experience to keep up. We&#8217;ll really only be scratching the surface. Cryptography is the practice of securing communications against potential adversaries &#8212; people who might want to interfere with the communication, or just listen in. </p>
+<p>TLS &#8212; the successor to SSL &#8212; is a protocol that&#8217;s most often used to implement secure HTTP connections (ie HTTPS). TLS sits at a lower level in the <a href="http://en.wikipedia.org/wiki/OSI_model#Examples" target="_blank">OSI model</a> than HTTP, which is basically a fancy way of saying that, during a web request the TLS connection stuff happens before the HTTP connection stuff.</p>
+<p>TLS is a hybrid cryptographic system, meaning it makes use of multiple crypto paradigms, both of which we&#8217;ll look at next:</p>
+<blockquote><p>
+<strong>Public Key Cryptography</strong> for shared secret generation and authentication (making sure you are who you say you are).</p>
+<p><strong>Symmetric Key Cryptography</strong> using s
