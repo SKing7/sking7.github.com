@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="zh-CN" xmlns:wb="http://open.weibo.com/wb">
+<head>
+<meta charset="UTF-8" />
+<meta property="qc:admins" content="147062105661447145156375" />
+<title>HTML5迟来的API：Page Visibility | Tencent AlloyTeam</title>
+<link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="stylesheet" type="text/css" media="all" href="http://www.alloyteam.com/wp-content/themes/alloyteam/style.css" />
+<link rel="stylesheet" type="text/css" media="all" href="http://www.alloyteam.com/wp-includes/syntaxhighlighter/styles/shCoreDefault.css" />
+<link rel="pingback" href="http://www.alloyteam.com/xmlrpc.php" />
+<!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<link rel="alternate" type="application/rss+xml" title="Tencent AlloyTeam &raquo; HTML5迟来的API：Page Visibility 评论 Feed" href="http://www.alloyteam.com/2012/11/page-visibility-api/feed/" />
+<link rel='stylesheet' id='author-avatars-shortcode-css'  href='http://www.alloyteam.com/wp-content/plugins/author-avatars/css/shortcode.css?ver=1.6.2' type='text/css' media='all' />
+<link rel='stylesheet' id='author-avatars-widget-css'  href='http://www.alloyteam.com/wp-content/plugins/author-avatars/css/widget.css?ver=1.6.2' type='text/css' media='all' />
+<script type='text/javascript' src='http://www.alloyteam.com/wp-includes/js/jquery/jquery.js?ver=1.7.2'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.alloyteam.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.alloyteam.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='使用HTML5 跨域共享特性解决AJAX跨域数据同步问题' href='http://www.alloyteam.com/2012/11/html5-cors/' />
+<link rel='next' title='CSS3 的 roate 与 rotateX 的顺序研究' href='http://www.alloyteam.com/2012/11/the-order-of-roate-with-rotatex-problem/' />
+<meta name="generator" content="WordPress 3.4.2, fitted with the WordPress Mobile Pack 1.2.5" />
+<link rel='shortlink' href='http://www.alloyteam.com/?p=3949' />
+
+<!-- All in One SEO Pack 1.6.15.2 by Michael Torbert of Semper Fi Web Designob_start_detected [-1,-1] -->
+<link rel="canonical" href="http://www.alloyteam.com/2012/11/page-visibility-api/" />
+<!-- /all in one seo pack -->
+
+<!-- lazyload images -->
+<style type="text/css">
+.lh_lazyimg{
+opacity:0.2;filter:alpha(opacity=20);
+background:url(http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/loading.gif) no-repeat center center;
+}
+</style>
+<!-- lazyload images end -->
+
+<!-- case nojs, hidden lazyload images -->
+<noscript>
+<style type="text/css">
+.lh_lazyimg{display:none;}
+</style>
+</noscript>
+<!-- case nojs, hidden lazyload images end -->
+
+<!-- lazyload -->
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	function lazyload(){
+		$("img.lh_lazyimg").each(function(){
+			_self = $(this);
+			if (_self.attr("lazyloadpass")===undefined
+					&& _self.attr("file")
+					&& (!_self.attr("src")
+							|| (_self.attr("src") && _self.attr("file")!=_self.attr("src"))
+						)
+				) {
+				if((_self.offset().top) < ($(window).height()+$(document).scrollTop()+200)
+						&& (_self.offset().left) < ($(window).width()+$(document).scrollLeft()+200)
+					) {
+					_self.attr("src",_self.attr("file"));
+					_self.attr("lazyloadpass", "1");
+					_self.animate({opacity:"1"}, 400);
+				}
+			}
+		});
+	}
+	lazyload();
+
+	var itv;
+	$(window).scroll(function(){clearTimeout(itv);itv=setTimeout(lazyload,400);});
+	$(window).resize(function(){clearTimeout(itv);itv=setTimeout(lazyload,400);});
+});
+</script>
+<!-- lazyload end -->
+
+<!-- prettyPhoto -->
+<link rel="stylesheet" href="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/prettyPhoto/css/prettyPhoto.css" type="text/css" media="screen" charset="utf-8"/>
+<script type="text/javascript" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/prettyPhoto/js/jquery.prettyPhoto.js" charset="utf-8"></script>
+<script type="text/javascript">
+jQuery(function($){
+	$(".content_banner img").each(function(i){
+		_self = $(this);
+
+		selfWidth = _self.attr("width")?_self.attr("width"):_self.width();
+		selfHeight = _self.attr("height")?_self.attr("height"):_self.height();
+		if ((selfWidth && selfWidth<50)
+				|| (selfHeight && selfHeight<50)) {
+			return;
+		}
+
+		if (! this.parentNode.href) {
+			imgsrc = "";
+
+			if (_self.attr("src")) {
+				imgsrc = _self.attr("src");
+			}
+			if (_self.attr("file")) {
+				imgsrc = _self.attr("file");
+			} else if (_self.attr("original")) {
+				imgsrc = _self.attr("original");
+			}
+
+			if (imgsrc) {
+				_self.addClass("slideshow_imgs");
+				_self.wrap("<a href='"+imgsrc+"' rel='prettyPhoto[1]'></a>");
+			}
+		} else {
+			aHref = this.parentNode.href;
+			var b=/.+(\.jpg)|(\.jpeg)|(\.png)|(\.gif)|(\.bmp)/i;
+			if (! b.test(aHref)) {
+				return;
+			}
+
+			_self.addClass("slideshow_imgs");
+
+			_parentA = $(this.parentNode);
+			rel = _parentA.attr("rel");
+			if (! rel) {
+				rel = "";
+			}
+			if (rel.indexOf("prettyPhoto") != 0) {
+				_parentA.attr("rel","prettyPhoto[1]");
+			}
+		}
+	});
+
+	$("a[rel^='prettyPhoto']").prettyPhoto({social_tools:""});
+});
+</script>
+<!-- prettyPhoto end -->
+<style type="text/css" media="screen">body{position:relative}#dynamic-to-top{display:none;overflow:hidden;width:auto;z-index:90;position:fixed;bottom:20px;right:20px;top:auto;left:auto;font-family:sans-serif;font-size:1em;color:#fff;text-decoration:none;text-shadow:0 1px 0 #333;font-weight:bold;padding:20px 23px;border:1px solid #aba6a6;background:#3C454F;-webkit-background-origin:border;-moz-background-origin:border;-icab-background-origin:border;-khtml-background-origin:border;-o-background-origin:border;background-origin:border;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;-icab-background-clip:padding-box;-khtml-background-clip:padding-box;-o-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-ms-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-moz-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-o-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-khtml-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-icab-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-webkit-border-radius:2px;-moz-border-radius:2px;-icab-border-radius:2px;-khtml-border-radius:2px;border-radius:2px}#dynamic-to-top:hover{background:#4fd687;background:#3C454F -webkit-gradient( linear, 0% 0%, 0% 100%, from( rgba( 255, 255, 255, .2 ) ), to( rgba( 0, 0, 0, 0 ) ) );background:#3C454F -webkit-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -khtml-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -moz-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -o-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -ms-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -icab-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#3C454F linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );cursor:pointer}#dynamic-to-top:active{background:#3C454F;background:#3C454F -webkit-gradient( linear, 0% 0%, 0% 100%, from( rgba( 0, 0, 0, .3 ) ), to( rgba( 0, 0, 0, 0 ) ) );background:#3C454F -webkit-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -moz-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -khtml-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -o-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -ms-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#3C454F -icab-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#3C454F linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) )}#dynamic-to-top,#dynamic-to-top:active,#dynamic-to-top:focus,#dynamic-to-top:hover{outline:none}#dynamic-to-top span{display:block;overflow:hidden;width:14px;height:12px;background:url( http://www.alloyteam.com/wp-content/plugins/dynamic-to-top/css/images/up.png )no-repeat center center}</style>
+
+<script type="text/JavaScript">
+function addCookie(){　 // 加入收藏夹
+	if (document.all){
+		window.external.addFavorite('http://www.alloyteam.com', 'Tencent AlloyTeam - 腾讯Web前端 Alloy 团队 Blog');
+	}else if (window.sidebar){
+		window.sidebar.addPanel('Tencent AlloyTeam - 腾讯Web前端 Alloy 团队 Blog', 'http://www.alloyteam.com', "");
+	}
+}
+</script>
+<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body class="home blog" style="display:none;">
+<!--[if IE]> 
+<script>document.body.style.display = "block";</script>
+<![endif]-->  
+<!-- 注释 -->
+<div id="alloy">
+	<h1 id ="alloyteam" class="alloyteam1">AlloyTeam</h1>
+	<h1 id ="alloyteam2" class="alloyteam2"><a href="/">AlloyTeam</a></h1>
+	<div id ="tencentInfo">Copyright &copy; <script>document.write(new Date().getFullYear());</script> Tencent AlloyTeam. All Rights Reserved.</div>
+
+</div>
+
+<!--Header-->
+<div id="header">
+	<div id="top">
+		<div id="nav">
+			<a onfocus="this.blur()" href="http://www.alloyteam.com" id="logo" title="腾讯Web前端 Alloy 团队 Blog"><cite>Tencent AlloyTeam</cite></a>
+			<span class="subtitle">腾讯Web前端 Alloy 团队 Blog</span>
+			<div id="menu">
+				<div class="widget_search">
+					<form method="get" id="searchform" action="http://www.alloyteam.com" target="_blank">
+						<input name="s" type="text" value="Search" onfocus="this.value='';" onblur="if(this.value==''){this.value='Search';}">
+						<input name="" type="submit" value="" class="so" onmouseout="this.className='so'" onmouseover="this.className='soHover'">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="clearfix"></div>	
+<div id="main">
+	<div id="access">
+	<div class="menu-navmenu-container"><ul id="menu-navmenu" class="menu"><li id="menu-item-29" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-29"><a title="腾讯Web前端团队博客 AlloyTeam 首页" href="http://www.alloyteam.com/">首页</a></li>
+<li id="menu-item-745" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-745"><a href="http://www.alloyteam.com/category/%e5%89%8d%e7%ab%af%e8%b5%84%e8%ae%af/">前端资讯</a></li>
+<li id="menu-item-740" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor menu-item-740"><a href="http://www.alloyteam.com/category/webfrontend/">Web前端</a>
+<ul class="sub-menu">
+	<li id="menu-item-855" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-855"><a href="http://www.alloyteam.com/category/webfrontend/html5/">HTML5</a></li>
+	<li id="menu-item-856" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-856"><a href="http://www.alloyteam.com/category/webfrontend/css3/">CSS3</a></li>
+	<li id="menu-item-854" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-854"><a href="http://www.alloyteam.com/category/webfrontend/javascript/">JavaScript</a></li>
+	<li id="menu-item-747" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-747"><a href="http://www.alloyteam.com/category/webfrontend/ued/">用户体验设计</a></li>
+	<li id="menu-item-857" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-857"><a href="http://www.alloyteam.com/category/webfrontend/%e5%89%8d%e7%ab%af%e4%bc%98%e5%8c%96/">前端优化</a></li>
+</ul>
+</li>
+<li id="menu-item-748" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-748"><a href="http://www.alloyteam.com/category/%e8%b5%84%e6%ba%90%e5%b7%a5%e5%85%b7/">资源工具</a></li>
+<li id="menu-item-1371" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1371"><a href="http://www.alloyteam.com/category/alloylabs/">Alloy实验室</a>
+<ul class="sub-menu">
+	<li id="menu-item-744" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-744"><a href="http://www.alloyteam.com/category/alloylabs/showcase/">作品</a></li>
+	<li id="menu-item-961" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-961"><a href="http://www.alloyteam.com/category/alloylabs/html5game/">HTML5游戏</a></li>
+</ul>
+</li>
+<li id="menu-item-853" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-853"><a title="我们在 Github.com 上的 Web 开源项目" href="http://AlloyTeam.github.com">Github开源</a></li>
+<li id="menu-item-746" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-746"><a href="http://www.alloyteam.com/category/team/">团队</a></li>
+<li id="menu-item-1327" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1327"><a href="http://www.alloyteam.com/message-board/">留言板</a>
+<ul class="sub-menu">
+	<li id="menu-item-1335" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1335"><a href="http://www.alloyteam.com/links/">友情链接</a></li>
+</ul>
+</li>
+<li id="menu-item-27" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-27"><a title="腾讯AlloyTeam" href="http://www.alloyteam.com/about/">关于</a></li>
+</ul></div>	</div>
+
+<!--Header End-->
+		<div id="content" role="main">	
+<div id="postlist">
+	    <div class="content_text"> 
+
+    <div class="title1"> 
+    <a href="" class="animated tada singleauthor" target="_blank"><img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript></a> 
+   
+    <a href="http://www.alloyteam.com/2012/11/page-visibility-api/" class="blogTitle btitle" rel="bookmark" title="HTML5迟来的API：Page Visibility">HTML5迟来的API：Page Visibility</a> 
+    <div class="blogPs"> In <a href="http://www.alloyteam.com/category/webfrontend/html5/" title="查看 HTML5 中的全部文章" rel="category tag">HTML5</a>,<a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 中的全部文章" rel="category tag">JavaScript</a> on 2012年11月05日 by <a href="http://www.alloyteam.com/author/dmyang/" title="由 TAT.dmyang 发布" rel="author">TAT.dmyang</a>  view: 4,022 </div> 
+    <span class="comments"><a href="http://www.alloyteam.com/2012/11/page-visibility-api/#comments" class="up"  title="《HTML5迟来的API：Page Visibility》上的评论">7</a></span>
+    </div> 
+    <!--content_banner_single--> 
+    <div class="content_banner"> 
+    
+
+	
+    <div class="text">
+    <p>一开始先看个<a title="page visibility demo" href="http://www.alloyteam.com/wp-content/uploads/2012/11/page-visibility.html" target="_blank">小小demo</a>，<strong><span style="color: #000000;">切换tab对比下！</span></strong></p>
+<p>不得不说，浏览器的多tab（and多窗口）设计确实是满足了用户同时浏览很多个网页的需求，但是，网上有成千上万的页面，这些页面性能又参差不齐，对于某些性能很差的页面，用户停留在这个页面倒还好，但是当用户切换了到了其他tab页时，有可能会出现由于性能差的页面卡死导致整个浏览器卡死甚至机器卡死，其他页面好冤，浏览器好冤，机子好冤[汗]。<span id="more-3949"></span></p>
+<p>多tab固然是好，但是即使用户打开了N个tab窗口，他看的永远只是一个tab，其他不是激活态（按API，应该是叫隐藏）的tab虽然没用被用户关注到，但是它照样再跑，该计算的还得计算，改占的内存并不会少，这明显是造成了很大的资源浪费，作为网页开发者的我们，如果是知道了用户已经不再关注我们的页面，一些耗性能的操作当然可以停掉了（比如canvas的绘图，动态拉取feeds等，这种情况我觉得在网页游戏里面应该较多见），当用户切换回页面时，之前状态就可以恢复，可以说毫不影响用户体验。</p>
+<p>这其中，最关键的是一个环节：开发者如何知道所开发的页面被用户关注了？HTML5的Page Visibility API提供了这种可能！但是我觉得在这个时候作为H5的标准提出来明显是迟了，应该在tab设计之初就应该有此API或者相关的方案，如果大家都按照此方式组织代码，我们有理由相信浏览器的内存占用会大幅减少。</p>
+<p>支持page visibility的浏览器在document上添加一个hidden属性（不同浏览器可能需要前缀，如webkitHidden），看当前tab页是否激活，激活（focus）时document.hidden属性是false，否则是true，一下这段代码能用来检测浏览器是否支持pagevisivility并读取document的hidden值：</p>
+<pre class="brush: js; title: JavaScript">function getHiddenProp() {
+	return 'hidden' in document ? 'hidden' : function() {
+		var r = null;
+
+		['webkit', 'moz', 'ms', 'o'].forEach(function(prefix) {
+			if((prefix + 'Hidden') in document) {
+				return r = prefix + 'Hidden';
+			}
+		});
+
+		return r;
+	}();
+}</pre>
+<p>document还会添加一个visibilityState属性，该属性有4个可能值，分别如下：</p>
+<p>hidden：当浏览器最小化、切换tab（the page is on a background tab）、电脑锁屏时visibilityState值是hidden</p>
+<p>visible：当浏览器顶级context（top level browsing context）的document至少显示在一个屏幕（screen）当中时，返回visible；当浏览器窗口没有最小化，但是浏览器被其他应用遮挡时，visibilityState值也是visible</p>
+<p>prerender：文档加载离屏（is loaded off-screen）或者不可见时返回prerender，浏览器可选择性的支持这个属性（not all browsers will necessarily support it）</p>
+<p>unloaded：当文档（document）将要被unload时返回unloaded，浏览器可选择性的支持这个属性</p>
+<p>此外就是事件支持，document上会添加visibilitychange事件，当UA的顶级document可见性（visibility）改变时触发：</p>
+<pre class="brush: js; title: JavaScript">document.addEventListener(bPrefix + 'visibilitychange', function onVisibilityChange(e) {
+	//do some thing...
+});</pre>
+<p>bPrefix是浏览器前缀，如webkit。</p>
+<p>总体来说，page visibility的内容很少，也很简单，但是窃以为很有用，比如我们在做视频页面时，tab是hidden状态时，我们可以去努力拉取视频内容，播放可以停止，当用户切回来时开始播放；又比如我们可以配合H5的桌面通知（Notifications）API，保证只在使用了Notifications的页面可以收取桌面通知，在此页面visibilityState不是visible时不干扰用户等等。。</p>
+<p>最后，enjoy it！</p>
+<p>参考：</p>
+<p>1.<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.w3.org/TR/page-visibility');"  href="http://www.w3.org/TR/page-v

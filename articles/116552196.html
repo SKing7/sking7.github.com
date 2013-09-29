@@ -169,40 +169,4 @@ console.log(history.go(-3));
 <p>Before the closing <code>&lt;/script&gt;</code> tag, add a new listener for the <code>popstate</code> event:</p>
 <figure>
 <pre><code>// Revert to a previously saved state
-window.addEventListener('popstate', function(event) {
-  console.log('popstate fired!');
-
-  updateContent(event.state);
-});
-</code></pre>
-</figure>
-<p>We attach the event listener to the <code>window</code>, which is responsible for firing the event, and pass this event into our handler. We log a message (so we can see when this event is firing), and then we update the content using the state we saved previously. The state is attached to the <code>event</code> object via the <code>state</code> property.</p>
-<p>Open up the page fresh in your browser, click around like before, and then click back. As before, the URL in the address bar changes as you cycle through states, but now the content is also restored back to what it should be. Click forward, and the content is likewise correctly restored.</p>
-<div class="callout warning-block">
-<p>If you look at the developer console in Chrome when you load the page for the first time, you’ll see the <code>popstate</code> event fired immediately, before you’ve even clicked a link. This is because Chrome considers the initial page load to be a change in state, and so it fires the event. In this instance, the <code>state</code> property is <code>null</code>, but thankfully the <code>updateContent</code> function deals with this. Keep this in mind when developing as it could catch you out, especially if other browsers assume this behavior.</p>
-</p></div>
-</section>
-<section id="rewriting-history">
-<h2>Rewriting history <a class="permalink" href="#rewriting-history">#</a></h2>
-<p>Unfortunately, as fantastic as HTML5 is, it doesn’t allow us actual time travel. If it did, I would be going back to my childhood and telling a younger me, “Yes, you should have a slice of cake”. Take that as you will.</p>
-<p>The History API does, however, allow us to make amends to our history log items. For example, we could update the current state in response to fresh user input in a form. We can do this with <code>history.replaceState</code>.</p>
-<p><code>replaceState</code> works just as <code>pushState</code> does, with the exact same parameters, except that it updates the current entry instead of adding a new one. I can think of one situation in our demo where this could be used: the initial page load. If you click back for long enough, you’ll find that going back to the original URL doesn’t provide you the original content. Let’s fix that by adding the following to the bottom of our script:</p>
-<figure>
-<pre><code>// Store the initial content so we can revisit it later
-history.replaceState({
-  content: contentEl.textContent,
-  photo: photoEl.src
-}, document.title, document.location.href);
-</code></pre>
-</figure>
-<p>As this runs when the page loads, it saves the initial page state. We can later load this state when the user browses back to this point via the event listener we set up previously. You can try it out by loading up the page, clicking a few links, and then hitting back until you return to the original URL. The initial content has returned!</p>
-</section>
-<section id="demo">
-<h2>Demo <a class="permalink" href="#demo">#</a></h2>
-<p>I’ve set up a demo of our completed code. I’ve also added a little back-end magic to make our <code>history.pushState</code> URLs work like a real site. Remember that the URLs you push should be live URLs that the user can bookmark and share as real entry points to your site.</p>
-<p class="btn half"><a href="http://html5doctor.com/demos/history/">View the History API demo</a></p>
-</section>
-<section id="browser-support">
-<h2>Browser support <a class="permalink" href="#browser-support">#</a></h2>
-<p>Up-to-date copies of Chrome (5+), Safari (5.0+), Firefox (4.0+), and Opera (11.50+) have support for the new History API. Even some mobile browsers work just fine, like Mobile Safari on iOS 4+. Unfortunately, IE 9 and below lack support, but it <a href="http://msdn.microsoft.com/en-us/ie/hh272905.aspx#_HTML5History">should work in IE 10</a> when it arrives.</p>
-<p>Safari 5.0 sometimes exhibits one oddity: navigating between states causes the loading spinner to appear and stay eve
+window.addEventListener('popstate', 

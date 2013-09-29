@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile">
+<title>HTTP Archive: adding flush | High Performance Web Sites</title>
+<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" />
+<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites &raquo; HTTP Archive: adding flush Comments Feed" href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='HTTP Archive: new schema &amp; dumps' href='http://www.stevesouders.com/blog/2013/01/29/http-archive-new-schema-dumps/' />
+<link rel='next' title='HTTP Archive: new stats' href='http://www.stevesouders.com/blog/2013/02/16/http-archive-new-stats/' />
+<meta name="generator" content="WordPress 3.6.1" />
+<link rel='canonical' href='http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/' />
+<link rel='shortlink' href='http://www.stevesouders.com/blog/?p=3131' />
+<script type="text/javascript">
+	window._wp_rp_static_base_url = 'http://dtmvdvtzf8rz0.cloudfront.net/static/';
+	window._wp_rp_wp_ajax_url = "http://www.stevesouders.com/blog/wp-admin/admin-ajax.php";
+	window._wp_rp_plugin_version = '2.6';
+	window._wp_rp_post_id = '3131';
+	window._wp_rp_num_rel_posts = '5';
+</script>
+
+<script>
+(function(d, s) {
+	var js = d.getElementsByTagName(s)[0],
+		ln = d.createElement(s);
+	ln.src = '//lognormal.net/boomerang/8fa4fc2785a82fae20c596ca4f45d1b218a9ab12ffef741d09b29532';
+	js.parentNode.insertBefore(ln, js);
+})(document, 'script');
+</script>
+
+<script type="text/javascript">
+// GOOGLE ANALYTICS
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-15026169-1']);
+_gaq.push(['_setSiteSpeedSampleRate', 100]);
+_gaq.push(['_trackPageview']);
+
+(function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</head>
+
+<body>
+<div id="header">
+	<div class="containerwrapper">
+  		<h1 id="logo"><a href="http://stevesouders.com/"><span>SteveSouders.com</span></a></h1>
+        <ul id="topnav">
+        <li><a href="http://stevesouders.com/about.php">about</a></li>
+        <li><a href="http://stevesouders.com/contact.php">contact</a></li>
+        <li class="last"> <a href="http://twitter.com/#!/souders/"><img src="/images/twitter-icon.png" width=16 height=16 border=0 style="vertical-align: bottom;"></a>
+        </ul>
+	</div>    
+</div>
+<div id="contentWrapper" class="containerwrapper">
+<div id="sidebar">
+<div id="search-3" class="widget widget_search"><form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/">
+				<div>
+					<label class="screen-reader-text" for="s">Search for:</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="Search" />
+				</div>
+			</form></div><div id="custom-recent-posts-3" class="widget custom-recent-posts"><h3 class="blockheader">Most Recent Posts</h3>		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;">
+        		<li><a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark">Domain Sharding revisited</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-fut

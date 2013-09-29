@@ -213,7 +213,7 @@ function addCookie(){　 // 加入收藏夹
     <a href="" class="animated tada singleauthor" target="_blank"><img alt='TAT.Johnny' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://www.alloyteam.com/wp-content/uploads/2012/06/johnny_avatar-43x43.png" class="avatar avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='TAT.Johnny' src='http://www.alloyteam.com/wp-content/uploads/2012/06/johnny_avatar-43x43.png' class='avatar avatar-43 photo' height='43' width='43' /></noscript></a> 
    
     <a href="http://www.alloyteam.com/2012/11/performance-writing-efficient-javascript/" class="blogTitle btitle" rel="bookmark" title="【译】编写高性能JavaScript">【译】编写高性能JavaScript</a> 
-    <div class="blogPs"> In <a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 中的全部文章" rel="category tag">JavaScript</a>,<a href="http://www.alloyteam.com/category/webfrontend/" title="查看 Web前端 中的全部文章" rel="category tag">Web前端</a>,<a href="http://www.alloyteam.com/category/webfrontend/%e5%89%8d%e7%ab%af%e4%bc%98%e5%8c%96/" title="查看 前端优化 中的全部文章" rel="category tag">前端优化</a> on 2012年11月20日 by <a href="http://www.alloyteam.com/author/johnny/" title="由 TAT.Johnny 发布" rel="author">TAT.Johnny</a>  view: 10,461 </div> 
+    <div class="blogPs"> In <a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 中的全部文章" rel="category tag">JavaScript</a>,<a href="http://www.alloyteam.com/category/webfrontend/" title="查看 Web前端 中的全部文章" rel="category tag">Web前端</a>,<a href="http://www.alloyteam.com/category/webfrontend/%e5%89%8d%e7%ab%af%e4%bc%98%e5%8c%96/" title="查看 前端优化 中的全部文章" rel="category tag">前端优化</a> on 2012年11月20日 by <a href="http://www.alloyteam.com/author/johnny/" title="由 TAT.Johnny 发布" rel="author">TAT.Johnny</a>  view: 10,462 </div> 
     <span class="comments"><a href="http://www.alloyteam.com/2012/11/performance-writing-efficient-javascript/#comments" class="up"  title="《【译】编写高性能JavaScript》上的评论">12</a></span>
     </div> 
     <!--content_banner_single--> 
@@ -371,4 +371,105 @@ console.log(sumB); // Returns 7</pre>
         },
         addEvents: function () {
             $('table td').on('click', function () {
-                $(this)
+                $(this).toggleClass('active');
+            });
+        }
+
+    };
+}();</pre>
+<p>这段代码简单有效地完成了任务。</p>
+<p>但在这种情况下，我们遍历的数据只是本应该简单地存放在数组中的数字型属性ID。有趣的是，直接使用DocumentFragment和本地DOM方法比使用jQuery（以这种方式）来生成表格是更优的选择，当然，事件代理比单独绑定每个td具有更高的性能。</p>
+<p>要注意虽然jQuery在内部使用DocumentFragment，但是在我们的例子中，代码在循环内调用append并且这些调用涉及到一些其他的小知识，因此在这里起到的优化作用不大。希望这不会是一个痛点，但请务必进行基准测试，以确保自己代码ok。</p>
+<p>对于我们的例子，上述的做法带来了（期望的）性能提升。事件代理对简单的绑定是一种改进，可选的DocumentFragment也起到了助推作用。</p>
+<pre class="brush: js; title: JavaScript">var moduleD = function () {
+
+    return {
+
+        data: dataArray,
+
+        init: function () {
+            this.addTable();
+            this.addEvents();
+        },
+        addTable: function () {
+            var td, tr;
+            var frag = document.createDocumentFragment();
+            var frag2 = document.createDocumentFragment();
+
+            for (var i = 0; i &lt; rows; i++) {
+                tr = document.createElement('tr');
+                for (var j = 0; j &lt; this.data.length; j++) {
+                    td = document.createElement('td');
+                    td.appendChild(document.createTextNode(this.data[j]));
+
+                    frag2.appendChild(td);
+                }
+                tr.appendChild(frag2);
+                frag.appendChild(tr);
+            }
+            tbody.appendChild(frag);
+        },
+        addEvents: function () {
+            $('table').on('click', 'td', function () {
+                $(this).toggleClass('active');
+            });
+        }
+
+    };
+
+}();</pre>
+<p>接下来看看其他提升性能的方式。你也许曾经在哪读到过使用原型模式比模块模式更优，或听说过使用JS模版框架性能更好。有时的确如此，不过使用它们其实是为了代码更具可读性。对了，还有预编译！让我们看看在实践中表现的如何？</p>
+<pre class="brush: js; title: JavaScript">moduleG = function () {};
+
+moduleG.prototype.data = dataArray;
+moduleG.prototype.init = function () {
+    this.addTable();
+    this.addEvents();
+};
+moduleG.prototype.addTable = function () {
+    var template = _.template($('#template').text());
+    var html = template({'data' : this.data});
+    $tbody.append(html);
+};
+moduleG.prototype.addEvents = function () {
+   $('table').on('click', 'td', function () {
+       $(this).toggleClass('active');
+   });
+};
+
+var modG = new moduleG();</pre>
+<p>事实证明，在这种情况下的带来的性能提升可以忽略不计。<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/second-pass');"  href="http://jsperf.com/second-pass" target="_blank">模板和原型的选择</a>并没有真正提供更多的东西。也就是说，性能并不是开发者使用它们的原因，给代码带来的可读性、继承模型和可维护性才是真正的原因。</p>
+<p>更复杂的问题包括<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/canvas-drawimage-vs-webgl-drawarrays/6');"  href="http://jsperf.com/canvas-drawimage-vs-webgl-drawarrays/6" target="_blank">高效地在canvas上绘制图片</a>和操作带或不带类型数组的像素数据。</p>
+<p>在将一些方法用在你自己的应用之前，一定要多了解这些方案的基准测试。也许有人还记得<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/dom-vs-innerhtml-based-templating/473');"  href="http://jsperf.com/dom-vs-innerhtml-based-templating/473" target="_blank">JS模版的shoot-off</a>和<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/javascript-templating-shootoff-extended/26');"  href="http://jsperf.com/javascript-templating-shootoff-extended/26" target="_blank">随后的扩展版</a>。你要搞清楚基准测试不是存在于你看不到的那些虚拟应用，而是应该在你的实际代码中去测试带来的优化。</p>
+<h2>V8优化技巧</h2>
+<p>详细介绍了每个V8引擎的优化点在本文讨论范围之外，当然这里也有许多值得一提的技巧。记住这些技巧你就能减少那些性能低下的代码了。</p>
+<ul>
+<li>特定模式可以使V8摆脱优化的困境，比如说try-catch。欲了解更多有关哪些函数能或不能进行优化，你可以在V8的脚本工具d8中使用&#8211;trace-opt file.js命令。</li>
+<li>如果你关心速度，尽量使你的函数职责单一，即确保变量（包括属性，数组，函数参数）只使用相同隐藏类包含的对象。举个例子，别这么干：
+<pre class="brush: js; title: JavaScript">function add(x, y) { 
+   return x+y;
+} 
+
+add(1, 2); 
+add('a','b'); 
+add(my_custom_object, undefined);</pre>
+</li>
+<li>不要加载未初始化或已删除的元素。如果这么做也不会出现什么错误，但是这样会使速度变慢。</li>
+<li>不要使函数体过大，这样会使得优化更加困难。</li>
+</ul>
+<p>更多内容可以去看Daniel Clifford在Google I/O的分享 <a onclick="javascript:pageTracker._trackPageview('/outgoing/www.youtube.com/watch?v=UJPdhx5zTaw');"  href="http://www.youtube.com/watch?v=UJPdhx5zTaw">Breaking the JavaScript Speed Limit with V8</a>。 <a onclick="javascript:pageTracker._trackPageview('/outgoing/floitsch.blogspot.co.uk/2012/03/optimizing-for-v8-introduction.html');"  href="http://floitsch.blogspot.co.uk/2012/03/optimizing-for-v8-introduction.html">Optimizing For V8 — A Series</a>也非常值得一读。</p>
+<h3>对象VS数组：我应该用哪个？</h3>
+<ul>
+<li>如果你想存储一串数字，或者一些相同类型的对象，使用一个数组。</li>
+<li>如果你语义上需要的是一堆的对象的属性（不同类型的），使用一个对象和属性。这在内存方面非常高效，速度也相当快。</li>
+<li>整数索引的元素，无论存储在一个数组或对象中，都要<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/performance-of-array-vs-object/3');"  href="http://jsperf.com/performance-of-array-vs-object/3" target="_blank">比遍历对象的属性快得多</a>。</li>
+<li>对象的属性比较复杂：它们可以被setter们创建，具有不同的枚举性和可写性。数组中则不具有如此的定制性，而只存在有和无这两种状态。在引擎层面，这允许更多存储结构方面的优化。特别是当数组中存在数字时，例如当你需要容器时，不用定义具有x,y,z属性的类，而只用数组就可以了。</li>
+</ul>
+<p>JavaScript中对象和数组之间只有一个的主要区别，那就是数组神奇的length属性。如果你自己来维护这个属性，那么V8中对象和数组的速度是一样快的。</p>
+<h3>使用对象时的技巧</h3>
+<ul>
+<li>使用一个构造函数来创建对象。这将确保它创建的所有对象具有相同的隐藏类，并有助于避免更改这些类。作为一个额外的好处，它也<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/object-create-vs-constructor-vs-object-literal/7');"  href="http://jsperf.com/object-create-vs-constructor-vs-object-literal/7" target="_blank">略快于Object.create()</a></li>
+<li>你的应用中，对于使用不同类型的对象和其复杂度（在合理的范围内：长原型链往往是有害的，呈现只有一个极少数属性的对象比大对象会快一点）是有没限制的。对于“hot”对象，尽量保持短原型链，并且少属性。</li>
+</ul>
+<h4>对象克隆</h4>
+<p>对于应用程序开发人员，对象克隆是一个常见的问题。虽然各种基准测试可以证明V8对这个问题处理得很好，但仍要小心。复制大的东西通常是较慢的——不要这么做。JS
