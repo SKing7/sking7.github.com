@@ -852,4 +852,1054 @@ function subTaskReceived(e) {
 				<table class="crayon-table">
 					<tr class="crayon-row">
 				<td class="crayon-nums " data-settings="show">
-					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-2">2</di
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-10">10</div><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-12">12</div><div class="crayon-num" data-line="crayon-52482d1ee8eb7517757964-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eb7517757964-14">14</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8eb7517757964-1"><span class="crayon-r">self</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">messageReceived</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eb7517757964-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8eb7517757964-3"><span class="crayon-c">// a sub worker</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eb7517757964-4"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">subworker</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Worker</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-s">'Task.js'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8eb7517757964-5">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eb7517757964-6"><span class="crayon-v">subworker</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">subTaskReceived</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8eb7517757964-7">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eb7517757964-8"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">messageReceived</span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8eb7517757964-9"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// some logic</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eb7517757964-10"><span class="crayon-sy">}</span></div><div class="crayon-line" id="crayon-52482d1ee8eb7517757964-11">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eb7517757964-12"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">subTaskReceived</span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8eb7517757964-13"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// some logic</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eb7517757964-14"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0030 seconds] -->
+<p></p>
+<h5><span style="line-height: 1.5em;">Passing data</span></h5>
+<p style="text-align: justify;">To communicate, we use the postMessage API (not to be confused with window.postMessage). Any message sent with postMessage triggers the &#8220;message&#8221; event that dispatched by the Worker object:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8ec0856637819" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// extract the string
+var logic = document.querySelectorAll("script[type=\"text\/js-worker\"]")[0].textContent;
+
+// worker logic
+var blob = new Blob([logic], {type: 'text/javascript'});
+
+// webkit handling
+var URL = window.URL || window.webkitURL;
+
+// create the virtual file
+var code = URL.createObjectURL(blob);
+
+// create the worker
+var worker = new Worker(code);
+
+// listen to the response from the Worker
+worker.addEventListener('message', receiveMessage);
+
+// pass some data
+worker.postMessage('How is it going over there?');
+
+// callback handling the response, data is available in the event object
+function receiveMessage (e)
+{
+    console.log (e.data);
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-10">10</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-12">12</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-14">14</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-16">16</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-18">18</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-19">19</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-20">20</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-21">21</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-22">22</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-23">23</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-24">24</div><div class="crayon-num" data-line="crayon-52482d1ee8ec0856637819-25">25</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ec0856637819-26">26</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-1"><span class="crayon-c">// extract the string</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">logic</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">document</span><span class="crayon-sy">.</span><span class="crayon-e">querySelectorAll</span><span class="crayon-sy">(</span><span class="crayon-s">"script[type=\"text\/js-worker\"]"</span><span class="crayon-sy">)</span><span class="crayon-sy">[</span><span class="crayon-cn">0</span><span class="crayon-sy">]</span><span class="crayon-sy">.</span><span class="crayon-i">textContent</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-4"><span class="crayon-c">// worker logic</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-5"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">blob</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Blob</span><span class="crayon-sy">(</span><span class="crayon-sy">[</span><span class="crayon-i">logic</span><span class="crayon-sy">]</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-v">type:</span><span class="crayon-h"> </span><span class="crayon-s">'text/javascript'</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-6">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-7"><span class="crayon-c">// webkit handling</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-8"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">URL</span><span class="crayon-h"> </span><span class="crayon-o">||</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">webkitURL</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-9">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-10"><span class="crayon-c">// create the virtual file</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-11"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">code</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-sy">.</span><span class="crayon-e">createObjectURL</span><span class="crayon-sy">(</span><span class="crayon-i">blob</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-12">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-13"><span class="crayon-c">// create the worker</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-14"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">worker</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Worker</span><span class="crayon-sy">(</span><span class="crayon-i">code</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-15">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-16"><span class="crayon-c">// listen to the response from the Worker</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-17"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">receiveMessage</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-18">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-19"><span class="crayon-c">// pass some data</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-20"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-s">'How is it going over there?'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-21">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-22"><span class="crayon-c">// callback handling the response, data is available in the event object</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-23"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">receiveMessage</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-24"><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8ec0856637819-25"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">e</span><span class="crayon-sy">.</span><span class="crayon-i">data</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ec0856637819-26"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0066 seconds] -->
+<p></p>
+<p style="text-align: justify;">Our code sends a message to the Worker, which returns a message back to the main thread. The code above outputs the following message:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8ec9067984944" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+Doing pretty good here!</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8ec9067984944-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8ec9067984944-1"><span class="crayon-e">Doing </span><span class="crayon-e">pretty </span><span class="crayon-e">good </span><span class="crayon-i">here</span><span class="crayon-o">!</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0019 seconds] -->
+<p></p>
+<p style="text-align: justify;">In that case, we sent the string: <em>&#8216;How is it going over there&#8217;</em>, and the Worker returned <em>&#8216;Doing pretty good here&#8217;</em>. We sent different data to illustrate how simply message passing works. But in most cases you want to send similar data that you can retrieve on both sides. Some coordinates, a path that has been computed in a game, or more simply a binary blob that you want to process, like a PDF or an image that has been generated. To retrieve the data that is being passed, we use the <em>data</em> property of the event object.</p>
+<p style="text-align: justify;">In the code below, we update our worker logic to return the data back to the main thread:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8ed1323336757" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+self.addEventListener('message', messageReceived);
+
+function messageReceived(e) {
+    self.postMessage(e.data);
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8ed1323336757-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ed1323336757-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8ed1323336757-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ed1323336757-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8ed1323336757-5">5</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8ed1323336757-1"><span class="crayon-r">self</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">messageReceived</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ed1323336757-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8ed1323336757-3"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">messageReceived</span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ed1323336757-4"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">self</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-v">e</span><span class="crayon-sy">.</span><span class="crayon-i">data</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8ed1323336757-5"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0019 seconds] -->
+<p></p>
+<p style="text-align: justify;">We still pass a simple string, but it is now sent back to the main thread:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8eda239755120" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// extract the string
+var logic = document.querySelectorAll("script[type=\"text\/js-worker\"]")[0].textContent;
+
+// worker logic
+var blob = new Blob([logic], {type: 'text/javascript'});
+
+// webkit handling
+var URL = window.URL || window.webkitURL;
+
+// create the virtual file
+var code = URL.createObjectURL(blob);
+
+// create the worker
+var worker = new Worker(code);
+
+// listen to the response from the Worker
+worker.addEventListener('message', receiveMessage);
+
+// we send some data
+worker.postMessage("Some data passed back and forth!")
+
+// callback handling the response, data is available in the event object
+function receiveMessage (e)
+{
+    console.log (e.data);
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-10">10</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-12">12</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-14">14</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-16">16</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-18">18</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-19">19</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-20">20</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-21">21</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-22">22</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-23">23</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-24">24</div><div class="crayon-num" data-line="crayon-52482d1ee8eda239755120-25">25</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eda239755120-26">26</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8eda239755120-1"><span class="crayon-c">// extract the string</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">logic</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">document</span><span class="crayon-sy">.</span><span class="crayon-e">querySelectorAll</span><span class="crayon-sy">(</span><span class="crayon-s">"script[type=\"text\/js-worker\"]"</span><span class="crayon-sy">)</span><span class="crayon-sy">[</span><span class="crayon-cn">0</span><span class="crayon-sy">]</span><span class="crayon-sy">.</span><span class="crayon-i">textContent</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-4"><span class="crayon-c">// worker logic</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-5"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">blob</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Blob</span><span class="crayon-sy">(</span><span class="crayon-sy">[</span><span class="crayon-i">logic</span><span class="crayon-sy">]</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-v">type:</span><span class="crayon-h"> </span><span class="crayon-s">'text/javascript'</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-6">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-7"><span class="crayon-c">// webkit handling</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-8"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">URL</span><span class="crayon-h"> </span><span class="crayon-o">||</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">webkitURL</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-9">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-10"><span class="crayon-c">// create the virtual file</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-11"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">code</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-sy">.</span><span class="crayon-e">createObjectURL</span><span class="crayon-sy">(</span><span class="crayon-i">blob</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-12">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-13"><span class="crayon-c">// create the worker</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-14"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">worker</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Worker</span><span class="crayon-sy">(</span><span class="crayon-i">code</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-15">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-16"><span class="crayon-c">// listen to the response from the Worker</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-17"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">receiveMessage</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-18">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-19"><span class="crayon-c">// we send some data</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-20"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-s">"Some data passed back and forth!"</span><span class="crayon-sy">)</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-21">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-22"><span class="crayon-c">// callback handling the response, data is available in the event object</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-23"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">receiveMessage</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-24"><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8eda239755120-25"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">e</span><span class="crayon-sy">.</span><span class="crayon-i">data</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eda239755120-26"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0065 seconds] -->
+<p></p>
+<p style="text-align: justify;">If we run the code above, the console outputs:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8ee3420604965" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+Some data passed back and forth!</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8ee3420604965-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8ee3420604965-1"><span class="crayon-e">Some </span><span class="crayon-e">data </span><span class="crayon-e">passed </span><span class="crayon-e">back </span><span class="crayon-st">and</span><span class="crayon-h"> </span><span class="crayon-i">forth</span><span class="crayon-o">!</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0008 seconds] -->
+<p></p>
+<p style="text-align: justify;">Remember that we are not sharing anything here, our string got cloned implicitly. Now you may wonder, can I pass any kind of data? If you stick to all the primitive types available in the JavaScript language, like Number, String, Boolean, you will be fine. For composite data types, plain JSON objects are supported, in addition to the ImageData and TypedArray types.</p>
+<p style="text-align: justify;">In the code below, we pass a simple JSON object:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8eeb384745260" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// a user
+var user = { name : "Bob", age: 30, city: "San Francisco" };
+
+// we pass our object
+worker.postMessage ( user );</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8eeb384745260-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eeb384745260-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8eeb384745260-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8eeb384745260-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8eeb384745260-5">5</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8eeb384745260-1"><span class="crayon-c">// a user</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eeb384745260-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">user</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h"> </span><span class="crayon-i">name</span><span class="crayon-h"> </span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-s">"Bob"</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">age</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">30</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">city</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-s">"San Francisco"</span><span class="crayon-h"> </span><span class="crayon-sy">}</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8eeb384745260-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8eeb384745260-4"><span class="crayon-c">// we pass our object</span></div><div class="crayon-line" id="crayon-52482d1ee8eeb384745260-5"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-h"> </span><span class="crayon-i">user</span><span class="crayon-h"> </span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0021 seconds] -->
+<p>Here again, the object is cloned and accessible from our Worker code:</p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8ef3110449195" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+self.addEventListener('message', messageReceived);
+
+function messageReceived (e)
+{
+    var user = e.data;
+    var name = user.name;
+    var age = user.age;
+    var city = user.city;
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8ef3110449195-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ef3110449195-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8ef3110449195-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ef3110449195-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8ef3110449195-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ef3110449195-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8ef3110449195-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8ef3110449195-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8ef3110449195-9">9</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8ef3110449195-1"><span class="crayon-r">self</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">messageReceived</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ef3110449195-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8ef3110449195-3"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">messageReceived</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ef3110449195-4"><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8ef3110449195-5"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">user</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">e</span><span class="crayon-sy">.</span><span class="crayon-i">data</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ef3110449195-6"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">name</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">user</span><span class="crayon-sy">.</span><span class="crayon-i">name</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8ef3110449195-7"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">age</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">user</span><span class="crayon-sy">.</span><span class="crayon-i">age</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8ef3110449195-8"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">city</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">user</span><span class="crayon-sy">.</span><span class="crayon-i">city</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8ef3110449195-9"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0032 seconds] -->
+<p></p>
+<p style="text-align: justify;">If you try to pass an unsupported type, you will get a <em>DataCloneError</em> exception. In the code below, we try to pass a reference to the window object:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8efc898988973" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// attempt to pass the window object
+worker.postMessage(this.window);</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8efc898988973-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8efc898988973-2">2</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8efc898988973-1"><span class="crayon-c">// attempt to pass the window object</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8efc898988973-2"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-i">window</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0009 seconds] -->
+<p>Which triggers the following exception:</p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f04801736773" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+Uncaught Error: DataCloneError: DOM Exception 25</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f04801736773-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f04801736773-1"><span class="crayon-e">Uncaught </span><span class="crayon-v">Error:</span><span class="crayon-h"> </span><span class="crayon-v">DataCloneError:</span><span class="crayon-h"> </span><span class="crayon-e">DOM </span><span class="crayon-i">Exception</span><span class="crayon-h"> </span><span class="crayon-cn">25</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0011 seconds] -->
+<p></p>
+<p style="text-align: justify;">Same thing with an XHR object:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f0c531419620" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// attempt to pass an XHR object
+worker.postMessage(new XMLHttpRequest());</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f0c531419620-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f0c531419620-2">2</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f0c531419620-1"><span class="crayon-c">// attempt to pass an XHR object</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f0c531419620-2"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">XMLHttpRequest</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0009 seconds] -->
+<p></p>
+<p style="text-align: justify;">Which also results in a runtime exception:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f14934512547" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+Uncaught Error: DataCloneError: DOM Exception 25</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f14934512547-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f14934512547-1"><span class="crayon-e">Uncaught </span><span class="crayon-i">Error</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-i">DataCloneError</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-e">DOM </span><span class="crayon-i">Exception</span><span class="crayon-h"> </span><span class="crayon-cn">25</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0009 seconds] -->
+<p></p>
+<p style="text-align: justify;">In the same way, passing a custom type is not supported. In the code below, we try to pass an Array of Ball objects:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f1c016038062" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var radius = 10;
+var Ball = (function () {
+    function Ball(radius, x, y, destX, destY, context, balls) {
+        this.friction = .1;
+        this.color = 'green';
+        this.radius = radius;
+        this.x = x;
+        this.y = y;
+        this.destX = destX;
+        this.destY = destY;
+        this.context = context;
+        this.balls = balls;
+    }
+    return Ball;
+})();
+
+var BALLS_NUM = 100;
+var balls = new Array();
+
+for(var i = 0; i &lt; BALLS_NUM; i++) {
+    var obj = new Ball(radius, Math.round(Math.random() * 1024), Math.round(Math.random() * 768), Math.random() * 1024, Math.random() * 768, context, balls);
+    balls.push(obj);
+}
+
+// attempt to pass an array of custom type (Ball) objects
+worker.postMessage (balls);</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-10">10</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-12">12</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-14">14</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-16">16</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-18">18</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-19">19</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-20">20</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-21">21</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-22">22</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-23">23</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-24">24</div><div class="crayon-num" data-line="crayon-52482d1ee8f1c016038062-25">25</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f1c016038062-26">26</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">radius</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">10</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">Ball</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-3"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">Ball</span><span class="crayon-sy">(</span><span class="crayon-i">radius</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">x</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">y</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">destX</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">destY</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">context</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">balls</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-4"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">friction</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">.</span><span class="crayon-cn">1</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-5"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">color</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-s">'green'</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-6"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">radius</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">radius</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-7"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">x</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">x</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-8"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">y</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">y</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-9"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">destX</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">destX</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-10"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">destY</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">destY</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-11"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">context</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">context</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-12"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">balls</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">balls</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-13"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-14"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-st">return</span><span class="crayon-h"> </span><span class="crayon-i">Ball</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-15"><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-16">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-17"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">BALLS_NUM</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">100</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-18"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">balls</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-t">Array</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-19">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-20"><span class="crayon-st">for</span><span class="crayon-sy">(</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">i</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">0</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-i">i</span><span class="crayon-h"> </span><span class="crayon-o">&lt;</span><span class="crayon-h"> </span><span class="crayon-i">BALLS_NUM</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-i">i</span><span class="crayon-o">++</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-21"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">obj</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Ball</span><span class="crayon-sy">(</span><span class="crayon-i">radius</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">Math</span><span class="crayon-sy">.</span><span class="crayon-e">round</span><span class="crayon-sy">(</span><span class="crayon-v">Math</span><span class="crayon-sy">.</span><span class="crayon-e">random</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">*</span><span class="crayon-h"> </span><span class="crayon-cn">1024</span><span class="crayon-sy">)</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">Math</span><span class="crayon-sy">.</span><span class="crayon-e">round</span><span class="crayon-sy">(</span><span class="crayon-v">Math</span><span class="crayon-sy">.</span><span class="crayon-e">random</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">*</span><span class="crayon-h"> </span><span class="crayon-cn">768</span><span class="crayon-sy">)</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">Math</span><span class="crayon-sy">.</span><span class="crayon-e">random</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">*</span><span class="crayon-h"> </span><span class="crayon-cn">1024</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">Math</span><span class="crayon-sy">.</span><span class="crayon-e">random</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">*</span><span class="crayon-h"> </span><span class="crayon-cn">768</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">context</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">balls</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-22"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">balls</span><span class="crayon-sy">.</span><span class="crayon-e">push</span><span class="crayon-sy">(</span><span class="crayon-i">obj</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-23"><span class="crayon-sy">}</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-24">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f1c016038062-25"><span class="crayon-c">// attempt to pass an array of custom type (Ball) objects</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f1c016038062-26"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-i">balls</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0130 seconds] -->
+<p></p>
+<p style="text-align: justify;">This code will also trigger the same <em>DataCloneError</em> exception. As you can imagine, passing data through cloning has overhead. If you try to pass a big amount of data at a high frequency, cloning will not be the most efficient path. However, this approach has one merit, it is very safe. Given that everything is cloned, it is therefore impossible to get in a situation where data is corrupted or simply ending up with unsynchronized shared data.</p>
+<h6 style="text-align: justify;">Sending larger objects</h6>
+<p style="text-align: justify;">In the following example, we create a 16mb byte array that we send to the worker, we capture the time it takes to allocate and transfer back and forth:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f25994752450" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// extract the string
+var logic = document.querySelectorAll("script[type=\"text\/js-worker\"]")[0].textContent;
+
+// worker logic
+var blob = new Blob([logic], {type: 'text/javascript'});
+
+// webkit handling
+var URL = window.URL || window.webkitURL;
+
+// create the virtual file
+var code = URL.createObjectURL(blob);
+
+// create the worker
+var worker = new Worker(code);
+
+// listen to the response from the Worker
+worker.addEventListener('message', receiveMessage);
+
+// capture current time
+var started = Date.now();
+
+// Create a 16MB "file" and fill it.
+var uInt8View = new Uint8Array(1024*1024*16); // 16MB
+for (var i = 0; i &lt; uInt8View.length; ++i) {
+    uInt8View[i] = i;
+}
+
+console.log ( "Memory allocation : " + (Date.now() - started) + " ms" );
+
+// capture current time
+started = Date.now();
+
+// pass the bytearray (cloned)
+worker.postMessage(uInt8View.buffer);
+
+// callback handling the response, data is available in the event object
+function receiveMessage (e)
+{
+    console.log ("Back/forth transfer : " + (Date.now() - started) + " ms");
+    console.log ("Byte array size : " + e.data.byteLength);
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-10">10</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-12">12</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-14">14</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-16">16</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-18">18</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-19">19</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-20">20</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-21">21</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-22">22</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-23">23</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-24">24</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-25">25</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-26">26</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-27">27</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-28">28</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-29">29</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-30">30</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-31">31</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-32">32</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-33">33</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-34">34</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-35">35</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-36">36</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-37">37</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-38">38</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-39">39</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f25994752450-40">40</div><div class="crayon-num" data-line="crayon-52482d1ee8f25994752450-41">41</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f25994752450-1"><span class="crayon-c">// extract the string</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">logic</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">document</span><span class="crayon-sy">.</span><span class="crayon-e">querySelectorAll</span><span class="crayon-sy">(</span><span class="crayon-s">"script[type=\"text\/js-worker\"]"</span><span class="crayon-sy">)</span><span class="crayon-sy">[</span><span class="crayon-cn">0</span><span class="crayon-sy">]</span><span class="crayon-sy">.</span><span class="crayon-i">textContent</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-4"><span class="crayon-c">// worker logic</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-5"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">blob</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Blob</span><span class="crayon-sy">(</span><span class="crayon-sy">[</span><span class="crayon-i">logic</span><span class="crayon-sy">]</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-v">type:</span><span class="crayon-h"> </span><span class="crayon-s">'text/javascript'</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-6">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-7"><span class="crayon-c">// webkit handling</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-8"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">URL</span><span class="crayon-h"> </span><span class="crayon-o">||</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">webkitURL</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-9">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-10"><span class="crayon-c">// create the virtual file</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-11"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">code</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-sy">.</span><span class="crayon-e">createObjectURL</span><span class="crayon-sy">(</span><span class="crayon-i">blob</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-12">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-13"><span class="crayon-c">// create the worker</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-14"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">worker</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Worker</span><span class="crayon-sy">(</span><span class="crayon-i">code</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-15">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-16"><span class="crayon-c">// listen to the response from the Worker</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-17"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">receiveMessage</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-18">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-19"><span class="crayon-c">// capture current time</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-20"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">started</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">Date</span><span class="crayon-sy">.</span><span class="crayon-e">now</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-21">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-22"><span class="crayon-c">// Create a 16MB "file" and fill it.</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-23"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">uInt8View</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Uint8Array</span><span class="crayon-sy">(</span><span class="crayon-cn">1024</span><span class="crayon-o">*</span><span class="crayon-cn">1024</span><span class="crayon-o">*</span><span class="crayon-cn">16</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// 16MB</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-24"><span class="crayon-st">for</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">i</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">0</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-i">i</span><span class="crayon-h"> </span><span class="crayon-o">&lt;</span><span class="crayon-h"> </span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">length</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-o">++</span><span class="crayon-i">i</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-25"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">[</span><span class="crayon-i">i</span><span class="crayon-sy">]</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">i</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-26"><span class="crayon-sy">}</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-27">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-28"><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-h"> </span><span class="crayon-s">"Memory allocation : "</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">Date</span><span class="crayon-sy">.</span><span class="crayon-e">now</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">-</span><span class="crayon-h"> </span><span class="crayon-i">started</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">" ms"</span><span class="crayon-h"> </span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-29">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-30"><span class="crayon-c">// capture current time</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-31"><span class="crayon-v">started</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">Date</span><span class="crayon-sy">.</span><span class="crayon-e">now</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-32">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-33"><span class="crayon-c">// pass the bytearray (cloned)</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-34"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">buffer</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-35">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-36"><span class="crayon-c">// callback handling the response, data is available in the event object</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-37"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">receiveMessage</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-38"><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-39"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-s">"Back/forth transfer : "</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">Date</span><span class="crayon-sy">.</span><span class="crayon-e">now</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">-</span><span class="crayon-h"> </span><span class="crayon-i">started</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">" ms"</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f25994752450-40"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-s">"Byte array size : "</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-v">e</span><span class="crayon-sy">.</span><span class="crayon-v">data</span><span class="crayon-sy">.</span><span class="crayon-i">byteLength</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f25994752450-41"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0134 seconds] -->
+<p></p>
+<p style="text-align: justify;">If we run this code on different devices and environments, we get the following results: 
+<table id="tablepress-4" class="tablepress tablepress-id-4">
+<thead>
+<tr class="row-1 odd">
+	<th class="column-1"><div>Platform</div></th><th class="column-2"><div>Time (ms)</div></th>
+</tr>
+</thead>
+<tbody class="row-hover">
+<tr class="row-2 even">
+	<td class="column-1">iOS7 (Safari/iPhone5)</td><td class="column-2">214</td>
+</tr>
+<tr class="row-3 odd">
+	<td class="column-1">iOS6 (Safari/iPhone4S)</td><td class="column-2">524</td>
+</tr>
+<tr class="row-4 even">
+	<td class="column-1">MacBook Pro (Chrome/10.8.4)</td><td class="column-2">75</td>
+</tr>
+</tbody>
+</table>
+<!-- #tablepress-4 from cache --></p>
+<p style="text-align: justify;">Note how expensive data cloning is on a recent device and OS. Let&#8217;s see if transfer of ownership can help performance.</p>
+<h6>Transferable objects</h6>
+<p style="text-align: justify;">In a scenario where you need to pass a large amount of data and cloning could be too costly, you can rely on transferrable objects. To transfer an object, the postMessage API accepts a second optional second argument, which is an array containing the objects to transfer ownership from:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f2f140977014" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// transfer ownership to the worker
+worker.postMessage(uInt8View.buffer, [uInt8View.buffer]);</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f2f140977014-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f2f140977014-2">2</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f2f140977014-1"><span class="crayon-c">// transfer ownership to the worker</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f2f140977014-2"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">buffer</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">buffer</span><span class="crayon-sy">]</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0014 seconds] -->
+<p></p>
+<p style="text-align: justify;">With that change, we see that passing data becomes much more efficient, around a 3x performance boost on mobile: 
+<table id="tablepress-5" class="tablepress tablepress-id-5">
+<thead>
+<tr class="row-1 odd">
+	<th class="column-1"><div>Platform</div></th><th class="column-2"><div>Time (ms)</div></th>
+</tr>
+</thead>
+<tbody class="row-hover">
+<tr class="row-2 even">
+	<td class="column-1">iOS7 (Safari/iPhone5)</td><td class="column-2">80</td>
+</tr>
+<tr class="row-3 odd">
+	<td class="column-1">iOS6 (Safari/iPhone4S)</td><td class="column-2">162</td>
+</tr>
+<tr class="row-4 even">
+	<td class="column-1">MacBook Pro (Chrome/10.8.4)</td><td class="column-2">37</td>
+</tr>
+</tbody>
+</table>
+<!-- #tablepress-5 from cache --></p>
+<p style="text-align: justify;">Note that just before calling postMessage, our byte array is available, right after the transfer, the reference is no longer accesssible and trying to access it throws a runtime exception:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f38360099081" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// outputs: 16777216
+// access to the bytearray possible
+console.log ( uInt8View.buffer.byteLength );
+
+// transfer ownership to the worker
+worker.postMessage(uInt8View.buffer, [uInt8View.buffer]);
+
+// triggers runtime exception: Uncaught TypeError: Cannot read property 'byteLength' of null
+console.log ( uInt8View.buffer.byteLength );</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f38360099081-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f38360099081-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8f38360099081-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f38360099081-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8f38360099081-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f38360099081-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8f38360099081-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f38360099081-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8f38360099081-9">9</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f38360099081-1"><span class="crayon-c">// outputs: 16777216</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f38360099081-2"><span class="crayon-c">// access to the bytearray possible</span></div><div class="crayon-line" id="crayon-52482d1ee8f38360099081-3"><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-h"> </span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-v">buffer</span><span class="crayon-sy">.</span><span class="crayon-i">byteLength</span><span class="crayon-h"> </span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f38360099081-4">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f38360099081-5"><span class="crayon-c">// transfer ownership to the worker</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f38360099081-6"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">buffer</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">buffer</span><span class="crayon-sy">]</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee8f38360099081-7">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f38360099081-8"><span class="crayon-c">// triggers runtime exception: Uncaught TypeError: Cannot read property 'byteLength' of null</span></div><div class="crayon-line" id="crayon-52482d1ee8f38360099081-9"><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-h"> </span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-v">buffer</span><span class="crayon-sy">.</span><span class="crayon-i">byteLength</span><span class="crayon-h"> </span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0029 seconds] -->
+<p></p>
+<p style="text-align: justify;">This technique can be useful in a scenario where you need to pass a big amount of data, like a big binary blob. Note that since the beginning, we passed data from the main thread to the Worker, but data could be passed the other way around. This time, we will create the memory buffer from the worker and send it to the main thread.</p>
+<p style="text-align: justify;">To achieve this, we modify our worker logic:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f40015192305" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// Create a 16MB "file" and fill it.
+var uInt8View = new Uint8Array(1024*1024*16); // 16MB
+
+for (var i = 0; i &lt; uInt8View.length; ++i) {
+    uInt8View[i] = i;
+} 
+
+self.postMessage(uInt8View.buffer, [uInt8View.buffer]);</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f40015192305-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f40015192305-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8f40015192305-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f40015192305-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8f40015192305-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f40015192305-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8f40015192305-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f40015192305-8">8</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f40015192305-1"><span class="crayon-c">// Create a 16MB "file" and fill it.</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f40015192305-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">uInt8View</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Uint8Array</span><span class="crayon-sy">(</span><span class="crayon-cn">1024</span><span class="crayon-o">*</span><span class="crayon-cn">1024</span><span class="crayon-o">*</span><span class="crayon-cn">16</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// 16MB</span></div><div class="crayon-line" id="crayon-52482d1ee8f40015192305-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f40015192305-4"><span class="crayon-st">for</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">i</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">0</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-i">i</span><span class="crayon-h"> </span><span class="crayon-o">&lt;</span><span class="crayon-h"> </span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">length</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-o">++</span><span class="crayon-i">i</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee8f40015192305-5"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">[</span><span class="crayon-i">i</span><span class="crayon-sy">]</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-i">i</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f40015192305-6"><span class="crayon-sy">}</span><span class="crayon-h"> </span></div><div class="crayon-line" id="crayon-52482d1ee8f40015192305-7">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f40015192305-8"><span class="crayon-r">self</span><span class="crayon-sy">.</span><span class="crayon-e">postMessage</span><span class="crayon-sy">(</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">buffer</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-v">uInt8View</span><span class="crayon-sy">.</span><span class="crayon-i">buffer</span><span class="crayon-sy">]</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0040 seconds] -->
+<p></p>
+<p style="text-align: justify;">Then, we listen to the message coming from the worker:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f49454201039" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// extract the string 
+var logic = document.querySelectorAll("script[type=\"text\/js-worker\"]")[0].textContent; 
+
+// worker logic 
+var blob = new Blob([logic], {type: 'text/javascript'}); 
+
+// webkit handling 
+var URL = window.URL || window.webkitURL; 
+
+// create the virtual file 
+var code = URL.createObjectURL(blob); 
+
+// create the Worker 
+var worker = new Worker(code); 
+
+// listen to the incoming message from the Worker 
+worker.addEventListener('message', receiveMessage); 
+
+function receiveMessage (e) { 
+    console.log (e.data.byteLength); 
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-10">10</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-12">12</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-14">14</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-16">16</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-18">18</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-19">19</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee8f49454201039-20">20</div><div class="crayon-num" data-line="crayon-52482d1ee8f49454201039-21">21</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f49454201039-1"><span class="crayon-c">// extract the string </span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">logic</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">document</span><span class="crayon-sy">.</span><span class="crayon-e">querySelectorAll</span><span class="crayon-sy">(</span><span class="crayon-s">"script[type=\"text\/js-worker\"]"</span><span class="crayon-sy">)</span><span class="crayon-sy">[</span><span class="crayon-cn">0</span><span class="crayon-sy">]</span><span class="crayon-sy">.</span><span class="crayon-i">textContent</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-4"><span class="crayon-c">// worker logic </span></div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-5"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">blob</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Blob</span><span class="crayon-sy">(</span><span class="crayon-sy">[</span><span class="crayon-i">logic</span><span class="crayon-sy">]</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-v">type:</span><span class="crayon-h"> </span><span class="crayon-s">'text/javascript'</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-6">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-7"><span class="crayon-c">// webkit handling </span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-8"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">URL</span><span class="crayon-h"> </span><span class="crayon-o">||</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-i">webkitURL</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-9">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-10"><span class="crayon-c">// create the virtual file </span></div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-11"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">code</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">URL</span><span class="crayon-sy">.</span><span class="crayon-e">createObjectURL</span><span class="crayon-sy">(</span><span class="crayon-i">blob</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-12">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-13"><span class="crayon-c">// create the Worker </span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-14"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">worker</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Worker</span><span class="crayon-sy">(</span><span class="crayon-i">code</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-15">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-16"><span class="crayon-c">// listen to the incoming message from the Worker </span></div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-17"><span class="crayon-v">worker</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'message'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-i">receiveMessage</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-18">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-19"><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">receiveMessage</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h"> </span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee8f49454201039-20"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">e</span><span class="crayon-sy">.</span><span class="crayon-v">data</span><span class="crayon-sy">.</span><span class="crayon-i">byteLength</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></div><div class="crayon-line" id="crayon-52482d1ee8f49454201039-21"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0068 seconds] -->
+<p></p>
+<p style="text-align: justify;">If we run the code above, the console outputs:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee8f52194761591" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+16777216</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee8f52194761591-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee8f52194761591-1"><span class="crayon-cn">16777216</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0005 seconds] -->
+<p></p>
+<p style="text-align: justify;">We are now transferring our data from the background Web Worker to the main UI thread.</p>
+<h5>Responsive use cases</h5>
+<p style="text-align: justify;">As we said earlier, Web Workers are commonly used today to perform expensive/synchronous tasks in the background. This allows you as a developer to perform expensive computations in the background, without causing the UI to lock so that your application stays always responsive.</p>
+<p>Here is below a few use cases:</p>
+<ul>
+<li>Generating or parsing/rendering a PDF.</li>
+<li>Compressing an image to a custom file format (JPEG, etc.).</li>
+<li>Compute an A* path inside a game.</li>
+<li>Lookup a word in a database for a spell checker in a text editor.</li>
+<li>Load and parse some resources inside a game.</li>
+<li>Perform general complex computations in the background and log that remotely.</li>
+<li>And many others&#8230;</li>
+</ul>
+<p style="text-align: justify;">For these, message cloning works just fine, because low-latency is acceptable. All you need is to pass your data back to the UI thread and that&#8217;s it, you don&#8217;t need to pass messages at a high frequency</p>
+<h5>Concurrency and the future of the web</h5>
+<p style="text-align: justify;">As you can see, Web Workers are very easy to use and pretty powerful. The message passing model is simple and easy and they can be leveraged today on desktop and mobile to make your application more responsive and snappier. So, are we done with them or could they be improved? We will see in the following section that there is room for a few improvements that could really move the web forward.</p>
+<h6 style="text-align: justify;">Parallelization</h6>
+<p style="text-align: justify;">So far, we have covered techniques to offload expensive computations to a background worker, using message cloning and transfer of ownership, but we have not discussed the parallelization use cases. Instead of relying on a single Web Worker to perform a computation in the background, the idea of parallelization is to have multiple Web Workers run in parallel and working on solving the same task but faster, given that we distribute the task to multiple threads. Microsoft has posted <a title="Web Workers and image manipulation" href="http://blogs.msdn.com/b/eternalcoding/archive/2012/09/20/using-web-workers-to-improve-performance-of-image-manipulation.aspx" target="_blank">a good example</a> about this for image manipulation.</p>
+<p style="text-align: justify;">As we have seen, two communication models currently exist for Web Workers, <strong>cloning</strong> and <strong>ownership transfer</strong>, unfortunately, both do not work well today for parallelization. The former does not, giving data ownership to one Web Worker at a time. The latter allows you to parallelize tasks by duplicating data when needed, but the cloning has real overhead and that can become limiting in some scenarios. In my tests, passing an array of 100 JSON objects over a few frames brought the performance to a crawl. Being able to truly share some memory (like a simple TypedArray) between workers would be fast, but it would expose some additional complexity to web developers, like having to deal with synchronization of data.</p>
+<p style="text-align: justify;">Most of the time, the idea of shared memory makes people worried about nasty things we usually don&#8217;t want to deal with, like data races and locks leading to memory corruption. I actually agree that within the context of low-level languages, this is pretty scary, but with a managed language like JavaScript, I would argue that it is not as bad. In addition, the main UI thread and Web Workers have been designed so that blocking cannot happen when one is waiting for the other and blocking the UI can already happen today with a simple while (true) sitting on the main thread.</p>
+<p style="text-align: justify;">So, really, I am not sure a shared memory model with Web Workers would necessarily hurt the web, but I agree that there is probably a better solution than exposing plain simple shared memory. This would expose to web developers some additional complexity, like dealing with conditions and mutexes, and there&#8217;s gotta be something better for web developers. Anyway, I am following discussions about bringing a better message passing model to Web Workers with great passion.</p>
+<h6>Shared resources (WebGL)</h6>
+<p style="text-align: justify;">Web Workers also offer some great potential when it comes to GPU programming. The most exciting one to me, is the idea of <a title="Shared Resources" href="http://www.khronos.org/webgl/wiki/SharedResouces" target="_blank">shared resources</a> for WebGL relying on Web Workers. Today, when you are programming with WebGL, all the initialization work required to initialize WebGL, like shader programs initialization and texture uploads happen on the UI thread. In other words, to see something on screen, WebGL requires you to upload your textures and programs (vertex/fragments shaders) and all of this still happens on the main UI thread. In addition. two things usually required when working with GPU APIs have always been slow historically and most importantly blocking operations: texture upload and texture readback.</p>
+<p style="text-align: justify;">This is a big limitation, as you obviously need to upload textures and this will once again lock the UI if expensive, making your game/application feel janky. Same thing for texture readback (which means copying the texture uploaded on the GPU back to RAM) to perform other computations on the CPU. With shared resources support for WebGL, multiple contexts could be created across Web Workers to perform some of the tasks mentioned earlier in other threads, allowing developers to produce lock-free, snappy, super responsive GPU experiences.</p>
+<h5 style="text-align: justify;">Additional Web Workers resources</h5>
+<ul>
+<li><a title="The Basics of Web Workers" href="http://www.html5rocks.com/en/tutorials/workers/basics/" target="_blank"><span style="line-height: 1.5em;">The Basics of Web Workers (HTML5 Rocks)</span></a></li>
+<li><a title="Using Web Workers to improve performance of image manipulation" href="http://blogs.msdn.com/b/eternalcoding/archive/2012/09/20/using-web-workers-to-improve-performance-of-image-manipulation.aspx" target="_blank">Using Web Workers to improve performance of image manipulation (Microsoft)</a></li>
+<li><a title="NodeJS Web Workers design" href="http://blog.std.in/2010/07/08/nodejs-webworker-design/" target="_blank">Design of Web Workers for NodeJS </a></li>
+</ul>
+<p style="text-align: justify;">I hope you enjoyed reading these additional details on Web Workers!</p>
+<div style="min-height:33px;" class="really_simple_share really_simple_share_button robots-nocontent snap_nopreview"><div class="really_simple_share_facebook_like" style="width:100px;"><iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Ftypedarray.org%2Fconcurrency-in-javascript%2F&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=false&amp;action=like&amp;colorscheme=light&amp;height=27&amp;locale=en_US" 
+							scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe></div><div class="really_simple_share_twitter" style="width:100px;"><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal"  data-text="Concurrency in JavaScript" data-url="http://typedarray.org/concurrency-in-javascript/"  data-via=""  ></a></div><div class="really_simple_share_google1" style="width:80px;"><div class="g-plusone" data-size="medium" data-href="http://typedarray.org/concurrency-in-javascript/" ></div></div></div>
+		<div style="clear:both;"></div>																	
+<small>
+	Posted on <a href="http://typedarray.org/2013/07/">July 1, 2013</a>
+	by <a href="http://typedarray.org/author/admin/">Thibault Imbert</a>
+	&middot;
+	<span class="dsq-postid" rel="69 http://typedarray.org/?p=69">20 comments</span>
+</small>
+								
+														<span class="mpcth-post-tags">
+									Tags: <a href="http://typedarray.org/tag/asynchronous/">asynchronous</a>, <a href="http://typedarray.org/tag/concurrency/">concurrency</a>, <a href="http://typedarray.org/tag/threading/">threading</a>, <a href="http://typedarray.org/tag/workers/">workers</a>. 
+
+								</span>
+													
+						<!-- Required by wordpress -->
+						<div class="mpcth-clear-fix"></div>
+												
+						  
+
+												</div>
+						
+<div id="disqus_thread">
+                    <div id="dsq-content">
+
+
+            <ul id="dsq-comments">
+                    <li class="comment even thread-even depth-1" id="dsq-comment-91">
+        <div id="dsq-comment-header-91" class="dsq-comment-header">
+            <cite id="dsq-cite-91">
+                <span id="dsq-author-user-91">Yo Dirkx</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-91" class="dsq-comment-body">
+            <div id="dsq-comment-message-91" class="dsq-comment-message"><p>The <code>user = e;</code> example is wrong. <code>e</code> is the message event. <code>e.data</code> will be the user.</p>
+</div>
+        </div>
+
+    <ul class='children'>
+    <li class="comment odd alt depth-2" id="dsq-comment-92">
+        <div id="dsq-comment-header-92" class="dsq-comment-header">
+            <cite id="dsq-cite-92">
+                <span id="dsq-author-user-92">Thibault Imbert</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-92" class="dsq-comment-body">
+            <div id="dsq-comment-message-92" class="dsq-comment-message"><p>Oh, good catch! Thanks, fixed.</p>
+</div>
+        </div>
+
+    </li>
+</ul>
+</li>
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-93">
+        <div id="dsq-comment-header-93" class="dsq-comment-header">
+            <cite id="dsq-cite-93">
+                <span id="dsq-author-user-93">armetiz</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-93" class="dsq-comment-body">
+            <div id="dsq-comment-message-93" class="dsq-comment-message"><p>&#8220;Design of Web Workers for NodeJS&#8221;<br />
+This link above is missing the &#8216;http://&#8217;. </p>
+<p>Great article!</p>
+</div>
+        </div>
+
+    <ul class='children'>
+    <li class="comment odd alt depth-2" id="dsq-comment-98">
+        <div id="dsq-comment-header-98" class="dsq-comment-header">
+            <cite id="dsq-cite-98">
+                <span id="dsq-author-user-98">Thibault Imbert</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-98" class="dsq-comment-body">
+            <div id="dsq-comment-message-98" class="dsq-comment-message"><p>Thanks! Link fixed!</p>
+</div>
+        </div>
+
+    </li>
+</ul>
+</li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.scoop.it/t/javascript-for-line-of-business-applications/p/4004459770/concurrency-in-javascript' rel='external nofollow' class='url'>Concurrency in JavaScript | JavaScript for Line...</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.scoop.it/t/whateverjs/p/4004464732/concurrency-in-javascript-typedarray-org' rel='external nofollow' class='url'>Concurrency in JavaScript | TypedArray.org | wh...</a></p>
+    </li>
+    </li>
+    <li class="comment even thread-even depth-1" id="dsq-comment-97">
+        <div id="dsq-comment-header-97" class="dsq-comment-header">
+            <cite id="dsq-cite-97">
+                <span id="dsq-author-user-97">Lindsey Simon</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-97" class="dsq-comment-body">
+            <div id="dsq-comment-message-97" class="dsq-comment-message"><p>In the transfer ownership example the times are still frighteningly high right(100ms)? &#8211; high enough that a user might notice a pause/glitch?</p>
+</div>
+        </div>
+
+    <ul class='children'>
+    <li class="comment odd alt depth-2" id="dsq-comment-99">
+        <div id="dsq-comment-header-99" class="dsq-comment-header">
+            <cite id="dsq-cite-99">
+                <span id="dsq-author-user-99">Thibault Imbert</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-99" class="dsq-comment-body">
+            <div id="dsq-comment-message-99" class="dsq-comment-message"><p>Yes, unfortunately, it would, especially on mobile. We are getting there with more recent hardware but there is still a lot of room for improvements.<br />
+Hopefully a new model will appear in the future allowing faster transfer, as fast as shared memory but safer!</p>
+</div>
+        </div>
+
+    </li>
+</ul>
+</li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.scoop.it/t/aoj/p/4004481222/concurrency-in-javascript-typedarray-org' rel='external nofollow' class='url'>Concurrency in JavaScript | TypedArray.org | Ao...</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.pearltrees.com/carlopellegrini/javascript/id8577426#pearl83480346&#038;show=reveal,6' rel='external nofollow' class='url'>Javascript | Pearltrees</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.pearltrees.com/semihgokduman/watch-read/id6447499#pearl83645536&#038;show=reveal,6' rel='external nofollow' class='url'>Watch || read | Pearltrees</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://blog.absolutedisaster.co.uk/web-workers-a-practical-guide/' rel='external nofollow' class='url'>I really need to think of a clever name for my blog</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.cssauthor.com/best-web-design-and-web-development-articles-roundup-2/' rel='external nofollow' class='url'>Best Web Design and Web Development Articles Roundup</a></p>
+    </li>
+    </li>
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-105">
+        <div id="dsq-comment-header-105" class="dsq-comment-header">
+            <cite id="dsq-cite-105">
+                <span id="dsq-author-user-105">Laszlo Radics</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-105" class="dsq-comment-body">
+            <div id="dsq-comment-message-105" class="dsq-comment-message"><p>to think one step further, you can create a worker from a simple function:<br />
+function createWorker(func){<br />
+  var blob = new Blob(['('+func.toString() + ')()'], {type: &#8216;text/javascript&#8217;});<br />
+  var URL = window.URL || window.webkitURL;<br />
+  var code = URL.createObjectURL(blob);<br />
+  var worker = new Worker(code);<br />
+}</p>
+</div>
+        </div>
+
+    <ul class='children'>
+    <li class="comment odd alt depth-2" id="dsq-comment-107">
+        <div id="dsq-comment-header-107" class="dsq-comment-header">
+            <cite id="dsq-cite-107">
+                <span id="dsq-author-user-107">Thibault Imbert</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-107" class="dsq-comment-body">
+            <div id="dsq-comment-message-107" class="dsq-comment-message"><p>Ah nice one. Thanks!</p>
+</div>
+        </div>
+
+    </li>
+</ul>
+</li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://kvarkson.com/13-15-iyulya-bednyj-osminog/' rel='external nofollow' class='url'>Ежедневник kvarkson&#039;a | 13 - 15 Июля / Бедный осьминог</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio/' rel='external nofollow' class='url'>From microphone to .WAV with: getUserMedia and Web Audio | TypedArray.org</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.iamntz.com/3860/frontend-developer/cateva-link-uri/' rel='external nofollow' class='url'>Câteva link-uri &laquo; Staicu Ionuț-Bogdan</a></p>
+    </li>
+    </li>
+    <li class="post pingback">
+        <p>Pingback: <a href='http://www.techleadershipnews.com/issue-55-greatness-rarely-happens-by-following-the-rules/' rel='external nofollow' class='url'>Issue 55 &#8211; Greatness Rarely Happens By Following The Rules | TLN</a></p>
+    </li>
+    </li>
+    <li class="comment even thread-even depth-1" id="dsq-comment-124">
+        <div id="dsq-comment-header-124" class="dsq-comment-header">
+            <cite id="dsq-cite-124">
+                <span id="dsq-author-user-124">masswerk</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-124" class="dsq-comment-body">
+            <div id="dsq-comment-message-124" class="dsq-comment-message"><p>First, thanks for the great article.</p>
+<p>@laszloradics:disqus @thibaulttimbert:disqus<br />
+Using the toSource() method of a function object provides also a fall-back for older browsers (just use an instance of the inlined function). I actually wrote a small library with abstractions for this and all the communication/messaging issues, including transferable objects. See: Plexer.js <a href="http://www.masswerk.at/plexer" rel="nofollow">http://www.masswerk.at/plexer</a> (MIT license).</p>
+<p>A note on transferable objects: I didn&#8217;t find any documentation of the transfer map (the array used to specify the values which are to be communicated as transferable objects). It seems that you may reference any of the values that are passed on the first nesting level in any order. The transfer map itself is just an array of reference(s) to the object(s) to be transfered. If there is any facility for nesting levels, I didn&#8217;t detect them yet.</p>
+</div>
+        </div>
+
+    </li>
+            </ul>
+
+
+        </div>
+
+    </div>
+
+<script type="text/javascript">
+/* <![CDATA[ */
+    var disqus_url = 'http://typedarray.org/concurrency-in-javascript/';
+    var disqus_identifier = '69 http://typedarray.org/?p=69';
+    var disqus_container_id = 'disqus_thread';
+    var disqus_domain = 'disqus.com';
+    var disqus_shortname = 'typedarray';
+    var disqus_title = "Concurrency in JavaScript";
+        var disqus_config = function () {
+        var config = this; // Access to the config object
+        config.language = '';
+
+        /*
+           All currently supported events:
+            * preData — fires just before we request for initial data
+            * preInit - fires after we get initial data but before we load any dependencies
+            * onInit  - fires when all dependencies are resolved but before dtpl template is rendered
+            * afterRender - fires when template is rendered but before we show it
+            * onReady - everything is done
+         */
+
+        config.callbacks.preData.push(function() {
+            // clear out the container (its filled for SEO/legacy purposes)
+            document.getElementById(disqus_container_id).innerHTML = '';
+        });
+                config.callbacks.onReady.push(function() {
+            // sync comments in the background so we don't block the page
+            var script = document.createElement('script');
+            script.async = true;
+            script.src = '?cf_action=sync_comments&post_id=69';
+
+            var firstScript = document.getElementsByTagName( "script" )[0];
+            firstScript.parentNode.insertBefore(script, firstScript);
+        });
+                    };
+/* ]]> */
+</script>
+
+<script type="text/javascript">
+/* <![CDATA[ */
+    var DsqLocal = {
+        'trackbacks': [
+            {
+                'author_name':    "Concurrency in JavaScript | JavaScript for Line...",
+                'author_url':    "http:\/\/www.scoop.it\/t\/javascript-for-line-of-business-applications\/p\/4004459770\/concurrency-in-javascript",
+                'date':            "07\/10\/2013 01:32 PM",
+                'excerpt':        "[...] Just like with Flash, JavaScript code runs by default on the UI thread, and any expensive JavaScript computation will ...",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Concurrency in JavaScript | TypedArray.org | wh...",
+                'author_url':    "http:\/\/www.scoop.it\/t\/whateverjs\/p\/4004464732\/concurrency-in-javascript-typedarray-org",
+                'date':            "07\/10\/2013 03:10 PM",
+                'excerpt':        "[...] &nbsp; [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Concurrency in JavaScript | TypedArray.org | Ao...",
+                'author_url':    "http:\/\/www.scoop.it\/t\/aoj\/p\/4004481222\/concurrency-in-javascript-typedarray-org",
+                'date':            "07\/10\/2013 09:52 PM",
+                'excerpt':        "[...] RT @JavaScriptDaily: Concurrency in JavaScript with Workers: http:\/\/t.co\/pkHCAksEjY (A practical look at Web Workers.)&nbsp; [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Javascript | Pearltrees",
+                'author_url':    "http:\/\/www.pearltrees.com\/carlopellegrini\/javascript\/id8577426#pearl83480346&#038;show=reveal,6",
+                'date':            "07\/11\/2013 08:35 PM",
+                'excerpt':        "[...] Concurrency in JavaScript | TypedArray.org [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Watch || read | Pearltrees",
+                'author_url':    "http:\/\/www.pearltrees.com\/semihgokduman\/watch-read\/id6447499#pearl83645536&#038;show=reveal,6",
+                'date':            "07\/12\/2013 10:12 AM",
+                'excerpt':        "[...] Concurrency in JavaScript | TypedArray.org [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "I really need to think of a clever name for my blog",
+                'author_url':    "http:\/\/blog.absolutedisaster.co.uk\/web-workers-a-practical-guide\/",
+                'date':            "07\/12\/2013 03:58 PM",
+                'excerpt':        "[...] http:\/\/typedarray.org\/concurrency-in-javascript\/ [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Best Web Design and Web Development Articles Roundup",
+                'author_url':    "http:\/\/www.cssauthor.com\/best-web-design-and-web-development-articles-roundup-2\/",
+                'date':            "07\/13\/2013 06:01 PM",
+                'excerpt':        "[...] → Go To Article Page [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Ежедневник kvarkson&#039;a | 13 - 15 Июля \/ Бедный осьминог",
+                'author_url':    "http:\/\/kvarkson.com\/13-15-iyulya-bednyj-osminog\/",
+                'date':            "07\/16\/2013 08:51 PM",
+                'excerpt':        "[...] Варианты реализации многопоточности на JS. [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "From microphone to .WAV with: getUserMedia and Web Audio | TypedArray.org",
+                'author_url':    "http:\/\/typedarray.org\/from-microphone-to-wav-with-getusermedia-and-web-audio\/",
+                'date':            "07\/22\/2013 08:35 PM",
+                'excerpt':        "[...] if WAV packaging becomes to expensive, it is an ideal task to offload to a background worker  Once ...",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Câteva link-uri &laquo; Staicu Ionuț-Bogdan",
+                'author_url':    "http:\/\/www.iamntz.com\/3860\/frontend-developer\/cateva-link-uri\/",
+                'date':            "07\/25\/2013 02:58 PM",
+                'excerpt':        "[...] Concurrency in JavaScript. O introducere în Web Workers. [...] ",
+                'type':            "pingback"            }
+,            {
+                'author_name':    "Issue 55 &#8211; Greatness Rarely Happens By Following The Rules | TLN",
+                'author_url':    "http:\/\/www.techleadershipnews.com\/issue-55-greatness-rarely-happens-by-following-the-rules\/",
+                'date':            "07\/29\/2013 04:00 AM",
+                'excerpt':        "[...] the short post with a good reminder to Do the right thing, Wait to get fired, and a deep ...",
+                'type':            "pingback"            }
+        ],
+        'trackback_url': "http:\/\/typedarray.org\/concurrency-in-javascript\/trackback\/"    };
+/* ]]> */
+</script>
+
+<script type="text/javascript">
+/* <![CDATA[ */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.' + 'disqus.com' + '/embed.js?pname=wordpress&pver=2.74';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+/* ]]> */
+</script>
+
+					</article>
+									 
+			</div> <!-- end #mpcth_page_articles -->
+			<div class="mpcth-pagination">
+				<a href="#" class="mpcth-footer-switch mpcth-alt-link mpcth-footer-open"><span class="icon-plus"></span></a>
+			</div>
+		</div><!-- end #mpcth_page_content -->
+
+		
+	</div><!-- #mpcth_page_container -->
+
+
+<footer id="mpcth_footer" class="mpcth-footer-open">
+			<div id="mpcth_footer_content">
+			<ul>
+									<li data-row="3" class="widget widget_3">
+						<h2 class="widget_title footer_title">About</h2>
+						<div class="textwidget">JavaScript for interactive developers. </br><a href="http://typedarray.org/about/">More infos</a>
+						</div>
+					</li>
+					<li data-row="3" class="widget widget_3"><h2 class="widget_title footer_title">Categories</h2>
+						<ul>
+								<li class="cat-item cat-item-2"><a href="http://typedarray.org/category/javascript/" title="View all posts filed under JavaScript">JavaScript</a> (11)
+</li>
+	<li class="cat-item cat-item-22"><a href="http://typedarray.org/category/web-audio/" title="View all posts filed under Web Audio">Web Audio</a> (1)
+</li>
+	<li class="cat-item cat-item-5"><a href="http://typedarray.org/category/webgl/" title="View all posts filed under WebGL">WebGL</a> (2)
+</li>
+						</ul>
+					</li>
+					<li data-row="3" class="widget widget_3"><h2 class="widget_title sidebar_widget_title">Archives</h2>
+						<ul>
+								<li><a href='http://typedarray.org/2013/08/' title='August 2013'>August 2013</a></li>
+	<li><a href='http://typedarray.org/2013/07/' title='July 2013'>July 2013</a></li>
+	<li><a href='http://typedarray.org/2013/05/' title='May 2013'>May 2013</a></li>
+	<li><a href='http://typedarray.org/2013/04/' title='April 2013'>April 2013</a></li>
+	<li><a href='http://typedarray.org/2013/03/' title='March 2013'>March 2013</a></li>
+						</ul>
+					</li>
+							</ul>
+			<div class="mpcth-clear-fix"></div>
+		</div>	
+		
+	</footer><!-- end #mpcth_footer -->
+
+</div><!-- end #mpcth_page_wrap -->
+	<script type='text/javascript' src='http://typedarray.org/wp-content/plugins/tablepress/js/jquery.datatables.min.js?ver=0.9-RC'></script>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+$('#tablepress-4').dataTable({"aaSorting":[],"bSortClasses":false,"asStripeClasses":['even','odd']});
+$('#tablepress-5').dataTable({"aaSorting":[],"bSortClasses":false,"asStripeClasses":['even','odd']});
+});
+</script></body>
+</html>		

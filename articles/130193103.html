@@ -311,4 +311,64 @@ Without images: <a href="http://www.webpagetest.org/result/120118_HD_e41457aff48
 <li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-3683">
 <div id="comment-3683">
 <p class="comment-metadata">
-<strong><a href=
+<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 18-Jan-12 at 3:38 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3683">Permalink</a> |  </p>
+
+
+<p>@Adam: Loading all scripts using CORS as XHR might turn out to be faster, but it&#8217;s certainly not easier. </p>
+<p>@Lars: Cool test, thanks. The reason JavaScript is a bigger problem is that it blocks rendering in most cases. Reducing JavaScript impact therefore makes rendering happen sooner, whereas reducing images has less effect on render time. For example, in your tests for CNN.com the start render time with images is 1.841s vs 1.855s without images &#8211; not much difference. For CNN.com the start render time with JS is 1.811s vs 0.894s without JS &#8211; a significant speedup of rendering. This was the first URL I chose, so I wasn&#8217;t hunting for a winning example. If you had time to pull down the csv for all four results and compare median start render times that would be a more conclusive comparison. I&#8217;m betting the removal of JS helps rendering much more than images.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-3684">
+<div id="comment-3684">
+<p class="comment-metadata">
+<strong><a href='http://webpro.nl' rel='external nofollow' class='url'>Lars Kappert</a></strong> | 18-Jan-12 at 11:21 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3684">Permalink</a> |  </p>
+
+
+<p>Steve, I completely agree. I just think it is important to make clear what exactly you are talking about. I think we can agree that JS has major impact on the *perceived* performance (significantly more than images); while images and JS roughly have the same impact on page load time:</p>
+<p>Render time median for JS:<br />
+With: 1387.5<br />
+Without: 1069 (decrease 23%)</p>
+<p>Render time median for images:<br />
+With: 1343.5<br />
+Without: 1334 (decrease &lt;1%)</p>
+<p>We should be careful with those numbers, I think we can do better (e.g. also not execute inline JS, generated images are even more expensive, etc.). But they do give a nice impression (more or less confirming our expectations).</p>
+<p>Thanks for the article and bringing this to our attention.</p>
+<p>Many thanks also to Pat Meenan from <a href="http://webpagetest.org" rel="nofollow">http://webpagetest.org</a> for allowing us to do our tests so easily!</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-4165">
+<div id="comment-4165">
+<p class="comment-metadata">
+<strong><a href='https://github.com/pablomoretti/jcors-loader' rel='external nofollow' class='url'>Pablo</a></strong> | 08-Oct-12 at 6:41 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-4165">Permalink</a> |  </p>
+
+
+<p>Steve, I&#8217;m working in a little tiny loader for javascript sources using CORS and make the web more fast !</p>
+<p>The goal is load multiples js in parallel and execute in order without blocking DOMReady or onload.</p>
+<p><a href="https://github.com/pablomoretti/jcors-loader" rel="nofollow">https://github.com/pablomoretti/jcors-loader</a></p>
+</div>
+</li><!-- #comment-## -->
+			</ol>
+
+
+
+
+
+
+
+</div><!-- #comments -->
+
+
+</div> <!-- end div id="content" -->
+</div>
+<div id="footer" class="containerwrapperpadded">
+<p>&copy; Steve Souders</p>
+</div>
+</body>
+</html>
+
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+Page Caching using disk: enhanced
+Database Caching 14/32 queries in 0.418 seconds using disk
+
+ Served from: www.stevesouders.com @ 2013-09-29 05:09:05 by W3 Total Cache -->

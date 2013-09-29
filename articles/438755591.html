@@ -696,3 +696,2879 @@ if (window.jstiming) window.jstiming.load.tick('headEnd');
 </span>
 </span>
 <div class='clear'></div>
+</div>
+</div></div>
+<div class='tabs section' id='crosscol-overflow'><div class='widget HTML' id='HTML4'>
+<div class='widget-content'>
+Upcoming: my <a href="http://www.jsguide.org/">programmer&#8217;s guide to JavaScript</a> (free online).
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=HTML&widgetId=HTML4&action=editWidget&sectionId=crosscol-overflow' onclick='return _WidgetManager._PopupConfig(document.getElementById("HTML4"));' target='configHTML4' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div></div>
+</div>
+</div>
+<div class='tabs-cap-bottom cap-bottom'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+</div>
+<div class='main-outer'>
+<div class='main-cap-top cap-top'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+<div class='fauxborder-left main-fauxborder-left'>
+<div class='fauxborder-right main-fauxborder-right'></div>
+<div class='region-inner main-inner'>
+<div class='columns fauxcolumns'>
+<div class='fauxcolumn-outer fauxcolumn-center-outer'>
+<div class='cap-top'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+<div class='fauxborder-left'>
+<div class='fauxborder-right'></div>
+<div class='fauxcolumn-inner'>
+</div>
+</div>
+<div class='cap-bottom'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+</div>
+<div class='fauxcolumn-outer fauxcolumn-left-outer'>
+<div class='cap-top'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+<div class='fauxborder-left'>
+<div class='fauxborder-right'></div>
+<div class='fauxcolumn-inner'>
+</div>
+</div>
+<div class='cap-bottom'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+</div>
+<div class='fauxcolumn-outer fauxcolumn-right-outer'>
+<div class='cap-top'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+<div class='fauxborder-left'>
+<div class='fauxborder-right'></div>
+<div class='fauxcolumn-inner'>
+</div>
+</div>
+<div class='cap-bottom'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+</div>
+<!-- corrects IE6 width calculation -->
+<div class='columns-inner'>
+<div class='column-center-outer'>
+<div class='column-center-inner'>
+<div class='main section' id='main'><div class='widget Blog' id='Blog1'>
+<script src=''></script>
+<div class='blog-posts hfeed'>
+<!-- google_ad_section_start(name=default) -->
+
+          <div class="date-outer">
+        
+<h2 class='date-header'><span>2013-09-16</span></h2>
+
+          <div class="date-posts">
+        
+<div class='post-outer'>
+<div class='post hentry'>
+<a name='7357631453060481791'></a>
+<h3 class='post-title entry-title'>
+OS X: kill all Google Chrome tabs from the shell
+</h3>
+<div class='post-header'>
+<div class='post-header-line-1'><span class='post-labels'>
+Labels:
+<a href='http://www.2ality.com/search/label/browser' rel='tag'>browser</a>,
+<a href='http://www.2ality.com/search/label/chrome' rel='tag'>chrome</a>,
+<a href='http://www.2ality.com/search/label/mac' rel='tag'>mac</a>
+</span>
+</div>
+</div>
+<div class='post-body entry-content'>
+If there are a lot of tabs open in Google Chrome, it tends to become slow. Killing tabs by hand, via the Task Manager helps, but is tedious. The following bash script (by <a href="https://github.com/mathiasbynens/dotfiles/blob/master/.aliases#L145">Sindre Sorhus</a>) lets you conveniently kill all open tabs from the shell (OS X only):
+
+<a name='more'></a>
+
+<pre>
+    #!/bin/bash
+
+    ps ux | \
+    grep '[C]hrome Helper --type=renderer' | \
+    grep -v extension-process | \
+    tr -s ' ' | \
+    cut -d ' ' -f2 | \
+    xargs kill
+
+    # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
+</pre>
+
+That is, all tabs are still open, but they don&#8217;t display any content. You can reload any tab to get the content back.
+<p>
+I&#8217;d love Chrome to have a mode where all background tabs are stopped completely and only the frontmost tab is active. Kind of like processes are managed on iOS.
+<div style='clear: both;'></div>
+</div>
+<div class='post-footer'>
+<div class='post-footer-line post-footer-line-1'><div class='post-share-buttons'>
+<a class='goog-inline-block share-button sb-email' href='http://www.blogger.com/share-post.g?blogID=8100407163665430627&postID=7357631453060481791&target=email' target='_blank' title='Email This'><span class='share-button-link-text'>Email This</span></a><a class='goog-inline-block share-button sb-blog' href='http://www.blogger.com/share-post.g?blogID=8100407163665430627&postID=7357631453060481791&target=blog' onclick='window.open(this.href, "_blank", "height=270,width=475"); return false;' target='_blank' title='BlogThis!'><span class='share-button-link-text'>BlogThis!</span></a><a class='goog-inline-block share-button sb-twitter' href='http://www.blogger.com/share-post.g?blogID=8100407163665430627&postID=7357631453060481791&target=twitter' target='_blank' title='Share to Twitter'><span class='share-button-link-text'>Share to Twitter</span></a><a class='goog-inline-block share-button sb-facebook' href='http://www.blogger.com/share-post.g?blogID=8100407163665430627&postID=7357631453060481791&target=facebook' onclick='window.open(this.href, "_blank", "height=430,width=640"); return false;' target='_blank' title='Share to Facebook'><span class='share-button-link-text'>Share to Facebook</span></a><div class='goog-inline-block dummy-container'><g:plusone source='blogger:blog:plusone' href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html' size='medium' width='300' annotation='inline'/></div>
+</div>
+<span class='post-comment-link'>
+</span>
+<span class='post-backlinks post-comment-link'>
+</span>
+<span class='post-icons'>
+<span class='item-control blog-admin pid-88863769'>
+<a href='http://www.blogger.com/post-edit.g?blogID=8100407163665430627&postID=7357631453060481791&from=pencil' title='Edit Post'>
+<img alt='' class='icon-action' height='18' src='http://img2.blogblog.com/img/icon18_edit_allbkg.gif' width='18'/>
+</a>
+</span>
+</span>
+</div>
+<div class='post-footer-line post-footer-line-2'></div>
+<div class='post-footer-line post-footer-line-3'></div>
+</div>
+</div>
+<div class='comments' id='comments'>
+<a name='comments'></a>
+<h4>7 comments:</h4>
+<div id='Blog1_comments-block-wrapper'>
+<dl class='avatar-comment-indent' id='comments-block'>
+<dt class='comment-author ' id='c7887209861108467660'>
+<a name='c7887209861108467660'></a>
+<div class="avatar-image-container avatar-stock"><span dir="ltr"><img src="http://img1.blogblog.com/img/blank.gif" width="16" height="16" alt="" title="Fizer">
+
+</span></div>
+Fizer
+said...
+</dt>
+<dd class='comment-body' id='Blog1_cmt-7887209861108467660'>
+<p>
+Cool one. I do not know the grep option -v. <br />After cutting by delimiter, the field 1 is empty. For me, cut -d &#39; &#39; -f 2 works.
+</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html?showComment=1379307689371#c7887209861108467660' title='comment permalink'>
+September 16, 2013 at 7:01 AM
+</a>
+<span class='item-control blog-admin pid-1049621047'>
+<a class='comment-delete' href='http://www.blogger.com/delete-comment.g?blogID=8100407163665430627&postID=7887209861108467660' title='Delete Comment'>
+<img src='//www.blogger.com/img/icon_delete13.gif'/>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author ' id='c1015315338181791207'>
+<a name='c1015315338181791207'></a>
+<div class="avatar-image-container avatar-stock"><span dir="ltr"><img src="http://img1.blogblog.com/img/blank.gif" width="16" height="16" alt="" title="Stefan B">
+
+</span></div>
+Stefan B
+said...
+</dt>
+<dd class='comment-body' id='Blog1_cmt-1015315338181791207'>
+<p>
+i think the killall command also exists on MacOS, so this should also work:<br /><br />  killall &#39;Google Chrome Helper&#39;
+</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html?showComment=1379326843510#c1015315338181791207' title='comment permalink'>
+September 16, 2013 at 12:20 PM
+</a>
+<span class='item-control blog-admin pid-1671596012'>
+<a class='comment-delete' href='http://www.blogger.com/delete-comment.g?blogID=8100407163665430627&postID=1015315338181791207' title='Delete Comment'>
+<img src='//www.blogger.com/img/icon_delete13.gif'/>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author ' id='c967785332637155908'>
+<a name='c967785332637155908'></a>
+<div class="avatar-image-container avatar-stock"><span dir="ltr"><img src="http://img1.blogblog.com/img/blank.gif" width="16" height="16" alt="" title="Dieter Luypaert">
+
+</span></div>
+Dieter Luypaert
+said...
+</dt>
+<dd class='comment-body' id='Blog1_cmt-967785332637155908'>
+<p>
+Doesn&#39;t work for me. Kills all my extensions instead. Tabs remain unaffected.
+</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html?showComment=1379337936715#c967785332637155908' title='comment permalink'>
+September 16, 2013 at 3:25 PM
+</a>
+<span class='item-control blog-admin pid-2016797399'>
+<a class='comment-delete' href='http://www.blogger.com/delete-comment.g?blogID=8100407163665430627&postID=967785332637155908' title='Delete Comment'>
+<img src='//www.blogger.com/img/icon_delete13.gif'/>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author ' id='c3684586074219780344'>
+<a name='c3684586074219780344'></a>
+<div class="avatar-image-container avatar-stock"><span dir="ltr"><a href="http://rauschma.de/" rel="nofollow" onclick=""><img src="http://img1.blogblog.com/img/blank.gif" width="16" height="16" alt="" title="Axel Rauschmayer">
+
+</a></span></div>
+<a href='http://rauschma.de/' rel='nofollow'>Axel Rauschmayer</a>
+said...
+</dt>
+<dd class='comment-body' id='Blog1_cmt-3684586074219780344'>
+<p>
+The latest version should be more gentle. Does it work better for you?
+</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html?showComment=1379340202148#c3684586074219780344' title='comment permalink'>
+September 16, 2013 at 4:03 PM
+</a>
+<span class='item-control blog-admin pid-2016797399'>
+<a class='comment-delete' href='http://www.blogger.com/delete-comment.g?blogID=8100407163665430627&postID=3684586074219780344' title='Delete Comment'>
+<img src='//www.blogger.com/img/icon_delete13.gif'/>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author ' id='c6166722278725335043'>
+<a name='c6166722278725335043'></a>
+<div class="avatar-image-container avatar-stock"><span dir="ltr"><img src="http://img1.blogblog.com/img/blank.gif" width="16" height="16" alt="" title="Dieter Luypaert">
+
+</span></div>
+Dieter Luypaert
+said...
+</dt>
+<dd class='comment-body' id='Blog1_cmt-6166722278725335043'>
+<p>
+That still kills everything. Also I need to adapt the cutting to &quot;cut -d &#39; &#39; -f 2&quot; to get my process IDs.
+</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html?showComment=1379340588776#c6166722278725335043' title='comment permalink'>
+September 16, 2013 at 4:09 PM
+</a>
+<span class='item-control blog-admin pid-1671596012'>
+<a class='comment-delete' href='http://www.blogger.com/delete-comment.g?blogID=8100407163665430627&postID=6166722278725335043' title='Delete Comment'>
+<img src='//www.blogger.com/img/icon_delete13.gif'/>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author ' id='c3906189768629389354'>
+<a name='c3906189768629389354'></a>
+<div class="avatar-image-container avatar-stock"><span dir="ltr"><img src="http://img1.blogblog.com/img/blank.gif" width="16" height="16" alt="" title="Sindre Sorhus">
+
+</span></div>
+Sindre Sorhus
+said...
+</dt>
+<dd class='comment-body' id='Blog1_cmt-3906189768629389354'>
+<p>
+That won&#39;t work as extensions are also `--type=renderer`. I don&#39;t get why you couldn&#39;t have just copied the code https://github.com/mathiasbynens/dotfiles/blob/master/.aliases#L145 which already works perfectly.
+</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html?showComment=1379352454445#c3906189768629389354' title='comment permalink'>
+September 16, 2013 at 7:27 PM
+</a>
+<span class='item-control blog-admin pid-2016797399'>
+<a class='comment-delete' href='http://www.blogger.com/delete-comment.g?blogID=8100407163665430627&postID=3906189768629389354' title='Delete Comment'>
+<img src='//www.blogger.com/img/icon_delete13.gif'/>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author ' id='c9114187173824922733'>
+<a name='c9114187173824922733'></a>
+<div class="avatar-image-container avatar-stock"><span dir="ltr"><a href="http://rauschma.de/" rel="nofollow" onclick=""><img src="http://img1.blogblog.com/img/blank.gif" width="16" height="16" alt="" title="Axel Rauschmayer">
+
+</a></span></div>
+<a href='http://rauschma.de/' rel='nofollow'>Axel Rauschmayer</a>
+said...
+</dt>
+<dd class='comment-body' id='Blog1_cmt-9114187173824922733'>
+<p>
+The reason is simple: I wasn&#8217;t aware of this solution until today. I started with a piece of code from a tweet that didn&#8217;t work on my system, found another solution and improved it until it was good enough for me. Your solution is better, I&#8217;ve edited the blog post accordingly.
+</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html?showComment=1379367247568#c9114187173824922733' title='comment permalink'>
+September 16, 2013 at 11:34 PM
+</a>
+<span class='item-control blog-admin pid-562911534'>
+<a class='comment-delete' href='http://www.blogger.com/delete-comment.g?blogID=8100407163665430627&postID=9114187173824922733' title='Delete Comment'>
+<img src='//www.blogger.com/img/icon_delete13.gif'/>
+</a>
+</span>
+</span>
+</dd>
+</dl>
+</div>
+<p class='comment-footer'>
+<a href='http://www.blogger.com/comment.g?blogID=8100407163665430627&amp;postID=7357631453060481791' onclick=''>Post a Comment</a>
+</p>
+<div id='backlinks-container'>
+<div id='Blog1_backlinks-container'>
+<a name='links'></a><h4>
+</h4>
+<p class='comment-footer'>
+<a class='comment-link' href='' id='Blog1_backlinks-create-link' target='_blank'>
+</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+        </div></div>
+      
+<!-- google_ad_section_end -->
+</div>
+<div class='blog-pager' id='blog-pager'>
+<span id='blog-pager-newer-link'>
+<a class='blog-pager-newer-link' href='http://www.2ality.com/2013/09/ecmascript-i18n-api.html' id='Blog1_blog-pager-newer-link' title='Newer Post'>Newer Post</a>
+</span>
+<span id='blog-pager-older-link'>
+<a class='blog-pager-older-link' href='http://www.2ality.com/2013/09/data-in-prototypes.html' id='Blog1_blog-pager-older-link' title='Older Post'>Older Post</a>
+</span>
+<a class='home-link' href='http://www.2ality.com/'>Home</a>
+</div>
+<div class='clear'></div>
+<div class='post-feeds'>
+<div class='feed-links'>
+Subscribe to:
+<a class='feed-link' href='http://www.2ality.com/feeds/7357631453060481791/comments/default' target='_blank' type='application/atom+xml'>Post Comments (Atom)</a>
+</div>
+</div>
+</div><div class='widget HTML' id='HTML1'>
+<script type='text/javascript'>
+                var disqus_shortname = '2ality';
+                var disqus_blogger_current_url = "http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html";
+                if (!disqus_blogger_current_url.length) {
+                    disqus_blogger_current_url = "http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html";
+                }
+                var disqus_blogger_homepage_url = "http://www.2ality.com/";
+                var disqus_blogger_canonical_homepage_url = "http://www.2ality.com/";
+            </script>
+<style type='text/css'>
+                    #comments {display:none;}
+                </style>
+<script type='text/javascript'>
+                    (function() {
+                        var bloggerjs = document.createElement('script');
+                        bloggerjs.type = 'text/javascript';
+                        bloggerjs.async = true;
+                        bloggerjs.src = 'http://'+disqus_shortname+'.disqus.com/blogger_item.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(bloggerjs);
+                    })();
+                </script>
+<style type='text/css'>
+                    .post-comment-link { visibility: hidden; }
+                </style>
+<script type='text/javascript'>
+                (function() {
+                    var bloggerjs = document.createElement('script');
+                    bloggerjs.type = 'text/javascript';
+                    bloggerjs.async = true;
+                    bloggerjs.src = 'http://'+disqus_shortname+'.disqus.com/blogger_index.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(bloggerjs);
+                })();
+                </script>
+</div></div>
+</div>
+</div>
+<div class='column-left-outer'>
+<div class='column-left-inner'>
+<aside>
+<div class='sidebar section' id='sidebar-left-1'><div class='widget PopularPosts' id='PopularPosts3'>
+<h2>Most popular (last 30 days)</h2>
+<div class='widget-content popular-posts'>
+<ul>
+<li>
+<a href='http://www.2ality.com/2013/08/protecting-objects.html'>Protecting objects in JavaScript</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/09/data-in-prototypes.html'>Data in prototype properties</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/09/javascript-unicode.html'>Unicode and JavaScript</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/09/types.html'>JavaScript&#8217;s type system</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/06/basic-javascript.html'>Basic JavaScript for the impatient programmer</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/05/google-polymer.html'>Google&#8217;s Polymer and the future of web UI frameworks</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/09/ecmascript-i18n-api.html'>The ECMAScript Internationalization API</a>
+</li>
+</ul>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=PopularPosts&widgetId=PopularPosts3&action=editWidget&sectionId=sidebar-left-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("PopularPosts3"));' target='configPopularPosts3' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div>
+</div><div class='widget PopularPosts' id='PopularPosts1'>
+<h2>Most popular (all time)</h2>
+<div class='widget-content popular-posts'>
+<ul>
+<li>
+<a href='http://www.2ality.com/2011/09/google-dart.html'>Google Dart to &#8220;ultimately ... replace JavaScript&#8221;</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/05/google-polymer.html'>Google&#8217;s Polymer and the future of web UI frameworks</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/06/basic-javascript.html'>Basic JavaScript for the impatient programmer</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/02/asm-js.html'>asm.js: closing the gap between JavaScript and native</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2011/06/implementing-bookmarklets.html'>Implementing bookmarklets in JavaScript</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2012/12/arrays.html'>Arrays in JavaScript</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/08/protecting-objects.html'>Protecting objects in JavaScript</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2011/07/coffeescript-overrated.html'>CoffeeScript &#8211; overrated?</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/07/defending-constructors.html'>In defense of JavaScript&#8217;s constructors</a>
+</li>
+<li>
+<a href='http://www.2ality.com/2013/07/es6-modules.html'>ECMAScript 6 modules: the future is now</a>
+</li>
+</ul>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=PopularPosts&widgetId=PopularPosts1&action=editWidget&sectionId=sidebar-left-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("PopularPosts1"));' target='configPopularPosts1' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div>
+</div><div class='widget BlogArchive' id='BlogArchive1'>
+<h2>Blog archive</h2>
+<div class='widget-content'>
+<div id='ArchiveList'>
+<div id='BlogArchive1_ArchiveList'>
+<ul class='hierarchy'>
+<li class='archivedate expanded'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy toggle-open'>&#9660;&#160;</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2013-01-01T00:00:00%2B01:00&amp;updated-max=2014-01-01T00:00:00%2B01:00&amp;max-results=50'>2013</a>
+<span class='post-count' dir='ltr'>(85)</span>
+<ul class='hierarchy'>
+<li class='archivedate expanded'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy toggle-open'>&#9660;&#160;</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_09_01_archive.html'>September</a>
+<span class='post-count' dir='ltr'>(6)</span>
+<ul class='posts'>
+<li><a href='http://www.2ality.com/2013/09/window.html'>Tips for using window in JavaScript</a></li>
+<li><a href='http://www.2ality.com/2013/09/javascript-unicode.html'>Unicode and JavaScript</a></li>
+<li><a href='http://www.2ality.com/2013/09/ecmascript-i18n-api.html'>The ECMAScript Internationalization API</a></li>
+<li><a href='http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html'>OS X: kill all Google Chrome tabs from the shell</a></li>
+<li><a href='http://www.2ality.com/2013/09/data-in-prototypes.html'>Data in prototype properties</a></li>
+<li><a href='http://www.2ality.com/2013/09/types.html'>JavaScript&#8217;s type system</a></li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(6)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_07_01_archive.html'>July</a>
+<span class='post-count' dir='ltr'>(8)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(11)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(11)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_04_01_archive.html'>April</a>
+<span class='post-count' dir='ltr'>(12)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(8)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(10)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2013_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(13)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2012-01-01T00:00:00%2B01:00&amp;updated-max=2013-01-01T00:00:00%2B01:00&amp;max-results=50'>2012</a>
+<span class='post-count' dir='ltr'>(178)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_12_01_archive.html'>December</a>
+<span class='post-count' dir='ltr'>(14)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(14)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_10_01_archive.html'>October</a>
+<span class='post-count' dir='ltr'>(15)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_09_01_archive.html'>September</a>
+<span class='post-count' dir='ltr'>(14)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(18)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_07_01_archive.html'>July</a>
+<span class='post-count' dir='ltr'>(15)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(16)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_04_01_archive.html'>April</a>
+<span class='post-count' dir='ltr'>(14)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(18)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(20)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2012_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(19)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2011-01-01T00:00:00%2B01:00&amp;updated-max=2012-01-01T00:00:00%2B01:00&amp;max-results=50'>2011</a>
+<span class='post-count' dir='ltr'>(380)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_12_01_archive.html'>December</a>
+<span class='post-count' dir='ltr'>(22)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(25)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_10_01_archive.html'>October</a>
+<span class='post-count' dir='ltr'>(27)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_09_01_archive.html'>September</a>
+<span class='post-count' dir='ltr'>(15)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(24)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_07_01_archive.html'>July</a>
+<span class='post-count' dir='ltr'>(18)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(29)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(23)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_04_01_archive.html'>April</a>
+<span class='post-count' dir='ltr'>(33)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(40)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(47)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2011_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(77)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2010-01-01T00:00:00%2B01:00&amp;updated-max=2011-01-01T00:00:00%2B01:00&amp;max-results=50'>2010</a>
+<span class='post-count' dir='ltr'>(174)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_12_01_archive.html'>December</a>
+<span class='post-count' dir='ltr'>(42)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(19)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_10_01_archive.html'>October</a>
+<span class='post-count' dir='ltr'>(28)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_09_01_archive.html'>September</a>
+<span class='post-count' dir='ltr'>(18)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(22)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_07_01_archive.html'>July</a>
+<span class='post-count' dir='ltr'>(17)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(8)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_04_01_archive.html'>April</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2010_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2009-01-01T00:00:00%2B01:00&amp;updated-max=2010-01-01T00:00:00%2B01:00&amp;max-results=50'>2009</a>
+<span class='post-count' dir='ltr'>(69)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_12_01_archive.html'>December</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(7)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_10_01_archive.html'>October</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_09_01_archive.html'>September</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(12)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_07_01_archive.html'>July</a>
+<span class='post-count' dir='ltr'>(14)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_04_01_archive.html'>April</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(6)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(7)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2009_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2008-01-01T00:00:00%2B01:00&amp;updated-max=2009-01-01T00:00:00%2B01:00&amp;max-results=46'>2008</a>
+<span class='post-count' dir='ltr'>(46)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_12_01_archive.html'>December</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(10)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_10_01_archive.html'>October</a>
+<span class='post-count' dir='ltr'>(9)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_04_01_archive.html'>April</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(11)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2008_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2007-01-01T00:00:00%2B01:00&amp;updated-max=2008-01-01T00:00:00%2B01:00&amp;max-results=12'>2007</a>
+<span class='post-count' dir='ltr'>(12)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2007_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2007_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(6)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2007_07_01_archive.html'>July</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2007_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2006-01-01T00:00:00%2B01:00&amp;updated-max=2007-01-01T00:00:00%2B01:00&amp;max-results=1'>2006</a>
+<span class='post-count' dir='ltr'>(1)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2006_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/search?updated-min=2005-01-01T00:00:00%2B01:00&amp;updated-max=2006-01-01T00:00:00%2B01:00&amp;max-results=2'>2005</a>
+<span class='post-count' dir='ltr'>(2)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2005_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://www.2ality.com/2005_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=BlogArchive&widgetId=BlogArchive1&action=editWidget&sectionId=sidebar-left-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("BlogArchive1"));' target='configBlogArchive1' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div>
+</div><div class='widget Label' id='Label1'>
+<h2>Labels</h2>
+<div class='widget-content list-label-widget-content'>
+<ul>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/dev'>dev</a>
+<span dir='ltr'>(431)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/computers'>computers</a>
+<span dir='ltr'>(310)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/javascript'>javascript</a>
+<span dir='ltr'>(247)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/life'>life</a>
+<span dir='ltr'>(194)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jslang'>jslang</a>
+<span dir='ltr'>(153)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/apple'>apple</a>
+<span dir='ltr'>(106)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/webdev'>webdev</a>
+<span dir='ltr'>(90)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/mobile'>mobile</a>
+<span dir='ltr'>(81)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/scitech'>scitech</a>
+<span dir='ltr'>(50)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/esnext'>esnext</a>
+<span dir='ltr'>(49)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/hack'>hack</a>
+<span dir='ltr'>(48)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/mac'>mac</a>
+<span dir='ltr'>(45)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/google'>google</a>
+<span dir='ltr'>(38)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/java'>java</a>
+<span dir='ltr'>(37)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/business'>business</a>
+<span dir='ltr'>(32)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/ios'>ios</a>
+<span dir='ltr'>(32)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/video'>video</a>
+<span dir='ltr'>(28)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/hci'>hci</a>
+<span dir='ltr'>(27)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/entertainment'>entertainment</a>
+<span dir='ltr'>(26)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/society'>society</a>
+<span dir='ltr'>(26)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/browser'>browser</a>
+<span dir='ltr'>(24)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/firefox'>firefox</a>
+<span dir='ltr'>(24)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/ipad'>ipad</a>
+<span dir='ltr'>(24)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/movie'>movie</a>
+<span dir='ltr'>(23)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/html5'>html5</a>
+<span dir='ltr'>(22)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/psychology'>psychology</a>
+<span dir='ltr'>(22)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/nodejs'>nodejs</a>
+<span dir='ltr'>(20)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/clientjs'>clientjs</a>
+<span dir='ltr'>(18)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/tv'>tv</a>
+<span dir='ltr'>(18)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/android'>android</a>
+<span dir='ltr'>(17)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/fun'>fun</a>
+<span dir='ltr'>(17)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/social'>social</a>
+<span dir='ltr'>(17)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/chrome'>chrome</a>
+<span dir='ltr'>(16)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/tablet'>tablet</a>
+<span dir='ltr'>(16)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/2ality'>2ality</a>
+<span dir='ltr'>(15)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/humor'>humor</a>
+<span dir='ltr'>(15)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/politics'>politics</a>
+<span dir='ltr'>(15)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/web'>web</a>
+<span dir='ltr'>(15)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/cloud'>cloud</a>
+<span dir='ltr'>(14)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/microsoft'>microsoft</a>
+<span dir='ltr'>(14)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/blogging'>blogging</a>
+<span dir='ltr'>(13)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/hardware'>hardware</a>
+<span dir='ltr'>(13)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/software%20engineering'>software engineering</a>
+<span dir='ltr'>(13)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/gaming'>gaming</a>
+<span dir='ltr'>(12)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/eclipse'>eclipse</a>
+<span dir='ltr'>(11)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/gwt'>gwt</a>
+<span dir='ltr'>(11)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/programming%20languages'>programming languages</a>
+<span dir='ltr'>(11)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/app%20store'>app store</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/nature'>nature</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/photo'>photo</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/security'>security</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/semantic%20web'>semantic web</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/software'>software</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/twitter'>twitter</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/webos'>webos</a>
+<span dir='ltr'>(10)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/12quirks'>12quirks</a>
+<span dir='ltr'>(9)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/education'>education</a>
+<span dir='ltr'>(9)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jsmodules'>jsmodules</a>
+<span dir='ltr'>(9)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/media'>media</a>
+<span dir='ltr'>(9)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/windows%208'>windows 8</a>
+<span dir='ltr'>(9)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/idea'>idea</a>
+<span dir='ltr'>(8)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/iphone'>iphone</a>
+<span dir='ltr'>(8)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/itunes'>itunes</a>
+<span dir='ltr'>(8)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/numbers'>numbers</a>
+<span dir='ltr'>(8)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/scifi-fantasy'>scifi-fantasy</a>
+<span dir='ltr'>(8)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/app'>app</a>
+<span dir='ltr'>(7)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/chromeos'>chromeos</a>
+<span dir='ltr'>(7)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/english'>english</a>
+<span dir='ltr'>(7)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/fringe'>fringe</a>
+<span dir='ltr'>(7)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jsshell'>jsshell</a>
+<span dir='ltr'>(7)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/thunderbolt'>thunderbolt</a>
+<span dir='ltr'>(7)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/webapp'>webapp</a>
+<span dir='ltr'>(7)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/blogger'>blogger</a>
+<span dir='ltr'>(6)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/bookmarklet'>bookmarklet</a>
+<span dir='ltr'>(6)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/crowdsourcing'>crowdsourcing</a>
+<span dir='ltr'>(6)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/latex'>latex</a>
+<span dir='ltr'>(6)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/lion'>lion</a>
+<span dir='ltr'>(6)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/ted'>ted</a>
+<span dir='ltr'>(6)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/environment'>environment</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/gadget'>gadget</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/html'>html</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/intel'>intel</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/layout'>layout</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/light%20peak'>light peak</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/michael%20j.%20fox'>michael j. fox</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/music'>music</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/pdf'>pdf</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/shell'>shell</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/underscorejs'>underscorejs</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/vlc'>vlc</a>
+<span dir='ltr'>(5)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/coffeescript'>coffeescript</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/dart'>dart</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/facebook'>facebook</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/gimp'>gimp</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/googleio'>googleio</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/googleplus'>googleplus</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/health'>health</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/howto'>howto</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/hp'>hp</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/javafx'>javafx</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jshistory'>jshistory</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jstools'>jstools</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/kindle'>kindle</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/leopard'>leopard</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/macbook'>macbook</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/motorola'>motorola</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/m%C3%BCnchen'>münchen</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/occupy'>occupy</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/pl%20fundamentals'>pl fundamentals</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/series'>series</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/tc39'>tc39</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/textbook'>textbook</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/web%20design'>web design</a>
+<span dir='ltr'>(4)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/__proto__'>__proto__</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/amazon'>amazon</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/back%20to%20the%20future'>back to the future</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/book'>book</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/css'>css</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/flattr'>flattr</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/food'>food</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/foreign%20languages'>foreign languages</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/house'>house</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/icloud'>icloud</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/info%20mgmt'>info mgmt</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jsfuture'>jsfuture</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jsstyle'>jsstyle</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/linux'>linux</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/mozilla'>mozilla</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/polymer'>polymer</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/publishing'>publishing</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/python'>python</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/regexp'>regexp</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/samsung'>samsung</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/tizen'>tizen</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/traffic'>traffic</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/unix'>unix</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/webcomponents'>webcomponents</a>
+<span dir='ltr'>(3)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/adobe'>adobe</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/angry%20birds'>angry birds</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/astronomy'>astronomy</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/audio'>audio</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/comic'>comic</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/design'>design</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/dom'>dom</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/ecommerce'>ecommerce</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/eval'>eval</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/facets'>facets</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/flash'>flash</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/fluentconf'>fluentconf</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/free'>free</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/futurama'>futurama</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/guide'>guide</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/history'>history</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/hyena'>hyena</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/internet%20explorer'>internet explorer</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/journalism'>journalism</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jquery'>jquery</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jsengine'>jsengine</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jslib'>jslib</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/law'>law</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/lightning'>lightning</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/math'>math</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/meego'>meego</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/month'>month</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/nike'>nike</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/nokia'>nokia</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/repl'>repl</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/servo'>servo</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/sponsor'>sponsor</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/steve%20jobs'>steve jobs</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/tmplstr'>tmplstr</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/travel'>travel</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/usb'>usb</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/winphone'>winphone</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/wwdc'>wwdc</a>
+<span dir='ltr'>(2)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/airbender'>airbender</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/amdefine'>amdefine</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/angularjs'>angularjs</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/aol'>aol</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/app%20urls'>app urls</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/architecture'>architecture</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/asmjs'>asmjs</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/async'>async</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/basic%20income'>basic income</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/biology'>biology</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/blink'>blink</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/bluetooth'>bluetooth</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/canada'>canada</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/community'>community</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/cross-platform'>cross-platform</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/deutsch'>deutsch</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/diaspora'>diaspora</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/distributed-social-network'>distributed-social-network</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/dsl'>dsl</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/dvd'>dvd</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/dzone'>dzone</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/emacs'>emacs</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/emberjs'>emberjs</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/energy'>energy</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/facetator'>facetator</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/feedback'>feedback</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/firefly'>firefly</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/firefoxos'>firefoxos</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/fritzbox'>fritzbox</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/german'>german</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/git'>git</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/guice'>guice</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/h.264'>h.264</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/home%20entertainment'>home entertainment</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/hosting'>hosting</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/htc'>htc</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/ical'>ical</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jsdom'>jsdom</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/jsmyth'>jsmyth</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/library'>library</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/location'>location</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/markdown'>markdown</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/marketing'>marketing</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/mars'>mars</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/meta-data'>meta-data</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/middle%20east'>middle east</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/mpaa'>mpaa</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/msl'>msl</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/mssurface'>mssurface</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/netflix'>netflix</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/nsa'>nsa</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/obama'>obama</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/openoffice'>openoffice</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/opinion'>opinion</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/oracle'>oracle</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/organizing'>organizing</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/philosophy'>philosophy</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/pixar'>pixar</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/pnacl'>pnacl</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/presenting'>presenting</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/prism'>prism</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/privacy'>privacy</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/programming'>programming</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/puzzle'>puzzle</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/raffle'>raffle</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/raspberry%20pi'>raspberry pi</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/read'>read</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/rust'>rust</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/safari'>safari</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/sponsoring'>sponsoring</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/star%20trek'>star trek</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/talk'>talk</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/theora'>theora</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/thunderbird'>thunderbird</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/typography'>typography</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/unicode'>unicode</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/v8'>v8</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/voice%20control'>voice control</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/webkit'>webkit</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/webm'>webm</a>
+<span dir='ltr'>(1)</span>
+</li>
+<li>
+<a dir='ltr' href='http://www.2ality.com/search/label/yahoo'>yahoo</a>
+<span dir='ltr'>(1)</span>
+</li>
+</ul>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=Label&widgetId=Label1&action=editWidget&sectionId=sidebar-left-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("Label1"));' target='configLabel1' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div>
+</div></div>
+</aside>
+</div>
+</div>
+<div class='column-right-outer'>
+<div class='column-right-inner'>
+<aside>
+<div class='sidebar section' id='sidebar-right-1'><div class='widget HTML' id='HTML5'>
+<h2 class='title'>Support 2ality</h2>
+<div class='widget-content'>
+<!-- BuySellAds Zone Code -->
+<div id="bsap_1281691" class="bsarocks bsap_4c6638b450ca5dbf136f2e95b13b8769"></div>
+<a href="http://adpacks.com" id="bsap_aplink">via Ad Packs</a>
+<!-- End BuySellAds Zone Code -->
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=HTML&widgetId=HTML5&action=editWidget&sectionId=sidebar-right-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("HTML5"));' target='configHTML5' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div><div class='widget HTML' id='HTML2'>
+<div class='widget-content'>
+<a href="http://rauschma.de/">
+<img src="http://2.bp.blogspot.com/-t-YPBvGl_4U/UcwIEg3JGqI/AAAAAAAAAxU/PEeoRbrnrI0/s1600/axel.jpg" />
+<br />
+Dr. Axel Rauschmayer
+</a>
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=HTML&widgetId=HTML2&action=editWidget&sectionId=sidebar-right-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("HTML2"));' target='configHTML2' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div><div class='widget HTML' id='HTML6'>
+<h2 class='title'>&#8220;My&#8221; sites</h2>
+<div class='widget-content'>
+<ul>
+<li><a href="http://javascriptweekly.com/" rel="nofollow">JavaScript Weekly [editor]</a></li>
+<li><a href="https://groups.google.com/d/forum/js-lang" rel="nofollow">js-lang &#8211; JavaScript discussion group [founder]</a></li>
+<li><a href="http://jscentral.org/" rel="nofollow">JS Central &#8211; JavaScript news and links [creator]</a></li>
+<li><a href="http://www.munichjs.org/" rel="nofollow">MunichJS &#8211; JavaScript User Group Munich [organizer]</a></li>
+</ul>
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=HTML&widgetId=HTML6&action=editWidget&sectionId=sidebar-right-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("HTML6"));' target='configHTML6' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div><div class='widget HTML' id='HTML7'>
+<div class='widget-content'>
+<a class="twitter-timeline" data-tweet-limit="5" data-chrome="nofooter transparent" data-dnt="true" href="https://twitter.com/rauschma" data-widget-id="372995588821757952">Tweets by @rauschma</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=HTML&widgetId=HTML7&action=editWidget&sectionId=sidebar-right-1' onclick='return _WidgetManager._PopupConfig(document.getElementById("HTML7"));' target='configHTML7' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div></div>
+</aside>
+</div>
+</div>
+</div>
+<div style='clear: both'></div>
+<!-- columns -->
+</div>
+<!-- main -->
+</div>
+</div>
+<div class='main-cap-bottom cap-bottom'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+</div>
+<footer>
+<div class='footer-outer'>
+<div class='footer-cap-top cap-top'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+<div class='fauxborder-left footer-fauxborder-left'>
+<div class='fauxborder-right footer-fauxborder-right'></div>
+<div class='region-inner footer-inner'>
+<div class='foot section' id='footer-1'></div>
+<table border='0' cellpadding='0' cellspacing='0' class='section-columns columns-2'>
+<tbody>
+<tr>
+<td class='first columns-cell'>
+<div class='foot section' id='footer-2-1'></div>
+</td>
+<td class='columns-cell'>
+<div class='foot section' id='footer-2-2'></div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- outside of the include in order to lock Attribution widget -->
+<div class='foot section' id='footer-3'><div class='widget Attribution' id='Attribution1'>
+<div class='widget-content' style='text-align: center;'>
+Powered by <a href='http://www.blogger.com' target='_blank'>Blogger</a>.
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=8100407163665430627&widgetType=Attribution&widgetId=Attribution1&action=editWidget&sectionId=footer-3' onclick='return _WidgetManager._PopupConfig(document.getElementById("Attribution1"));' target='configAttribution1' title='Edit'>
+<img alt='' height='18' src='http://img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div></div>
+</div>
+</div>
+<div class='footer-cap-bottom cap-bottom'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+</div>
+</footer>
+<!-- content -->
+</div>
+</div>
+<div class='content-cap-bottom cap-bottom'>
+<div class='cap-left'></div>
+<div class='cap-right'></div>
+</div>
+</div>
+</div>
+<script type='text/javascript'>
+    window.setTimeout(function() {
+        document.body.className = document.body.className.replace('loading', '');
+      }, 10);
+  </script>
+<!--BEGIN: rauschma-->
+<!--AdPacks.com-->
+<script type='text/javascript'>
+(function(){
+  var bsa = document.createElement('script');
+     bsa.type = 'text/javascript';
+     bsa.async = true;
+     bsa.src = '//s3.buysellads.com/ac/bsa.js';
+  (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(bsa);
+})();
+</script>
+<!--post.js-->
+<script>
+//<![CDATA[
+(function () {
+    var countDownToInit = countDownTo(2, init);
+
+    loadScript("http://dl.2ality.com/prettify/prettify.js", countDownToInit);
+
+    var oldOnLoad = window.onload;
+    window.onload = function (event) {
+        if (typeof oldOnLoad === "function") {
+            oldOnLoad(event);
+        }
+        countDownToInit();
+    };
+
+    function init() {
+        prettyPrint();
+
+        // References: add link sources and link targets
+        if (document.getElementsByClassName) {
+            var elems = document.getElementsByClassName("ptr");
+            for (var i = 0; i<elems.length; i++) {
+                var elem = elems[i];
+                elem.setAttribute("href", "#"+elem.innerHTML);
+            }
+            var refs = document.getElementById("references");
+            if (refs.getElementsByTagName) {
+                var elems = refs.getElementsByTagName("li");
+                for (var i = 0; i<elems.length; i++) {
+                    var elem = elems[i];
+                    elem.setAttribute("id", "["+(i+1)+"]");
+                }
+            }
+        }
+    }
+
+    function countDownTo(count, callback) {
+        return function () {
+            count--;
+            if (count === 0) {
+                callback();
+            } else if (count < 0) {
+                throw new Error("Invoked too many times");
+            }
+        }
+    }
+    
+    /**
+     * Code by Nicholas C. Zakas, with minor modifications
+     * @see http://www.nczonline.net/blog/2009/07/28/the-best-way-to-load-external-javascript/
+     */
+    function loadScript(url, callback) {
+        var script = document.createElement("script")
+        script.type = "text/javascript";
+
+        if (script.readyState) {  // IE
+            script.onreadystatechange = function () {
+                if (script.readyState === "loaded" ||
+                        script.readyState === "complete") {
+                    script.onreadystatechange = null;
+                    if (callback) callback();
+                }
+            };
+        } else {  // Others
+            script.onload = function(){
+                if (callback) callback();
+            };
+        }
+
+        script.src = url;
+        document.getElementsByTagName("head")[0].appendChild(script);
+    }
+}());
+//]]>
+</script>
+<a href='http://clicky.com/66467360' title='Web Analytics'><img alt='Web Analytics' border='0' src='//static.clicky.com/media/links/badge.gif'/></a>
+<script src='//static.clicky.com/js' type='text/javascript'></script>
+<script type='text/javascript'>try{ clicky.init(66467360); }catch(e){}</script>
+<noscript><p><img alt='Clicky' height='1' src='//in.clicky.com/66467360ns.gif' width='1'/></p></noscript>
+<!--END: rauschma-->
+<script type="text/javascript">
+if (window.jstiming) window.jstiming.load.tick('widgetJsBefore');
+</script><script type="text/javascript" src="//www.blogger.com/static/v1/widgets/2178715077-widgets.js"></script>
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<script type='text/javascript'>
+if (typeof(BLOG_attachCsiOnload) != 'undefined' && BLOG_attachCsiOnload != null) { window['blogger_templates_experiment_id'] = "templatesV2";window['blogger_blog_id'] = '8100407163665430627';BLOG_attachCsiOnload('item_'); }_WidgetManager._Init('//www.blogger.com/rearrange?blogID\x3d8100407163665430627','//www.2ality.com/2013/09/osx-kill-chrome-tabs.html','8100407163665430627');
+_WidgetManager._SetDataContext([{'name': 'blog', 'data': {'blogId': '8100407163665430627', 'bloggerUrl': 'http://www.blogger.com', 'title': '&#9313;ality &#8211; JavaScript and more', 'pageType': 'item', 'url': 'http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html', 'canonicalUrl': 'http://www.2ality.com/2013/09/osx-kill-chrome-tabs.html', 'canonicalHomepageUrl': 'http://www.2ality.com/', 'homepageUrl': 'http://www.2ality.com/', 'blogspotFaviconUrl': 'http://www.2ality.com/favicon.ico', 'enabledCommentProfileImages': true, 'adultContent': false, 'disableAdSenseWidget': false, 'analyticsAccountNumber': '', 'searchLabel': '', 'searchQuery': '', 'pageName': 'OS X: kill all Google Chrome tabs from the shell', 'pageTitle': '&#9313;ality &#8211; JavaScript and more: OS X: kill all Google Chrome tabs from the shell', 'encoding': 'UTF-8', 'locale': 'en', 'localeUnderscoreDelimited': 'en', 'isPrivate': false, 'isMobile': false, 'isMobileRequest': false, 'mobileClass': '', 'isPrivateBlog': false, 'languageDirection': 'ltr', 'feedLinks': '\74link rel\75\42alternate\42 type\75\42application/atom+xml\42 title\75\42&#9313;ality &#8211; JavaScript and more - Atom\42 href\75\42http://www.2ality.com/feeds/posts/default\42 /\76\n\74link rel\75\42alternate\42 type\75\42application/rss+xml\42 title\75\42&#9313;ality &#8211; JavaScript and more - RSS\42 href\75\42http://www.2ality.com/feeds/posts/default?alt\75rss\42 /\76\n\74link rel\75\42service.post\42 type\75\42application/atom+xml\42 title\75\42&#9313;ality &#8211; JavaScript and more - Atom\42 href\75\42http://www.blogger.com/feeds/8100407163665430627/posts/default\42 /\76\n\n\74link rel\75\42alternate\42 type\75\42application/atom+xml\42 title\75\42&#9313;ality &#8211; JavaScript and more - Atom\42 href\75\42http://www.2ality.com/feeds/7357631453060481791/comments/default\42 /\76\n', 'meTag': '', 'openIdOpTag': '', 'googleProfileUrl': 'https://plus.google.com/110516491705475800224', 'imageSrcTag': '', 'latencyHeadScript': '\74script type\75\42text/javascript\42\76(function() { var b\75window,e\75\42jstiming\42,g\75\42tick\42;(function(){function d(a){this.t\75{};this.tick\75function(a,d,c){c\75void 0!\75c?c:(new Date).getTime();this.t[a]\75[c,d]};this[g](\42start\42,null,a)}var a\75new d;b.jstiming\75{Timer:d,load:a};if(b.performance\46\46b.performance.timing){var a\75b.performance.timing,c\75b[e].load,f\75a.navigationStart,a\75a.responseStart;0\74f\46\46a\76\75f\46\46(c[g](\42_wtsrt\42,void 0,f),c[g](\42wtsrt_\42,\42_wtsrt\42,a),c[g](\42tbsd_\42,\42wtsrt_\42))}try{a\75null,b.chrome\46\46b.chrome.csi\46\46(a\75Math.floor(b.chrome.csi().pageT),c\46\0460\74f\46\46(c[g](\42_tbnd\42,void 0,b.chrome.csi().startE),\nc[g](\42tbnd_\42,\42_tbnd\42,f))),null\75\75a\46\46b.gtbExternal\46\46(a\75b.gtbExternal.pageT()),null\75\75a\46\46b.external\46\46(a\75b.external.pageT,c\46\0460\74f\46\46(c[g](\42_tbnd\42,void 0,b.external.startE),c[g](\42tbnd_\42,\42_tbnd\42,f))),a\46\46(b[e].pt\75a)}catch(l){}})();b.tickAboveFold\75function(d){var a\0750;if(d.offsetParent){do a+\75d.offsetTop;while(d\75d.offsetParent)}d\75a;750\76\75d\46\46b[e].load[g](\42aft\42)};var h\75!1;function k(){h||(h\75!0,b[e].load[g](\42firstScrollTime\42))}b.addEventListener?b.addEventListener(\42scroll\42,k,!1):b.attachEvent(\42onscroll\42,k);\n })();\74/script\076', 'mobileHeadScript': '', 'ieCssRetrofitLinks': '\74!--[if IE]\76\74script type\75\42text/javascript\42 src\75\42//www.blogger.com/static/v1/jsbin/4163410827-ieretrofit.js\42\76\74/script\76\n\74![endif]--\076', 'view': '', 'dynamicViewsCommentsSrc': '//www.blogblog.com/dynamicviews/4224c15c4e7c9321/js/comments.js', 'dynamicViewsScriptSrc': '//www.blogblog.com/dynamicviews/15de8d1bfc9ff1d1', 'plusOneApiSrc': 'https://apis.google.com/js/plusone.js', 'testHtml5CssSrc': '//www.blogger.com/static/v1/widgets/721438413-css_bundle_html5.css', 'sf': 'n', 'tf': ''}}, {'name': 'skin', 'data': {'vars': {'tabs_border_size': '0', 'tabs_shadow_spread': '0', 'link_visited_color': '#993322', 'post_title_font': 'normal normal 30px Georgia, Utopia, \47Palatino Linotype\47, Palatino, serif', 'tabs_separator_color': '#c0a154', 'tabs_text_color': '#cc3300', 'post_shadow_spread': '0', 'body_background_overlay_height': '121px', 'main_cap_height': '0', 'widget_title_font': 'normal normal 20px Georgia, Utopia, \47Palatino Linotype\47, Palatino, serif', 'body_background_overlay': 'transparent url(http://www.blogblog.com/1kt/watermark/body_overlay_birds.png) no-repeat scroll top right', 'tabs_background_outer': 'none', 'body_background': '#c0a154 url(http://www.blogblog.com/1kt/watermark/body_background_birds.png) repeat scroll top left', 'keycolor': '#c0a154', 'main_background': 'transparent none no-repeat scroll top left', 'header_font': 'normal normal 60px Georgia, Utopia, \47Palatino Linotype\47, Palatino, serif', 'footer_background': '#330000 url(http://www.blogblog.com/1kt/watermark/body_background_navigator.png) repeat scroll top left', 'post_border_style': 'dotted', 'footer_link_visited_color': '#dd5533', 'post_background_url': 'url(http://www.blogblog.com/1kt/watermark/post_background_birds.png)', 'footer_link_hover_color': '#ff9977', 'tabs_background_color': 'transparent', 'link_hover_color': '#ff3300', 'footer_link_color': '#ff7755', 'description_text_color': '#997755', 'body_text_color': '#333333', 'post_border_color': '#ccbb99', 'footer_text_color': '#ccbb99', 'post_background_color': 'transparent', 'post_footer_text_color': '#997755', 'tabs_background_inner': 'none', 'endSide': 'right', 'tabs_font': 'normal normal 20px Georgia, Utopia, \47Palatino Linotype\47, Palatino, serif', 'startSide': 'left', 'body_font': 'normal normal 14px Arial, Tahoma, Helvetica, FreeSans, sans-serif', 'main_cap_overlay': 'none', 'date_text_color': '#997755', 'widget_title_text_color': '#000000', 'link_color': '#cc3300', 'footer_widget_title_text_color': '#eeddbb', 'post_border_size': '1px', 'main_cap_image': 'none', 'footer_background_color': '#330000', 'header_text_color': '#ffffff', 'date_font': 'normal normal 16px Arial, Tahoma, Helvetica, FreeSans, sans-serif', 'main_padding_top': '30px', 'tabs_selected_text_color': '#000000', 'body_background_color': '#c0a154', 'widget_alternate_text_color': '#777777'}, 'override': ''}}, {'name': 'view', 'data': {'classic': {'name': 'classic', 'url': '/?view\75classic'}, 'flipcard': {'name': 'flipcard', 'url': '/?view\75flipcard'}, 'magazine': {'name': 'magazine', 'url': '/?view\75magazine'}, 'mosaic': {'name': 'mosaic', 'url': '/?view\75mosaic'}, 'sidebar': {'name': 'sidebar', 'url': '/?view\75sidebar'}, 'snapshot': {'name': 'snapshot', 'url': '/?view\75snapshot'}, 'timeslide': {'name': 'timeslide', 'url': '/?view\75timeslide'}}}]);
+_WidgetManager._RegisterWidget('_PageListView', new _WidgetInfo('PageList1', 'crosscol', null, document.getElementById('PageList1'), {'title': 'Pages', 'links': [{'href': 'http://www.2ality.com/', 'title': 'Home', 'isCurrentPage': false}, {'href': 'http://www.2ality.com/p/about.html', 'title': 'About', 'isCurrentPage': false}, {'href': 'http://www.2ality.com/p/best.html', 'title': 'Best of', 'isCurrentPage': false}, {'href': 'http://www.2ality.com/p/subscribe.html', 'title': 'Subscribe', 'isCurrentPage': false}, {'href': 'http://www.2ality.com/p/advertise.html', 'title': 'Advertise', 'isCurrentPage': false}], 'mobile': false}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML5', 'sidebar-right-1', null, document.getElementById('HTML5'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML2', 'sidebar-right-1', null, document.getElementById('HTML2'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML6', 'sidebar-right-1', null, document.getElementById('HTML6'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML7', 'sidebar-right-1', null, document.getElementById('HTML7'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_PopularPostsView', new _WidgetInfo('PopularPosts3', 'sidebar-left-1', null, document.getElementById('PopularPosts3'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_PopularPostsView', new _WidgetInfo('PopularPosts1', 'sidebar-left-1', null, document.getElementById('PopularPosts1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogArchiveView', new _WidgetInfo('BlogArchive1', 'sidebar-left-1', null, document.getElementById('BlogArchive1'), {'languageDirection': 'ltr'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_LabelView', new _WidgetInfo('Label1', 'sidebar-left-1', null, document.getElementById('Label1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML4', 'crosscol-overflow', null, document.getElementById('HTML4'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_AttributionView', new _WidgetInfo('Attribution1', 'footer-3', null, document.getElementById('Attribution1'), {'attribution': 'Powered by \74a href\75\47http://www.blogger.com\47 target\75\47_blank\47\76Blogger\74/a\76.'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HeaderView', new _WidgetInfo('Header1', 'header', null, document.getElementById('Header1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogView', new _WidgetInfo('Blog1', 'main', null, document.getElementById('Blog1'), {'cmtInteractionsEnabled': false, 'showBacklinks': true, 'postId': '7357631453060481791', 'lightboxEnabled': true, 'lightboxModuleUrl': '//www.blogger.com/static/v1/jsbin/1766472746-lbx.js', 'lightboxCssUrl': '//www.blogger.com/static/v1/v-css/4138445517-lightbox_bundle.css'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML1', 'main', null, document.getElementById('HTML1'), {}, 'displayModeFull'));
+</script>
+</body>
+</html>

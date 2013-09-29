@@ -577,4 +577,600 @@ var CrayonSyntaxStrings = {"copy":"Press %s to Copy, %s to Paste","minimize":"Cl
 		<header id="mpcth_page_header_wrap">
 			<div id="mpcth_page_header_content">
 				<div id="mpcth_top_dropdown"><ul></ul><div class="mpcth-clear-fix"></div></div><a id="mpcth_logo" href="http://typedarray.org"><h1>TypedArray.org</h1><small>JavaScript for interactive developers</small></a><nav id="mpcth_nav" class="mpcth-visible-desktop"><ul id="nav"><li class="page_item page-item-2"><a href="http://typedarray.org/about/">About</a></li>
-</ul><a class="mpcth-header-search 
+</ul><a class="mpcth-header-search mpcth-sc-icon-search mpcth-alt-link"></a></nav><!-- end #mpcth_nav --> <!-- end menu --> 
+
+				 
+<form method="get" id="searchform" action="http://typedarray.org/">
+	<input type="text" class="field mpcth-search" name="s" id="s" value="Type something and hit enter" onfocus="if(this.value=='Type something and hit enter')this.value='';" onblur="if(this.value=='')this.value='Type something and hit enter';"/>
+	<input type="submit" class="submit" name="submit" id="searchsubmit" value="Search"/>
+</form>
+				<div class="mpcth-clear-fix"></div>
+			</div> <!-- end #mpcth_page_header_content -->
+		</header><!-- end #mpcth_page_header_wrap -->
+<div id="mpcth_page_container" class="mpcth-sidebar-none single-post">
+		
+		<!-- Display menu on the side and logo (if set in settings ) -->
+		
+<!-- Menu on the side of a page -->
+<!-- End Menu on the side -->
+
+		<div id="mpcth_page_content">
+				<div id="mpcth_page_articles" class="mpcth-single-post mpcth-sidebar-open">
+												
+
+					<article id="post-8"  class="post-8 post type-post status-publish format-standard hentry category-javascript tag-javascript-tutorial tag-refresh blog-post" >
+															<div class="mpcth-post-thumbnail">
+										<img width="1024" height="615" src="http://typedarray.org/wp-content/uploads/2013/03/js-refresh-header-1024x615.jpg" class="attachment-post-thumbnail wp-post-image" alt="JavaScript refresh" />																			</div>
+									<div class="mpcth-post-content">
+																											<header>
+											<h2 class="mpcth-post-title"><a href="http://typedarray.org/javascript-refresh/" title="A JavaScript refresh">
+												A JavaScript refresh											</a></h2>
+										</header>
+																										<address> </address>
+<ul>
+<li><a href="#versions">Versions</a></li>
+<li><a href="#assembly">Assembly language of the web</a></li>
+<li><a href="#no-compiling">No compiling</a></li>
+<li><a href="#tools">Tools</a></li>
+<li><a href="#repl">REPL</a></li>
+<li><a href="#start">Getting started</a></li>
+<li><a href="#dynamic">A dynamically typed language</a></li>
+<li><a href="#variables-scope">Variables and scope</a></li>
+<li><a href="#conversions">Type conversions</a></li>
+<li><a href="#exceptions">Runtime exceptions</a></li>
+<li><a href="#primitive-composite">Primitive and composite datatypes</a></li>
+<li><a href="#boolean">Boolean</a></li>
+<li><a href="#number">Number</a></li>
+<li><a href="#object">Object and properties</a></li>
+<li><a href="#everything-object">Almost everything as an object</a></li>
+<li><a href="#null-undefined">Null and undefined</a></li>
+<li><a href="#loops">Loops</a></li>
+<li><a href="#array">Array</a></li>
+<li><a href="#iterator">Iterator</a></li>
+<li><a href="#date">Date</a></li>
+<li><a href="#function">Function</a></li>
+<li><a href="#context">Context of execution</a></li>
+<li><a href="#prototype">Prototype, the good old friend</a></li>
+<li><a href="#closure">Closure</a></li>
+<li><a href="#gc">Garbage collection</a></li>
+<li><a href="#object-pooling">Object pooling</a></li>
+</ul>
+<p style="text-align: justify;">We will cover here some of the key concepts of JavaScript to get us started. If you have not checked JavaScript for the past few years or if you are new to JavaScript, I hope you find this useful.</p>
+<p style="text-align: justify;">We will start by covering the language basics like variables, functions, scope, and the different types, but we will not spend much time on the absolute basics like operators, or what is a function or a variable, you probably already know all that as a developer. We will discover JavaScript by going through simple examples and for each of these, highlight specific behaviors and approach the language from an interactive developer standpoint, coming from other technologies like Flash (ActionScript 3), Java, C# or simply native (C++).</p>
+<p style="text-align: justify;">Like other managed languages, JavaScript runs inside a JavaScript VM (Virtual Machine), one key difference to note is that unlike executing bytecode, JavaScript VMs are source based, translating JavaScript source code directly to native code by using what is called a JIT (Just in Time compiler) when available. The JIT performs optimization at runtime (just in time) to leverage platform specific optimizations depending on the architecture the code is being run on. Of course, most browsers available today run JavaScript, the list below highlights the most popular JavaScript VMs today in the industry:</p>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Chakra_(JScript_engine)">Chakra</a> (Microsoft Internet Explorer)</li>
+<li><a href="http://en.wikipedia.org/wiki/WebKit#JavaScriptCore">Nitro/JavaScript Core</a> (Safari)</li>
+<li><a href="http://dev.opera.com/articles/view/labs-carakan/">Carakan</a> (Opera)</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/SpiderMonkey">SpiderMonkey</a> (Firefox)</li>
+<li><a href="http://en.wikipedia.org/wiki/V8_(JavaScript_engine)">V8</a> (Chrome, Chromium)</li>
+</ul>
+<p style="text-align: justify;">JavaScript can provide some serious advantages over low-level languages like automatic memory allocation and collection through garbage collectors. This, however comes at the cost of speed. But managed languages provides so much value in terms of productivity and platform reach that developers today tend to favor them over low-level languages, despite the loss of performance because of the higher cost for those languages when it comes to targeting multiple platforms.</p>
+<p><span id="more-8"></span></p>
+<p style="text-align: justify;">Before we get started, it is important to differentiate how browsers work. On one side we have the core language, JavaScript, and on the other side we have the browser APIs. Historically, JavaScript and the DOM used to be tightly coupled and most tutorials would cover both at the same time, but they evolved into strong separate entities. So we we will cover JavaScript first, then deep dive into the DOM and browser APIs later on. Everything in this first article could run on the shell without any interaction with the browser APIs, just pure core JavaScript. The list below represents the general-purpose core objects defined in JavaScript:</p>
+<ul>
+<li>Array</li>
+<li>Boolean</li>
+<li>Date</li>
+<li>Function</li>
+<li>Number</li>
+<li>Object</li>
+<li>RegExp</li>
+<li>String</li>
+<li>Error</li>
+</ul>
+<p style="text-align: justify;">For a complete list of the global objects, check the <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects">Global Objects</a> page from Mozilla. Other objects you might have seen in JavaScript, like Window, CanvasRenderingContext2D, or XMLHttpRequest object or any other, have nothing to do with the JavaScript language itself and are just objects to leverage specific browser capabilities, like network access, audio, rendering and more. We will cover all of these APIs in future articles.</p>
+<h5><a name="versions"></a>Versions</h5>
+<p style="text-align: justify;">JavaScript today is implemented across browsers following the <a href="http://www.ecmascript.org/docs.php">ECMAScript</a> specification. As of today, five editions of ECMA-262 have been published. <a href="http://wiki.ecmascript.org/doku.php?id=harmony:proposals">“Harmony”</a>, the latest revision is a work in progress:</p>
+
+<table id="tablepress-2" class="tablepress tablepress-id-2">
+<thead>
+<tr class="row-1 odd">
+	<th class="column-1"><div>Edition</div></th><th class="column-2"><div>Date Published</div></th>
+</tr>
+</thead>
+<tbody class="row-hover">
+<tr class="row-2 even">
+	<td class="column-1">1</td><td class="column-2">June 1997</td>
+</tr>
+<tr class="row-3 odd">
+	<td class="column-1">2</td><td class="column-2">June 1998</td>
+</tr>
+<tr class="row-4 even">
+	<td class="column-1">3</td><td class="column-2">December 1999</td>
+</tr>
+<tr class="row-5 odd">
+	<td class="column-1">4</td><td class="column-2">Abandoned</td>
+</tr>
+<tr class="row-6 even">
+	<td class="column-1">5</td><td class="column-2">December 2009</td>
+</tr>
+<tr class="row-7 odd">
+	<td class="column-1">5.1</td><td class="column-2">June 2011</td>
+</tr>
+<tr class="row-8 even">
+	<td class="column-1">6 (Harmony)</td><td class="column-2">In progress</td>
+</tr>
+</tbody>
+</table>
+<!-- #tablepress-2 from cache -->
+<p style="text-align: justify;">Most browsers today support ECMAScript 5.1, the table below illustrates the conformance test suite used:</p>
+
+<table id="tablepress-1" class="tablepress tablepress-id-1">
+<thead>
+<tr class="row-1 odd">
+	<th class="column-1"><div>Product</div></th><th class="column-2"><div>Version</div></th><th class="column-3"><div>Test Suite Version</div></th>
+</tr>
+</thead>
+<tbody class="row-hover">
+<tr class="row-2 even">
+	<td class="column-1">Chrome</td><td class="column-2">24.0.1312.57 m</td><td class="column-3">ES5.1 (2012-12-17)</td>
+</tr>
+<tr class="row-3 odd">
+	<td class="column-1">Firefox</td><td class="column-2">19</td><td class="column-3">ES5.1 (2013-02-07)</td>
+</tr>
+<tr class="row-4 even">
+	<td class="column-1">Internet Explorer</td><td class="column-2">10.0 (10.0.9200.16384)</td><td class="column-3">ES5.1 (2012-12-17)</td>
+</tr>
+<tr class="row-5 odd">
+	<td class="column-1">Maxthon</td><td class="column-2">3.4.2.3000</td><td class="column-3">ES5.1 (2012-08-26)</td>
+</tr>
+<tr class="row-6 even">
+	<td class="column-1">Opera</td><td class="column-2">12.14 (build 1738)</td><td class="column-3">ES5.1 (2013-02-07)</td>
+</tr>
+<tr class="row-7 odd">
+	<td class="column-1">Safari</td><td class="column-2">6.0.2 (8536.26.17)</td><td class="column-3">ES5.1 (2012-12-17)</td>
+</tr>
+</tbody>
+</table>
+<!-- #tablepress-1 from cache -->
+<p style="text-align: justify;">There is also separate versioning for JavaScript with some additional features not necessarily implemented in ECMAScript. The latest JavaScript version is 1.8. The table below illustrates the correspondence between JavaScript and ECMAScript versions:</p>
+
+<table id="tablepress-3" class="tablepress tablepress-id-3">
+<thead>
+<tr class="row-1 odd">
+	<th class="column-1"><div>JavaScript version</div></th><th class="column-2"><div>Relation with ECMAScript</div></th>
+</tr>
+</thead>
+<tbody class="row-hover">
+<tr class="row-2 even">
+	<td class="column-1">JavaScript 1.1</td><td class="column-2">ECMA-262 - Edition 1 is based on JavaScript 1.1.</td>
+</tr>
+<tr class="row-3 odd">
+	<td class="column-1">JavaScript 1.2</td><td class="column-2">ECMA-262 was not complete when JavaScript 1.2 was released. JavaScript 1.2 is not fully compatible with ECMA-262 - Edition 1.</td>
+</tr>
+<tr class="row-4 even">
+	<td class="column-1">JavaScript 1.3</td><td class="column-2">JavaScript 1.3 is fully compatible with ECMA-262 Edition 1. JavaScript 1.3 resolved the inconsistencies that JavaScript 1.2 had with ECMA-262 while keeping all the additional features of JavaScript 1.2 except == and != which were changed to conform with ECMA-262.</td>
+</tr>
+<tr class="row-5 odd">
+	<td class="column-1">JavaScript 1.4</td><td class="column-2">JavaScript 1.4 is fully compatible with ECMA-262 Edition 1. The third version of the ECMAScript specification was not finalized when JavaScript 1.4 was released.</td>
+</tr>
+<tr class="row-6 even">
+	<td class="column-1">JavaScript 1.5</td><td class="column-2">JavaScript 1.5 is fully compatible with ECMA-262 Edition 3.</td>
+</tr>
+</tbody>
+</table>
+<!-- #tablepress-3 from cache -->
+<p><a title="JavaScript / EcmaScript versions" href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/JavaScript_Overview" target="_blank">Source (Mozilla)</a></p>
+<p style="text-align: justify;">Throughout this article we will be sticking to the ECMAScript 5.1 feature set, which is the latest revision implemented by all major browsers. From time to time we will have a quick look at some specific features outside the ECMAScript scope just for general information. When such features are covered it will be explicitly mentioned.</p>
+<h5><a name="assembly"></a>Assembly language of the web</h5>
+<p style="text-align: justify;">In the past years, more and more languages have been targeting JavaScript. Recently projects like <a title="Emscripten" href="https://github.com/kripken/emscripten" target="_blank">Emscripten</a> have proved that it is even possible to take native C/C++ code and compile it to JavaScript. Some people have mentioned the idea of JavaScript being the <i>assembly language of the web</i>. It is indeed an interesting analogy. Languages like <a href="http://typescriptlang.org">TypeScript</a> or <a href="http://www.dartlang.org/">Dart</a> have demonstrated this too by cross-compiling into JavaScript.</p>
+<p style="text-align: justify;">TypeScript is an implementation of ECMAScript 6 with optional strong typing, whereas Dart is a more aggressive approach as a different language that would ideally a Dart VM for Chrome. Recently, efforts like <a href="http://asmjs.org/spec/latest/">asm.js</a> from Mozilla have pushed the idea even further by proposing a low-level subset of JavaScript that would be targeted by compilers more efficiently. Some other initiatives like <a href="http://coffeescript.org/">CoffeScript</a> (often called transpilers) help developers by exposing language syntactic sugar not necessarily exposed in JavaScript today.</p>
+<h5><a name="no-compiling"></a>No Compiling</h5>
+<p style="text-align: justify;">As we just mentioned, one of the beauty of JavaScript is that you do not have to pre-compile your code to get it to run. Your source code is loaded directly then compiled to native code at runtime by the VM using a JIT. As a developer writing JavaScript code and coming probably from a compiled language like C#, Java or ActionScript, you have to remember at all times that there will not be any optimizations done ahead of time by a <i>static</i> compiler. Everything will be figured out at <i>runtime</i> when you will be hitting refresh.</p>
+<p style="text-align: justify;">VMs like V8 introduced engines like <a href="http://blog.chromium.org/2010/12/new-crankshaft-for-v8.html">CrankShaft</a> which perform key optimizations at runtime like constant folding, inlining, or loop-invariant code motion that will help with performance. However, always keep in mind what you can do in your code to help with performance too. Throughout this article, we will cover key optimizations you can rely on to help your code perform better.</p>
+<p style="text-align: center;"><strong>Memo</strong></p>
+<ul>
+<li><strong>JavaScript is based on the ECMA-262 standard.</strong></li>
+<li><strong>The latest revision implemented by most browsers is ECMAScript 5.1.</strong></li>
+<li><strong>The latest revision of the ECMAScript specification is revision 6 called « Harmony ».</strong></li>
+<li><strong>JavaScript does not rely on a static compiler.</strong></li>
+<li><strong>JavaScript source code is directly compiled to native code by the JIT (a component of the virtual machine).</strong></li>
+<li><strong>Other languages like TypeScript, Dart or CoffeeScript and more are targeting JavaScript too.</strong></li>
+</ul>
+<h5><a name="tools"></a>Tools</h5>
+<p style="text-align: justify;">Feel free to use any text editor you want to write your JavaScript code. Examples in this article will be using the console from Chrome for small code samples to test things quickly. For bigger projects, WebStorm will be used. You can follow along using these tools or use your own. Here is below a set of popular tools to write JavaScript:</p>
+<ul>
+<li><a href="http://www.sublimetext.com/">Sublime Text</a></li>
+<li><a href="http://html.adobe.com/edge/code/">Adobe Edge Code</a> or <a href="http://brackets.io/">Brackets</a></li>
+<li><a href="http://www.jetbrains.com/webstorm/">Webstorm</a></li>
+</ul>
+<p>Let’s get started and write some code now.</p>
+<h5><a name="repl"></a>REPL</h5>
+<p style="text-align: justify;">As a developer reading this, you will probably want to test small things quickly and iteratively. Traditionally, when using bytecode based languages, you would type your code, hit compile, bytecode would be generated and then executed. For every modification, you would change the source code, then hit compile again and observe the changes. With JavaScript, you could be using REPL and have a way more natural and flexible way to test things and compile them on the fly. So what does REPL stands for? It stands for <a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop"><i>read-eval-print loop</i></a>. Some bytecode based languages like C#, F# offer a similar functionality to easily test some pieces of your code where you can type in the command line and evaluate pieces of you code quickly and naturally.</p>
+<p style="text-align: justify;">With Chrome Developer Tools or any other console available like Firebug with Firefox, you can use the console and just start typing some code. The figure below shows the Chrome console:</p>
+<p><img class="size-full wp-image-17  alignnone" alt="REPL" src="http://typedarray.org/wp-content/uploads/2013/03/figure-1.1.jpg" width="577" height="271" /></p>
+<p style="text-align: justify;">When pressing enter, your code is injected and executed. In our first example, when declaring a variable, the console will just return undefined as variable declarations return no value. Just referencing the variable we declared will automatically return its value:</p>
+<p><img class="alignnone size-full wp-image-18" alt="REPL" src="http://typedarray.org/wp-content/uploads/2013/03/figure-1.2.jpg" width="578" height="273" /></p>
+<p style="text-align: justify;">If we want to retrieve the string length, we also get auto-completion directly from the console:</p>
+<p><img class="alignnone size-full wp-image-19" alt="REPL" src="http://typedarray.org/wp-content/uploads/2013/03/figure-1.3.jpg" width="577" height="271" /></p>
+<p style="text-align: justify;">In the figure below, we retrieve the string length:</p>
+<p><img class="alignnone size-full wp-image-20" alt="REPL" src="http://typedarray.org/wp-content/uploads/2013/03/figure-1.4.jpg" width="580" height="271" /></p>
+<p style="text-align: justify;">This provides a very nice way to test quickly some pieces of your code. Note that in the Chrome developer tools console for multiline entries, you will need to use the Shift+Enter since Enter triggers code execution. In the next figure, we define a foo function then execute it:</p>
+<p><img class="alignnone size-full wp-image-21" alt="REPL" src="http://typedarray.org/wp-content/uploads/2013/03/figure-1.5.jpg" width="580" height="272" /></p>
+<p style="text-align: justify;">Note that with Firebug in Firefox, the console supports multiline code in an expanded editor view where Enter creates a new line and Shift+Enter executes it. Firefox also provides <a title="ScratchPad" href="https://blog.mozilla.org/devtools/2011/08/15/introducing-scratchpad/" target="_blank">ScratchPad</a> as part of their developer tools. In ScratchPad, JavaScript multi-line code can be entered and tested interactively by just selecting the lines needed and press Shift+F4 (MacOS) or CTRL+R (Windows). The figure below shows the ScratchPad window and the console displaying the result:</p>
+<p><img class="alignnone size-full wp-image-22" alt="REPL" src="http://typedarray.org/wp-content/uploads/2013/03/figure-1.6.jpg" width="833" height="357" /></p>
+<p style="text-align: center;"><strong>Memo</strong></p>
+<ul>
+<li><strong>The JavaScript console allows you to test code interactively inside the browser.</strong></li>
+<li><strong>Anything defined on the page can be overriden or added through the console.</strong></li>
+<li><strong>This interactive mode is called « read evaluate print loop » known as REPL.</strong></li>
+<li><strong>ScratchPad in Firefox offers a great REPL workflow.</strong></li>
+</ul>
+<h5><a name="start"></a>Getting started</h5>
+<p style="text-align: justify;">If you come from other languages like C#, C++ or ActionScript, you may have been used to installing lots of tools, compilers, debuggers. One of the very cool things with JavaScript is that all your really need is a text editor and a browser. When embedded in HTML, JavaScript code can be either inlined inside a script tag:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee2829349956210" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-mixed-highlight" title="Contains Mixed Languages"></span><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">XHTML</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+&lt;script&gt;
+
+// some javascript code
+
+&lt;/script&gt;</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee2829349956210-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee2829349956210-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee2829349956210-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee2829349956210-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee2829349956210-5">5</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee2829349956210-1"><span class="crayon-ta">&lt;script&gt;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee2829349956210-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee2829349956210-3"><span class="crayon-c">// some javascript code</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee2829349956210-4">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee2829349956210-5"><span class="crayon-ta">&lt;/script&gt;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0062 seconds] -->
+<p></p>
+<p style="text-align: justify;">Or referenced and placed in external .js files, which is a better practice:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee2872422403653" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-mixed-highlight" title="Contains Mixed Languages"></span><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">XHTML</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+&lt;script src="js/main.js"&gt;&lt;/script&gt;</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee2872422403653-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee2872422403653-1"><span class="crayon-ta">&lt;script </span><span class="crayon-e ">src</span><span class="crayon-o">=</span><span class="crayon-s">"js/main.js"</span><span class="crayon-o">&gt;</span><span class="crayon-ta">&lt;/script&gt;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0009 seconds] -->
+<p></p>
+<p style="text-align: justify;">By default, our JavaScript code will be executed synchronously in the order the browser parses the page, from top to bottom. As a result, placing your JavaScript code at the beginning of the page is discouraged; this would cause the browser to wait until the script is executed to start displaying anything on the page. For now, we will stick to a general good practice and place our code just before the end of the body tag:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee287b254043614" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-mixed-highlight" title="Contains Mixed Languages"></span><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">XHTML</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+...
+
+&lt;script src="js/main.js"&gt;&lt;/script&gt;
+
+&lt;/body&gt;</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee287b254043614-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee287b254043614-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee287b254043614-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee287b254043614-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee287b254043614-5">5</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee287b254043614-1"><span class="crayon-sy">.</span><span class="crayon-sy">.</span><span class="crayon-sy">.</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee287b254043614-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee287b254043614-3"><span class="crayon-ta">&lt;script </span><span class="crayon-e ">src</span><span class="crayon-o">=</span><span class="crayon-s">"js/main.js"</span><span class="crayon-o">&gt;</span><span class="crayon-ta">&lt;/script&gt;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee287b254043614-4">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee287b254043614-5"><span class="crayon-r ">&lt;/body&gt;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0010 seconds] -->
+<p></p>
+<p style="text-align: justify;">That way, content on the page be displayed first, and once the display list (DOM) is loaded, our code will be executed. This will also ensure that our scripts have access to the DOM and that all objects can be scripted. We will be spending some time on the order of execution of JavaScript in a future article about the DOM. HTML5 introduced some interesting new capabilities in terms of sequencing and order of JavaScript execution that we will cover too.</p>
+<h5><a name="dynamic"></a>A dynamically typed language</h5>
+<p style="text-align: justify;">JavaScript is a dynamically typed language, meaning that any variable can hold any data type. If you are coming from a statically typed language, this may sound scary to you. In JavaScript there is no static typing and there will probably never be. Sadly, it is often perceived that having an explicit typing of variables is required to get type checking. It is actually not necessarily required. Types can be inferred (<a href="http://en.wikipedia.org/wiki/Type_inference">type-inference</a>) automatically and propagated everywhere and provide solid code completion and type checking even with languages like JavaScript. TypeScript from Microsoft is a good example of this.</p>
+<div>
+<p style="text-align: justify;">Given the absence of a typing system, JavaScript will never enforce the type of a variable, so you would not be able to rely on types to implicitly perform conversions. Remember, JavaScript does not rely on a static compiler, the VM directly interprets the source code and compiles it to native code at runtime using the JIT. To create an array in JavaScript, you could use the new keyword with the Array function constructor:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee2885523731035" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var scores = new Array();</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee2885523731035-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee2885523731035-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-t">Array</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0015 seconds] -->
+<p></p>
+<p style="text-align: justify;">Or simply (using the literal syntax):</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee288d120288834" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var scores = [];</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee288d120288834-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee288d120288834-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0008 seconds] -->
+<p></p>
+<p style="text-align: justify;">Note that no types are specified. At runtime the scores variable will be evaluated as an array:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee2896542286029" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var scores = [];
+
+// outputs: true
+console.log ( scores instanceof Array );</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee2896542286029-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee2896542286029-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee2896542286029-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee2896542286029-4">4</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee2896542286029-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee2896542286029-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee2896542286029-3"><span class="crayon-c">// outputs: true</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee2896542286029-4"><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-h"> </span><span class="crayon-e">scores </span><span class="crayon-r">instanceof</span><span class="crayon-h"> </span><span class="crayon-t">Array</span><span class="crayon-h"> </span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0015 seconds] -->
+<p></p>
+<p style="text-align: justify;">Because types cannot be enforced, variables can hold any type at anytime:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee289d398425740" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// store an array
+var scores = [];
+
+// store a number
+scores = 5;
+
+// store an object
+scores = {}; 
+
+// store a string
+scores = "Hello";</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee289d398425740-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee289d398425740-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee289d398425740-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee289d398425740-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee289d398425740-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee289d398425740-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee289d398425740-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee289d398425740-8">8</div><div class="crayon-num" data-line="crayon-52482d1ee289d398425740-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee289d398425740-10">10</div><div class="crayon-num" data-line="crayon-52482d1ee289d398425740-11">11</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee289d398425740-1"><span class="crayon-c">// store an array</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee289d398425740-2"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee289d398425740-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee289d398425740-4"><span class="crayon-c">// store a number</span></div><div class="crayon-line" id="crayon-52482d1ee289d398425740-5"><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">5</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee289d398425740-6">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee289d398425740-7"><span class="crayon-c">// store an object</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee289d398425740-8"><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-sy">}</span><span class="crayon-sy">;</span> </div><div class="crayon-line" id="crayon-52482d1ee289d398425740-9">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee289d398425740-10"><span class="crayon-c">// store a string</span></div><div class="crayon-line" id="crayon-52482d1ee289d398425740-11"><span class="crayon-e ">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-s">"Hello"</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0044 seconds] -->
+<p></p>
+<p style="text-align: justify;">If we try to call an undefined API, no errors will be captured at compile time given that there is no compilation happening statically:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28a6447858588" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var scores = []; 
+
+scores.foo();</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee28a6447858588-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee28a6447858588-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee28a6447858588-3">3</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee28a6447858588-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span> </div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee28a6447858588-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee28a6447858588-3"><span class="crayon-v">scores</span><span class="crayon-sy">.</span><span class="crayon-e">foo</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0012 seconds] -->
+<p></p>
+<p style="text-align: justify;">Because the foo method is not available on Array, we will get a runtime exception:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28ae937955155" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+Uncaught TypeError: Object  has no method 'foo'</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee28ae937955155-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee28ae937955155-1"><span class="crayon-e">Uncaught </span><span class="crayon-v">TypeError:</span><span class="crayon-h"> </span><span class="crayon-t">Object</span> <span class="crayon-h"> </span><span class="crayon-e">has </span><span class="crayon-e">no </span><span class="crayon-i">method</span><span class="crayon-h"> </span><span class="crayon-s">'foo'</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0010 seconds] -->
+<p></p>
+<p style="text-align: justify;">Same thing for even the simplest object:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28b6553123349" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var myObject = {};
+
+myObject.foo();</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee28b6553123349-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee28b6553123349-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee28b6553123349-3">3</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee28b6553123349-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">myObject</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-sy">}</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee28b6553123349-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee28b6553123349-3"><span class="crayon-v">myObject</span><span class="crayon-sy">.</span><span class="crayon-e">foo</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0012 seconds] -->
+<p></p>
+<p style="text-align: justify;">Which would trigger the following runtime exception:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28be394199512" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+Uncaught TypeError: Object  has no method 'foo'</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee28be394199512-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee28be394199512-1"><span class="crayon-e">Uncaught </span><span class="crayon-v">TypeError:</span><span class="crayon-h"> </span><span class="crayon-t">Object</span> <span class="crayon-h"> </span><span class="crayon-e">has </span><span class="crayon-e">no </span><span class="crayon-i">method</span><span class="crayon-h"> </span><span class="crayon-s">'foo'</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0010 seconds] -->
+<p></p>
+<p style="text-align: justify;">Browsers report errors like this one through the JavaScript console, and usually include the line that triggered the exception. The exception was uncaught in the example, but we update the code to catch it using the try catch clause:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28c6002537168" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var scores = [];
+
+try {
+  scores.foo();
+
+} catch (e) {
+  console.log ('API not available!');
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee28c6002537168-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee28c6002537168-2">2</div><div class="crayon-num" data-line="crayon-52482d1ee28c6002537168-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee28c6002537168-4">4</div><div class="crayon-num" data-line="crayon-52482d1ee28c6002537168-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee28c6002537168-6">6</div><div class="crayon-num" data-line="crayon-52482d1ee28c6002537168-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee28c6002537168-8">8</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee28c6002537168-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">scores</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee28c6002537168-2">&nbsp;</div><div class="crayon-line" id="crayon-52482d1ee28c6002537168-3"><span class="crayon-st">try</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee28c6002537168-4"> <span class="crayon-h"> </span><span class="crayon-v">scores</span><span class="crayon-sy">.</span><span class="crayon-e">foo</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-52482d1ee28c6002537168-5">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee28c6002537168-6"><span class="crayon-sy">}</span><span class="crayon-h"> </span><span class="crayon-st">catch</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-i">e</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-52482d1ee28c6002537168-7"> <span class="crayon-h"> </span><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-s">'API not available!'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee28c6002537168-8"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0022 seconds] -->
+<p></p>
+<p style="text-align: justify;">We will get back to error handling soon, but for now let’s move for now on to some more essentials concepts like variable declaration.</p>
+<p style="text-align: center;"><strong>Memo</strong></p>
+<ul>
+<li><strong>JavaScript is a dynamically typed language.</strong></li>
+<li><strong>No typing is required, types are evaluated at runtime.</strong></li>
+<li><strong>Types cannot be enforced.</strong></li>
+<li><strong>Therefore, a variable can hold any type at anytime.</strong></li>
+<li><strong>If an object does not have an API available, the error will be triggered at runtime</strong>.</li>
+</ul>
+<h5><a name="variables-scope"></a>Variables and scope</h5>
+<p style="text-align: justify;">Variables are declared using the var keyword:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28cf949951561" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+var score = 12;</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee28cf949951561-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee28cf949951561-1"><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">score</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">12</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0007 seconds] -->
+<p></p>
+<p style="text-align: justify;">But omitting the var keyword will also work and declare the variable as global:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28d7987432082" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">JavaScript</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="off" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// declare a global variable
+score = 12;</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-52482d1ee28d7987432082-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-52482d1ee28d7987432082-2">2</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-line" id="crayon-52482d1ee28d7987432082-1"><span class="crayon-c">// declare a global variable</span></div><div class="crayon-line crayon-striped-line" id="crayon-52482d1ee28d7987432082-2"><span class="crayon-v">score</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">12</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0008 seconds] -->
+<p></p>
+<p style="text-align: justify;">As you can imagine, this is not recommended and you should always use var when declaring variables. So why is that? The var keyword actually dictates the scope. In the code below we use a local variable inside the foo function, making it inaccessible from outside:</p>
+<p></p><!-- Crayon Syntax Highlighter v2.3.0 -->
+
+		<div id="crayon-52482d1ee28df887663887" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; float: none; clear: both; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-butto

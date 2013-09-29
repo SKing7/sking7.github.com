@@ -109,4 +109,406 @@
 <p>TLS is a hybrid cryptographic system, meaning it makes use of multiple crypto paradigms, both of which we&#8217;ll look at next:</p>
 <blockquote><p>
 <strong>Public Key Cryptography</strong> for shared secret generation and authentication (making sure you are who you say you are).</p>
-<p><strong>Symmetric Key Cryptography</strong> using s
+<p><strong>Symmetric Key Cryptography</strong> using shared secrets for encrypting requests and responses.
+</p></blockquote>
+<h3>Public Key Encryption</h3>
+<p>Public key encryption is a type of cryptographic system where each party has both a private and a public key, which are mathematically linked to each other. The public key is used for encrypting plaintext to &#8220;ciphertext&#8221; (essentially, gibberish), while the private key is used for decrypting that gibberish back into plaintext. </p>
+<p>Once a message has been encrypted by a public key, it can <strong>only</strong> be decrypted with the corresponding private key. Neither key can perform both functions by itself. The public key can be published freely without compromising the security of the system, but the private key must not be revealed to anyone who isn&#8217;t authorized to decrypt messages. Hence the names, public and private.</p>
+<p>One of the cool benefits of public key cryptography is that two parties with no prior knowledge of each other can create a secure connection <strong>while initially communicating over an open, insecure connection.</strong></p>
+<p>The client and the server can both use their own private keys &#8212; along with some shared, public information &#8212; to agree upon a <strong>shared secret key</strong> for the session. </p>
+<p>That means that even if someone is sitting in between the client and server and watches the connection happen, they still can&#8217;t determine the private keys of either the client or the server, or the secret key for the session.</p>
+<p>How is this possible? Math!</p>
+<p><strong>Diffie-Hellman</strong><br />
+One of the most common way this exchange is performed is by using a <a href="http://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange" target="_blank">Diffie-Hellman key exchange</a>. This process allows the client and sever to agree upon a shared secret, without having to transmit that secret over the connection. Again, snoopers can&#8217;t determine the shared secret even if they&#8217;re watching every packet on the connection. </p>
+<p>Once the initial DH exchange takes place, the resulting shared secret can be used to encrypt further communications in that session using a much simpler symmetric key encryption, which we&#8217;ll look at in a bit.</p>
+<p><strong>A Bit of Math&#8230;</strong><br />
+The math behind it is actually fairly simple to calculate one way, but essentially impossible to reverse. This is where the importance of having really large prime numbers comes into play.</p>
+<p>If Alice and Bob are two parties performing a DH key exchange, they start by agreeing on a <em>root</em> (generally a small number, like 2, 3 or 5) and a large <em>prime</em> (300+ digits), both of which can be sent in the clear without compromising the security of the exchange.</p>
+<p>Remember, Alice and Bob each have their own private key (100+ digits) that should never be shared, either between them or with anyone else. What they exchange publicly over the network is a <em>mixture</em> of their private keys, plus the root and the prime. Specifically: </p>
+<blockquote><p>
+Alice&#8217;s mixture = (root <sup>Alice&#8217;s Secret</sup>) % prime<br />
+Bob&#8217;s mixture = (root <sup>Bob&#8217;s Secret</sup>) % prime<br />
+<small>% here means modulo, taking the remainder after division</small>
+</p></blockquote>
+<p>So Alice creates her mixture using the agreed upon constants (<em>root</em> and <em>prime</em>) plus her private key, and Bob does the same. Once they&#8217;ve received each other&#8217;s mixture, they then perform some more math to derive the shared secret for the session. Specifically:</p>
+<blockquote><p>
+<em>Alice Calculates</em><br />
+(Bob&#8217;s mixture <sup>Alice&#8217;s Secret</sup>) % prime</p>
+<p><em>Bob Calculates</em><br />
+(Alice&#8217;s mixture <sup>Bob&#8217;s Secret</sup>) % prime
+</p></blockquote>
+<p>This calculation generates the same number for both Alice and Bob, and that number becomes the shared secret for this session. Note that neither party had to send their private key to the other one, and the resulting shared secret was also never sent over the connection. Brilliant!</p>
+<p>For those who are less math-inclined, the Wikipedia article has a great image involving mixing colors:</p>
+<p><a href="http://en.wikipedia.org/wiki/Diffie-hellman#Description"><img src="http://blog.hartleybrody.com/wp-content/uploads/2013/07/Diffie-Hellman_Key_Exchange.png" alt="Diffie-Hellman Key Exchange" width="250" class="aligncenter size-full wp-image-2300" /></a></p>
+<p>Notice how the starting color (yellow) ends up getting &#8220;mixed&#8221; with both Alice&#8217;s color and Bob&#8217;s color. That&#8217;s how it ends up being the same for both parties at the end. The only thing that&#8217;s sent over the connection is the half-way-done mixture which is meaningless to anyone watching the connection.</p>
+<h3>Symmetric Key Encryption</h3>
+<p>This public key exchange only needs to happen once per session, the first time the client and server connect. Once they&#8217;ve agreed on a shared secret, the client and server communicate using a <a href="http://en.wikipedia.org/wiki/Symmetric-key_cryptography" target="_blank">symmetric-key crypto system</a> which is much more efficient to communicate on since it saves an extra round-trip each exchange.</p>
+<p>With the shared secret they agreed upon earlier, plus an agreed-upon <a href="http://en.wikipedia.org/wiki/Cipher_suite" target="_blank">cipher suite</a> (essentially a collection of encryption algorithms), the client and server can now communicate securely, encrypting and decrypting each others&#8217; messages using the shared secret, with a snooper just seeing gibberish going back and forth.</p>
+<h3>Authentication</h3>
+<p>The Diffie-Hellman key exchange allows two parties to create a private, shared secret. But how do the two parties know they&#8217;re talking to the correct entity? We haven&#8217;t talked about <em>authentication</em> yet.</p>
+<p>What if I picked up the phone and called my friend and we performed a Diffie-Hellman key exchange, but it turns out my call was intercepted and I was actually talking to someone else? I&#8217;d still be able to communicate securely with that person &#8212; no one else would be able to decode our communication once we negotiated the shared secret &#8212; but they&#8217;re not who I thought I would be talking to. That&#8217;s not very secure!</p>
+<p>To solve the <em>authentication</em> problem, we need a <a href="http://en.wikipedia.org/wiki/Public_key_infrastructure" target="_blank">Public Key Infrastructure</a> to make sure that entities are who they say they are. These infrastructures are set up to create, manage, distribute and revoke <em>signed certificates</em>. Certificates are those annoying things you have to pay for in order to serve your site over HTTPS. </p>
+<p>But what exactly is a certificate, and how does it make things more secure?</p>
+<h3>Certificates</h3>
+<p>At a high level: a public key certificate is a file that uses a digital signature (more on that in a minute) to bind a machine&#8217;s <em>public key</em> with an <em>identity</em>. The digital signature on the certificate is someone vouching for the fact that a particular public key belongs to a particular individual or organization.</p>
+<p>Certificates essentially associate domain names (the identities) with a particular public key. This prevents a snooper from presenting their own public key, pretending to be the server a client is trying to reach.</p>
+<p>In the phone call example above, the attacker could try presenting his public key, pretending he&#8217;s my friend &#8212; but the signature on that certificate wouldn&#8217;t be from someone I trusted.</p>
+<p>In order to be trusted by the average web browser, certificates have to be signed by a trusted <em>Certificate Authority</em> (CA). CAs are companies that perform manual inspection and review, to make sure that the applying entity is both:</p>
+<ol>
+<li>a real person or business that exists in the public record</li>
+<li>in control of the domain they&#8217;re applying for a signed certificate for</li>
+</ol>
+<p>Once the CA verifies that the applicant is real and really owns the domain, the CA will &#8220;sign&#8221; the site&#8217;s certificate, essentially putting their stamp of approval on the fact that this site&#8217;s public key really belongs to them and should be trusted.</p>
+<p>Your browser comes preloaded with a list of trusted CAs. If a sever returns a certificate that isn&#8217;t signed by a trusted CA, it will flash a big red error warning. Otherwise anyone could go around &#8220;signing&#8221; bogus certificates. There needs to be a layer of trust in the system.</p>
+<p><img src="http://blog.hartleybrody.com/wp-content/uploads/2013/07/https-security-warning.gif" alt="HTTPS security warning" width="384" height="300" class="aligncenter size-full wp-image-2302" /></p>
+<p>So even if an attacker were to take their machine&#8217;s own public key and generate a certificate saying that public key was associated with facebook.com, a browser wouldn&#8217;t trust it since that certificate isn&#8217;t signed by a trusted CA.</p>
+<h3>Other Things to Know About Certificates</h3>
+<p><strong>Extended Validation</strong><br />
+In addition to the regular X.509 certificates, a <a href="http://en.wikipedia.org/wiki/Extended_validation" target="_blank">extended validation certificates</a> promise a stronger layer of trust. </p>
+<p>When granting an extended validation certificate, the CAs must do even more checking into the identity of the entity who owns the domain (usually requiring passport or utility bills). </p>
+<p>This type of certificate turns the browser bar green, in addition to showing the usual padlock icon.</p>
+<p><strong>Serving Multiple Websites from the Same Server</strong><br />
+Because the TLS handshake occurs before the HTTP connection begins, there can be problems if there are multiple websites hosted on the same server, at the same IP address.</p>
+<p>The named virtual hosts routing happens in the web server, but the handshake happens before the connection reaches that point. The single certificate for that system needs to be sent on requests to <em>any</em> of the sites hosted on that machine, which can create <a href="http://en.wikipedia.org/wiki/Transport_Layer_Security#Support_for_name-based_virtual_servers" target="_blank">problems for shared hosting environments</a>.</p>
+<p>If you&#8217;re using a web hosting company, they&#8217;ll usually require that you purchase a dedicated IP address before you can get HTTPS set up for your website. Otherwise they&#8217;d constantly need to get new certificates (and get them re-verified by CAs) every time a site on that machine updated.</p>
+<p>&#8212;</p>
+<p>Wikipedia is a great resource for this stuff, and this <a href="https://www.coursera.org/course/crypto" target="_blank">Coursera course</a> looks especially interesting. Thanks to the guys in the <a href="http://security.stackexchange.com/">security.stackexchange.com</a> chat room for answering some of my questions this morning.</p>
+<p><a href="https://news.ycombinator.com/item?id=6100626" target="_blank">Discuss on Hacker News</a>.</p>
+					
+			<div id="share">
+				<div id="share-email">
+			<div style="float:left; margin: 2px 5px; border: 1px solid #ccc;">
+				<img src="http://www.gravatar.com/avatar/0b3ac738e74f7fbda25fca0f754b0aad?s=100" />
+							</div>
+                    Hartley is a 20-something, full-stack web developer. Author of <a href="http://marketingforhackers.com/">Marketing for Hackers</a> and <a href="http://blog.hartleybrody.com/guide-to-web-scraping/">The Ultimate Guide to Web Scraping</a>.
+<br /><br />
+					<!--<span style="font-size:1.3em">Subscribe to this blog via <a href="http://hartleybrody.us2.list-manage1.com/subscribe?u=1e2ffc22f13e314b870d2bc1d&id=9318e680dd" target="_blank">email</a> or <a href="http://bit.ly/gQvnWc" target="_blank">RSS</a>.</span>-->
+                    <a href="http://twitter.com/hartleybrody" class="twitter-follow-button">Follow @hartleybrody</a><script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+				</div>
+                
+				<div id="share-social">
+					<div class="share-social-button">
+						<a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.hartleybrody.com/https-certificates/" data-count="horizontal" data-via="hartleybrody">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+					</div>
+					<div class="share-social-button">
+						<g:plusone size="medium"></g:plusone>
+					</div>
+					<div class="share-social-button">
+						<iframe src="http://www.facebook.com/plugins/like.php?href=http://blog.hartleybrody.com/https-certificates/&amp;layout=button_count&amp;show_faces=false&amp;width=110&amp;action=like&amp;font&amp;colorscheme=light&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:110px; height:21px;" allowTransparency="true"></iframe>
+					</div>
+                                        <div class="share-social-button">
+						<script src="http://platform.linkedin.com/in.js" type="text/javascript"></script><script type="IN/Share" data-url="http://blog.hartleybrody.com/https-certificates/" data-counter="right"></script>
+					</div>
+                                        <div class="share-social-button">
+						<a href="http://bufferapp.com/add" class="buffer-add-button" data-count="horizontal" data-via="hartleybrody" >Buffer</a><script type="text/javascript" src="http://static.bufferapp.com/js/button.js"></script>
+					</div>
+				</div><!--#share-social-->
+                
+			</div><!--#share-->
+			
+			<div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script><fb:comments href="http://blog.hartleybrody.com/https-certificates/" num_posts="5" width="500"></fb:comments>
+
+					</div>
+
+	</div> <!-- /post (2299) -->
+
+ <!-- END: LOOP -->
+
+</div> <!-- content -->
+
+<div id="sidebar">
+<ul>
+<div class="sidebar-item"><h3>About Me</h3>			<div class="textwidget"><a href="http://www.hartleybrody.com/" style="display:block;"> <img src="https://twimg0-a.akamaihd.net/profile_images/1542000650/DSC_0255.jpg" id="bioimg" /> 
+</a> 
+
+<p class="bio">I'm a 20-something, full-stack web developer. Author of <a href="http://marketingforhackers.com/" style="font-size: 1.0em; color: 
+#069; text-decoration: none;">Marketing for Hackers</a> and <a href="http://blog.hartleybrody.com/guide-to-web-scraping/"  style="font-size: 1.0em; color: 
+#069; text-decoration: none;">The Ultimate Guide to Web Scraping</a>.
+</p></div>
+		</div><div class="sidebar-item"><h3>Follow me on Twitter</h3>			<div class="textwidget"><a href="https://twitter.com/hartleybrody" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @hartleybrody</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></div>
+		</div><div class="sidebar-item"><h3>Email Updates</h3>			<div class="textwidget"><!-- Begin MailChimp Signup Form -->
+<form action="http://hartleybrody.us2.list-manage.com/subscribe/post?u=1e2ffc22f13e314b870d2bc1d&amp;id=9318e680dd" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+<div class="mc-field-group">
+	<!--<label for="mce-EMAIL">Email Address</label>-->
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="email address..." style="width:160px;">
+	<input type="hidden" name="SOURCE" value="blog-sidebar-widget">
+	<input type="submit" value="Join &raquo;" name="subscribe" id="mc-embedded-subscribe" class="button" style="width:55px; height:20px; margin-top:2px; float:right; background-color: #06C; border: 0 none; border-radius: 2px; color: white; cursor: pointer; display: inline-block; font-family: 'PT Sans Regular', 'Arial Unicode', 'Lucida Sans Unicode', Arial, sans-serif">
+</div>
+<div align="center"><script type="text/javascript" src="http://hartleybrody.us2.list-manage.com/subscriber-count?b=0&u=e03582ad-8aa8-4dbb-8823-ab665cf96753&id=9318e680dd"></script></div>	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>	
+</form>
+
+<!--End mc_embed_signup--></div>
+		</div><div class="sidebar-item"><h3>Elsewhere</h3>			<div class="textwidget"><style>
+.simple-icons {
+    margin: 5px;
+    display: inline-block;
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+    opacity: 0.5;
+}
+.simple-icons:hover { 
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    opacity: 1.0;
+}
+#elsewhere{
+    display: inline-block;
+}
+
+</style>
+
+<div id="elsewhere">
+<a href="http://feeds.feedburner.com/hartleybrody" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/rss-32.png" style="background-color: #ff8300" class="simple-icons" />
+</a>
+
+<a href="https://twitter.com/hartleybrody" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/twitter-32.png" style="background-color: #00aced" class="simple-icons" />
+</a>
+
+<a href="http://www.linkedin.com/in/hartleybrody" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/linkedin-32.png" style="background-color: #007fb1" class="simple-icons" />
+</a>
+
+<a href="https://github.com/hartleybrody" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/github-32.png" style="background-color: #4183c4" class="simple-icons" />
+</a>
+
+<span style="display:none"><a rel="author" href="http://gplus.to/hartleybrody" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/googleplus-32.png" style="background-color: #000" class="simple-icons" />
+</a></span>
+
+<a href="http://hartleybrody.us2.list-manage.com/subscribe?u=1e2ffc22f13e314b870d2bc1d&id=9318e680dd" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/email-32.png" style="background-color: #f2d523" class="simple-icons" />
+</a>
+
+<a href="https://angel.co/hartleybrody" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/angellist-32.png" style="background-color: #000" class="simple-icons" />
+</a>
+
+<a href="https://news.ycombinator.com/user?id=hartleybrody" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/hackernews-32.png" style="background-color: #f60" class="simple-icons" />
+</a>
+
+<a href="http://stackexchange.com/users/311987/hartley-brody?tab=accounts" target="_blank">
+	<img src="http://blog.hartleybrody.com/wp-content/uploads/2013/06/stackexchange-32.png" style="background-color: #1f5196" class="simple-icons" />
+</a>
+</div></div>
+		</div><div class="sidebar-item">			<div class="textwidget"><a href="http://blog.hartleybrody.com/guide-to-web-scraping/">
+  <img src="http://blog.hartleybrody.com/wp-content/uploads/2012/12/web-scraping-ebook-cover-300x293.jpg" style="margin:5px; width:180px" />
+</a></div>
+		</div><div class="sidebar-item"><h3>Popular Posts</h3>			<div class="textwidget"><ul>
+  <li><a href="http://blog.hartleybrody.com/https-certificates/">How HTTPS Secures Connections: What Every Web Dev Should Know</a></li>
+  <li><a href="http://blog.hartleybrody.com/web-scraping/">I Don’t Need No Stinking API: Web Scraping For Fun and Profit</a></li>
+  <li><a href="http://blog.hartleybrody.com/google-python/">Google’s Python Lessons are Awesome</a></li>
+  <li><a href="http://blog.hartleybrody.com/growth-hacker-definition/">Growth Hacking: The Tale of a Marketer Who Writes Code</a></li>
+  <li><a href="http://blog.hartleybrody.com/hacker-developer-engineer/">Are You A Hacker, Developer or Engineer? (And Why it Matters)</a></li>
+  <li><a href="http://blog.hartleybrody.com/post-sign-up-funnel/">Convert New Users to Evangelists: Understanding the Post Sign Up Funnel</a></li>
+  <li><a href="http://blog.hartleybrody.com/find-a-coder/">So You Want to Find a Coder…</a></li>
+</ul></div>
+		</div>		<div class="sidebar-item">		<h3>Recent Posts</h3>		<ul>
+					<li>
+				<a href="http://blog.hartleybrody.com/web-scraping-guide/" title="The &#8220;Ultimate Guide to Web Scraping&#8221; is Now Available">The &#8220;Ultimate Guide to Web Scraping&#8221; is Now Available</a>
+						</li>
+					<li>
+				<a href="http://blog.hartleybrody.com/https-certificates/" title="How HTTPS Secures Connections: What Every Web Dev Should Know">How HTTPS Secures Connections: What Every Web Dev Should Know</a>
+						</li>
+					<li>
+				<a href="http://blog.hartleybrody.com/hacker-developer-engineer/" title="Are You A Hacker, Developer or Engineer? (And Why it Matters)">Are You A Hacker, Developer or Engineer? (And Why it Matters)</a>
+						</li>
+					<li>
+				<a href="http://blog.hartleybrody.com/calling-it-mobile/" title="When Will We Stop Calling it &#8220;Mobile&#8221;?">When Will We Stop Calling it &#8220;Mobile&#8221;?</a>
+						</li>
+					<li>
+				<a href="http://blog.hartleybrody.com/magic/" title="Dependencies: Why Building Modern Applications is Like Using Magic">Dependencies: Why Building Modern Applications is Like Using Magic</a>
+						</li>
+					<li>
+				<a href="http://blog.hartleybrody.com/chrome-extension/" title="So You Want to Build a Chrome Extension?">So You Want to Build a Chrome Extension?</a>
+						</li>
+					<li>
+				<a href="http://blog.hartleybrody.com/python-style-guide/" title="A Quick Primer on Writing Readable Python Code for New Developers">A Quick Primer on Writing Readable Python Code for New Developers</a>
+						</li>
+				</ul>
+		</div><div class="sidebar-item"><h3>More Info</h3>		<ul>
+			<li class="page_item page-item-2275"><a href="http://blog.hartleybrody.com/contact-me/">Contact Me</a></li>
+<li class="page_item page-item-2057"><a href="http://blog.hartleybrody.com/press/">Press Mentions</a></li>
+<li class="page_item page-item-2268"><a href="http://blog.hartleybrody.com/projects/">Recent Projects</a></li>
+		</ul>
+		</div></ul>
+</div>
+
+<div id="navigation">
+	<div style="float:left;"><a href="http://blog.hartleybrody.com/hacker-developer-engineer/" rel="prev">&laquo; Are You A Hacker, Developer or Engineer? (And Why it Matters)</a></div>
+	<!--&nbsp;&#124;&nbsp;THIS IS THE NAV?&nbsp;&#124;&nbsp;-->
+	<div style="float:right;"><a href="http://blog.hartleybrody.com/web-scraping-guide/" rel="next">The &#8220;Ultimate Guide to Web Scraping&#8221; is Now Available &raquo;</a></div>
+</div>
+
+<!-- #################### -->
+<!-- END: DIFFERENT CONTENT FOR DIFFERENT TEMPLATES -->
+<!-- #################### -->
+
+
+<!-- BOTTOM CONTENT -->
+
+	<div id="footer">
+		<!--<p><i>Page last updated: July 25, 2013</i></p>-->
+		
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+		<div id="slider">
+			<div id="slider-shell">
+				
+				<!-- Begin MailChimp Signup Form -->
+				<link href="http://cdn-images.mailchimp.com/embedcode/slim-081011.css" rel="stylesheet" type="text/css">
+				<style type="text/css">
+					#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+					<!-- Add your own MailChimp form style overrides in your site stylesheet or in here. -->
+				</style>
+				<div id="mc_embed_signup">
+				<form action="http://hartleybrody.us2.list-manage.com/subscribe/post?u=1e2ffc22f13e314b870d2bc1d&amp;id=9318e680dd" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+					<label for="mce-EMAIL">Get my next article in your inbox!</label>
+					<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+					<input type="hidden" name="SOURCE" value="full-window-width-dropdown">
+					<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button" style="background-color: #06C;"></div>
+				</form>
+				</div>
+				<!--End mc_embed_signup-->
+				
+				<div id="slider-tab">Wait! I want to get email updates, bring that back...</div>
+			</div>
+		</div>
+		 
+		<style type="text/css">
+			#slider{
+				/*hide the window*/
+				position:fixed;
+				top:-125px;
+				right:0px; 
+		 
+				height:120px; width:100%;
+				background-color:#fff;
+				opacity:0.98;
+				filter:alpha(opacity=98)
+		 
+				/*add shadow*/
+				-moz-box-shadow:    0px 0px 8px #ccc;
+				-webkit-box-shadow: 0px 0px 8px #ccc;
+				box-shadow:         0px 0px 8px #ccc;
+			}
+			
+			#slider #slider-shell{
+				width:800px; height:110px;
+				margin:10px auto;
+				position:relative;
+			}
+			
+			#slider #slider-tab{
+				position:absolute; bottom:0px; right:0px;
+				width:400px; text-align:right; padding-right:10px;
+				cursor:pointer; font-size:0.6em;
+			}
+		</style>
+
+		<script type="text/javascript">
+		$(document).ready(function() {
+		 
+				function isScrolledDown(elem) {
+					var docViewTop = $(window).scrollTop(); //num of pixels hidden above current screen
+					var docViewBottom = docViewTop + $(window).height();
+		 
+					var elemTop = $(elem).offset().top; //num of pixels above the elem
+					var elemBottom = elemTop + $(elem).height();
+		 
+					return (elemBottom <= docViewBottom); //if the bottom of the current viewing area is lower than the top of the trigger
+				}
+				
+				function isScrolledUp(elem) {
+					var docViewTop = $(window).scrollTop();
+					var docViewBottom = docViewTop + $(window).height();
+		 
+					var elemTop = $(elem).offset().top; 
+					var elemBottom = elemTop + $(elem).height();
+		 
+					return (elemTop - 200 >= docViewBottom); 
+				}
+				
+				function bringSliderOut(){
+					$(slider).animate({
+						top: 0
+					}, "fast");
+					
+					$('#slider-tab').text("hide this...");
+				}
+				
+				function bringSliderIn(){
+					$(slider).animate({
+						top: -108
+					}, "fast");
+					
+					$('#slider-tab').text("Wait! I want to get email updates, bring that back...");
+				}
+		 
+				var slider = $('#slider');    //set the trigger
+				var trigger = $('#share');    //set the trigger
+				var reached = false;
+				var sliderOut = false;
+				
+				$('#slider-tab').click( function(){
+					if(!sliderOut){
+						bringSliderOut() 
+						sliderOut = true;
+					}
+					else{
+						bringSliderIn();
+						sliderOut = false
+					}
+				});
+		 
+				$(window).scroll(function() {
+					
+					if(isScrolledUp(trigger)) {
+						//slide CTA off of screen
+						if(reached){
+							bringSliderIn();
+							reached = false;
+							sliderOut = false;
+						}
+					}
+					
+					else if(isScrolledDown(trigger)) { 
+						//slide CTA onto screen
+						if(!reached){
+							bringSliderOut();
+							sliderOut = true;
+							reached = true;
+						}
+					} 
+				});
+			});
+		</script>		
+		<!--  Place this tag after the last plusone tag -->
+		<script type="text/javascript">
+		  (function() {
+			var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+			po.src = 'https://apis.google.com/js/plusone.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+		  })();
+		</script>
+
+		<!--stats_footer_test--><script src="http://stats.wordpress.com/e-201339.js" type="text/javascript"></script>
+<script type="text/javascript">
+st_go({blog:'21666962',v:'ext',post:'2299'});
+var load_cmc = function(){linktracker_init(21666962,2299,2);};
+if ( typeof addLoadEvent != 'undefined' ) addLoadEvent(load_cmc);
+else load_cmc();
+</script>
+
+				
+				
+	</div>
+
+</div> <!-- container -->
+
+</body>
+</html>

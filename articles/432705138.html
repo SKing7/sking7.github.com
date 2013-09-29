@@ -1,0 +1,188 @@
+<!doctype html>
+<!--[if lt IE 7]><html lang="zh-CN" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html lang="zh-CN" class="no-js lt-ie9 lt-ie8"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html lang="zh-CN" class="no-js lt-ie9"><![endif]-->
+<!--[if gt IE 8]><!--> <html lang="zh-CN" class="no-js"><!--<![endif]-->
+<!-- 
+主题地址: http://luolei.org/2013/05/will-box-one-theme/
+作者 will Luo  （ http://luolei.org )
+新浪微博@罗罗磊磊 http://weibo.co/foru17  
+twitter @foru17 https://twitter.com/foru17
+ -->
+<head>
+<meta charset="utf-8">
+<!-- Google Chrome Frame for IE -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript">var NREUMQ=NREUMQ||[];NREUMQ.push(["mark","firstbyte",new Date().getTime()]);</script><title>  Git log diff config高级进阶</title>
+<!-- 预加载优化 HTML5 参考( http://www.mhtml5.com/2011/11/3335.html ) -->
+<link rel="prefetch" href="http://luolei.org">
+<link rel="prerender" href="http://luolei.org">
+<!--关键字优化设置 后台定制功能 可以在管理页面设置 请及时修改 利于SEO -->
+<meta name="keywords" content="git, 教程" />
+<meta name="description" content="前一段时间分享了一篇《更好的 git log》简要介绍怎么美化 git log 命令，其中提到了 alias命令，今天再继续谈谈 git相关， 看看如何通过配置自己的 git config 让自己的 gi" />
+<!-- mobile meta  -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- 图标icons & favicons (参考: http://www.jonathantneal.com/blog/understand-the-favicon/) -->
+<link rel="apple-touch-icon" href="http://luolei.org/wp-content/themes/will-box/library/images/apple-icon-touch.png">
+<link rel="icon" href="http://luolei.org/wp-content/themes/will-box/favicon.png">
+<!-- Google plus连接添加，谷歌搜索显示博主头像 -->
+<link rel="author" href="https://plus.google.com/105790146178074084423/">
+<!--[if IE]>
+<link rel="shortcut icon" href="http://luolei.org/wp-content/themes/will-box/favicon.ico">
+<![endif]-->
+<!-- or, set /favicon.ico for IE10 win -->
+<meta name="msapplication-TileColor" content="#f01d4f">
+<meta name="msapplication-TileImage" content="http://luolei.org/wp-content/themes/will-box/library/images/win8-tile-icon.png">
+<link rel="pingback" href="http://luolei.org/xmlrpc.php">
+<!-- wordpress head functions -->
+<link rel="alternate" type="application/rss+xml" title="罗磊的独立博客 &raquo; Feed" href="http://luolei.org/feed/" />
+<link rel="alternate" type="application/rss+xml" title="罗磊的独立博客 &raquo; 评论Feed" href="http://luolei.org/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="罗磊的独立博客 &raquo; Git log diff config高级进阶评论Feed" href="http://luolei.org/2013/09/git-config-advanced/feed/" />
+<link rel='stylesheet' id='wp-syntax-css-css'  href='http://luolei.org/wp-content/plugins/wp-syntax/css/wp-syntax.css' type='text/css' media='all' />
+<link rel='stylesheet' id='bones-stylesheet-css'  href='http://luolei.org/wp-content/themes/will-box/library/css/style.css' type='text/css' media='all' />
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='bones-ie-only-css'  href='http://luolei.org/wp-content/themes/will-box/library/css/ie.css' type='text/css' media='all' />
+<![endif]-->
+<script type="text/javascript">
+var duoshuoQuery = {"short_name":"luolei","sso":{"login":"http:\/\/luolei.org\/wp-login.php?action=duoshuo_login","logout":"http:\/\/luolei.org\/wp-login.php?action=logout&_wpnonce=70a019cec7"},"theme":"default","stylePatch":"wordpress\/Will-Box-One"};
+duoshuoQuery.sso.login += '&redirect_to=' + encodeURIComponent(window.location.href);
+duoshuoQuery.sso.logout += '&redirect_to=' + encodeURIComponent(window.location.href);
+</script>
+<script type="text/javascript" src="http://static.duoshuo.com/embed.js" charset="UTF-8" async="async"></script>
+<script type='text/javascript' src='http://luolei.org/wp-includes/js/comment-reply.min.js'></script>
+<script type='text/javascript' src='http://upcdn.b0.upaiyun.com/libs/modernizr/modernizr-2.5.3.min.js'></script>
+<script type='text/javascript' src='http://luolei.org/wp-includes/js/jquery/jquery.js'></script>
+<script type='text/javascript' src='http://luolei.org/wp-includes/js/jquery/jquery-migrate.min.js'></script>
+<script type='text/javascript' src='http://upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.0.min.js'></script>
+<script type='text/javascript' src='http://luolei.org/wp-content/themes/will-box/library/js/jquery.masonry.min.js'></script>
+<link rel='canonical' href='http://luolei.org/2013/09/git-config-advanced/' />
+<link rel='shortlink' href='http://luolei.org/?p=1411' />
+<!-- end of wordpress head -->
+<script>
+	$(function() {
+    $('.home-posts-list').masonry({
+        itemSelector: '.post-in-list',
+        columnWidth: function(containerWidth) {
+            return containerWidth / ($(window).width() > 640 ? 3 : 2);
+        }
+    });
+    // 加载后自动reload瀑布流（仿佛布局混乱
+    $(window).load(function(){
+        $('.home-posts-list').masonry('reload');
+    });
+    // 改变窗口后reload瀑布流
+    $(window).resize(function() {
+        $('.home-posts-list').masonry('reload');
+    });
+});
+</script>
+</head>
+<body class="single single-post postid-1411 single-format-standard">
+	<div id="container">		
+	<header class="header" role="banner">
+	<!-- Top nav bar -->
+	<nav class="top-bar fixed">
+		<div class="top-inner">
+		<div id="top-logo">
+				<a class="logo-small" href="http://luolei.org/">罗磊的独立博客</a>
+			</div>
+				<div class="menu-button"><span class="icon-font touch-button">&#382;</span></div>
+				<ul class="menu flexnav clearfloat" data-breakpoint="800" id="nav">  <!--顶部menu导航-->
+				<li><a href="http://luolei.org/" class="on">首页</a></li>
+								<li class="cat-item"><a href="#">博客</a>
+					<ul class="children">
+						<li class="cat-item cat-item-3"><a href="http://luolei.org/category/it/" title="查看互联网下的所有文章">互联网</a>
+</li>
+	<li class="cat-item cat-item-115"><a href="http://luolei.org/category/develop/" title="查看前端下的所有文章">前端</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="http://luolei.org/category/other/" title="查看杂七杂八下的所有文章">杂七杂八</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://luolei.org/category/life/" title="查看生活下的所有文章">生活</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://luolei.org/category/pc/" title="查看计算机下的所有文章">计算机</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="http://luolei.org/category/design/" title="查看设计下的所有文章">设计</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://luolei.org/category/read/" title="查看读书下的所有文章">读书</a>
+</li>
+	<li class="cat-item cat-item-39"><a href="http://luolei.org/category/bike/" title="罗磊的「骑行日志」，在路上的故事">骑行日志</a>
+</li>
+					</ul>
+				</li>
+				</ul>
+
+				<div class="search-header">
+				 <form role="search" method="get" id="searchform" action="http://luolei.org/">
+	<div>
+        <input type="text" value="" name="s" placeholder="搜一下" id="s" />
+        <!-- <input type="submit" id="searchsubmit" value="搜索" /> -->
+    </div>
+</form> 
+				</div>
+		</div>
+		</nav>
+		<!-- Top nav bar End -->
+				<div id="inner-header" class="wrap clearfix">
+					<!-- 显示为博客描述，随机链接文章，目录类为描述 -->
+				
+				</div> <!-- end #inner-header -->
+
+			</header> <!-- end header -->
+
+<div id="content">
+<div id="single-inner-content" class="wrap clearfix">
+<div id="main" class="first clearfix" role="main">
+<article id="post-1411" class="post-1411 post type-post status-publish format-standard hentry category-develop tag-git tag-99 clearfix" role="article" itemscope itemtype="http://schema.org/BlogPosting">
+<header class="article-header">
+<h1 class="entry-title single-title" itemprop="headline">Git log diff config高级进阶</h1>
+<div class="artile-meta">
+<li class="meta-date"><span class="icon-font">&#58;</span>2013 年 09 月 07 日</li>
+<li class="meta-comments"><span class="icon-font">&#343;</span><a href="http://luolei.org/2013/09/git-config-advanced/#comments" class="ds-thread-count" data-thread-key="1411" title="《Git log diff config高级进阶》上的评论">6 评论</a></li> 
+<li class="meta-views"><span class="icon-font">&#279;</span>249次围观</li>
+</div>
+</header> <!-- end article header -->
+<section class="entry-content clearfix" itemprop="articleBody">
+<p><img class="alignnone size-full wp-image-1412" alt="git_wallpaper_clean_by_black_pixel-d5wmjnw" src="http://luolei.org/wp-content/uploads/2013/09/git_wallpaper_clean_by_black_pixel-d5wmjnw.jpg" width="1024" height="640" data-pinit="registered" />前一段时间分享了一篇<a href="http://luolei.org/2013/08/better-git-log/">《更好的 git log》</a>简要介绍怎么美化 git log 命令，其中提到了 <code>alias</code>命令，今天再继续谈谈 git相关， 看看如何通过配置自己的 git config 让自己的 git 用起来更顺手。</p>
+<h4>git log 进阶</h4>
+<p><strong>在一行显示 git log</strong></p>
+<p><code>git log --pretty =oneline</code>在一行显示 git log.</p>
+<p><code>git log --oneline --stat</code> ，显示每个文件的变化行数，其中后面跟的<code>--start</code>参数是用来统计哪些文件被改动，有多少行被改动。</p>
+<p><code>git log --oneline --graph</code>，则可以图形化地显示 branch 的变化（方便查看 merge 变化）。</p>
+<p><strong>查看不同时间段的 git log</strong></p>
+<pre><code>git log --until=1.minute.ago // 一分钟之前的所有 log
+git log --since=1.day.ago //一天之内的log
+git log --since=1.hour.ago //一个小时之内的 log
+git log --since=`.month.ago --until=2.weeks.ago //一个月之前到半个月之前的log
+git log --since ==2013-08.01 --until=2013-09-07 //某个时间段的 log
+</code></pre>
+<p>如果你想更加个性化地设置 git log 输出的不同参数的颜色，可以使用如下命令</p>
+<p><code>git log --pretty=format:"%h %ad- %s [%an]"</code></p>
+<p>其中的参数对应的是</p>
+<pre><code>%ad  author date  // 日期
+%an author name // 作者名
+%cn committer name //提交者姓名
+%h SHA hash // hash值
+%s subject //commit的描述
+%d  ref names //对应的 branch 分支名
+</code></pre>
+<p>更多的选项可以使用<code>git help log</code> 来看看，如我在<a href="http://luolei.org/2013/08/better-git-log/">《更好的 git log》</a>中提到的，你可以通过<code>alias</code> 来创建一个简洁的<code>git lg</code> 命令来定制自己喜欢的输出方案。</p>
+<h4>git diff 进阶</h4>
+<p><code>git diff</code> 是用来比较版本之间的差异变化 balbalbala 之类的，哪里修改了，哪里添加了 balbalbala</p>
+<pre><code>git diff HEAD //与上次 commit 之间的差别（爸爸）
+git diff HEAD^ //与上上次（爷爷）
+git diff HEAD^^ //与上上上次（曾祖父）
+git diff HEAD~5 //与前面第5次commit（好吧…祖先吧）
+git diff HEAD^..HEAD //中间是两个点比较(爸爸)和(爷爷)的差别
+git diff f5fdjsalfjdskaf..4fdklsajfdksaf //比较 两个不同 hash 值记录之间的不同
+git diff master bird //比较 branch 之间的不同
+git diff --since=1.week.ago --until=1.minute.ago //还可以根据时间来比较哦
+</code></pre>
+<h4>git blame</h4>
+<p>如果你想要看看某一个文件的相关历史记录，可以使用<code>git blame</code> 命令。<br />
+如<code>git blame index.html --date short</code></p>
+<img class="alignnone size-full wp-image-1413" alt="2._git_blame__base.less_--date_short__git__and_New_Tab-3" src="http://luolei.org/wp-content/uploads/2013/09/2._git_blame__base.less_-date_short__git__and_New_Tab-3.png" width="680" height="486" data-pinit="registered" />
+<h4>git config进阶</h4>
+<p>config 就是配置的意思，git config 字如其意，就是 git 的配置文件，git config 文件有三层。<br />
+第一层config是在系统层<code>etc/gitconfig</code>， 可以�
