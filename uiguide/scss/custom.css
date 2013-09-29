@@ -1,0 +1,10 @@
+/* ------------------Put your custom code here--------------------*/
+#navvbar {
+  width: 80%;
+  height: 23px; }
+  #navvbar ul {
+    list-style-type: none; }
+  #navvbar li {
+    float: left; }
+  #navvbar a {
+    font-weight: bold; }
