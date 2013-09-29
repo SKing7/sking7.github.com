@@ -213,7 +213,7 @@ function addCookie(){　 // 加入收藏夹
     <a href="" class="animated tada singleauthor" target="_blank"><img alt='TAT.Johnny' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://www.alloyteam.com/wp-content/uploads/2012/06/johnny_avatar-43x43.png" class="avatar avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='TAT.Johnny' src='http://www.alloyteam.com/wp-content/uploads/2012/06/johnny_avatar-43x43.png' class='avatar avatar-43 photo' height='43' width='43' /></noscript></a> 
    
     <a href="http://www.alloyteam.com/2012/11/performance-writing-efficient-javascript/" class="blogTitle btitle" rel="bookmark" title="【译】编写高性能JavaScript">【译】编写高性能JavaScript</a> 
-    <div class="blogPs"> In <a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 中的全部文章" rel="category tag">JavaScript</a>,<a href="http://www.alloyteam.com/category/webfrontend/" title="查看 Web前端 中的全部文章" rel="category tag">Web前端</a>,<a href="http://www.alloyteam.com/category/webfrontend/%e5%89%8d%e7%ab%af%e4%bc%98%e5%8c%96/" title="查看 前端优化 中的全部文章" rel="category tag">前端优化</a> on 2012年11月20日 by <a href="http://www.alloyteam.com/author/johnny/" title="由 TAT.Johnny 发布" rel="author">TAT.Johnny</a>  view: 10,462 </div> 
+    <div class="blogPs"> In <a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 中的全部文章" rel="category tag">JavaScript</a>,<a href="http://www.alloyteam.com/category/webfrontend/" title="查看 Web前端 中的全部文章" rel="category tag">Web前端</a>,<a href="http://www.alloyteam.com/category/webfrontend/%e5%89%8d%e7%ab%af%e4%bc%98%e5%8c%96/" title="查看 前端优化 中的全部文章" rel="category tag">前端优化</a> on 2012年11月20日 by <a href="http://www.alloyteam.com/author/johnny/" title="由 TAT.Johnny 发布" rel="author">TAT.Johnny</a>  view: 10,468 </div> 
     <span class="comments"><a href="http://www.alloyteam.com/2012/11/performance-writing-efficient-javascript/#comments" class="up"  title="《【译】编写高性能JavaScript》上的评论">12</a></span>
     </div> 
     <!--content_banner_single--> 
@@ -472,4 +472,639 @@ add(my_custom_object, undefined);</pre>
 <li>你的应用中，对于使用不同类型的对象和其复杂度（在合理的范围内：长原型链往往是有害的，呈现只有一个极少数属性的对象比大对象会快一点）是有没限制的。对于“hot”对象，尽量保持短原型链，并且少属性。</li>
 </ul>
 <h4>对象克隆</h4>
-<p>对于应用程序开发人员，对象克隆是一个常见的问题。虽然各种基准测试可以证明V8对这个问题处理得很好，但仍要小心。复制大的东西通常是较慢的——不要这么做。JS
+<p>对于应用程序开发人员，对象克隆是一个常见的问题。虽然各种基准测试可以证明V8对这个问题处理得很好，但仍要小心。复制大的东西通常是较慢的——不要这么做。JS中的for..in循环尤其糟糕，因为它有着恶魔般的规范，并且无论是在哪个引擎中，都可能永远不会比任何对象快。</p>
+<p>当你一定要在关键性能代码路径上复制对象时，使用数组或一个自定义的“拷贝构造函数”功能明确地复制每个属性。这可能是最快的方式：</p>
+<pre class="brush: js; title: JavaScript">function clone(original) {
+  this.foo = original.foo;
+  this.bar = original.bar;
+}
+var copy = new clone(original);</pre>
+<h4>模块模式中缓存函数</h4>
+<p>使用模块模式时缓存函数，可能会导致性能方面的提升。参阅下面的例子，因为它总是创建成员函数的新副本，你看到的变化可能会比较慢。</p>
+<p>另外请注意，使用这种方法明显更优，不仅仅是依靠原型模式（经过jsPerf测试确认）。</p>
+<p><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/11/Screen-Shot-2012-11-06-at-10.42.10.png" alt="Performance improvements" width="648" height="471" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/11/Screen-Shot-2012-11-06-at-10.42.10.png" alt="Performance improvements" width="648" height="471" /></noscript></p>
+<p style="text-align: center;"><em>使用模块模式或原型模式时的性能提升</em></p>
+<p style="text-align: left;">这是一个<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/prototypal-performance/12');"  href="http://jsperf.com/prototypal-performance/12" target="_blank">原型模式与模块模式的性能对比测试</a>：</p>
+<pre class="brush: js; title: JavaScript">  // Prototypal pattern
+  Klass1 = function () {}
+  Klass1.prototype.foo = function () {
+      log('foo');
+  }
+  Klass1.prototype.bar = function () {
+      log('bar');
+  }
+
+  // Module pattern
+  Klass2 = function () {
+      var foo = function () {
+          log('foo');
+      },
+      bar = function () {
+          log('bar');
+      };
+
+      return {
+          foo: foo,
+          bar: bar
+      }
+  }
+
+  // Module pattern with cached functions
+  var FooFunction = function () {
+      log('foo');
+  };
+  var BarFunction = function () {
+      log('bar');
+  };
+
+  Klass3 = function () {
+      return {
+          foo: FooFunction,
+          bar: BarFunction
+      }
+  }
+
+  // Iteration tests
+
+  // Prototypal
+  var i = 1000,
+      objs = [];
+  while (i--) {
+      var o = new Klass1()
+      objs.push(new Klass1());
+      o.bar;
+      o.foo;
+  }
+
+  // Module pattern
+  var i = 1000,
+      objs = [];
+  while (i--) {
+      var o = Klass2()
+      objs.push(Klass2());
+      o.bar;
+      o.foo;
+  }
+
+  // Module pattern with cached functions
+  var i = 1000,
+      objs = [];
+  while (i--) {
+      var o = Klass3()
+      objs.push(Klass3());
+      o.bar;
+      o.foo;
+  }
+// See the test for full details</pre>
+<h3>使用数组时的技巧</h3>
+<p>接下来说说数组相关的技巧。在一般情况下，<strong>不要删除数组元素</strong>，这样将使数组过渡到较慢的内部表示。当索引变得稀疏，V8将会使元素转为更慢的字典模式。</p>
+<h4>数组字面量</h4>
+<p>数组字面量非常有用，它可以暗示VM数组的大小和类型。它通常用在体积不大的数组中。</p>
+<pre class="brush: js; title: JavaScript">// Here V8 can see that you want a 4-element array containing numbers:
+var a = [1, 2, 3, 4];
+
+// Don't do this:
+a = []; // Here V8 knows nothing about the array
+for(var i = 1; i &lt;= 4; i++) {
+     a.push(i);
+}</pre>
+<h4>存储单一类型VS多类型</h4>
+<p>将混合类型（比如数字、字符串、undefined、true/false）的数据存在数组中绝不是一个好想法。例如var arr = [1, “1”, undefined, true, “true”]</p>
+<p><a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/type-inference-performance/2');"  href="http://jsperf.com/type-inference-performance/2" target="_blank">类型推断的性能测试</a></p>
+<p>正如我们所看到的结果，整数的数组是最快的。</p>
+<h4>稀疏数组与满数组</h4>
+<p>当你使用稀疏数组时，要注意访问元素将远远慢于满数组。因为V8不会分配一整块空间给只用到部分空间的数组。取而代之的是，它被管理在字典中，既节约了空间，但花费访问的时间。</p>
+<p><a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/sparse-arrays-vs-full-arrays');"  href="http://jsperf.com/sparse-arrays-vs-full-arrays" target="_blank">稀疏数组与满数组的测试</a></p>
+<h4>预分配空间VS动态分配</h4>
+<p>不要预分配大数组（如大于64K的元素），其最大的大小，而应该动态分配。在我们这篇文章的性能测试之前，请记住这只适用部分JavaScript引擎。</p>
+<p><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/graph2.jpg" alt="Test of empty literal versus pre-allocated arrays in various browsers." width="540" height="348" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/graph2.jpg" alt="Test of empty literal versus pre-allocated arrays in various browsers." width="540" height="348" /></noscript></p>
+<p style="text-align: center;">空字面量与预分配数组在不同的浏览器进行测试</p>
+<p style="text-align: left;">Nitro (Safari)对预分配的数组更有利。而在其他引擎（V8，SpiderMonkey）中，预先分配并不是高效的。</p>
+<p style="text-align: left;"><a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/pre-allocated-arrays');"  href="http://jsperf.com/pre-allocated-arrays" target="_blank">预分配数组测试</a></p>
+<pre class="brush: js; title: JavaScript">// Empty array
+var arr = [];
+for (var i = 0; i &lt; 1000000; i++) {
+    arr[i] = i;
+}
+
+// Pre-allocated array
+var arr = new Array(1000000);
+for (var i = 0; i &lt; 1000000; i++) {
+    arr[i] = i;
+}</pre>
+<h2>优化你的应用</h2>
+<p>在Web应用的世界中，速度就是一切。没有用户希望用一个要花几秒钟计算某列总数或花几分钟汇总信息的表格应用。这是为什么你要在代码中压榨每一点性能的重要原因。</p>
+<p><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_250x250.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/improving-apps.jpg" alt="An old phone on the screen of an iPad." /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/improving-apps.jpg" alt="An old phone on the screen of an iPad." /></noscript></p>
+<p style="text-align: center;"><em>图片来源: <a onclick="javascript:pageTracker._trackPageview('/outgoing/www.flickr.com/photos/perolofforsberg/6691744587/in/photostream/');"  href="http://www.flickr.com/photos/perolofforsberg/6691744587/in/photostream/">Per Olof Forsberg</a>.</em></p>
+<p style="text-align: left;">理解和提高应用程序的性能是非常有用的同时，它也是困难的。我们推荐以下的步骤来解决性能的痛点：</p>
+<ul>
+<li>测量：在您的应用程序中找到慢的地方（约45％）</li>
+<li>理解：找出实际的问题是什么（约45％）</li>
+<li>修复它！ （约10％）</li>
+</ul>
+<p>下面推荐的一些工具和技术可以协助你。</p>
+<h3>基准化（BENCHMARKING）</h3>
+<p>有很多方式来运行JavaScript代码片段的基准测试其性能——一般的假设是，基准简单地比较两个时间戳。这中模式被<a onclick="javascript:pageTracker._trackPageview('/outgoing/jsperf.com/');"  href="http://jsperf.com/">jsPerf</a>团队指出，并在<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.webkit.org/perf/sunspider/sunspider.html');"  href="http://www.webkit.org/perf/sunspider/sunspider.html">SunSpider</a>和<a onclick="javascript:pageTracker._trackPageview('/outgoing/krakenbenchmark.mozilla.org/');"  href="http://krakenbenchmark.mozilla.org/">Kraken</a>的基准套件中使用：</p>
+<pre class="brush: js; title: JavaScript">var totalTime,
+    start = new Date,
+    iterations = 1000;
+while (iterations--) {
+  // Code snippet goes here
+}
+// totalTime → the number of milliseconds taken 
+// to execute the code snippet 1000 times
+totalTime = new Date - start;</pre>
+<p>在这里，要测试的代码被放置在一个循环中，并运行一个设定的次数（例如6次）。在此之后，开始日期减去结束日期，就得出在循环中执行操作所花费的时间。</p>
+<p>然而，这种基准测试做的事情过于简单了，特别是如果你想运行在多个浏览器和环境的基准。垃圾收集器本身对结果是有一定影响的。即使你使用window.performance这样的解决方案，也必须考虑到这些缺陷。</p>
+<p>不管你是否只运行基准部分的代码，编写一个测试套件或编码基准库，JavaScript基准其实比你想象的更多。如需更详细的指南基准，我强烈建议你阅读由Mathias Bynens和John-David Dalton提供的<a onclick="javascript:pageTracker._trackPageview('/outgoing/mathiasbynens.be/notes/javascript-benchmarking');"  href="http://mathiasbynens.be/notes/javascript-benchmarking" target="_blank">Javascript基准测试</a>。</p>
+<h3>分析（PROFILING）</h3>
+<p>Chrome开发者工具为<a onclick="javascript:pageTracker._trackPageview('/outgoing/developers.google.com/chrome-developer-tools/docs/profiles');"  href="https://developers.google.com/chrome-developer-tools/docs/profiles" target="_blank">JavaScript分析</a>有很好的支持。可以使用此功能检测哪些函数占用了大部分时间，这样你就可以去优化它们。这很重要，即使是代码很小的改变会对整体表现产生重要的影响。</p>
+<p style="text-align: center;"><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/profiling.jpg" alt="Profiles panel in Chrome Developer Tools." width="480" height="302" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/profiling.jpg" alt="Profiles panel in Chrome Developer Tools." width="480" height="302" /></noscript></p>
+<p style="text-align: center;">Chrome开发者工具的分析面板</p>
+<p style="text-align: left;">分析过程开始获取代码性能基线，然后以时间线的形式体现。这将告诉我们代码需要多长时间运行。“Profiles”选项卡给了我们一个更好的视角来了解应用程序中发生了什么。JavaScript CPU分析文件展示了多少CPU时间被用于我们的代码，CSS选择器分析文件展示了多少时间花费在处理选择器上，堆快照显示多少内存正被用于我们的对象。</p>
+<p style="text-align: left;">利用这些工具，我们可以分离、调整和重新分析来衡量我们的功能或操作性能优化是否真的起到了效果。</p>
+<p style="text-align: center;"><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/profiling2.jpg" alt="The profile tab gives information about your code's performance." width="486" height="284" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/profiling2.jpg" alt="The profile tab gives information about your code's performance." width="486" height="284" /></noscript></p>
+<p style="text-align: center;"><em>“Profile”选项卡展示了代码性能信息。</em></p>
+<p style="text-align: left;">一个很好的分析介绍，阅读Zack Grossbart的 <a onclick="javascript:pageTracker._trackPageview('/outgoing/coding.smashingmagazine.com/2012/06/12/javascript-profiling-chrome-developer-tools/');"  href="http://coding.smashingmagazine.com/2012/06/12/javascript-profiling-chrome-developer-tools/">JavaScript Profiling With The Chrome Developer Tools</a>。</p>
+<p style="text-align: left;">提示：在理想情况下，若想确保你的分析并未受到已安装的应用程序或扩展的任何影响，可以使用<code>--user-data-dir &lt;empty_directory&gt;</code>标志来启动Chrome。在大多数情况下，这种方法优化测试应该是足够的，但也需要你更多的时间。这是V8标志能有所帮助的。</p>
+<h3 style="text-align: left;">避免内存泄漏——3快照技术</h3>
+<p>在谷歌内部，Chrome开发者工具被Gmail等团队大量使用，用来帮助发现和排除内存泄漏。</p>
+<p style="text-align: center;"><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/devtools.jpg" alt="Memory statistics in Chrome Developer Tools." width="540" height="305" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/devtools.jpg" alt="Memory statistics in Chrome Developer Tools." width="540" height="305" /></noscript></p>
+<p style="text-align: center;"><em>Chrome开发者工具中的内存统计</em></p>
+<p style="text-align: left;">内存统计出我们团队所关心的私有内存使用、JavaScript堆的大小、DOM节点数量、存储清理、事件监听计数器和垃圾收集器正要回收的东西。推荐阅读Loreena Lee的<a onclick="javascript:pageTracker._trackPageview('/outgoing/docs.google.com/presentation/d/1wUVmf78gG-ra5aOxvTfYdiLkdGaR9OhXRnOlIcEmu2s/pub?start=false&amp;loop=false&amp;delayms=3000#slide=id.g1d65bdf6_0_0');"  href="https://docs.google.com/presentation/d/1wUVmf78gG-ra5aOxvTfYdiLkdGaR9OhXRnOlIcEmu2s/pub?start=false&amp;loop=false&amp;delayms=3000#slide=id.g1d65bdf6_0_0" target="_blank">“3快照”技术</a>。该技术的要点是，在你的应用程序中记录一些行为，强制垃圾回收，检查DOM节点的数量有没有恢复到预期的基线，然后分析三个堆的快照来确定是否有内存泄漏。</p>
+<h3 style="text-align: left;">单页面应用的内存管理</h3>
+<p>单页面应用程序（例如AngularJS，Backbone，Ember）的内存管理是非常重要的，它们几乎永远不会刷新页面。这意味着内存泄漏可能相当明显。移动终端上的单页面应用充满了陷阱，因为设备的内存有限，并在长期运行Email客户端或社交网络等应用程序。<strong>能力愈大责任愈重。</strong></p>
+<p>有很多办法解决这个问题。在Backbone中，确保使用dispose()来处理旧视图和引用（目前在<a onclick="javascript:pageTracker._trackPageview('/outgoing/github.com/documentcloud/backbone/blob/master/backbone.js#L1234');"  href="https://github.com/documentcloud/backbone/blob/master/backbone.js#L1234" target="_blank">Backbone(Edge)</a>中可用）。这个函数是最近加上的，移除添加到视图“event”对象中的处理函数，以及通过传给view的第三个参数（回调上下文）的model或collection的事件监听器。dispose()也会被视图的remove()调用，处理当元素被移除时的主要清理工作。Ember 等其他的库当检测到元素被移除时，会清理监听器以避免内存泄漏。</p>
+<p>Derick Bailey的一些明智的建议：</p>
+<blockquote><p>与其了解事件与引用是如何工作的，不如遵循的标准规则来管理JavaScript中的内存。如果你想加载数据到的一个存满用户对象的Backbone集合中，你要清空这个集合使它不再占用内存，那必须这个集合的所有引用以及集合内对象的引用。一旦清楚了所用的引用，资源就会被回收。这就是标准的JavaScript垃圾回收规则。</p></blockquote>
+<p>在文章中，Derick涵盖了许多使用Backbone.js时的常见<a onclick="javascript:pageTracker._trackPageview('/outgoing/lostechies.com/derickbailey/2012/03/19/backbone-js-and-javascript-garbage-collection/');"  href="http://lostechies.com/derickbailey/2012/03/19/backbone-js-and-javascript-garbage-collection/" target="_blank">内存缺陷</a>，以及如何解决这些问题。</p>
+<p>Felix Geisendörfer的<a onclick="javascript:pageTracker._trackPageview('/outgoing/github.com/felixge/node-memory-leak-tutorial');"  href="https://github.com/felixge/node-memory-leak-tutorial" target="_blank">在Node中调试内存泄漏</a>的教程也值得一读，尤其是当它形成了更广泛SPA堆栈的一部分。</p>
+<h3>减少回流（REFLOWS）</h3>
+<p>当浏览器重新渲染文档中的元素时需要 重新计算它们的位置和几何形状，我们称之为<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.youtube.com/watch?feature=player_embedded&amp;v=ZHxbs5WEQzE');"  href="https://www.youtube.com/watch?feature=player_embedded&amp;v=ZHxbs5WEQzE" target="_blank">回流</a>。回流会阻塞用户在浏览器中的操作，因此理解提升回流时间是非常有帮助的。</p>
+<p><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_250x250.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/reflow.jpg" alt="Chart of reflow time." /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/reflow.jpg" alt="Chart of reflow time." /></noscript></p>
+<p style="text-align: center;"><em>回流时间图表</em></p>
+<p style="text-align: left;">你应该批量地触发回流或重绘，但是要节制地使用这些方法。尽量不处理DOM也很重要。可以使用<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.w3.org/TR/DOM-Level-2-Core/core.html#ID-B63ED1A3');"  href="http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-B63ED1A3" target="_blank">DocumentFragment</a>，一个轻量级的文档对象。你可以把它作为一种方法来提取文档树的一部分，或创建一个新的文档“片段”。与其不断地添加DOM节点，不如使用文档片段后只执行一次DOM插入操作，以避免过多的回流。</p>
+<p style="text-align: left;">例如，我们写一个函数给一个元素添加20个div。如果只是简单地每次append一个div到元素中，这会触发20次回流。</p>
+<pre class="brush: js; title: JavaScript">function addDivs(element) {
+  var div;
+  for (var i = 0; i &lt; 20; i ++) {
+    div = document.createElement('div');
+    div.innerHTML = 'Heya!';
+    element.appendChild(div);
+  }
+}</pre>
+<p style="text-align: left;">要解决这个问题，可以使用DocumentFragment来代替，我们可以每次添加一个新的div到里面。完成后将DocumentFragment添加到DOM中只会触发一次回流。</p>
+<pre class="brush: js; title: JavaScript">function addDivs(element) {
+  var div; 
+  // Creates a new empty DocumentFragment.
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i &lt; 20; i ++) {
+    div = document.createElement('a');
+    div.innerHTML = 'Heya!';
+    fragment.appendChild(div);
+  }
+  element.appendChild(fragment);
+}</pre>
+<p style="text-align: left;">可以参阅 <a onclick="javascript:pageTracker._trackPageview('/outgoing/developers.google.com/speed/articles/javascript-dom');"  href="https://developers.google.com/speed/articles/javascript-dom">Make the Web Faster</a>，<a onclick="javascript:pageTracker._trackPageview('/outgoing/blog.tojicode.com/2012/03/javascript-memory-optimization-and.html');"  href="http://blog.tojicode.com/2012/03/javascript-memory-optimization-and.html">JavaScript Memory Optimization</a> 和 <a onclick="javascript:pageTracker._trackPageview('/outgoing/gent.ilcore.com/2011/08/finding-memory-leaks.html');"  href="http://gent.ilcore.com/2011/08/finding-memory-leaks.html">Finding Memory Leaks</a>。</p>
+<h3 style="text-align: left;">JS内存泄漏探测器</h3>
+<p>为了帮助发现JavaScript内存泄漏，谷歌的开发人员（(Marja Hölttä和Jochen Eisinger）开发了一种工具，它与Chrome开发人员工具结合使用，检索堆的快照并检测出是什么对象导致了内存泄漏。</p>
+<p style="text-align: center;"><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/leak.jpg" alt="A tool for detecting JavaScript memory leaks." width="480" height="260" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/leak.jpg" alt="A tool for detecting JavaScript memory leaks." width="480" height="260" /></noscript></p>
+<p style="text-align: center;"><em>一个JavaScript内存泄漏检测工具</em></p>
+<p style="text-align: left;">有完整的文章介绍了<a onclick="javascript:pageTracker._trackPageview('/outgoing/google-opensource.blogspot.de/2012/08/leak-finder-new-tool-for-javascript.html');"  href="http://google-opensource.blogspot.de/2012/08/leak-finder-new-tool-for-javascript.html" target="_blank">如何使用这个工具</a>，建议你自己到<a onclick="javascript:pageTracker._trackPageview('/outgoing/code.google.com/p/leak-finder-for-javascript/');"  href="http://code.google.com/p/leak-finder-for-javascript/" target="_blank">内存泄漏探测器项目页面</a>看看。</p>
+<p style="text-align: left;">如果你想知道为什么这样的工具还没集成到我们的开发工具，其原因有二。它最初是在Closure库中帮助我们捕捉一些特定的内存场景，它更适合作为一个外部工具。</p>
+<h3 style="text-align: left;">V8优化调试和垃圾回收的标志位</h3>
+<p>Chrome支持直接通过传递一些标志给V8，以获得更详细的引擎优化输出结果。例如，这样可以追踪V8的优化：</p>
+<pre class="brush: js; title: JavaScript">"/Applications/Google Chrome/Google Chrome" --js-flags="--trace-opt --trace-deopt"</pre>
+<p>Windows用户可以这样运行 chrome.exe &#8211;js-flags=&#8221;&#8211;trace-opt &#8211;trace-deopt&#8221;</p>
+<p>在开发应用程序时，下面的V8标志都可以使用。</p>
+<ul>
+<li>trace-opt —— 记录优化函数的名称，并显示跳过的代码，因为优化器不知道如何优化。</li>
+<li>trace-deopt —— 记录运行时将要“去优化”的代码。</li>
+<li>trace-gc —— 记录每次的垃圾回收。</li>
+</ul>
+<p>V8的处理脚本用*（星号）标识优化过的函数，用~（波浪号）表示未优化的函数。</p>
+<p>如果你有兴趣了解更多关于V8的标志和V8的内部是如何工作的，强烈建议 阅读Vyacheslav Egorov的<a onclick="javascript:pageTracker._trackPageview('/outgoing/mrale.ph/blog/2011/12/18/v8-optimization-checklist.html');"  href="http://mrale.ph/blog/2011/12/18/v8-optimization-checklist.html">excellent post on V8 internals</a>。</p>
+<h3>HIGH-RESOLUTION TIME 和 NAVIGATION TIMING API</h3>
+<p><a onclick="javascript:pageTracker._trackPageview('/outgoing/www.w3.org/TR/hr-time/');"  href="http://www.w3.org/TR/hr-time/" target="_blank">高精度时间</a>（HRT）是一个提供不受系统时间和用户调整影响的亚毫秒级高精度时间接口，可以把它当做是比 new Date 和 Date.now()更精准的度量方法。这对我们编写基准测试帮助很大。</p>
+<p style="text-align: center;"><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/perfnow.jpg" alt="High Resolution Time (HRT) provides the current time in sub-millisecond resolution." width="462" height="132" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/perfnow.jpg" alt="High Resolution Time (HRT) provides the current time in sub-millisecond resolution." width="462" height="132" /></noscript></p>
+<p style="text-align: center;">高精度时间（HRT）提供了当前亚毫秒级的时间精度</p>
+<p style="text-align: left;">目前HRT在Chrome（稳定版）中是以window.performance.webkitNow()方式使用，但在Chrome Canary中前缀被丢弃了，这使得它可以通过window.performance.now()方式调用。Paul Irish在HTML5Rocks上了<a onclick="javascript:pageTracker._trackPageview('/outgoing/updates.html5rocks.com/2012/08/When-milliseconds-are-not-enough-performance-now');"  href="http://updates.html5rocks.com/2012/08/When-milliseconds-are-not-enough-performance-now" target="_blank">关于HRT更多内容</a>的文章。</p>
+<p style="text-align: left;">现在我们知道当前的精准时间，那有可以准确测量页面性能的API吗？好吧，现在有个<a onclick="javascript:pageTracker._trackPageview('/outgoing/dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html');"  href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html" target="_blank">Navigation Timing API</a>可以使用，这个API提供了一种简单的方式，来获取网页在加载呈现给用户时，精确和详细的时间测量记录。可以在console中使用window.performance.timing来获取时间信息：</p>
+<p style="text-align: center;"><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/performance.jpg" alt="Timing information is shown in the console." width="480" height="280" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/performance.jpg" alt="Timing information is shown in the console." width="480" height="280" /></noscript></p>
+<p style="text-align: center;"><em>显示在控制台中的时间信息</em></p>
+<p style="text-align: left;">我们可以从上面的数据获取很多有用的信息，例如网络延时为responseEnd &#8211; fetchStart，页面加载时间为loadEventEnd &#8211; responseEnd，处理导航和页面加载的时间为loadEventEnd &#8211; navigationStart。</p>
+<p style="text-align: left;">正如你所看到的，perfomance.memory的属性也能显示JavaScript的内存数据使用情况，如总的堆大小。</p>
+<p style="text-align: left;">更多Navigation Timing API的细节，阅读 Sam Dutton的 <a onclick="javascript:pageTracker._trackPageview('/outgoing/www.html5rocks.com/en/tutorials/webperformance/basics/');"  href="http://www.html5rocks.com/en/tutorials/webperformance/basics/">Measuring Page Load Speed With Navigation Timing</a>。</p>
+<h3>ABOUT:MEMORY 和 ABOUT:TRACING</h3>
+<p>Chrome中的about:tracing提供了浏览器的性能视图，记录了Chrome的所有线程、tab页和进程。</p>
+<p><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_250x250.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/10/tracing.jpg" alt="about:tracing offers an intimate view of the browser’s performance." /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/10/tracing.jpg" alt="about:tracing offers an intimate view of the browser’s performance." /></noscript></p>
+<p style="text-align: center;"><em><code>About:Tracing提供了浏览器的性能视图</code></em></p>
+<p style="text-align: left;">这个工具的真正用处是允许你捕获Chrome的运行数据，这样你就可以适当地调整JavaScript执行，或优化资源加载。</p>
+<p style="text-align: left;">Lilli Thompson有一篇<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.html5rocks.com/en/tutorials/games/abouttracing/');"  href="http://www.html5rocks.com/en/tutorials/games/abouttracing/" target="_blank">写给游戏开发者</a>的使用about:tracing分析WebGL游戏的文章，同时也适合JavaScript的开发者。</p>
+<p style="text-align: left;">在Chrome的导航栏里可以输入about:memory，同样十分实用，可以获得每个tab页的内存使用情况，对定位内存泄漏很有帮助。</p>
+<h2 style="text-align: left;">总结</h2>
+<p>我们看到，<strong>JavaScript的世界中有很多隐藏的陷阱</strong>，且并没有提升性能的银弹。只有把一些优化方案综合使用到（现实世界）测试环境，才能获得最大的性能收益。即便如此，了解引擎是如何解释和优化代码，可以帮助你调整应用程序。</p>
+<p><strong>测量，理解，修复。</strong>不断重复这个过程。</p>
+<p style="text-align: center;"><img class="aligncenter lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://media.smashingmagazine.com/wp-content/uploads/2012/11/barometer.jpg" alt="Measuring." width="401" height="405" /><noscript><img class="aligncenter" src="http://media.smashingmagazine.com/wp-content/uploads/2012/11/barometer.jpg" alt="Measuring." width="401" height="405" /></noscript></p>
+<p style="text-align: center;"><em>图片来源: <a onclick="javascript:pageTracker._trackPageview('/outgoing/www.flickr.com/photos/38891164@N02/4266609887/');"  href="http://www.flickr.com/photos/38891164@N02/4266609887/">Sally Hunter</a></em></p>
+<p style="text-align: left;">谨记关注优化，但为了便利可以舍弃一些很小的优化。例如，有些开发者选择.forEach和Object.keys代替for和for..in循环，尽管这会更慢但使用更方便。要保证清醒的头脑，知道什么优化是需要的，什么优化是不需要的。</p>
+<p style="text-align: left;">同时注意，虽然JavaScript引擎越来越快，但下一个真正的瓶颈是DOM。回流和重绘的减少也是重要的，所以必要时再去动DOM。还有就是要关注网络，HTTP请求是珍贵的，特别是移动终端上，因此要使用HTTP的缓存去减少资源的加载。</p>
+<p style="text-align: left;">记住这几点可以保证你获取了本文的大部分信息，希望对你有所帮助！</p>
+<div style="clear:both; margin-top:5px; margin-bottom:5px;"></div><div style="float:left"><!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_tsina">新浪微博</a>
+<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.jiathis.com/share');"  href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+	summary:"",
+	hideMore:true
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END --></div><div style="clear:both; margin-top:5px; margin-bottom:5px;"></div>    </div> 
+	</div>
+	<div class="toolbar">
+	</div>
+
+</div>
+		<div id="comments" class="comments">
+     <script type="text/javascript"> 
+	var defaultAuthor = "称呼(必填)";
+	var defaultEmail = "邮箱(不会被公开,必填)";
+	var defaultUrl = "网站";
+	var defaultComment = "评论内容...";
+	
+	function commentform_submit(){
+		if(document.commentform.author.value == '' || document.commentform.author.value == defaultAuthor) {alert('咳咳...称呼忘填了');document.commentform.author.focus();return;}
+		if(document.commentform.email.value == '' || document.commentform.email.value == defaultEmail) {alert('email...您的email没填');document.commentform.email.focus();return;}
+		if(document.commentform.comment.value == '' || document.commentform.comment.value == defaultComment) {alert('评论内容在哪？');document.commentform.comment.focus();return;}
+		if(document.commentform.url.value == defaultUrl) document.commentform.url.value = '';
+		// document.commentform.submit();
+	}
+	</script>
+
+	<ol class="commentlist">
+			<li class="comment even thread-even depth-1" id="li-comment-6822">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/d1a774f8252a972c3c3bba74c2a6af01?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/d1a774f8252a972c3c3bba74c2a6af01?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-6822" class="comment_c">
+		<h2>
+			Path of Exile Items						<span class="c_time">2013 年 8 月 28 日</span>
+		</h2>
+		<p>Just   wanna  admit that this is very useful , Thanks for taking your time to write this.</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=6822#respond' onclick='return addComment.moveForm("comment-6822", "6822", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-4339">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/cb5e6889eb7a40323c290066cbca3016?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/cb5e6889eb7a40323c290066cbca3016?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4339" class="comment_c">
+		<h2>
+			svenzeng						<span class="c_time">2012 年 11 月 23 日</span>
+		</h2>
+		<p>最糟的内存泄漏地方之一是在循环中，或者在setTimeout()/ setInterval()中，但这是相当常见的。思考下面的例子:<br />
+JavaScript</p>
+<p>var myObj = {<br />
+    callMeMaybe: function () {<br />
+        var myRef = this;<br />
+        var val = setTimeout(function () {<br />
+            console.log(&#8216;Time is running out!&#8217;);<br />
+            myRef.callMeMaybe();<br />
+        }, 1000);<br />
+    }<br />
+};</p>
+<p>有点疑惑, 这里说内存泄漏貌似不是太严谨. 说内存占用可能更适合点.</p>
+<p>内存泄漏是指页面刷新后,仍有无法回收的内存对象</p>
+<p>现在的绝大多数浏览器中, js对象的垃圾回收机制都是用的标记清除法, 即给变量打上标记, 当变量离开作用环境时, 该变量就会被引擎回收.</p>
+<p>这里的环境最终是指向window的, 也就是说刷新页面的时候还是会回收内存的, 并没有造成内存泄漏吧.</p>
+<p>除非是跟使用引用计数法的dom对象或者bom对象形成了循环引用, 才会导致内存泄漏. 在闭包特别是dom事件中经常会有隐式的循环引用.</p>
+<p>我们经常责怪闭包引起了内存泄漏, 其实并非闭包本身的错. 就像我们路上有坑我们摔倒了并非是走路姿势的问题, 是坑实在太坑.</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4339#respond' onclick='return addComment.moveForm("comment-4339", "4339", "respond", "4120")'>回复</a>		</div>
+	</div>
+<ul class='children'>
+<li class="comment byuser comment-author-johnny bypostauthor even depth-2" id="li-comment-4401">
+	<img alt='TAT.Johnny' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://www.alloyteam.com/wp-content/uploads/2012/06/johnny_avatar-43x43.png" class="avatar avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='TAT.Johnny' src='http://www.alloyteam.com/wp-content/uploads/2012/06/johnny_avatar-43x43.png' class='avatar avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4401" class="comment_c">
+		<h2>
+			TAT.Johnny						<span class="c_time">2012 年 11 月 25 日</span>
+		</h2>
+		<p>是的, 作者的原意也应该是指避免这种无谓的内存占用 <img src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://www.alloyteam.com/wp-includes/images/smilies/icon_smile.gif" alt=':)' class="wp-smiley lh_lazyimg" /><noscript><img src='http://www.alloyteam.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' class='wp-smiley' /></noscript> </p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4401#respond' onclick='return addComment.moveForm("comment-4401", "4401", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+</ul>
+</li>
+<li class="comment odd alt thread-even depth-1" id="li-comment-4283">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/18d30f33dad5084017ab1cf003f2a0af?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/18d30f33dad5084017ab1cf003f2a0af?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4283" class="comment_c">
+		<h2>
+			<a onclick="javascript:pageTracker._trackPageview('/outgoing/iallai.com');"  href='http://iallai.com' rel='external nofollow' class='url'>iallai</a>						<span class="c_time">2012 年 11 月 21 日</span>
+		</h2>
+		<p>好长的好贴 mark了</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4283#respond' onclick='return addComment.moveForm("comment-4283", "4283", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment even thread-odd thread-alt depth-1" id="li-comment-4271">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/f75eb7723d30119aadff16f16aefa81d?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/f75eb7723d30119aadff16f16aefa81d?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4271" class="comment_c">
+		<h2>
+			<a href='#' rel='external nofollow' class='url'>perlt</a>						<span class="c_time">2012 年 11 月 21 日</span>
+		</h2>
+		<p>翻译很给力， 内容很充实， 顶~~</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4271#respond' onclick='return addComment.moveForm("comment-4271", "4271", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment odd alt thread-even depth-1" id="li-comment-4255">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/254a5acaee4728118528cd09424a44d8?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/254a5acaee4728118528cd09424a44d8?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4255" class="comment_c">
+		<h2>
+			道格拉斯						<span class="c_time">2012 年 11 月 20 日</span>
+		</h2>
+		<p>牛逼，好文！</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4255#respond' onclick='return addComment.moveForm("comment-4255", "4255", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment even thread-odd thread-alt depth-1" id="li-comment-4250">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/0816afcfbc07758e37dbb2d7b7fb774b?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/0816afcfbc07758e37dbb2d7b7fb774b?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4250" class="comment_c">
+		<h2>
+			<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.kinogam.com');"  href='http://www.kinogam.com' rel='external nofollow' class='url'>kinogam</a>						<span class="c_time">2012 年 11 月 20 日</span>
+		</h2>
+		<p>感觉大部分真正关心js的人都在用js来写node.js,或者windows8应用，再者……webkit，phonegap……</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4250#respond' onclick='return addComment.moveForm("comment-4250", "4250", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment odd alt thread-even depth-1" id="li-comment-4244">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/874d7f4bf2010925200c29893daebbf4?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/874d7f4bf2010925200c29893daebbf4?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4244" class="comment_c">
+		<h2>
+			<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.apkstory.com');"  href='http://www.apkstory.com' rel='external nofollow' class='url'>锋翼</a>						<span class="c_time">2012 年 11 月 20 日</span>
+		</h2>
+		<p>非常感谢！感谢奉献！</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4244#respond' onclick='return addComment.moveForm("comment-4244", "4244", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment even thread-odd thread-alt depth-1" id="li-comment-4241">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/dee8ea79410098612f9347b6e0afb34f?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/dee8ea79410098612f9347b6e0afb34f?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4241" class="comment_c">
+		<h2>
+			灯盏细辛						<span class="c_time">2012 年 11 月 20 日</span>
+		</h2>
+		<p>好文！</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4241#respond' onclick='return addComment.moveForm("comment-4241", "4241", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment odd alt thread-even depth-1" id="li-comment-4240">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/cb5e6889eb7a40323c290066cbca3016?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/cb5e6889eb7a40323c290066cbca3016?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4240" class="comment_c">
+		<h2>
+			svenzeng						<span class="c_time">2012 年 11 月 20 日</span>
+		</h2>
+		<p>顶，学习拉。</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4240#respond' onclick='return addComment.moveForm("comment-4240", "4240", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment even thread-odd thread-alt depth-1" id="li-comment-4231">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/5d77d2bd56574d6ea382036c78d0d200?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/5d77d2bd56574d6ea382036c78d0d200?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4231" class="comment_c">
+		<h2>
+			<a onclick="javascript:pageTracker._trackPageview('/outgoing/kexiao.me');"  href='http://kexiao.me' rel='external nofollow' class='url'>小克</a>						<span class="c_time">2012 年 11 月 20 日</span>
+		</h2>
+		<p>感谢翻译，感谢奉献~</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4231#respond' onclick='return addComment.moveForm("comment-4231", "4231", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment odd alt thread-even depth-1" id="li-comment-4230">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/526dc5b39e8099325be246c5d9a81f5d?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/526dc5b39e8099325be246c5d9a81f5d?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-4230" class="comment_c">
+		<h2>
+			koala						<span class="c_time">2012 年 11 月 20 日</span>
+		</h2>
+		<p>顶，这篇文章非常实用~~</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/performance-writing-efficient-javascript/?replytocom=4230#respond' onclick='return addComment.moveForm("comment-4230", "4230", "respond", "4120")'>回复</a>		</div>
+	</div>
+</li>
+	</ol>
+	
+	
+	<div class="pagenavi"></div>
+ 
+<div class="clearfix"></div>
+
+
+	<div id="respond" class="commentform">
+		<h3>发表评论</h3>
+		<div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/2012/11/performance-writing-efficient-javascript/#respond" style="display:none;">点击这里取消回复。</a></div>
+				<form action="http://www.alloyteam.com/wp-comments-post.php" method="post" id="commentform">
+		
+						<p><input type="text" name="author" id="author" value="" size="22" tabindex="1" />
+			<label for="author"><small>称呼 (必填)</small></label></p>
+			<p><input type="text" name="email" id="email" value="" size="22" tabindex="2" />
+			<label for="email"><small>邮箱 (不会被公开,必填)</small></label></p>
+			<p><input type="text" name="url" id="url" value="" size="22" tabindex="3" />
+			<label for="url"><small>网站</small></label></p>
+						<p><textarea name="comment" id="comment" cols="100%" rows="6" tabindex="4" onkeydown="if(event.ctrlKey&amp;&amp;event.keyCode==13){document.getElementById('submit').click();return false};"></textarea></p>
+			<p><input name="submit" type="submit" id="submit" tabindex="5" value="提 交" /><input type='hidden' name='comment_post_ID' value='4120' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p>
+			<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="fd42beef80" /></p>			
+		</form>
+				
+	</div>
+	
+</div>
+	</div></div>
+<div id="sidebar">
+	<div class="widget">			<div class="textwidget"><a title="全球首个在线编程对战游戏——CodeTank官网" href="http://CodeTank.AlloyTeam.com/" target="_blank">
+<img class="lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_250x250.gif" file="/wp-content/uploads/2012/10/codetank_banner.png"/><noscript><img src="/wp-content/uploads/2012/10/codetank_banner.png"/></noscript>
+</a></div>
+		</div><div class="widget"><div class="ilovertitle"><span class="ilovertitlespan">分类目录</span></div>		<ul>
+	<li class="cat-item cat-item-102"><a href="http://www.alloyteam.com/category/alloylabs/" title="腾讯 Web 前端 Alloy Labs 实验室">Alloy 实验室</a> (24)
+<ul class='children'>
+	<li class="cat-item cat-item-82"><a href="http://www.alloyteam.com/category/alloylabs/html5game/" title="开发HTML5游戏
+">HTML5游戏</a> (10)
+</li>
+	<li class="cat-item cat-item-37"><a href="http://www.alloyteam.com/category/alloylabs/showcase/" title="查看 作品 下的所有文章">作品</a> (17)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://www.alloyteam.com/category/webfrontend/" title="Web前端开发技术">Web前端</a> (104)
+<ul class='children'>
+	<li class="cat-item cat-item-6"><a href="http://www.alloyteam.com/category/webfrontend/css3/" title="查看 CSS3 下的所有文章">CSS3</a> (14)
+</li>
+	<li class="cat-item cat-item-20"><a href="http://www.alloyteam.com/category/webfrontend/html5/" title="查看 HTML5 下的所有文章">HTML5</a> (32)
+</li>
+	<li class="cat-item cat-item-5"><a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 下的所有文章">JavaScript</a> (35)
+</li>
+	<li class="cat-item cat-item-63"><a href="http://www.alloyteam.com/category/webfrontend/%e5%89%8d%e7%ab%af%e4%bc%98%e5%8c%96/" title="查看 前端优化 下的所有文章">前端优化</a> (16)
+</li>
+	<li class="cat-item cat-item-1"><a href="http://www.alloyteam.com/category/webfrontend/ued/" title="用户体验设计、可用性研究、以用户为中心的设计">用户体验设计</a> (10)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-38"><a href="http://www.alloyteam.com/category/%e5%89%8d%e7%ab%af%e8%b5%84%e8%ae%af/" title="查看 前端资讯 下的所有文章">前端资讯</a> (43)
+</li>
+	<li class="cat-item cat-item-11"><a href="http://www.alloyteam.com/category/team/" title="查看 团队 下的所有文章">团队</a> (18)
+</li>
+	<li class="cat-item cat-item-39"><a href="http://www.alloyteam.com/category/%e8%b5%84%e6%ba%90%e5%b7%a5%e5%85%b7/" title="查看 资源工具 下的所有文章">资源工具</a> (19)
+</li>
+		</ul>
+</div>		<div class="widget">		<div class="ilovertitle"><span class="ilovertitlespan">最新文章</span></div>		<ul>
+				<li><a href="http://www.alloyteam.com/2013/09/jx-framework-tutorial-c/" title="腾讯Web前端JX框架入门教程(三)">腾讯Web前端JX框架入门教程(三)</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/jx-framework-tutorial-b/" title="腾讯Web前端JX框架入门教程(二)">腾讯Web前端JX框架入门教程(二)</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/yong-aop-gai-shan-javascript-dai-ma/" title="用AOP改善javascript代码">用AOP改善javascript代码</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/javascript-zhong-you-qu-di-fan-ke-li-hua-ji-shu/" title="Javascript中有趣的反柯里化技术">Javascript中有趣的反柯里化技术</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/2013-zhong-guo-html5-feng-hui-ji-kai-fa-zhe-ri-ji-jiang-sheng-da-ju-xing/" title="2013中国HTML5峰会暨开发者日即将盛大举行">2013中国HTML5峰会暨开发者日即将盛大举行</a></li>
+				<li><a href="http://www.alloyteam.com/2013/02/rang-java-gen-javascript-geng-jia-qin-mi/" title="让Java跟Javascript更加亲密">让Java跟Javascript更加亲密</a></li>
+				<li><a href="http://www.alloyteam.com/2013/02/cong-wang-ye-jian-ting-android-she-bei-di-fan-hui-jian/" title="从网页监听Android设备的返回键">从网页监听Android设备的返回键</a></li>
+				<li><a href="http://www.alloyteam.com/2012/11/somatosensory-game-wall-introduced/" title="腾讯AlloyTeam体感游戏《墙来了WallComing》介绍">腾讯AlloyTeam体感游戏《墙来了WallComing》介绍</a></li>
+				<li><a href="http://www.alloyteam.com/2012/11/the-css3-ui-lib-library-introduction/" title="腾讯 AlloyTeam 的 CSS3 UI Lib库简介">腾讯 AlloyTeam 的 CSS3 UI Lib库简介</a></li>
+				<li><a href="http://www.alloyteam.com/2012/11/mozilla-html5-bootcamp-seminar-ntu-singapore/" title="Mozilla HTML5 Bootcamp &amp; Seminar 活动回顾">Mozilla HTML5 Bootcamp &#038; Seminar 活动回顾</a></li>
+				</ul>
+		</div><div class="widget"><div class="ilovertitle"><span class="ilovertitlespan">注册/登录</span></div>			<ul>
+						<li><a href="http://www.alloyteam.com/wp-login.php">登录</a></li>
+			<li><a href="http://www.alloyteam.com/feed/" title="使用 RSS 2.0 订阅本站点内容">文章 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://www.alloyteam.com/comments/feed/" title="使用 RSS 订阅本站点的所有文章的近期评论">评论 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://cn.wordpress.org/" title="基于 WordPress，一个优美、先进的个人信息发布平台。">WordPress.org</a></li>
+						</ul>
+</div>
+</div>
+﻿ <div class="clearfix"></div>
+
+</div>
+</div>
+<div id="footer">
+	<div id="footerbar">
+    <!--Copyright-->
+		<div class="copyright"> 
+			<p>
+				<span>
+					Copyright &copy;&nbsp; 2011-2013  <a href="http://www.alloyteam.com">Tencent AlloyTeam</a>. All Rights Reserved. Powered By <a href="http://wordpress.org/">WordPress</a>.
+				</span>
+			</p>
+		</div>
+    <!--Copyright End-->     
+	</div>
+<!--[if !IE]><!-->
+<script type="text/javascript">
+	window.onerror=function(){return true;}
+
+	var alloyrefer = document.referrer;
+	var hasClassListProperty = document && Object.prototype.hasOwnProperty.call(document.documentElement,'classList');
+	var addClass = function(){
+        if (hasClassListProperty) {
+            return function (el, className) {
+                if (!el || !className ) {
+                    return;
+                }
+                el.classList.add(className);
+            };
+        } else {
+            return function (el, className) {
+                if (!el || !className ) {
+                    return;
+                }
+                el.className += ' ' + className;
+            };
+        }
+	}();
+	var refername = "www.alloyteam.com";
+	var flag = alloyrefer.indexOf(refername) === -1;
+	if(flag && alloyrefer !== ""){	
+		var main = document.getElementById("main");
+		var alloyteam = document.getElementById("alloyteam");
+		var alloyteam2 = document.getElementById("alloyteam2");
+		var tencentInfo = document.getElementById("tencentInfo");
+		var header = document.getElementById("header");	
+		var alloy = document.getElementById("alloy");	
+		addClass(alloy,'alloy'); 
+		addClass(header,'header');		
+		addClass(main,'main');
+		addClass(alloyteam,'alloyteam');
+		addClass(alloyteam2,'alloyteam');
+		addClass(tencentInfo,'tencentInfo');
+
+	}
+	document.body.style.display = "block";
+	if(flag){
+		setTimeout(function(){
+			if (navigator.userAgent.indexOf('Firefox') >= 0){
+				document.documentElement.scrollTop = 1;
+				document.documentElement.scrollTop = 0;
+			}else{
+				document.body.scrollTop = 2;
+				document.body.scrollTop = 0;   
+			}
+				
+		},3000);		
+	}
+</script>
+<!--<![endif]-->  
+<script type="text/javascript" src="http://www.alloyteam.com/wp-content/themes/alloyteam/js/all.js"></script>
+<script type="text/javascript" src="http://www.alloyteam.com/wp-content/themes/alloyteam/comments-ajax.js"></script>
+
+<!-- tracker added by Ultimate Google Analytics plugin v1.6.0: http://www.oratransplant.nl/uga -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-23019343-3");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<p><a onclick='document.cookie="wpmp_switcher=mobile;path=/;expires=Tue, 01-01-2030 00:00:00 GMT";' href='http://www.alloyteam.com/2012/11/performance-writing-efficient-javascript/?wpmp_switcher=mobile'>Switch to our mobile site</a></p><script type='text/javascript' src='http://www.alloyteam.com/wp-content/plugins/dynamic-to-top/js/libs/jquery.easing.js?ver=1.3'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var mv_dynamic_to_top = {"text":"To Top","version":"0","min":"300","speed":"300","easing":"easeInOutExpo","margin":"20"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://www.alloyteam.com/wp-content/plugins/dynamic-to-top/js/dynamic.to.top.min.js?ver=3.4.2'></script>
+
+</div>
+<script src="http://www.alloyteam.com/wp-includes/syntaxhighlighter/scripts/shCore.js"></script>
+<script src="http://www.alloyteam.com/wp-includes/syntaxhighlighter/scripts/shAutoloader.js"></script>
+<script>
+function path()
+{
+  var args = arguments,
+      result = []
+      ;
+  for(var i = 0; i < args.length; i++)
+      result.push(args[i].replace('@', 'http://www.alloyteam.com/wp-includes/syntaxhighlighter/scripts/'));
+  return result
+};
+SyntaxHighlighter.autoloader.apply(null, path(
+  'applescript            @shBrushAppleScript.js',
+  'actionscript3 as3      @shBrushAS3.js',
+  'bash shell             @shBrushBash.js',
+  'coldfusion cf          @shBrushColdFusion.js',
+  'cpp c                  @shBrushCpp.js',
+  'c# c-sharp csharp      @shBrushCSharp.js',
+  'css                    @shBrushCss.js',
+  'delphi pascal          @shBrushDelphi.js',
+  'diff patch pas         @shBrushDiff.js',
+  'erl erlang             @shBrushErlang.js',
+  'groovy                 @shBrushGroovy.js',
+  'java                   @shBrushJava.js',
+  'jfx javafx             @shBrushJavaFX.js',
+  'js jscript javascript  @shBrushJScript.js',
+  'perl pl                @shBrushPerl.js',
+  'php                    @shBrushPhp.js',
+  'text plain             @shBrushPlain.js',
+  'py python              @shBrushPython.js',
+  'ruby rails ror rb      @shBrushRuby.js',
+  'sass scss              @shBrushSass.js',
+  'scala                  @shBrushScala.js',
+  'sql                    @shBrushSql.js',
+  'vb vbnet               @shBrushVb.js',
+  'xml xhtml xslt html    @shBrushXml.js'
+));
+SyntaxHighlighter.defaults.toolbar = false;
+SyntaxHighlighter.defaults.title = '双击选中源代码';
+SyntaxHighlighter.all();
+</script>
+</body>
+</html>

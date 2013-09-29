@@ -212,7 +212,7 @@ function addCookie(){　 // 加入收藏夹
     <a href="" class="animated tada singleauthor" target="_blank"><img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript></a> 
    
     <a href="http://www.alloyteam.com/2012/11/page-visibility-api/" class="blogTitle btitle" rel="bookmark" title="HTML5迟来的API：Page Visibility">HTML5迟来的API：Page Visibility</a> 
-    <div class="blogPs"> In <a href="http://www.alloyteam.com/category/webfrontend/html5/" title="查看 HTML5 中的全部文章" rel="category tag">HTML5</a>,<a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 中的全部文章" rel="category tag">JavaScript</a> on 2012年11月05日 by <a href="http://www.alloyteam.com/author/dmyang/" title="由 TAT.dmyang 发布" rel="author">TAT.dmyang</a>  view: 4,022 </div> 
+    <div class="blogPs"> In <a href="http://www.alloyteam.com/category/webfrontend/html5/" title="查看 HTML5 中的全部文章" rel="category tag">HTML5</a>,<a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 中的全部文章" rel="category tag">JavaScript</a> on 2012年11月05日 by <a href="http://www.alloyteam.com/author/dmyang/" title="由 TAT.dmyang 发布" rel="author">TAT.dmyang</a>  view: 4,024 </div> 
     <span class="comments"><a href="http://www.alloyteam.com/2012/11/page-visibility-api/#comments" class="up"  title="《HTML5迟来的API：Page Visibility》上的评论">7</a></span>
     </div> 
     <!--content_banner_single--> 
@@ -252,4 +252,340 @@ function addCookie(){　 // 加入收藏夹
 <p>总体来说，page visibility的内容很少，也很简单，但是窃以为很有用，比如我们在做视频页面时，tab是hidden状态时，我们可以去努力拉取视频内容，播放可以停止，当用户切回来时开始播放；又比如我们可以配合H5的桌面通知（Notifications）API，保证只在使用了Notifications的页面可以收取桌面通知，在此页面visibilityState不是visible时不干扰用户等等。。</p>
 <p>最后，enjoy it！</p>
 <p>参考：</p>
-<p>1.<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.w3.org/TR/page-visibility');"  href="http://www.w3.org/TR/page-v
+<p>1.<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.w3.org/TR/page-visibility');"  href="http://www.w3.org/TR/page-visibility" target="_blank">W3C PageVisibility API Spec</a></p>
+<p>2.<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.html5rocks.com/en/tutorials/pagevisibility/intro/');"  href="http://www.html5rocks.com/en/tutorials/pagevisibility/intro/" target="_blank">Using the PageVisibility API</a></p>
+<div style="clear:both; margin-top:5px; margin-bottom:5px;"></div><div style="float:left"><!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_tsina">新浪微博</a>
+<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.jiathis.com/share');"  href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+	summary:"",
+	hideMore:true
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END --></div><div style="clear:both; margin-top:5px; margin-bottom:5px;"></div>    </div> 
+	</div>
+	<div class="toolbar">
+	</div>
+
+</div>
+		<div id="comments" class="comments">
+     <script type="text/javascript"> 
+	var defaultAuthor = "称呼(必填)";
+	var defaultEmail = "邮箱(不会被公开,必填)";
+	var defaultUrl = "网站";
+	var defaultComment = "评论内容...";
+	
+	function commentform_submit(){
+		if(document.commentform.author.value == '' || document.commentform.author.value == defaultAuthor) {alert('咳咳...称呼忘填了');document.commentform.author.focus();return;}
+		if(document.commentform.email.value == '' || document.commentform.email.value == defaultEmail) {alert('email...您的email没填');document.commentform.email.focus();return;}
+		if(document.commentform.comment.value == '' || document.commentform.comment.value == defaultComment) {alert('评论内容在哪？');document.commentform.comment.focus();return;}
+		if(document.commentform.url.value == defaultUrl) document.commentform.url.value = '';
+		// document.commentform.submit();
+	}
+	</script>
+
+	<ol class="commentlist">
+			<li class="comment even thread-even depth-1" id="li-comment-6441">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/4b0954ee00ca1047f8266d900ae3092c?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/4b0954ee00ca1047f8266d900ae3092c?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-6441" class="comment_c">
+		<h2>
+			<a onclick="javascript:pageTracker._trackPageview('/outgoing/meepo.sinaapp.com');"  href='http://meepo.sinaapp.com' rel='external nofollow' class='url'>meepo</a>						<span class="c_time">2013 年 8 月 23 日</span>
+		</h2>
+		<p>这个只能说，真的很不错哟</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/page-visibility-api/?replytocom=6441#respond' onclick='return addComment.moveForm("comment-6441", "6441", "respond", "3949")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3374">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/b310029566880627a74adeceb0c01bdf?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/b310029566880627a74adeceb0c01bdf?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-3374" class="comment_c">
+		<h2>
+			Air						<span class="c_time">2012 年 11 月 6 日</span>
+		</h2>
+		<p>文中提到 “如果当前tab页是否激活，激活（focus）时document.hidden属性是true，否则是false，”  这句描述反了。</p>
+<p>Returns true if the page is in a state considered to be hidden to the user, and false otherwise.</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/page-visibility-api/?replytocom=3374#respond' onclick='return addComment.moveForm("comment-3374", "3374", "respond", "3949")'>回复</a>		</div>
+	</div>
+<ul class='children'>
+<li class="comment even depth-2" id="li-comment-3381">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/1187fb7230af330f9a8dd0ae5d9266fc?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/1187fb7230af330f9a8dd0ae5d9266fc?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-3381" class="comment_c">
+		<h2>
+			laoya						<span class="c_time">2012 年 11 月 6 日</span>
+		</h2>
+		<p>确实弄反了</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/page-visibility-api/?replytocom=3381#respond' onclick='return addComment.moveForm("comment-3381", "3381", "respond", "3949")'>回复</a>		</div>
+	</div>
+<ul class='children'>
+<li class="comment byuser comment-author-dmyang bypostauthor odd alt depth-3" id="li-comment-3440">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-3440" class="comment_c">
+		<h2>
+			TAT.dmyang						<span class="c_time">2012 年 11 月 8 日</span>
+		</h2>
+		<p>已经改正 谢谢提醒 嘿嘿^_^!</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/page-visibility-api/?replytocom=3440#respond' onclick='return addComment.moveForm("comment-3440", "3440", "respond", "3949")'>回复</a>		</div>
+	</div>
+</li>
+</ul>
+</li>
+<li class="comment byuser comment-author-dmyang bypostauthor even depth-2" id="li-comment-3439">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://0.gravatar.com/avatar/a6681493ca8bd8f04a0ac2ac88a29c14?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-3439" class="comment_c">
+		<h2>
+			TAT.dmyang						<span class="c_time">2012 年 11 月 8 日</span>
+		</h2>
+		<p>已经改正 谢谢提醒 呵呵^_^!</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/page-visibility-api/?replytocom=3439#respond' onclick='return addComment.moveForm("comment-3439", "3439", "respond", "3949")'>回复</a>		</div>
+	</div>
+</li>
+</ul>
+</li>
+<li class="comment odd alt thread-even depth-1" id="li-comment-3367">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/91a113092265f621ba1de2b5f461d2b2?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/91a113092265f621ba1de2b5f461d2b2?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-3367" class="comment_c">
+		<h2>
+			李晶						<span class="c_time">2012 年 11 月 6 日</span>
+		</h2>
+		<p>受教！</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/page-visibility-api/?replytocom=3367#respond' onclick='return addComment.moveForm("comment-3367", "3367", "respond", "3949")'>回复</a>		</div>
+	</div>
+</li>
+<li class="comment even thread-odd thread-alt depth-1" id="li-comment-3364">
+	<img alt='' src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_1x1.gif" file="http://1.gravatar.com/avatar/5d77d2bd56574d6ea382036c78d0d200?s=43&amp;d=wavatar&amp;r=G" class="avatar  animated tada avatar-43 photo lh_lazyimg" height='43' width='43' /><noscript><img alt='' src='http://1.gravatar.com/avatar/5d77d2bd56574d6ea382036c78d0d200?s=43&amp;d=wavatar&amp;r=G' class='avatar  animated tada avatar-43 photo' height='43' width='43' /></noscript>	<div id="comment-3364" class="comment_c">
+		<h2>
+			<a onclick="javascript:pageTracker._trackPageview('/outgoing/kexiao.me');"  href='http://kexiao.me' rel='external nofollow' class='url'>小克</a>						<span class="c_time">2012 年 11 月 6 日</span>
+		</h2>
+		<p>受教！很有用啊</p>
+				<div class="reply">
+			<a class='comment-reply-link' href='/2012/11/page-visibility-api/?replytocom=3364#respond' onclick='return addComment.moveForm("comment-3364", "3364", "respond", "3949")'>回复</a>		</div>
+	</div>
+</li>
+	</ol>
+	
+	
+	<div class="pagenavi"></div>
+ 
+<div class="clearfix"></div>
+
+
+	<div id="respond" class="commentform">
+		<h3>发表评论</h3>
+		<div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/2012/11/page-visibility-api/#respond" style="display:none;">点击这里取消回复。</a></div>
+				<form action="http://www.alloyteam.com/wp-comments-post.php" method="post" id="commentform">
+		
+						<p><input type="text" name="author" id="author" value="" size="22" tabindex="1" />
+			<label for="author"><small>称呼 (必填)</small></label></p>
+			<p><input type="text" name="email" id="email" value="" size="22" tabindex="2" />
+			<label for="email"><small>邮箱 (不会被公开,必填)</small></label></p>
+			<p><input type="text" name="url" id="url" value="" size="22" tabindex="3" />
+			<label for="url"><small>网站</small></label></p>
+						<p><textarea name="comment" id="comment" cols="100%" rows="6" tabindex="4" onkeydown="if(event.ctrlKey&amp;&amp;event.keyCode==13){document.getElementById('submit').click();return false};"></textarea></p>
+			<p><input name="submit" type="submit" id="submit" tabindex="5" value="提 交" /><input type='hidden' name='comment_post_ID' value='3949' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p>
+			<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="7dfec8278a" /></p>			
+		</form>
+				
+	</div>
+	
+</div>
+	</div></div>
+<div id="sidebar">
+	<div class="widget">			<div class="textwidget"><a title="全球首个在线编程对战游戏——CodeTank官网" href="http://CodeTank.AlloyTeam.com/" target="_blank">
+<img class="lh_lazyimg" src="http://www.alloyteam.com/wp-content/plugins/images-lazyload-and-slideshow/blank_250x250.gif" file="/wp-content/uploads/2012/10/codetank_banner.png"/><noscript><img src="/wp-content/uploads/2012/10/codetank_banner.png"/></noscript>
+</a></div>
+		</div><div class="widget"><div class="ilovertitle"><span class="ilovertitlespan">分类目录</span></div>		<ul>
+	<li class="cat-item cat-item-102"><a href="http://www.alloyteam.com/category/alloylabs/" title="腾讯 Web 前端 Alloy Labs 实验室">Alloy 实验室</a> (24)
+<ul class='children'>
+	<li class="cat-item cat-item-82"><a href="http://www.alloyteam.com/category/alloylabs/html5game/" title="开发HTML5游戏
+">HTML5游戏</a> (10)
+</li>
+	<li class="cat-item cat-item-37"><a href="http://www.alloyteam.com/category/alloylabs/showcase/" title="查看 作品 下的所有文章">作品</a> (17)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://www.alloyteam.com/category/webfrontend/" title="Web前端开发技术">Web前端</a> (104)
+<ul class='children'>
+	<li class="cat-item cat-item-6"><a href="http://www.alloyteam.com/category/webfrontend/css3/" title="查看 CSS3 下的所有文章">CSS3</a> (14)
+</li>
+	<li class="cat-item cat-item-20"><a href="http://www.alloyteam.com/category/webfrontend/html5/" title="查看 HTML5 下的所有文章">HTML5</a> (32)
+</li>
+	<li class="cat-item cat-item-5"><a href="http://www.alloyteam.com/category/webfrontend/javascript/" title="查看 JavaScript 下的所有文章">JavaScript</a> (35)
+</li>
+	<li class="cat-item cat-item-63"><a href="http://www.alloyteam.com/category/webfrontend/%e5%89%8d%e7%ab%af%e4%bc%98%e5%8c%96/" title="查看 前端优化 下的所有文章">前端优化</a> (16)
+</li>
+	<li class="cat-item cat-item-1"><a href="http://www.alloyteam.com/category/webfrontend/ued/" title="用户体验设计、可用性研究、以用户为中心的设计">用户体验设计</a> (10)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-38"><a href="http://www.alloyteam.com/category/%e5%89%8d%e7%ab%af%e8%b5%84%e8%ae%af/" title="查看 前端资讯 下的所有文章">前端资讯</a> (43)
+</li>
+	<li class="cat-item cat-item-11"><a href="http://www.alloyteam.com/category/team/" title="查看 团队 下的所有文章">团队</a> (18)
+</li>
+	<li class="cat-item cat-item-39"><a href="http://www.alloyteam.com/category/%e8%b5%84%e6%ba%90%e5%b7%a5%e5%85%b7/" title="查看 资源工具 下的所有文章">资源工具</a> (19)
+</li>
+		</ul>
+</div>		<div class="widget">		<div class="ilovertitle"><span class="ilovertitlespan">最新文章</span></div>		<ul>
+				<li><a href="http://www.alloyteam.com/2013/09/jx-framework-tutorial-c/" title="腾讯Web前端JX框架入门教程(三)">腾讯Web前端JX框架入门教程(三)</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/jx-framework-tutorial-b/" title="腾讯Web前端JX框架入门教程(二)">腾讯Web前端JX框架入门教程(二)</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/yong-aop-gai-shan-javascript-dai-ma/" title="用AOP改善javascript代码">用AOP改善javascript代码</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/javascript-zhong-you-qu-di-fan-ke-li-hua-ji-shu/" title="Javascript中有趣的反柯里化技术">Javascript中有趣的反柯里化技术</a></li>
+				<li><a href="http://www.alloyteam.com/2013/08/2013-zhong-guo-html5-feng-hui-ji-kai-fa-zhe-ri-ji-jiang-sheng-da-ju-xing/" title="2013中国HTML5峰会暨开发者日即将盛大举行">2013中国HTML5峰会暨开发者日即将盛大举行</a></li>
+				<li><a href="http://www.alloyteam.com/2013/02/rang-java-gen-javascript-geng-jia-qin-mi/" title="让Java跟Javascript更加亲密">让Java跟Javascript更加亲密</a></li>
+				<li><a href="http://www.alloyteam.com/2013/02/cong-wang-ye-jian-ting-android-she-bei-di-fan-hui-jian/" title="从网页监听Android设备的返回键">从网页监听Android设备的返回键</a></li>
+				<li><a href="http://www.alloyteam.com/2012/11/somatosensory-game-wall-introduced/" title="腾讯AlloyTeam体感游戏《墙来了WallComing》介绍">腾讯AlloyTeam体感游戏《墙来了WallComing》介绍</a></li>
+				<li><a href="http://www.alloyteam.com/2012/11/the-css3-ui-lib-library-introduction/" title="腾讯 AlloyTeam 的 CSS3 UI Lib库简介">腾讯 AlloyTeam 的 CSS3 UI Lib库简介</a></li>
+				<li><a href="http://www.alloyteam.com/2012/11/mozilla-html5-bootcamp-seminar-ntu-singapore/" title="Mozilla HTML5 Bootcamp &amp; Seminar 活动回顾">Mozilla HTML5 Bootcamp &#038; Seminar 活动回顾</a></li>
+				</ul>
+		</div><div class="widget"><div class="ilovertitle"><span class="ilovertitlespan">注册/登录</span></div>			<ul>
+						<li><a href="http://www.alloyteam.com/wp-login.php">登录</a></li>
+			<li><a href="http://www.alloyteam.com/feed/" title="使用 RSS 2.0 订阅本站点内容">文章 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://www.alloyteam.com/comments/feed/" title="使用 RSS 订阅本站点的所有文章的近期评论">评论 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://cn.wordpress.org/" title="基于 WordPress，一个优美、先进的个人信息发布平台。">WordPress.org</a></li>
+						</ul>
+</div>
+</div>
+﻿ <div class="clearfix"></div>
+
+</div>
+</div>
+<div id="footer">
+	<div id="footerbar">
+    <!--Copyright-->
+		<div class="copyright"> 
+			<p>
+				<span>
+					Copyright &copy;&nbsp; 2011-2013  <a href="http://www.alloyteam.com">Tencent AlloyTeam</a>. All Rights Reserved. Powered By <a href="http://wordpress.org/">WordPress</a>.
+				</span>
+			</p>
+		</div>
+    <!--Copyright End-->     
+	</div>
+<!--[if !IE]><!-->
+<script type="text/javascript">
+	window.onerror=function(){return true;}
+
+	var alloyrefer = document.referrer;
+	var hasClassListProperty = document && Object.prototype.hasOwnProperty.call(document.documentElement,'classList');
+	var addClass = function(){
+        if (hasClassListProperty) {
+            return function (el, className) {
+                if (!el || !className ) {
+                    return;
+                }
+                el.classList.add(className);
+            };
+        } else {
+            return function (el, className) {
+                if (!el || !className ) {
+                    return;
+                }
+                el.className += ' ' + className;
+            };
+        }
+	}();
+	var refername = "www.alloyteam.com";
+	var flag = alloyrefer.indexOf(refername) === -1;
+	if(flag && alloyrefer !== ""){	
+		var main = document.getElementById("main");
+		var alloyteam = document.getElementById("alloyteam");
+		var alloyteam2 = document.getElementById("alloyteam2");
+		var tencentInfo = document.getElementById("tencentInfo");
+		var header = document.getElementById("header");	
+		var alloy = document.getElementById("alloy");	
+		addClass(alloy,'alloy'); 
+		addClass(header,'header');		
+		addClass(main,'main');
+		addClass(alloyteam,'alloyteam');
+		addClass(alloyteam2,'alloyteam');
+		addClass(tencentInfo,'tencentInfo');
+
+	}
+	document.body.style.display = "block";
+	if(flag){
+		setTimeout(function(){
+			if (navigator.userAgent.indexOf('Firefox') >= 0){
+				document.documentElement.scrollTop = 1;
+				document.documentElement.scrollTop = 0;
+			}else{
+				document.body.scrollTop = 2;
+				document.body.scrollTop = 0;   
+			}
+				
+		},3000);		
+	}
+</script>
+<!--<![endif]-->  
+<script type="text/javascript" src="http://www.alloyteam.com/wp-content/themes/alloyteam/js/all.js"></script>
+<script type="text/javascript" src="http://www.alloyteam.com/wp-content/themes/alloyteam/comments-ajax.js"></script>
+
+<!-- tracker added by Ultimate Google Analytics plugin v1.6.0: http://www.oratransplant.nl/uga -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-23019343-3");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<p><a onclick='document.cookie="wpmp_switcher=mobile;path=/;expires=Tue, 01-01-2030 00:00:00 GMT";' href='http://www.alloyteam.com/2012/11/page-visibility-api/?wpmp_switcher=mobile'>Switch to our mobile site</a></p><script type='text/javascript' src='http://www.alloyteam.com/wp-content/plugins/dynamic-to-top/js/libs/jquery.easing.js?ver=1.3'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var mv_dynamic_to_top = {"text":"To Top","version":"0","min":"300","speed":"300","easing":"easeInOutExpo","margin":"20"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://www.alloyteam.com/wp-content/plugins/dynamic-to-top/js/dynamic.to.top.min.js?ver=3.4.2'></script>
+
+</div>
+<script src="http://www.alloyteam.com/wp-includes/syntaxhighlighter/scripts/shCore.js"></script>
+<script src="http://www.alloyteam.com/wp-includes/syntaxhighlighter/scripts/shAutoloader.js"></script>
+<script>
+function path()
+{
+  var args = arguments,
+      result = []
+      ;
+  for(var i = 0; i < args.length; i++)
+      result.push(args[i].replace('@', 'http://www.alloyteam.com/wp-includes/syntaxhighlighter/scripts/'));
+  return result
+};
+SyntaxHighlighter.autoloader.apply(null, path(
+  'applescript            @shBrushAppleScript.js',
+  'actionscript3 as3      @shBrushAS3.js',
+  'bash shell             @shBrushBash.js',
+  'coldfusion cf          @shBrushColdFusion.js',
+  'cpp c                  @shBrushCpp.js',
+  'c# c-sharp csharp      @shBrushCSharp.js',
+  'css                    @shBrushCss.js',
+  'delphi pascal          @shBrushDelphi.js',
+  'diff patch pas         @shBrushDiff.js',
+  'erl erlang             @shBrushErlang.js',
+  'groovy                 @shBrushGroovy.js',
+  'java                   @shBrushJava.js',
+  'jfx javafx             @shBrushJavaFX.js',
+  'js jscript javascript  @shBrushJScript.js',
+  'perl pl                @shBrushPerl.js',
+  'php                    @shBrushPhp.js',
+  'text plain             @shBrushPlain.js',
+  'py python              @shBrushPython.js',
+  'ruby rails ror rb      @shBrushRuby.js',
+  'sass scss              @shBrushSass.js',
+  'scala                  @shBrushScala.js',
+  'sql                    @shBrushSql.js',
+  'vb vbnet               @shBrushVb.js',
+  'xml xhtml xslt html    @shBrushXml.js'
+));
+SyntaxHighlighter.defaults.toolbar = false;
+SyntaxHighlighter.defaults.title = '双击选中源代码';
+SyntaxHighlighter.all();
+</script>
+</body>
+</html>
