@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile">
+<title>HTTP Archive: adding flush | High Performance Web Sites</title>
+<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" />
+<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites &raquo; HTTP Archive: adding flush Comments Feed" href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='HTTP Archive: new schema &amp; dumps' href='http://www.stevesouders.com/blog/2013/01/29/http-archive-new-schema-dumps/' />
+<link rel='next' title='HTTP Archive: new stats' href='http://www.stevesouders.com/blog/2013/02/16/http-archive-new-stats/' />
+<meta name="generator" content="WordPress 3.6.1" />
+<link rel='canonical' href='http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/' />
+<link rel='shortlink' href='http://www.stevesouders.com/blog/?p=3131' />
+<script type="text/javascript">
+	window._wp_rp_static_base_url = 'http://dtmvdvtzf8rz0.cloudfront.net/static/';
+	window._wp_rp_wp_ajax_url = "http://www.stevesouders.com/blog/wp-admin/admin-ajax.php";
+	window._wp_rp_plugin_version = '2.6';
+	window._wp_rp_post_id = '3131';
+	window._wp_rp_num_rel_posts = '5';
+</script>
+
+<script>
+(function(d, s) {
+	var js = d.getElementsByTagName(s)[0],
+		ln = d.createElement(s);
+	ln.src = '//lognormal.net/boomerang/8fa4fc2785a82fae20c596ca4f45d1b218a9ab12ffef741d09b29532';
+	js.parentNode.insertBefore(ln, js);
+})(document, 'script');
+</script>
+
+<script type="text/javascript">
+// GOOGLE ANALYTICS
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-15026169-1']);
+_gaq.push(['_setSiteSpeedSampleRate', 100]);
+_gaq.push(['_trackPageview']);
+
+(function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</head>
+
+<body>
+<div id="header">
+	<div class="containerwrapper">
+  		<h1 id="logo"><a href="http://stevesouders.com/"><span>SteveSouders.com</span></a></h1>
+        <ul id="topnav">
+        <li><a href="http://stevesouders.com/about.php">about</a></li>
+        <li><a href="http://stevesouders.com/contact.php">contact</a></li>
+        <li class="last"> <a href="http://twitter.com/#!/souders/"><img src="/images/twitter-icon.png" width=16 height=16 border=0 style="vertical-align: bottom;"></a>
+        </ul>
+	</div>    
+</div>
+<div id="contentWrapper" class="containerwrapper">
+<div id="sidebar">
+<div id="search-3" class="widget widget_search"><form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/">
+				<div>
+					<label class="screen-reader-text" for="s">Search for:</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="Search" />
+				</div>
+			</form></div><div id="custom-recent-posts-3" class="widget custom-recent-posts"><h3 class="blockheader">Most Recent Posts</h3>		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;">
+        		<li><a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark">Domain Sharding revisited</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-future/" rel="bookmark">Web performance for the future</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/07/16/activetable-bookmarklet/" rel="bookmark">ActiveTable bookmarklet</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/07/15/twitter-widget-update/" rel="bookmark">Twitter widget update</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/06/16/browser-busy-indicators/" rel="bookmark">Browser Busy Indicators</a></li>
+				</ul>
+		<a href="http://www.stevesouders.com/blog/archives/">View Archive</a></div><div id="text-3" class="widget widget_text"><h3 class="blockheader">Feeds</h3>			<div class="textwidget"><a href="http://www.stevesouders.com/blog/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/feed/">Posts</a><br />
+<a href="http://www.stevesouders.com/blog/comments/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/comments/feed/">Comments</a></li></div>
+		</div>        
+</div><div id="content">
+
+
+
+		<div id="post-3131" class="post-3131 post type-post status-publish format-standard hentry category-efws category-http-archive category-performance category-web-development tag-apache tag-deflate tag-flushing tag-gzip tag-php">
+        	            	<h1>HTTP Archive: adding flush</h1>
+            
+			<p class="meta">January 31, 2013 12:09 am | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comments" title="Comment on HTTP Archive: adding flush">8 Comments</a></p><!-- .entry-meta -->
+
+			<p>In my previous post, <a href="http://www.stevesouders.com/blog/2013/01/29/http-archive-new-schema-dumps/">HTTP Archive: new schema &amp; dumps</a>, I described my work to make the database faster, easier to download, consume less disk space, and contain more stats. Once these updates were finished I was excited to start going through the code and make pages faster using the new schema changes. Although time consuming, it&#8217;s been fun to change some queries and see the site get much faster.</p>
+<p>Along the way I bumped into the page for viewing an individual website&#8217;s results, for example <a title="HTTP Archive results for Whole Foods" href="http://httparchive.org/viewsite.php?pageid=5778528">Whole Foods</a>. Despite my schema changes, it has a slow (~10 seconds) query in the middle of the page. I&#8217;ve created a bug to figure out how to improve this (I think I need a new index), but for the short term I decided to just flush the document before the slow query. This page is long, so the slow part is well below-the-fold. By adding flush I would be able to get the above-the-fold content to render more quickly.</p>
+<p>I wrote a blog post in 2009 describing <a href="http://www.stevesouders.com/blog/2009/05/18/flushing-the-document-early/">Flushing the Document Early</a>. It describes flushing thusly:</p>
+<blockquote><p><em>Flushing</em> is when the server sends the initial part of the HTML document to the client before the entire response is ready. All major browsers start parsing the partial response. When done correctly, flushing results in a page that loads and feels faster. The key is choosing the right point at which to flush the partial HTML document response. The flush should occur <em>before</em> the expensive parts of the back end work, such as database queries and web service calls. But the flush should occur <em>after</em> the initial response has enough content to keep the browser busy. The part of the HTML document that is flushed should contain some resources as well as some visible content. If resources (e.g., stylesheets, external scripts, and images) are included, the browser gets an early start on its download work. If some visible content is included, the user receives feedback sooner that the page is loading.</p></blockquote>
+<p>My first step was to add a call to <a href="http://php.net/manual/en/function.flush.php">PHP&#8217;s flush function</a> right before trends.inc which contains the slow query:</p>
+<pre class="codesample">&lt;?php
+<strong>flush();</strong>
+require_once('trends.inc'); // contains the slow query
+?&gt;</pre>
+<p>Nothing changed. The page still took ~10 seconds to render. In that 2009 blog post I mentioned it&#8217;s hard to get the details straight. Fortunately I dug into those details in the corresponding chapter from <a title="Event Faster Web Sites on Amazon" href="http://www.amazon.com/gp/product/0596522304?ie=UTF8&amp;tag=stevsoud-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0596522304">Even Faster Web Sites</a>. I reviewed the chapter and read about how PHP uses output buffering, requiring some additional PHP flush functions. Specifically, all existing output buffers have to be cleared with a call to <a title="PHP ob_end_flush" href="http://www.php.net/manual/en/function.ob-end-flush.php">ob_end_flush</a>, a new output buffer is activated by <a title="PHP ob_start" href="http://www.php.net/manual/en/function.ob-start.php">ob_start</a>, and this new output buffer has to be cleared using <a title="PHP ob_flush" href="http://php.net/manual/en/function.ob-flush.php">ob_flush</a> before calling flush:</p>
+<pre class="codesample">&lt;?php
+<strong>// Flush any currently open buffers.</strong>
+<strong>while (ob_get_level() &gt; 0) {</strong>
+<strong> ob_end_flush();</strong>
+<strong>}</strong>
+<strong>ob_start();</strong>
+?&gt;
+[a bunch of HTML...]
+&lt;?php
+<strong>ob_flush();</strong>
+flush();
+require_once('trends.inc'); // contains the slow query
+?&gt;</pre>
+<p>After following the advice for managing PHP&#8217;s output buffers, flushing <em>still</em> didn&#8217;t work. Reading further in the chapter I saw that Apache has a buffer that it uses when gzipping. If the size of the output is less than 8K at the time flush is called, Apache won&#8217;t flush the output because it wants at least 8K before it gzips. In my case I had only ~6K of output before the slow query so was falling short of the 8K threshold. An easy workaround is to add padding to the HTML document to exceed the threshold:</p>
+<pre class="codesample">&lt;?php
+// Flush any currently open buffers.
+while (ob_get_level() &gt; 0) {
+    ob_end_flush();
+}
+ob_start();
+?&gt;
+[a bunch of HTML...]
+<strong>&lt;!-- 0001020304050607080[2K worth of padding]... --&gt;</strong>
+&lt;?php
+ob_flush();
+flush();
+require_once('trends.inc'); // contains the slow query
+?&gt;</pre>
+<p>After adding the padding flushing worked! It felt much faster. As expected, the flush occurred at a point well below-the-fold, so the page looks done unless the user quickly scrolls down. The downside of adding padding to the page is a larger HTML document that takes longer to download, is larger to store, etc. Instead, we used Apache&#8217;s DeflateBufferSize directive to lower the gzip threshold to 4K. With this change the page renders faster without the added page weight.</p>
+<p>The flush change is now in production. You can see the difference using these URLs:</p>
+<ul>
+<li><a title="View Website, No Flushing" href="http://httparchive.org/viewsite.php?rand=1&amp;flush=0">no flushing</a></li>
+<li><a title="View Site, Yes Flushing" href="http://httparchive.org/viewsite.php?rand=1">yes flushing</a></li>
+</ul>
+<p>These URLs open a random website each time to avoid any cached MySQL results. Without flushing, the page doesn&#8217;t change for ~10 seconds. With flushing, the above-the-fold content changes after ~3 seconds, and the below-the-fold content arrives ~7 seconds later.</p>
+<p>I still don&#8217;t see flushing used on many websites. It can be confusing and even frustrating to setup. My responses already had chunked encoding, so I didn&#8217;t have to jump through that hoop. But as you can see the faster rendering makes a significant difference. If you&#8217;re not flushing your document early, I recommend you give it a try.</p>
+<p>&nbsp;</p>
+
+<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"><div class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul class="related_post wp_rp" style="visibility: visible"><li ><a href="http://www.stevesouders.com/blog/2009/05/18/flushing-the-document-early/" class="wp_rp_title">Flushing the Document Early</a></li><li ><a href="http://www.stevesouders.com/blog/2009/08/21/the-skinny-on-cookies/" class="wp_rp_title">The skinny on cookies</a></li><li ><a href="http://www.stevesouders.com/blog/2009/11/11/whos-not-getting-gzip/" class="wp_rp_title">Who&#8217;s not getting gzip?</a></li><li ><a href="http://www.stevesouders.com/blog/2013/02/16/http-archive-new-stats/" class="wp_rp_title">HTTP Archive: new stats</a></li><li ><a href="http://www.stevesouders.com/blog/2013/01/29/http-archive-new-schema-dumps/" class="wp_rp_title">HTTP Archive: new schema &#038; dumps</a></li></ul><div class="wp_rp_footer"><a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts">Zemanta</a></div></div></div>
+            
+            			
+		</div><!-- #post-## -->
+
+
+		
+			<div id="comments">
+
+			<h3 id="comments-title">8 Responses to <em>HTTP Archive: adding flush</em></h3>
+
+
+			<ol class="commentlist">
+				<li class="comment even thread-even depth-1" id="li-comment-19731">
+<div id="comment-19731">
+<p class="comment-metadata">
+<strong><a href='http://www.manuel-strehl.de/' rel='external nofollow' class='url'>Manuel Strehl</a></strong> | 31-Jan-13 at 2:30 am | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-19731">Permalink</a> |  </p>
+
+
+<p>I&#8217;d love to use flushing, but the problem is, that you are usually trapped in the view, if you use an MVC approach. E.g., we develop an CMS and use Smarty templates. There is no possibility to tell Smarty mid-template, that we want to flush the thing.</p>
+<p>The same goes without templates. For <a href="http://codepoints.net" rel="nofollow">http://codepoints.net</a> I collect the data first and then hand it over to the view (PHP file). I already need much of the data, when I put together the head&#8217;s meta elements. Then in the body the few remaining queries usually don&#8217;t make up for so much of the speed loss.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-19737">
+<div id="comment-19737">
+<p class="comment-metadata">
+<strong>Charlie</strong> | 31-Jan-13 at 3:06 am | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-19737">Permalink</a> |  </p>
+
+
+<p>I agree with Manuel on this &#8211; you&#8217;re embedding webserver behaviour into the application and this has limited applicability. For example, what happens if you&#8217;re using Nginx instead of Apache?</p>
+<p>Another approach is to load the various page elements asynchronously as you do with trends.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-19902">
+<div id="comment-19902">
+<p class="comment-metadata">
+<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 31-Jan-13 at 9:21 pm | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-19902">Permalink</a> |  </p>
+
+
+<p>Manuel: There is definitely a tradeoff between frameworks and homegrown in terms of flexibility.</p>
+<p>Charlie: I&#8217;m not a purist when it comes to coding. I think web developers should use what they can to create a faster user experience. A rigid separation of knowledge of the transport mechanism and application logic is unrealistic on the Web, and in fact we see that line blurred frequently: the &#8220;async&#8221; tag for scripts, &#8220;prerender&#8221; and &#8220;prefetch&#8221; with links, etc. There&#8217;s also the consideration of development time. It would have taken 5x longer and 10x more code to break out the trends as an XHR. It was breathtaking to get such an improved experience in so little time.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-19909">
+<div id="comment-19909">
+<p class="comment-metadata">
+<strong><a href='http://www.treyp.com' rel='external nofollow' class='url'>Trey Philips</a></strong> | 31-Jan-13 at 10:20 pm | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-19909">Permalink</a> |  </p>
+
+
+<p>Other issues with flushing include error handling and redirects. What happens if you&#8217;ve already flushed a header with a 200, and now you realize you need to send an HTTP status code other than 200? Maybe you want to redirect somewhere with a 3xx. Maybe you now realize that object can&#8217;t be found and want to 404. Maybe you need to handle an exception or something catastrophic happens and you want to send a 5xx? The only ways that come to mind to continue are by sending a JS redirect or displaying an HTML error. In both cases, you&#8217;re sending inaccurate HTTP status codes which has side effects, like spiders (search engines, FB shares, etc.) crawling bad data.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-20070">
+<div id="comment-20070">
+<p class="comment-metadata">
+<strong>Steffen</strong> | 01-Feb-13 at 2:50 pm | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-20070">Permalink</a> |  </p>
+
+
+<p>Trey: According to Wikipedia, &#8220;Chunked encoding allows the sender to send additional header fields after the message body.&#8221; (<a href="http://en.wikipedia.org/wiki/Chunked_transfer_encoding" rel="nofollow">http://en.wikipedia.org/wiki/Chunked_transfer_encoding</a>)</p>
+<p>However, I guess you cannot change the HTTP status code this way because it is not an ordinary header. :-/</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-20781">
+<div id="comment-20781">
+<p class="comment-metadata">
+<strong><a href='http://hatzopoulos.ca/' rel='external nofollow' class='url'>Anthony Hatzopoulos</a></strong> | 04-Feb-13 at 10:39 am | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-20781">Permalink</a> |  </p>
+
+
+<p>Great idea Steve, flushing early to make the user happier. I&#8217;ll try this.</p>
+<p>Also worth mentioning the PHP function `ob_start` has the `output_callback` and `chunk_size` parameters which allow the customization quite easily to the output buffering prior to any template engine&#8217;s business needs to be done. So applying Steve&#8217;s 8K trick could be for example during the display logic: `ob_start(&#8216;customCallback&#8217;, 8192)` so the site will flush every 8K chunk of bytes. Or even `ob_start(null, 8192)` with no callback. <a href="http://www.php.net/manual/en/function.ob-start.php#53117" rel="nofollow">http://www.php.net/manual/en/function.ob-start.php#53117</a></p>
+<p>I think most web development languages will provide a method of hooking into the output buffer callback in some form or another.</p>
+<p>Trey: A possible solution to the header issue would be to do the apps business logic first and setting the headers in that phase. Then once in the display logic phase and rendering later using a output buffering call back that knows to split the output and send it as soon as possible so as to make the user feel the site more instantaneously.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-21606">
+<div id="comment-21606">
+<p class="comment-metadata">
+<strong>Jorge Nerin</strong> | 07-Feb-13 at 8:49 am | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-21606">Permalink</a> |  </p>
+
+
+<p>Well, been here, done that, but instead of adding X KB of random data, output X KB of highly compressible data, like a stream of a single repeated character, this way you will fill the input buffer of apache, but the compressed output will almost be the same.</p>
+<p>Or embed something you have to use but it&#8217;s now in an external file, like on the fly inlining a .js or .css inside the header, this way you will avoid one download without sending padding data.</p>
+<p>Of course the best solution is to fix that query :D.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-24002">
+<div id="comment-24002">
+<p class="comment-metadata">
+<strong>Frank van Gemeren</strong> | 18-Feb-13 at 3:13 am | <a href="http://www.stevesouders.com/blog/2013/01/31/http-archive-adding-flush/#comment-24002">Permalink</a> |  </p>
+
+
+<p>Lack of framework support for this is unfortunately the reason why I don&#8217;t use it. If it&#8217;s just very very simple templates, it can work.</p>
+<p>If all the possible changes to headers and  for example are done at a point before the template of the  comes into play, then it should be possible. You lose some flexibility tho.</p>
+</div>
+</li><!-- #comment-## -->
+			</ol>
+
+
+
+
+
+
+
+</div><!-- #comments -->
+
+
+</div> <!-- end div id="content" -->
+</div>
+<div id="footer" class="containerwrapperpadded">
+<p>&copy; Steve Souders</p>
+</div>
+</body>
+</html>
+
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+Page Caching using disk: enhanced
+Database Caching 14/30 queries in 0.232 seconds using disk
+
+ Served from: www.stevesouders.com @ 2013-09-29 03:53:18 by W3 Total Cache -->

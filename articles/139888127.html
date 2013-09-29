@@ -1,0 +1,1040 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Tutorial: Making annoying rainbows and other color cycles in Javascript</title>
+<meta name="description" content="Javascript Tutorial by KrazyDad">
+<meta name="keywords" content="color,colour,rgb,pastels,convert,color cycles,rainbows,games,colors,javascript,tutorials,sine waves,trig,fun,annoyings">
+<link rel=stylesheet type="text/css" href="/wbase_sm2.css">
+<style>
+pre { font-size:12px; background-color: #EEE; }
+</style>
+<script language="JavaScript">
+<!--
+
+function RGB2Color(r,g,b)
+{
+  return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+}
+
+function byte2Hex(n)
+{
+  var nybHexString = "0123456789ABCDEF";
+  return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+}
+
+
+function roundDecimal(v,n)
+{
+  var isNeg = v < 0;
+  v = Math.abs(v);
+
+  return (isNeg? '-' : '') + String(Math.floor(v)) + '.' + String((1 + Math.abs(v) - Math.floor(Math.abs(v)))*Math.pow(10,n)).substr(1,n);
+}
+
+function colorText(str,phase)
+{
+  if (phase == undefined)
+    phase = 0;
+  center = 128;
+  width = 127;
+  frequency = Math.PI*2/str.length;
+  for (var i = 0; i < str.length; ++i)
+  {
+     red   = Math.sin(frequency*i+2+phase) * width + center;
+     green = Math.sin(frequency*i+0+phase) * width + center;
+     blue  = Math.sin(frequency*i+4+phase) * width + center;
+     document.write( '<font color="' + RGB2Color(red,green,blue) + '">' + str.substr(i,1) + '</font>');
+  }
+}
+
+function makeColorGradient(frequency1, frequency2, frequency3, phase1,phase2,phase3,center,width,len)
+{
+  if (len == undefined)
+    len = 50;
+  if (center == undefined)
+    center = 128;
+  if (width == undefined)
+    width = 127;
+  for (var i = 0; i < len; ++i)
+  {
+     var red = Math.sin(frequency1*i + phase1) * width + center;
+     var grn = Math.sin(frequency2*i + phase2) * width + center;
+     var blu = Math.sin(frequency3*i + phase3) * width + center;
+     document.write( '<font color="' + RGB2Color(red,grn,blu) + '">&#9608;</font>');
+  }
+}
+
+
+// -->
+</script>
+
+</head>
+<body BGCOLOR=white TEXT=black>
+
+<script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-605293-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<div class="outer" align=center>
+<div class="inner">
+<div class="adbar">
+<script type="text/javascript"><!--
+google_ad_client = "pub-1449267043676994";
+//728x90 Puzzle Banners
+google_ad_slot = "6905239361";
+google_ad_width = 728;
+google_ad_height = 90;
+//--></script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div> <!-- adbar -->
+<div >
+<table cellpadding=0 cellspacing=0 border=0 width="100%">
+<tr>
+<td width=549 align=center height=122><a href="/" title="Creator of software toys of wondrous delight."><img src="/img/kz_whitelogo_wood2.jpg" width=549 height=122 border=0 style="position:relative; left:-12px;"></a>
+</td>
+<td width="100%" align=right valign=top style="position:relative; left:-9px;">
+  <table cellpadding=0 cellspacing=0 border=0>
+  <tr><td><img src="/img/dot.gif" width=1 height=8 alt="" />
+  </td></tr>
+  <tr><td align="right">
+  <font size="3">
+  <br/>
+  <a class="outer" href="/blog/" title="Current Events in the land of KrazyDad">Blog</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="outer" href="/pubs/" title="Books, papers and more...">Publications</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="outer" href="/" title="Free Printable Puzzles">Puzzles</a><br />
+  <a class="outer" href="/fungames.php" title="Games and Software Toys">Fun &amp; Games</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="outer" href="/about.php" title="Learn all about me, you curious person.">About</a><br/>
+
+  </font>
+  </td></tr></table>
+</td>
+<td width=30><img src="/img/dot.gif" width=30 height=60 alt="" /></td>
+</tr></table>
+<table class='bdy' width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td width=10>&nbsp;</td>
+<td valign=top width=620 align=left>
+<!-- news item -->
+
+
+
+<br>
+<h1>
+<script language="JavaScript">
+<!--
+colorText("Making annoying rainbows in javascript",0);
+// -->
+</script>
+</h1>
+<h3>A tutorial by jim bumgardner (<a href="https://twitter.com/#!/jbum">@jbum</a> on twitter)</h3>
+<p>
+<a class="FlattrButton" style="display:none;" href="http://krazydad.com/tutorials/makecolors.php"></a>
+<noscript><a href="http://flattr.com/thing/465411/Making-annoying-rainbows-in-javascript-A-tutorial-on-color-cycles-" target="_blank">
+<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+<p>
+<i>
+6/2012: You'll find a great, mind-blowing overview of how color perception works on <a href="http://blog.asmartbear.com/color-wheels.html">Jason Cohen's blog</a>. He points to a <a href="http://www.handprint.com/HP/WCL/color1.html">far more in-depth source</a> which will also reward your time.
+<p>
+12/2011: Charlie Loyd has written <a href="http://basecase.org/env/on-rainbows">a nice analysis</a> of the techniques presented in this article, and makes
+a good case for sine-generated rainbows as an aesthetic improvement over the more common HSB-space rainbows (which have brightness/saturation spokes).
+<p>
+1/2011: Since I wrote this tutorial, CSS3 has introduced the hsla() color specifications, which makes the kinds of tricks explained in
+this article much easier on browsers that support CSS3.  Since my intent was to teach some simple color theory and applied mathematics, I suggest 
+you pretend this feature doesn't exist as you read this article.  Then, afterwards, use it willy nilly!
+</i>
+<p><hr/>
+<p>
+This is a tutorial on how to produce sequences of discrete colors, for use in fonts, graphics or tables, such as
+in the color strips shown here, or the title of this article.
+<p>
+<center>
+<script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,2,4,128,127,32);
+// -->
+</script>
+</center>
+<p>
+Obviously you can make a webpage look incredibly annoying if you
+overuse this technique (and by <i>overuse</i>, I mean <i>use at all</i>), but you may have fun learning to do it, and you will improve your javascript skills, and your
+understanding of how colors work.
+
+<p>
+<center>
+
+<script language="JavaScript">
+<!--
+makeColorGradient(2,4,6,0,2,4,128,127,32);
+// -->
+
+</script>
+</center>
+<p>
+I am going to use javacsript for my code examples, but you can use the same
+basic techniques in any language, and indeed I originally developed these tricks in C, but I now use the same old
+tricks in C++, Perl, Processing, Java, Flash Actionscript and other languages.
+<p>
+
+<center>
+<script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,0,0,128,127,32);
+// -->
+</script>
+</center>
+<p>
+To get the most out of this tutorial, you will need to know a little Javascript, and a little HTML.  However, you won't
+need to know a whole lot.  I mean c'mon.  I even explain how <i>hexadecimal</i> works in this document, and why
+'#FF0000' comes out red, and so on...
+<p>
+<center>
+<script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,1,2,192,63,32);
+// -->
+</script>
+</center>
+<p>
+Well, let's get to it, shall we?
+<p>
+<center>
+<table width=80%><tr>
+<td>
+<a class="donate" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=dad%40krazydad%2ecom&item_name=KrazyDad+-+Jim+Bumgardner+-+Color+Cycle+Tutorial&item_number=TUTORIAL_009&no_shipping=1&cn=Your%20comments%20are%20welcome&tax=0&currency_code=USD&bn=PP%2dDonationsBF&charset=UTF%2d8&return=http%3A%2F%2Fkrazydad.com%2Ftutorials%2Fmakecolors.php%3Fpaypal%3Dsuccess&cancel_return=http%3A%2F%2Fkrazydad.com%2Ftutorials%2Fmakecolors.php%3Fpaypal%3Dcancel"><font color=#00a99d>Help me win a shiny red bicycle by making a donation via Paypal. Thank you!!
+</font></a>
+<p/>Prefer to donate by mail? <a href="/donatebymail.php" target="donatebymail">Here's how.</a>
+</td>
+<td height=64>
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <input type="hidden" name="cmd" value="_donations">
+  <input type="hidden" name="business" value="dad@krazydad.com">
+  <input type="hidden" name="item_name" value="KrazyDad - Jim Bumgardner - Color Cycle Tutorial">
+  <input type="hidden" name="item_number" value="TUTORIAL-009">
+  <input type="hidden" name="no_shipping" value="1">
+  <input type="hidden" name="cn" value="Your comments are welcome">
+  <input type="hidden" name="currency_code" value="USD">
+  <input type="hidden" name="tax" value="0">
+  <input type="hidden" name="bn" value="PP-DonationsBF">
+  <input type="hidden" name="return" value="http://krazydad.com/tutorials/makecolors.php?paypal=success">
+  <input type="hidden" name="cancel_return" value=" http://krazydad.com/tutorials/makecolors.php?paypal=cancel">
+  <!-- <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="Donate with PayPal"> -->
+  <input type="image" src="/img/paypal_donate.png" width=147 height=69 border="0" name="submit" alt="Donate with PayPal">
+</form>
+</td></tr></table>
+</center><p>
+<h2>Converting R,G,B values to HTML hex notation</h2>
+
+On computer monitors, you get different colors by combining red, green and blue.  The red, green and blue levels are called 'color components'.
+<p>
+To generate rainbow-like sequences of colors, I am going to be manipulating the individual RGB components of each subsequent color.
+So the first thing I need is a utility function to convert individual red, green and blue values to an HTML hex color specification, which
+looks something like this:
+<p>
+#AABBCC
+<p>
+This represents an RGB color with 8-bits per component.  In an 8-bit color system, the values of the color components, R, G, and B can
+go from 0-255.  But the HTML color specification uses hexadecimal notation for each of the components, so that they each occupy two digits.
+<p>
+In hexadecimal, each color component (red, green, and blue) occupies two digits, like so:
+#<font color='red'>RR</font><font color='green'>GG</font><font color='blue'>BB</font>.  So our color has the following hex values:
+
+<pre>
+<table border=1 cellspacing=0 cellpadding=8>
+<tr><td>Component</td><td>Value (in hex)</td></tr>
+<tr><td>Red</td><td>AA</td></tr>
+<tr><td>Green</td><td>BB</td></tr>
+<tr><td>Blue</td><td>CC</td></tr>
+</table>
+</pre>
+Hexadecimal numbers are base 16 numbers.  You can use the following table to convert two digit hex numbers to their
+decimal equivalents.
+<p>
+<table border=1 cellpadding=8 cellspacing=0 ><tr>
+<td>Hexadecimal</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
+<td>Decimal</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+</table>
+<p>
+If you don't have a calculator handy that does hexadecimal -> decimal conversion, it's not too hard to do it yourself.
+Just take the first digit, convert it to decimal (using the above table, which is easily memorized, especially if you're not busy friday), multiply it by 16, and
+then add the decimal equivalent of the second digit.  For example, the number AB corresponds to 10*16 + 11, or 171.
+<p>
+Using this formula, you will see that the color #AABBCC corresponds to the following values:
+<pre>
+<table border=1 cellspacing=0 cellpadding=8>
+<tr><td>Component</td><td>Value (in hex)</td><td>Value (in decimal)</td></tr>
+<tr><td>Red</td><td>AA</td><td>170</td></tr>
+<tr><td>Green</td><td>BB</td><td>187</td></tr>
+<tr><td>Blue</td><td>CC</td><td>204</td></tr>
+</table>
+</pre>
+<p>
+What I need for this tutorial is a function that does the reverse - converts 170,187,204 back to #AABBCC.
+I would use it like this:
+<p>
+<pre>
+output = RGB2Color(170,187,204);
+</pre>
+<p>
+And know that the string '#AABBCC' is in the output value, ready to be output as HTML, using the document.write() command.
+<p>
+Here is the function.
+<pre>
+  function RGB2Color(r,g,b)
+  {
+    return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+  }
+</pre>
+My conversion function relies on yet another utility function, byteToHex(), which converts each of the color components from a numeric value (such as 170) to a hexadecimal string
+(such as 'AA'):
+<pre>
+  function byte2Hex(n)
+  {
+    var nybHexString = "0123456789ABCDEF";
+    return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+  }
+</pre>
+This function relies on the binary arithmetic operators >> and &, which treat the numbers as binary, which is closely
+related to hexdecimal.  Every 4 bits (or binary digits) in a binary number corresponds to a single hex digit, 0-F.
+So this function takes the leftmost 4 bits of the number (given by n >> 4, which shifts the number right by 4 bits) and converts it to hex, and then takes
+the rightmost 4 bits of the number (given by n & 0x0F, which masks off the rightmost 4 bits) and converts it to hex.
+<p>
+I should point out that decimal -> hex conversion (and number formatting in general) is much easier in languages that provide a 'printf' function - something sorely missing from Javascript.
+<p>
+In Perl, you can do this same conversion in one line, like so:
+<pre>
+  output = sprintf '#%02x%02x%02x', $r, $g, $b;
+</pre>
+<p>
+If you can live without an old-style CSS color specification, you can also produce colors more simply without byte2Hex, like so:
+<pre>
+  function RGB2Color(r,g,b)
+  {
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+</pre>
+
+<p>
+<h2>Sine wave cycles</h2>
+<p>
+The basic tool I am going to use to make color cycles is the sine wave.  There is a function in Javascript, Math.sin() which
+will produce a smoothly undulating value that goes from 0 to 1 to 0 to -1 and back to 0.  Here are some samples:
+<p>
+<script language="JavaScript">
+<!--
+
+function makeSineTable(rows, f)
+{
+  var v = 0;
+
+  document.write("<table><tr><td width=100>function</td><td width=60 align='right'>result</td><td width=40></td><td width=300>graph of result (with zero in the middle)</td></tr>");
+  var graphWidth = 300;
+  var lEdge, rEdge;
+  for (var y = 0; y < rows; ++y, v += f)
+  {
+    var str = 'Math.sin(' + roundDecimal(v,2) + ');';
+    var r = Math.sin(v);
+    if (r < 0) {
+      lEdge = graphWidth/2 + r*(graphWidth/2);
+      rEdge = graphWidth/2;
+    }
+    else {
+      lEdge = graphWidth/2;
+      rEdge = graphWidth/2 + r*graphWidth/2;
+    }
+  var subTable = '<table cellpadding=0 cellspacing=0 width=300><tr>' +
+                 '<td width=' + lEdge + '></td>' +
+                 '<td width=' + (rEdge-lEdge) + ' bgcolor=\'black\'>&nbsp;</td>' +
+                 '<td width=' + (300-rEdge) + '></td>' +
+                 '</tr></table>';
+
+
+  document.write('<tr>');
+  document.write('<td>' + str + '</td>');
+  document.write('<td align=right>' + roundDecimal(r,2) + '</td>');
+  document.write('<td></td>');
+  document.write('<td>' + subTable + '</td>');
+  document.write('</tr>');
+  }
+  document.write('</table>');
+}
+
+
+makeSineTable(40,.2);
+// -->
+</script>
+<p>
+Sine waves are <b>really useful in real life</b>, contrary to what you might have inadvertantly learned in trig class, and they are especially useful for all kinds of things relating to graphics and music.
+<p>
+To get this pattern, I have input into the Math.sin() function a value which is steadily increasing.  You can
+produce a series of sine wave values using a loop, like so:
+<pre>
+var frequency = .3;
+for (var i = 0; i &lt; 32; ++i)
+{
+   Document.write( Math.sin(frequency * i)  );
+}
+</pre>
+
+
+You may have noticed that the sine wave pattern starts to repeat right about when frequency*i is equal to 6.2.  The precise value where it repeats is actually
+2&pi; (2 times PI) or 6.28318, which happens to correspond to the circumfrence of a circle with a radius of 1.  As you may already know,
+sine waves are closely related to circles.  The halfway point in the sine wave is &pi; exactly, or 3.14159...
+<p>
+At this time I would like to apologize for how crappy the &pi; (PI) character looks in the san-serif font used in 80% of the computers out there.  If I were
+using <font face='Serif'>lovely Times Roman, the &pi; character would be far more recognizeable.  </font>Sadly, I'm not, because for just about everything else
+I find the San Serif font more readable.  But I digress...
+<p>
+There is a relationship between these &pi; units which are used with the Math.sin() function (called <i>radians</i>) and the more familiar <i>degrees</i> which go from 0-360
+(degrees are an old Babylonian unit -- the Babylonians really liked numbers like 60 and 360 because all kinds of numbers go evenly into them.  Also, the Babylonians hadn't
+invented pie yet...)
+<p>
+<table border=1 cellpadding=8 cellspacing=0>
+<tr><td>Degrees</td><td>Radians</td></tr>
+<tr><td>0</td><td>0</td></tr>
+<tr><td>90</td><td>&pi;/2</td></tr>
+<tr><td>180</td><td>&pi;</td></tr>
+<tr><td>270</td><td>3*&pi;/2</td></tr>
+<tr><td>360</td><td>2*&pi;</td></tr>
+</table>
+
+<p>
+You can produce a value for &pi; in Javascript by saying:
+<pre>
+    document.write(Math.PI);
+</pre>
+Like so:
+<p>
+<script language="JavaScript">
+<!--
+document.write(Math.PI);
+// -->
+</script>
+<p>
+I <i>personally</i> have &pi; memorized up to 8 digits.  Kind of a waste of gray matter, really.
+<p>
+Speaking of gray matter...
+<p>
+<h2>Using sine waves to make shades of gray</h2>
+I can use the return value of Math.sin() to make fluctuating color values.  However, I need to do
+a little conversion.  As shown above, the return value of Math.sin() goes from -1 to 1.  The color components I use to
+make RGB colors go from 0 to 255.  So I need to translate a number from the range (-1 --> 1) into (0 --> 255).
+<P>
+This isn't too hard because we know that we want the sine value to start at some center value, and then
+go up and down by some amount.  Since the sine wave goes up to 1, and down to -1, it is already <i>normalized</i>
+(meaning that it's maximum value is 1, a very useful number).  We can just multiply it by some other number, and it will go up to that number, and down to the negative version of that number.
+<p>
+For our color values, it will work well if we use 255/2 for our center value, and have the sine value go up and down with an amplitude of 255/2 (which
+will take us to 255 and down to 0.
+<p>
+<pre>
+color_component = Math.sin(frequency*i)*255/2 + 255/2;
+</pre>
+I usually express this, using integers, as:
+<pre>
+color_component = Math.sin(frequency*i)*128 + 127;
+</pre>
+...which isn't exactly the same, but close enough.
+<p>
+
+More generally, when we want to use a sine wave to oscillate something, we will use the formula
+<pre>
+value = Math.sin(frequency*increment)*amplitude + center;
+</pre>
+<p>
+<i>frequency</i> is a constant that controls how fast the wave oscillates<br>
+<i>increment</i> is a variable that counts up, typically provided by a loop<br>
+<i>amplitude</i> controls how high (and low) the wave goes<br>
+<i>center</i> controls the center position of the wave.
+<p>
+Now I can modify my original sine wave loop, and produce a series of test colors.
+
+<pre>
+var frequency = .3;
+var amplitude = 127;
+var center = 128;
+
+for (var i = 0; i &lt; 32; ++i)
+{
+   v = Math.sin(frequency*i) * amplitude + center;
+
+   // Note that &amp;#9608; is a unicode character that makes a solid block
+   document.write( '&lt;font color="' + RGB2Color(v,v,v) + '"&gt;&amp;#9608;&lt;/font&gt;');
+}
+</pre>
+
+Inside the document.write I am producing a color by calling RGB2Color(v,v,v).  Since I pass
+the same value in 3 times, for red, green, and blue, I will get a gray color.  In gray colors, red,
+green, and blue have the same value.  To view the color, I print out a block character, using the
+unicode value &amp;#9608;.
+<p>
+And here's what the code produces -- a kind of color sine wave:
+<p>
+<script language="JavaScript">
+<!--
+var frequency = .3;
+var amplitude = 127;
+var center = 128;
+for (var i = 0; i < 32; ++i)
+{
+   v = Math.sin(frequency*i) * amplitude + center;
+
+   // Note that &#9608; is a unicode character that makes a solid block
+   document.write( '<font color="' + RGB2Color(v,v,v) + '">&#9608;</font>');
+}
+// -->
+</script>
+<p>
+For fun, I can try using a series of different values for frequency.  This is what I'll get if I add an
+additional outer loop that changes the value of frequency.
+<p>
+<script language="JavaScript">
+<!--
+for (frequency = .01; frequency < 1; frequency += .05)
+{
+  for (var i = 0; i < 32; ++i)
+  {
+     lev = Math.sin(frequency*i) * 127 + 128;
+     document.write( '<font color="' + RGB2Color(lev,lev,lev) + '">&#9608;</font>');
+  }
+  document.write(' frequency = ' + roundDecimal(frequency,3) + '<br>');
+}
+// -->
+</script>
+
+
+
+<h2>Using out-of-phase sine waves to make rainbows</h2>
+Now, as I mentioned, the reason the above gradient looks gray is beacuse I am using the same value
+for red, green, and blue.  One way we can try to get colors is to add a constant to the value of v
+that we are using for the green and blue parameters.  So instead of saying:
+<pre>
+RGB2Color(v,v,v)
+</pre>
+I might say:
+<pre>
+RGB2Color(v,v+30,v+60)
+</pre>
+This produces the following color sequence:
+<p>
+<script language="JavaScript">
+<!--
+var frequency = .3;
+for (var i = 0; i < 32; ++i)
+{
+   lev = Math.sin(frequency*i) * 127 + 128;
+
+   document.write( '<font color="' + RGB2Color(lev,lev+30,lev+60) + '">&#9608;</font>');
+}
+// -->
+</script>
+<p>
+This is interesting, but it is not quite what I want.  A better technique is to generate 3 out-of-phase
+sine waves, by doing something like this:
+<pre>
+var frequency = .3;
+for (var i = 0; i &lt; 32; ++i)
+{
+   red   = Math.sin(frequency*i + 0) * 127 + 128;
+   green = Math.sin(frequency*i + 2) * 127 + 128;
+   blue  = Math.sin(frequency*i + 4) * 127 + 128;
+
+   document.write( '&lt;font color="' + RGB2Color(red,green,blue) + '"&gt;&amp;#9608;&lt;/font&gt;');
+}
+</pre>
+<p>
+Which produces this:
+<p>
+<script language="JavaScript">
+<!--
+var frequency = .3;
+for (var i = 0; i < 32; ++i)
+{
+   red   = Math.sin(frequency*i + 0) * 127 + 128;
+   green = Math.sin(frequency*i + 2) * 127 + 128;
+   blue  = Math.sin(frequency*i + 4) * 127 + 128;
+   // Note that &#9608; is a unicode character that makes a solid block
+   document.write( '<font color="' + RGB2Color(red,green,blue) + '">&#9608;</font>');
+}
+// -->
+</script>
+<p>
+As you can see I am using the values 2 and 4 to change the alignment (or phase) of the green and blue sine waves.  I chose
+2 and 4 because they nearly divide the range of the sine wave (2&pi; or 6.2) into three equal parts, which puts each sine
+wave approximately 1/3rd of a cycle, or 120&deg;,  out of phase, like so:
+<pre>
+red    <script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,0,0);
+// -->
+</script> (phase = 0)
+green  <script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,2,2,2);
+// -->
+</script> (phase = 2)
+blue   <script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,4,4,4);
+// --></script> (phase = 4)
+RGB    <script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,2,4);
+// -->
+</script>
+</pre>
+<p>
+If I wanted <i>exactly</i> 120&deg; I can use 2*Math.PI/3 in place of 2, and 4*Math.PI/3 in place of 4, which produces
+this nearly identical (but perfect) color cycle:
+<p>
+<script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,2*Math.PI/3,4*Math.PI/3);
+// -->
+</script>
+<p>
+However, the results are so close, that I think 2 and 4 are fine substitutes.  It is said that ancient Egyptians thought that &pi; was equal to three.
+And in this tutorial, we're gonna <i>code like an Egyptian</i>.
+<p>
+<h2>More about the hue cycle</h2>
+<p>
+This basic phenomenon - that three 120&deg; out-of-phase sine waves produces a rainbow effect is something I've known
+about for a long time - since the mid 1980s actually.  I originally discovered it just by playing around with using sine waves to make color (a frequent activity which took the place of <i>having a life</i>).  Once I learned this trick, I started using it whenever I wanted an assortment of bright colors.  For example, the dots
+in my <a href="http://whitneymusicbox.org/">Whitney Music Box</a> are colored using this system.
+<p>
+Later, when I learned more about color theory, I found out that what I'm doing is basically causing the hue of the color
+to travel around the circle of a color wheel.  If you plot the path that I'm making on the hue-saturation
+circle commonly seen in color pickers, you'll find it doesn't produce a perfect circle, but more of a trefoil pattern, like so:
+<P>
+<img src="exampleHuePath.png" />
+<p>
+Note: I used the <a href="http://www.processing.org/">Processing language</a> to produce this illustration.  Making it in Javascript would be a bit of a
+chore.  If you like graphics programming in Javascript, you'll love it in Processing.js, and you will enjoy my Processing blog (and upcoming book): <a href="http://joyofprocessing.com">The Joy of Processing</a>.
+<p>
+Even though it doesn't make a perfect hue circle, the sine-wave trefoil makes a pretty color gradient, and it's pretty easy to
+get a rainbow effect in just a few lines of code.  I actually prefer it to the "correct" HSB / HSL hue cycle, because it has more consistent brightness.  It minimizes the spokes at yellow, cyan and magenta, which you can see in the picture.
+<P>
+Now,  I'll talk about how to modify the function to produce a greater assortment of colors, and different shades, such as pastels.
+<p>
+<h2>Generalizing it</h2>
+In the next few sections, I'm going to use a general purpose function for drawing these color gradients.
+It allows me to specify separate parameters for frequency and phase for each color component. Here's the code:
+<pre>
+  function makeColorGradient(frequency1, frequency2, frequency3,
+                             phase1, phase2, phase3,
+                             center, width, len)
+  {
+    if (len == undefined)      len = 50;
+    if (center == undefined)   center = 128;
+    if (width == undefined)    width = 127;
+
+    for (var i = 0; i &lt; len; ++i)
+    {
+       var red = Math.sin(frequency1*i + phase1) * width + center;
+       var grn = Math.sin(frequency2*i + phase2) * width + center;
+       var blu = Math.sin(frequency3*i + phase3) * width + center;
+       document.write( '&lt;font color="' + RGB2Color(red,grn,blu) + '"&gt;&amp;#9608;&lt;/font&gt;');
+    }
+  }
+</pre>
+And here's the code for drawing the basic rainbow gradient.
+<pre>
+    makeColorGradient(.3,.3,.3,0,2,4);
+</pre>
+Which looks like this:
+<p>
+<script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,2,4,128,127);
+// -->
+</script>
+
+<p>
+
+
+
+<h2>Making pastels</h2>
+<p>
+The basic trick to getting pastels is to change the gamut of the color components to use lighter colored values for
+the color components.  So, when we convert the sine values, instead of convering to the full range (0 --> 255), we convert
+to something like (205 - 255).  We change the last two parameters (center and width) as follows.  Before:
+<pre>
+   // center = 128, width = 127
+   makeColorGradient(.3,.3,.3,0,2,4, 128,127);
+</pre>
+after:
+<pre>
+   // center = 230, width = 25
+   makeColorGradient(.3,.3,.3,0,2,4, 230,25);
+</pre>
+In the changed code, the 230 is the center of the sine wave, and the 25 is the maximum deviation from this
+center value.  So the sine wave starts at 230, goes up to (230+25) and goes down to (230-25).  In other
+words, it has a range of (205-255).
+<p>
+And this makes a pastel strip:
+<p>
+
+<script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,2,4,230,25);
+// -->
+</script>
+<P>
+I can get darker pastels by using a wider range (center=200, width=55), like so:
+<p>
+<script language="JavaScript">
+<!--
+makeColorGradient(.3,.3,.3,0,2,4,200,55);
+// -->
+</script>
+<p>
+
+<h2>Get more stripes by increasing the frequency</h2>
+<p>
+When you change the value of frequency, you can get the colors to change more quickly, or more slowly.  Up to now,
+I've mostly been using an frequency value of .3, but here are some other values:
+<p>
+<script language="JavaScript">
+<!--
+center = 128;
+width = 127;
+for (frequency = .1; frequency <= 1; frequency += .1)
+{
+    makeColorGradient(frequency,frequency,frequency,0,2,4,center,width,32);
+    document.write('<font size=-1>frequency = ' + roundDecimal(frequency,2) + ' center = ' + center + ' width = ' + width + '</font><br>');
+    center += 12;
+    width -= 12;
+}
+// -->
+</script>
+<p>
+<h2>Experimenting with phase</h2>
+For the basic rainbow effect, I separated the phases of each sine wave by 120&deg;.  What happens if I
+put the phases closer together?  Let's find out:
+<p>
+<script language="JavaScript">
+<!--
+center = 128;
+width = 127;
+frequency = .3;
+for (phaseShift = 2*Math.PI/3; phaseShift >= -.001; phaseShift -= Math.PI/18)
+{
+    makeColorGradient(frequency,frequency,frequency,0,phaseShift,phaseShift*2,center,width,32);
+    document.write(' phaseShift = ' + Math.ceil(phaseShift*180/Math.PI) + '&deg;<br>');
+}
+// -->
+</script>
+
+
+<h2>Get more variety by using separate frequencies for each component</h2>
+<p>
+Another trick I've used which produces greater color variety is to put each color component on a different
+frequency.  Here's the code:
+<pre>
+redFrequency = .1;
+grnFrequency = .2;
+bluFrequency = .3;
+center = 128;
+width = 127;
+makeColorGradient(redFrequency,redFrequency,redFrequency,0,0,0,center,width,50);
+</pre>
+
+...and here's what it looks like:
+<p>
+<script language="JavaScript">
+<!--
+redFrequency = .1;
+grnFrequency = .2;
+bluFrequency = .3;
+center = 128;
+width = 127;
+makeColorGradient(redFrequency,grnFrequency,bluFrequency,0,2,4,center,width,50);
+// -->
+</script>
+<p>
+If I separate out the individual channels, you can see what is going on:
+<pre>
+red    <script language="JavaScript">
+<!--
+makeColorGradient(redFrequency,redFrequency,redFrequency,0,0,0,center,width,50);
+// -->
+</script> (freq = .1)
+green  <script language="JavaScript">
+<!--
+makeColorGradient(grnFrequency,grnFrequency,grnFrequency,2,2,2,center,width,50);
+// -->
+</script> (freq = .2)
+blue   <script language="JavaScript">
+<!--
+makeColorGradient(bluFrequency,bluFrequency,bluFrequency,4,4,4,center,width,50);
+// --></script> (freq = .3)
+RGB    <script language="JavaScript">
+<!--
+makeColorGradient(redFrequency,grnFrequency,bluFrequency,0,2,4,center,width,50);
+// -->
+</script>
+</pre>
+
+<p>
+Using three different frequencies may produce colors with a low saturation value, such as the black seen in the example above, or grays or whites.
+This happens when the three sine waves cross the same value simultaneously.
+<p>
+
+
+
+<h2>Getting cycles to repeat</h2>
+Let's say you want the color cycle to repeat every 6 steps.  How do you do it?  The way I accomplish
+this is by using a frequency value which corresponds to 1/6th of 2&pi;.  Remember that the sine wave repeats
+every 2&pi;, so this will make the colors repeat every 6 increments.  Here's the code...
+<pre>
+center = 128;
+width = 127;
+steps = 6;
+frequency = 2*Math.PI/steps;
+makeColorGradient(frequency,frequency,frequency,0,2,4,center,width,50);
+</pre>
+And here's what it looks like:
+<p>
+<script language="JavaScript">
+<!--
+center = 128;
+width = 127;
+steps = 6;
+frequency = 2*Math.PI/steps;
+makeColorGradient(frequency,frequency,frequency,0,2,4,center,width,50);
+// -->
+</script>
+
+<h2>Getting cycles to not repeat</h2>
+If you don't want the colors to repeat exactly, then use frequency values which don't go evenly into 2&pi;.
+It turns out that the number 2.4 works very well for this.  2.4 in radians, is very close to the <a href="http://en.wikipedia.org/wiki/Golden_angle">golden angle (137.51&deg;)</a>, which
+is the angle that many plants grow new shoots to maximize the sunlight received by leaves.  Here I'm using essentially the same technique -
+I am maximizing the distance between color repeats (which would be like overlapping leaves around a stem).  2.4 is a good frequency to use if you're selecting colors for a pie chart or graph, and you're not sure how many data values you're going to need to plot.
+Here's the code.
+<pre>
+center = 128;
+width = 127;
+frequency = 2.4;
+makeColorGradient(frequency,frequency,frequency,0,2,4,center,width,50);
+</pre>
+And here's what it looks like with a frequency of 2.4:
+<p>
+<script language="JavaScript">
+<!--
+center = 128;
+width = 127;
+frequency = 2.4;
+makeColorGradient(frequency,frequency,frequency,0,2,4,center,width,50);
+// -->
+</script>
+<p>
+If you combine this with the trick of using separate freqencies for each color, and insure that none of the
+individual frequencies are multiples of each other, you can get even more variety.
+Here I'm using frequency of 1.666, 2.666, and 4.666.
+<pre>
+center = 128;
+width = 127;
+redFrequency = 1.666;
+grnFrequency = 2.666;
+bluFrequency = 3.666;
+makeColorGradient(redFrequency,grnFrequency,bluFrequency,0,0,0,center,width,50);
+</pre>
+<p>
+<script language="JavaScript">
+<!--
+center = 128;
+width = 127;
+redFrequency = 1.666;
+grnFrequency = 2.666;
+bluFrequency = 3.666;
+makeColorGradient(redFrequency,grnFrequency,bluFrequency,0,0,0,center,width,50);
+// -->
+</script>
+<p>
+Finally, here's a function that does the rainbow effect on a line of text.
+<pre>
+function colorText(str,phase)
+{
+    if (phase == undefined) phase = 0;
+  center = 128;
+  width = 127;
+  frequency = Math.PI*2/str.length;
+  for (var i = 0; i &lt; str.length; ++i)
+  {
+     red   = Math.sin(frequency*i+2+phase) * width + center;
+     green = Math.sin(frequency*i+0+phase) * width + center;
+     blue  = Math.sin(frequency*i+4+phase) * width + center;
+     document.write( '&lt;font color="' + RGB2Color(red,green,blue) + '"&gt;' + str.substr(i,1) + '&lt;/font&gt;');
+  }
+}
+</pre>
+<p>
+<script language="JavaScript">
+<!--
+colorText('Now is the time for all good hackersr to come to the aid of their country.',0);
+document.write('<br>');
+colorText('Now is the time for all good hackersr to come to the aid of their country.',2);
+document.write('<br>');
+colorText('Now is the time for all good hackersr to come to the aid of their country.',4);
+// -->
+</script>
+<p>
+Well, that's it.  I hope you enjoyed the tutorial!  
+<p>
+<center>
+<table width=80%><tr>
+<td>
+<a class="donate" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=dad%40krazydad%2ecom&item_name=KrazyDad+-+Jim+Bumgardner+-+Color+Cycle+Tutorial&item_number=TUTORIAL_005&no_shipping=1&cn=Your%20comments%20are%20welcome&tax=0&currency_code=USD&bn=PP%2dDonationsBF&charset=UTF%2d8&return=http%3A%2F%2Fkrazydad.com%2Ftutorials%2Fmakecolors.php%3Fpaypal%3Dsuccess&cancel_return=http%3A%2F%2Fkrazydad.com%2Ftutorials%2Fmakecolors.php%3Fpaypal%3Dcancel"><font color=#00a99d>Bad dog! Help me send my puppy to obedience school by making a donation. Thank you!!
+</font></a>
+<p/>Prefer to donate by mail? <a href="/donatebymail.php" target="donatebymail">Here's how.</a>
+</td>
+<td height=64>
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <input type="hidden" name="cmd" value="_donations">
+  <input type="hidden" name="business" value="dad@krazydad.com">
+  <input type="hidden" name="item_name" value="KrazyDad - Jim Bumgardner - Color Cycle Tutorial">
+  <input type="hidden" name="item_number" value="TUTORIAL-005">
+  <input type="hidden" name="no_shipping" value="1">
+  <input type="hidden" name="cn" value="Your comments are welcome">
+  <input type="hidden" name="currency_code" value="USD">
+  <input type="hidden" name="tax" value="0">
+  <input type="hidden" name="bn" value="PP-DonationsBF">
+  <input type="hidden" name="return" value="http://krazydad.com/tutorials/makecolors.php?paypal=success">
+  <input type="hidden" name="cancel_return" value=" http://krazydad.com/tutorials/makecolors.php?paypal=cancel">
+  <!-- <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="Donate with PayPal"> -->
+  <input type="image" src="/img/paypal_donate.png" width=147 height=69 border="0" name="submit" alt="Donate with PayPal">
+</form>
+</td></tr></table>
+</center><p>
+If you have any questions or comments, add them to the <a href="http://krazydad.com/blog/2006/10/13/making-annoying-rainbows-in-javascript/">blog
+entry about this article</a>, which you'll find <a href="http://krazydad.com/blog/2006/10/13/making-annoying-rainbows-in-javascript/">here</a>.
+<hr width="80%" />
+My second Javascript tutorial: <a href="/arcaneoperators.php">Using the Arcane Operators in Javascript/Actionscript</a>
+<p>
+My other blog: <a href="http://joyofprocessing.com/">The Joy of Processing</a>
+<p>
+<hr>
+<center>
+<font size=1>
+Copyright &copy; 2013 by KrazyDad.  All Rights Reserved.<br>
+<a href="/privacy/">Privacy Policy</a><br>
+<a rel="author" href="https://plus.google.com/109972214378981665730?rel=author">Google Profile</a></br>
+<a href="http://krazydad.com/blog/contact-krazydad/">Send Jim a message.</a><br>
+</font>
+</center>
+
+
+</td>
+
+
+<td width=10>&nbsp;</td>
+<td width="160" valign=top align=right>
+<br>
+<br>
+<br>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-1449267043676994";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+//2006-11-27: KrazyDad Puzzles
+google_ad_channel = "7198281076";
+google_color_border = "FFFFFF";
+google_color_bg = "FFFFFF";
+google_color_link = "C81020";  // was F37280
+google_color_url = "008000";   // was 92A1C8
+google_color_text = "00000";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+
+<p>
+</td>
+
+</tr></table>
+</div> <!-- end logo -->
+</div> <!-- inner -->
+</div> <!-- outer -->
+<!-- PInterest -->
+<!-- Include ONCE for ALL buttons in the page -->
+<script type="text/javascript">
+(function() {
+    window.PinIt = window.PinIt || { loaded:false };
+    if (window.PinIt.loaded) return;
+    window.PinIt.loaded = true;
+    function async_load(){
+        var s = document.createElement("script");
+        s.type = "text/javascript";
+        s.async = true;
+        if (window.location.protocol == "https:")
+            s.src = "https://assets.pinterest.com/js/pinit.js";
+        else
+            s.src = "http://assets.pinterest.com/js/pinit.js";
+        var x = document.getElementsByTagName("script")[0];
+        x.parentNode.insertBefore(s, x);
+    }
+    if (window.attachEvent)
+        window.attachEvent("onload", async_load);
+    else
+        window.addEventListener("load", async_load, false);
+})();
+</script>
+<!-- End PInterest -->
+<!-- Quantcast Tag -->
+<script type="text/javascript">
+var _qevents = _qevents || [];
+
+(function() {
+var elem = document.createElement('script');
+elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+elem.async = true;
+elem.type = "text/javascript";
+var scpt = document.getElementsByTagName('script')[0];
+scpt.parentNode.insertBefore(elem, scpt);
+})();
+
+_qevents.push({
+qacct:"p-4dk_MYkZQ7bvI"
+});
+</script>
+<noscript>
+<div style="display:none;">
+<img src="//pixel.quantserve.com/pixel/p-4dk_MYkZQ7bvI.gif" border="0" height="1" width="1" alt="Quantcast"/>
+</div>
+</noscript>
+<!-- End Quantcast tag -->
+<script type="text/javascript"><!-- begin chartbeat -->
+var _sf_async_config={uid:32338,domain:"krazydad.com"};
+(function(){
+  function loadChartbeat() {
+    window._sf_endpt=(new Date()).getTime();
+    var e = document.createElement('script');
+    e.setAttribute('language', 'javascript');
+    e.setAttribute('type', 'text/javascript');
+    e.setAttribute('src',
+       (("https:" == document.location.protocol) ? "https://a248.e.akamai.net/chartbeat.download.akamai.com/102508/" : "http://static.chartbeat.com/") +
+       "js/chartbeat.js");
+    document.body.appendChild(e);
+  }
+  var oldonload = window.onload;
+  window.onload = (typeof window.onload != 'function') ?
+     loadChartbeat : function() { oldonload(); loadChartbeat(); };
+})();
+</script><!-- end chartbeat -->
+
+
+
+</body>
+</html>
+
+

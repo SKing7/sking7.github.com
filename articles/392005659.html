@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JavaScript Grid with One Million Records | JavaScript UI - w2ui</title>
+  <link href="http://w2ui.com/web/blog/rss" rel="alternate" title="w2ui updates [RSS]" type="application/rss+xml"/>
+  <link href="/web/css/master.css" rel="stylesheet">
+  
+  <link href="/web/css/bootstrap.css" rel="stylesheet">
+  <script src="/web/js/jquery.min.js"></script>
+  <script src="/web/js/bootstrap.min.js"></script>
+  
+  <link rel="stylesheet" href="/web/js/CodeMirror/lib/codemirror.css">
+  <script src="/web/js/CodeMirror/lib/codemirror.js"></script>
+  <script src="/web/js/CodeMirror/mode/javascript.js"></script>
+  <script src="/web/js/CodeMirror/mode/htmlmixed.js"></script>
+  <script src="/web/js/CodeMirror/mode/css.js"></script>
+  <script src="/web/js/CodeMirror/mode/xml.js"></script>
+  <link rel="stylesheet" type="text/css" href="/web/js/w2ui-1.3a.min.css" /><script type="text/javascript" src="/web/js/w2ui-1.3a.min.js"></script>
+  <meta property="og:type" content="website" />
+  <meta property="fb:admins" content="100005203482289" />
+  <meta property="og:image" content="http://w2ui.com/web/img/w2ui.png" />
+  <meta property="og:site_name" content="W2UI" />
+  <meta itemprop="image" content="http://w2ui.com/web/img/w2ui.png">
+	
+  <meta property="og:type" content="website" />
+  <meta property="fb:admins" content="100005203482289" />
+  <meta property="og:image" content="http://w2ui.com/web/img/w2ui.png" />
+  <meta property="og:site_name" content="W2UI" />
+  <meta itemprop="image" content="http://w2ui.com/web/img/w2ui.png">
+	
+</head>
+<body>
+
+  
+<!-- Top Menu -->
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <div class="nav-collapse collapse">
+        <div class="pull-right">
+          <a class="brand" href="/web/home">w2ui</a>
+        </div>
+        <ul class="nav">
+          <li >
+            <a href="/web/home">Home</a>
+          </li>
+          <li >
+            <a href="/web/get-started">Get started</a>
+          </li>
+          <li >
+            <a href="/web/demo">Demos</a>
+          </li>
+          <li >
+            <a href="/web/docs">Docs</a>
+          </li>
+          <li >
+            <a href="/web/mobile">Mobile</a>
+          </li>
+          				  <li >
+					<a href="/web/support">Support</a>
+				  </li>
+		            <li class="active">
+            <a href="/web/blog">Blog</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+<div class="container">
+	<div class="row">
+		<div class="spacer15"></div>
+
+		<div class="span9">
+			
+<style>
+table.results {
+	margin: 20px 0px;
+	border-collapse: collapse;
+}
+table.results td {
+	padding: 5px 20px;
+	border: 1px solid silver;
+	text-align: center;
+}
+ul.list {
+	margin: 10px 0px;
+	margin-left: 40px;
+}
+.best {
+	background-color: #95FF93; 
+}
+.second {
+	background-color: #F7FF9C; 
+}
+.bad { 
+	background-color: #FFD9D7;
+}
+.medium {
+	background-color: #FFF0D6; 
+}
+</style>
+
+<h2>JavaScript Grid with One Million Records</h2>
+<div class="date">July 5, 2013</div>
+
+<!-- Twitter/Google+/Facebook -->
+<div style="float: left; width: 110px; height: 32px;">
+	<a href="https://twitter.com/share" class="twitter-share-button" data-hashtags="JavaScript">Tweet</a>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<div style="float: left; width: 100px; height: 32px;">
+	<!-- Place this tag where you want the +1 button to render -->
+	<div class="g-plusone" data-size="medium" data-width="40" data-href="http://w2ui.com/web/blog/7/JavaScript-Grid-with-One-Million-Records"></div>
+
+	<!-- Place this render call where appropriate -->
+	<script type="text/javascript">
+	  (function() {
+		var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+		po.src = 'https://apis.google.com/js/plusone.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	  })();
+	</script>
+</div>
+
+<div style="margin-left: 190px; height: 32px;">
+	<div class="fb-like" data-send="false" data-href="http://w2ui.com/web/blog/7/JavaScript-Grid-with-One-Million-Records" data-width="110" data-show-faces="false" data-layout="button_count"></div>
+</div>
+<div style="height: 10px" class="spacer"></div>
+<!-- -->
+
+Some time ago, I got a comment from a user who wanted to use the grid as a log table. He quickly put 
+10,000 records into the grid without paginating, but found that it got really, really slow. This got me wondering, 
+can it be optimized to handle 10k of records or it is too much for the browser.
+
+<h3>Establishing the Baseline</h3>
+
+For my initial test I have used w2ui ver 1.2, created a simple grid with 4 columns, populated it with random data and rendered 
+into a 1024x768 container. I have started my testing with recordsPerPage set to 50 and tried 25, 250, 2.5K, 25K, 250K and 
+1MIL records in the grid. To my surprise the grid performed well. It was responsive and fast, I could go from page to page 
+and perform other grid functions. 
+<div class="spacer10"></div>
+
+It was an unexpected and pleasant surprise. It meant that JavaScript can handle large data sets, which was awesome. As a 
+next step, I have set recordsPerPage to 1,000,000 and repeated my tests. The table below shows my findings:
+
+<table class="results">
+	<tr>
+		<td># of Records</td>
+		<td>Render Time</td>
+		<td># of DOM Nodes</td>
+	</tr>
+	<tr>
+		<td>25</td>
+		<td>0.047 sec</td>
+		<td>329</td>
+	</tr>
+	<tr>
+		<td>250</td>
+		<td>0.466 sec</td>
+		<td>2,354</td>
+	</tr>
+	<tr>
+		<td>2,500</td>
+		<td class="bad">14.425 sec</td>
+		<td class="medium">22,604</td>
+	</tr>
+	<tr>
+		<td>25,000</td>
+		<td class="bad">crashed</td>
+		<td class="bad">??</td>
+	</tr>
+	<tr>
+		<td>250,000</td>
+		<td class="bad">crashed</td>
+		<td class="bad">??</td>
+	</tr>
+	<tr>
+		<td>1,000,000</td>
+		<td class="bad">crashed</td>
+		<td class="bad">??</td>
+	</tr>
+</table>
+
+I have found that if the number of records in the grid becomes more then just a few thousands the grid gets very slow because the 
+rendering speed is directly related to the number of nodes in the DOM. If the number of nodes in the DOM is more then 40-50k 
+(depending on your computer configuration and amount of memory), your browser will crash or will become unresponsive. 
+<div class="spacer10"></div>
+
+So, I decided to set out on a quest to do two things: (1) dynamically create records as user 
+scrolls (2) optimize grid to handle large data sets. After a few weeks of work, the grid was optimized and 
+ready for testing. I have repeated my original tests:
+
+<table class="results">
+	<tr>
+		<td># of Records</td>
+		<td>Render Time</td>
+		<td># of DOM Nodes</td>
+	</tr>
+	<tr>
+		<td>25</td>
+		<td>0.021 sec</td>
+		<td>355</td>
+	</tr>
+	<tr>
+		<td>250</td>
+		<td>0.112 sec</td>
+		<td>2,605</td>
+	</tr>
+	<tr>
+		<td>2,500</td>
+		<td>0.036 sec</td>
+		<td>705</td>
+	</tr>
+	<tr>
+		<td>25,000</td>
+		<td>0.051 sec</td>
+		<td>705</td>
+	</tr>
+	<tr>
+		<td>250,000</td>
+		<td>0.198 sec</td>
+		<td>705</td>
+	</tr>
+	<tr>
+		<td>1,000,000</td>
+		<td>0.676 sec</td>
+		<td>705</td>
+	</tr>
+</table>
+Wow! The results were awesome! Now the grid was capable of handling large data sets that not so long ago only a databas server could.
+If you are wondering why 2500 records performed better than 250, the answer is very simple: I have defined a parameter in the 
+grid not to use buffered scroll if number of records below 300. So, when there are less then 300 records - all of them
+are rendered in the grid. If there are more then 300 records, only the ones that are in the view, plus a few items on top and 
+botton for smooth scrolling.
+<div class="spacer10"></div>
+
+<h3>Example of the grid</h3>
+Below you can find an example of the grid with random 25K records. You can generate a different amount and play with it for 
+yourself. Please note that different browsers can handle different number of records, though pretty much all of them can handle 1MIL 
+of records.
+<div class="spacer20"></div>
+
+Generate: 
+<input type="button" value="25K Records" onclick="generate(25)">
+<input type="button" value="250K Records" onclick="generate(250)">
+<input type="button" value="1MIL Records" onclick="generate(1000)">
+<div id="grid" style="width: 100%; height: 450px; margin: 20px 0px;"></div>
+
+<h3>Sorting & Searching</h3>
+The next challenge was to make local sorting and searching fast. In the table below you can see results before 
+optimization:
+<table class="results">
+	<tr>
+		<td># of Records</td>
+		<td>Sorting (int)</td>
+		<td>Sorting (Text)</td>
+		<td>Searching (int)</td>
+		<td>Searching (text)</td>
+	</tr>
+	<tr>
+		<td>25</td>
+		<td>0.000 sec</td>
+		<td>0.000 sec</td>
+		<td>0.005 sec</td>
+		<td>0.005 sec</td>
+	</tr>
+	<tr>
+		<td>250</td>
+		<td>0.002 sec</td>
+		<td>0.002 sec</td>
+		<td>0.029 sec</td>
+		<td>0.029 sec</td>
+	</tr>
+	<tr>
+		<td>2,500</td>
+		<td>0.022 sec</td>
+		<td>0.010 sec</td>
+		<td>0.239 sec</td>
+		<td>0.245 sec</td>
+	</tr>
+	<tr>
+		<td>25,000</td>
+		<td>0.243 sec</td>
+		<td>0.066 sec</td>
+		<td class="medium">2.539 sec</td>
+		<td class="medium">2.282 sec</td>
+	</tr>
+	<tr>
+		<td>250,000</td>
+		<td class="bad">3.046 sec</td>
+		<td>0.632 sec</td>
+		<td class="bad">25.725 sec</td>
+		<td class="bad">25.204 sec</td>
+	</tr>
+	<tr>
+		<td>1,000,000</td>
+		<td class="bad">14.804 sec</td>
+		<td class="medium">2.353 sec</td>
+		<td class="bad">??</td>
+		<td class="bad">??</td>
+	</tr>
+</table>
+
+As it is seen from the data, the sorting performed well (I used Array.sort() for this) and the search was increasingly slow with the
+increase in the number of records. I found that the biggest issue with the search was the use of eval() to parse nested record sets, 
+which turned out to be slow. I have refactored the code and repeated the tests
+
+<table class="results">
+	<tr>
+		<td># of Records</td>
+		<td>Sorting (int)</td>
+		<td>Sorting (Text)</td>
+		<td>Searching (int)</td>
+		<td>Searching (text)</td>
+	</tr>
+	<tr>
+		<td>25</td>
+		<td>0.000 sec</td>
+		<td>0.000 sec</td>
+		<td>0.000 sec</td>
+		<td>0.000 sec</td>
+	</tr>
+	<tr>
+		<td>250</td>
+		<td>0.001 sec</td>
+		<td>0.001 sec</td>
+		<td>0.001 sec</td>
+		<td>0.001 sec</td>
+	</tr>
+	<tr>
+		<td>2,500</td>
+		<td>0.019 sec</td>
+		<td>0.006 sec</td>
+		<td>0.006 sec</td>
+		<td>0.008 sec</td>
+	</tr>
+	<tr>
+		<td>25,000</td>
+		<td>0.275 sec</td>
+		<td>0.069 sec</td>
+		<td>0.058 sec</td>
+		<td>0.052 sec</td>
+	</tr>
+	<tr>
+		<td>250,000</td>
+		<td class="bad">3.622 sec</td>
+		<td>0.702 sec</td>
+		<td>0.589 sec</td>
+		<td>0.523 sec</td>
+	</tr>
+	<tr>
+		<td>1,000,000</td>
+		<td class="bad">16.301 sec</td>
+		<td class="medium">2.789 sec</td>
+		<td class="medium">2.456 sec</td>
+		<td class="medium">2.019 sec</td>
+	</tr>
+</table>
+
+<h3>Infinite Scroll</h3>
+
+Now, rendering, sorting and searching was fast on large data sets, but still was not good enough if the number of records goes
+over 250K. I did not know any other way to make it faster and I think it hits the performace ceiling just because there is 
+nothing else you can do to optimize it. There is no way to create indexes in JavaScript, but database already have this functionality.
+So, to make your grid work on large data set you can use Infinite Scroll, which I have also implemented in the grid.
+<div class="spacer10"></div>
+
+I have created a Postgres database with 1 million records and implemented infinite scroll in the grid, buffering
+100 records at a time. All my test have shown that it was never over 0.2 seconds to sort and search through this record set.
+
+<h3>Browsers Test</h3>
+
+Initially, I have done all my tests in Chrome. Now, I wanted to repeat them on other browsers too. 
+Though Chrome performed better in most categories, the test have shown that other 
+browsers can do a pretty good job with large data sets. I have recorded best of 5 tries for each browser in each category.
+<div class="spacer20"></div>
+
+<b>Render</b> - (green - best, yellow - second best)
+<table class="results">
+	<tr>
+		<td># of Records</td>
+		<td>Chrome</td>
+		<td>FireFox</td>
+		<td>Safari 6</td>
+		<td>Opera</td>
+		<td>IE 9</td>
+	</tr>
+	<tr>
+		<td>25</td>
+		<td class="second">0.028 sec</td> 
+		<td>0.047 sec</td> 
+		<td class="b
