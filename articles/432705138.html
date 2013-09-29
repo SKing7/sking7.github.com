@@ -185,4 +185,245 @@ git diff --since=1.week.ago --until=1.minute.ago //还可以根据时间来比�
 <img class="alignnone size-full wp-image-1413" alt="2._git_blame__base.less_--date_short__git__and_New_Tab-3" src="http://luolei.org/wp-content/uploads/2013/09/2._git_blame__base.less_-date_short__git__and_New_Tab-3.png" width="680" height="486" data-pinit="registered" />
 <h4>git config进阶</h4>
 <p>config 就是配置的意思，git config 字如其意，就是 git 的配置文件，git config 文件有三层。<br />
-第一层config是在系统层<code>etc/gitconfig</code>， 可以�
+第一层config是在系统层<code>etc/gitconfig</code>， 可以通过使用 <code>git config --system</code>来进行配置，此层gitcofnig 配置针对系统所有用户的分支都有效。</p>
+<p>第二层是<code>~/.gitconfig</code>，针对某个用户有效，针对此层设置使用的是<code>git config --global</code>命令。</p>
+<p>第三层是项目文件夹中的配置文件，比如说我有一个 project1的文件夹，<code>project1/.git/config</code>就是在这个 repo 中使用的 gitconfig 配置。直接使用<code>git config</code> 就能进行配置。</p>
+<h6>基础配置</h6>
+<p><code>git config --help</code>,使用这个命令可以列出 git config 的帮助列表。<br />
+而使用<code>git config --list</code>,则可以显示你目前的 git config 配置。</p>
+<p><strong>用户信息配置</strong></p>
+<pre><code>git config --global user.name "will luo" //
+git config --global user.emal "i@luolei.org" //
+</code></pre>
+<p><strong>颜色设置</strong></p>
+<pre><code>git config --global color.ui true //
+</code></pre>
+<p>git 在终端显示会有颜色</p>
+<p><code>color.*</code></p>
+<p>如果你想针对不同的 git 命令输出不同的配色，你可以使用 <code>color.[command-type]</code> 命令。</p>
+<pre><code>color.branch 
+color.diff
+color.interactive
+color.status
+</code></pre>
+<p>以上参数都能设置<code>true</code>,<code>false</code>,<code>always</code>。</p>
+<pre><code>git config --global color.diff.meta "blue black bold"
+</code></pre>
+<p>这段代码的意思就是git diff 输出的「git 改变的信息(diff)」 以粗体、蓝色前景、黑色背景的形式展现。<br />
+能设置的颜色值包括<br />
+<code>normal, black, red, green, yellow, blue, magenta, cyan, white.</code>，字体属性则有<code>bold, dim, ul, blink, reverse</code>.</p>
+<p><strong>ALIASES</strong></p>
+<p><code>git config --global alias.mylog "log --pretty=format:'%h %ad- %s [%an]' --graph "</code></p>
+<p><code>git config --global --add alias.lol "log --graph --decorate --pretty=oneline --abbrev-commit --all"</code></p>
+<p>这样就自定义<code>git mylog</code>,和<code>git lol</code>两个命令，至于是什么样的效果，大家就根据代码的意思领悟和学习一下吧。</p>
+<p>对于我们日常常用的 git 命令，我们可以通过</p>
+<pre><code>git config --global alias.st status //status 缩写成 st
+git config --global alias.co checkout //checkout 缩写成 co
+git config --global alias.br branch //branch 缩写成 br
+git config --global alias.ci commit //commit 缩写成 ci
+</code></pre>
+<p>大家可以根据自己的喜好来缩写，当然，到时候别忘了备份自己的 config 文件（可参考我的博文<a href="http://luolei.org/2013/09/dotfiles-tutorial/">dotfiles新手教程</a>）。</p>
+<div class="wumii-hook">
+    <input type="hidden" name="wurl" value="http://luolei.org/2013/09/git-config-advanced/" /><br />
+    <input type="hidden" name="wtitle" value="Git log diff config高级进阶" /><br />
+    <input type="hidden" name="wpic" value="" />
+</div>
+</section> <!-- end article section -->
+<footer class="article-footer">		
+<p class="tags"><span class="tags-title"></span> <a href="http://luolei.org/tag/git/" rel="tag">git</a><a href="http://luolei.org/tag/%e6%95%99%e7%a8%8b/" rel="tag">教程</a></p></footer> <!-- end article footer -->
+<a name="comments"></a>
+
+<div class="ds-thread" data-thread-key="1411" data-author-key="1" data-title="Git log diff config高级进阶" data-url="http://luolei.org/2013/09/git-config-advanced/"></div>
+
+<script type="text/javascript">
+	if (typeof DUOSHUO !== 'undefined')
+		DUOSHUO.EmbedThread('.ds-thread');
+</script>
+	<div id="ds-ssr">
+
+		
+            <ol id="commentlist">
+                		<li class="comment even thread-even depth-1" id="li-comment-1204">
+			<article id="comment-1204" class="comment">
+				<footer class="comment-meta">
+					<cite class="comment-author vcard">
+						<span class="fn"><a href='http://blog.banbanchs.info' rel='external nofollow' class='url'>Silent_Voyage</a></span> on <a rel="nofollow" href="http://luolei.org/2013/09/git-config-advanced/#comment-1204"><time pubdate datetime="2013-09-07T21:36:33+00:00">2013 年 09 月 07 日 at 下午 9:36</time></a> <span class="says">said:</span>					</cite><!-- .comment-author .vcard -->
+				</footer>
+	
+				<div class="comment-content"><p>git blame index.html &#8211;data short这个&#8211;data应该是&#8211;date? 我不太懂，这是zsh自动补全的$ git blame &#8211;d&#8211;date                    &#8212; format of date output&#8211;date-order              &#8212; display commits in date order&#8230;</p>
+</div>
+				
+			</article><!-- #comment-## -->
+		<ul class="children">
+		<li class="comment byuser comment-author-luolei bypostauthor odd alt depth-2" id="li-comment-1205">
+			<article id="comment-1205" class="comment">
+				<footer class="comment-meta">
+					<cite class="comment-author vcard">
+						<span class="fn"><a href='http://luolei.org' rel='external nofollow' class='url'>罗罗磊磊</a></span> on <a rel="nofollow" href="http://luolei.org/2013/09/git-config-advanced/#comment-1205"><time pubdate datetime="2013-09-07T21:49:33+00:00">2013 年 09 月 07 日 at 下午 9:49</time></a> <span class="says">said:</span>					</cite><!-- .comment-author .vcard -->
+				</footer>
+	
+				<div class="comment-content"><p>依靠时间顺训，显示index.html 的每次修改的变化</p>
+</div>
+				
+			</article><!-- #comment-## -->
+		<ul class="children">
+		<li class="comment even depth-3" id="li-comment-1206">
+			<article id="comment-1206" class="comment">
+				<footer class="comment-meta">
+					<cite class="comment-author vcard">
+						<span class="fn"><a href='http://blog.banbanchs.info' rel='external nofollow' class='url'>Silent_Voyage</a></span> on <a rel="nofollow" href="http://luolei.org/2013/09/git-config-advanced/#comment-1206"><time pubdate datetime="2013-09-07T22:30:09+00:00">2013 年 09 月 07 日 at 下午 10:30</time></a> <span class="says">said:</span>					</cite><!-- .comment-author .vcard -->
+				</footer>
+	
+				<div class="comment-content"><p>额，我的意思是你把date打错成data了</p>
+</div>
+				
+			</article><!-- #comment-## -->
+		<ul class="children">
+		<li class="comment byuser comment-author-luolei bypostauthor odd alt depth-4" id="li-comment-1207">
+			<article id="comment-1207" class="comment">
+				<footer class="comment-meta">
+					<cite class="comment-author vcard">
+						<span class="fn"><a href='http://luolei.org' rel='external nofollow' class='url'>罗罗磊磊</a></span> on <a rel="nofollow" href="http://luolei.org/2013/09/git-config-advanced/#comment-1207"><time pubdate datetime="2013-09-07T23:20:33+00:00">2013 年 09 月 07 日 at 下午 11:20</time></a> <span class="says">said:</span>					</cite><!-- .comment-author .vcard -->
+				</footer>
+	
+				<div class="comment-content"><p>还真是，我几个地方都随手把 date 打成了 data 了，多谢提醒。</p>
+</div>
+				
+			</article><!-- #comment-## -->
+		</li><!-- #comment-## -->
+		<li class="comment byuser comment-author-luolei bypostauthor even depth-4" id="li-comment-1208">
+			<article id="comment-1208" class="comment">
+				<footer class="comment-meta">
+					<cite class="comment-author vcard">
+						<span class="fn"><a href='http://luolei.org' rel='external nofollow' class='url'>罗罗磊磊</a></span> on <a rel="nofollow" href="http://luolei.org/2013/09/git-config-advanced/#comment-1208"><time pubdate datetime="2013-09-07T23:21:10+00:00">2013 年 09 月 07 日 at 下午 11:21</time></a> <span class="says">said:</span>					</cite><!-- .comment-author .vcard -->
+				</footer>
+	
+				<div class="comment-content"><p>顺便提醒一下，你的网站被黑了，自动跳转到广告界面。</p>
+</div>
+				
+			</article><!-- #comment-## -->
+		<ul class="children">
+		<li class="comment odd alt depth-5" id="li-comment-1225">
+			<article id="comment-1225" class="comment">
+				<footer class="comment-meta">
+					<cite class="comment-author vcard">
+						<span class="fn">Silent_Voyage</span> on <a rel="nofollow" href="http://luolei.org/2013/09/git-config-advanced/#comment-1225"><time pubdate datetime="2013-09-08T20:57:50+00:00">2013 年 09 月 08 日 at 下午 8:57</time></a> <span class="says">said:</span>					</cite><!-- .comment-author .vcard -->
+				</footer>
+	
+				<div class="comment-content"><p>那域名过期了忘记去多说改了&#8230;</p>
+</div>
+				
+			</article><!-- #comment-## -->
+		</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+            </ol>
+
+		            
+    </div></article> <!-- end article -->
+</div> <!-- end #main -->
+</div> <!-- end #inner-content -->
+</div>
+
+
+<footer class="footer" role="contentinfo">
+
+<div id="inner-footer" class="wrap clearfix">
+<div class="footer-comments-list footer-box">
+<h6>最新评论</h6>
+<ul class="recentcomments">
+<li class="footer-comment-in-list">
+
+<img alt='' src='http://1.gravatar.com/avatar/357a20e8c56e69d6f9734d23ef9517e8?s=32&amp;d=&amp;r=G' class='avatar avatar-32 photo' height='32' width='32' /><a href="http://luolei.org/2013/09/regula-expression-simple-tutorial/#comment-1274"> QQ:d[123567890]+$, 是可以不用d吧？</a>
+</li>
+<li class="footer-comment-in-list">
+
+<img alt='' src='http://0.gravatar.com/avatar/?s=32' class='avatar avatar-32 photo avatar-default' height='32' width='32' /><a href="http://luolei.org/2013/09/dotfiles-tutorial/#comment-1273"> 其实我的疑问是:Symbolic link不是类似于shorcuts嘛,也就说它是一个新文件啊,dropbox同步的时候居然同步的源文件,而不是Symbolic link文件?(被Windows荼毒太深?)想到一种解释:就是dropbox,git等等软件在处理softlink类型的文件时,会去找它指向的文件同步,而不是softlink文件本身,不知道对不对? <img src="http://img.t.sinajs.cn/t35/style/images/common/face/ext/normal/5c/yw_org.gif" /> </a>
+</li>
+<li class="footer-comment-in-list">
+
+<img alt='' src='http://0.gravatar.com/avatar/4c1bd12b2ed1770ef6ad6ff3e739aec5?s=32&amp;d=&amp;r=G' class='avatar avatar-32 photo' height='32' width='32' /><a href="http://luolei.org/2013/08/tiny-time-film-review/#comment-1272"> 《致青春》、《小时代》占据了6月档，其实，我更希望看到老友记《爱4》及《爱情公寓》电影版，可惜只能等到过年啦！</a>
+</li>
+<li class="footer-comment-in-list">
+
+<img alt='' src='http://0.gravatar.com/avatar/?s=32' class='avatar avatar-32 photo avatar-default' height='32' width='32' /><a href="http://luolei.org/2013/09/dotfiles-tutorial/#comment-1270"> 为什么是软链接而不是硬链接?</a>
+</li>
+<li class="footer-comment-in-list">
+
+<img alt='' src='http://1.gravatar.com/avatar/b45f55b055f50eb5868f8efaa607af66?s=32&amp;d=&amp;r=G' class='avatar avatar-32 photo' height='32' width='32' /><a href="http://luolei.org/2013/08/books-i-read-in-2013/#comment-1268"> 你看书的速度是不是太快了，一个月看了好几本。。。是学生么呃？</a>
+</li>
+</ul>
+</div>
+
+<div class="footer-box footer-tag-list">
+<h6>标签云</h6>
+<a href='http://luolei.org/tag/%e5%be%ae%e5%8d%9a/' class='tag-link-14' title='5个话题' style='font-size: 12pt;'>微博</a>
+<a href='http://luolei.org/tag/%e5%91%a8%e5%ad%9d%e6%ad%a3/' class='tag-link-19' title='2个话题' style='font-size: 12pt;'>周孝正</a>
+<a href='http://luolei.org/tag/%e6%9a%a8%e5%8d%97%e5%a4%a7%e5%ad%a6/' class='tag-link-24' title='3个话题' style='font-size: 12pt;'>暨南大学</a>
+<a href='http://luolei.org/tag/%e5%aa%92%e4%bd%93/' class='tag-link-15' title='2个话题' style='font-size: 12pt;'>媒体</a>
+<a href='http://luolei.org/tag/life/' class='tag-link-11' title='2个话题' style='font-size: 12pt;'>生活</a>
+<a href='http://luolei.org/tag/develop/' class='tag-link-115' title='4个话题' style='font-size: 12pt;'>前端</a>
+<a href='http://luolei.org/tag/%e5%b7%9d%e8%97%8f%e7%ba%bf/' class='tag-link-56' title='3个话题' style='font-size: 12pt;'>川藏线</a>
+<a href='http://luolei.org/tag/%e9%aa%91%e8%a1%8c/' class='tag-link-40' title='8个话题' style='font-size: 12pt;'>骑行</a>
+<a href='http://luolei.org/tag/it/' class='tag-link-3' title='4个话题' style='font-size: 12pt;'>互联网</a>
+<a href='http://luolei.org/tag/%e7%94%b5%e5%bd%b1/' class='tag-link-104' title='3个话题' style='font-size: 12pt;'>电影</a>
+<a href='http://luolei.org/tag/%e6%8f%92%e4%bb%b6/' class='tag-link-61' title='3个话题' style='font-size: 12pt;'>插件</a>
+<a href='http://luolei.org/tag/%e6%9d%82%e6%83%b3/' class='tag-link-36' title='2个话题' style='font-size: 12pt;'>杂想</a>
+<a href='http://luolei.org/tag/%e5%b9%bf%e5%91%8a/' class='tag-link-9' title='2个话题' style='font-size: 12pt;'>广告</a>
+<a href='http://luolei.org/tag/%e8%af%bb%e4%b9%a6/' class='tag-link-16' title='7个话题' style='font-size: 12pt;'>读书</a>
+<a href='http://luolei.org/tag/design/' class='tag-link-20' title='7个话题' style='font-size: 12pt;'>设计</a>
+<a href='http://luolei.org/tag/%e6%95%99%e7%a8%8b/' class='tag-link-99' title='4个话题' style='font-size: 12pt;'>教程</a>
+<a href='http://luolei.org/tag/318/' class='tag-link-57' title='3个话题' style='font-size: 12pt;'>318</a>
+<a href='http://luolei.org/tag/chrome/' class='tag-link-30' title='5个话题' style='font-size: 12pt;'>chrome</a>
+<a href='http://luolei.org/tag/%e7%ae%80%e5%8e%86/' class='tag-link-28' title='2个话题' style='font-size: 12pt;'>简历</a>
+<a href='http://luolei.org/tag/%e6%96%b9%e6%bb%a8%e5%85%b4/' class='tag-link-4' title='2个话题' style='font-size: 12pt;'>方滨兴</a></div>
+
+<div class="footer-box footer-contact-info">
+
+
+</div>
+
+
+</div> <!-- end #inner-footer -->
+
+</footer> <!-- end footer -->
+<div class="copyright">
+<p>Copyright &copy; 2013 罗磊的独立博客 |<a href="http://this.is26.com"> Designed by [THIS.IS26.COM] 二十六號工作室</a>| ALL RIGHTS RESERVED </p>          
+</div>
+
+</div> <!-- end #container -->
+
+<!-- all js scripts are loaded in library/bones.php -->
+
+<p style="margin:0;padding:0;height:1px;overflow:hidden;">
+    <script type="text/javascript"><!--
+        var wumiiSitePrefix = "http://luolei.org";
+        var wumiiEnableCustomPos = false;
+        var wumiiParams = "&num=4&mode=3&displayInFeed=0&version=1.0.5.6&pf=WordPress3.6.1";
+        var wumiiCategories = ["\u524d\u7aef"];
+    //--></script><script type="text/javascript" src="http://widget.wumii.cn/ext/relatedItemsWidget"></script><a href="http://www.wumii.com/widget/relatedItems" style="border:0;"><img src="http://static.wumii.cn/images/pixel.png" alt="无觅相关文章插件，快速提升流量" style="border:0;padding:0;margin:0;" /></a>
+</p><script type='text/javascript' src='http://luolei.org/wp-content/themes/will-box/library/js/scripts.js'></script>
+<script>
+$(".flexnav").flexNav();
+</script>
+
+<!-- 百度统计代码 默认隐藏-->
+<span class="analysis">
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fd60bcc77299990ec2461de1b0c126319' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</span>
+<script type="text/javascript">if(!NREUMQ.f){NREUMQ.f=function(){NREUMQ.push(["load",new Date().getTime()]);var e=document.createElement("script");e.type="text/javascript";e.src=(("http:"===document.location.protocol)?"http:":"https:")+"//"+"js-agent.newrelic.com/nr-100.js";document.body.appendChild(e);if(NREUMQ.a)NREUMQ.a();};NREUMQ.a=window.onload;window.onload=NREUMQ.f;};NREUMQ.push(["nrfj","beacon-2.newrelic.com","d01b903e74","3018322","ZlwAZhFQWhAHU0UNDl8WN0AKHl0NAlVJShFZSQ==",0,10,new Date().getTime(),"","","","",""]);</script></body>
+</html> <!-- end page. what a ride! -->
+
+<!-- Dynamic page generated in 0.418 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2013-09-29 21:08:19 -->
+
+<!-- super cache -->
