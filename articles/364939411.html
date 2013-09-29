@@ -69,4 +69,118 @@
 
 <h2>思路</h2>
 
-<p>我们的思路是在Dropbox客户端的目录中建立Git仓库，然后我们clone
+<p>我们的思路是在Dropbox客户端的目录中建立Git仓库，然后我们clone此仓库到本地仓库，然后我们进行提交操作，完成提交之后，我们执行push操作，
+那么本地的数据会被push到Dropbox客户端目录的仓库中，之后Dropbox客户端会把仓库文件的更改同步到Dropbox服务器。</p>
+
+<pre><code>+------------+            +-----------+              +---------+
+|  Dropbox   |  --Sync-&gt;  |  Dropbox  |   --Clone-&gt;  | Working |
+|   Server   |  &lt;-Sync--  |   Client  |   &lt;-Push---  |  Space  |
++------------+            +-----------+              +---------+
+</code></pre>
+
+<h2>实现</h2>
+
+<p>我们现在Dropbox的目录中创建一个裸git仓库</p>
+
+<pre><code>$ cd ~/Dropbox
+$ git init --bare project.git
+</code></pre>
+
+<p>完成之后，我们clone这个仓库</p>
+
+<pre><code>$ cd ~
+$ git clone ~/Dropbox/project.git project
+$ cd project
+</code></pre>
+
+<p>提交并且push</p>
+
+<pre><code>$ touch README
+$ git add .
+$ git commit -m "init commit"
+$ git push origin master
+</code></pre>
+
+<p>完成之后，Dropbox会把你push的内容同步到服务器，你通过<a href="https://www.dropbox.com/">https://www.dropbox.com/</a>可以查看到仓库的内容。</p>
+
+<h2>参考</h2>
+
+<p><a href="http://stackoverflow.com/questions/1960799/using-gitdropbox-together-effectively">http://stackoverflow.com/questions/1960799/using-gitdropbox-together-effectively</a></p>
+
+	(完)
+
+	<div class="post-info">
+		24 Nov 2012  
+	
+		
+	
+		
+	</div>
+	
+	<!-- disqus start -->
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+	    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+	    var disqus_shortname = 'jeremywei'; // required: replace example with your forum shortname
+
+	    /* * * DON'T EDIT BELOW THIS LINE * * */
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+	<!-- disqus end -->
+
+	<!-- related start -->
+	<div id="related">
+	  <h2>相关内容</h2>
+	  <ul class="posts">
+	    
+	      <li><span>31 Aug 2013</span> &raquo; <a href="/responsive-design-with-css3-media-queries.html">利用媒体查询进行响应式设计</a></li>
+	    
+	      <li><span>24 Aug 2013</span> &raquo; <a href="/responsive-design-in-3-steps.html">响应式web设计(Responsive web design)三步曲</a></li>
+	    
+	      <li><span>14 Aug 2013</span> &raquo; <a href="/a-primer-on-hybrid-apps-for-ios.html">iOS混合应用开发入门</a></li>
+	    
+	      <li><span>09 Aug 2013</span> &raquo; <a href="/viewports2.html">两个viewport的故事（第二部分）</a></li>
+	    
+	      <li><span>21 Jul 2013</span> &raquo; <a href="/viewports.html">两个viewport的故事（第一部分）</a></li>
+	    
+	  </ul>
+	</div>
+	<!-- related end -->
+</div>
+  
+<div class="footer"></div>
+<div class="power">  
+  Powered by <a href="http://github.com/" targe="_blank">Github</a> &nbsp;&amp;&amp;&nbsp; <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> 
+</div>
+</div>
+
+<a href="http://github.com/jeremywei" target="_blank">
+	<img class="right-banner first" src="http://s0-weizhifeng-net.b0.upaiyun.com/images/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" />
+</a>
+
+<a href="http://www.phptherightway.com" target="_blank">
+    <img class="right-banner second" src="http://s0-weizhifeng-net.b0.upaiyun.com/images/php-the-right-way-120x60.png" alt="PHP: The Right Way"/>
+</a>
+</body>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-5179718-7']);
+  _gaq.push(['_setDomainName', 'weizhifeng.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</html>

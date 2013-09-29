@@ -104,4 +104,226 @@ _gaq.push(['_trackPageview']);
 <p>A middle ground is to alter domain sharding depending on the client: 1 domain for browsers that support SPDY, 2 domains for non-SPDY modern browsers, 3-4 domains for IE 6-7. This makes domain sharding harder to deploy. It also lowers the cache hit rate on intermediate proxies.</p>
 <p>There&#8217;s no need for domain sharding in the world of HTTP 2.0 across all popular browsers. Until then, there&#8217;s no silver bullet answer. But if you&#8217;re one of the websites with 39+ resources on a single hostname, domain sharding is worth exploring.</p>
 
-<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"><div class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul class="related_post wp_rp" style="visibility: visible"><li ><a href="http://www.stevesouders.com/blog/2009/05/12/
+<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"><div class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul class="related_post wp_rp" style="visibility: visible"><li ><a href="http://www.stevesouders.com/blog/2009/05/12/sharding-dominant-domains/" class="wp_rp_title">Sharding Dominant Domains</a></li><li ><a href="http://www.stevesouders.com/blog/2009/11/12/speedy-twice-as-fast-as-http/" class="wp_rp_title">SPeeDY &#8211; twice as fast as HTTP</a></li><li ><a href="http://www.stevesouders.com/blog/2010/02/15/browser-performance-wishlist/" class="wp_rp_title">Browser Performance Wishlist</a></li><li ><a href="http://www.stevesouders.com/blog/2011/04/18/http-archive-max-ag/" class="wp_rp_title">HTTP Archive: max-age</a></li><li ><a href="http://www.stevesouders.com/blog/2011/05/09/http-archive-servers-and-most-404s/" class="wp_rp_title">HTTP Archive: servers and most 404s</a></li></ul><div class="wp_rp_footer"><a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts">Zemanta</a></div></div></div>
+            
+            			
+		</div><!-- #post-## -->
+
+
+		
+			<div id="comments">
+
+			<h3 id="comments-title">12 Responses to <em>Domain Sharding revisited</em></h3>
+
+
+			<ol class="commentlist">
+				<li class="comment even thread-even depth-1" id="li-comment-60142">
+<div id="comment-60142">
+<p class="comment-metadata">
+<strong><a href='http://andydavies.me' rel='external nofollow' class='url'>Andy Davies</a></strong> | 05-Sep-13 at 11:02 am | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60142">Permalink</a> |  </p>
+
+
+<p>Will Chan talked about the network congestion produced by too many shards here &#8211; <a href="https://insouciant.org/tech/network-congestion-and-web-browsing/#Google_Kitten_Search" rel="nofollow">https://insouciant.org/tech/network-congestion-and-web-browsing/#Google_Kitten_Search</a></p>
+<p>The post has a really interesting line that Chrome is already limiting parallelism for some types of resources &#8220;Indeed, we’ve experimented with doing so and found compelling data to support limiting the number of concurrent image requests to 10, which should roll out to stable channel in the upcoming Chrome 27 release and dramatically mitigate congestion related issues.&#8221;</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60144">
+<div id="comment-60144">
+<p class="comment-metadata">
+<strong><a href='http://www.softwarearchiblog.com/' rel='external nofollow' class='url'>Lior Bar-On</a></strong> | 05-Sep-13 at 12:30 pm | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60144">Permalink</a> |  </p>
+
+
+<p>Repost due to some bad edits:</p>
+<p>Hi Steve,</p>
+<p>Thanks for the interesting article!</p>
+<p>According to what I know, the HTTP standard recommended a limit of 2 connections per host – a limit no modern browser does comply to, anymore. browsers did select to use no more 6-8 parallel connections per host to balance between Parallelism and Congestion. As far as I read, this number is based on exhaustive testing.</p>
+<p>If browser makers would believe 10 or even 20 parallel connections per host is preferable, I believe they would have just done that.</p>
+<p>I understand the browser doesn&#8217;t know how many requests are expected per domain, while the site’s developer does. But… if the median site has 39 requests + I make a guess (from sites I know) almost all of the other domain require less than 6 request – it sound logical that increasing the browser amount of connections per domain would provide a benefit here. Yeah… this is just guessing.</p>
+<p>Is there any data available about the effect of “max domain sharding” on different web sites?</p>
+<p>Thanks in advance,<br />
+Lior</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-60145">
+<div id="comment-60145">
+<p class="comment-metadata">
+<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 05-Sep-13 at 1:07 pm | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60145">Permalink</a> |  </p>
+
+
+<p>Andy: Thanks for the pointer to Will&#8217;s (awesome) article. Note that this only applies to images, which are given a lower download priority than scripts &#038; stylesheets. Thus, a website might still benefit from domain sharding wrt non-image assets and to fill that queue of 10 image requests when it&#8217;s time.</p>
+<p>Lior: It is possible that browsers may revisit their max-connections-per-domain settings. Opera dropped there&#8217;s from 8 connections in Opera 8 down to 6 connections starting in Opera 11. It looks like IE 10 raised its value from 6 to 8 connections. Domain sharding is a way for the web developer to work with the browser to decide what&#8217;s best. Both are important. I&#8217;m not aware of any public data on this topic.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60146">
+<div id="comment-60146">
+<p class="comment-metadata">
+<strong>Patrick McManus</strong> | 05-Sep-13 at 9:45 pm | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60146">Permalink</a> |  </p>
+
+
+<p>Nice post Steve &#8211; a couple additional thoughts:</p>
+<p>1] the size of the resources being transferred should be a primary factor in deciding whether or not to shard aggressively. Small resources should be sharded more aggressively. Sharding large hi-res images is a great way to create self induced packet loss and retransmissions, but not sharding buttons and icons is a great way to leave unused bandwidth on the table.</p>
+<p>2] Both chrome and firefox will automatically unshard transparently for you when using spdy and both of the sharded hosts are at the same IP address and covered under one SSL cert (e.g. *.example.com). That&#8217;s pretty cool because you can automatically shard for HTTP/1 but not for HTTP/2 (spdy) without doing UA sniffing. Cause nothing ever goes wrong with UA sniffing :)</p>
+<p>3] At high levels of sharding-induced parallelism firefox will actually engage in pacing requests a few milliseconds apart.. they are staggered but by a factor much smaller than a RTT. This really helps with the packet loss problem.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-60147">
+<div id="comment-60147">
+<p class="comment-metadata">
+<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 06-Sep-13 at 9:06 am | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60147">Permalink</a> |  </p>
+
+
+<p>Patrick: Great to hear from you! I didn&#8217;t know about Chrome &#038; Firefox UNsharding &#8211; that&#8217;s very cool. And Firefox&#8217;s staggered multiple requests is great. Were those changes motivated by sharding specifically, or do those issues arise on popular websites even without sharding?</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60148">
+<div id="comment-60148">
+<p class="comment-metadata">
+<strong><a href='http://www.finanznachrichten.de' rel='external nofollow' class='url'>Markus</a></strong> | 07-Sep-13 at 11:22 am | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60148">Permalink</a> |  </p>
+
+
+<p>Thank you for the interesting article, Steve, but I disagree with your view of SPDY.</p>
+<p>SPDY requires a https connection which means that all those people using Internet Explorers will have see that the website is slower. So, using SPDY might bring a little improvement for one group (FF, Chrome), but it would bring make the website slower for IE users.</p>
+<p>According to this current report IE has a worldwide market share of 56 % (with IE8 as most important browser):<br />
+<a href="http://thenextweb.com/insider/2013/08/01/ie9-falls-below-10-market-share-firefox-hits-50-month-low-and-chrome-again-gains-the-most/" rel="nofollow">http://thenextweb.com/insider/2013/08/01/ie9-falls-below-10-market-share-firefox-hits-50-month-low-and-chrome-again-gains-the-most/</a></p>
+<p>On our German-speaking financial news website we have these numbers:</p>
+<p>1. Internet Explorer 33,98 %<br />
+2. Firefox 30,80 %<br />
+3. Safari 15,36 %<br />
+4. Chrome 10,42 %<br />
+5. Android Browser 6,52 %<br />
+6. Opera 1,28 %</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60149">
+<div id="comment-60149">
+<p class="comment-metadata">
+<strong>Klimax</strong> | 10-Sep-13 at 11:25 am | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60149">Permalink</a> |  </p>
+
+
+<p>Markus:<br />
+In what way it is slower? If it is badly configured server then, not surprising.<br />
+(<a href="http://blogs.msdn.com/b/ieinternals/archive/2011/03/26/https-and-connection-close-is-your-apache-modssl-server-configuration-set-to-slow.aspx" rel="nofollow">http://blogs.msdn.com/b/ieinternals/archive/2011/03/26/https-and-connection-close-is-your-apache-modssl-server-configuration-set-to-slow.aspx</a>)</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60153">
+<div id="comment-60153">
+<p class="comment-metadata">
+<strong><a href='http://www.finanznachrichten.de' rel='external nofollow' class='url'>Markus</a></strong> | 12-Sep-13 at 1:17 pm | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60153">Permalink</a> |  </p>
+
+
+<p>Klimax, no, the problem would not be the server, but the browsers.<br />
+Maybe half of the users have a browser which supports (already) SPDY. For them it could bring a little advantage.</p>
+<p>On the other handside the website would become slower for the others as users as building up a https connection takes extra time. When you look e.g. at tests with Chrome on WPT, you can see in the column &#8216;SSL Negotiation&#8217; the additional time to build up the https connection:<br />
+<a href="http://www.webpagetest.org/result/130912_CP_W1J/1/details/" rel="nofollow">http://www.webpagetest.org/result/130912_CP_W1J/1/details/</a></p>
+<p><a href="https://apis.google.com" rel="nofollow">https://apis.google.com</a> &#8230; 55 ms<br />
+<a href="https://twitter.com" rel="nofollow">https://twitter.com</a> &#8230; 171 ms<br />
+<a href="https://ssl.gstatic.com" rel="nofollow">https://ssl.gstatic.com</a> &#8230; 65 ms<br />
+<a href="https://googleads.g.doubleclick.net" rel="nofollow">https://googleads.g.doubleclick.net</a> &#8230; 69 ms</p>
+<p>So, SPDY might bring an advantage for half of the users if you then download many files through this connection, but in case you load only 1 or 2 files there might be no advantage.<br />
+And there should definitely be a disadvantage for all other people, e.g. those using browsers like the popular IE8 &#8230;</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60154">
+<div id="comment-60154">
+<p class="comment-metadata">
+<strong>Vignesh</strong> | 14-Sep-13 at 1:53 am | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60154">Permalink</a> |  </p>
+
+
+<p>Nice article Steve, </p>
+<p>Assume if we are having an index.html page, If that page requires like 10 external Js and Css files, Can we enable something in the server so that those files will be pushed for us from the server rather than we requesting the resources.</p>
+<p>This will reduce the number of HTTP requests that we create from client right. Is it possible Steve?</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-60155">
+<div id="comment-60155">
+<p class="comment-metadata">
+<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 14-Sep-13 at 9:17 am | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60155">Permalink</a> |  </p>
+
+
+<p>Vignesh: You can use LINK REL PREFETCH if you&#8217;re navigating from another page you own to index.html. If index.html is the first page the user is navigating to, then you can use <a href="http://www.chromium.org/spdy/link-headers-and-server-hint/link-rel-subresource" rel="nofollow">LINK REL SUBRESOURCE</a> but it&#8217;s not supported in many browsers. If you&#8217;re mostly thinking about scripts &#038; stylesheets then you can put those at the top of the HEAD (use async) and the browser will start fetching them immediately. Stay tuned for some future posts about prefetching.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60156">
+<div id="comment-60156">
+<p class="comment-metadata">
+<strong><a href='http://chris.improbable.org' rel='external nofollow' class='url'>Chris Adams</a></strong> | 16-Sep-13 at 5:07 pm | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60156">Permalink</a> |  </p>
+
+
+<p>Vignesh: one other neat thing – I did some testing and found that simply using link rel=&#8221;prefetch subresource&#8221; not only gave the expected super-fast performance in Chrome and improved the situation in Firefox and IE10, so you can get a nice win simply by adding one tag per script or stylesheet:</p>
+<p><a href="http://chris.improbable.org/experiments/browser/prefetch-timing.html" rel="nofollow">http://chris.improbable.org/experiments/browser/prefetch-timing.html</a></p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60159">
+<div id="comment-60159">
+<p class="comment-metadata">
+<strong>Vignesh</strong> | 23-Sep-13 at 3:35 am | <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/#comment-60159">Permalink</a> |  </p>
+
+
+<p>Steve : Nicely done.. Thanks a lot for the answer. That made a tremendous improvement in performance. </p>
+<p>Chris : Cool thing Chris. That was amazing :)</p>
+<p>I am digging in to performance more.. these things are getting interesting a lot.</p>
+</div>
+</li><!-- #comment-## -->
+			</ol>
+
+
+
+
+
+<div id="respond">
+
+
+
+<h3>Post a Comment<a rel="nofollow" id="cancel-comment-reply-link" href="/blog/2013/09/05/domain-sharding-revisited/#respond" style="display:none;">cancel</a></h3>
+
+<p>Your email is never published nor shared. Required fields are marked <span class='req'>*</span></p>
+
+
+<form action="http://www.stevesouders.com/blog/wp-comments-post.php" method="post" id="commentform">
+
+
+<p><label for="author"><small>Name <span class='req'>*</span></small></label>
+<input type="text" name="author" id="author" value="" size="22" tabindex="1" /></p>
+
+<p><label for="email"><small>Email <span class='req'>*</span></small></label>
+<input type="text" name="email" id="email" value="" size="22" tabindex="2" />
+</p>
+
+<p><label for="url"><small>Website</small></label><input type="text" name="url" id="url" value="" size="22" tabindex="3" />
+</p>
+
+
+
+
+<p><textarea name="comment" id="comment" cols="60" rows="10" tabindex="4"></textarea></p>
+
+<!--<p><small><strong>XHTML:</strong> You can use these tags: <code>&lt;a href=&quot;&quot; title=&quot;&quot;&gt; &lt;abbr title=&quot;&quot;&gt; &lt;acronym title=&quot;&quot;&gt; &lt;b&gt; &lt;blockquote cite=&quot;&quot;&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=&quot;&quot;&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=&quot;&quot;&gt; &lt;strike&gt; &lt;strong&gt; </code></small></p>-->
+
+<p><input name="submit" type="submit" id="submit" tabindex="5" value="Submit Comment" />
+<input type='hidden' name='comment_post_ID' value='3720' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p>
+<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="bf815debd7" /></p><div class='cq_question'><p class='cq_message'>Answer the question below to get past the spam blocker.</p></div><div class='formleft'><label for='url'>forty-eight minus 5 =</label></div><div class='formright'><input type='text' id='cq_answer' name='cq_answer' value='' size='4' /><span style='color:red;background:#fff;'>*</span></div><input type='hidden' id='cq_id' name='cq_id' value='8' /></div>
+</form>
+
+</div>
+
+
+
+</div><!-- #comments -->
+
+
+</div> <!-- end div id="content" -->
+</div>
+<div id="footer" class="containerwrapperpadded">
+<p>&copy; Steve Souders</p>
+</div>
+</body>
+</html>
+
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+Page Caching using disk: enhanced
+Database Caching 10/33 queries in 0.377 seconds using disk
+
+ Served from: www.stevesouders.com @ 2013-09-29 05:09:02 by W3 Total Cache -->
