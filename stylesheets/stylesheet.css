@@ -263,12 +263,11 @@ Full-Width Styles
 *******************************************************************************/
 
 .outer {
-  width: 100%;
+  padding:20px 50px; 
 }
 
 .inner {
   position: relative;
-  max-width: 640px;
   padding: 20px 10px;
   margin: 0 auto;
 }
@@ -362,6 +361,11 @@ Full-Width Styles
   border-bottom: 1px solid #111;
 }
 
+#main_content_wrap .real-link{
+    background:#f4f4f4;
+    color:#333;
+    font-size:12px;
+}
 #main_content {
   padding-top: 40px;
 }
