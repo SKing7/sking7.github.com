@@ -1,223 +1,247 @@
-
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-<meta charset="utf-8">
-<title>The protocol-relative URL - Paul Irish</title>
-<meta name="author" content="Paul Irish">
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <title></title>
+  </head>
+  <body>
+        <!-- MAIN CONTENT -->
+        <div id="main_content_wrap" class="outer">
+        <textarea style="visibility:none" id="html-area">
+
+<!DOCTYPE html&gt;
+<!--[if IEMobile 7 ]&gt;<html class="no-js iem7"&gt;<![endif]--&gt;
+<!--[if lt IE 9]&gt;<html class="no-js lte-ie8"&gt;<![endif]--&gt;
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]&gt;<!--&gt;<html class="no-js" lang="en"&gt;<!--<![endif]--&gt;
+<head&gt;
+<meta charset="utf-8"&gt;
+<title&gt;The protocol-relative URL - Paul Irish</title&gt;
+<meta name="author" content="Paul Irish"&gt;
  
 <meta name="description" content="There&#8217;s this little trick you can get away with that&#8217;ll save you some headaches: 1
-&lt;img src=&quot;//domain.com/img/logo.png&quot;&gt; &hellip;">
+&lt;img src=&quot;//domain.com/img/logo.png&quot;&gt; &hellip;"&gt;
  
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script type="text/javascript">
+<meta name="HandheldFriendly" content="True"&gt;
+<meta name="MobileOptimized" content="320"&gt;
+<meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+<script type="text/javascript"&gt;
 //<![CDATA[
 window.__CF=window.__CF||{};window.__CF.AJS={"cdnjs":{"__h":"1","cdnjs":"JS"}};
-//]]>
-</script>
-<script type="text/javascript">
+//]]&gt;
+</script&gt;
+<script type="text/javascript"&gt;
 //<![CDATA[
-try{if (!window.CloudFlare) { var CloudFlare=[{verbose:0,p:0,byc:0,owlid:"cf",bag2:0,mirage2:0,oracle:0,paths:{cloudflare:"/cdn-cgi/nexp/abv=3462778032/"},atok:"a52ea8a7396f85568b8d8358cf2545a6",zone:"paulirish.com",rocket:"0",apps:{"cdnjs":{"__h":"1","cdnjs":"JS"}}}];var a=document.createElement("script"),b=document.getElementsByTagName("script")[0];a.async=!0;a.src="//ajax.cloudflare.com/cdn-cgi/nexp/abv=3600133553/cloudflare.min.js";b.parentNode.insertBefore(a,b);}}catch(e){};
-//]]>
-</script>
-<script type="text/javascript" src="//ajax.cloudflare.com/cdn-cgi/nexp/abv=547027026/appsh.min.js"></script><script type="text/javascript">__CF.AJS.inith();</script><link rel="canonical" href="http://paulirish.com/2010/the-protocol-relative-url/">
-<link href="/favicon.ico" rel="icon">
-<link href="http://www.paulirish.com/stylesheets/A.screen.css,qsidebar.pagespeed.cf.gW-SmblZ_i.css" media="screen, projection" rel="stylesheet" type="text/css">
+try{if (!window.CloudFlare) { var CloudFlare=[{verbose:0,p:0,byc:0,owlid:"cf",bag2:0,mirage2:0,oracle:0,paths:{cloudflare:"/cdn-cgi/nexp/abv=3462778032/"},atok:"ff6ee6363e01443d047e66a1ab76abd8",zone:"paulirish.com",rocket:"0",apps:{"cdnjs":{"__h":"1","cdnjs":"JS"}}}];var a=document.createElement("script"),b=document.getElementsByTagName("script")[0];a.async=!0;a.src="//ajax.cloudflare.com/cdn-cgi/nexp/abv=3600133553/cloudflare.min.js";b.parentNode.insertBefore(a,b);}}catch(e){};
+//]]&gt;
+</script&gt;
+<script type="text/javascript" src="//ajax.cloudflare.com/cdn-cgi/nexp/abv=547027026/appsh.min.js"&gt;</script&gt;<script type="text/javascript"&gt;__CF.AJS.inith();</script&gt;<link rel="canonical" href="http://paulirish.com/2010/the-protocol-relative-url/"&gt;
+<link href="/favicon.ico" rel="icon"&gt;
+<link href="http://www.paulirish.com/stylesheets/A.screen.css,qsidebar.pagespeed.cf.gW-SmblZ_i.css" media="screen, projection" rel="stylesheet" type="text/css"&gt;
  
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold|PT+Sans:regular,italic,bold|Droid+Sans:400,700|Lato:700,900" rel="stylesheet" type="text/css">
-<script src="http://www.paulirish.com/javascripts/modernizr-2.0.js.pagespeed.jm.tWJiHFCbtH.js"></script>
-<script src="http://www.paulirish.com/javascripts/ender.js.pagespeed.jm.gNFbbAwMF-.js"></script>
-<script src="http://www.paulirish.com/javascripts/octopress.js.pagespeed.jm.m-13OjAywS.js" type="text/javascript"></script>
-<link href="http://feeds.feedburner.com/paul-irish" rel="alternate" title="Paul Irish" type="application/atom+xml">
-<script type="text/javascript">var _gaq=_gaq||[];_gaq.push(['_setAccount','UA-692547-2']);_gaq.push(['_trackPageview']);(function(){var ga=document.createElement('script');ga.type='text/javascript';ga.async=true;ga.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);})();</script>
-</head>
-<body>
-<header role="banner"><hgroup>
-<h1><a href="/">Paul Irish</a></h1>
-<h2>I make the www fun.</h2>
-</hgroup>
-</header>
-<nav role="navigation"><ul class="subscription" data-subscription="rss">
-<li><a href="http://feeds.feedburner.com/paul-irish" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-</ul>
-<form action="http://google.com/search" method="get">
-<fieldset role="search">
-<input type="hidden" name="q" value="site:paulirish.com"/>
-<input class="search" type="text" name="q" results="0" placeholder="Search"/>
-</fieldset>
-</form>
-<ul class="main-navigation">
-<li><a href="/">Blog</a></li>
-<li><a href="/blog/archives/">Archives</a></li>
-<li><a href="/about/">About</a></li>
-<li><a href="/contact-me/">Contact</a></li>
-</ul>
-</nav>
-<div id="main">
-<div id="content">
-<div>
-<article class="hentry" role="article">
-<header>
-<h1 class="entry-title">The Protocol-relative URL</h1>
-<p class="meta">
-<time datetime="2010-10-27T11:27:00-07:00" pubdate data-updated="true">Oct 27<span>th</span>, 2010</time>
-</p>
-</header>
-<div class="entry-content"><p>There&#8217;s this little trick you can get away with that&#8217;ll save you some headaches:</p>
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;//domain.com/img/logo.png&quot;</span><span class="nt">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-<p><img src="http://paulirish.com/wp-content/uploads/2010/10/this-page-contains-both-secure-and-nonsecure-items.gif" align="right" style="width: 222px; margin: 0 0 10px 10px;">If the browser is viewing that current page in through HTTPS, then it&#8217;ll request that asset with the HTTPS protocol, otherwise it&#8217;ll typically* request it with HTTP. This prevents that awful &#8220;This Page Contains Both Secure and Non-Secure Items&#8221; error message in IE, keeping all your asset requests within the same protocol.</p>
-<p>*Of course, if you&#8217;re viewing the file locally, it&#8217;ll try to request the file with the <code>file://</code> protocol.</p>
-<p>We use this trick in the <a href="http://html5boilerplate.com">HTML5 Boilerplate</a> for a clever request of jQuery off the Google CDN:</p>
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;script&gt;</span><span class="o">!</span><span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span> <span class="o">&amp;&amp;</span> <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">unescape</span><span class="p">(</span><span class="s1">&#39;%3Cscript src=&quot;js/libs/jquery-1.4.2.js&quot;%3E%3C/script%3E&#39;</span><span class="p">))</span><span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-<p>Technically, this is called a &#8220;network-path reference&#8221; according to <a href="http://tools.ietf.org/html/rfc3986#section-4.2">RFC 3986</a>. Oh and if you want to be <a href="http://url.spec.whatwg.org/#concept-scheme-relative-url">truly correct</a>, you&#8217;ll use the term &#8220;scheme&#8221; instead of &#8220;protocol&#8221; when talking about URLs.</p>
-<p>This trick also works fine in CSS:</p>
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.omgomg</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="sx">url(//websbestgifs.net/kittyonadolphin.gif)</span><span class="p">;</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-<p>&#8230; assuming the site you&#8217;re pointing to has this asset available on both HTTP and HTTPS.</p>
-<p>Caveat: When used on a &lt;link> or @import for a stylesheet, IE7 and IE8 <a href="http://www.stevesouders.com/blog/2010/02/10/5a-missing-schema-double-download/">download the file twice</a>. All other uses, however, are just fine.</p>
-<p><small>Thx to miketaylr, ralphholzmann, annevk for smarts on this, and ajaxian, where I think I learned it like 4 years ago? maybe?</small></p>
-<div class="update">2011.01.23: But… what about <a href="http://mathiasbynens.be/notes/async-analytics-snippet#protocol-check">using this on the Google Analytics snippet</a>?</div>
-<p>Yes of course, wouldn&#8217;t that be nice… So I worked with the Google Analytics javascript lead developer (God, I love working at google) to see if we could do this.. turns out we can&#8217;t. There is an edgecase bug in IE6 that causes a dialog to blow up&#8230; under some security settings (unsure if they are default) when requesting form the non-&#8216;ssl&#8217; subdomain. <a href="http://paulirish.com/i/7b01.png">screenshot here</a>. So feel free to take 40 bytes off your GA snippet if you don&#8217;t care about IE6.. otherwise you&#8217;re gonna need that ternary operator. :)</p>
-<div class=update>2011.12.24. Eric Law (from the IE team) chimes on why IE6 doesnt play well GA&#8230;</div>
-<blockquote>The reason this doesn&#8217;t work in IE6 is that the server is using SNI to deduce what certificate to return. XP (and thus IE6) doesn&#8217;t support SNI in the HTTPS stack. <a href="http://blogs.msdn.com/b/ieinternals/archive/2009/12/07/certificate-name-mismatch-warnings-and-server-name-indication.aspx">See for details.</a></blockquote>
-</div>
-<footer>
-<p class="meta">
-<span class="byline author vcard">Posted by <span class="fn">Paul Irish</span></span>
-<time datetime="2010-10-27T11:27:00-07:00" pubdate data-updated="true">Oct 27<span>th</span>, 2010</time>
-<span class="categories">
-<a class='category' href='/blog/categories/front-end-development/'>front-end development</a>
-</span>
-</p>
-<div class="sharing">
-<div class="g-plusone" data-size="medium"></div>
-</div>
-<p class="meta">
-<a class="basic-alignment left" href="/2010/announcing-html5-boilerplate/" title="Previous Post: Announcing: HTML5 Boilerplate">&laquo; Announcing: HTML5 Boilerplate</a>
-<a class="basic-alignment right" href="/2010/lazyweb-requests/" title="Next Post: A call for development help and research: Lazyweb Requests">A call for development help and research: Lazyweb Requests &raquo;</a>
-</p>
-</footer>
-</article>
-<section>
-<h1>Comments</h1>
-<div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-</section>
-</div>
-<aside class="sidebar">
-<section>
-<div>
-<p>
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold|PT+Sans:regular,italic,bold|Droid+Sans:400,700|Lato:700,900" rel="stylesheet" type="text/css"&gt;
+<script src="http://www.paulirish.com/javascripts/modernizr-2.0.js.pagespeed.jm.tWJiHFCbtH.js"&gt;</script&gt;
+<script src="http://www.paulirish.com/javascripts/ender.js.pagespeed.jm.gNFbbAwMF-.js"&gt;</script&gt;
+<script src="http://www.paulirish.com/javascripts/octopress.js.pagespeed.jm.m-13OjAywS.js" type="text/javascript"&gt;</script&gt;
+<link href="http://feeds.feedburner.com/paul-irish" rel="alternate" title="Paul Irish" type="application/atom+xml"&gt;
+<script type="text/javascript"&gt;var _gaq=_gaq||[];_gaq.push(['_setAccount','UA-692547-2']);_gaq.push(['_trackPageview']);(function(){var ga=document.createElement('script');ga.type='text/javascript';ga.async=true;ga.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);})();</script&gt;
+</head&gt;
+<body&gt;
+<header role="banner"&gt;<hgroup&gt;
+<h1&gt;<a href="/"&gt;Paul Irish</a&gt;</h1&gt;
+<h2&gt;I make the www fun.</h2&gt;
+</hgroup&gt;
+</header&gt;
+<nav role="navigation"&gt;<ul class="subscription" data-subscription="rss"&gt;
+<li&gt;<a href="http://feeds.feedburner.com/paul-irish" rel="subscribe-rss" title="subscribe via RSS"&gt;RSS</a&gt;</li&gt;
+</ul&gt;
+<form action="http://google.com/search" method="get"&gt;
+<fieldset role="search"&gt;
+<input type="hidden" name="q" value="site:paulirish.com"/&gt;
+<input class="search" type="text" name="q" results="0" placeholder="Search"/&gt;
+</fieldset&gt;
+</form&gt;
+<ul class="main-navigation"&gt;
+<li&gt;<a href="/"&gt;Blog</a&gt;</li&gt;
+<li&gt;<a href="/blog/archives/"&gt;Archives</a&gt;</li&gt;
+<li&gt;<a href="/about/"&gt;About</a&gt;</li&gt;
+<li&gt;<a href="/contact-me/"&gt;Contact</a&gt;</li&gt;
+</ul&gt;
+</nav&gt;
+<div id="main"&gt;
+<div id="content"&gt;
+<div&gt;
+<article class="hentry" role="article"&gt;
+<header&gt;
+<h1 class="entry-title"&gt;The Protocol-relative URL</h1&gt;
+<p class="meta"&gt;
+<time datetime="2010-10-27T11:27:00-07:00" pubdate data-updated="true"&gt;Oct 27<span&gt;th</span&gt;, 2010</time&gt;
+</p&gt;
+</header&gt;
+<div class="entry-content"&gt;<p&gt;There&#8217;s this little trick you can get away with that&#8217;ll save you some headaches:</p&gt;
+<figure class='code'&gt;<figcaption&gt;<span&gt;</span&gt;</figcaption&gt;<div class="highlight"&gt;<table&gt;<tr&gt;<td class="gutter"&gt;<pre class="line-numbers"&gt;<span class='line-number'&gt;1</span&gt;
+</pre&gt;</td&gt;<td class='code'&gt;<pre&gt;<code class='html'&gt;<span class='line'&gt;<span class="nt"&gt;&lt;img</span&gt; <span class="na"&gt;src=</span&gt;<span class="s"&gt;&quot;//domain.com/img/logo.png&quot;</span&gt;<span class="nt"&gt;&gt;</span&gt;
+</span&gt;</code&gt;</pre&gt;</td&gt;</tr&gt;</table&gt;</div&gt;</figure&gt;
+<p&gt;<img src="http://paulirish.com/wp-content/uploads/2010/10/this-page-contains-both-secure-and-nonsecure-items.gif" align="right" style="width: 222px; margin: 0 0 10px 10px;"&gt;If the browser is viewing that current page in through HTTPS, then it&#8217;ll request that asset with the HTTPS protocol, otherwise it&#8217;ll typically* request it with HTTP. This prevents that awful &#8220;This Page Contains Both Secure and Non-Secure Items&#8221; error message in IE, keeping all your asset requests within the same protocol.</p&gt;
+<p&gt;*Of course, if you&#8217;re viewing the file locally, it&#8217;ll try to request the file with the <code&gt;file://</code&gt; protocol.</p&gt;
+<p&gt;We use this trick in the <a href="http://html5boilerplate.com"&gt;HTML5 Boilerplate</a&gt; for a clever request of jQuery off the Google CDN:</p&gt;
+<figure class='code'&gt;<figcaption&gt;<span&gt;</span&gt;</figcaption&gt;<div class="highlight"&gt;<table&gt;<tr&gt;<td class="gutter"&gt;<pre class="line-numbers"&gt;<span class='line-number'&gt;1</span&gt;
+<span class='line-number'&gt;2</span&gt;
+</pre&gt;</td&gt;<td class='code'&gt;<pre&gt;<code class='html'&gt;<span class='line'&gt;<span class="nt"&gt;&lt;script </span&gt;<span class="na"&gt;src=</span&gt;<span class="s"&gt;&quot;//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js&quot;</span&gt;<span class="nt"&gt;&gt;&lt;/script&gt;</span&gt;
+</span&gt;<span class='line'&gt;<span class="nt"&gt;&lt;script&gt;</span&gt;<span class="o"&gt;!</span&gt;<span class="nb"&gt;window</span&gt;<span class="p"&gt;.</span&gt;<span class="nx"&gt;jQuery</span&gt; <span class="o"&gt;&amp;&amp;</span&gt; <span class="nb"&gt;document</span&gt;<span class="p"&gt;.</span&gt;<span class="nx"&gt;write</span&gt;<span class="p"&gt;(</span&gt;<span class="nx"&gt;unescape</span&gt;<span class="p"&gt;(</span&gt;<span class="s1"&gt;&#39;%3Cscript src=&quot;js/libs/jquery-1.4.2.js&quot;%3E%3C/script%3E&#39;</span&gt;<span class="p"&gt;))</span&gt;<span class="nt"&gt;&lt;/script&gt;</span&gt;
+</span&gt;</code&gt;</pre&gt;</td&gt;</tr&gt;</table&gt;</div&gt;</figure&gt;
+<p&gt;Technically, this is called a &#8220;network-path reference&#8221; according to <a href="http://tools.ietf.org/html/rfc3986#section-4.2"&gt;RFC 3986</a&gt;. Oh and if you want to be <a href="http://url.spec.whatwg.org/#concept-scheme-relative-url"&gt;truly correct</a&gt;, you&#8217;ll use the term &#8220;scheme&#8221; instead of &#8220;protocol&#8221; when talking about URLs.</p&gt;
+<p&gt;This trick also works fine in CSS:</p&gt;
+<figure class='code'&gt;<figcaption&gt;<span&gt;</span&gt;</figcaption&gt;<div class="highlight"&gt;<table&gt;<tr&gt;<td class="gutter"&gt;<pre class="line-numbers"&gt;<span class='line-number'&gt;1</span&gt;
+</pre&gt;</td&gt;<td class='code'&gt;<pre&gt;<code class='css'&gt;<span class='line'&gt;<span class="nc"&gt;.omgomg</span&gt; <span class="p"&gt;{</span&gt; <span class="k"&gt;background</span&gt;<span class="o"&gt;:</span&gt; <span class="sx"&gt;url(//websbestgifs.net/kittyonadolphin.gif)</span&gt;<span class="p"&gt;;</span&gt; <span class="p"&gt;}</span&gt;
+</span&gt;</code&gt;</pre&gt;</td&gt;</tr&gt;</table&gt;</div&gt;</figure&gt;
+<p&gt;&#8230; assuming the site you&#8217;re pointing to has this asset available on both HTTP and HTTPS.</p&gt;
+<p&gt;Caveat: When used on a &lt;link&gt; or @import for a stylesheet, IE7 and IE8 <a href="http://www.stevesouders.com/blog/2010/02/10/5a-missing-schema-double-download/"&gt;download the file twice</a&gt;. All other uses, however, are just fine.</p&gt;
+<p&gt;<small&gt;Thx to miketaylr, ralphholzmann, annevk for smarts on this, and ajaxian, where I think I learned it like 4 years ago? maybe?</small&gt;</p&gt;
+<div class="update"&gt;2011.01.23: But… what about <a href="http://mathiasbynens.be/notes/async-analytics-snippet#protocol-check"&gt;using this on the Google Analytics snippet</a&gt;?</div&gt;
+<p&gt;Yes of course, wouldn&#8217;t that be nice… So I worked with the Google Analytics javascript lead developer (God, I love working at google) to see if we could do this.. turns out we can&#8217;t. There is an edgecase bug in IE6 that causes a dialog to blow up&#8230; under some security settings (unsure if they are default) when requesting form the non-&#8216;ssl&#8217; subdomain. <a href="http://paulirish.com/i/7b01.png"&gt;screenshot here</a&gt;. So feel free to take 40 bytes off your GA snippet if you don&#8217;t care about IE6.. otherwise you&#8217;re gonna need that ternary operator. :)</p&gt;
+<div class=update&gt;2011.12.24. Eric Law (from the IE team) chimes on why IE6 doesnt play well GA&#8230;</div&gt;
+<blockquote&gt;The reason this doesn&#8217;t work in IE6 is that the server is using SNI to deduce what certificate to return. XP (and thus IE6) doesn&#8217;t support SNI in the HTTPS stack. <a href="http://blogs.msdn.com/b/ieinternals/archive/2009/12/07/certificate-name-mismatch-warnings-and-server-name-indication.aspx"&gt;See for details.</a&gt;</blockquote&gt;
+</div&gt;
+<footer&gt;
+<p class="meta"&gt;
+<span class="byline author vcard"&gt;Posted by <span class="fn"&gt;Paul Irish</span&gt;</span&gt;
+<time datetime="2010-10-27T11:27:00-07:00" pubdate data-updated="true"&gt;Oct 27<span&gt;th</span&gt;, 2010</time&gt;
+<span class="categories"&gt;
+<a class='category' href='/blog/categories/front-end-development/'&gt;front-end development</a&gt;
+</span&gt;
+</p&gt;
+<div class="sharing"&gt;
+<div class="g-plusone" data-size="medium"&gt;</div&gt;
+</div&gt;
+<p class="meta"&gt;
+<a class="basic-alignment left" href="/2010/announcing-html5-boilerplate/" title="Previous Post: Announcing: HTML5 Boilerplate"&gt;&laquo; Announcing: HTML5 Boilerplate</a&gt;
+<a class="basic-alignment right" href="/2010/lazyweb-requests/" title="Next Post: A call for development help and research: Lazyweb Requests"&gt;A call for development help and research: Lazyweb Requests &raquo;</a&gt;
+</p&gt;
+</footer&gt;
+</article&gt;
+<section&gt;
+<h1&gt;Comments</h1&gt;
+<div id="disqus_thread" aria-live="polite"&gt;<noscript&gt;Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript"&gt;comments powered by Disqus.</a&gt;</noscript&gt;
+</div&gt;
+</section&gt;
+</div&gt;
+<aside class="sidebar"&gt;
+<section&gt;
+<div&gt;
+<p&gt;
 Heyo, I'm
-a <strong>front-end developer</strong>,<br>
-a <strong>Google Chrome Developer Advocate</strong><br>
-a <strong>developer</strong> of
-<a href="http://modernizr.com">Modernizr</a>,
-<a href="http://yeoman.io">Yeoman</a>,
-<a href="http://css3please.com">CSS3 Please</a> and
-<a href="http://html5boilerplate.com">HTML5 Boilerplate</a>,<br>
-a <strong>curator</strong> of
-<a href="http://html5rocks.com">HTML5 Rocks</a>,<br>
-a <strong>creator</strong> of
-<a href="http://html5please.us">HTML5 Please</a>,
-<a href="http://mothereffingtextshadow.com">mothereffingtextshadow</a>,
-<a href="http://mothereffinghsl.com">mothereffinghsl</a>,
-<a href="http://movethewebforward.org">Move the Web Forward</a>,
-<a href="http://mothereffinganimatedgif.com">Mothereffing Animated GIF</a>,
-<a href="http://w3fools.com">W3Fools</a>,
-<a style="font-size:90%" href="http://chromestatus.com">chromestatus.com</a>,
-<a style="font-size:80%" href="http://html5readiness.com">HTML5 Readiness</a>,
-<a style="font-size:65%" href="http://na.isobar.com/standards/">Front-end Coding Standards</a>,
-<a style="font-size:60%" href="http://typerendering.com">Type Rendering Project</a>…
-<br/>
-a former <strong>host</strong> on the <a href="http://yayquery.com" title="yayQuery Podcast - It's about jQuery, duh. :)">yayQuery Podcast</a>,<br>
+a <strong&gt;front-end developer</strong&gt;,<br&gt;
+a <strong&gt;Google Chrome Developer Advocate</strong&gt;<br&gt;
+a <strong&gt;developer</strong&gt; of
+<a href="http://modernizr.com"&gt;Modernizr</a&gt;,
+<a href="http://yeoman.io"&gt;Yeoman</a&gt;,
+<a href="http://css3please.com"&gt;CSS3 Please</a&gt; and
+<a href="http://html5boilerplate.com"&gt;HTML5 Boilerplate</a&gt;,<br&gt;
+a <strong&gt;curator</strong&gt; of
+<a href="http://html5rocks.com"&gt;HTML5 Rocks</a&gt;,<br&gt;
+a <strong&gt;creator</strong&gt; of
+<a href="http://html5please.us"&gt;HTML5 Please</a&gt;,
+<a href="http://mothereffingtextshadow.com"&gt;mothereffingtextshadow</a&gt;,
+<a href="http://mothereffinghsl.com"&gt;mothereffinghsl</a&gt;,
+<a href="http://movethewebforward.org"&gt;Move the Web Forward</a&gt;,
+<a href="http://mothereffinganimatedgif.com"&gt;Mothereffing Animated GIF</a&gt;,
+<a href="http://w3fools.com"&gt;W3Fools</a&gt;,
+<a style="font-size:90%" href="http://chromestatus.com"&gt;chromestatus.com</a&gt;,
+<a style="font-size:80%" href="http://html5readiness.com"&gt;HTML5 Readiness</a&gt;,
+<a style="font-size:65%" href="http://na.isobar.com/standards/"&gt;Front-end Coding Standards</a&gt;,
+<a style="font-size:60%" href="http://typerendering.com"&gt;Type Rendering Project</a&gt;…
+<br/&gt;
+a former <strong&gt;host</strong&gt; on the <a href="http://yayquery.com" title="yayQuery Podcast - It's about jQuery, duh. :)"&gt;yayQuery Podcast</a&gt;,<br&gt;
 and
-an <strong>mp3 blogger</strong> at <a href="http://aurgasm.us">Aurgasm</a>.
-<br><br>I live in sunny Palo Alto.<br><br>
-<strong><a href="/contact-me/">Contact me</a></strong> or <b><a href="/about/">read more about me</a></b></p>
-<div style="text-align:center; margin: 15px 0;">
-<img id="side-avatar" width="150" height="150" src="http://paulirish.com/avatar150.jpg" title="Photo by Ben Alman. Scribble made here on this site background by @gravitywins."/>
-<script>(function(){var av=$('#side-avatar');av.hover(function(){av.attr('src','http://paulirish.com/avatar150-scribble.png');},function(){av.attr('src','http://paulirish.com/avatar150.jpg');});})();</script>
-</div>
-</div>
-</section>
-<section class="twitter">
-<a href="http://twitter.com/paul_irish" class="twitter-follow-button" data-show-count="false">Follow @paul_irish</a>
-</section>
-<section class="googleplus">
-<h3>
-<a href="https://google.com/+PaulIrish">
-<img src="http://www.google.com/images/icons/ui/gprofile_button-16.png" width="16" height="16">
+an <strong&gt;mp3 blogger</strong&gt; at <a href="http://aurgasm.us"&gt;Aurgasm</a&gt;.
+<br&gt;<br&gt;I live in sunny Palo Alto.<br&gt;<br&gt;
+<strong&gt;<a href="/contact-me/"&gt;Contact me</a&gt;</strong&gt; or <b&gt;<a href="/about/"&gt;read more about me</a&gt;</b&gt;</p&gt;
+<div style="text-align:center; margin: 15px 0;"&gt;
+<img id="side-avatar" width="150" height="150" src="http://paulirish.com/avatar150.jpg" title="Photo by Ben Alman. Scribble made here on this site background by @gravitywins."/&gt;
+<script&gt;(function(){var av=$('#side-avatar');av.hover(function(){av.attr('src','http://paulirish.com/avatar150-scribble.png');},function(){av.attr('src','http://paulirish.com/avatar150.jpg');});})();</script&gt;
+</div&gt;
+</div&gt;
+</section&gt;
+<section class="twitter"&gt;
+<a href="http://twitter.com/paul_irish" class="twitter-follow-button" data-show-count="false"&gt;Follow @paul_irish</a&gt;
+</section&gt;
+<section class="googleplus"&gt;
+<h3&gt;
+<a href="https://google.com/+PaulIrish"&gt;
+<img src="http://www.google.com/images/icons/ui/gprofile_button-16.png" width="16" height="16"&gt;
 +PaulIrish
-</a>
-</h3>
-</section>
-<p class="gittip">
-<script async data-gittip-username="paulirish" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+</a&gt;
+</h3&gt;
+</section&gt;
+<p class="gittip"&gt;
+<script async data-gittip-username="paulirish" data-gittip-widget="button" src="//gttp.co/v1.js"&gt;</script&gt;
 Tip me on Gittip, if you like.
-</p>
-<section>
-<h1>Popular Posts</h1>
-<ul id="recent_posts">
-<li class="post">
-<a href="/2012/a-browser-benchmark-that-has-your-back-robohornet/">A browser benchmark that has your back: RoboHornet</a>
-</li>
-<li class="post">
-<a href="/2008/conditional-stylesheets-vs-css-hacks-answer-neither/">Conditional stylesheets vs CSS hacks? Answer: Neither!</a>
-</li>
-<li class="post">
-<a href="/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/">Why moving elements with translate() is better than pos:abs top/left</a>
-</li>
-<li class="post">
-<a href="/2010/the-protocol-relative-url/">The protocol-relative URL</a>
-</li>
-<li class="post">
-<a href="/2012/chrome-canary-for-developers/">Chrome Canary for Developers</a>
-</li>
-</ul>
-</section>
-<section>
-<h1>GitHub</h1>
-<ul id="gh_repos">
-<li class="loading">Status updating...</li>
-</ul>
-<a href="https://github.com/paulirish">@paulirish</a> on GitHub
-<script type="text/javascript">$.domReady(function(){if(!window.jXHR){var jxhr=document.createElement('script');jxhr.type='text/javascript';jxhr.src='/javascripts/libs/jXHR.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(jxhr,s);}
-github.showRepos({user:'paulirish',count:3,skip_forks:true,target:'#gh_repos'});});</script>
-<script type="text/javascript">//<![CDATA[
-var github=(function(){function escapeHtml(str){return $('<div/>').text(str).html();}
-function render(target,repos){var i=0,fragment='',t=$(target)[0];for(i=0;i<repos.length;i++){fragment+='<li><a href="'+repos[i].html_url+'">'+repos[i].name+'</a><p>'+escapeHtml(repos[i].description||'')+'</p></li>';}
+</p&gt;
+<section&gt;
+<h1&gt;Popular Posts</h1&gt;
+<ul id="recent_posts"&gt;
+<li class="post"&gt;
+<a href="/2012/a-browser-benchmark-that-has-your-back-robohornet/"&gt;A browser benchmark that has your back: RoboHornet</a&gt;
+</li&gt;
+<li class="post"&gt;
+<a href="/2008/conditional-stylesheets-vs-css-hacks-answer-neither/"&gt;Conditional stylesheets vs CSS hacks? Answer: Neither!</a&gt;
+</li&gt;
+<li class="post"&gt;
+<a href="/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/"&gt;Why moving elements with translate() is better than pos:abs top/left</a&gt;
+</li&gt;
+<li class="post"&gt;
+<a href="/2010/the-protocol-relative-url/"&gt;The protocol-relative URL</a&gt;
+</li&gt;
+<li class="post"&gt;
+<a href="/2012/chrome-canary-for-developers/"&gt;Chrome Canary for Developers</a&gt;
+</li&gt;
+</ul&gt;
+</section&gt;
+<section&gt;
+<h1&gt;GitHub</h1&gt;
+<ul id="gh_repos"&gt;
+<li class="loading"&gt;Status updating...</li&gt;
+</ul&gt;
+<a href="https://github.com/paulirish"&gt;@paulirish</a&gt; on GitHub
+<script type="text/javascript"&gt;$.domReady(function(){if(!window.jXHR){var jxhr=document.createElement('script');jxhr.type='text/javascript';jxhr.src='/javascripts/libs/jXHR.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(jxhr,s);}
+github.showRepos({user:'paulirish',count:3,skip_forks:true,target:'#gh_repos'});});</script&gt;
+<script type="text/javascript"&gt;//<![CDATA[
+var github=(function(){function escapeHtml(str){return $('<div/&gt;').text(str).html();}
+function render(target,repos){var i=0,fragment='',t=$(target)[0];for(i=0;i<repos.length;i++){fragment+='<li&gt;<a href="'+repos[i].html_url+'"&gt;'+repos[i].name+'</a&gt;<p&gt;'+escapeHtml(repos[i].description||'')+'</p&gt;</li&gt;';}
 t.innerHTML=fragment;}
 return{showRepos:function(options){$.ajax({url:"https://api.github.com/users/"+options.user+"/repos?callback=?",type:'jsonp',error:function(err){$(options.target+' li.loading').addClass('error').text("Error loading feed");},success:function(data){var repos=[];if(!data||!data.data){return;}
 for(var i=0;i<data.data.length;i++){if(options.skip_forks&&data.data[i].fork){continue;}
 repos.push(data.data[i]);}
 repos.sort(function(a,b){var aDate=new Date(a.pushed_at).valueOf(),bDate=new Date(b.pushed_at).valueOf();if(aDate===bDate){return 0;}
-return aDate>bDate?-1:1;});if(options.count){repos.splice(options.count);}
+return aDate&gt;bDate?-1:1;});if(options.count){repos.splice(options.count);}
 render(options.target,repos);}});}};})();
-//]]></script>
-</section>
-<hr>
-<div id="azk12258" class="adzerk"></div>
-</aside>
-</div>
-</div>
-<footer role="contentinfo"><p>Paul Irish doesn't care about attribution, bro. — It's all yours under <a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons CC0</a>.</p>
-<script>var p="http",d="static";if(document.location.protocol=="https:"){p+="s";d="engine";}var z=document.createElement("script");z.type="text/javascript";z.async=true;z.src=p+"://"+d+".adzerk.net/ados.js";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(z,s);</script>
-<script>var ados=ados||{};ados.run=ados.run||[];ados.run.push(function(){ados_add_placement(4433,27633,"azk12258",1);ados_load();});</script>
-</footer>
-<script type="text/javascript">var disqus_shortname='paulirish';var disqus_identifier='http://paulirish.com/2010/the-protocol-relative-url/';var disqus_url='http://paulirish.com/2010/the-protocol-relative-url/';var disqus_script='embed.js';(function(){var dsq=document.createElement('script');dsq.type='text/javascript';dsq.async=true;dsq.src='http://'+disqus_shortname+'.disqus.com/'+disqus_script;(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(dsq);}());</script>
-<script type="text/javascript">(function(){var script=document.createElement('script');script.type='text/javascript';script.async=true;script.src='https://apis.google.com/js/plusone.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(script,s);})();</script>
-<script type="text/javascript">(function(){var twitterWidgets=document.createElement('script');twitterWidgets.type='text/javascript';twitterWidgets.async=true;twitterWidgets.src='http://platform.twitter.com/widgets.js';document.getElementsByTagName('head')[0].appendChild(twitterWidgets);})();</script>
-<script type="text/javascript" src="//ajax.cloudflare.com/cdn-cgi/nexp/abv=2801265337/apps1.min.js"></script><script type="text/javascript">__CF.AJS.init1();</script></body>
+//]]&gt;</script&gt;
+</section&gt;
+<hr&gt;
+<div id="azk12258" class="adzerk"&gt;</div&gt;
+</aside&gt;
+</div&gt;
+</div&gt;
+<footer role="contentinfo"&gt;<p&gt;Paul Irish doesn't care about attribution, bro. — It's all yours under <a href="http://creativecommons.org/publicdomain/zero/1.0/"&gt;Creative Commons CC0</a&gt;.</p&gt;
+<script&gt;var p="http",d="static";if(document.location.protocol=="https:"){p+="s";d="engine";}var z=document.createElement("script");z.type="text/javascript";z.async=true;z.src=p+"://"+d+".adzerk.net/ados.js";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(z,s);</script&gt;
+<script&gt;var ados=ados||{};ados.run=ados.run||[];ados.run.push(function(){ados_add_placement(4433,27633,"azk12258",1);ados_load();});</script&gt;
+</footer&gt;
+<script type="text/javascript"&gt;var disqus_shortname='paulirish';var disqus_identifier='http://paulirish.com/2010/the-protocol-relative-url/';var disqus_url='http://paulirish.com/2010/the-protocol-relative-url/';var disqus_script='embed.js';(function(){var dsq=document.createElement('script');dsq.type='text/javascript';dsq.async=true;dsq.src='http://'+disqus_shortname+'.disqus.com/'+disqus_script;(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(dsq);}());</script&gt;
+<script type="text/javascript"&gt;(function(){var script=document.createElement('script');script.type='text/javascript';script.async=true;script.src='https://apis.google.com/js/plusone.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(script,s);})();</script&gt;
+<script type="text/javascript"&gt;(function(){var twitterWidgets=document.createElement('script');twitterWidgets.type='text/javascript';twitterWidgets.async=true;twitterWidgets.src='http://platform.twitter.com/widgets.js';document.getElementsByTagName('head')[0].appendChild(twitterWidgets);})();</script&gt;
+<script type="text/javascript" src="//ajax.cloudflare.com/cdn-cgi/nexp/abv=2801265337/apps1.min.js"&gt;</script&gt;<script type="text/javascript"&gt;__CF.AJS.init1();</script&gt;</body&gt;
+</html&gt;
+
+        </textarea>
+        </div>
+        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+        <script src="../js/clearly.js"></script>
+        <script>
+            var html = window.__getMyClearlyResults().html;
+            $('#main_content_wrap').html(html);
+        </script>
+  </body>
 </html>

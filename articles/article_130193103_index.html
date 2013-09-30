@@ -1,36 +1,49 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile">
-<title>JavaScript Performance | High Performance Web Sites</title>
-<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" />
-<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites &raquo; JavaScript Performance Comments Feed" href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/feed/" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /> 
-<link rel='prev' title='Silk, iPad, Galaxy comparison' href='http://www.stevesouders.com/blog/2011/12/01/silk-ipad-galaxy-comparison/' />
-<link rel='next' title='HTTP Archive: 2011 recap' href='http://www.stevesouders.com/blog/2012/02/01/http-archive-2011-recap/' />
-<meta name="generator" content="WordPress 3.6.1" />
-<link rel='canonical' href='http://www.stevesouders.com/blog/2012/01/13/javascript-performance/' />
-<link rel='shortlink' href='http://www.stevesouders.com/blog/?p=2375' />
-<script type="text/javascript">
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <title></title>
+  </head>
+  <body>
+        <!-- MAIN CONTENT -->
+        <div id="main_content_wrap" class="outer">
+        <textarea style="visibility:none" id="html-area">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+<html xmlns="http://www.w3.org/1999/xhtml"&gt;
+<head&gt;
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /&gt;
+<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile"&gt;
+<title&gt;JavaScript Performance | High Performance Web Sites</title&gt;
+<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" /&gt;
+<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites &raquo; JavaScript Performance Comments Feed" href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/feed/" /&gt;
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" /&gt;
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /&gt; 
+<link rel='prev' title='Silk, iPad, Galaxy comparison' href='http://www.stevesouders.com/blog/2011/12/01/silk-ipad-galaxy-comparison/' /&gt;
+<link rel='next' title='HTTP Archive: 2011 recap' href='http://www.stevesouders.com/blog/2012/02/01/http-archive-2011-recap/' /&gt;
+<meta name="generator" content="WordPress 3.6.1" /&gt;
+<link rel='canonical' href='http://www.stevesouders.com/blog/2012/01/13/javascript-performance/' /&gt;
+<link rel='shortlink' href='http://www.stevesouders.com/blog/?p=2375' /&gt;
+<script type="text/javascript"&gt;
 	window._wp_rp_static_base_url = 'http://dtmvdvtzf8rz0.cloudfront.net/static/';
 	window._wp_rp_wp_ajax_url = "http://www.stevesouders.com/blog/wp-admin/admin-ajax.php";
 	window._wp_rp_plugin_version = '2.6';
 	window._wp_rp_post_id = '2375';
 	window._wp_rp_num_rel_posts = '5';
-</script>
+</script&gt;
 
-<script>
+<script&gt;
 (function(d, s) {
 	var js = d.getElementsByTagName(s)[0],
 		ln = d.createElement(s);
 	ln.src = '//lognormal.net/boomerang/8fa4fc2785a82fae20c596ca4f45d1b218a9ab12ffef741d09b29532';
 	js.parentNode.insertBefore(ln, js);
 })(document, 'script');
-</script>
+</script&gt;
 
-<script type="text/javascript">
+<script type="text/javascript"&gt;
 // GOOGLE ANALYTICS
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-15026169-1']);
@@ -42,333 +55,343 @@ _gaq.push(['_trackPageview']);
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
-</script>
-</head>
+</script&gt;
+</head&gt;
 
-<body>
-<div id="header">
-	<div class="containerwrapper">
-  		<h1 id="logo"><a href="http://stevesouders.com/"><span>SteveSouders.com</span></a></h1>
-        <ul id="topnav">
-        <li><a href="http://stevesouders.com/about.php">about</a></li>
-        <li><a href="http://stevesouders.com/contact.php">contact</a></li>
-        <li class="last"> <a href="http://twitter.com/#!/souders/"><img src="/images/twitter-icon.png" width=16 height=16 border=0 style="vertical-align: bottom;"></a>
-        </ul>
-	</div>    
-</div>
-<div id="contentWrapper" class="containerwrapper">
-<div id="sidebar">
-<div id="search-3" class="widget widget_search"><form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/">
-				<div>
-					<label class="screen-reader-text" for="s">Search for:</label>
-					<input type="text" value="" name="s" id="s" />
-					<input type="submit" id="searchsubmit" value="Search" />
-				</div>
-			</form></div><div id="custom-recent-posts-3" class="widget custom-recent-posts"><h3 class="blockheader">Most Recent Posts</h3>		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;">
-        		<li><a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark">Domain Sharding revisited</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-future/" rel="bookmark">Web performance for the future</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/07/16/activetable-bookmarklet/" rel="bookmark">ActiveTable bookmarklet</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/07/15/twitter-widget-update/" rel="bookmark">Twitter widget update</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/06/16/browser-busy-indicators/" rel="bookmark">Browser Busy Indicators</a></li>
-				</ul>
-		<a href="http://www.stevesouders.com/blog/archives/">View Archive</a></div><div id="text-3" class="widget widget_text"><h3 class="blockheader">Feeds</h3>			<div class="textwidget"><a href="http://www.stevesouders.com/blog/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/feed/">Posts</a><br />
-<a href="http://www.stevesouders.com/blog/comments/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/comments/feed/">Comments</a></li></div>
-		</div>        
-</div><div id="content">
+<body&gt;
+<div id="header"&gt;
+	<div class="containerwrapper"&gt;
+  		<h1 id="logo"&gt;<a href="http://stevesouders.com/"&gt;<span&gt;SteveSouders.com</span&gt;</a&gt;</h1&gt;
+        <ul id="topnav"&gt;
+        <li&gt;<a href="http://stevesouders.com/about.php"&gt;about</a&gt;</li&gt;
+        <li&gt;<a href="http://stevesouders.com/contact.php"&gt;contact</a&gt;</li&gt;
+        <li class="last"&gt; <a href="http://twitter.com/#!/souders/"&gt;<img src="/images/twitter-icon.png" width=16 height=16 border=0 style="vertical-align: bottom;"&gt;</a&gt;
+        </ul&gt;
+	</div&gt;    
+</div&gt;
+<div id="contentWrapper" class="containerwrapper"&gt;
+<div id="sidebar"&gt;
+<div id="search-3" class="widget widget_search"&gt;<form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/"&gt;
+				<div&gt;
+					<label class="screen-reader-text" for="s"&gt;Search for:</label&gt;
+					<input type="text" value="" name="s" id="s" /&gt;
+					<input type="submit" id="searchsubmit" value="Search" /&gt;
+				</div&gt;
+			</form&gt;</div&gt;<div id="custom-recent-posts-3" class="widget custom-recent-posts"&gt;<h3 class="blockheader"&gt;Most Recent Posts</h3&gt;		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;"&gt;
+        		<li&gt;<a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark"&gt;Domain Sharding revisited</a&gt;</li&gt;
+				<li&gt;<a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-future/" rel="bookmark"&gt;Web performance for the future</a&gt;</li&gt;
+				<li&gt;<a href="http://www.stevesouders.com/blog/2013/07/16/activetable-bookmarklet/" rel="bookmark"&gt;ActiveTable bookmarklet</a&gt;</li&gt;
+				<li&gt;<a href="http://www.stevesouders.com/blog/2013/07/15/twitter-widget-update/" rel="bookmark"&gt;Twitter widget update</a&gt;</li&gt;
+				<li&gt;<a href="http://www.stevesouders.com/blog/2013/06/16/browser-busy-indicators/" rel="bookmark"&gt;Browser Busy Indicators</a&gt;</li&gt;
+				</ul&gt;
+		<a href="http://www.stevesouders.com/blog/archives/"&gt;View Archive</a&gt;</div&gt;<div id="text-3" class="widget widget_text"&gt;<h3 class="blockheader"&gt;Feeds</h3&gt;			<div class="textwidget"&gt;<a href="http://www.stevesouders.com/blog/feed/"&gt;<img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /&gt; </a&gt;<a href="http://www.stevesouders.com/blog/feed/"&gt;Posts</a&gt;<br /&gt;
+<a href="http://www.stevesouders.com/blog/comments/feed/"&gt;<img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /&gt; </a&gt;<a href="http://www.stevesouders.com/blog/comments/feed/"&gt;Comments</a&gt;</li&gt;</div&gt;
+		</div&gt;        
+</div&gt;<div id="content"&gt;
 
 
 
-		<div id="post-2375" class="post-2375 post type-post status-publish format-standard hentry category-browsers category-javascript category-performance category-tools category-web-development tag-async tag-browserscope tag-onload tag-webpagetest">
-        	            	<h1>JavaScript Performance</h1>
+		<div id="post-2375" class="post-2375 post type-post status-publish format-standard hentry category-browsers category-javascript category-performance category-tools category-web-development tag-async tag-browserscope tag-onload tag-webpagetest"&gt;
+        	            	<h1&gt;JavaScript Performance</h1&gt;
             
-			<p class="meta">January 13, 2012 10:09 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comments" title="Comment on JavaScript Performance">20 Comments</a></p><!-- .entry-meta -->
+			<p class="meta"&gt;January 13, 2012 10:09 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comments" title="Comment on JavaScript Performance"&gt;20 Comments</a&gt;</p&gt;<!-- .entry-meta --&gt;
 
-			<p>Last night I spoke at the <a href="http://www.meetup.com/jsmeetup/events/38563112/">San Francisco JavaScript Meetup</a>. I gave a brand new talk called <a href="http://www.slideshare.net/souders/javascript-performance-at-sfjs">JavaScript Performance</a> that focuses on script loading and async snippets. The snippet example I chose was the <a href="http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html">Google Analytics async snippet</a>. The script-loading part of that snippet is only six lines, but a lot of thought and testing went into it. It&#8217;s a great prototype to use if you&#8217;re creating your own async snippet. I&#8217;ll tweet if/when the video of my talk comes out, but in the meantime the slides (<a href="http://www.slideshare.net/souders/javascript-performance-at-sfjs">Slideshare</a>, <a href="http://stevesouders.com/docs/sfjs-20120112.pptx">pptx</a>) do a good job of relaying the information.</p>
-<p>There are two new data points from the presentation that I want to call out in this blog post.</p>
-<h2>Impact of JavaScript</h2>
-<p>The presentation starts by suggesting that JavaScript is typically the #1 place to look for making a website faster. My anecdotal experience supports this hypothesis, but I wanted to try to do some quantitative verification. As often happens, I turned to <a href="http://webpagetest.org/">WebPagetest</a>.</p>
-<p>I wanted to test the Alexa Top 100 URLs with and without JavaScript. To load these sites withOUT JavaScript I used WebPagetest&#8217;s &#8220;block&#8221; feature. I entered &#8220;.js&#8221; which tells WebPagetest to ignore every HTTP request with a URL that contains that string. Each website was loaded three times and the median page load time was recorded. I then found the median of all these median page load times.</p>
-<p>The median page load <em>with JavaScript</em> is 3.65 seconds. <em>Without JavaScript</em> the page load time drops to 2.487 seconds &#8211; a 31% decrease. (Here&#8217;s the data in WebPagetest: <a title="with JavaScript" href="http://www.webpagetest.org/result/120111_GR_2TW90/">with JavaScript</a>, <a title="without JavaScript" href="http://www.webpagetest.org/result/120111_0P_2TW4Q/">without JavaScript</a>.) It&#8217;s not a perfect analysis: Some script URLs don&#8217;t contain &#8220;.js&#8221; and inline script blocks are still executed. I think this is a good approximation and I hope to do further experiments to corroborate this finding.</p>
-<p><center><img class="alignnone" title="Top 100 sites with and without JS" src="http://stevesouders.com/images/withoutjs.png" alt="" width="460" height="291" /></center></p>
-<h2>Async Execution Order &amp; Onload</h2>
-<p>The other new infobyte has to do with the <code style="font-size: 1.1em;">async=true</code> line from the GA async snippet. The purpose of this line is to cause the <code>ga.js</code> script to not block other async scripts from being executed. It turns out that some browsers preserve the execution order of scripts loaded using the insertBefore technique, which is the technique used in the GA snippet:</p>
-<div class="codesample" style="font-family: monospace;">var ga = document.createElement(‘script’);<br />
-ga.type = ‘text/javascript’;<br />
-ga.async = true;<br />
-ga.src = (‘https:’ == document.location.protocol ? ‘https://ssl’ : ‘http://www’) + ‘.google-analytics.com/ga.js’;<br />
-var s = document.getElementsByTagName(‘script’)[0];<br />
-s.parentNode.insertBefore(ga, s);</div>
-<p>Preserving execution order of async scripts makes the page slower. If the first async script takes a long time to download, all the other async scripts are blocked from executing, even if they download sooner. Executing async scripts immediately as they&#8217;re downloaded results in a faster page load time. I knew old versions of Firefox had this issue, and setting <code>async=true</code> fixed the problem. But I wanted to see if any other browsers also preserved execution order of async scripts loaded this way, and whether setting <code>async=true</code> worked.</p>
-<p>To answer these questions I created a <a href="http://www.browserscope.org/user/tests/howto">Browserscope user test</a> called <a href="http://stevesouders.com/tests/jsorder.php">Async Script Execution Order</a>. I tweeted the test URL and got 348 results from 60+ different browsers. (Thanks to all the people that ran the test! I still need results from more mobile browsers so please run <a href="http://stevesouders.com/tests/jsorder.php">the test</a> if you have a browser that&#8217;s not covered.) Here&#8217;s a snapshot of <a href="http://www.browserscope.org/user/tests/table/agt1YS1wcm9maWxlcnINCxIEVGVzdBjrq90MDA?v=3&amp;layout=simple&amp;highlight=1">the results</a>:</p>
-<div style="margin-bottom: 1em; text-align: center;"><a href="http://www.browserscope.org/user/tests/table/agt1YS1wcm9maWxlcnINCxIEVGVzdBjrq90MDA?v=2&amp;layout=simple&amp;highlight=1"><img class="alignnone" title="Execution order results" src="http://stevesouders.com/images/jsorder.png" alt="" width="460" height="576" /></a></div>
-<p>The second column shows the results of loading two async scripts with the insertBefore pattern AND setting <code>async=true</code>. The third column shows the results if <code>async</code> is NOT set to <code>true</code>. Green means the scripts execute immediately (good) and red indicates that execution order is preserved (bad).</p>
-<p>The results show that Firefox 3.6, OmniWeb 622, and all versions of Opera preserve execution order. Setting <code>async=true</code> successfully makes the async scripts execute immediately in Firefox 3.6 and OmniWeb 622, but not in Opera. Although this fix only applies to a few browsers, its small cost makes it worthwhile. Also, if we get results for more mobile browsers I would expect to find a few more places where the fix is necessary.</p>
-<p>I also tested whether these insertBefore-style async scripts block the onload event. The results, shown in the fourth column, are mixed if we include older browsers, but we see that newer browsers generally block the onload event when loading these async scripts &#8211; this is true in Android, Chrome, Firefox, iOS, Opera, Safari, and IE 10. This is useful to know if you wonder why you&#8217;re still seeing long page load times even after adopting async script loading. It also means that code in your onload handler can&#8217;t reliably assume async scripts are loaded because of the many browsers out there that do <em>not</em> block the onload event, including IE 6-9.</p>
-<p>And a final shout out to the awesomeness of the Open Source community that makes tools like <a href="http://webpagetest.org/">WebPagetest</a> and <a href="http://www.browserscope.org/">Browserscope</a> available &#8211; thanks <a href="https://twitter.com/#!/patmeenan">Pat</a> and <a href="https://twitter.com/#!/elsigh">Lindsey</a>!</p>
+			<p&gt;Last night I spoke at the <a href="http://www.meetup.com/jsmeetup/events/38563112/"&gt;San Francisco JavaScript Meetup</a&gt;. I gave a brand new talk called <a href="http://www.slideshare.net/souders/javascript-performance-at-sfjs"&gt;JavaScript Performance</a&gt; that focuses on script loading and async snippets. The snippet example I chose was the <a href="http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html"&gt;Google Analytics async snippet</a&gt;. The script-loading part of that snippet is only six lines, but a lot of thought and testing went into it. It&#8217;s a great prototype to use if you&#8217;re creating your own async snippet. I&#8217;ll tweet if/when the video of my talk comes out, but in the meantime the slides (<a href="http://www.slideshare.net/souders/javascript-performance-at-sfjs"&gt;Slideshare</a&gt;, <a href="http://stevesouders.com/docs/sfjs-20120112.pptx"&gt;pptx</a&gt;) do a good job of relaying the information.</p&gt;
+<p&gt;There are two new data points from the presentation that I want to call out in this blog post.</p&gt;
+<h2&gt;Impact of JavaScript</h2&gt;
+<p&gt;The presentation starts by suggesting that JavaScript is typically the #1 place to look for making a website faster. My anecdotal experience supports this hypothesis, but I wanted to try to do some quantitative verification. As often happens, I turned to <a href="http://webpagetest.org/"&gt;WebPagetest</a&gt;.</p&gt;
+<p&gt;I wanted to test the Alexa Top 100 URLs with and without JavaScript. To load these sites withOUT JavaScript I used WebPagetest&#8217;s &#8220;block&#8221; feature. I entered &#8220;.js&#8221; which tells WebPagetest to ignore every HTTP request with a URL that contains that string. Each website was loaded three times and the median page load time was recorded. I then found the median of all these median page load times.</p&gt;
+<p&gt;The median page load <em&gt;with JavaScript</em&gt; is 3.65 seconds. <em&gt;Without JavaScript</em&gt; the page load time drops to 2.487 seconds &#8211; a 31% decrease. (Here&#8217;s the data in WebPagetest: <a title="with JavaScript" href="http://www.webpagetest.org/result/120111_GR_2TW90/"&gt;with JavaScript</a&gt;, <a title="without JavaScript" href="http://www.webpagetest.org/result/120111_0P_2TW4Q/"&gt;without JavaScript</a&gt;.) It&#8217;s not a perfect analysis: Some script URLs don&#8217;t contain &#8220;.js&#8221; and inline script blocks are still executed. I think this is a good approximation and I hope to do further experiments to corroborate this finding.</p&gt;
+<p&gt;<center&gt;<img class="alignnone" title="Top 100 sites with and without JS" src="http://stevesouders.com/images/withoutjs.png" alt="" width="460" height="291" /&gt;</center&gt;</p&gt;
+<h2&gt;Async Execution Order &amp; Onload</h2&gt;
+<p&gt;The other new infobyte has to do with the <code style="font-size: 1.1em;"&gt;async=true</code&gt; line from the GA async snippet. The purpose of this line is to cause the <code&gt;ga.js</code&gt; script to not block other async scripts from being executed. It turns out that some browsers preserve the execution order of scripts loaded using the insertBefore technique, which is the technique used in the GA snippet:</p&gt;
+<div class="codesample" style="font-family: monospace;"&gt;var ga = document.createElement(‘script’);<br /&gt;
+ga.type = ‘text/javascript’;<br /&gt;
+ga.async = true;<br /&gt;
+ga.src = (‘https:’ == document.location.protocol ? ‘https://ssl’ : ‘http://www’) + ‘.google-analytics.com/ga.js’;<br /&gt;
+var s = document.getElementsByTagName(‘script’)[0];<br /&gt;
+s.parentNode.insertBefore(ga, s);</div&gt;
+<p&gt;Preserving execution order of async scripts makes the page slower. If the first async script takes a long time to download, all the other async scripts are blocked from executing, even if they download sooner. Executing async scripts immediately as they&#8217;re downloaded results in a faster page load time. I knew old versions of Firefox had this issue, and setting <code&gt;async=true</code&gt; fixed the problem. But I wanted to see if any other browsers also preserved execution order of async scripts loaded this way, and whether setting <code&gt;async=true</code&gt; worked.</p&gt;
+<p&gt;To answer these questions I created a <a href="http://www.browserscope.org/user/tests/howto"&gt;Browserscope user test</a&gt; called <a href="http://stevesouders.com/tests/jsorder.php"&gt;Async Script Execution Order</a&gt;. I tweeted the test URL and got 348 results from 60+ different browsers. (Thanks to all the people that ran the test! I still need results from more mobile browsers so please run <a href="http://stevesouders.com/tests/jsorder.php"&gt;the test</a&gt; if you have a browser that&#8217;s not covered.) Here&#8217;s a snapshot of <a href="http://www.browserscope.org/user/tests/table/agt1YS1wcm9maWxlcnINCxIEVGVzdBjrq90MDA?v=3&amp;layout=simple&amp;highlight=1"&gt;the results</a&gt;:</p&gt;
+<div style="margin-bottom: 1em; text-align: center;"&gt;<a href="http://www.browserscope.org/user/tests/table/agt1YS1wcm9maWxlcnINCxIEVGVzdBjrq90MDA?v=2&amp;layout=simple&amp;highlight=1"&gt;<img class="alignnone" title="Execution order results" src="http://stevesouders.com/images/jsorder.png" alt="" width="460" height="576" /&gt;</a&gt;</div&gt;
+<p&gt;The second column shows the results of loading two async scripts with the insertBefore pattern AND setting <code&gt;async=true</code&gt;. The third column shows the results if <code&gt;async</code&gt; is NOT set to <code&gt;true</code&gt;. Green means the scripts execute immediately (good) and red indicates that execution order is preserved (bad).</p&gt;
+<p&gt;The results show that Firefox 3.6, OmniWeb 622, and all versions of Opera preserve execution order. Setting <code&gt;async=true</code&gt; successfully makes the async scripts execute immediately in Firefox 3.6 and OmniWeb 622, but not in Opera. Although this fix only applies to a few browsers, its small cost makes it worthwhile. Also, if we get results for more mobile browsers I would expect to find a few more places where the fix is necessary.</p&gt;
+<p&gt;I also tested whether these insertBefore-style async scripts block the onload event. The results, shown in the fourth column, are mixed if we include older browsers, but we see that newer browsers generally block the onload event when loading these async scripts &#8211; this is true in Android, Chrome, Firefox, iOS, Opera, Safari, and IE 10. This is useful to know if you wonder why you&#8217;re still seeing long page load times even after adopting async script loading. It also means that code in your onload handler can&#8217;t reliably assume async scripts are loaded because of the many browsers out there that do <em&gt;not</em&gt; block the onload event, including IE 6-9.</p&gt;
+<p&gt;And a final shout out to the awesomeness of the Open Source community that makes tools like <a href="http://webpagetest.org/"&gt;WebPagetest</a&gt; and <a href="http://www.browserscope.org/"&gt;Browserscope</a&gt; available &#8211; thanks <a href="https://twitter.com/#!/patmeenan"&gt;Pat</a&gt; and <a href="https://twitter.com/#!/elsigh"&gt;Lindsey</a&gt;!</p&gt;
 
-<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"><div class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul class="related_post wp_rp" style="visibility: visible"><li ><a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/" class="wp_rp_title">Moving beyond window.onload()</a></li><li ><a href="http://www.stevesouders.com/blog/2012/04/09/making-the-http-archive-faster/" class="wp_rp_title">Making the HTTP Archive faster</a></li><li ><a href="http://www.stevesouders.com/blog/2009/12/10/speed-tracer/" class="wp_rp_title">Speed Tracer &#8211; visibility into the browser</a></li><li ><a href="http://www.stevesouders.com/blog/2009/11/11/security-tests-added-to-browserscope/" class="wp_rp_title">Security tests added to Browserscope</a></li><li ><a href="http://www.stevesouders.com/blog/2010/12/15/controljs-part-3/" class="wp_rp_title">ControlJS part 3: overriding document.write</a></li></ul><div class="wp_rp_footer"><a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts">Zemanta</a></div></div></div>
+<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"&gt;<div class="wp_rp_content"&gt;<h3 class="related_post_title"&gt;Related Posts</h3&gt;<ul class="related_post wp_rp" style="visibility: visible"&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/" class="wp_rp_title"&gt;Moving beyond window.onload()</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2012/04/09/making-the-http-archive-faster/" class="wp_rp_title"&gt;Making the HTTP Archive faster</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2009/12/10/speed-tracer/" class="wp_rp_title"&gt;Speed Tracer &#8211; visibility into the browser</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2009/11/11/security-tests-added-to-browserscope/" class="wp_rp_title"&gt;Security tests added to Browserscope</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2010/12/15/controljs-part-3/" class="wp_rp_title"&gt;ControlJS part 3: overriding document.write</a&gt;</li&gt;</ul&gt;<div class="wp_rp_footer"&gt;<a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts"&gt;Zemanta</a&gt;</div&gt;</div&gt;</div&gt;
             
             			
-		</div><!-- #post-## -->
+		</div&gt;<!-- #post-## --&gt;
 
 
 		
-			<div id="comments">
+			<div id="comments"&gt;
 
-			<h3 id="comments-title">20 Responses to <em>JavaScript Performance</em></h3>
-
-
-			<ol class="commentlist">
-				<li class="comment even thread-even depth-1" id="li-comment-3658">
-<div id="comment-3658">
-<p class="comment-metadata">
-<strong><a href='http://driverdan.com' rel='external nofollow' class='url'>Dan DeFelippi</a></strong> | 13-Jan-12 at 10:34 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3658">Permalink</a> |  </p>
+			<h3 id="comments-title"&gt;20 Responses to <em&gt;JavaScript Performance</em&gt;</h3&gt;
 
 
-<p>Interesting stats Steve. I see some problems though. It looks like there may have been connectivity issues for some of the sites. For example, Imgur had a median load time of 45.134s in the JS test and 4.551s without. I wonder if these hiccups skewed the results</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3659">
-<div id="comment-3659">
-<p class="comment-metadata">
-<strong><a href='http://mathiasbynens.be/' rel='external nofollow' class='url'>Mathias Bynens</a></strong> | 13-Jan-12 at 10:38 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3659">Permalink</a> |  </p>
+			<ol class="commentlist"&gt;
+				<li class="comment even thread-even depth-1" id="li-comment-3658"&gt;
+<div id="comment-3658"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://driverdan.com' rel='external nofollow' class='url'&gt;Dan DeFelippi</a&gt;</strong&gt; | 13-Jan-12 at 10:34 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3658"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<blockquote><p>Setting <code>async=true</code> successfully makes the async scripts execute immediately in Firefox 3.6 and OmniWeb 622, but not in Opera. Although this fix only applies to a few browsers, its small cost makes it worthwhile.</p></blockquote>
-<p>I disagree it’s worthwhile in all situations — it really depends IMHO. The <code>.async = true</code> part is <em>only</em> worth adding if <em>all</em> of these conditions are met:</p>
-<p>You load <em>more than one script</em> asynchronously by dynamically inserting it into the document.<br />
-You still care about getting the best possible performance in Firefox 3.6.<br />
-You support OmniWeb 622. (I sure don’t.)</p>
-<p>Even in cases where the first bullet point applies, the last two bullet points don’t apply to me anno 2012.</p>
-<p>For what it’s worth, <a href="http://getify.me/" rel="nofollow">Kyle Simpson</a> told me about this behavior back in 2010 and I documented it in <a href="http://mathiasbynens.be/notes/async-analytics-snippet#async" rel="nofollow">my write-up on the optimized Google Analytics snippet</a>. We didn’t know about OmniWeb though — but luckily, that’s not a browser I have to support.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-3660">
-<div id="comment-3660">
-<p class="comment-metadata">
-<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 13-Jan-12 at 10:38 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3660">Permalink</a> |  </p>
+<p&gt;Interesting stats Steve. I see some problems though. It looks like there may have been connectivity issues for some of the sites. For example, Imgur had a median load time of 45.134s in the JS test and 4.551s without. I wonder if these hiccups skewed the results</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3659"&gt;
+<div id="comment-3659"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://mathiasbynens.be/' rel='external nofollow' class='url'&gt;Mathias Bynens</a&gt;</strong&gt; | 13-Jan-12 at 10:38 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3659"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Dan: That looks like an issue with WebPagetest determining when the page is &#8220;done&#8221; because there&#8217;s some lazy loaded resources. I used median instead of average so this doesn&#8217;t affect the stats.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-3661">
-<div id="comment-3661">
-<p class="comment-metadata">
-<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 13-Jan-12 at 10:44 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3661">Permalink</a> |  </p>
+<blockquote&gt;<p&gt;Setting <code&gt;async=true</code&gt; successfully makes the async scripts execute immediately in Firefox 3.6 and OmniWeb 622, but not in Opera. Although this fix only applies to a few browsers, its small cost makes it worthwhile.</p&gt;</blockquote&gt;
+<p&gt;I disagree it’s worthwhile in all situations — it really depends IMHO. The <code&gt;.async = true</code&gt; part is <em&gt;only</em&gt; worth adding if <em&gt;all</em&gt; of these conditions are met:</p&gt;
+<p&gt;You load <em&gt;more than one script</em&gt; asynchronously by dynamically inserting it into the document.<br /&gt;
+You still care about getting the best possible performance in Firefox 3.6.<br /&gt;
+You support OmniWeb 622. (I sure don’t.)</p&gt;
+<p&gt;Even in cases where the first bullet point applies, the last two bullet points don’t apply to me anno 2012.</p&gt;
+<p&gt;For what it’s worth, <a href="http://getify.me/" rel="nofollow"&gt;Kyle Simpson</a&gt; told me about this behavior back in 2010 and I documented it in <a href="http://mathiasbynens.be/notes/async-analytics-snippet#async" rel="nofollow"&gt;my write-up on the optimized Google Analytics snippet</a&gt;. We didn’t know about OmniWeb though — but luckily, that’s not a browser I have to support.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-3660"&gt;
+<div id="comment-3660"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://stevesouders.com' rel='external nofollow' class='url'&gt;Steve Souders</a&gt;</strong&gt; | 13-Jan-12 at 10:38 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3660"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Mathias: For the sake of a few more characters I think it&#8217;s worthwhile to support these browsers that are known to need the fix, plus the handful of others that we don&#8217;t know about (yet). Also, having async=true might bring other benefits as browsers get smarter about supporting the async attribute. But I totally agree with you &#8211; Firefox 3.6 and OmniWeb are not major browsers.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-3662">
-<div id="comment-3662">
-<p class="comment-metadata">
-<strong><a href='http://mathiasbynens.be/' rel='external nofollow' class='url'>Mathias Bynens</a></strong> | 13-Jan-12 at 10:51 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3662">Permalink</a> |  </p>
+<p&gt;@Dan: That looks like an issue with WebPagetest determining when the page is &#8220;done&#8221; because there&#8217;s some lazy loaded resources. I used median instead of average so this doesn&#8217;t affect the stats.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-3661"&gt;
+<div id="comment-3661"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://stevesouders.com' rel='external nofollow' class='url'&gt;Steve Souders</a&gt;</strong&gt; | 13-Jan-12 at 10:44 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3661"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Steve: My point is, if you don’t even <em>test</em> your website in these browsers (I’d think most people don’t) to see if the CSS and JS behave as expected, there’s no point in blindly adding the <code>.async = true</code>.</p>
-<p>Thanks for digging into this!</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3663">
-<div id="comment-3663">
-<p class="comment-metadata">
-<strong><a href='http://mathiasbynens.be/' rel='external nofollow' class='url'>Mathias Bynens</a></strong> | 13-Jan-12 at 10:59 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3663">Permalink</a> |  </p>
+<p&gt;@Mathias: For the sake of a few more characters I think it&#8217;s worthwhile to support these browsers that are known to need the fix, plus the handful of others that we don&#8217;t know about (yet). Also, having async=true might bring other benefits as browsers get smarter about supporting the async attribute. But I totally agree with you &#8211; Firefox 3.6 and OmniWeb are not major browsers.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment even thread-even depth-1" id="li-comment-3662"&gt;
+<div id="comment-3662"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://mathiasbynens.be/' rel='external nofollow' class='url'&gt;Mathias Bynens</a&gt;</strong&gt; | 13-Jan-12 at 10:51 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3662"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>Steve:</p>
-<blockquote><p>having <code>async=true</code> might bring other benefits as browsers get smarter about supporting the <code>async</code> attribute.</p></blockquote>
-<p>Could you elaborate on this, please? If I understand <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#force-async" rel="nofollow">the current HTML spec</a> correctly, all dynamically inserted scripts default to <code>.async = true</code>. (This has been implemented in all major browsers.)</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-3664">
-<div id="comment-3664">
-<p class="comment-metadata">
-<strong>happypoulp</strong> | 14-Jan-12 at 3:55 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3664">Permalink</a> |  </p>
+<p&gt;@Steve: My point is, if you don’t even <em&gt;test</em&gt; your website in these browsers (I’d think most people don’t) to see if the CSS and JS behave as expected, there’s no point in blindly adding the <code&gt;.async = true</code&gt;.</p&gt;
+<p&gt;Thanks for digging into this!</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3663"&gt;
+<div id="comment-3663"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://mathiasbynens.be/' rel='external nofollow' class='url'&gt;Mathias Bynens</a&gt;</strong&gt; | 13-Jan-12 at 10:59 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3663"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>About the &#8220;Async Execution Order &amp; Onload&#8221; tests, I wonder what you consider to be the normal (best) behaviour for the fouth column? For me, I think that a script loaded asynchronously should not block onload event in any way. Why would you want to load a script asynchronously while having it blocking onload event?</p>
-<p>Isn&#8217;t IE6-9 having the best behaviour on that (just this once won&#8217;t hurt).</p>
-<p>Thanks for the good infos!</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-3669">
-<div id="comment-3669">
-<p class="comment-metadata">
-<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 14-Jan-12 at 11:31 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3669">Permalink</a> |  </p>
+<p&gt;Steve:</p&gt;
+<blockquote&gt;<p&gt;having <code&gt;async=true</code&gt; might bring other benefits as browsers get smarter about supporting the <code&gt;async</code&gt; attribute.</p&gt;</blockquote&gt;
+<p&gt;Could you elaborate on this, please? If I understand <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#force-async" rel="nofollow"&gt;the current HTML spec</a&gt; correctly, all dynamically inserted scripts default to <code&gt;.async = true</code&gt;. (This has been implemented in all major browsers.)</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment even thread-even depth-1" id="li-comment-3664"&gt;
+<div id="comment-3664"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;happypoulp</strong&gt; | 14-Jan-12 at 3:55 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3664"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Mathias: The bar is higher for someone creating a 3rd party snippet that will be used on a wider variety of pages and browsers than can be feasibly tested. The point is that following a pattern from a widely popular snippet like GA is a good move and not characterized as &#8220;blindly&#8221; adding functionality. Having a good understanding of why each line is in the snippet is valuable &#8211; that&#8217;s the goal of this post. On your second point, it is true that .async=true for async scripts in newer browsers, but not in those edge case browsers &#8211; which is why setting it explicitly solves the problem. Going forward it might be the case that letting the browser set it during it&#8217;s processing of the async snippet is the same as setting it explicitly &#8211; we&#8217;ll have to see.</p>
-<p>@happypoulp: There are use cases that argue for both behaviors. As you point out &#8211; it might be nicer for onload to fire without waiting for async scripts to record a faster onload time. On the other hand, if I&#8217;m lazy loading more scripts in the onload handler I might not want them to contend with the async scripts in the body for execution time, so blocking onload is better. I don&#8217;t think there&#8217;s a clear winner. Having consistent behavior across browsers is the most preferred solution.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-3670">
-<div id="comment-3670">
-<p class="comment-metadata">
-<strong><a href='http://www.blaze.io' rel='external nofollow' class='url'>Guypo</a></strong> | 14-Jan-12 at 11:38 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3670">Permalink</a> |  </p>
+<p&gt;About the &#8220;Async Execution Order &amp; Onload&#8221; tests, I wonder what you consider to be the normal (best) behaviour for the fouth column? For me, I think that a script loaded asynchronously should not block onload event in any way. Why would you want to load a script asynchronously while having it blocking onload event?</p&gt;
+<p&gt;Isn&#8217;t IE6-9 having the best behaviour on that (just this once won&#8217;t hurt).</p&gt;
+<p&gt;Thanks for the good infos!</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-3669"&gt;
+<div id="comment-3669"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://stevesouders.com' rel='external nofollow' class='url'&gt;Steve Souders</a&gt;</strong&gt; | 14-Jan-12 at 11:31 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3669"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>Great article, Steve, and great slides.</p>
-<p>While my experience also shows JS is likely the biggest performance hog on a page, I think the test above is too simplistic.</p>
-<p>If you look at the average page size with and without JS, you&#8217;ll see removing JS reduced the average size from ~550K to ~330K, and the number of requests from 53 to 37. </p>
-<p>This means the time delta can be easily be explained by the reduced page size, regardless of whether it was JS or images that were removed. Would be worth doing some statistical analysis of how JS requests correlate to load time compared to other parts, or at the very least repeat the same JS test with blocking CSS and images for comparison.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3671">
-<div id="comment-3671">
-<p class="comment-metadata">
-<strong><a href='http://Snowboards-for-sale.com' rel='external nofollow' class='url'>Dave Gullo</a></strong> | 14-Jan-12 at 5:54 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3671">Permalink</a> |  </p>
+<p&gt;@Mathias: The bar is higher for someone creating a 3rd party snippet that will be used on a wider variety of pages and browsers than can be feasibly tested. The point is that following a pattern from a widely popular snippet like GA is a good move and not characterized as &#8220;blindly&#8221; adding functionality. Having a good understanding of why each line is in the snippet is valuable &#8211; that&#8217;s the goal of this post. On your second point, it is true that .async=true for async scripts in newer browsers, but not in those edge case browsers &#8211; which is why setting it explicitly solves the problem. Going forward it might be the case that letting the browser set it during it&#8217;s processing of the async snippet is the same as setting it explicitly &#8211; we&#8217;ll have to see.</p&gt;
+<p&gt;@happypoulp: There are use cases that argue for both behaviors. As you point out &#8211; it might be nicer for onload to fire without waiting for async scripts to record a faster onload time. On the other hand, if I&#8217;m lazy loading more scripts in the onload handler I might not want them to contend with the async scripts in the body for execution time, so blocking onload is better. I don&#8217;t think there&#8217;s a clear winner. Having consistent behavior across browsers is the most preferred solution.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment even thread-even depth-1" id="li-comment-3670"&gt;
+<div id="comment-3670"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://www.blaze.io' rel='external nofollow' class='url'&gt;Guypo</a&gt;</strong&gt; | 14-Jan-12 at 11:38 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3670"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>In playing heavily with webpagetest and getting to about the 90% I found that the next easiest thing to do to optimize was to only use jquery on the pages that need it. This may sound super obvious but many times sites include js libs site wide, and just narrowing each page to script that is necessary, it&#8217;s a noticeable perf change when you consider it site wide and in the aggregate. </p>
-<p>This gained 5% more, and pages that window.onload in 200-500ms.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-3672">
-<div id="comment-3672">
-<p class="comment-metadata">
-<strong><a href='http://mathiasbynens.be/' rel='external nofollow' class='url'>Mathias Bynens</a></strong> | 14-Jan-12 at 11:21 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3672">Permalink</a> |  </p>
+<p&gt;Great article, Steve, and great slides.</p&gt;
+<p&gt;While my experience also shows JS is likely the biggest performance hog on a page, I think the test above is too simplistic.</p&gt;
+<p&gt;If you look at the average page size with and without JS, you&#8217;ll see removing JS reduced the average size from ~550K to ~330K, and the number of requests from 53 to 37. </p&gt;
+<p&gt;This means the time delta can be easily be explained by the reduced page size, regardless of whether it was JS or images that were removed. Would be worth doing some statistical analysis of how JS requests correlate to load time compared to other parts, or at the very least repeat the same JS test with blocking CSS and images for comparison.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3671"&gt;
+<div id="comment-3671"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://Snowboards-for-sale.com' rel='external nofollow' class='url'&gt;Dave Gullo</a&gt;</strong&gt; | 14-Jan-12 at 5:54 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3671"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Steve:</p>
-<blockquote><p>The point is that following a pattern from a widely popular snippet like GA is a good move and not characterized as “blindly” adding functionality</p></blockquote>
-<p>Google’s GA snippet is definitely a good place to start, but I’d prefer to see more developers analyze third party snippets (in general) thoroughly before including them as-is rather than blindly copy-pasting. <a href="http://calendar.perfplanet.com/2011/advice-on-trusting-advice/" rel="nofollow">Even when a snippet comes from a trusted authority on web performance.</a></p>
-<blockquote><p>Having a good understanding of why each line is in the snippet is valuable – that’s the goal of this post.</p></blockquote>
-<p>Then we’re in agreement :) It’s important to fully understand what each line in the snippet does. However, <a href="http://mathiasbynens.be/notes/async-analytics-snippet" rel="nofollow">the current GA snippet does contain some redundant stuff</a>. What does <code>ga.type = ‘text/javascript’;</code> do, for example? Are there any edge case browsers that actually need this line? I don’t know of any, but perhaps the Google Analytics JS team does?</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3673">
-<div id="comment-3673">
-<p class="comment-metadata">
-<strong>Jim Hirshfield</strong> | 16-Jan-12 at 9:13 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3673">Permalink</a> |  </p>
+<p&gt;In playing heavily with webpagetest and getting to about the 90% I found that the next easiest thing to do to optimize was to only use jquery on the pages that need it. This may sound super obvious but many times sites include js libs site wide, and just narrowing each page to script that is necessary, it&#8217;s a noticeable perf change when you consider it site wide and in the aggregate. </p&gt;
+<p&gt;This gained 5% more, and pages that window.onload in 200-500ms.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment even thread-even depth-1" id="li-comment-3672"&gt;
+<div id="comment-3672"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://mathiasbynens.be/' rel='external nofollow' class='url'&gt;Mathias Bynens</a&gt;</strong&gt; | 14-Jan-12 at 11:21 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3672"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>Steve &#8211; Great post. I read it with interest, not as an engineer, but as someone that works with online publishers who are frequently removing js so as to speed up their sites. Like many publisher tools providers, my company&#8217;s mode of deployment involves publishers adding js to their sites. </p>
-<p>Publishers are at war to shave milliseconds off load times &#8211; an effort driven by Google&#8217;s statements that slower sites will get less SEO juice. Script load time is one of the top questions we are asked.</p>
-<p>Given that Google is a producer of js, I&#8217;m troubled by the conflict of Google making the (ambiguous) rules AND benefiting from them. How fast is fast enough? Google doesn&#8217;t advocate the removal of Google Analytics&#8217; js, obviously.</p>
-<p>I&#8217;d like to believe that Google&#8217;s focus in this area is to penalize &#8220;slow&#8221; sites that load in 10 seconds or more, and _not_ sites that load in 3.65 seconds instead of 2.487 (I&#8217;m using your numbers from above, but don&#8217;t mean to imply that you&#8217;re saying 2.487 is ideal or that all js should be removed to optimize for SEO).</p>
-<p>Yes, a 31% improvement in load time is huge. But are we being unnecessarily obsessive below 3 seconds?</p>
-<p>Any clarity or references to other posts would greatly be appreciated.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-3674">
-<div id="comment-3674">
-<p class="comment-metadata">
-<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 16-Jan-12 at 12:52 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3674">Permalink</a> |  </p>
+<p&gt;@Steve:</p&gt;
+<blockquote&gt;<p&gt;The point is that following a pattern from a widely popular snippet like GA is a good move and not characterized as “blindly” adding functionality</p&gt;</blockquote&gt;
+<p&gt;Google’s GA snippet is definitely a good place to start, but I’d prefer to see more developers analyze third party snippets (in general) thoroughly before including them as-is rather than blindly copy-pasting. <a href="http://calendar.perfplanet.com/2011/advice-on-trusting-advice/" rel="nofollow"&gt;Even when a snippet comes from a trusted authority on web performance.</a&gt;</p&gt;
+<blockquote&gt;<p&gt;Having a good understanding of why each line is in the snippet is valuable – that’s the goal of this post.</p&gt;</blockquote&gt;
+<p&gt;Then we’re in agreement :) It’s important to fully understand what each line in the snippet does. However, <a href="http://mathiasbynens.be/notes/async-analytics-snippet" rel="nofollow"&gt;the current GA snippet does contain some redundant stuff</a&gt;. What does <code&gt;ga.type = ‘text/javascript’;</code&gt; do, for example? Are there any edge case browsers that actually need this line? I don’t know of any, but perhaps the Google Analytics JS team does?</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3673"&gt;
+<div id="comment-3673"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;Jim Hirshfield</strong&gt; | 16-Jan-12 at 9:13 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3673"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Jim: There are many <a href="http://radar.oreilly.com/2009/07/velocity-making-your-site-fast.html" rel="nofollow">case</a> <a href="http://www.strangeloopnetworks.com/web-performance-optimization-hub/research-type/case-study/" rel="nofollow">studies</a> that show the negative impact slow web pages have on business metrics and the user experience. Even 400ms can make a significant difference.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3677">
-<div id="comment-3677">
-<p class="comment-metadata">
-<strong><a href='http://www.sergeychernyshev.com/' rel='external nofollow' class='url'>Sergey Chernyshev</a></strong> | 17-Jan-12 at 10:23 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3677">Permalink</a> |  </p>
+<p&gt;Steve &#8211; Great post. I read it with interest, not as an engineer, but as someone that works with online publishers who are frequently removing js so as to speed up their sites. Like many publisher tools providers, my company&#8217;s mode of deployment involves publishers adding js to their sites. </p&gt;
+<p&gt;Publishers are at war to shave milliseconds off load times &#8211; an effort driven by Google&#8217;s statements that slower sites will get less SEO juice. Script load time is one of the top questions we are asked.</p&gt;
+<p&gt;Given that Google is a producer of js, I&#8217;m troubled by the conflict of Google making the (ambiguous) rules AND benefiting from them. How fast is fast enough? Google doesn&#8217;t advocate the removal of Google Analytics&#8217; js, obviously.</p&gt;
+<p&gt;I&#8217;d like to believe that Google&#8217;s focus in this area is to penalize &#8220;slow&#8221; sites that load in 10 seconds or more, and _not_ sites that load in 3.65 seconds instead of 2.487 (I&#8217;m using your numbers from above, but don&#8217;t mean to imply that you&#8217;re saying 2.487 is ideal or that all js should be removed to optimize for SEO).</p&gt;
+<p&gt;Yes, a 31% improvement in load time is huge. But are we being unnecessarily obsessive below 3 seconds?</p&gt;
+<p&gt;Any clarity or references to other posts would greatly be appreciated.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-3674"&gt;
+<div id="comment-3674"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://stevesouders.com' rel='external nofollow' class='url'&gt;Steve Souders</a&gt;</strong&gt; | 16-Jan-12 at 12:52 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3674"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Jim glad to see you joining the performance discussion ;)</p>
-<p>I&#8217;d love to chat about business reasoning behind all of the performance stuff &#8211; come over to our meetup or let&#8217;s just grab lunch some day ;)</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-3678">
-<div id="comment-3678">
-<p class="comment-metadata">
-<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 17-Jan-12 at 12:15 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3678">Permalink</a> |  </p>
+<p&gt;@Jim: There are many <a href="http://radar.oreilly.com/2009/07/velocity-making-your-site-fast.html" rel="nofollow"&gt;case</a&gt; <a href="http://www.strangeloopnetworks.com/web-performance-optimization-hub/research-type/case-study/" rel="nofollow"&gt;studies</a&gt; that show the negative impact slow web pages have on business metrics and the user experience. Even 400ms can make a significant difference.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3677"&gt;
+<div id="comment-3677"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://www.sergeychernyshev.com/' rel='external nofollow' class='url'&gt;Sergey Chernyshev</a&gt;</strong&gt; | 17-Jan-12 at 10:23 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3677"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Dan: The results for Imgur are accurate. That long page load time (45 seconds) is from a request to rlcdn.com that redirects to a script that does document.write for a tracking pixel. The request fails but takes 30 seconds to timeout.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3680">
-<div id="comment-3680">
-<p class="comment-metadata">
-<strong><a href='http://twitter.com/CrabDude' rel='external nofollow' class='url'>Adam Crabtree</a></strong> | 18-Jan-12 at 10:35 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3680">Permalink</a> |  </p>
+<p&gt;@Jim glad to see you joining the performance discussion ;)</p&gt;
+<p&gt;I&#8217;d love to chat about business reasoning behind all of the performance stuff &#8211; come over to our meetup or let&#8217;s just grab lunch some day ;)</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-3678"&gt;
+<div id="comment-3678"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://stevesouders.com' rel='external nofollow' class='url'&gt;Steve Souders</a&gt;</strong&gt; | 17-Jan-12 at 12:15 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3678"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>Just a thought that regularly comes to mind when I hear people talking about async and defer in scripts. Wouldn&#8217;t it be easier for CDNS to adopt CORS headers, and start loading scripts via XHR and eval? With CORS + eval / script injection you get absolute control over when to request and when to execute.</p>
-<p>It seems it would be far easier and faster to expect Javascript serving CDNs / hosts to update their headers than wait till the populace has updated their browsers, and has quasi-support down to IE8.</p>
-<p>I usually don&#8217;t get much involved in these conversations because I always more or less assume I&#8217;ll never use defer/async b/c of this (though obviously I may use a snippet that does).</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-3682">
-<div id="comment-3682">
-<p class="comment-metadata">
-<strong><a href='http://webpro.nl' rel='external nofollow' class='url'>Lars Kappert</a></strong> | 18-Jan-12 at 2:10 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3682">Permalink</a> |  </p>
+<p&gt;@Dan: The results for Imgur are accurate. That long page load time (45 seconds) is from a request to rlcdn.com that redirects to a script that does document.write for a tracking pixel. The request fails but takes 30 seconds to timeout.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3680"&gt;
+<div id="comment-3680"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://twitter.com/CrabDude' rel='external nofollow' class='url'&gt;Adam Crabtree</a&gt;</strong&gt; | 18-Jan-12 at 10:35 am | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3680"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>What about the impact of images? Apart from the fact you&#8217;re not really proving the &#8220;Javascript being the #1 place to look for making a website faster&#8221; statement, I wanted to put this to the test.</p>
-<p>As a follow-up to our conversation on Twitter (<a href="https://twitter.com/#!/souders/status/158070791659986945" rel="nofollow">https://twitter.com/#!/souders/status/158070791659986945</a>), here are my numbers:</p>
-<p>With images: 3.3965 sec.<br />
-Without images: 2.275 sec. This is a 33% decrease.</p>
-<p>It must be noted that the blocking rule was just &#8220;.png .gif .jpg .jpeg&#8221;, which does not eliminate favicons, server-side generated images (often seen with a .php extension), and of course Flash.</p>
-<p>With images: <a href="http://www.webpagetest.org/result/120118_K6_4a2273c148243934ef3064a87edc7fd1/" rel="nofollow">http://www.webpagetest.org/result/120118_K6_4a2273c148243934ef3064a87edc7fd1/</a><br />
-Without images: <a href="http://www.webpagetest.org/result/120118_HD_e41457aff4811b43c72590f8ab42bc10/" rel="nofollow">http://www.webpagetest.org/result/120118_HD_e41457aff4811b43c72590f8ab42bc10/</a></p>
-<p>Since all of our measurements are too flaky imho; and definitely do Javascript and images require a whole different approach when optimizing, I&#8217;m not saying that images are the #1 place to look for now. But at least it deserves the same kind of attention.</p>
-<p>(Btw, your numbers would be 3.61 and 2.481 seconds respectively, but the 31% increase would remain the same. Here&#8217;s using the Numbers app)</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-3683">
-<div id="comment-3683">
-<p class="comment-metadata">
-<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 18-Jan-12 at 3:38 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3683">Permalink</a> |  </p>
+<p&gt;Just a thought that regularly comes to mind when I hear people talking about async and defer in scripts. Wouldn&#8217;t it be easier for CDNS to adopt CORS headers, and start loading scripts via XHR and eval? With CORS + eval / script injection you get absolute control over when to request and when to execute.</p&gt;
+<p&gt;It seems it would be far easier and faster to expect Javascript serving CDNs / hosts to update their headers than wait till the populace has updated their browsers, and has quasi-support down to IE8.</p&gt;
+<p&gt;I usually don&#8217;t get much involved in these conversations because I always more or less assume I&#8217;ll never use defer/async b/c of this (though obviously I may use a snippet that does).</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment even thread-even depth-1" id="li-comment-3682"&gt;
+<div id="comment-3682"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://webpro.nl' rel='external nofollow' class='url'&gt;Lars Kappert</a&gt;</strong&gt; | 18-Jan-12 at 2:10 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3682"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>@Adam: Loading all scripts using CORS as XHR might turn out to be faster, but it&#8217;s certainly not easier. </p>
-<p>@Lars: Cool test, thanks. The reason JavaScript is a bigger problem is that it blocks rendering in most cases. Reducing JavaScript impact therefore makes rendering happen sooner, whereas reducing images has less effect on render time. For example, in your tests for CNN.com the start render time with images is 1.841s vs 1.855s without images &#8211; not much difference. For CNN.com the start render time with JS is 1.811s vs 0.894s without JS &#8211; a significant speedup of rendering. This was the first URL I chose, so I wasn&#8217;t hunting for a winning example. If you had time to pull down the csv for all four results and compare median start render times that would be a more conclusive comparison. I&#8217;m betting the removal of JS helps rendering much more than images.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-3684">
-<div id="comment-3684">
-<p class="comment-metadata">
-<strong><a href='http://webpro.nl' rel='external nofollow' class='url'>Lars Kappert</a></strong> | 18-Jan-12 at 11:21 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3684">Permalink</a> |  </p>
+<p&gt;What about the impact of images? Apart from the fact you&#8217;re not really proving the &#8220;Javascript being the #1 place to look for making a website faster&#8221; statement, I wanted to put this to the test.</p&gt;
+<p&gt;As a follow-up to our conversation on Twitter (<a href="https://twitter.com/#!/souders/status/158070791659986945" rel="nofollow"&gt;https://twitter.com/#!/souders/status/158070791659986945</a&gt;), here are my numbers:</p&gt;
+<p&gt;With images: 3.3965 sec.<br /&gt;
+Without images: 2.275 sec. This is a 33% decrease.</p&gt;
+<p&gt;It must be noted that the blocking rule was just &#8220;.png .gif .jpg .jpeg&#8221;, which does not eliminate favicons, server-side generated images (often seen with a .php extension), and of course Flash.</p&gt;
+<p&gt;With images: <a href="http://www.webpagetest.org/result/120118_K6_4a2273c148243934ef3064a87edc7fd1/" rel="nofollow"&gt;http://www.webpagetest.org/result/120118_K6_4a2273c148243934ef3064a87edc7fd1/</a&gt;<br /&gt;
+Without images: <a href="http://www.webpagetest.org/result/120118_HD_e41457aff4811b43c72590f8ab42bc10/" rel="nofollow"&gt;http://www.webpagetest.org/result/120118_HD_e41457aff4811b43c72590f8ab42bc10/</a&gt;</p&gt;
+<p&gt;Since all of our measurements are too flaky imho; and definitely do Javascript and images require a whole different approach when optimizing, I&#8217;m not saying that images are the #1 place to look for now. But at least it deserves the same kind of attention.</p&gt;
+<p&gt;(Btw, your numbers would be 3.61 and 2.481 seconds respectively, but the 31% increase would remain the same. Here&#8217;s using the Numbers app)</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-3683"&gt;
+<div id="comment-3683"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://stevesouders.com' rel='external nofollow' class='url'&gt;Steve Souders</a&gt;</strong&gt; | 18-Jan-12 at 3:38 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3683"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>Steve, I completely agree. I just think it is important to make clear what exactly you are talking about. I think we can agree that JS has major impact on the *perceived* performance (significantly more than images); while images and JS roughly have the same impact on page load time:</p>
-<p>Render time median for JS:<br />
-With: 1387.5<br />
-Without: 1069 (decrease 23%)</p>
-<p>Render time median for images:<br />
-With: 1343.5<br />
-Without: 1334 (decrease &lt;1%)</p>
-<p>We should be careful with those numbers, I think we can do better (e.g. also not execute inline JS, generated images are even more expensive, etc.). But they do give a nice impression (more or less confirming our expectations).</p>
-<p>Thanks for the article and bringing this to our attention.</p>
-<p>Many thanks also to Pat Meenan from <a href="http://webpagetest.org" rel="nofollow">http://webpagetest.org</a> for allowing us to do our tests so easily!</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-4165">
-<div id="comment-4165">
-<p class="comment-metadata">
-<strong><a href='https://github.com/pablomoretti/jcors-loader' rel='external nofollow' class='url'>Pablo</a></strong> | 08-Oct-12 at 6:41 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-4165">Permalink</a> |  </p>
+<p&gt;@Adam: Loading all scripts using CORS as XHR might turn out to be faster, but it&#8217;s certainly not easier. </p&gt;
+<p&gt;@Lars: Cool test, thanks. The reason JavaScript is a bigger problem is that it blocks rendering in most cases. Reducing JavaScript impact therefore makes rendering happen sooner, whereas reducing images has less effect on render time. For example, in your tests for CNN.com the start render time with images is 1.841s vs 1.855s without images &#8211; not much difference. For CNN.com the start render time with JS is 1.811s vs 0.894s without JS &#8211; a significant speedup of rendering. This was the first URL I chose, so I wasn&#8217;t hunting for a winning example. If you had time to pull down the csv for all four results and compare median start render times that would be a more conclusive comparison. I&#8217;m betting the removal of JS helps rendering much more than images.</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment even thread-even depth-1" id="li-comment-3684"&gt;
+<div id="comment-3684"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='http://webpro.nl' rel='external nofollow' class='url'&gt;Lars Kappert</a&gt;</strong&gt; | 18-Jan-12 at 11:21 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-3684"&gt;Permalink</a&gt; |  </p&gt;
 
 
-<p>Steve, I&#8217;m working in a little tiny loader for javascript sources using CORS and make the web more fast !</p>
-<p>The goal is load multiples js in parallel and execute in order without blocking DOMReady or onload.</p>
-<p><a href="https://github.com/pablomoretti/jcors-loader" rel="nofollow">https://github.com/pablomoretti/jcors-loader</a></p>
-</div>
-</li><!-- #comment-## -->
-			</ol>
+<p&gt;Steve, I completely agree. I just think it is important to make clear what exactly you are talking about. I think we can agree that JS has major impact on the *perceived* performance (significantly more than images); while images and JS roughly have the same impact on page load time:</p&gt;
+<p&gt;Render time median for JS:<br /&gt;
+With: 1387.5<br /&gt;
+Without: 1069 (decrease 23%)</p&gt;
+<p&gt;Render time median for images:<br /&gt;
+With: 1343.5<br /&gt;
+Without: 1334 (decrease &lt;1%)</p&gt;
+<p&gt;We should be careful with those numbers, I think we can do better (e.g. also not execute inline JS, generated images are even more expensive, etc.). But they do give a nice impression (more or less confirming our expectations).</p&gt;
+<p&gt;Thanks for the article and bringing this to our attention.</p&gt;
+<p&gt;Many thanks also to Pat Meenan from <a href="http://webpagetest.org" rel="nofollow"&gt;http://webpagetest.org</a&gt; for allowing us to do our tests so easily!</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-4165"&gt;
+<div id="comment-4165"&gt;
+<p class="comment-metadata"&gt;
+<strong&gt;<a href='https://github.com/pablomoretti/jcors-loader' rel='external nofollow' class='url'&gt;Pablo</a&gt;</strong&gt; | 08-Oct-12 at 6:41 pm | <a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/#comment-4165"&gt;Permalink</a&gt; |  </p&gt;
 
 
+<p&gt;Steve, I&#8217;m working in a little tiny loader for javascript sources using CORS and make the web more fast !</p&gt;
+<p&gt;The goal is load multiples js in parallel and execute in order without blocking DOMReady or onload.</p&gt;
+<p&gt;<a href="https://github.com/pablomoretti/jcors-loader" rel="nofollow"&gt;https://github.com/pablomoretti/jcors-loader</a&gt;</p&gt;
+</div&gt;
+</li&gt;<!-- #comment-## --&gt;
+			</ol&gt;
 
 
 
 
 
-</div><!-- #comments -->
 
 
-</div> <!-- end div id="content" -->
-</div>
-<div id="footer" class="containerwrapperpadded">
-<p>&copy; Steve Souders</p>
-</div>
-</body>
-</html>
+</div&gt;<!-- #comments --&gt;
+
+
+</div&gt; <!-- end div id="content" --&gt;
+</div&gt;
+<div id="footer" class="containerwrapperpadded"&gt;
+<p&gt;&copy; Steve Souders</p&gt;
+</div&gt;
+</body&gt;
+</html&gt;
 
 <!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
 
 Page Caching using disk: enhanced
-Database Caching 13/32 queries in 0.171 seconds using disk
+Database Caching 19/32 queries in 0.227 seconds using disk
 
- Served from: www.stevesouders.com @ 2013-09-30 01:19:54 by W3 Total Cache -->
+ Served from: www.stevesouders.com @ 2013-09-30 03:15:28 by W3 Total Cache --&gt;
+        </textarea>
+        </div>
+        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+        <script src="../js/clearly.js"></script>
+        <script>
+            var html = window.__getMyClearlyResults().html;
+            $('#main_content_wrap').html(html);
+        </script>
+  </body>
+</html>

@@ -1,26 +1,39 @@
-	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Hacker News 排名算法工作原理 -- 算法 -- IT技术博客大学习 -- 共学习 共进步！</title>
-<meta name="description" content="这篇文章我要向大家介绍Hacker News网站的文章排名算法工作原理，以及如何在自己的应用里使用这种算法。这个算法非常的简单，但却在突出热门文章和遴选新文章上表现的异常优秀。" />
-<meta name="keywords" content="HackerNews,排名,Hacker News 排名算法工作原理,算法" />
-<link rel="canonical" href="http://blogread.cn/it/article/6652"/>
-<html xmlns:wb=“http://open.weibo.com/wb”>
-<link href="/it/css/css.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/1.8/jquery.min.js"></script>
-<script type="text/javascript">
-	window.google_analytics_uacct = "UA-6082292-6";
-</script>
-<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=3741373929" type="text/javascript" charset="utf-8"></script>
+<!DOCTYPE html>
+<html>
 
-<script type="text/javascript">
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <title></title>
+  </head>
+  <body>
+        <!-- MAIN CONTENT -->
+        <div id="main_content_wrap" class="outer">
+        <textarea style="visibility:none" id="html-area">
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+<html xmlns="http://www.w3.org/1999/xhtml"&gt;
+<head&gt;
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;
+<title&gt;Hacker News 排名算法工作原理 -- 算法 -- IT技术博客大学习 -- 共学习 共进步！</title&gt;
+<meta name="description" content="这篇文章我要向大家介绍Hacker News网站的文章排名算法工作原理，以及如何在自己的应用里使用这种算法。这个算法非常的简单，但却在突出热门文章和遴选新文章上表现的异常优秀。" /&gt;
+<meta name="keywords" content="HackerNews,排名,Hacker News 排名算法工作原理,算法" /&gt;
+<link rel="canonical" href="http://blogread.cn/it/article/6652"/&gt;
+<html xmlns:wb=“http://open.weibo.com/wb”&gt;
+<link href="/it/css/css.css" rel="stylesheet" type="text/css" /&gt;
+<script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/1.8/jquery.min.js"&gt;</script&gt;
+<script type="text/javascript"&gt;
+	window.google_analytics_uacct = "UA-6082292-6";
+</script&gt;
+<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=3741373929" type="text/javascript" charset="utf-8"&gt;</script&gt;
+
+<script type="text/javascript"&gt;
 function nav_locate(){
 	var top=$(document).scrollTop();
 	if(($.browser.msie==true)&&($.browser.version==6.0)){
-		if(top>201)$("#nav").css({position:"absolute",top:top-201});
+		if(top&gt;201)$("#nav").css({position:"absolute",top:top-201});
 	}else{
-		if(top>201)$("#nav").css({position:"fixed",top:0});
+		if(top&gt;201)$("#nav").css({position:"fixed",top:0});
 	}
 	if(top<=201)$("#nav").css({position:"static",top:0});
 }
@@ -28,55 +41,55 @@ $(function(){
 		window.onscroll=nav_locate;
 		window.onresize=nav_locate;
 });
-</script>
+</script&gt;
 
-</head>
+</head&gt;
 
-<body>
+<body&gt;
 
-<div class="body">
-	<div class="topnav">
-		<div style="float:left;"><a href="http://weibo.com/blogread" title="IT技术博客大学习" target="_blank"><img src="http://tp1.sinaimg.cn/1646218964/30/1279883225/1" style="border:0" alt="IT技术博客大学习" /></a></div>
-		<div style="float:left;margin-top:5px;"><wb:follow-button uid="1646218964" type="red_3" width="100%" height="24" ></wb:follow-button></div>
-		&nbsp;&nbsp;&nbsp;&nbsp;<a href="/daohang/"><strong>博客导航</strong></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/wap/">手机版</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/search.php">搜索本站</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/site/">作者列表</a>
-	</div>
+<div class="body"&gt;
+	<div class="topnav"&gt;
+		<div style="float:left;"&gt;<a href="http://weibo.com/blogread" title="IT技术博客大学习" target="_blank"&gt;<img src="http://tp1.sinaimg.cn/1646218964/30/1279883225/1" style="border:0" alt="IT技术博客大学习" /&gt;</a&gt;</div&gt;
+		<div style="float:left;margin-top:5px;"&gt;<wb:follow-button uid="1646218964" type="red_3" width="100%" height="24" &gt;</wb:follow-button&gt;</div&gt;
+		&nbsp;&nbsp;&nbsp;&nbsp;<a href="/daohang/"&gt;<strong&gt;博客导航</strong&gt;</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/wap/"&gt;手机版</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/search.php"&gt;搜索本站</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/site/"&gt;作者列表</a&gt;
+	</div&gt;
     
-    <div class="banner">
-    	<div>
-        	<div class="logo"><h2><a href="/it/">IT技术博客大学习</a></h2><font color="#FB993B">-- 共学习 共进步！ --</font></div>
-        	<div class="ad">
-				<script type="text/javascript"><!--
+    <div class="banner"&gt;
+    	<div&gt;
+        	<div class="logo"&gt;<h2&gt;<a href="/it/"&gt;IT技术博客大学习</a&gt;</h2&gt;<font color="#FB993B"&gt;-- 共学习 共进步！ --</font&gt;</div&gt;
+        	<div class="ad"&gt;
+				<script type="text/javascript"&gt;<!--
 				google_ad_client = "pub-2206192680127944";
 				/* 728x90, 创建于 09-10-14 */
 				google_ad_slot = "2235377458";
 				google_ad_width = 728;
 				google_ad_height = 90;
-				//-->
-				</script>
+				//--&gt;
+				</script&gt;
 				<script type="text/javascript"
-				src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-				</script>
-            </div>    
-        </div>
-	</div><!-- banner -->
+				src="http://pagead2.googlesyndication.com/pagead/show_ads.js"&gt;
+				</script&gt;
+            </div&gt;    
+        </div&gt;
+	</div&gt;<!-- banner --&gt;
 
-	<div class="nav" id="nav"> 
-		<a href="/it/category/2">PHP</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/3">MySQL</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/4">Oracle</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/5">Linux</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/6">Apache</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/9">算法</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/16">安全</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/15">网络系统</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/17">系统架构</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/18">系统运维</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/23">源码分析</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/22">编程语言</a>
-		<br /> 
-		<a href="/it/">首页</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/7">JavaScript</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/12">CSS/HTML</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/13">用户研究</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/20">信息和交互</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/19">视觉设计</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/21">设计思想</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/11">发现</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/10">奋斗</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/14">互联网</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/8">其他</a> 
-	</div> 
-	<div class="main"> 
+	<div class="nav" id="nav"&gt; 
+		<a href="/it/category/2"&gt;PHP</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/3"&gt;MySQL</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/4"&gt;Oracle</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/5"&gt;Linux</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/6"&gt;Apache</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/9"&gt;算法</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/16"&gt;安全</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/15"&gt;网络系统</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/17"&gt;系统架构</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/18"&gt;系统运维</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/23"&gt;源码分析</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/22"&gt;编程语言</a&gt;
+		<br /&gt; 
+		<a href="/it/"&gt;首页</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/7"&gt;JavaScript</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/12"&gt;CSS/HTML</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/13"&gt;用户研究</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/20"&gt;信息和交互</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/19"&gt;视觉设计</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/21"&gt;设计思想</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/11"&gt;发现</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/10"&gt;奋斗</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/14"&gt;互联网</a&gt;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/it/category/8"&gt;其他</a&gt; 
+	</div&gt; 
+	<div class="main"&gt; 
 
-		<div class="main_left">
+		<div class="main_left"&gt;
 
-			<div class="posi">
-				<strong>您现在的位置</strong>：<a href="http://blogread.cn/it/">首页</a> --> <a href="http://blogread.cn/it/category/9">算法</a> --> Hacker News 排名算法工作原理
-			</div>
+			<div class="posi"&gt;
+				<strong&gt;您现在的位置</strong&gt;：<a href="http://blogread.cn/it/"&gt;首页</a&gt; --&gt; <a href="http://blogread.cn/it/category/9"&gt;算法</a&gt; --&gt; Hacker News 排名算法工作原理
+			</div&gt;
 
-			<div class="articlebox">
-				<div class="title"><h2>Hacker News 排名算法工作原理</h2></div>
-				<div class="info">
-					<script type="text/javascript" charset="utf-8">
+			<div class="articlebox"&gt;
+				<div class="title"&gt;<h2&gt;Hacker News 排名算法工作原理</h2&gt;</div&gt;
+				<div class="info"&gt;
+					<script type="text/javascript" charset="utf-8"&gt;
 (function(){
   var _w = 106 , _h = 24;
   var param = {
@@ -95,28 +108,28 @@ $(function(){
   for( var p in param ){
     temp.push(p + '=' + encodeURIComponent( param[p] || '' ) )
   }
-  document.write('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://hits.sinajs.cn/A1/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"></iframe>')
+  document.write('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://hits.sinajs.cn/A1/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"&gt;</iframe&gt;')
 })()
-</script>
-									&nbsp;&nbsp;<a href="#original">出处信息</a>
-				</div>
+</script&gt;
+									&nbsp;&nbsp;<a href="#original"&gt;出处信息</a&gt;
+				</div&gt;
 
-				<div class="article">
-										<div style="float:right;margin: 4px;">
-						<script type="text/javascript"><!--
+				<div class="article"&gt;
+										<div style="float:right;margin: 4px;"&gt;
+						<script type="text/javascript"&gt;<!--
 						google_ad_client = "ca-pub-2206192680127944";
 						/* IT技术博客大学习正文页 */
 						google_ad_slot = "5793669285";
 						google_ad_width = 300;
 						google_ad_height = 250;
-						//-->
-						</script>
+						//--&gt;
+						</script&gt;
 						<script type="text/javascript"
-						src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-						</script>
-					</div>
+						src="http://pagead2.googlesyndication.com/pagead/show_ads.js"&gt;
+						</script&gt;
+					</div&gt;
 
-					<p> &nbsp; &nbsp;这篇文章我要向大家介绍<a href="http://news.ycombinator.com/" target="_blank">Hacker News</a>网站的文章排名算法工作原理，以及如何在自己的应用里使用这种算法。这个算法非常的简单，但却在突出热门文章和遴选新文章上表现的异常优秀。<br /></p><h3>深入 news.arc 程序代码</h3><p> &nbsp; &nbsp;Hacker News是用Arc语言开发的，这是一种Lisp方言，由Y Combinator投资公司创始人<a href="http://www.paulgraham.com/" target="_blank">Paul Graham</a>创造。Hacker News的开源的，你可以在<a href="http://arclanguage.org/" target="_blank">arclanguage.org</a>找到它的源代码。深入发掘 news.arc 程序，你会找到这段排名算法代码，就是下面这段：</p><pre>; Votes divided by the age in hours to the gravityth power.
+					<p&gt; &nbsp; &nbsp;这篇文章我要向大家介绍<a href="http://news.ycombinator.com/" target="_blank"&gt;Hacker News</a&gt;网站的文章排名算法工作原理，以及如何在自己的应用里使用这种算法。这个算法非常的简单，但却在突出热门文章和遴选新文章上表现的异常优秀。<br /&gt;</p&gt;<h3&gt;深入 news.arc 程序代码</h3&gt;<p&gt; &nbsp; &nbsp;Hacker News是用Arc语言开发的，这是一种Lisp方言，由Y Combinator投资公司创始人<a href="http://www.paulgraham.com/" target="_blank"&gt;Paul Graham</a&gt;创造。Hacker News的开源的，你可以在<a href="http://arclanguage.org/" target="_blank"&gt;arclanguage.org</a&gt;找到它的源代码。深入发掘 news.arc 程序，你会找到这段排名算法代码，就是下面这段：</p&gt;<pre&gt;; Votes divided by the age in hours to the gravityth power.
 ; Would be interesting to scale gravity in a slider.
 
 (= gravity* 1.8 timebase* 120 front-threshold* 1 
@@ -130,21 +143,21 @@ $(function(){
          (blank s!url)                  nourl-factor*
          (lightweight s)                (min lightweight-factor* 
                                              (contro-factor s))
-                                        (contro-factor s))))</pre><p> &nbsp; &nbsp;本质上，这段 Hacker News采用的排名算法的工作原理看起来大概是这个样子：</p><pre>Score = (P-1) / (T+2)^G
+                                        (contro-factor s))))</pre&gt;<p&gt; &nbsp; &nbsp;本质上，这段 Hacker News采用的排名算法的工作原理看起来大概是这个样子：</p&gt;<pre&gt;Score = (P-1) / (T+2)^G
 
 其中，
 P = 文章获得的票数( -1 是去掉文章提交人的票)
 T = 从文章提交至今的时间(小时)
-G = 比重，news.arc里缺省值是1.8</pre><p> &nbsp; &nbsp;正如你看到的，这个算法很容易实现。在下面的内容里，我们将会看到这个算法是如何工作的。</p><h3>比重(G)和时间(T)对排名的影响</h3><p> &nbsp; &nbsp;比重和时间在文章的排名得分上有重大的影响。正常情况下如下面所述：</p><ul><li><p>当T增加时文章得分会下降，这就是说越老的文章分数会越底。</p></li><li><p>当比重加大时，老的文章的得分会减的更快</p></li><p> &nbsp; &nbsp;为了能视觉呈现这个算法，我们可以把它绘制到<a href="http://www.wolframalpha.com/" target="_blank">Wolfram Alpha</a>。</p><h3>得分随着时间是如何变化的</h3><p> &nbsp; &nbsp;<img alt="Score 24 hours" src="http://amix.dk/uploads/score_24_hours.gif" /></p><p> &nbsp; &nbsp;你可以看到，随着时间的流逝，得分骤然下降，例如，24小时前的文章的分数变的非常低——不管它获得了如何多的票数。</p><p> &nbsp; &nbsp;<a href="http://goo.gl/ddYe" target="_blank">Plot语句</a>:</p><pre>plot(
+G = 比重，news.arc里缺省值是1.8</pre&gt;<p&gt; &nbsp; &nbsp;正如你看到的，这个算法很容易实现。在下面的内容里，我们将会看到这个算法是如何工作的。</p&gt;<h3&gt;比重(G)和时间(T)对排名的影响</h3&gt;<p&gt; &nbsp; &nbsp;比重和时间在文章的排名得分上有重大的影响。正常情况下如下面所述：</p&gt;<ul&gt;<li&gt;<p&gt;当T增加时文章得分会下降，这就是说越老的文章分数会越底。</p&gt;</li&gt;<li&gt;<p&gt;当比重加大时，老的文章的得分会减的更快</p&gt;</li&gt;<p&gt; &nbsp; &nbsp;为了能视觉呈现这个算法，我们可以把它绘制到<a href="http://www.wolframalpha.com/" target="_blank"&gt;Wolfram Alpha</a&gt;。</p&gt;<h3&gt;得分随着时间是如何变化的</h3&gt;<p&gt; &nbsp; &nbsp;<img alt="Score 24 hours" src="http://amix.dk/uploads/score_24_hours.gif" /&gt;</p&gt;<p&gt; &nbsp; &nbsp;你可以看到，随着时间的流逝，得分骤然下降，例如，24小时前的文章的分数变的非常低——不管它获得了如何多的票数。</p&gt;<p&gt; &nbsp; &nbsp;<a href="http://goo.gl/ddYe" target="_blank"&gt;Plot语句</a&gt;:</p&gt;<pre&gt;plot(
     (30 - 1) / (t + 2)^1.8, 
     (60 - 1) / (t + 2)^1.8,
     (200 - 1) / (t + 2)^1.8
-) where t=0..24</pre><h3>比重参数是如何影响排名的</h3><p> &nbsp; &nbsp;<img alt="Gravity effects" src="http://amix.dk/uploads/gravity_effects.gif" /></p><p> &nbsp; &nbsp;图中你可以看到，比重越大，得分下降的越快。</p><p> &nbsp; &nbsp;<a href="http://goo.gl/AGPN" target="_blank">Plot语句</a>:</p><pre>plot(
+) where t=0..24</pre&gt;<h3&gt;比重参数是如何影响排名的</h3&gt;<p&gt; &nbsp; &nbsp;<img alt="Gravity effects" src="http://amix.dk/uploads/gravity_effects.gif" /&gt;</p&gt;<p&gt; &nbsp; &nbsp;图中你可以看到，比重越大，得分下降的越快。</p&gt;<p&gt; &nbsp; &nbsp;<a href="http://goo.gl/AGPN" target="_blank"&gt;Plot语句</a&gt;:</p&gt;<pre&gt;plot(
     (p - 1) / (t + 2)^1.8, 
     (p - 1) / (t + 2)^0.5,
     (p - 1) / (t + 2)^2.0
-) where t=0..24, p=10</pre><h3>Python语言实现</h3><p> &nbsp; &nbsp;之前已经说了，这个评分算法很容易实现：</p><div class="highlight"><pre>def calculate_score(votes, item_hour_age, gravity=1.8):
-    return (votes - 1) / pow((item_hour_age+2), gravity)</pre></div><p> &nbsp; &nbsp;关键是要理解算法中的各个因素对评分的影响，这样你可以在你的应用中进行定制。我希望这篇文章已经向你说明了这些 <img src="http://www.aqee.net/wordpress/wp-includes/images/smilies/icon_smile.gif?006071" alt=":-)" class="wp-smiley" /></p><p> &nbsp; &nbsp;祝编程快乐！</p><p> &nbsp; &nbsp;编辑：</p><p> &nbsp; &nbsp;Paul Graham 分享了修正后的<a href="http://news.ycombinator.com/item?id=1781417" target="_blank">HN 排名算法</a>：</p><pre>    (= gravity* 1.8 timebase* 120 front-threshold* 1
+) where t=0..24, p=10</pre&gt;<h3&gt;Python语言实现</h3&gt;<p&gt; &nbsp; &nbsp;之前已经说了，这个评分算法很容易实现：</p&gt;<div class="highlight"&gt;<pre&gt;def calculate_score(votes, item_hour_age, gravity=1.8):
+    return (votes - 1) / pow((item_hour_age+2), gravity)</pre&gt;</div&gt;<p&gt; &nbsp; &nbsp;关键是要理解算法中的各个因素对评分的影响，这样你可以在你的应用中进行定制。我希望这篇文章已经向你说明了这些 <img src="http://www.aqee.net/wordpress/wp-includes/images/smilies/icon_smile.gif?006071" alt=":-)" class="wp-smiley" /&gt;</p&gt;<p&gt; &nbsp; &nbsp;祝编程快乐！</p&gt;<p&gt; &nbsp; &nbsp;编辑：</p&gt;<p&gt; &nbsp; &nbsp;Paul Graham 分享了修正后的<a href="http://news.ycombinator.com/item?id=1781417" target="_blank"&gt;HN 排名算法</a&gt;：</p&gt;<pre&gt;    (= gravity* 1.8 timebase* 120 front-threshold* 1
        nourl-factor* .4 lightweight-factor* .17 gag-factor* .1)
 
     (def frontpage-rank (s (o scorefn realscore) (o gravity gravity*))
@@ -159,11 +172,11 @@ G = 比重，news.arc里缺省值是1.8</pre><p> &nbsp; &nbsp;正如你看到的
                                                     gag-factor*
                                                    (lightweight s)
                                                     lightweight-factor*
-                                                   1)))))</pre><p> &nbsp; &nbsp;:)</p><p> &nbsp; &nbsp;</p><hr /></ul><p>本文由<a href="http://www.aqee.net">外刊IT评论网</a>(<a href="http://www.aqee.net">www.aqee.net</a>)原创发表，文章地址：<a href="http://www.aqee.net/how-hacker-news-ranking-algorithm-works/">Hacker News 排名算法工作原理</a>，[英文原文：<a href="http://amix.dk/blog/post/19574">How Hacker News ranking algorithm works</a> ]</p><p><br/></p>
+                                                   1)))))</pre&gt;<p&gt; &nbsp; &nbsp;:)</p&gt;<p&gt; &nbsp; &nbsp;</p&gt;<hr /&gt;</ul&gt;<p&gt;本文由<a href="http://www.aqee.net"&gt;外刊IT评论网</a&gt;(<a href="http://www.aqee.net"&gt;www.aqee.net</a&gt;)原创发表，文章地址：<a href="http://www.aqee.net/how-hacker-news-ranking-algorithm-works/"&gt;Hacker News 排名算法工作原理</a&gt;，[英文原文：<a href="http://amix.dk/blog/post/19574"&gt;How Hacker News ranking algorithm works</a&gt; ]</p&gt;<p&gt;<br/&gt;</p&gt;
 					
-					<div style="margin: 4px 80px;padding:10px;border:#01DF01 3px dashed;background: #F3F781;-moz-border-radius: 5px;border-radius: 5px;">
+					<div style="margin: 4px 80px;padding:10px;border:#01DF01 3px dashed;background: #F3F781;-moz-border-radius: 5px;border-radius: 5px;"&gt;
 					觉得文章有用？立即：
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript" charset="utf-8"&gt;
 (function(){
   var _w = 106 , _h = 24;
   var param = {
@@ -182,155 +195,155 @@ G = 比重，news.arc里缺省值是1.8</pre><p> &nbsp; &nbsp;正如你看到的
   for( var p in param ){
     temp.push(p + '=' + encodeURIComponent( param[p] || '' ) )
   }
-  document.write('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://hits.sinajs.cn/A1/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"></iframe>')
+  document.write('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://hits.sinajs.cn/A1/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"&gt;</iframe&gt;')
 })()
-</script>
-						和朋友一起 <strong>共学习 共进步！</strong>
+</script&gt;
+						和朋友一起 <strong&gt;共学习 共进步！</strong&gt;
 						
-					                		<script type="text/javascript">
+					                		<script type="text/javascript"&gt;
 							WB2.anyWhere(function(W){
 								W.widget.followButton({
 									'nick_name': '外刊IT评论网',	//用户昵称
 									'id': "wb_follow_btn1"	//关注按钮容器ID
 								});
 							});
-						</script>
-						<p>本文作者：</p>
-						<span id="wb_follow_btn1"></span>
-						<p>而且，对文章有任何想法，可：</p>
-						<wb:publish default_text="@外刊IT评论网，我对您这个文章（http://blogread.cn/it/article/6652?f=wbc2 分享自 @IT技术博客大学习）有点想法：" button_size="big" button_text="立即在微博与作者 @外刊IT评论网 沟通！" />正在拼命挖掘沟通路线，马上就通了！</wb:publish>
-                    					</div>
+						</script&gt;
+						<p&gt;本文作者：</p&gt;
+						<span id="wb_follow_btn1"&gt;</span&gt;
+						<p&gt;而且，对文章有任何想法，可：</p&gt;
+						<wb:publish default_text="@外刊IT评论网，我对您这个文章（http://blogread.cn/it/article/6652?f=wbc2 分享自 @IT技术博客大学习）有点想法：" button_size="big" button_text="立即在微博与作者 @外刊IT评论网 沟通！" /&gt;正在拼命挖掘沟通路线，马上就通了！</wb:publish&gt;
+                    					</div&gt;
 
-					<div>
-						<script type="text/javascript"><!--
+					<div&gt;
+						<script type="text/javascript"&gt;<!--
 						google_ad_client = "ca-pub-2206192680127944";
 						/* blogread文章底部 */
 						google_ad_slot = "1471313689";
 						google_ad_width = 728;
 						google_ad_height = 90;
-						//-->
-						</script>
+						//--&gt;
+						</script&gt;
 						<script type="text/javascript"
-						src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-						</script>
-					</div>
+						src="http://pagead2.googlesyndication.com/pagead/show_ads.js"&gt;
+						</script&gt;
+					</div&gt;
 					
 					
-										<h3>我们猜你喜欢：</h3>
-					<ol>
-													<li><a href="http://blogread.cn/it/article/492?f=sa">用skip list实现实时排名? &nbsp;&nbsp; <span style="font-size:14px;">(阅读：3340)</span></a></li>
-													<li><a href="http://blogread.cn/it/article/2436?f=sa">IMDB评分排名算法 &nbsp;&nbsp; <span style="font-size:14px;">(阅读：2700)</span></a></li>
-													<li><a href="http://blogread.cn/it/article/493?f=sa">实时排名，其实很简单 &nbsp;&nbsp; <span style="font-size:14px;">(阅读：2240)</span></a></li>
-													<li><a href="http://blogread.cn/it/article/5561?f=sa">数学之美：Reddit评论排名算法 &nbsp;&nbsp; <span style="font-size:14px;">(阅读：2180)</span></a></li>
-													<li><a href="http://blogread.cn/it/article/5560?f=sa">数学之美：Hacker News的热门排名算法 &nbsp;&nbsp; <span style="font-size:14px;">(阅读：1980)</span></a></li>
-													<li><a href="http://blogread.cn/it/article/5549?f=sa">数学之美：StackOverflow问答排名算法 &nbsp;&nbsp; <span style="font-size:14px;">(阅读：1600)</span></a></li>
-													<li><a href="http://blogread.cn/it/article/6653?f=sa">Reddit排名算法工作原理 &nbsp;&nbsp; <span style="font-size:14px;">(阅读：400)</span></a></li>
+										<h3&gt;我们猜你喜欢：</h3&gt;
+					<ol&gt;
+													<li&gt;<a href="http://blogread.cn/it/article/492?f=sa"&gt;用skip list实现实时排名? &nbsp;&nbsp; <span style="font-size:14px;"&gt;(阅读：3340)</span&gt;</a&gt;</li&gt;
+													<li&gt;<a href="http://blogread.cn/it/article/2436?f=sa"&gt;IMDB评分排名算法 &nbsp;&nbsp; <span style="font-size:14px;"&gt;(阅读：2700)</span&gt;</a&gt;</li&gt;
+													<li&gt;<a href="http://blogread.cn/it/article/493?f=sa"&gt;实时排名，其实很简单 &nbsp;&nbsp; <span style="font-size:14px;"&gt;(阅读：2240)</span&gt;</a&gt;</li&gt;
+													<li&gt;<a href="http://blogread.cn/it/article/5561?f=sa"&gt;数学之美：Reddit评论排名算法 &nbsp;&nbsp; <span style="font-size:14px;"&gt;(阅读：2180)</span&gt;</a&gt;</li&gt;
+													<li&gt;<a href="http://blogread.cn/it/article/5560?f=sa"&gt;数学之美：Hacker News的热门排名算法 &nbsp;&nbsp; <span style="font-size:14px;"&gt;(阅读：1980)</span&gt;</a&gt;</li&gt;
+													<li&gt;<a href="http://blogread.cn/it/article/5549?f=sa"&gt;数学之美：StackOverflow问答排名算法 &nbsp;&nbsp; <span style="font-size:14px;"&gt;(阅读：1600)</span&gt;</a&gt;</li&gt;
+													<li&gt;<a href="http://blogread.cn/it/article/6653?f=sa"&gt;Reddit排名算法工作原理 &nbsp;&nbsp; <span style="font-size:14px;"&gt;(阅读：400)</span&gt;</a&gt;</li&gt;
 												
-					</ol>
+					</ol&gt;
 					
-				</div><!-- article -->
+				</div&gt;<!-- article --&gt;
 
-			</div><!-- articlebox -->
+			</div&gt;<!-- articlebox --&gt;
 
-			<div class="around">
-				<div class="prefix"><img src="http://blogread.cn/it/images/article.gif" border="0"> <strong>前一篇：</strong><a href="http://blogread.cn/it/article/6636">线性代数的妙用：怎样在Windows画图软件中实现28度旋转？</a></div>
-				<div class="suffix"><img src="http://blogread.cn/it/images/article.gif" border="0"> <strong>后一篇：</strong><a href="http://blogread.cn/it/article/6653">Reddit排名算法工作原理</a></div>
-			</div>
+			<div class="around"&gt;
+				<div class="prefix"&gt;<img src="http://blogread.cn/it/images/article.gif" border="0"&gt; <strong&gt;前一篇：</strong&gt;<a href="http://blogread.cn/it/article/6636"&gt;线性代数的妙用：怎样在Windows画图软件中实现28度旋转？</a&gt;</div&gt;
+				<div class="suffix"&gt;<img src="http://blogread.cn/it/images/article.gif" border="0"&gt; <strong&gt;后一篇：</strong&gt;<a href="http://blogread.cn/it/article/6653"&gt;Reddit排名算法工作原理</a&gt;</div&gt;
+			</div&gt;
 			
-			<div class="comment">
-				<div class="tip"><a name="original">文章信息</a></div>
+			<div class="comment"&gt;
+				<div class="tip"&gt;<a name="original"&gt;文章信息</a&gt;</div&gt;
 				
-				<ul>
-					<li>作者：<a href="http://blogread.cn/it/channel/245">Aqee</a></li>
-					<li>来源： <a href="http://www.aqee.net/how-hacker-news-ranking-algorithm-works/" target="_blank">外刊IT评论</a></li>
-					<li>发布时间：2013-08-29 13:36:59</li>
-					<li>浏览：1701</li>
-					<li>标签：    <a href="http://blogread.cn/it/tags/HackerNews">HackerNews</a>    <a href="http://blogread.cn/it/tags/%E6%8E%92%E5%90%8D">排名</a></li>
-				</ul>
-			</div>
+				<ul&gt;
+					<li&gt;作者：<a href="http://blogread.cn/it/channel/245"&gt;Aqee</a&gt;</li&gt;
+					<li&gt;来源： <a href="http://www.aqee.net/how-hacker-news-ranking-algorithm-works/" target="_blank"&gt;外刊IT评论</a&gt;</li&gt;
+					<li&gt;发布时间：2013-08-29 13:36:59</li&gt;
+					<li&gt;浏览：1707</li&gt;
+					<li&gt;标签：    <a href="http://blogread.cn/it/tags/HackerNews"&gt;HackerNews</a&gt;    <a href="http://blogread.cn/it/tags/%E6%8E%92%E5%90%8D"&gt;排名</a&gt;</li&gt;
+				</ul&gt;
+			</div&gt;
 
-			<div class="comment">
-				<div class="tip"><a name="comment">评论</a></div>
-				<div class="commentbox">
-				            	<wb:comments url="http://blogread.cn/it/article/6652?f=wb" brandline="y" width="auto" appkey="3741373929" ></wb:comments>
-				</div>
+			<div class="comment"&gt;
+				<div class="tip"&gt;<a name="comment"&gt;评论</a&gt;</div&gt;
+				<div class="commentbox"&gt;
+				            	<wb:comments url="http://blogread.cn/it/article/6652?f=wb" brandline="y" width="auto" appkey="3741373929" &gt;</wb:comments&gt;
+				</div&gt;
 				<!-- 
-									<ol>暂时还没有评论，要不您先来？</ol>
-								 -->
+									<ol&gt;暂时还没有评论，要不您先来？</ol&gt;
+								 --&gt;
                 
-            </div><!-- comment -->
+            </div&gt;<!-- comment --&gt;
             
             
 <!-- 
-            <div class="commentadd">
+            <div class="commentadd"&gt;
 
             	
-            	<form action="" method="post">
-            		<input type="hidden" name="idArticle" value="6652" />
-            	<div class="tip">巩固知识，从评论开始！</div>
-            	<div class="info">
-                	昵称(*)：<input name="name" type="text" id="name" value="" size="8">
-                    <br />邮箱(*)：<input name="email" type="text" id="email" value="" size="20">
-                   个人网站：<input name="site" type="text" id="site" value="" size="30">
-                    <p>（昵称、邮箱和内容为必填，邮箱将被保密！）</p>
-                </div>
-                <div class="content">
-                	<textarea name="content" cols="70" rows="10" wrap="PHYSICAL"></textarea>
-                </div>
-                <div class="post">
-                	<input name="submit" type="submit" value="提交评论"> 巩固知识，从评论开始！
-                </div>
-                </form>
+            	<form action="" method="post"&gt;
+            		<input type="hidden" name="idArticle" value="6652" /&gt;
+            	<div class="tip"&gt;巩固知识，从评论开始！</div&gt;
+            	<div class="info"&gt;
+                	昵称(*)：<input name="name" type="text" id="name" value="" size="8"&gt;
+                    <br /&gt;邮箱(*)：<input name="email" type="text" id="email" value="" size="20"&gt;
+                   个人网站：<input name="site" type="text" id="site" value="" size="30"&gt;
+                    <p&gt;（昵称、邮箱和内容为必填，邮箱将被保密！）</p&gt;
+                </div&gt;
+                <div class="content"&gt;
+                	<textarea name="content" cols="70" rows="10" wrap="PHYSICAL"&gt;</textarea&gt;
+                </div&gt;
+                <div class="post"&gt;
+                	<input name="submit" type="submit" value="提交评论"&gt; 巩固知识，从评论开始！
+                </div&gt;
+                </form&gt;
                 
-            </div>!-- commentadd -->
+            </div&gt;!-- commentadd --&gt;
 
-        </div><!-- main_left -->
+        </div&gt;<!-- main_left --&gt;
 
-        <div class="main_right"> 
+        <div class="main_right"&gt; 
 
-                        <div class="category">
-                <div class="title">
+                        <div class="category"&gt;
+                <div class="title"&gt;
 					努力让您和作者直接沟通
-                </div>
-                <div class="info">
-                	                		<script type="text/javascript">
+                </div&gt;
+                <div class="info"&gt;
+                	                		<script type="text/javascript"&gt;
 							WB2.anyWhere(function(W){
 								W.widget.followButton({
 									'nick_name': '外刊IT评论网',	//用户昵称
 									'id': "wb_follow_btn"	//关注按钮容器ID
 								});
 							});
-						</script>
-						<span id="wb_follow_btn"></span>
-						<p>哇，太棒了！对文章有任何想法，可：</p>
-						<wb:publish default_text="@外刊IT评论网，我对您这个文章（http://blogread.cn/it/article/6652?f=wbc 分享自 @IT技术博客大学习）有点想法：" button_size="big" button_text="立即在微博与作者沟通！" />正在拼命挖掘沟通路线，马上就通了！</wb:publish>
-                                    </div>
-            </div><!-- category -->
+						</script&gt;
+						<span id="wb_follow_btn"&gt;</span&gt;
+						<p&gt;哇，太棒了！对文章有任何想法，可：</p&gt;
+						<wb:publish default_text="@外刊IT评论网，我对您这个文章（http://blogread.cn/it/article/6652?f=wbc 分享自 @IT技术博客大学习）有点想法：" button_size="big" button_text="立即在微博与作者沟通！" /&gt;正在拼命挖掘沟通路线，马上就通了！</wb:publish&gt;
+                                    </div&gt;
+            </div&gt;<!-- category --&gt;
 
 
-            <div class="category">
-                <div class="title">
+            <div class="category"&gt;
+                <div class="title"&gt;
                     我们猜您喜欢
-                </div>
-                <div class="info">
-                    <ul>
-                                            <li><img src="http://blogread.cn/it/images/re.gif" border="0"><a href="http://blogread.cn/it/article/492?f=sr">用skip list实现实时排名?</a></li>
-                                            <li><img src="http://blogread.cn/it/images/re.gif" border="0"><a href="http://blogread.cn/it/article/2436?f=sr">IMDB评分排名算法</a></li>
-                                            <li><img src="http://blogread.cn/it/images/re.gif" border="0"><a href="http://blogread.cn/it/article/493?f=sr">实时排名，其实很简单</a></li>
-                                            <li><img src="http://blogread.cn/it/images/re.gif" border="0"><a href="http://blogread.cn/it/article/5561?f=sr">数学之美：Reddit评论排名算法</a></li>
-                                            <li><img src="http://blogread.cn/it/images/re.gif" border="0"><a href="http://blogread.cn/it/article/5560?f=sr">数学之美：Hacker News的热门排名算法</a></li>
-                                            <li><img src="http://blogread.cn/it/images/re.gif" border="0"><a href="http://blogread.cn/it/article/5549?f=sr">数学之美：StackOverflow问答排名算法</a></li>
-                                            <li><img src="http://blogread.cn/it/images/re.gif" border="0"><a href="http://blogread.cn/it/article/6653?f=sr">Reddit排名算法工作原理</a></li>
+                </div&gt;
+                <div class="info"&gt;
+                    <ul&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/re.gif" border="0"&gt;<a href="http://blogread.cn/it/article/492?f=sr"&gt;用skip list实现实时排名?</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/re.gif" border="0"&gt;<a href="http://blogread.cn/it/article/2436?f=sr"&gt;IMDB评分排名算法</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/re.gif" border="0"&gt;<a href="http://blogread.cn/it/article/493?f=sr"&gt;实时排名，其实很简单</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/re.gif" border="0"&gt;<a href="http://blogread.cn/it/article/5561?f=sr"&gt;数学之美：Reddit评论排名算法</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/re.gif" border="0"&gt;<a href="http://blogread.cn/it/article/5560?f=sr"&gt;数学之美：Hacker News的热门排名算法</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/re.gif" border="0"&gt;<a href="http://blogread.cn/it/article/5549?f=sr"&gt;数学之美：StackOverflow问答排名算法</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/re.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6653?f=sr"&gt;Reddit排名算法工作原理</a&gt;</li&gt;
                         
-                    </ul>
-                </div>
-            </div><!-- category -->
+                    </ul&gt;
+                </div&gt;
+            </div&gt;<!-- category --&gt;
 
-            <div class="category">
-                <div class="info">
+            <div class="category"&gt;
+                <div class="info"&gt;
                 	学习的同时，勿忘上淘宝，上淘宝有助家庭和睦 :) 原因你懂的！
-<script type="text/javascript">
-     document.write('<a style="display:none!important" id="tanx-a-mm_10984112_4090067_13398709"></a>');
+<script type="text/javascript"&gt;
+     document.write('<a style="display:none!important" id="tanx-a-mm_10984112_4090067_13398709"&gt;</a&gt;');
      tanx_s = document.createElement("script");
      tanx_s.type = "text/javascript";
      tanx_s.charset = "gbk";
@@ -339,104 +352,104 @@ G = 比重，news.arc里缺省值是1.8</pre><p> &nbsp; &nbsp;正如你看到的
      tanx_s.src = "http://p.tanx.com/ex?i=mm_10984112_4090067_13398709";
      tanx_h = document.getElementsByTagName("head")[0];
      if(tanx_h)tanx_h.insertBefore(tanx_s,tanx_h.firstChild);
-</script>
-				</div>
-            </div><!-- category -->
+</script&gt;
+				</div&gt;
+            </div&gt;<!-- category --&gt;
             
 
-            <div class="category">
-                <div class="title">
+            <div class="category"&gt;
+                <div class="title"&gt;
                     扫一扫订阅我的微信
-                </div>
-                <div class="info">
+                </div&gt;
+                <div class="info"&gt;
 					微信号：IT技术博客大学习
-					<br />
-                        <img src="http://blogread.cn/it/images/weixin/qrcode_for_gh_609c8c16bbd2_258.jpg" border="0" alt="扫一扫订阅我的微信。微信号：IT技术博客大学习" />
-                </div>
-            </div><!-- category -->
+					<br /&gt;
+                        <img src="http://blogread.cn/it/images/weixin/qrcode_for_gh_609c8c16bbd2_258.jpg" border="0" alt="扫一扫订阅我的微信。微信号：IT技术博客大学习" /&gt;
+                </div&gt;
+            </div&gt;<!-- category --&gt;
 
-            <div class="category">
-                <div class="title">
+            <div class="category"&gt;
+                <div class="title"&gt;
                     近3天十大热文
-                </div>
-                <div class="info">
-                    <ul>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[367] <a href="http://blogread.cn/it/article/2799?f=hot3">大公司与风险管理</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[276] <a href="http://blogread.cn/it/article/2789?f=hot3">为什么在多线程程序中要慎用volatile关</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[200] <a href="http://blogread.cn/it/article/5608?f=hot3">解析nginx负载均衡</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[192] <a href="http://blogread.cn/it/article/2803?f=hot3">PHP抓屏函数实现屏幕快照</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[191] <a href="http://blogread.cn/it/article/2774?f=hot3">多线程程序中操作的原子性</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[158] <a href="http://blogread.cn/it/article/2807?f=hot3">CentOS分区规律大总结</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[128] <a href="http://blogread.cn/it/article/4229?f=hot3">前端必须熟悉的10个CSS3属性</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[114] <a href="http://blogread.cn/it/article/1765?f=hot3">搜狐闪电邮箱的 Nginx/Postfix </a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[113] <a href="http://blogread.cn/it/article/2806?f=hot3">多线程程序常见Bug剖析（下）</a></li>
-                                                	<li><img src="http://blogread.cn/it/images/h_article.gif" border="0">[108] <a href="http://blogread.cn/it/article/6721?f=hot3">谁说设计师不会写代码？—Photoshop脚</a></li>
-                                        </ul>
-                </div>
-            </div><!-- category -->
+                </div&gt;
+                <div class="info"&gt;
+                    <ul&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[315] <a href="http://blogread.cn/it/article/2789?f=hot3"&gt;为什么在多线程程序中要慎用volatile关</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[310] <a href="http://blogread.cn/it/article/2799?f=hot3"&gt;大公司与风险管理</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[214] <a href="http://blogread.cn/it/article/2803?f=hot3"&gt;PHP抓屏函数实现屏幕快照</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[206] <a href="http://blogread.cn/it/article/5608?f=hot3"&gt;解析nginx负载均衡</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[195] <a href="http://blogread.cn/it/article/2774?f=hot3"&gt;多线程程序中操作的原子性</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[145] <a href="http://blogread.cn/it/article/4229?f=hot3"&gt;前端必须熟悉的10个CSS3属性</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[114] <a href="http://blogread.cn/it/article/1765?f=hot3"&gt;搜狐闪电邮箱的 Nginx/Postfix </a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[107] <a href="http://blogread.cn/it/article/4779?f=hot3"&gt;为什么要用 Emacs/Vim，而不是任何其</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[106] <a href="http://blogread.cn/it/article/2785?f=hot3"&gt;Nginx启动初始化过程（一）</a&gt;</li&gt;
+                                                	<li&gt;<img src="http://blogread.cn/it/images/h_article.gif" border="0"&gt;[103] <a href="http://blogread.cn/it/article/6721?f=hot3"&gt;谁说设计师不会写代码？—Photoshop脚</a&gt;</li&gt;
+                                        </ul&gt;
+                </div&gt;
+            </div&gt;<!-- category --&gt;
 
-            <div class="category">
-                <div class="title">
+            <div class="category"&gt;
+                <div class="title"&gt;
                     最新发表
-                </div>
-                <div class="info">
-                    <ul>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6721">谁说设计师不会写代码？—Photoshop脚本语言简介</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6720">图片服务架构学习之ZIMG</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6719">每个程序员都应该了解的知识有哪些？</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6718">Go 语言简介（下）— 特性</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6717">Go 语言简介（上）— 语法</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6716">Storm：最火的流式处理框架</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6715">电子商务互联网营销：ROI的罪与罚（下）</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6714">电子商务互联网营销：ROI的罪与罚（上）</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6713">深入理解 GRE tunnel</a></li>
-                                            <li><img src="http://blogread.cn/it/images/h_reart.gif" border="0"><a href="http://blogread.cn/it/article/6712">让进程在后台可靠运行的几种方法</a></li>
+                </div&gt;
+                <div class="info"&gt;
+                    <ul&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6721"&gt;谁说设计师不会写代码？—Photoshop脚本语言简介</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6720"&gt;图片服务架构学习之ZIMG</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6719"&gt;每个程序员都应该了解的知识有哪些？</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6718"&gt;Go 语言简介（下）— 特性</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6717"&gt;Go 语言简介（上）— 语法</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6716"&gt;Storm：最火的流式处理框架</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6715"&gt;电子商务互联网营销：ROI的罪与罚（下）</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6714"&gt;电子商务互联网营销：ROI的罪与罚（上）</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6713"&gt;深入理解 GRE tunnel</a&gt;</li&gt;
+                                            <li&gt;<img src="http://blogread.cn/it/images/h_reart.gif" border="0"&gt;<a href="http://blogread.cn/it/article/6712"&gt;让进程在后台可靠运行的几种方法</a&gt;</li&gt;
                         
-                    </ul>
-                </div>
-            </div><!-- category -->
+                    </ul&gt;
+                </div&gt;
+            </div&gt;<!-- category --&gt;
 
 
 
             
-        </div><!-- main_right --> 
+        </div&gt;<!-- main_right --&gt; 
 
-    </div> 
+    </div&gt; 
 
-            <div class="bottomarticle">
+            <div class="bottomarticle"&gt;
             &copy; 2009 - 2013 本页面所有内容，转载请注明出处 站长Email:blogread.cn@gmail.com
         
-        <br />
-        <br />
-		<a href="http://www.miibeian.gov.cn" target="_blank">京ICP备09017802号</a>
-		<script language="javascript" type="text/javascript" src="http://js.users.51.la/2709512.js"></script>
-<noscript><a href="http://www.51.la/?2709512" target="_blank"><img alt="&#x6211;&#x8981;&#x5566;&#x514D;&#x8D39;&#x7EDF;&#x8BA1;" src="http://img.users.51.la/2709512.asp" style="border:none" /></a></noscript>
+        <br /&gt;
+        <br /&gt;
+		<a href="http://www.miibeian.gov.cn" target="_blank"&gt;京ICP备09017802号</a&gt;
+		<script language="javascript" type="text/javascript" src="http://js.users.51.la/2709512.js"&gt;</script&gt;
+<noscript&gt;<a href="http://www.51.la/?2709512" target="_blank"&gt;<img alt="&#x6211;&#x8981;&#x5566;&#x514D;&#x8D39;&#x7EDF;&#x8BA1;" src="http://img.users.51.la/2709512.asp" style="border:none" /&gt;</a&gt;</noscript&gt;
 
-	<script src="http://s15.cnzz.com/stat.php?id=2320291&web_id=2320291" language="JavaScript"></script>
+	<script src="http://s15.cnzz.com/stat.php?id=2320291&web_id=2320291" language="JavaScript"&gt;</script&gt;
 	
 	
-	<script type="text/javascript">
+	<script type="text/javascript"&gt;
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
+</script&gt;
+<script type="text/javascript"&gt;
 try {
 var pageTracker = _gat._getTracker("UA-6082292-6");
 pageTracker._trackPageview();
-} catch(err) {}</script>
+} catch(err) {}</script&gt;
 
-<script type="text/javascript">
+<script type="text/javascript"&gt;
 var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
 document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F7d07e17bc73562efebd41b6ddcd5a499' type='text/javascript'%3E%3C/script%3E"));
-</script>
+</script&gt;
 
-    </div><!-- bottom -->
+    </div&gt;<!-- bottom --&gt;
 
-		<!--cnzz tui-->
-	<script  type="text/javascript" charset="utf-8"  src="http://tui.cnzz.net/cs.php?id=1000045620"></script>
-<!--cnzz tui-->
+		<!--cnzz tui--&gt;
+	<script  type="text/javascript" charset="utf-8"  src="http://tui.cnzz.net/cs.php?id=1000045620"&gt;</script&gt;
+<!--cnzz tui--&gt;
 <!--
-	<script>
+	<script&gt;
 		function showArticle(whichArt)
 		{
 			var odivString = whichArt.getAttribute("urn");
@@ -454,31 +467,41 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
 			}
 			return false;
 		}
-	</script>
+	</script&gt;
 		
-			<div id="showfooterrecommendwide">
-				<div>
-					<div style="float:left;">
-						<strong>推荐继续阅读：<a href="http://blogread.cn/it/article/5561?f=footerrecommend">数学之美：Reddit评论排名算法</a></strong>
-					</div>
-					<div style="float:right;">
-						<a href="#" urn="showfooterrecommendwide" onclick="showArticle(this); return false;">【关闭推荐】</a>
-					</div>
-				</div>
+			<div id="showfooterrecommendwide"&gt;
+				<div&gt;
+					<div style="float:left;"&gt;
+						<strong&gt;推荐继续阅读：<a href="http://blogread.cn/it/article/5549?f=footerrecommend"&gt;数学之美：StackOverflow问答排名算法</a&gt;</strong&gt;
+					</div&gt;
+					<div style="float:right;"&gt;
+						<a href="#" urn="showfooterrecommendwide" onclick="showArticle(this); return false;"&gt;【关闭推荐】</a&gt;
+					</div&gt;
+				</div&gt;
 				
-				<div><br /><strong>简介：</strong>与文章新闻类排名不同的事，评论类的算法可能发表时间没有什么关系。 目前很多网站采用的评论排名主要有两种，即绝对好评数（好评减去差评）和好评率（好评/总评）。这两种评价方式 都存在很明显的缺陷，以下为事例： A:好评550;　差评450 B:...</div>
-			</div>
+				<div&gt;<br /&gt;<strong&gt;简介：</strong&gt;StackOverflow的排序共分为两类，1个是问题排序，1个是答案排序。这里主要介绍的是关于热门问题的排序。 在分析问题前可以先考虑下，如果是你来做这个排名算法需要考虑哪些因素？ 1、问题的投票人数，StackOverflow允许用户投...</div&gt;
+			</div&gt;
 		
-		<div id="showfooterrecommendwidetips" style="display:none">
-			<a href="#" urn="showfooterrecommendwide" onclick="showArticle(this); return false;">【打开推荐】</a>
-		</div>
-		-->
+		<div id="showfooterrecommendwidetips" style="display:none"&gt;
+			<a href="#" urn="showfooterrecommendwide" onclick="showArticle(this); return false;"&gt;【打开推荐】</a&gt;
+		</div&gt;
+		--&gt;
 		 
-</div><!-- body -->
-<!-- 将以下代码放在<head>之后或者</body>标签之前。 -->
-<script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+</div&gt;<!-- body --&gt;
+<!-- 将以下代码放在<head&gt;之后或者</body&gt;标签之前。 --&gt;
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"&gt;
   {lang: 'zh-CN'}
-</script>
+</script&gt;
 
-</body> 
+</body&gt; 
+</html&gt;
+        </textarea>
+        </div>
+        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+        <script src="../js/clearly.js"></script>
+        <script>
+            var html = window.__getMyClearlyResults().html;
+            $('#main_content_wrap').html(html);
+        </script>
+  </body>
 </html>

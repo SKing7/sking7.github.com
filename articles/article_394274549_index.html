@@ -1,52 +1,65 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>Managing Responsive Breakpoints in Javascript - Jonathan Fielding</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <link rel="stylesheet" href="http://www.jonathanfielding.com/wp-content/themes/main_bs/style.css"/>
-        <link rel="stylesheet" href="http://www.jonathanfielding.com/wp-content/themes/main_bs/print.css" media="print"/>
-        <script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/modernizr.min.js"></script>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <title></title>
+  </head>
+  <body>
+        <!-- MAIN CONTENT -->
+        <div id="main_content_wrap" class="outer">
+        <textarea style="visibility:none" id="html-area">
+<!DOCTYPE html&gt;
+<!--[if lt IE 7]&gt;      <html class="no-js lt-ie9 lt-ie8 lt-ie7"&gt; <![endif]--&gt;
+<!--[if IE 7]&gt;         <html class="no-js lt-ie9 lt-ie8"&gt; <![endif]--&gt;
+<!--[if IE 8]&gt;         <html class="no-js lt-ie9"&gt; <![endif]--&gt;
+<!--[if gt IE 8]&gt;<!--&gt; <html class="no-js"&gt; <!--<![endif]--&gt;
+    <head&gt;
+        <meta charset="utf-8"/&gt;
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/&gt;
+        <title&gt;Managing Responsive Breakpoints in Javascript - Jonathan Fielding</title&gt;
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;
+        <link rel="stylesheet" href="http://www.jonathanfielding.com/wp-content/themes/main_bs/style.css"/&gt;
+        <link rel="stylesheet" href="http://www.jonathanfielding.com/wp-content/themes/main_bs/print.css" media="print"/&gt;
+        <script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/modernizr.min.js"&gt;</script&gt;
 		
-        <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://www.jonathanfielding.com/feed/" />
-		<link rel="alternate" type="text/xml" title="RSS .92" href="http://www.jonathanfielding.com/feed/" />
-		<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="http://www.jonathanfielding.com/feed/atom/" />
+        <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://www.jonathanfielding.com/feed/" /&gt;
+		<link rel="alternate" type="text/xml" title="RSS .92" href="http://www.jonathanfielding.com/feed/" /&gt;
+		<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="http://www.jonathanfielding.com/feed/atom/" /&gt;
 
 		
-<!-- This site is optimized with the Yoast WordPress SEO plugin v1.4.13 - http://yoast.com/wordpress/seo/ -->
-<link rel="canonical" href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" />
-<meta property='og:locale' content='en_US'/>
-<meta property='og:type' content='article'/>
-<meta property='og:title' content='Managing Responsive Breakpoints in Javascript - Jonathan Fielding'/>
-<meta property='og:description' content='Responsive design is increasingly popular with separate mobile/desktop sites being replaced by a hybrid approach where websites are able to respond to the users needs. In responsive design, media queries are used  to allow sites to change the appearance of the page  based on the browser thing like browser width and browser height. To enable support [&hellip;]'/>
-<meta property='og:url' content='http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/'/>
-<meta property='og:site_name' content='Jonathan Fielding'/>
-<meta property='fb:admins' content='557586115'/>
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:site" content="@jonthanfielding"/>
-<meta name="twitter:domain" content="Jonathan Fielding"/>
-<meta name="twitter:creator" content="@jonthanfielding"/>
-<meta name="twitter:image:src" content=""/>
-<!-- / Yoast WordPress SEO plugin. -->
+<!-- This site is optimized with the Yoast WordPress SEO plugin v1.4.13 - http://yoast.com/wordpress/seo/ --&gt;
+<link rel="canonical" href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" /&gt;
+<meta property='og:locale' content='en_US'/&gt;
+<meta property='og:type' content='article'/&gt;
+<meta property='og:title' content='Managing Responsive Breakpoints in Javascript - Jonathan Fielding'/&gt;
+<meta property='og:description' content='Responsive design is increasingly popular with separate mobile/desktop sites being replaced by a hybrid approach where websites are able to respond to the users needs. In responsive design, media queries are used  to allow sites to change the appearance of the page  based on the browser thing like browser width and browser height. To enable support [&hellip;]'/&gt;
+<meta property='og:url' content='http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/'/&gt;
+<meta property='og:site_name' content='Jonathan Fielding'/&gt;
+<meta property='fb:admins' content='557586115'/&gt;
+<meta name="twitter:card" content="summary"/&gt;
+<meta name="twitter:site" content="@jonthanfielding"/&gt;
+<meta name="twitter:domain" content="Jonathan Fielding"/&gt;
+<meta name="twitter:creator" content="@jonthanfielding"/&gt;
+<meta name="twitter:image:src" content=""/&gt;
+<!-- / Yoast WordPress SEO plugin. --&gt;
 
-<link rel="alternate" type="application/rss+xml" title="Jonathan Fielding &raquo; Managing Responsive Design Breakpoints in Javascript Comments Feed" href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/feed/" />
-<script type='text/javascript' src='http://www.jonathanfielding.com/wp-includes/js/jquery/jquery.js?ver=1.10.2'></script>
-<script type='text/javascript' src='http://www.jonathanfielding.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
-<script type='text/javascript' src='http://www.jonathanfielding.com/wp-content/plugins/google-analyticator/external-tracking.min.js?ver=6.4.5'></script>
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.jonathanfielding.com/xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.jonathanfielding.com/wp-includes/wlwmanifest.xml" /> 
-<meta name="generator" content="WordPress 3.6" />
-<link rel='shortlink' href='http://www.jonathanfielding.com/?p=668' />
-<!-- Google Analytics Tracking by Google Analyticator 6.4.5: http://www.videousermanuals.com/google-analyticator/ -->
-<script type="text/javascript">
+<link rel="alternate" type="application/rss+xml" title="Jonathan Fielding &raquo; Managing Responsive Design Breakpoints in Javascript Comments Feed" href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/feed/" /&gt;
+<script type='text/javascript' src='http://www.jonathanfielding.com/wp-includes/js/jquery/jquery.js?ver=1.10.2'&gt;</script&gt;
+<script type='text/javascript' src='http://www.jonathanfielding.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'&gt;</script&gt;
+<script type='text/javascript' src='http://www.jonathanfielding.com/wp-content/plugins/google-analyticator/external-tracking.min.js?ver=6.4.5'&gt;</script&gt;
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.jonathanfielding.com/xmlrpc.php?rsd" /&gt;
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.jonathanfielding.com/wp-includes/wlwmanifest.xml" /&gt; 
+<meta name="generator" content="WordPress 3.6" /&gt;
+<link rel='shortlink' href='http://www.jonathanfielding.com/?p=668' /&gt;
+<!-- Google Analytics Tracking by Google Analyticator 6.4.5: http://www.videousermanuals.com/google-analyticator/ --&gt;
+<script type="text/javascript"&gt;
 	var analyticsFileTypes = [''];
 	var analyticsEventTracking = 'enabled';
-</script>
-<script type="text/javascript">
+</script&gt;
+<script type="text/javascript"&gt;
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21770282-1']);
         _gaq.push(['_addDevId', 'i9k95']); // Google Analyticator App ID with Google 
@@ -58,69 +71,69 @@
 		                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 		                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	})();
-</script>
-    </head>
-    <body>
-    	<div id="fb-root"></div>
-		<script>(function(d, s, id) {
+</script&gt;
+    </head&gt;
+    <body&gt;
+    	<div id="fb-root"&gt;</div&gt;
+		<script&gt;(function(d, s, id) {
 		  var js, fjs = d.getElementsByTagName(s)[0];
 		  if (d.getElementById(id)) return;
 		  js = d.createElement(s); js.id = id;
 		  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=156135717777189";
 		  fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));</script>
+		}(document, 'script', 'facebook-jssdk'));</script&gt;
 	
-    	<header class="navbar navbar-fixed-top">
-			<div class="navbar-inner">
-				<div class="container">
-					<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
-					<a class="brand" href="http://www.jonathanfielding.com">Jonathan Fielding</a>
-					<div class="nav-collapse collapse">
-						<ul id="menu-main-menu" class="nav"><li id="menu-item-504" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-504"><a href="http://www.jonathanfielding.com/portfolio/">Portfolio</a></li>
-<li id="menu-item-506" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-506"><a href="http://www.jonathanfielding.com/contact/">Contact</a></li>
-</ul>
-			            <form action="http://www.jonathanfielding.com/" method="get" class="navbar-form pull-right">
-						    <fieldset>
-								<div class="clearfix">
-									<div>
-										<input type="text" name="s" id="search" placeholder="Search" value="" /> 
-										<button type="submit" class="btn">Search</button>
-									</div>
-						        </div>
-						    </fieldset>
-						</form>
-					</div>
+    	<header class="navbar navbar-fixed-top"&gt;
+			<div class="navbar-inner"&gt;
+				<div class="container"&gt;
+					<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"&gt; <span class="icon-bar"&gt;</span&gt; <span class="icon-bar"&gt;</span&gt; <span class="icon-bar"&gt;</span&gt; </button&gt;
+					<a class="brand" href="http://www.jonathanfielding.com"&gt;Jonathan Fielding</a&gt;
+					<div class="nav-collapse collapse"&gt;
+						<ul id="menu-main-menu" class="nav"&gt;<li id="menu-item-504" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-504"&gt;<a href="http://www.jonathanfielding.com/portfolio/"&gt;Portfolio</a&gt;</li&gt;
+<li id="menu-item-506" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-506"&gt;<a href="http://www.jonathanfielding.com/contact/"&gt;Contact</a&gt;</li&gt;
+</ul&gt;
+			            <form action="http://www.jonathanfielding.com/" method="get" class="navbar-form pull-right"&gt;
+						    <fieldset&gt;
+								<div class="clearfix"&gt;
+									<div&gt;
+										<input type="text" name="s" id="search" placeholder="Search" value="" /&gt; 
+										<button type="submit" class="btn"&gt;Search</button&gt;
+									</div&gt;
+						        </div&gt;
+						    </fieldset&gt;
+						</form&gt;
+					</div&gt;
 
-				</div>
-			</div>
-		</header>
+				</div&gt;
+			</div&gt;
+		</header&gt;
 
-		<section class="hoverbar">
-			<div class="container">
-				<div class="row">
-					<div class="span6">
-						<h2>Open Source</h2>
-						<p>I love the spirit of the open source community, without it the web wouldnt be where it is today. My love for open source has led me to develop several of my own open source projects in both javascript and PHP.</p>
-						<ul>
-							<li><a href="https://github.com/jonathan-fielding/jQuery-Hover-Panels">Hover Panels</a></li>
-							<li><a href="https://github.com/jonathan-fielding/jquery-focusgroups">jQuery Focus Groups</a></li>
-							<li><a href="https://github.com/jonathan-fielding/X-Carousel">jQuery X-Carousel</a></li>
-						</ul>
-					</div>
-					<div class="span6">
-						<h2>Portfolio</h2>
-						<p>Through both my professional career and personal endevours I have built many websites. My portfolio consists of my work that I am most proud of including BT global services</p>
-						<ul>
+		<section class="hoverbar"&gt;
+			<div class="container"&gt;
+				<div class="row"&gt;
+					<div class="span6"&gt;
+						<h2&gt;Open Source</h2&gt;
+						<p&gt;I love the spirit of the open source community, without it the web wouldnt be where it is today. My love for open source has led me to develop several of my own open source projects in both javascript and PHP.</p&gt;
+						<ul&gt;
+							<li&gt;<a href="https://github.com/jonathan-fielding/jQuery-Hover-Panels"&gt;Hover Panels</a&gt;</li&gt;
+							<li&gt;<a href="https://github.com/jonathan-fielding/jquery-focusgroups"&gt;jQuery Focus Groups</a&gt;</li&gt;
+							<li&gt;<a href="https://github.com/jonathan-fielding/X-Carousel"&gt;jQuery X-Carousel</a&gt;</li&gt;
+						</ul&gt;
+					</div&gt;
+					<div class="span6"&gt;
+						<h2&gt;Portfolio</h2&gt;
+						<p&gt;Through both my professional career and personal endevours I have built many websites. My portfolio consists of my work that I am most proud of including BT global services</p&gt;
+						<ul&gt;
 							
-							<li><a href="http://www.jonathanfielding.com/portfolio/flavour-first/">Flavour First</a></li>
-
-							
-							<li><a href="http://www.jonathanfielding.com/portfolio/brandgurus/">BrandGurus</a></li>
+							<li&gt;<a href="http://www.jonathanfielding.com/portfolio/flavour-first/"&gt;Flavour First</a&gt;</li&gt;
 
 							
-							<li><a href="http://www.jonathanfielding.com/portfolio/virgin-active-landing-pages/">Virgin Active Landing Pages</a></li>
+							<li&gt;<a href="http://www.jonathanfielding.com/portfolio/brandgurus/"&gt;BrandGurus</a&gt;</li&gt;
 
-							    <script type="text/javascript">
+							
+							<li&gt;<a href="http://www.jonathanfielding.com/portfolio/virgin-active-landing-pages/"&gt;Virgin Active Landing Pages</a&gt;</li&gt;
+
+							    <script type="text/javascript"&gt;
     // <![CDATA[
         var disqus_shortname = 'jonathanfieldingsblog';
         (function () {
@@ -139,37 +152,37 @@
             s.src = '//' + 'disqus.com/forums/' + disqus_shortname + '/count.js';
             (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
         }());
-    //]]>
-    </script>
+    //]]&gt;
+    </script&gt;
 
-						</ul>
-					</div>
-				</div>
-			</div>
-		</section>
-<div class="container">
+						</ul&gt;
+					</div&gt;
+				</div&gt;
+			</div&gt;
+		</section&gt;
+<div class="container"&gt;
 
-	<div class="row">
-		<div class="content span8" role="main">
+	<div class="row"&gt;
+		<div class="content span8" role="main"&gt;
 
 				
 				
-				<article class="clearfix ">
+				<article class="clearfix "&gt;
 
-					<!-- Display the Title as a link to the Post's permalink. -->
-					<h1><a href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" rel="bookmark" title="Permanent Link to Managing Responsive Design Breakpoints in Javascript">Managing Responsive Design Breakpoints in Javascript</a></h1>
+					<!-- Display the Title as a link to the Post's permalink. --&gt;
+					<h1&gt;<a href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" rel="bookmark" title="Permanent Link to Managing Responsive Design Breakpoints in Javascript"&gt;Managing Responsive Design Breakpoints in Javascript</a&gt;</h1&gt;
 
 										
-					<div class="entry">
-						<ul class="social_share clearfix">
-							<li><div class="fb-like" data-href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-font="arial"></div></li>
-							<li><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" data-text="Managing Responsive Design Breakpoints in Javascript" data-via="JonthanFielding" data-related="jonthanfielding">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></li>
-						</ul>
-					<p>Responsive design is increasingly popular with separate mobile/desktop sites being replaced by a hybrid approach where websites are able to respond to the users needs.</p>
-<p>In responsive design, media queries are used  to allow sites to change the appearance of the page  based on the browser thing like browser width and browser height. To enable support for media queries in older browsers we simply include respond.js in the page. Unfortunately things are not quite as simple in javascript, browsers do not come with a simple way to add javascript to a specific state so we are left to fend for ourselves in this area.</p>
-<p>A simple way to handle resizing would be to write a state manager which uses the browser resize event.  It would store the name of your current state in a variable and then update as required. A sample of how this might look is shown below (also can be found in this <a href="https://gist.github.com/jonathan-fielding/5867484" target="_blank">gist</a>).</p>
-<pre>var stateManager = (function () {
+					<div class="entry"&gt;
+						<ul class="social_share clearfix"&gt;
+							<li&gt;<div class="fb-like" data-href="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-font="arial"&gt;</div&gt;</li&gt;
+							<li&gt;<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/" data-text="Managing Responsive Design Breakpoints in Javascript" data-via="JonthanFielding" data-related="jonthanfielding"&gt;Tweet</a&gt;
+<script&gt;!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script&gt;</li&gt;
+						</ul&gt;
+					<p&gt;Responsive design is increasingly popular with separate mobile/desktop sites being replaced by a hybrid approach where websites are able to respond to the users needs.</p&gt;
+<p&gt;In responsive design, media queries are used  to allow sites to change the appearance of the page  based on the browser thing like browser width and browser height. To enable support for media queries in older browsers we simply include respond.js in the page. Unfortunately things are not quite as simple in javascript, browsers do not come with a simple way to add javascript to a specific state so we are left to fend for ourselves in this area.</p&gt;
+<p&gt;A simple way to handle resizing would be to write a state manager which uses the browser resize event.  It would store the name of your current state in a variable and then update as required. A sample of how this might look is shown below (also can be found in this <a href="https://gist.github.com/jonathan-fielding/5867484" target="_blank"&gt;gist</a&gt;).</p&gt;
+<pre&gt;var stateManager = (function () {
 	var state = null;
 
 	var setState = function () {
@@ -228,126 +241,126 @@
 
 function(window){
 	stateManager.init();
-}(window, undefined);</pre>
-<p>When working with multiple states though, it is important to remember that there are some gotchas when changing state in javascript:</p>
-<ul>
-<li><span style="line-height: 13px;">Manipulated DOM elements &#8211; Any elements that needed to be manipulated with js may need to be manipulated again when you change state.</span></li>
-<li>Performance &#8211; As the majority of browsers constantly fire resize as the browser is resized the browser can suffer from slow down so it is important to take this into account when adding code to the resize.</li>
-</ul>
-<p>In newer browsers we also have access the <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.matchMedia">matchMedia API</a> which is an alternative to using the resize method mentioned above however to use in older browsers we have to use a polyfill. The matchMedia API also does not cater for having &#8216;state&#8217; specific resize events, which the above code does handle, therefore it may make sense to have a mix of the two approaches to provide the best experience.</p>
-<h2>Libraries</h2>
-<p>There are a couple of libraries which allow you to manage responsive state within javascript, two of which are enquire.js and SimpleStateManager.</p>
-<h3><a title="enquire.js" href="http://wicky.nillia.ms/enquire.js/" target="_blank">enquire.js</a></h3>
-<p>enquire.js takes the same media query syntax used in CSS and allows you to add JavaScript callbacks for media queries <em>matching and unmatching</em>. The benefit of this approach is that developers will already be familiar with the syntax from working with media queries in CSS however to achieve this it relies upon the matchMedia API which is not available in older browsers. This means that to use enquire.js in older browsers (IE8 and below) you will need to use a polyfill.</p>
-<h3><a title="SimpleStateManager" href="https://github.com/jonathan-fielding/SimpleStateManager" target="_blank">SimpleStateManager</a></h3>
-<p>SimpleStateManager is a fairly new alternative to enquire.js, it provides its own API for creating states rather than trying to replicate CSS media queries. The benefit of SimpleStateManager is that it works in older browsers without the need for a polyfill, the current version also has a smaller filesize than enquire.js. The main disadvantage is that it only allows you to add one method per responsive &#8216;state&#8217;, the current roadmap suggests that this will be fixed in the future as a v2 feature.</p>
-<h2>Summary</h2>
-<p>While it isn&#8217;t overly difficult to write your own script to manage states, both enquire.js and SimpleStateManager are able to make your job easier. Personally the API used by SimpleStateManger feels easier to use, you simply provide the upper width limit of a state and it automatically knows the lower limit based on any states you have added for lower widths where as enquire.js requires you to provide a full media query to define the constraints of when that state is active. Using javascript that is able to respond to different responsive states is going to become more important as responsive sites start to use more javascript aimed at a particular state, leveraging libraries will save time and allow you to be consistent with the way responsive states are handled across projects.</p>
-					</div>
+}(window, undefined);</pre&gt;
+<p&gt;When working with multiple states though, it is important to remember that there are some gotchas when changing state in javascript:</p&gt;
+<ul&gt;
+<li&gt;<span style="line-height: 13px;"&gt;Manipulated DOM elements &#8211; Any elements that needed to be manipulated with js may need to be manipulated again when you change state.</span&gt;</li&gt;
+<li&gt;Performance &#8211; As the majority of browsers constantly fire resize as the browser is resized the browser can suffer from slow down so it is important to take this into account when adding code to the resize.</li&gt;
+</ul&gt;
+<p&gt;In newer browsers we also have access the <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.matchMedia"&gt;matchMedia API</a&gt; which is an alternative to using the resize method mentioned above however to use in older browsers we have to use a polyfill. The matchMedia API also does not cater for having &#8216;state&#8217; specific resize events, which the above code does handle, therefore it may make sense to have a mix of the two approaches to provide the best experience.</p&gt;
+<h2&gt;Libraries</h2&gt;
+<p&gt;There are a couple of libraries which allow you to manage responsive state within javascript, two of which are enquire.js and SimpleStateManager.</p&gt;
+<h3&gt;<a title="enquire.js" href="http://wicky.nillia.ms/enquire.js/" target="_blank"&gt;enquire.js</a&gt;</h3&gt;
+<p&gt;enquire.js takes the same media query syntax used in CSS and allows you to add JavaScript callbacks for media queries <em&gt;matching and unmatching</em&gt;. The benefit of this approach is that developers will already be familiar with the syntax from working with media queries in CSS however to achieve this it relies upon the matchMedia API which is not available in older browsers. This means that to use enquire.js in older browsers (IE8 and below) you will need to use a polyfill.</p&gt;
+<h3&gt;<a title="SimpleStateManager" href="https://github.com/jonathan-fielding/SimpleStateManager" target="_blank"&gt;SimpleStateManager</a&gt;</h3&gt;
+<p&gt;SimpleStateManager is a fairly new alternative to enquire.js, it provides its own API for creating states rather than trying to replicate CSS media queries. The benefit of SimpleStateManager is that it works in older browsers without the need for a polyfill, the current version also has a smaller filesize than enquire.js. The main disadvantage is that it only allows you to add one method per responsive &#8216;state&#8217;, the current roadmap suggests that this will be fixed in the future as a v2 feature.</p&gt;
+<h2&gt;Summary</h2&gt;
+<p&gt;While it isn&#8217;t overly difficult to write your own script to manage states, both enquire.js and SimpleStateManager are able to make your job easier. Personally the API used by SimpleStateManger feels easier to use, you simply provide the upper width limit of a state and it automatically knows the lower limit based on any states you have added for lower widths where as enquire.js requires you to provide a full media query to define the constraints of when that state is active. Using javascript that is able to respond to different responsive states is going to become more important as responsive sites start to use more javascript aimed at a particular state, leveraging libraries will save time and allow you to be consistent with the way responsive states are handled across projects.</p&gt;
+					</div&gt;
 
-					<div class="comments">
+					<div class="comments"&gt;
 						
-<div id="disqus_thread">
-                    <div id="dsq-content">
+<div id="disqus_thread"&gt;
+                    <div id="dsq-content"&gt;
 
 
-            <ul id="dsq-comments">
-                    <li class="comment even thread-even depth-1" id="dsq-comment-30">
-        <div id="dsq-comment-header-30" class="dsq-comment-header">
-            <cite id="dsq-cite-30">
-                <span id="dsq-author-user-30">Moin</span>
-            </cite>
-        </div>
-        <div id="dsq-comment-body-30" class="dsq-comment-body">
-            <div id="dsq-comment-message-30" class="dsq-comment-message"><p>Why don&#8217;t you make code font size a bit more smaller :p</p>
-</div>
-        </div>
+            <ul id="dsq-comments"&gt;
+                    <li class="comment even thread-even depth-1" id="dsq-comment-30"&gt;
+        <div id="dsq-comment-header-30" class="dsq-comment-header"&gt;
+            <cite id="dsq-cite-30"&gt;
+                <span id="dsq-author-user-30"&gt;Moin</span&gt;
+            </cite&gt;
+        </div&gt;
+        <div id="dsq-comment-body-30" class="dsq-comment-body"&gt;
+            <div id="dsq-comment-message-30" class="dsq-comment-message"&gt;<p&gt;Why don&#8217;t you make code font size a bit more smaller :p</p&gt;
+</div&gt;
+        </div&gt;
 
-    <ul class="children">
-    <li class="comment odd alt depth-2" id="dsq-comment-31">
-        <div id="dsq-comment-header-31" class="dsq-comment-header">
-            <cite id="dsq-cite-31">
-                <span id="dsq-author-user-31">jonathan_fielding</span>
-            </cite>
-        </div>
-        <div id="dsq-comment-body-31" class="dsq-comment-body">
-            <div id="dsq-comment-message-31" class="dsq-comment-message"><p>I only recently redesigned the blog and I messed up the font sizes, I am currently in process of fixing them (hence why I only added comment support this morning). I am also in process of making the examples interactive so you can test out the code  in the page.</p>
-</div>
-        </div>
+    <ul class="children"&gt;
+    <li class="comment odd alt depth-2" id="dsq-comment-31"&gt;
+        <div id="dsq-comment-header-31" class="dsq-comment-header"&gt;
+            <cite id="dsq-cite-31"&gt;
+                <span id="dsq-author-user-31"&gt;jonathan_fielding</span&gt;
+            </cite&gt;
+        </div&gt;
+        <div id="dsq-comment-body-31" class="dsq-comment-body"&gt;
+            <div id="dsq-comment-message-31" class="dsq-comment-message"&gt;<p&gt;I only recently redesigned the blog and I messed up the font sizes, I am currently in process of fixing them (hence why I only added comment support this morning). I am also in process of making the examples interactive so you can test out the code  in the page.</p&gt;
+</div&gt;
+        </div&gt;
 
-    <ul class="children">
-    <li class="comment even depth-3" id="dsq-comment-32">
-        <div id="dsq-comment-header-32" class="dsq-comment-header">
-            <cite id="dsq-cite-32">
-http://moin.im/                <span id="dsq-author-user-32">Moin</span>
-            </cite>
-        </div>
-        <div id="dsq-comment-body-32" class="dsq-comment-body">
-            <div id="dsq-comment-message-32" class="dsq-comment-message"><p>Ahhh&#8230;. Okay.</p>
-<p>Anyways, Thanks a lot for such great article and good luck.</p>
-</div>
-        </div>
+    <ul class="children"&gt;
+    <li class="comment even depth-3" id="dsq-comment-32"&gt;
+        <div id="dsq-comment-header-32" class="dsq-comment-header"&gt;
+            <cite id="dsq-cite-32"&gt;
+http://moin.im/                <span id="dsq-author-user-32"&gt;Moin</span&gt;
+            </cite&gt;
+        </div&gt;
+        <div id="dsq-comment-body-32" class="dsq-comment-body"&gt;
+            <div id="dsq-comment-message-32" class="dsq-comment-message"&gt;<p&gt;Ahhh&#8230;. Okay.</p&gt;
+<p&gt;Anyways, Thanks a lot for such great article and good luck.</p&gt;
+</div&gt;
+        </div&gt;
 
-    <ul class="children">
-    <li class="comment odd alt depth-4" id="dsq-comment-33">
-        <div id="dsq-comment-header-33" class="dsq-comment-header">
-            <cite id="dsq-cite-33">
-http://www.jonathanfielding.com/                <span id="dsq-author-user-33">Jonathan Fielding</span>
-            </cite>
-        </div>
-        <div id="dsq-comment-body-33" class="dsq-comment-body">
-            <div id="dsq-comment-message-33" class="dsq-comment-message"><p>Thanks, if you have any suggestions for articles you would like to read let me know, on here or on Twitter. I have updated font size for the code now.</p>
-</div>
-        </div>
+    <ul class="children"&gt;
+    <li class="comment odd alt depth-4" id="dsq-comment-33"&gt;
+        <div id="dsq-comment-header-33" class="dsq-comment-header"&gt;
+            <cite id="dsq-cite-33"&gt;
+http://www.jonathanfielding.com/                <span id="dsq-author-user-33"&gt;Jonathan Fielding</span&gt;
+            </cite&gt;
+        </div&gt;
+        <div id="dsq-comment-body-33" class="dsq-comment-body"&gt;
+            <div id="dsq-comment-message-33" class="dsq-comment-message"&gt;<p&gt;Thanks, if you have any suggestions for articles you would like to read let me know, on here or on Twitter. I have updated font size for the code now.</p&gt;
+</div&gt;
+        </div&gt;
 
-    </li><!-- #comment-## -->
-</ul><!-- .children -->
-</li><!-- #comment-## -->
-</ul><!-- .children -->
-</li><!-- #comment-## -->
-</ul><!-- .children -->
-</li><!-- #comment-## -->
-    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-42">
-        <div id="dsq-comment-header-42" class="dsq-comment-header">
-            <cite id="dsq-cite-42">
-                <span id="dsq-author-user-42">WickyNilliams</span>
-            </cite>
-        </div>
-        <div id="dsq-comment-body-42" class="dsq-comment-body">
-            <div id="dsq-comment-message-42" class="dsq-comment-message"><p>Hey Jonathan, enquire.js author here! Saw your site in my analytics logs and thought I&#8217;d have a look around. I think it&#8217;s unfair to say that (your) SimpleStateManager has a smaller file size &#8211; it does, but only by 50 bytes (i.e. negligible), most of that is due to enquire having a license etc defined in the comment banner. The code itself can be said to be of equal size. </p>
-<p>Good work otherwise though, always interesting to see alternate takes on the same problem <img src='http://www.jonathanfielding.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' class='wp-smiley' /> </p>
-<p>PS. you might want to add a license to your repo, without it some people may refuse to even use it! MIT is a good choice if you&#8217;re unsure. See here for more details: <a href="http://www.codinghorror.com/blog/2007/04/pick-a-license-any-license.html" rel="nofollow">http://www.codinghorror.com/blog/2007/04/pick-a-license-any-license.html</a></p>
-</div>
-        </div>
+    </li&gt;<!-- #comment-## --&gt;
+</ul&gt;<!-- .children --&gt;
+</li&gt;<!-- #comment-## --&gt;
+</ul&gt;<!-- .children --&gt;
+</li&gt;<!-- #comment-## --&gt;
+</ul&gt;<!-- .children --&gt;
+</li&gt;<!-- #comment-## --&gt;
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-42"&gt;
+        <div id="dsq-comment-header-42" class="dsq-comment-header"&gt;
+            <cite id="dsq-cite-42"&gt;
+                <span id="dsq-author-user-42"&gt;WickyNilliams</span&gt;
+            </cite&gt;
+        </div&gt;
+        <div id="dsq-comment-body-42" class="dsq-comment-body"&gt;
+            <div id="dsq-comment-message-42" class="dsq-comment-message"&gt;<p&gt;Hey Jonathan, enquire.js author here! Saw your site in my analytics logs and thought I&#8217;d have a look around. I think it&#8217;s unfair to say that (your) SimpleStateManager has a smaller file size &#8211; it does, but only by 50 bytes (i.e. negligible), most of that is due to enquire having a license etc defined in the comment banner. The code itself can be said to be of equal size. </p&gt;
+<p&gt;Good work otherwise though, always interesting to see alternate takes on the same problem <img src='http://www.jonathanfielding.com/wp-includes/images/smilies/icon_smile.gif' alt=':)' class='wp-smiley' /&gt; </p&gt;
+<p&gt;PS. you might want to add a license to your repo, without it some people may refuse to even use it! MIT is a good choice if you&#8217;re unsure. See here for more details: <a href="http://www.codinghorror.com/blog/2007/04/pick-a-license-any-license.html" rel="nofollow"&gt;http://www.codinghorror.com/blog/2007/04/pick-a-license-any-license.html</a&gt;</p&gt;
+</div&gt;
+        </div&gt;
 
-    <ul class="children">
-    <li class="comment odd alt depth-2" id="dsq-comment-43">
-        <div id="dsq-comment-header-43" class="dsq-comment-header">
-            <cite id="dsq-cite-43">
-http://www.jonathanfielding.com/                <span id="dsq-author-user-43">Jonathan Fielding</span>
-            </cite>
-        </div>
-        <div id="dsq-comment-body-43" class="dsq-comment-body">
-            <div id="dsq-comment-message-43" class="dsq-comment-message"><p>Hi Wicky, at the the time I wrote the post  think the file size difference was bigger, SSM has grown a bit since then adding missing features and the whole resize debouncer was replaced with a timeout method. Version 2.0.0 of SSM will actually be looking at how I can increase performance an decrease file size.</p>
-<p>Also remember that SSM does not require any Polyfills to work so you have to include the Polyfill in the total file size when looking at using it in older browsers.</p>
-</div>
-        </div>
+    <ul class="children"&gt;
+    <li class="comment odd alt depth-2" id="dsq-comment-43"&gt;
+        <div id="dsq-comment-header-43" class="dsq-comment-header"&gt;
+            <cite id="dsq-cite-43"&gt;
+http://www.jonathanfielding.com/                <span id="dsq-author-user-43"&gt;Jonathan Fielding</span&gt;
+            </cite&gt;
+        </div&gt;
+        <div id="dsq-comment-body-43" class="dsq-comment-body"&gt;
+            <div id="dsq-comment-message-43" class="dsq-comment-message"&gt;<p&gt;Hi Wicky, at the the time I wrote the post  think the file size difference was bigger, SSM has grown a bit since then adding missing features and the whole resize debouncer was replaced with a timeout method. Version 2.0.0 of SSM will actually be looking at how I can increase performance an decrease file size.</p&gt;
+<p&gt;Also remember that SSM does not require any Polyfills to work so you have to include the Polyfill in the total file size when looking at using it in older browsers.</p&gt;
+</div&gt;
+        </div&gt;
 
-    </li><!-- #comment-## -->
-</ul><!-- .children -->
-</li><!-- #comment-## -->
-    <li class="post pingback">
-        <p>Pingback: <a href='http://flippinawesome.org/2013/08/12/coding-for-responsive-state-changes-with-simplestatemanager/' rel='external nofollow' class='url'>Coding for Responsive State Changes with SimpleStateManager | Flippin&#039; Awesome</a></p>
-    </li>
-    </li><!-- #comment-## -->
-            </ul>
+    </li&gt;<!-- #comment-## --&gt;
+</ul&gt;<!-- .children --&gt;
+</li&gt;<!-- #comment-## --&gt;
+    <li class="post pingback"&gt;
+        <p&gt;Pingback: <a href='http://flippinawesome.org/2013/08/12/coding-for-responsive-state-changes-with-simplestatemanager/' rel='external nofollow' class='url'&gt;Coding for Responsive State Changes with SimpleStateManager | Flippin&#039; Awesome</a&gt;</p&gt;
+    </li&gt;
+    </li&gt;<!-- #comment-## --&gt;
+            </ul&gt;
 
 
-        </div>
+        </div&gt;
 
-    </div>
+    </div&gt;
 
-<script type="text/javascript">
+<script type="text/javascript"&gt;
 /* <![CDATA[ */
     var disqus_url = 'http://www.jonathanfielding.com/managing-responsive-design-breakpointstates-in-javascript/';
     var disqus_identifier = '668 http://www.jonathanfielding.com/?p=668';
@@ -382,10 +395,10 @@ http://www.jonathanfielding.com/                <span id="dsq-author-user-43">Jo
             firstScript.parentNode.insertBefore(script, firstScript);
         });
                     };
-/* ]]> */
-</script>
+/* ]]&gt; */
+</script&gt;
 
-<script type="text/javascript">
+<script type="text/javascript"&gt;
 /* <![CDATA[ */
     var DsqLocal = {
         'trackbacks': [
@@ -397,10 +410,10 @@ http://www.jonathanfielding.com/                <span id="dsq-author-user-43">Jo
                 'type':            "pingback"            }
         ],
         'trackback_url': "http:\/\/www.jonathanfielding.com\/managing-responsive-design-breakpointstates-in-javascript\/trackback\/"    };
-/* ]]> */
-</script>
+/* ]]&gt; */
+</script&gt;
 
-<script type="text/javascript">
+<script type="text/javascript"&gt;
 /* <![CDATA[ */
 (function() {
     var dsq = document.createElement('script'); dsq.type = 'text/javascript';
@@ -408,117 +421,127 @@ http://www.jonathanfielding.com/                <span id="dsq-author-user-43">Jo
     dsq.src = '//' + disqus_shortname + '.' + 'disqus.com' + '/embed.js?pname=wordpress&pver=2.74';
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 })();
-/* ]]> */
-</script>
-					</div>
+/* ]]&gt; */
+</script&gt;
+					</div&gt;
 
-					<p class="postmetadata">Posted in <a href="http://www.jonathanfielding.com/category/misc/" title="View all posts in Miscellaneous" rel="category tag">Miscellaneous</a>, July 9th, 2013 by <a href="http://www.jonathanfielding.com/author/jonathan/" title="Posts by Jonathan Fielding" rel="author">Jonathan Fielding</a></p>
-				</article> <!-- closes the first div box -->
+					<p class="postmetadata"&gt;Posted in <a href="http://www.jonathanfielding.com/category/misc/" title="View all posts in Miscellaneous" rel="category tag"&gt;Miscellaneous</a&gt;, July 9th, 2013 by <a href="http://www.jonathanfielding.com/author/jonathan/" title="Posts by Jonathan Fielding" rel="author"&gt;Jonathan Fielding</a&gt;</p&gt;
+				</article&gt; <!-- closes the first div box --&gt;
 
 				
-				<div class="pagination">
-									</div>
-		</div>
+				<div class="pagination"&gt;
+									</div&gt;
+		</div&gt;
 
-		<aside class="span4">
-			<h2>Order My Book</h2>
-			<p><a href="http://www.packtpub.com/jquery-boilerplate-for-plugins/book"><img src="http://www.jonathanfielding.com/wp-content/themes/main_bs/images/9700OS_mockupcover_instant-how-to.jpg" /></a></p>
-			<p><a href="http://www.packtpub.com/jquery-boilerplate-for-plugins/book">Instant jQuery Boilerplate for Plugins</a></p>
-			<h2>Follow Us</h2>
-			<ul class="social clearfix">
-				<li><a href="https://www.facebook.com/jonathanfieldingcom" target="_blank" class="hide-text facebook">Facebook</a></li>
-				<li><a href="http://www.twitter.com/jonthanfielding" target="_blank" class="hide-text twitter">Twitter</a></li>
-				<li><a href="http://www.jonathanfielding.com/feed/" target="_blank" class="hide-text rss">RSS</a></li>
-			</ul>
+		<aside class="span4"&gt;
+			<h2&gt;Order My Book</h2&gt;
+			<p&gt;<a href="http://www.packtpub.com/jquery-boilerplate-for-plugins/book"&gt;<img src="http://www.jonathanfielding.com/wp-content/themes/main_bs/images/9700OS_mockupcover_instant-how-to.jpg" /&gt;</a&gt;</p&gt;
+			<p&gt;<a href="http://www.packtpub.com/jquery-boilerplate-for-plugins/book"&gt;Instant jQuery Boilerplate for Plugins</a&gt;</p&gt;
+			<h2&gt;Follow Us</h2&gt;
+			<ul class="social clearfix"&gt;
+				<li&gt;<a href="https://www.facebook.com/jonathanfieldingcom" target="_blank" class="hide-text facebook"&gt;Facebook</a&gt;</li&gt;
+				<li&gt;<a href="http://www.twitter.com/jonthanfielding" target="_blank" class="hide-text twitter"&gt;Twitter</a&gt;</li&gt;
+				<li&gt;<a href="http://www.jonathanfielding.com/feed/" target="_blank" class="hide-text rss"&gt;RSS</a&gt;</li&gt;
+			</ul&gt;
 
-			<h2>Categories</h2>
-			<ul>
-					<li class="cat-item cat-item-10"><a href="http://www.jonathanfielding.com/category/book-reviews/" title="View all posts filed under Book reviews">Book reviews</a>
-</li>
-	<li class="cat-item cat-item-20"><a href="http://www.jonathanfielding.com/category/cli/" title="View all posts filed under CLI">CLI</a>
-</li>
-	<li class="cat-item cat-item-21"><a href="http://www.jonathanfielding.com/category/conferences/" title="View all posts filed under Conferences">Conferences</a>
-</li>
-	<li class="cat-item cat-item-4"><a href="http://www.jonathanfielding.com/category/css3/" title="View all posts filed under CSS3">CSS3</a>
-</li>
-	<li class="cat-item cat-item-5"><a href="http://www.jonathanfielding.com/category/html5/" title="View all posts filed under HTML5">HTML5</a>
-</li>
-	<li class="cat-item cat-item-8"><a href="http://www.jonathanfielding.com/category/javascript/" title="View all posts filed under Javascript">Javascript</a>
-</li>
-	<li class="cat-item cat-item-1"><a href="http://www.jonathanfielding.com/category/misc/" title="View all posts filed under Miscellaneous">Miscellaneous</a>
-</li>
-	<li class="cat-item cat-item-19"><a href="http://www.jonathanfielding.com/category/node/" title="View all posts filed under Node">Node</a>
-</li>
-	<li class="cat-item cat-item-7"><a href="http://www.jonathanfielding.com/category/php/" title="View all posts filed under PHP">PHP</a>
-</li>
-	<li class="cat-item cat-item-9"><a href="http://www.jonathanfielding.com/category/quick-tips/" title="View all posts filed under Quick Tips">Quick Tips</a>
-</li>
-	<li class="cat-item cat-item-6"><a href="http://www.jonathanfielding.com/category/weekly-links/" title="View all posts filed under Weekly Links">Weekly Links</a>
-</li>
-			</ul>
+			<h2&gt;Categories</h2&gt;
+			<ul&gt;
+					<li class="cat-item cat-item-10"&gt;<a href="http://www.jonathanfielding.com/category/book-reviews/" title="View all posts filed under Book reviews"&gt;Book reviews</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-20"&gt;<a href="http://www.jonathanfielding.com/category/cli/" title="View all posts filed under CLI"&gt;CLI</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-21"&gt;<a href="http://www.jonathanfielding.com/category/conferences/" title="View all posts filed under Conferences"&gt;Conferences</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-4"&gt;<a href="http://www.jonathanfielding.com/category/css3/" title="View all posts filed under CSS3"&gt;CSS3</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-5"&gt;<a href="http://www.jonathanfielding.com/category/html5/" title="View all posts filed under HTML5"&gt;HTML5</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-8"&gt;<a href="http://www.jonathanfielding.com/category/javascript/" title="View all posts filed under Javascript"&gt;Javascript</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-1"&gt;<a href="http://www.jonathanfielding.com/category/misc/" title="View all posts filed under Miscellaneous"&gt;Miscellaneous</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-19"&gt;<a href="http://www.jonathanfielding.com/category/node/" title="View all posts filed under Node"&gt;Node</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-7"&gt;<a href="http://www.jonathanfielding.com/category/php/" title="View all posts filed under PHP"&gt;PHP</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-9"&gt;<a href="http://www.jonathanfielding.com/category/quick-tips/" title="View all posts filed under Quick Tips"&gt;Quick Tips</a&gt;
+</li&gt;
+	<li class="cat-item cat-item-6"&gt;<a href="http://www.jonathanfielding.com/category/weekly-links/" title="View all posts filed under Weekly Links"&gt;Weekly Links</a&gt;
+</li&gt;
+			</ul&gt;
 
-			<h2>MONTHS GONE BY</h2>
-			<ul>
-					<li><a href='http://www.jonathanfielding.com/2013/09/' title='September 2013'>September 2013</a></li>
-	<li><a href='http://www.jonathanfielding.com/2013/08/' title='August 2013'>August 2013</a></li>
-	<li><a href='http://www.jonathanfielding.com/2013/07/' title='July 2013'>July 2013</a></li>
-	<li><a href='http://www.jonathanfielding.com/2013/05/' title='May 2013'>May 2013</a></li>
-	<li><a href='http://www.jonathanfielding.com/2013/04/' title='April 2013'>April 2013</a></li>
-	<li><a href='http://www.jonathanfielding.com/2013/01/' title='January 2013'>January 2013</a></li>
-	<li><a href='http://www.jonathanfielding.com/2012/11/' title='November 2012'>November 2012</a></li>
-	<li><a href='http://www.jonathanfielding.com/2012/10/' title='October 2012'>October 2012</a></li>
-	<li><a href='http://www.jonathanfielding.com/2012/08/' title='August 2012'>August 2012</a></li>
-	<li><a href='http://www.jonathanfielding.com/2012/07/' title='July 2012'>July 2012</a></li>
-	<li><a href='http://www.jonathanfielding.com/2012/03/' title='March 2012'>March 2012</a></li>
-	<li><a href='http://www.jonathanfielding.com/2012/02/' title='February 2012'>February 2012</a></li>
-	<li><a href='http://www.jonathanfielding.com/2012/01/' title='January 2012'>January 2012</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/12/' title='December 2011'>December 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/11/' title='November 2011'>November 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/10/' title='October 2011'>October 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/09/' title='September 2011'>September 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/08/' title='August 2011'>August 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/07/' title='July 2011'>July 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/06/' title='June 2011'>June 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/05/' title='May 2011'>May 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/04/' title='April 2011'>April 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/03/' title='March 2011'>March 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2011/02/' title='February 2011'>February 2011</a></li>
-	<li><a href='http://www.jonathanfielding.com/2010/10/' title='October 2010'>October 2010</a></li>
-			</ul>
-		</aside>
-	</div>
-</div>
+			<h2&gt;MONTHS GONE BY</h2&gt;
+			<ul&gt;
+					<li&gt;<a href='http://www.jonathanfielding.com/2013/09/' title='September 2013'&gt;September 2013</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2013/08/' title='August 2013'&gt;August 2013</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2013/07/' title='July 2013'&gt;July 2013</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2013/05/' title='May 2013'&gt;May 2013</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2013/04/' title='April 2013'&gt;April 2013</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2013/01/' title='January 2013'&gt;January 2013</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2012/11/' title='November 2012'&gt;November 2012</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2012/10/' title='October 2012'&gt;October 2012</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2012/08/' title='August 2012'&gt;August 2012</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2012/07/' title='July 2012'&gt;July 2012</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2012/03/' title='March 2012'&gt;March 2012</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2012/02/' title='February 2012'&gt;February 2012</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2012/01/' title='January 2012'&gt;January 2012</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/12/' title='December 2011'&gt;December 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/11/' title='November 2011'&gt;November 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/10/' title='October 2011'&gt;October 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/09/' title='September 2011'&gt;September 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/08/' title='August 2011'&gt;August 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/07/' title='July 2011'&gt;July 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/06/' title='June 2011'&gt;June 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/05/' title='May 2011'&gt;May 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/04/' title='April 2011'&gt;April 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/03/' title='March 2011'&gt;March 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2011/02/' title='February 2011'&gt;February 2011</a&gt;</li&gt;
+	<li&gt;<a href='http://www.jonathanfielding.com/2010/10/' title='October 2010'&gt;October 2010</a&gt;</li&gt;
+			</ul&gt;
+		</aside&gt;
+	</div&gt;
+</div&gt;
 
-			<footer class="clearfix wrap">
-				<div class="container">
-					<div class="row">
-						<div class="span2">
-							<img src="http://www.jonathanfielding.com/wp-content/themes/main_bs/images/jonathan.jpg" />
-						</div>
-						<div class="span10">
-							<h2>About Jonathan</h2>
-							<p>I am a senior web developer working in London in for a small digital marketing agency called McCormack &amp; Morrison where I work with a variety of clients including Vodafone, Virgin Active and Intent Media.</p>
-							<p>I love to get involved in open source and have many of my open source projects along with contributing to projects including HTML5 Boilerplate and PhoneGap Plugins and jQuery Validation.</p>
-							<p>Outside of the web (such a world does exist) I love to spend time with my wife and my 2 little children who are almost as geeky as my wife and I.
-						</div>
-					</div>
-				</div>
-				<div class="copyright">
-					<div class="container">
-						<div class="row">
-							<p class="span12">&copy; Copyright 2013 Jonathan Fielding</p>
-						</div>
-					</div>
-				</div>
-			</footer>		
+			<footer class="clearfix wrap"&gt;
+				<div class="container"&gt;
+					<div class="row"&gt;
+						<div class="span2"&gt;
+							<img src="http://www.jonathanfielding.com/wp-content/themes/main_bs/images/jonathan.jpg" /&gt;
+						</div&gt;
+						<div class="span10"&gt;
+							<h2&gt;About Jonathan</h2&gt;
+							<p&gt;I am a senior web developer working in London in for a small digital marketing agency called McCormack &amp; Morrison where I work with a variety of clients including Vodafone, Virgin Active and Intent Media.</p&gt;
+							<p&gt;I love to get involved in open source and have many of my open source projects along with contributing to projects including HTML5 Boilerplate and PhoneGap Plugins and jQuery Validation.</p&gt;
+							<p&gt;Outside of the web (such a world does exist) I love to spend time with my wife and my 2 little children who are almost as geeky as my wife and I.
+						</div&gt;
+					</div&gt;
+				</div&gt;
+				<div class="copyright"&gt;
+					<div class="container"&gt;
+						<div class="row"&gt;
+							<p class="span12"&gt;&copy; Copyright 2013 Jonathan Fielding</p&gt;
+						</div&gt;
+					</div&gt;
+				</div&gt;
+			</footer&gt;		
 	
-	        <!-- Add your site or application content here -->
+	        <!-- Add your site or application content here --&gt;
 	
-	        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-	        <script>window.jQuery || document.write('<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/jquery.min.js"><\/script>')</script>
-			<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/jquery.chosen.min.js"></script>
-			<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/bootstrap.min.js"></script>
-			<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/main.js"></script>
-					</div>
-	</body>
+	        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"&gt;</script&gt;
+	        <script&gt;window.jQuery || document.write('<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/jquery.min.js"&gt;<\/script&gt;')</script&gt;
+			<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/jquery.chosen.min.js"&gt;</script&gt;
+			<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/vendor/bootstrap.min.js"&gt;</script&gt;
+			<script src="http://www.jonathanfielding.com/wp-content/themes/main_bs/scripts/main.js"&gt;</script&gt;
+					</div&gt;
+	</body&gt;
+</html&gt;
+        </textarea>
+        </div>
+        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+        <script src="../js/clearly.js"></script>
+        <script>
+            var html = window.__getMyClearlyResults().html;
+            $('#main_content_wrap').html(html);
+        </script>
+  </body>
 </html>

@@ -1,26 +1,39 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-   <meta name="apple-mobile-web-app-capable" content="yes" />
-   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-   <!-- <link rel="apple-touch-icon" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-iphone.png" /> -->
-   <link rel="apple-touch-icon-precomposed" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-iphone-precomposed.png" />
-   <link rel="apple-touch-icon" sizes="72x72" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-ipad.png" />
-   <link rel="apple-touch-icon" sizes="114x114" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-iphone-retina.png" />
-   <link rel="apple-touch-icon" sizes="144x144" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-ipad-retina.png" />
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <title></title>
+  </head>
+  <body>
+        <!-- MAIN CONTENT -->
+        <div id="main_content_wrap" class="outer">
+        <textarea style="visibility:none" id="html-area">
+<!DOCTYPE html&gt;
+<html xmlns="http://www.w3.org/1999/xhtml"&gt;
+<head&gt;
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" /&gt;
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"&gt;
+   <meta name="apple-mobile-web-app-capable" content="yes" /&gt;
+   <meta name="apple-mobile-web-app-status-bar-style" content="black" /&gt;
+   <!-- <link rel="apple-touch-icon" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-iphone.png" /&gt; --&gt;
+   <link rel="apple-touch-icon-precomposed" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-iphone-precomposed.png" /&gt;
+   <link rel="apple-touch-icon" sizes="72x72" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-ipad.png" /&gt;
+   <link rel="apple-touch-icon" sizes="114x114" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-iphone-retina.png" /&gt;
+   <link rel="apple-touch-icon" sizes="144x144" href="http://s0-weizhifeng-net.b0.upaiyun.com/touch-icon-ipad-retina.png" /&gt;
    
-   <title>把Dropbox改造为Git私有仓库</title>
-   <meta name="author" content="Jeremy Wei" />
-   <link href="http://feeds.feedburner.com/JeremyWei" rel="alternate" title="Jeremy Wei" type="application/atom+xml" />
-   <link rel="shortcut icon" type="image/x-icon" href="http://s0-weizhifeng-net.b0.upaiyun.com/favicon.ico">
+   <title&gt;把Dropbox改造为Git私有仓库</title&gt;
+   <meta name="author" content="Jeremy Wei" /&gt;
+   <link href="http://feeds.feedburner.com/JeremyWei" rel="alternate" title="Jeremy Wei" type="application/atom+xml" /&gt;
+   <link rel="shortcut icon" type="image/x-icon" href="http://s0-weizhifeng-net.b0.upaiyun.com/favicon.ico"&gt;
       
-   <!-- Homepage CSS -->
-   <link rel="stylesheet" href="http://s0-weizhifeng-net.b0.upaiyun.com/css/screen.css?0824" type="text/css" media="screen, projection" />
-   <!-- <link rel="stylesheet" href="/css/screen.css?0831" type="text/css" media="screen, projection" /> -->
+   <!-- Homepage CSS --&gt;
+   <link rel="stylesheet" href="http://s0-weizhifeng-net.b0.upaiyun.com/css/screen.css?0824" type="text/css" media="screen, projection" /&gt;
+   <!-- <link rel="stylesheet" href="/css/screen.css?0831" type="text/css" media="screen, projection" /&gt; --&gt;
    
-   <script type="text/javascript" charset="utf-8">
+   <script type="text/javascript" charset="utf-8"&gt;
    // Mobile Safari in standalone mode
    if(("standalone" in window.navigator) && window.navigator.standalone){
 	   
@@ -44,82 +57,82 @@
 	
    	},false);
    }
-   </script>
-</head>
-<body>
+   </script&gt;
+</head&gt;
+<body&gt;
 	
-<div class="site">
-  <pre class="nav margin-for-mobile">{"<a href='/tech.html'>Tech</a>", "<a href='/poem.html'>詩</a>", "<a href='/5000years.html'>國史</a>", "<a href='/resume.html'>己</a>"}</pre>
-  <br />
-  <div id="post">
-	<h1>把Dropbox改造为Git私有仓库</h1>
-	<div class="copyright">
-	作者: JeremyWei | 可以转载, 但必须以超链接形式标明文章原始出处和作者信息及版权声明<br />
+<div class="site"&gt;
+  <pre class="nav margin-for-mobile"&gt;{"<a href='/tech.html'&gt;Tech</a&gt;", "<a href='/poem.html'&gt;詩</a&gt;", "<a href='/5000years.html'&gt;國史</a&gt;", "<a href='/resume.html'&gt;己</a&gt;"}</pre&gt;
+  <br /&gt;
+  <div id="post"&gt;
+	<h1&gt;把Dropbox改造为Git私有仓库</h1&gt;
+	<div class="copyright"&gt;
+	作者: JeremyWei | 可以转载, 但必须以超链接形式标明文章原始出处和作者信息及版权声明<br /&gt;
 	网址: http://weizhifeng.net/git-with-dropbox.html
-	</div>
+	</div&gt;
 
-	<p><img src="http://s0-weizhifeng-net.b0.upaiyun.com/images/tech/git.jpg" title="Git" alt="Git" /> <img src="http://s0-weizhifeng-net.b0.upaiyun.com/images/tech/dropbox.jpg" title="Dropbox" alt="Dropbox" />　</p>
+	<p&gt;<img src="http://s0-weizhifeng-net.b0.upaiyun.com/images/tech/git.jpg" title="Git" alt="Git" /&gt; <img src="http://s0-weizhifeng-net.b0.upaiyun.com/images/tech/dropbox.jpg" title="Dropbox" alt="Dropbox" /&gt;　</p&gt;
 
-<h2>前言</h2>
+<h2&gt;前言</h2&gt;
 
-<p><a href="http://git-scm.com/" title="Git">Git</a>作为强大的分布式版本控制工具，越来越受欢迎。大量的开源项目可以在<a href="https://github.com" title="Github">Github</a>上发布，不过项目是公共可见的，即人人可以fork。
-对于一些用户，他们也有自己的项目，但是还不太想立刻就把项目开源出来，有可能是因为还没有完成，所以他们需要通过Git临时性地管理他们的「私有项目」，Github上虽然有私有项目托管服务，不过性价比不高。</p>
+<p&gt;<a href="http://git-scm.com/" title="Git"&gt;Git</a&gt;作为强大的分布式版本控制工具，越来越受欢迎。大量的开源项目可以在<a href="https://github.com" title="Github"&gt;Github</a&gt;上发布，不过项目是公共可见的，即人人可以fork。
+对于一些用户，他们也有自己的项目，但是还不太想立刻就把项目开源出来，有可能是因为还没有完成，所以他们需要通过Git临时性地管理他们的「私有项目」，Github上虽然有私有项目托管服务，不过性价比不高。</p&gt;
 
-<p><a href="https://www.dropbox.com/" title="Dropbox">Dropbox</a>（墙）是最流行的云存储服务，通过Dropbox我们可以实现对Git私有项目的托管。</p>
+<p&gt;<a href="https://www.dropbox.com/" title="Dropbox"&gt;Dropbox</a&gt;（墙）是最流行的云存储服务，通过Dropbox我们可以实现对Git私有项目的托管。</p&gt;
 
-<h2>思路</h2>
+<h2&gt;思路</h2&gt;
 
-<p>我们的思路是在Dropbox客户端的目录中建立Git仓库，然后我们clone此仓库到本地仓库，然后我们进行提交操作，完成提交之后，我们执行push操作，
-那么本地的数据会被push到Dropbox客户端目录的仓库中，之后Dropbox客户端会把仓库文件的更改同步到Dropbox服务器。</p>
+<p&gt;我们的思路是在Dropbox客户端的目录中建立Git仓库，然后我们clone此仓库到本地仓库，然后我们进行提交操作，完成提交之后，我们执行push操作，
+那么本地的数据会被push到Dropbox客户端目录的仓库中，之后Dropbox客户端会把仓库文件的更改同步到Dropbox服务器。</p&gt;
 
-<pre><code>+------------+            +-----------+              +---------+
+<pre&gt;<code&gt;+------------+            +-----------+              +---------+
 |  Dropbox   |  --Sync-&gt;  |  Dropbox  |   --Clone-&gt;  | Working |
 |   Server   |  &lt;-Sync--  |   Client  |   &lt;-Push---  |  Space  |
 +------------+            +-----------+              +---------+
-</code></pre>
+</code&gt;</pre&gt;
 
-<h2>实现</h2>
+<h2&gt;实现</h2&gt;
 
-<p>我们现在Dropbox的目录中创建一个裸git仓库</p>
+<p&gt;我们现在Dropbox的目录中创建一个裸git仓库</p&gt;
 
-<pre><code>$ cd ~/Dropbox
+<pre&gt;<code&gt;$ cd ~/Dropbox
 $ git init --bare project.git
-</code></pre>
+</code&gt;</pre&gt;
 
-<p>完成之后，我们clone这个仓库</p>
+<p&gt;完成之后，我们clone这个仓库</p&gt;
 
-<pre><code>$ cd ~
+<pre&gt;<code&gt;$ cd ~
 $ git clone ~/Dropbox/project.git project
 $ cd project
-</code></pre>
+</code&gt;</pre&gt;
 
-<p>提交并且push</p>
+<p&gt;提交并且push</p&gt;
 
-<pre><code>$ touch README
+<pre&gt;<code&gt;$ touch README
 $ git add .
 $ git commit -m "init commit"
 $ git push origin master
-</code></pre>
+</code&gt;</pre&gt;
 
-<p>完成之后，Dropbox会把你push的内容同步到服务器，你通过<a href="https://www.dropbox.com/">https://www.dropbox.com/</a>可以查看到仓库的内容。</p>
+<p&gt;完成之后，Dropbox会把你push的内容同步到服务器，你通过<a href="https://www.dropbox.com/"&gt;https://www.dropbox.com/</a&gt;可以查看到仓库的内容。</p&gt;
 
-<h2>参考</h2>
+<h2&gt;参考</h2&gt;
 
-<p><a href="http://stackoverflow.com/questions/1960799/using-gitdropbox-together-effectively">http://stackoverflow.com/questions/1960799/using-gitdropbox-together-effectively</a></p>
+<p&gt;<a href="http://stackoverflow.com/questions/1960799/using-gitdropbox-together-effectively"&gt;http://stackoverflow.com/questions/1960799/using-gitdropbox-together-effectively</a&gt;</p&gt;
 
 	(完)
 
-	<div class="post-info">
+	<div class="post-info"&gt;
 		24 Nov 2012  
 	
 		
 	
 		
-	</div>
+	</div&gt;
 	
-	<!-- disqus start -->
-	<div id="disqus_thread"></div>
-	<script type="text/javascript">
+	<!-- disqus start --&gt;
+	<div id="disqus_thread"&gt;</div&gt;
+	<script type="text/javascript"&gt;
 	    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
 	    var disqus_shortname = 'jeremywei'; // required: replace example with your forum shortname
 
@@ -129,47 +142,47 @@ $ git push origin master
 	        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
 	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 	    })();
-	</script>
-	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-	<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-	<!-- disqus end -->
+	</script&gt;
+	<noscript&gt;Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript"&gt;comments powered by Disqus.</a&gt;</noscript&gt;
+	<a href="http://disqus.com" class="dsq-brlink"&gt;comments powered by <span class="logo-disqus"&gt;Disqus</span&gt;</a&gt;
+	<!-- disqus end --&gt;
 
-	<!-- related start -->
-	<div id="related">
-	  <h2>相关内容</h2>
-	  <ul class="posts">
+	<!-- related start --&gt;
+	<div id="related"&gt;
+	  <h2&gt;相关内容</h2&gt;
+	  <ul class="posts"&gt;
 	    
-	      <li><span>31 Aug 2013</span> &raquo; <a href="/responsive-design-with-css3-media-queries.html">利用媒体查询进行响应式设计</a></li>
+	      <li&gt;<span&gt;31 Aug 2013</span&gt; &raquo; <a href="/responsive-design-with-css3-media-queries.html"&gt;利用媒体查询进行响应式设计</a&gt;</li&gt;
 	    
-	      <li><span>24 Aug 2013</span> &raquo; <a href="/responsive-design-in-3-steps.html">响应式web设计(Responsive web design)三步曲</a></li>
+	      <li&gt;<span&gt;24 Aug 2013</span&gt; &raquo; <a href="/responsive-design-in-3-steps.html"&gt;响应式web设计(Responsive web design)三步曲</a&gt;</li&gt;
 	    
-	      <li><span>14 Aug 2013</span> &raquo; <a href="/a-primer-on-hybrid-apps-for-ios.html">iOS混合应用开发入门</a></li>
+	      <li&gt;<span&gt;14 Aug 2013</span&gt; &raquo; <a href="/a-primer-on-hybrid-apps-for-ios.html"&gt;iOS混合应用开发入门</a&gt;</li&gt;
 	    
-	      <li><span>09 Aug 2013</span> &raquo; <a href="/viewports2.html">两个viewport的故事（第二部分）</a></li>
+	      <li&gt;<span&gt;09 Aug 2013</span&gt; &raquo; <a href="/viewports2.html"&gt;两个viewport的故事（第二部分）</a&gt;</li&gt;
 	    
-	      <li><span>21 Jul 2013</span> &raquo; <a href="/viewports.html">两个viewport的故事（第一部分）</a></li>
+	      <li&gt;<span&gt;21 Jul 2013</span&gt; &raquo; <a href="/viewports.html"&gt;两个viewport的故事（第一部分）</a&gt;</li&gt;
 	    
-	  </ul>
-	</div>
-	<!-- related end -->
-</div>
+	  </ul&gt;
+	</div&gt;
+	<!-- related end --&gt;
+</div&gt;
   
-<div class="footer"></div>
-<div class="power">  
-  Powered by <a href="http://github.com/" targe="_blank">Github</a> &nbsp;&amp;&amp;&nbsp; <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> 
-</div>
-</div>
+<div class="footer"&gt;</div&gt;
+<div class="power"&gt;  
+  Powered by <a href="http://github.com/" targe="_blank"&gt;Github</a&gt; &nbsp;&amp;&amp;&nbsp; <a href="http://jekyllrb.com/" target="_blank"&gt;Jekyll</a&gt; 
+</div&gt;
+</div&gt;
 
-<a href="http://github.com/jeremywei" target="_blank">
-	<img class="right-banner first" src="http://s0-weizhifeng-net.b0.upaiyun.com/images/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" />
-</a>
+<a href="http://github.com/jeremywei" target="_blank"&gt;
+	<img class="right-banner first" src="http://s0-weizhifeng-net.b0.upaiyun.com/images/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /&gt;
+</a&gt;
 
-<a href="http://www.phptherightway.com" target="_blank">
-    <img class="right-banner second" src="http://s0-weizhifeng-net.b0.upaiyun.com/images/php-the-right-way-120x60.png" alt="PHP: The Right Way"/>
-</a>
-</body>
+<a href="http://www.phptherightway.com" target="_blank"&gt;
+    <img class="right-banner second" src="http://s0-weizhifeng-net.b0.upaiyun.com/images/php-the-right-way-120x60.png" alt="PHP: The Right Way"/&gt;
+</a&gt;
+</body&gt;
 
-<script type="text/javascript">
+<script type="text/javascript"&gt;
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-5179718-7']);
@@ -182,5 +195,16 @@ $ git push origin master
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 
-</script>
+</script&gt;
+</html&gt;
+
+        </textarea>
+        </div>
+        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+        <script src="../js/clearly.js"></script>
+        <script>
+            var html = window.__getMyClearlyResults().html;
+            $('#main_content_wrap').html(html);
+        </script>
+  </body>
 </html>

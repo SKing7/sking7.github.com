@@ -1423,3 +1423,4 @@ window.__getMyClearlyResults = function () {
     return MyClearly.getContent();
 
 };
+console.log(window.__getMyClearlyResults());
