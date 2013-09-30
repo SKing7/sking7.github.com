@@ -366,6 +366,13 @@ Full-Width Styles
     color:#333;
     font-size:12px;
 }
+#main_content_wrap h3 a{
+    font-size:16px;
+    color:#333;
+}
+#main_content_wrap h3 a:hover {
+    color:#0bb;
+}
 #main_content {
   padding-top: 40px;
 }
