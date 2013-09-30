@@ -366,6 +366,11 @@ Full-Width Styles
     color:#333;
     font-size:12px;
 }
+#main_content_wrap .time-label{
+    color:#979393;
+    margin-left:15px;
+    font-size:12px; 
+}
 #main_content_wrap h3 a{
     font-size:16px;
     color:#333;

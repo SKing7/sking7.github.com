@@ -382,4 +382,81 @@ _gaq.push(['_trackPageview']);
 <li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-26314">
 <div id="comment-26314">
 <p class="comment-metadata">
-<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 27-Feb-13 at 1:33 pm | <a href="http://www.stevesouders.com/blog/
+<strong><a href='http://stevesouders.com' rel='external nofollow' class='url'>Steve Souders</a></strong> | 27-Feb-13 at 1:33 pm | <a href="http://www.stevesouders.com/blog/2013/02/26/reloading-post-onload-resources/#comment-26314">Permalink</a> |  </p>
+
+
+<p>Eric: Hi! Thanks for the link. Most of the postonload resources that are NOT refetched are regular images and scripts &#8211; they are not XHRs. Is the IE10 change just for XHRs, or does it also apply to &#8220;items pulled down by JavaScript&#8221;? In my tests it appears this change doesn&#8217;t happen for regular images and scripts in IE10.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-40329">
+<div id="comment-40329">
+<p class="comment-metadata">
+<strong><a href='http://ninja.sg/' rel='external nofollow' class='url'>Sebastiaan Deckers</a></strong> | 23-Mar-13 at 7:55 pm | <a href="http://www.stevesouders.com/blog/2013/02/26/reloading-post-onload-resources/#comment-40329">Permalink</a> |  </p>
+
+
+<p>Why not just clear all current page assets from the browser cache on a Force-Reload?</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60005">
+<div id="comment-60005">
+<p class="comment-metadata">
+<strong><a href='http://braincracking.org' rel='external nofollow' class='url'>jpvincent</a></strong> | 18-Apr-13 at 9:08 am | <a href="http://www.stevesouders.com/blog/2013/02/26/reloading-post-onload-resources/#comment-60005">Permalink</a> |  </p>
+
+
+<p>hi Steve</p>
+<p>thanks for the research.</p>
+<p>At the time of writing this comment, your example seems to have a problem : the cache headers on the resources you are using is set to + 1 Month, because you are using this kind of URL :</p>
+<p><a href="http://www.stevesouders.com/bin/resource.cgi?type=js&#038;sleep=0&#038;expires=1&#038;n=5" rel="nofollow">http://www.stevesouders.com/bin/resource.cgi?type=js&#038;sleep=0&#038;expires=1&#038;n=5</a></p>
+<p>I copied back your code and tested with an expires=-1 and expires=0 . The results confirm your theory with expires = 0 but there is new stuff to get for the expires = -1 :</p>
+<p>- Chrome with expires 0 and document.location.reload() :<br />
+<a href="http://www.webpagetest.org/results.php?test=130418_GJ_a11707efcfa343cc5004b7723b413df9" rel="nofollow">http://www.webpagetest.org/results.php?test=130418_GJ_a11707efcfa343cc5004b7723b413df9</a></p>
+<p>in this configuration, no expires header is set, resources onload and post-onload are taken from the cache, as in your results</p>
+<p>- Chrome with expires -1 and document.location.reload() :</p>
+<p><a href="http://www.webpagetest.org/results.php?test=130418_S2_02fc87adbef561ce611bae44fee23504" rel="nofollow">http://www.webpagetest.org/results.php?test=130418_S2_02fc87adbef561ce611bae44fee23504</a></p>
+<p>here, expires header are set to 0 and expiration date is in the past. Chrome seems to react in a sane way (for the developer at least) and DOES NOT USE CACHE</p>
+<p>For reference the cache + 1 as in your current example, and works as expected : <a href="http://www.webpagetest.org/result/130418_CT_e20e850d48299321efd65e869e76004b/1/details/" rel="nofollow">http://www.webpagetest.org/result/130418_CT_e20e850d48299321efd65e869e76004b/1/details/</a></p>
+<p>I guess we should try to reproduce that with all the other browsers now and check if behaviour is same for all. Also I&#8217;m wondering how the lack of expire header is interpreted in this case for all browsers</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60006">
+<div id="comment-60006">
+<p class="comment-metadata">
+<strong><a href='http://braincracking.org' rel='external nofollow' class='url'>jpvincent</a></strong> | 19-Apr-13 at 3:05 am | <a href="http://www.stevesouders.com/blog/2013/02/26/reloading-post-onload-resources/#comment-60006">Permalink</a> |  </p>
+
+
+<p>Ok, did more tests using WPT to have my own table<br />
+<a href="https://docs.google.com/spreadsheet/ccc?key=0AirWN83fytRxdGpoS24tRXVKZzB0d01oWTcwWEMxT3c&#038;usp=sharing" rel="nofollow">https://docs.google.com/spreadsheet/ccc?key=0AirWN83fytRxdGpoS24tRXVKZzB0d01oWTcwWEMxT3c&#038;usp=sharing</a></p>
+<p>My goal was to answer to the question : are post-onload resources loaded from cache or not ?<br />
+the answers variy between browsers with no cache header or with cache headers set to + 1 month.<br />
+However, that looks consistent with those headers :<br />
+Expires: &#8221; &#8211; 1 month &#8221;<br />
+Cache-Control: public, max-age=0<br />
+no eTag or Last-Modified</p>
+<p>We should probably make more tests with eTag caching and so on.</p>
+</div>
+</li><!-- #comment-## -->
+			</ol>
+
+
+
+
+
+
+
+</div><!-- #comments -->
+
+
+</div> <!-- end div id="content" -->
+</div>
+<div id="footer" class="containerwrapperpadded">
+<p>&copy; Steve Souders</p>
+</div>
+</body>
+</html>
+
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+Page Caching using disk: enhanced
+Database Caching 11/32 queries in 1.338 seconds using disk
+
+ Served from: www.stevesouders.com @ 2013-09-30 00:33:54 by W3 Total Cache -->
