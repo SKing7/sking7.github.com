@@ -1,29 +1,14 @@
-<!DOCTYPE html>
 <html>
-
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    <title></title>
-  </head>
-  <body>
-        <!-- MAIN CONTENT -->
-        <div id="main_content_wrap" class="outer">
-        <textarea style="visibility:none" id="html-area">
-
-<!DOCTYPE html&gt;
-<html&gt;
-<head&gt;
-    <title&gt; 揭开 iOS 7 之 Multipath TCP 的面纱 | I'm TualatriX </title&gt;
-    <link rel="alternate" type="application/rss+xml" title="订阅 TualatriX Feed" href="http://feeds.feedburner.com/tualatrix" /&gt;
-    <link rel="pingback" href="http://imtx.me/xmlrpc/" /&gt;
-    <link rel="shortcut icon" type="image/ico" href="/static/img/favicon.ico" /&gt;
-    <meta name="google-site-verification" content="dQrNwIxyr9oBaxexqgzQKlenOC-d-7VmT_asQEizeJU" /&gt;
-    <link href="/static/css/imtx-style.c0a91332fa21.css" rel="stylesheet" type="text/css" media="screen" /&gt;
+<head>
+    <title> 揭开 iOS 7 之 Multipath TCP 的面纱 | I'm TualatriX </title>
+    <link rel="alternate" type="application/rss+xml" title="订阅 TualatriX Feed" href="http://feeds.feedburner.com/tualatrix" />
+    <link rel="pingback" href="http://imtx.me/xmlrpc/" />
+    <link rel="shortcut icon" type="image/ico" href="/static/img/favicon.ico" />
+    <meta name="google-site-verification" content="dQrNwIxyr9oBaxexqgzQKlenOC-d-7VmT_asQEizeJU" />
+    <link href="/static/css/imtx-style.c0a91332fa21.css" rel="stylesheet" type="text/css" media="screen" />
     
-    <meta name="keywords" content="iOS,Multipath-TCP"&gt;
-    <script type="text/javascript"&gt;
+    <meta name="keywords" content="iOS,Multipath-TCP" />
+    <script type="text/javascript">
 
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-503846-2']);
@@ -35,693 +20,686 @@
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
 
-    </script&gt;
-</head&gt;
+    </script>
+</head>
         
-<body&gt;
-    <div id="bgcontain"&gt; 
-        <div id="header"&gt;
-            <h1&gt;<a href="/"&gt;I'm TualatriX!</a&gt;</h1&gt;
-            <form action="/search/" method="GET"&gt;
-            <div&gt;
-                <input type="text" value="Search..." onfocus="if (value =='Search...'){value =''}" onblur="if (value ==''){value='Search...'}" name="s" id="s" /&gt;
-                <input type="image" id="searchsubmit" value="Search" src="/static/css/images/search.gif" /&gt;
-            </div&gt;
-            </form&gt;
-        </div&gt; 
+<body>
+    <div id="bgcontain"> 
+        <div id="header">
+            <h1><a href="/">I'm TualatriX!</a></h1>
+            <form action="/search/" method="GET">
+            <div>
+                <input type="text" value="Search..." onfocus="if (value =='Search...'){value =''}" onblur="if (value ==''){value='Search...'}" name="s" id="s" />
+                <input type="image" id="searchsubmit" value="Search" src="/static/css/images/search.gif" />
+            </div>
+            </form>
+        </div> 
 
-        <div id="menu"&gt;
+        <div id="menu">
         
 
-<ul&gt;
-<li class="current_page_item"&gt;<a href="/" title="Home"&gt;Home</a&gt;</li&gt;
+<ul>
+<li class="current_page_item"><a href="/" title="Home">Home</a></li>
 
 
-    <li class="page_item"&gt;<a href="/comments/" title="Comments"&gt;Comments</a&gt;</li&gt;
+    <li class="page_item"><a href="/comments/" title="Comments">Comments</a></li>
 
 
-	<li class="page_item"&gt;<a href="/project/" title="Projects"&gt;Projects</a&gt;</li&gt;
+	<li class="page_item"><a href="/project/" title="Projects">Projects</a></li>
 	
 
-	<li class="page_item"&gt;<a href="/event/" title="Event"&gt;Event</a&gt;</li&gt;
+	<li class="page_item"><a href="/event/" title="Event">Event</a></li>
 	
 
-	<li class="page_item"&gt;<a href="/about/" title="About"&gt;About</a&gt;</li&gt;
+	<li class="page_item"><a href="/about/" title="About">About</a></li>
 	
 
-<li id="pattern"&gt;</li&gt;
-</ul&gt;
+<li id="pattern"></li>
+</ul>
 
-        </div&gt;
-        <div class="contain"&gt;
-            <div id="content" class="narrowcolumn"&gt;
+        </div>
+        <div class="contain">
+            <div id="content" class="narrowcolumn">
                 
-    <div class="post" id="post-1852"&gt;
+    <div class="post" id="post-1852">
     
-<ul class="date"&gt;
-    <li class="day"&gt;21</li&gt;
-    <li class="month"&gt;Sep</li&gt;
-</ul&gt;
+<ul class="date">
+    <li class="day">21</li>
+    <li class="month">Sep</li>
+</ul>
 
-<ul class="title"&gt;
-    <li class="topic"&gt;<a href="/archives/1852.html" rel="bookmark" title="Permanent Link to 揭开 iOS 7 之 Multipath TCP 的面纱"&gt;揭开 iOS 7 之 Multipath TCP 的面纱</a&gt;</li&gt;
-    <li class="postmeta"&gt;Post by TualatriX at 2013 . Category: <a href="/archives/category/operation-system/"&gt;Operation System</a&gt;.  2271 Views. <a href="/archives/1852.html#comments"&gt;14 Comments </a&gt; </li&gt; </ul&gt;
+<ul class="title">
+    <li class="topic"><a href="/archives/1852.html" rel="bookmark" title="Permanent Link to 揭开 iOS 7 之 Multipath TCP 的面纱">揭开 iOS 7 之 Multipath TCP 的面纱</a></li>
+    <li class="postmeta">Post by TualatriX at 2013 . Category: <a href="/archives/category/operation-system/">Operation System</a>.  2314 Views. <a href="/archives/1852.html#comments">14 Comments </a> </li> </ul>
 
-    <div class="clear"&gt;</div&gt;
-    <div class="entry"&gt;
+    <div class="clear"></div>
+    <div class="entry">
         
         
-            <p&gt;看到中文圈似乎讨论 iOS 7 的这个特性的还不多，于是我稍微研究了一下这个「Mutlipath TCP」，写点心得。过程是这样的：</p&gt;
-<p&gt;
-            <p&gt;<span id="more-1852"&gt;</span&gt;</p&gt;
-            </p&gt;
-<p&gt;Olivier Bonaventure 通过&nbsp;Wireshark （一个网络数据包监控工具）发现了他升级了 iOS 7 的 iPad 在使用 Siri 的时候会建立 Mutlipath TCP 连接，由此断定 iOS 7 已经内置了 Mutlipath TCP 的支持。见《<a href="http://perso.uclouvain.be/olivier.bonaventure/blog/html/2013/09/18/mptcp.html"&gt;Apple seems to also believe in Multipath TCP</a&gt;》</p&gt;
-<p&gt;Mutlipath TCP，是一套基于当前 TCP/IP 协议的一个扩展，所谓扩展即是能兼容当前协议，又能带来不少新特性。那么 Multipath TCP 有什么特别之处呢？这里通过一个简单的例子来说明好了。</p&gt;
-<blockquote&gt;假如我手中的 iPhone 同时开启了 3G 和 WiFi 连接（大多数情况也是这样），这个时候我通过 App Store 更新一个 100M 的软件。按照以往的情况，App Store 的软件更新是会优先通过 WiFi 进行的，3G 在此刻是闲置状态。</blockquote&gt;
-<blockquote&gt;但是在 Multipath TCP 的支援下，尽管只通过 App Store 更新一个软件，建立起了一个网络连接，但是它却可以同时利用 3G 和 WiFi 建立 Mutlpath 连接，通过多点优化网络下载，且互为备份。</blockquote&gt;
-<blockquote&gt;假如这个时候 WiFi 断了，以前的情况是，App Store 更新中断，需要人工干预恢复或重新下载。而在 Mutlipath TCP 的优化下，只要 3G 没断，App Store 就能继续更新下载。除非 3G 也断了，才宣告此次连接失败。</blockquote&gt;
-<p&gt;总之，在 Multipath TCP 的支持下，终端设备可以同时利用多个网络设备达到优化网络连接速度、稳定性，一个网络的中断也不会影响全局，大大增强了设备的可移动性和连接可靠性。而在服务端，特别是数据中心层面，则可以利用 Multipath TCP 利用多个网络设置来大大增强网络的吞吐量。</p&gt;
-<p&gt;可以说，Multipath TCP 就是 Internet 的未来。</p&gt;
-<p&gt;那么，Multipath TCP 现在的发展状况如何呢？这可是一个大项目，研究并努力了5年，直到在2013年初才正式制定完成，不过很快相关的实现和利用都来了：</p&gt;
-<ul&gt;
-<li&gt;Linux 内核已经有了一个单独实现的 Multipath TCP 0.87，基于Linux 3.10，只是一个实验分支，不知道什么时候才会合并到主干；</li&gt;
-<li&gt;iOS 7 是首个正式采用 Multipath TCP 的商用操作系统，在这里可以看到，Apple 拥抱和利用新技术是多么的迅速。另外 iPhone 5s 的 A7 64 位芯片也算是一项。</li&gt;
-</ul&gt;
-<p&gt;Multipath TCP 是可以预见的接下来 Internet 进化的一个新方向，虽然普通用户不会感受到它带来和变化，但是整个网络系统将在它的支援下更好地利用资源、更大的吞吐量以及带来更棒的可靠性。</p&gt;
-<p&gt;参考：</p&gt;
-<ul&gt;
-<li&gt;在 Linux 上演示如何使用 Multipah TCP 带来吞吐量的大大提升：<a href="http://multipath-tcp.org/pmwiki.php?n=Main.50Gbps"&gt;http://multipath-tcp.org/pmwiki.php?n=Main.50Gbps</a&gt;</li&gt;
-<li&gt;在 Linux 桌面上演示 Multipath TCP 带来多设备利用带来的网络连接可靠和持续性：<a href="http://www.youtube.com/watch?v=VWN0ctPi5cw"&gt;http://www.youtube.com/watch?v=VWN0ctPi5cw</a&gt;</li&gt;
-<li&gt;更多可见：<a href="http://multipath-tcp.org"&gt;http://multipath-tcp.org</a&gt;</li&gt;
-</ul&gt;
+            <p>看到中文圈似乎讨论 iOS 7 的这个特性的还不多，于是我稍微研究了一下这个「Mutlipath TCP」，写点心得。过程是这样的：</p>
+<p>
+            </p><p><span id="more-1852"></span></p>
+            <p></p>
+<p>Olivier Bonaventure 通过&nbsp;Wireshark （一个网络数据包监控工具）发现了他升级了 iOS 7 的 iPad 在使用 Siri 的时候会建立 Mutlipath TCP 连接，由此断定 iOS 7 已经内置了 Mutlipath TCP 的支持。见《<a href="http://perso.uclouvain.be/olivier.bonaventure/blog/html/2013/09/18/mptcp.html">Apple seems to also believe in Multipath TCP</a>》</p>
+<p>Mutlipath TCP，是一套基于当前 TCP/IP 协议的一个扩展，所谓扩展即是能兼容当前协议，又能带来不少新特性。那么 Multipath TCP 有什么特别之处呢？这里通过一个简单的例子来说明好了。</p>
+<blockquote>假如我手中的 iPhone 同时开启了 3G 和 WiFi 连接（大多数情况也是这样），这个时候我通过 App Store 更新一个 100M 的软件。按照以往的情况，App Store 的软件更新是会优先通过 WiFi 进行的，3G 在此刻是闲置状态。</blockquote>
+<blockquote>但是在 Multipath TCP 的支援下，尽管只通过 App Store 更新一个软件，建立起了一个网络连接，但是它却可以同时利用 3G 和 WiFi 建立 Mutlpath 连接，通过多点优化网络下载，且互为备份。</blockquote>
+<blockquote>假如这个时候 WiFi 断了，以前的情况是，App Store 更新中断，需要人工干预恢复或重新下载。而在 Mutlipath TCP 的优化下，只要 3G 没断，App Store 就能继续更新下载。除非 3G 也断了，才宣告此次连接失败。</blockquote>
+<p>总之，在 Multipath TCP 的支持下，终端设备可以同时利用多个网络设备达到优化网络连接速度、稳定性，一个网络的中断也不会影响全局，大大增强了设备的可移动性和连接可靠性。而在服务端，特别是数据中心层面，则可以利用 Multipath TCP 利用多个网络设置来大大增强网络的吞吐量。</p>
+<p>可以说，Multipath TCP 就是 Internet 的未来。</p>
+<p>那么，Multipath TCP 现在的发展状况如何呢？这可是一个大项目，研究并努力了5年，直到在2013年初才正式制定完成，不过很快相关的实现和利用都来了：</p>
+<ul>
+<li>Linux 内核已经有了一个单独实现的 Multipath TCP 0.87，基于Linux 3.10，只是一个实验分支，不知道什么时候才会合并到主干；</li>
+<li>iOS 7 是首个正式采用 Multipath TCP 的商用操作系统，在这里可以看到，Apple 拥抱和利用新技术是多么的迅速。另外 iPhone 5s 的 A7 64 位芯片也算是一项。</li>
+</ul>
+<p>Multipath TCP 是可以预见的接下来 Internet 进化的一个新方向，虽然普通用户不会感受到它带来和变化，但是整个网络系统将在它的支援下更好地利用资源、更大的吞吐量以及带来更棒的可靠性。</p>
+<p>参考：</p>
+<ul>
+<li>在 Linux 上演示如何使用 Multipah TCP 带来吞吐量的大大提升：<a href="http://multipath-tcp.org/pmwiki.php?n=Main.50Gbps">http://multipath-tcp.org/pmwiki.php?n=Main.50Gbps</a></li>
+<li>在 Linux 桌面上演示 Multipath TCP 带来多设备利用带来的网络连接可靠和持续性：<a href="http://www.youtube.com/watch?v=VWN0ctPi5cw">http://www.youtube.com/watch?v=VWN0ctPi5cw</a></li>
+<li>更多可见：<a href="http://multipath-tcp.org">http://multipath-tcp.org</a></li>
+</ul>
         
         
 
-        <p&gt;
+        <p>
         
-        <div id="tags"&gt;Tag: <a href="/tag/iOS/"&gt;iOS</a&gt;, <a href="/tag/Multipath-TCP/"&gt;Multipath-TCP</a&gt;. </div&gt;
+        <div id="tags">Tag: <a href="/tag/iOS/">iOS</a>, <a href="/tag/Multipath-TCP/">Multipath-TCP</a>. </div>
         
-        </p&gt;
-        <p class="meta"&gt; 
+        </p>
+        <p class="meta"> 
         
-        <small&gt; &raquo; <a href="#comments"&gt;You can leave a comment.</a&gt;</small&gt;
+        <small> » <a href="#comments">You can leave a comment.</a></small>
         
-        </p&gt;
-    </div&gt;
-</div&gt;
+        </p>
+    </div>
+</div>
     
     
 
 
 
 
-	<h3&gt;1 Pingbacks</h3&gt;
-	<div class="b-pingback"&gt;
+	<h3>1 Pingbacks</h3>
+	<div class="b-pingback">
 	
-			<li class="b-meta"&gt;
-            <a href="/archives/1852.html#pingback-552"&gt;</a&gt;Sep 22, 2013: <a name="pingback-552" href="http://www.codenong.com/214.html" class="b-permlink"&gt;
-揭开 iOS 7 之 Multipath TCP 的面纱 &amp;#8211; 码农们的博客</a&gt;
-			</li&gt;
+			<li class="b-meta">
+            <a href="/archives/1852.html#pingback-552"></a>Sep 22, 2013: <a name="pingback-552" href="http://www.codenong.com/214.html" class="b-permlink">
+揭开 iOS 7 之 Multipath TCP 的面纱 &amp;#8211; 码农们的博客</a>
+			</li>
 	
-	</div&gt;
+	</div>
 
 
     
     
 
 
-<h3 id="comments"&gt;14 Comments</h3&gt;
+<h3 id="comments">14 Comments</h3>
 
-<ol class="commentlist"&gt;
-<li class="comment even thread-even depth-1" id="comment-32395"&gt;
-<div id="div-comment-32395"&gt;<div class="comment-author vcard"&gt;Jason</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32395"&gt;2013 September 22, 10:47</a&gt;</div&gt;
-<p&gt;<p&gt;&quot;互为备份&quot;是指在有wifi的情况下3g也要跑流量么？</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32395#respond" onclick='return addComment.moveForm("div-comment-32395", "32395", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+<ol class="commentlist">
+<li class="comment even thread-even depth-1" id="comment-32395">
+<div id="div-comment-32395"><div class="comment-author vcard">Jason</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32395">2013 September 22, 10:47</a></div>
+<p></p><p>"互为备份"是指在有wifi的情况下3g也要跑流量么？</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32395#respond" onclick="return addComment.moveForm(&quot;div-comment-32395&quot;, &quot;32395&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-<ul class="children"&gt;
-<li class="comment odd depth-2" id="comment-32397"&gt;
-<div id="div-comment-32397"&gt;<div class="comment-author vcard"&gt;<cite&gt;<a href="http://imtx.me/" rel="external nofollow"&gt;TualatriX</a&gt;</cite&gt;</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32397"&gt;2013 September 22, 10:56</a&gt;</div&gt;
-<p&gt;<p&gt;是的，如果这个时候WiFi信号不好，丢包，就会由3G来顶替</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32397#respond" onclick='return addComment.moveForm("div-comment-32397", "32397", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+<ul class="children">
+<li class="comment odd depth-2" id="comment-32397">
+<div id="div-comment-32397"><div class="comment-author vcard"><cite><a href="http://imtx.me/" rel="external nofollow">TualatriX</a></cite></div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32397">2013 September 22, 10:56</a></div>
+<p></p><p>是的，如果这个时候WiFi信号不好，丢包，就会由3G来顶替</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32397#respond" onclick="return addComment.moveForm(&quot;div-comment-32397&quot;, &quot;32397&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-</ul&gt;
-</li&gt;
-<li class="comment odd thread-odd depth-1" id="comment-32396"&gt;
-<div id="div-comment-32396"&gt;<div class="comment-author vcard"&gt;benno</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32396"&gt;2013 September 22, 10:52</a&gt;</div&gt;
-<p&gt;<p&gt;3g更新app 伤不起 不适合中国的网络资费<br /&gt;</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32396#respond" onclick='return addComment.moveForm("div-comment-32396", "32396", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+</ul>
+</li>
+<li class="comment odd thread-odd depth-1" id="comment-32396">
+<div id="div-comment-32396"><div class="comment-author vcard">benno</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32396">2013 September 22, 10:52</a></div>
+<p></p><p>3g更新app 伤不起 不适合中国的网络资费<br /></p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32396#respond" onclick="return addComment.moveForm(&quot;div-comment-32396&quot;, &quot;32396&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment even thread-even depth-1" id="comment-32398"&gt;
-<div id="div-comment-32398"&gt;<div class="comment-author vcard"&gt;<cite&gt;<a href="http://www.zuola.com/weblog/" rel="external nofollow"&gt;Zola</a&gt;</cite&gt;</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32398"&gt;2013 September 22, 10:58</a&gt;</div&gt;
-<p&gt;<p&gt;Mutlipath TCP好东西啊,有了Mutlipath TCP双网关路由器就真正能发挥作用了</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32398#respond" onclick='return addComment.moveForm("div-comment-32398", "32398", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment even thread-even depth-1" id="comment-32398">
+<div id="div-comment-32398"><div class="comment-author vcard"><cite><a href="http://www.zuola.com/weblog/" rel="external nofollow">Zola</a></cite></div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32398">2013 September 22, 10:58</a></div>
+<p></p><p>Mutlipath TCP好东西啊,有了Mutlipath TCP双网关路由器就真正能发挥作用了</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32398#respond" onclick="return addComment.moveForm(&quot;div-comment-32398&quot;, &quot;32398&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment odd thread-odd depth-1" id="comment-32399"&gt;
-<div id="div-comment-32399"&gt;<div class="comment-author vcard"&gt;spin6lock</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32399"&gt;2013 September 22, 11:06</a&gt;</div&gt;
-<p&gt;<p&gt;比较期待mac os有这个功能，可以用以太网网卡和wifi融合上网</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32399#respond" onclick='return addComment.moveForm("div-comment-32399", "32399", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment odd thread-odd depth-1" id="comment-32399">
+<div id="div-comment-32399"><div class="comment-author vcard">spin6lock</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32399">2013 September 22, 11:06</a></div>
+<p></p><p>比较期待mac os有这个功能，可以用以太网网卡和wifi融合上网</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32399#respond" onclick="return addComment.moveForm(&quot;div-comment-32399&quot;, &quot;32399&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment even thread-even depth-1" id="comment-32401"&gt;
-<div id="div-comment-32401"&gt;<div class="comment-author vcard"&gt;<cite&gt;<a href="http://www.makemusic-asia.com/" rel="external nofollow"&gt;walkerxk</a&gt;</cite&gt;</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32401"&gt;2013 September 22, 12:27</a&gt;</div&gt;
-<p&gt;<p&gt;这个只是一个技术，并没有规定wifi的时候必须跑3G，看系统和应用怎么处理了，比如网页的话可以打开，但是电影的话就关闭算了，或者这个可以用在多个wifi的情况下，也可以加速。<br /&gt;就算没上MCTCP，没wifi的时候，蜂窝数据也会顶上的，你可以设置里面选择有wifi的时候不使用蜂窝的，或者网页才使用蜂窝数据。<br /&gt;其实就算是wifi也不一定是免费的，比如运营商的wifi就是走流量或者时间的，这个android考虑比较周到，可以设置哪些wifi是移动热点，这样可以限制下载。</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32401#respond" onclick='return addComment.moveForm("div-comment-32401", "32401", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment even thread-even depth-1" id="comment-32401">
+<div id="div-comment-32401"><div class="comment-author vcard"><cite><a href="http://www.makemusic-asia.com/" rel="external nofollow">walkerxk</a></cite></div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32401">2013 September 22, 12:27</a></div>
+<p></p><p>这个只是一个技术，并没有规定wifi的时候必须跑3G，看系统和应用怎么处理了，比如网页的话可以打开，但是电影的话就关闭算了，或者这个可以用在多个wifi的情况下，也可以加速。<br />就算没上MCTCP，没wifi的时候，蜂窝数据也会顶上的，你可以设置里面选择有wifi的时候不使用蜂窝的，或者网页才使用蜂窝数据。<br />其实就算是wifi也不一定是免费的，比如运营商的wifi就是走流量或者时间的，这个android考虑比较周到，可以设置哪些wifi是移动热点，这样可以限制下载。</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32401#respond" onclick="return addComment.moveForm(&quot;div-comment-32401&quot;, &quot;32401&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment odd thread-odd depth-1" id="comment-32402"&gt;
-<div id="div-comment-32402"&gt;<div class="comment-author vcard"&gt;fai</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32402"&gt;2013 September 22, 12:47</a&gt;</div&gt;
-<p&gt;<p&gt;可以說apple用新東西, 另一個說法就是用未成熟的技術... <br /&gt;如果是android 先用, 一定會被說成未成熟就用.</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32402#respond" onclick='return addComment.moveForm("div-comment-32402", "32402", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment odd thread-odd depth-1" id="comment-32402">
+<div id="div-comment-32402"><div class="comment-author vcard">fai</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32402">2013 September 22, 12:47</a></div>
+<p></p><p>可以說apple用新東西, 另一個說法就是用未成熟的技術... <br />如果是android 先用, 一定會被說成未成熟就用.</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32402#respond" onclick="return addComment.moveForm(&quot;div-comment-32402&quot;, &quot;32402&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment even thread-even depth-1" id="comment-32403"&gt;
-<div id="div-comment-32403"&gt;<div class="comment-author vcard"&gt;<cite&gt;<a href="http://lilydjwg.is-programmer.com/" rel="external nofollow"&gt;依云</a&gt;</cite&gt;</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32403"&gt;2013 September 22, 13:48</a&gt;</div&gt;
-<p&gt;<p&gt;感觉像 SCTP 的部分特性被移植到 TCP 了。</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32403#respond" onclick='return addComment.moveForm("div-comment-32403", "32403", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment even thread-even depth-1" id="comment-32403">
+<div id="div-comment-32403"><div class="comment-author vcard"><cite><a href="http://lilydjwg.is-programmer.com/" rel="external nofollow">依云</a></cite></div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32403">2013 September 22, 13:48</a></div>
+<p></p><p>感觉像 SCTP 的部分特性被移植到 TCP 了。</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32403#respond" onclick="return addComment.moveForm(&quot;div-comment-32403&quot;, &quot;32403&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment odd thread-odd depth-1" id="comment-32404"&gt;
-<div id="div-comment-32404"&gt;<div class="comment-author vcard"&gt;<cite&gt;<a href="http://www.weaoo.com/cn_shanghai/shanghai.html" rel="external nofollow"&gt;上海天气预报</a&gt;</cite&gt;</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32404"&gt;2013 September 22, 16:29</a&gt;</div&gt;
-<p&gt;<p&gt;期待</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32404#respond" onclick='return addComment.moveForm("div-comment-32404", "32404", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment odd thread-odd depth-1" id="comment-32404">
+<div id="div-comment-32404"><div class="comment-author vcard"><cite><a href="http://www.weaoo.com/cn_shanghai/shanghai.html" rel="external nofollow">上海天气预报</a></cite></div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32404">2013 September 22, 16:29</a></div>
+<p></p><p>期待</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32404#respond" onclick="return addComment.moveForm(&quot;div-comment-32404&quot;, &quot;32404&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment even thread-even depth-1" id="comment-32405"&gt;
-<div id="div-comment-32405"&gt;<div class="comment-author vcard"&gt;<cite&gt;<a href="http://maclove.me/" rel="external nofollow"&gt;LV</a&gt;</cite&gt;</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32405"&gt;2013 September 22, 17:30</a&gt;</div&gt;
-<p&gt;<p&gt;今后看一下，流量使用有没有因为mutipath技术和增加的趋势！</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32405#respond" onclick='return addComment.moveForm("div-comment-32405", "32405", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment even thread-even depth-1" id="comment-32405">
+<div id="div-comment-32405"><div class="comment-author vcard"><cite><a href="http://maclove.me/" rel="external nofollow">LV</a></cite></div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32405">2013 September 22, 17:30</a></div>
+<p></p><p>今后看一下，流量使用有没有因为mutipath技术和增加的趋势！</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32405#respond" onclick="return addComment.moveForm(&quot;div-comment-32405&quot;, &quot;32405&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment odd thread-odd depth-1" id="comment-32408"&gt;
-<div id="div-comment-32408"&gt;<div class="comment-author vcard"&gt;burn</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32408"&gt;2013 September 23, 11:05</a&gt;</div&gt;
-<p&gt;<p&gt;话说名字是TCP，那UDP能用吗？去看看去</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32408#respond" onclick='return addComment.moveForm("div-comment-32408", "32408", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment odd thread-odd depth-1" id="comment-32408">
+<div id="div-comment-32408"><div class="comment-author vcard">burn</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32408">2013 September 23, 11:05</a></div>
+<p></p><p>话说名字是TCP，那UDP能用吗？去看看去</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32408#respond" onclick="return addComment.moveForm(&quot;div-comment-32408&quot;, &quot;32408&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment even thread-even depth-1" id="comment-32411"&gt;
-<div id="div-comment-32411"&gt;<div class="comment-author vcard"&gt;gary.guo</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32411"&gt;2013 September 23, 13:30</a&gt;</div&gt;
-<p&gt;<p&gt;长见识了，第一次听说 Mutlipath TCP</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32411#respond" onclick='return addComment.moveForm("div-comment-32411", "32411", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment even thread-even depth-1" id="comment-32411">
+<div id="div-comment-32411"><div class="comment-author vcard">gary.guo</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32411">2013 September 23, 13:30</a></div>
+<p></p><p>长见识了，第一次听说 Mutlipath TCP</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32411#respond" onclick="return addComment.moveForm(&quot;div-comment-32411&quot;, &quot;32411&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment odd thread-odd depth-1" id="comment-32415"&gt;
-<div id="div-comment-32415"&gt;<div class="comment-author vcard"&gt;chris.zhang</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32415"&gt;2013 September 24, 21:40</a&gt;</div&gt;
-<p&gt;<p&gt;记得在iOS5下，同时开着3G+WIFI下载APP，这时出门买菜，没有WIFI了，3G会完成APP下载的</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32415#respond" onclick='return addComment.moveForm("div-comment-32415", "32415", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment odd thread-odd depth-1" id="comment-32415">
+<div id="div-comment-32415"><div class="comment-author vcard">chris.zhang</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32415">2013 September 24, 21:40</a></div>
+<p></p><p>记得在iOS5下，同时开着3G+WIFI下载APP，这时出门买菜，没有WIFI了，3G会完成APP下载的</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32415#respond" onclick="return addComment.moveForm(&quot;div-comment-32415&quot;, &quot;32415&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-<li class="comment even thread-even depth-1" id="comment-32416"&gt;
-<div id="div-comment-32416"&gt;<div class="comment-author vcard"&gt;tkiller</div&gt;
-<div class="comment-meta commentmetadata"&gt;<a href="/archives/1852.html#comment-32416"&gt;2013 September 25, 16:36</a&gt;</div&gt;
-<p&gt;<p&gt;呵呵，要是3g流量大幅度超标你的套餐，就等着老老实实的掏钱吧！<br /&gt;对于懂的人来说这是一件不好不坏的事情，对于广大的不懂ios的装ber来说，这绝对是噩梦的功能，掏钱必须的，老外那里是无限流量，此功能根本就适用于天朝，小白慎用！！！</p&gt;</p&gt;
-<div class="reply"&gt;<a rel="nofollow" href="/archives/1852.html#comment-32416#respond" onclick='return addComment.moveForm("div-comment-32416", "32416", "respond")'&gt;Reply</a&gt;</div&gt;</div&gt;
+</li>
+<li class="comment even thread-even depth-1" id="comment-32416">
+<div id="div-comment-32416"><div class="comment-author vcard">tkiller</div>
+<div class="comment-meta commentmetadata"><a href="/archives/1852.html#comment-32416">2013 September 25, 16:36</a></div>
+<p></p><p>呵呵，要是3g流量大幅度超标你的套餐，就等着老老实实的掏钱吧！<br />对于懂的人来说这是一件不好不坏的事情，对于广大的不懂ios的装ber来说，这绝对是噩梦的功能，掏钱必须的，老外那里是无限流量，此功能根本就适用于天朝，小白慎用！！！</p><p></p>
+<div class="reply"><a rel="nofollow" href="/archives/1852.html#comment-32416#respond" onclick="return addComment.moveForm(&quot;div-comment-32416&quot;, &quot;32416&quot;, &quot;respond&quot;)">Reply</a></div></div>
 
-</li&gt;
-</ol&gt;
+</li>
+</ol>
 
-<div id="respond"&gt;
-<h3&gt;Leave a Comment</h3&gt;
-<div class="cancel-comment-reply"&gt;
-<small&gt;<a rel="nofollow" id="cancel-comment-reply-link" href="#respond" style="display:none;"&gt;Click here to cancel reply.</a&gt;</small&gt;
-</div&gt;
-<form style="display: block;" action="/" method="GET" id="commentform" ext="fuckoffspammer/" onsubmit="this.method='post';this.action='/comment'+['/', '1', 3][0]+this.getAttribute('ext')"&gt;<div style='display:none'&gt;<input type='hidden' name='csrfmiddlewaretoken' value='FQQC0H58Yf7ECntFZtUcuGw5BqM9u18V' /&gt;</div&gt;
+<div id="respond">
+<h3>Leave a Comment</h3>
+<div class="cancel-comment-reply">
+<small><a rel="nofollow" id="cancel-comment-reply-link" href="#respond" style="display:none;">Click here to cancel reply.</a></small>
+</div>
+<form style="display: block;" action="/" method="GET" id="commentform" ext="fuckoffspammer/" onsubmit="this.method='post';this.action='/comment'+['/', '1', 3][0]+this.getAttribute('ext')"><div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="MZ0j7RoTeAUZfiusjzwzWS4YnsEdUqq4" /></div>
     
-        <p&gt;<input id="id_name" type="text" name="name" maxlength="50" /&gt;
-        <label for="author"&gt;<small&gt;Name (required)</small&gt;</label&gt;</p&gt;
-        <div id="result"&gt;</div&gt;
+        <p><input type="text" id="id_name" name="name" maxlength="50" />
+        <label for="author"><small>Name (required)</small></label></p>
+        <div id="result"></div>
 
-        <p&gt;<input type="text" name="email" id="id_email" /&gt;
-        <label for="email"&gt;<small&gt;Mail (will not be published) (required)</small&gt;</label&gt;</p&gt;
+        <p><input type="text" name="email" id="id_email" />
+        <label for="email"><small>Mail (will not be published) (required)</small></label></p>
 
 
-        <p&gt;<input type="text" name="url" id="id_url" /&gt;
-        <label for="url"&gt;<small&gt;Website</small&gt;</label&gt;</p&gt;
-
-    
-
-    <p&gt;
-    <textarea id="id_content" rows="10" cols="40" name="content"&gt;</textarea&gt;
-    <input type="hidden" name="content_type" value="blog.post" id="id_content_type" /&gt;
-    <input type="hidden" name="object_pk" value="1852" id="id_object_pk" /&gt;
-    <input type="hidden" name="timestamp" value="1380534155" id="id_timestamp" /&gt;
-    <input type="hidden" name="security_hash" value="b58516a704b5a72de5cf5c0c4022194ee35a7f8b" id="id_security_hash" /&gt;
-    <input type="hidden" name="parent_id" value="0" id="id_parent_id" /&gt;
-    </p&gt;
-
-    
-    <p&gt;<input type="checkbox" name="mail_notify" id="id_mail_notify" /&gt;
-        <label for="url"&gt;<small&gt;Email me when someone replied</small&gt;</label&gt;</p&gt;
-    
-
-    <p&gt;<input name="submit" type="image" src="/static/css/images/submit.png" id="submit" value="Submit Comment" /&gt;
-    <input type="hidden" name="object_id" value="1852" /&gt;</p&gt;
-</form&gt;
-</div&gt;
+        <p><input type="text" name="url" id="id_url" />
+        <label for="url"><small>Website</small></label></p>
 
     
 
-            </div&gt;
+    <p>
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+    <input type="hidden" name="content_type" value="blog.post" id="id_content_type" />
+    <input type="hidden" name="object_pk" value="1852" id="id_object_pk" />
+    <input type="hidden" name="timestamp" value="1380592232" id="id_timestamp" />
+    <input type="hidden" name="security_hash" value="9096d81b72fd05131dcfdbebc99524a92b7c29c4" id="id_security_hash" />
+    <input type="hidden" name="parent_id" value="0" id="id_parent_id" />
+    </p>
+
     
-<div id="sidebar"&gt;
-  <ul&gt;
-    <li&gt;
-      <h2&gt;Wechat</h2&gt;
-      <p align="center"&gt;<img width="129px" height="129px" src="/static/img/imtx-qrcode.4bd575d9b8c8.jpg" alt="imtx-qrcode"/&gt;</p&gt;
-    </li&gt;
-    <li&gt;
-      <h2&gt;Recent Posts</h2&gt;
+    <p><input type="checkbox" name="mail_notify" id="id_mail_notify" />
+        <label for="url"><small>Email me when someone replied</small></label></p>
+    
+
+    <p><input type="image" name="submit" src="/static/css/images/submit.png" id="submit" value="Submit Comment" />
+    <input type="hidden" name="object_id" value="1852" /></p>
+</form>
+</div>
+
+    
+
+            </div>
+    
+<div id="sidebar">
+  <ul>
+    <li>
+      <h2>Wechat</h2>
+      <p align="center"><img width="129px" height="129px" src="/static/img/imtx-qrcode.4bd575d9b8c8.jpg" alt="imtx-qrcode" /></p>
+    </li>
+    <li>
+      <h2>Recent Posts</h2>
       
-<ul&gt;
+<ul>
 	
-	<li&gt;<a href="/archives/1852.html"&gt;揭开 iOS 7 之 Multipath TCP 的面纱</a&gt;</li&gt;
+	<li><a href="/archives/1852.html">揭开 iOS 7 之 Multipath TCP 的面纱</a></li>
 	
-	<li&gt;<a href="/archives/1851.html"&gt;iOS 7初体验</a&gt;</li&gt;
+	<li><a href="/archives/1851.html">iOS 7初体验</a></li>
 	
-	<li&gt;<a href="/archives/1850.html"&gt;How to compare version strings easily in Python and Objective-C</a&gt;</li&gt;
+	<li><a href="/archives/1850.html">How to compare version strings easily in Python and Objective-C</a></li>
 	
-	<li&gt;<a href="/archives/1848.html"&gt;Manico 1.1正式发布：新增任务管理模式</a&gt;</li&gt;
+	<li><a href="/archives/1848.html">Manico 1.1正式发布：新增任务管理模式</a></li>
 	
-	<li&gt;<a href="/archives/1846.html"&gt;家乡通100M光纤了</a&gt;</li&gt;
+	<li><a href="/archives/1846.html">家乡通100M光纤了</a></li>
 	
-	<li&gt;<a href="/archives/1845.html"&gt;Cocoa App开发之多国语言的调式</a&gt;</li&gt;
+	<li><a href="/archives/1845.html">Cocoa App开发之多国语言的调式</a></li>
 	
-	<li&gt;<a href="/archives/1844.html"&gt;独立开发者的第一周有感</a&gt;</li&gt;
+	<li><a href="/archives/1844.html">独立开发者的第一周有感</a></li>
 	
-	<li&gt;<a href="/archives/1842.html"&gt;写在Manico 1.0正式发布后</a&gt;</li&gt;
+	<li><a href="/archives/1842.html">写在Manico 1.0正式发布后</a></li>
 	
-	<li&gt;<a href="/archives/1840.html"&gt;真实体验杭州的数字交通</a&gt;</li&gt;
+	<li><a href="/archives/1840.html">真实体验杭州的数字交通</a></li>
 	
-	<li&gt;<a href="/archives/1839.html"&gt;离职后的近况</a&gt;</li&gt;
+	<li><a href="/archives/1839.html">离职后的近况</a></li>
 	
-	<li&gt;<a href="/archives/1835.html"&gt;用手机点菜的时代悄然来临…</a&gt;</li&gt;
+	<li><a href="/archives/1835.html">用手机点菜的时代悄然来临…</a></li>
 	
-	<li&gt;<a href="/archives/1833.html"&gt;OS X Mavericks DP1体验（三）：去材质化</a&gt;</li&gt;
+	<li><a href="/archives/1833.html">OS X Mavericks DP1体验（三）：去材质化</a></li>
 	
-	<li&gt;<a href="/archives/1832.html"&gt;在北京的最后18天</a&gt;</li&gt;
+	<li><a href="/archives/1832.html">在北京的最后18天</a></li>
 	
-	<li&gt;<a href="/archives/1831.html"&gt;OS X Mavericks DP1体验（二）：Responsiveness</a&gt;</li&gt;
+	<li><a href="/archives/1831.html">OS X Mavericks DP1体验（二）：Responsiveness</a></li>
 	
-	<li&gt;<a href="/archives/1830.html"&gt;OS X Mavericks DP1体验（一）：Compressed Memory</a&gt;</li&gt;
+	<li><a href="/archives/1830.html">OS X Mavericks DP1体验（一）：Compressed Memory</a></li>
 	
-</ul&gt;
+</ul>
 
 
-    </li&gt;
+    </li>
 
-    <li&gt;
-      <h2&gt;Recent Comments</h2&gt;
+    <li>
+      <h2>Recent Comments</h2>
       
-<ul&gt;
+<ul>
 	
-	<li&gt;<a href="/archives/1851.html#comment-32420"&gt;鲜活</a&gt;:  ios7貌似被很多人鄙视了</li&gt;
+	<li><a href="/archives/1851.html#comment-32420">鲜活</a>:  ios7貌似被很多人鄙视了</li>
 	
-	<li&gt;<a href="/archives/1362.html#comment-32419"&gt;鲜活</a&gt;:  vps要经得起折腾</li&gt;
+	<li><a href="/archives/1362.html#comment-32419">鲜活</a>:  vps要经得起折腾</li>
 	
-	<li&gt;<a href="/archives/1842.html#comment-32418"&gt;tkiller</a&gt;:  支持，将来的mac及其相关应用是个热门，可以坚持，培养用户群，获取开发经验，同时还可以收点辛苦费补贴，非常好，支持大牛！！！</li&gt;
+	<li><a href="/archives/1842.html#comment-32418">tkiller</a>:  支持，将来的mac及其相关应用是个热门，可以坚持，培养用户群，获取开发经验，同时还可以收点辛苦费补贴，非常好，支持大牛！！！</li>
 	
-	<li&gt;<a href="/archives/1846.html#comment-32417"&gt;tkiller</a&gt;:  主干都慢，国际出口慢了一个数量级不止，国内几十ms，但在国际出口的路由器延迟是直接大了10倍，不知道是GFW所为还是故意人为延迟；
+	<li><a href="/archives/1846.html#comment-32417">tkiller</a>:  主干都慢，国际出口慢了一个数量级不止，国内几十ms，但在国际出口的路由器延迟是直接大了10倍，不知道是GFW所为还是故意人为延迟；
 还有，虽然是100m可以开通，但有很多地方没改造的能装吗？
 先普及10M光纤才是根本王道，一般人的网络需求10M基本满足了，关键价格要降下来，160一个月，辛苦一个月才拿有多钱？？？网费跟国民收入严重脱节！！！
-日本的ftth 100m也就一顿普通饭钱！！！</li&gt;
+日本的ftth 100m也就一顿普通饭钱！！！</li>
 	
-	<li&gt;<a href="/archives/1852.html#comment-32416"&gt;tkiller</a&gt;:  呵呵，要是3g流量大幅度超标你的套餐，就等着老老实实的掏钱吧！
-对于懂的人来说这是一件不好不坏的事情，对于广大的不懂ios的装ber来说，这绝对是噩梦的功能，掏钱必须的，老外那里是无限流量，此功能根本就适用于天朝，小白慎用！！！</li&gt;
+	<li><a href="/archives/1852.html#comment-32416">tkiller</a>:  呵呵，要是3g流量大幅度超标你的套餐，就等着老老实实的掏钱吧！
+对于懂的人来说这是一件不好不坏的事情，对于广大的不懂ios的装ber来说，这绝对是噩梦的功能，掏钱必须的，老外那里是无限流量，此功能根本就适用于天朝，小白慎用！！！</li>
 	
-	<li&gt;<a href="/archives/1852.html#comment-32415"&gt;chris.zhang</a&gt;:  记得在iOS5下，同时开着3G+WIFI下载APP，这时出门买菜，没有WIFI了，3G会完成APP下载的</li&gt;
+	<li><a href="/archives/1852.html#comment-32415">chris.zhang</a>:  记得在iOS5下，同时开着3G+WIFI下载APP，这时出门买菜，没有WIFI了，3G会完成APP下载的</li>
 	
-	<li&gt;<a href="/archives/1852.html#comment-32411"&gt;gary.guo</a&gt;:  长见识了，第一次听说 Mutlipath TCP</li&gt;
+	<li><a href="/archives/1852.html#comment-32411">gary.guo</a>:  长见识了，第一次听说 Mutlipath TCP</li>
 	
-	<li&gt;<a href="/archives/1851.html#comment-32410"&gt;TualatriX</a&gt;:  很少，感觉和用iOS 6一样。</li&gt;
+	<li><a href="/archives/1851.html#comment-32410">TualatriX</a>:  很少，感觉和用iOS 6一样。</li>
 	
-	<li&gt;<a href="/archives/1851.html#comment-32409"&gt;TualatriX</a&gt;:  没有，基本都很流畅。</li&gt;
+	<li><a href="/archives/1851.html#comment-32409">TualatriX</a>:  没有，基本都很流畅。</li>
 	
-	<li&gt;<a href="/archives/1852.html#comment-32408"&gt;burn</a&gt;:  话说名字是TCP，那UDP能用吗？去看看去</li&gt;
+	<li><a href="/archives/1852.html#comment-32408">burn</a>:  话说名字是TCP，那UDP能用吗？去看看去</li>
 	
-	<li&gt;<a href="/archives/1851.html#comment-32407"&gt;sangshuduo</a&gt;:  有卡顿的现象吗？</li&gt;
+	<li><a href="/archives/1851.html#comment-32407">sangshuduo</a>:  有卡顿的现象吗？</li>
 	
-	<li&gt;<a href="/archives/1851.html#comment-32406"&gt;Louis Han</a&gt;:  看起来4S更新7之后不会被拖慢吧</li&gt;
+	<li><a href="/archives/1851.html#comment-32406">Louis Han</a>:  看起来4S更新7之后不会被拖慢吧</li>
 	
-	<li&gt;<a href="/archives/1852.html#comment-32405"&gt;LV</a&gt;:  今后看一下，流量使用有没有因为mutipath技术和增加的趋势！</li&gt;
+	<li><a href="/archives/1852.html#comment-32405">LV</a>:  今后看一下，流量使用有没有因为mutipath技术和增加的趋势！</li>
 	
-	<li&gt;<a href="/archives/1852.html#comment-32404"&gt;上海天气预报</a&gt;:  期待</li&gt;
+	<li><a href="/archives/1852.html#comment-32404">上海天气预报</a>:  期待</li>
 	
-	<li&gt;<a href="/archives/1852.html#comment-32403"&gt;依云</a&gt;:  感觉像 SCTP 的部分特性被移植到 TCP 了。</li&gt;
+	<li><a href="/archives/1852.html#comment-32403">依云</a>:  感觉像 SCTP 的部分特性被移植到 TCP 了。</li>
 	
-</ul&gt;
+</ul>
 
 
-    </li&gt;
+    </li>
 
-    <li&gt;
-      <h2&gt;Recent Pingbacks</h2&gt;
+    <li>
+      <h2>Recent Pingbacks</h2>
       
-<ul&gt;
+<ul>
 	
-	<li&gt;<a href="/archives/1852.html#pingback-552"&gt;
-揭开 iOS 7 之 Multipath TCP 的面纱 &amp;#8211; 码农们的博客</a&gt;</li&gt;
+	<li><a href="/archives/1852.html#pingback-552">
+揭开 iOS 7 之 Multipath TCP 的面纱 &amp;#8211; 码农们的博客</a></li>
 	
-	<li&gt;<a href="/archives/1825.html#pingback-551"&gt;Ubuntu Tweak 0.8.5发布 | IMCN</a&gt;</li&gt;
+	<li><a href="/archives/1825.html#pingback-551">Ubuntu Tweak 0.8.5发布 | IMCN</a></li>
 	
-	<li&gt;<a href="/archives/1630.html#pingback-550"&gt;细数Unity的好与坏（二）：近乎完美的Indicator | IMCN</a&gt;</li&gt;
+	<li><a href="/archives/1630.html#pingback-550">细数Unity的好与坏（二）：近乎完美的Indicator | IMCN</a></li>
 	
-	<li&gt;<a href="/archives/1702.html#pingback-549"&gt;Ubuntu 12.04 配置指南 - Linux - 开发者第1004984个问答</a&gt;</li&gt;
+	<li><a href="/archives/1702.html#pingback-549">Ubuntu 12.04 配置指南 - Linux - 开发者第1004984个问答</a></li>
 	
-	<li&gt;<a href="/archives/1714.html#pingback-548"&gt;Ubuntu 12.04 配置指南 - Linux - 开发者第1004984个问答</a&gt;</li&gt;
+	<li><a href="/archives/1714.html#pingback-548">Ubuntu 12.04 配置指南 - Linux - 开发者第1004984个问答</a></li>
 	
-	<li&gt;<a href="/archives/1848.html#pingback-547"&gt;发现未知的惊喜 &amp;#8211; Playout &amp;laquo; 24Says</a&gt;</li&gt;
+	<li><a href="/archives/1848.html#pingback-547">发现未知的惊喜 &amp;#8211; Playout &amp;laquo; 24Says</a></li>
 	
-	<li&gt;<a href="/archives/1831.html#pingback-546"&gt;   Odin略評MacBook Air、Time Capsule、Mavericks | Tablet HK &amp;#8211; 平板天下</a&gt;</li&gt;
+	<li><a href="/archives/1831.html#pingback-546">   Odin略評MacBook Air、Time Capsule、Mavericks | Tablet HK &amp;#8211; 平板天下</a></li>
 	
-	<li&gt;<a href="/archives/1830.html#pingback-545"&gt;Definite Digest &amp;raquo; OS X Mavericks DP1体验（二）：Responsiveness</a&gt;</li&gt;
+	<li><a href="/archives/1830.html#pingback-545">Definite Digest &amp;raquo; OS X Mavericks DP1体验（二）：Responsiveness</a></li>
 	
-	<li&gt;<a href="/archives/1830.html#pingback-544"&gt;OS X Mavericks DP1体验（二）：Responsiveness | 天天三国杀</a&gt;</li&gt;
+	<li><a href="/archives/1830.html#pingback-544">OS X Mavericks DP1体验（二）：Responsiveness | 天天三国杀</a></li>
 	
-	<li&gt;<a href="/archives/1479.html#pingback-543"&gt;重新认识Ubuntu Unity（上）：Unity之降临 | ubuntu啦</a&gt;</li&gt;
+	<li><a href="/archives/1479.html#pingback-543">重新认识Ubuntu Unity（上）：Unity之降临 | ubuntu啦</a></li>
 	
-	<li&gt;<a href="/archives/1825.html#pingback-542"&gt;Ubuntu Tweak 0.8.5 发布 - 淡水博客</a&gt;</li&gt;
+	<li><a href="/archives/1825.html#pingback-542">Ubuntu Tweak 0.8.5 发布 - 淡水博客</a></li>
 	
-	<li&gt;<a href="/archives/1825.html#pingback-541"&gt;Ubuntu Tweak 0.8.5 发布 | 岸边科技资讯网</a&gt;</li&gt;
+	<li><a href="/archives/1825.html#pingback-541">Ubuntu Tweak 0.8.5 发布 | 岸边科技资讯网</a></li>
 	
-	<li&gt;<a href="/archives/1825.html#pingback-540"&gt;  Ubuntu Tweak 0.8.5 发布</a&gt;</li&gt;
+	<li><a href="/archives/1825.html#pingback-540">  Ubuntu Tweak 0.8.5 发布</a></li>
 	
-	<li&gt;<a href="/archives/1825.html#pingback-539"&gt;  Ubuntu Tweak 0.8.5 发布</a&gt;</li&gt;
+	<li><a href="/archives/1825.html#pingback-539">  Ubuntu Tweak 0.8.5 发布</a></li>
 	
-	<li&gt;<a href="/archives/1825.html#pingback-538"&gt;Ubuntu Tweak 0.8.5 发布_Linux伊甸园开源社区-24小时滚动更新开源资讯，全年无休！ | laohanlinux</a&gt;</li&gt;
+	<li><a href="/archives/1825.html#pingback-538">Ubuntu Tweak 0.8.5 发布_Linux伊甸园开源社区-24小时滚动更新开源资讯，全年无休！ | laohanlinux</a></li>
 	
-</ul&gt;
+</ul>
 
 
-    </li&gt;
+    </li>
 
-    <li&gt;
-      <h2&gt;Links</h2&gt;
+    <li>
+      <h2>Links</h2>
       
-<ul&gt;
+<ul>
 	
-    <li&gt;<a href="http://shawnjiang.com/" title="NZ Living"&gt;Shawn</a&gt;</li&gt;
+    <li><a href="http://shawnjiang.com/" title="NZ Living">Shawn</a></li>
 	
-    <li&gt;<a href="http://www.alexgao.com/" title=""&gt;Alex’s Station</a&gt;</li&gt;
+    <li><a href="http://www.alexgao.com/" title="">Alex’s Station</a></li>
 	
-    <li&gt;<a href="http://imxie.net/" title="杭州人，在宁波。"&gt;I am rem1x！</a&gt;</li&gt;
+    <li><a href="http://imxie.net/" title="杭州人，在宁波。">I am rem1x！</a></li>
 	
-    <li&gt;<a href="http://www.seebit.org/" title="海边拾贝"&gt;Fird</a&gt;</li&gt;
+    <li><a href="http://www.seebit.org/" title="海边拾贝">Fird</a></li>
 	
-    <li&gt;<a href="http://latteye.com/" title=""&gt;latteye</a&gt;</li&gt;
+    <li><a href="http://latteye.com/" title="">latteye</a></li>
 	
-    <li&gt;<a href="http://imkeke.net/" title="Keke!"&gt;keke</a&gt;</li&gt;
+    <li><a href="http://imkeke.net/" title="Keke!">keke</a></li>
 	
-    <li&gt;<a href="http://www.oceanboo.cn" title=""&gt;OceanBoo</a&gt;</li&gt;
+    <li><a href="http://www.oceanboo.cn" title="">OceanBoo</a></li>
 	
-    <li&gt;<a href="http://luy.li/" title="骨头～"&gt;bones7456</a&gt;</li&gt;
+    <li><a href="http://luy.li/" title="骨头～">bones7456</a></li>
 	
-    <li&gt;<a href="http://www.imchao.net/" title="杭州的朋友"&gt;吼吼在这</a&gt;</li&gt;
+    <li><a href="http://www.imchao.net/" title="杭州的朋友">吼吼在这</a></li>
 	
-    <li&gt;<a href="http://www.brucebot.com/" title="Yong Qian"&gt;于仁颇黎@机器人</a&gt;</li&gt;
+    <li><a href="http://www.brucebot.com/" title="Yong Qian">于仁颇黎@机器人</a></li>
 	
-    <li&gt;<a href="http://huacnlee.com/" title=" "&gt;Jason Lee</a&gt;</li&gt;
+    <li><a href="http://huacnlee.com/" title=" ">Jason Lee</a></li>
 	
-    <li&gt;<a href="http://greghe.yo2.cn/" title=""&gt;Greg&#39;s Blog</a&gt;</li&gt;
+    <li><a href="http://greghe.yo2.cn/" title="">Greg's Blog</a></li>
 	
-    <li&gt;<a href="http://www.lixiaoyong.net/blog/" title=""&gt;To Be A Brave One</a&gt;</li&gt;
+    <li><a href="http://www.lixiaoyong.net/blog/" title="">To Be A Brave One</a></li>
 	
-    <li&gt;<a href="http://blog.imalbert.com/" title="albert!"&gt;I&#39;m Albert748</a&gt;</li&gt;
+    <li><a href="http://blog.imalbert.com/" title="albert!">I'm Albert748</a></li>
 	
-    <li&gt;<a href="http://www.hicrokee.com/" title="Hicro Kee&#39; Otaku"&gt;Hicro Kee</a&gt;</li&gt;
+    <li><a href="http://www.hicrokee.com/" title="Hicro Kee' Otaku">Hicro Kee</a></li>
 	
-    <li&gt;<a href="http://www.lerosua.org/" title="阳光烂灿的日子"&gt;Lerosua</a&gt;</li&gt;
+    <li><a href="http://www.lerosua.org/" title="阳光烂灿的日子">Lerosua</a></li>
 	
-    <li&gt;<a href="http://shellex.info/" title="超牛的Hacker &amp;&amp; Geek!"&gt;ShelleX同学</a&gt;</li&gt;
+    <li><a href="http://shellex.info/" title="超牛的Hacker &amp;&amp; Geek!">ShelleX同学</a></li>
 	
-    <li&gt;<a href="http://www.kissuki.com/" title="K.I.S.S. - Keep It Simple, Stupid!"&gt;Iven</a&gt;</li&gt;
+    <li><a href="http://www.kissuki.com/" title="K.I.S.S. - Keep It Simple, Stupid!">Iven</a></li>
 	
-    <li&gt;<a href="http://www.liangsuilong.info/" title="一个热爱地球的广州大学生"&gt;若有所思&amp;&amp;若有所想 </a&gt;</li&gt;
+    <li><a href="http://www.liangsuilong.info/" title="一个热爱地球的广州大学生">若有所思&amp;&amp;若有所想 </a></li>
 	
-    <li&gt;<a href="http://lfeng.cn/" title="冷水怎么能泡面呢！"&gt;冷水泡面</a&gt;</li&gt;
+    <li><a href="http://lfeng.cn/" title="冷水怎么能泡面呢！">冷水泡面</a></li>
 	
-    <li&gt;<a href="http://imkevin.me/" title="我的正在读高中的徒弟"&gt;I&#39;m Kevin</a&gt;</li&gt;
+    <li><a href="http://imkevin.me/" title="我的正在读高中的徒弟">I'm Kevin</a></li>
 	
-    <li&gt;<a href="http://www.linuxrock.com/" title="非常有前途的高中小伙！"&gt;Linux Rock</a&gt;</li&gt;
+    <li><a href="http://www.linuxrock.com/" title="非常有前途的高中小伙！">Linux Rock</a></li>
 	
-    <li&gt;<a href="http://www.imbanum.net/" title="牛B哄哄的前端设计师！"&gt;I&#39;m banum</a&gt;</li&gt;
+    <li><a href="http://www.imbanum.net/" title="牛B哄哄的前端设计师！">I'm banum</a></li>
 	
-    <li&gt;<a href="http://roclinux.cn/" title="体会linux，体会一种生活方式。"&gt;Linux大棚</a&gt;</li&gt;
+    <li><a href="http://roclinux.cn/" title="体会linux，体会一种生活方式。">Linux大棚</a></li>
 	
-    <li&gt;<a href="http://www.imv0m.com/" title="imv0m"&gt;Time Machine</a&gt;</li&gt;
+    <li><a href="http://www.imv0m.com/" title="imv0m">Time Machine</a></li>
 	
-    <li&gt;<a href="http://pengjiayou.com/" title="嘉佑中文博客"&gt;彭嘉佑</a&gt;</li&gt;
+    <li><a href="http://pengjiayou.com/" title="嘉佑中文博客">彭嘉佑</a></li>
 	
-    <li&gt;<a href="http://jeonkwan.posterous.com/" title="蜘蛛人"&gt;Jeonkwan</a&gt;</li&gt;
+    <li><a href="http://jeonkwan.posterous.com/" title="蜘蛛人">Jeonkwan</a></li>
 	
-    <li&gt;<a href="http://www.ibentu.org/" title="愛笨兔"&gt;iBentu</a&gt;</li&gt;
+    <li><a href="http://www.ibentu.org/" title="愛笨兔">iBentu</a></li>
 	
-</ul&gt;
+</ul>
 
 
-    </li&gt;
+    </li>
 
-    <li&gt;
-      <h2&gt;Categories</h2&gt;
+    <li>
+      <h2>Categories</h2>
       
-<ul&gt;
+<ul>
 	
-    <li&gt;<a href="/archives/category/applications/"&gt;Applications</a&gt; (95)</li&gt;
+    <li><a href="/archives/category/applications/">Applications</a> (95)</li>
 	
-    <li&gt;<a href="/archives/category/desktop-develop/"&gt;Desktop Develop</a&gt; (184)</li&gt;
+    <li><a href="/archives/category/desktop-develop/">Desktop Develop</a> (184)</li>
 	
-    <li&gt;<a href="/archives/category/digital/"&gt;Digital</a&gt; (17)</li&gt;
+    <li><a href="/archives/category/digital/">Digital</a> (17)</li>
 	
-    <li&gt;<a href="/archives/category/event/"&gt;Event</a&gt; (37)</li&gt;
+    <li><a href="/archives/category/event/">Event</a> (37)</li>
 	
-    <li&gt;<a href="/archives/category/graphic-design-typography/"&gt;Graphic Design &amp; Typography</a&gt; (0)</li&gt;
+    <li><a href="/archives/category/graphic-design-typography/">Graphic Design &amp; Typography</a> (0)</li>
 	
-    <li&gt;<a href="/archives/category/life/"&gt;Life</a&gt; (204)</li&gt;
+    <li><a href="/archives/category/life/">Life</a> (204)</li>
 	
-    <li&gt;<a href="/archives/category/mobile/"&gt;Mobile</a&gt; (37)</li&gt;
+    <li><a href="/archives/category/mobile/">Mobile</a> (37)</li>
 	
-    <li&gt;<a href="/archives/category/news/"&gt;News</a&gt; (26)</li&gt;
+    <li><a href="/archives/category/news/">News</a> (26)</li>
 	
-    <li&gt;<a href="/archives/category/operation-system/"&gt;Operation System</a&gt; (164)</li&gt;
+    <li><a href="/archives/category/operation-system/">Operation System</a> (164)</li>
 	
-    <li&gt;<a href="/archives/category/photography/"&gt;Photography</a&gt; (24)</li&gt;
+    <li><a href="/archives/category/photography/">Photography</a> (24)</li>
 	
-    <li&gt;<a href="/archives/category/programing/"&gt;Programing</a&gt; (35)</li&gt;
+    <li><a href="/archives/category/programing/">Programing</a> (35)</li>
 	
-    <li&gt;<a href="/archives/category/web-develop/"&gt;Web Develop</a&gt; (101)</li&gt;
+    <li><a href="/archives/category/web-develop/">Web Develop</a> (101)</li>
 	
-</ul&gt;
+</ul>
 
 
-    </li&gt;
+    </li>
 
-    <li&gt;
-    <h2&gt;Archive</h2&gt;
+    <li>
+    <h2>Archive</h2>
       
-<ul&gt;
+<ul>
 	
-	<li&gt;<a href="/archives/2013/09/"&gt;September 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/09/">September 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/08/"&gt;August 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/08/">August 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/07/"&gt;July 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/07/">July 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/06/"&gt;June 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/06/">June 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/05/"&gt;May 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/05/">May 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/04/"&gt;April 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/04/">April 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/03/"&gt;March 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/03/">March 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/02/"&gt;February 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/02/">February 2013</a></li>
 	
-	<li&gt;<a href="/archives/2013/01/"&gt;January 2013</a&gt;</li&gt;
+	<li><a href="/archives/2013/01/">January 2013</a></li>
 	
-	<li&gt;<a href="/archives/2012/12/"&gt;December 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/12/">December 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/11/"&gt;November 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/11/">November 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/10/"&gt;October 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/10/">October 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/09/"&gt;September 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/09/">September 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/08/"&gt;August 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/08/">August 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/07/"&gt;July 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/07/">July 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/06/"&gt;June 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/06/">June 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/05/"&gt;May 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/05/">May 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/04/"&gt;April 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/04/">April 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/03/"&gt;March 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/03/">March 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/02/"&gt;February 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/02/">February 2012</a></li>
 	
-	<li&gt;<a href="/archives/2012/01/"&gt;January 2012</a&gt;</li&gt;
+	<li><a href="/archives/2012/01/">January 2012</a></li>
 	
-	<li&gt;<a href="/archives/2011/12/"&gt;December 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/12/">December 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/11/"&gt;November 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/11/">November 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/10/"&gt;October 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/10/">October 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/09/"&gt;September 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/09/">September 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/08/"&gt;August 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/08/">August 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/07/"&gt;July 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/07/">July 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/06/"&gt;June 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/06/">June 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/05/"&gt;May 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/05/">May 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/04/"&gt;April 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/04/">April 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/03/"&gt;March 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/03/">March 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/02/"&gt;February 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/02/">February 2011</a></li>
 	
-	<li&gt;<a href="/archives/2011/01/"&gt;January 2011</a&gt;</li&gt;
+	<li><a href="/archives/2011/01/">January 2011</a></li>
 	
-	<li&gt;<a href="/archives/2010/12/"&gt;December 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/12/">December 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/11/"&gt;November 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/11/">November 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/10/"&gt;October 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/10/">October 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/09/"&gt;September 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/09/">September 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/08/"&gt;August 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/08/">August 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/07/"&gt;July 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/07/">July 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/06/"&gt;June 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/06/">June 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/05/"&gt;May 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/05/">May 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/04/"&gt;April 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/04/">April 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/03/"&gt;March 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/03/">March 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/02/"&gt;February 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/02/">February 2010</a></li>
 	
-	<li&gt;<a href="/archives/2010/01/"&gt;January 2010</a&gt;</li&gt;
+	<li><a href="/archives/2010/01/">January 2010</a></li>
 	
-	<li&gt;<a href="/archives/2009/12/"&gt;December 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/12/">December 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/11/"&gt;November 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/11/">November 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/10/"&gt;October 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/10/">October 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/09/"&gt;September 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/09/">September 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/08/"&gt;August 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/08/">August 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/07/"&gt;July 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/07/">July 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/06/"&gt;June 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/06/">June 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/05/"&gt;May 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/05/">May 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/04/"&gt;April 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/04/">April 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/03/"&gt;March 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/03/">March 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/02/"&gt;February 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/02/">February 2009</a></li>
 	
-	<li&gt;<a href="/archives/2009/01/"&gt;January 2009</a&gt;</li&gt;
+	<li><a href="/archives/2009/01/">January 2009</a></li>
 	
-	<li&gt;<a href="/archives/2008/12/"&gt;December 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/12/">December 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/11/"&gt;November 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/11/">November 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/10/"&gt;October 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/10/">October 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/09/"&gt;September 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/09/">September 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/08/"&gt;August 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/08/">August 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/07/"&gt;July 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/07/">July 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/06/"&gt;June 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/06/">June 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/05/"&gt;May 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/05/">May 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/04/"&gt;April 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/04/">April 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/03/"&gt;March 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/03/">March 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/02/"&gt;February 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/02/">February 2008</a></li>
 	
-	<li&gt;<a href="/archives/2008/01/"&gt;January 2008</a&gt;</li&gt;
+	<li><a href="/archives/2008/01/">January 2008</a></li>
 	
-	<li&gt;<a href="/archives/2007/12/"&gt;December 2007</a&gt;</li&gt;
+	<li><a href="/archives/2007/12/">December 2007</a></li>
 	
-	<li&gt;<a href="/archives/2007/11/"&gt;November 2007</a&gt;</li&gt;
+	<li><a href="/archives/2007/11/">November 2007</a></li>
 	
-	<li&gt;<a href="/archives/2007/10/"&gt;October 2007</a&gt;</li&gt;
+	<li><a href="/archives/2007/10/">October 2007</a></li>
 	
-	<li&gt;<a href="/archives/2007/09/"&gt;September 2007</a&gt;</li&gt;
+	<li><a href="/archives/2007/09/">September 2007</a></li>
 	
-	<li&gt;<a href="/archives/2007/08/"&gt;August 2007</a&gt;</li&gt;
+	<li><a href="/archives/2007/08/">August 2007</a></li>
 	
-	<li&gt;<a href="/archives/2007/07/"&gt;July 2007</a&gt;</li&gt;
+	<li><a href="/archives/2007/07/">July 2007</a></li>
 	
-	<li&gt;<a href="/archives/2007/06/"&gt;June 2007</a&gt;</li&gt;
+	<li><a href="/archives/2007/06/">June 2007</a></li>
 	
-</ul&gt;
+</ul>
 
 
-    </li&gt;
+    </li>
 
-    <li&gt;
-      <h2&gt;Admin</h2&gt;
-      <ul&gt;
+    <li>
+      <h2>Admin</h2>
+      <ul>
         
-        <li&gt;<a href="/admin/"&gt;Login</a&gt;</li&gt;
+        <li><a href="/admin/">Login</a></li>
         
         
-      </ul&gt;
-    </li&gt;
-  </ul&gt;
-</div&gt;
+      </ul>
+    </li>
+  </ul>
+</div>
 
-        </div&gt;
-        <hr /&gt;
-        <div id="footer"&gt;
-            <p&gt;
-            Powered by <a href="http://www.djangoproject.org/" rel="external"&gt;Django</a&gt; and <a href="http://imtx.me" title="It's TualatriX's Website."&gt;TualatriX</a&gt;, Theme designed By <a href="http://www.hoofei.com/"&gt;Hoofei</a&gt;
-            </p&gt;
-        </div&gt;
-    </div&gt;
-    <script   type="text/javascript" src="/static/js/imtx.ba6d3cca696a.js" charset="utf-8"&gt;</script&gt;
-</body&gt;
-</html&gt;
-
-        </textarea>
         </div>
-        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-        <script src="../js/clearly.js"></script>
-        <script>
-            var html = window.__getMyClearlyResults().html;
-            $('#main_content_wrap').html(html);
-        </script>
-  </body>
+        <hr />
+        <div id="footer">
+            <p>
+            Powered by <a href="http://www.djangoproject.org/" rel="external">Django</a> and <a href="http://imtx.me" title="It's TualatriX's Website.">TualatriX</a>, Theme designed By <a href="http://www.hoofei.com/">Hoofei</a>
+            </p>
+        </div>
+    </div>
+    <script type="text/javascript" src="/static/js/imtx.ba6d3cca696a.js" charset="utf-8"></script>
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>var html = window.__getMyClearlyResults().html;$("html").html(html);$("html").show()</script>
+</div></body>
 </html>

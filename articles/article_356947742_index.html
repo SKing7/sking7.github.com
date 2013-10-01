@@ -1,49 +1,35 @@
-<!DOCTYPE html>
 <html>
-
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    <title></title>
-  </head>
-  <body>
-        <!-- MAIN CONTENT -->
-        <div id="main_content_wrap" class="outer">
-        <textarea style="visibility:none" id="html-area">
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
-<html xmlns="http://www.w3.org/1999/xhtml"&gt;
-<head&gt;
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /&gt;
-<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile"&gt;
-<title&gt;Moving beyond window.onload() | High Performance Web Sites</title&gt;
-<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" /&gt;
-<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites &raquo; Moving beyond window.onload() Comments Feed" href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/feed/" /&gt;
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" /&gt;
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /&gt; 
-<link rel='prev' title='How fast are we going now?' href='http://www.stevesouders.com/blog/2013/05/09/how-fast-are-we-going-now/' /&gt;
-<link rel='next' title='Creating a Performance Culture' href='http://www.stevesouders.com/blog/2013/05/17/creating-a-performance-culture/' /&gt;
-<meta name="generator" content="WordPress 3.6.1" /&gt;
-<link rel='canonical' href='http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/' /&gt;
-<link rel='shortlink' href='http://www.stevesouders.com/blog/?p=3604' /&gt;
-<script type="text/javascript"&gt;
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile" />
+<title>Moving beyond window.onload() | High Performance Web Sites</title>
+<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" />
+<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites » Moving beyond window.onload() Comments Feed" href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /> 
+<link rel="prev" title="How fast are we going now?" href="http://www.stevesouders.com/blog/2013/05/09/how-fast-are-we-going-now/" />
+<link rel="next" title="Creating a Performance Culture" href="http://www.stevesouders.com/blog/2013/05/17/creating-a-performance-culture/" />
+<meta name="generator" content="WordPress 3.6.1" />
+<link rel="canonical" href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/" />
+<link rel="shortlink" href="http://www.stevesouders.com/blog/?p=3604" />
+<script type="text/javascript">
 	window._wp_rp_static_base_url = 'http://dtmvdvtzf8rz0.cloudfront.net/static/';
 	window._wp_rp_wp_ajax_url = "http://www.stevesouders.com/blog/wp-admin/admin-ajax.php";
 	window._wp_rp_plugin_version = '2.6';
 	window._wp_rp_post_id = '3604';
 	window._wp_rp_num_rel_posts = '5';
-</script&gt;
+</script>
 
-<script&gt;
+<script>
 (function(d, s) {
 	var js = d.getElementsByTagName(s)[0],
 		ln = d.createElement(s);
 	ln.src = '//lognormal.net/boomerang/8fa4fc2785a82fae20c596ca4f45d1b218a9ab12ffef741d09b29532';
 	js.parentNode.insertBefore(ln, js);
 })(document, 'script');
-</script&gt;
+</script>
 
-<script type="text/javascript"&gt;
+<script type="text/javascript">
 // GOOGLE ANALYTICS
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-15026169-1']);
@@ -55,276 +41,263 @@ _gaq.push(['_trackPageview']);
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
-</script&gt;
-</head&gt;
+</script>
+</head>
 
-<body&gt;
-<div id="header"&gt;
-	<div class="containerwrapper"&gt;
-  		<h1 id="logo"&gt;<a href="http://stevesouders.com/"&gt;<span&gt;SteveSouders.com</span&gt;</a&gt;</h1&gt;
-        <ul id="topnav"&gt;
-        <li&gt;<a href="http://stevesouders.com/about.php"&gt;about</a&gt;</li&gt;
-        <li&gt;<a href="http://stevesouders.com/contact.php"&gt;contact</a&gt;</li&gt;
-        <li class="last"&gt; <a href="http://twitter.com/#!/souders/"&gt;<img src="/images/twitter-icon.png" width=16 height=16 border=0 style="vertical-align: bottom;"&gt;</a&gt;
-        </ul&gt;
-	</div&gt;    
-</div&gt;
-<div id="contentWrapper" class="containerwrapper"&gt;
-<div id="sidebar"&gt;
-<div id="search-3" class="widget widget_search"&gt;<form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/"&gt;
-				<div&gt;
-					<label class="screen-reader-text" for="s"&gt;Search for:</label&gt;
-					<input type="text" value="" name="s" id="s" /&gt;
-					<input type="submit" id="searchsubmit" value="Search" /&gt;
-				</div&gt;
-			</form&gt;</div&gt;<div id="custom-recent-posts-3" class="widget custom-recent-posts"&gt;<h3 class="blockheader"&gt;Most Recent Posts</h3&gt;		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;"&gt;
-        		<li&gt;<a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark"&gt;Domain Sharding revisited</a&gt;</li&gt;
-				<li&gt;<a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-future/" rel="bookmark"&gt;Web performance for the future</a&gt;</li&gt;
-				<li&gt;<a href="http://www.stevesouders.com/blog/2013/07/16/activetable-bookmarklet/" rel="bookmark"&gt;ActiveTable bookmarklet</a&gt;</li&gt;
-				<li&gt;<a href="http://www.stevesouders.com/blog/2013/07/15/twitter-widget-update/" rel="bookmark"&gt;Twitter widget update</a&gt;</li&gt;
-				<li&gt;<a href="http://www.stevesouders.com/blog/2013/06/16/browser-busy-indicators/" rel="bookmark"&gt;Browser Busy Indicators</a&gt;</li&gt;
-				</ul&gt;
-		<a href="http://www.stevesouders.com/blog/archives/"&gt;View Archive</a&gt;</div&gt;<div id="text-3" class="widget widget_text"&gt;<h3 class="blockheader"&gt;Feeds</h3&gt;			<div class="textwidget"&gt;<a href="http://www.stevesouders.com/blog/feed/"&gt;<img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /&gt; </a&gt;<a href="http://www.stevesouders.com/blog/feed/"&gt;Posts</a&gt;<br /&gt;
-<a href="http://www.stevesouders.com/blog/comments/feed/"&gt;<img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /&gt; </a&gt;<a href="http://www.stevesouders.com/blog/comments/feed/"&gt;Comments</a&gt;</li&gt;</div&gt;
-		</div&gt;        
-</div&gt;<div id="content"&gt;
+<body>
+<div id="header">
+	<div class="containerwrapper">
+  		<h1 id="logo"><a href="http://stevesouders.com/"><span>SteveSouders.com</span></a></h1>
+        <ul id="topnav">
+        <li><a href="http://stevesouders.com/about.php">about</a></li>
+        <li><a href="http://stevesouders.com/contact.php">contact</a></li>
+        <li class="last"> <a href="http://twitter.com/#!/souders/"><img src="/images/twitter-icon.png" width="16" height="16" border="0" style="vertical-align: bottom;" /></a>
+        </li></ul>
+	</div>    
+</div>
+<div id="contentWrapper" class="containerwrapper">
+<div id="sidebar">
+<div id="search-3" class="widget widget_search"><form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/">
+				<div>
+					<label class="screen-reader-text" for="s">Search for:</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="Search" />
+				</div>
+			</form></div><div id="custom-recent-posts-3" class="widget custom-recent-posts"><h3 class="blockheader">Most Recent Posts</h3>		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;">
+        		<li><a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark">Domain Sharding revisited</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-future/" rel="bookmark">Web performance for the future</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/07/16/activetable-bookmarklet/" rel="bookmark">ActiveTable bookmarklet</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/07/15/twitter-widget-update/" rel="bookmark">Twitter widget update</a></li>
+				<li><a href="http://www.stevesouders.com/blog/2013/06/16/browser-busy-indicators/" rel="bookmark">Browser Busy Indicators</a></li>
+				</ul>
+		<a href="http://www.stevesouders.com/blog/archives/">View Archive</a></div><div id="text-3" class="widget widget_text"><h3 class="blockheader">Feeds</h3>			<div class="textwidget"><a href="http://www.stevesouders.com/blog/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/feed/">Posts</a><br />
+<a href="http://www.stevesouders.com/blog/comments/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/comments/feed/">Comments</a></div>
+		</div>        
+</div><div id="content">
 
 
 
-		<div id="post-3604" class="post-3604 post type-post status-publish format-standard hentry category-performance category-tools category-web-development tag-aft tag-onload tag-rendering tag-speed-index tag-webpagetest"&gt;
-        	            	<h1&gt;Moving beyond window.onload()</h1&gt;
+		<div id="post-3604" class="post-3604 post type-post status-publish format-standard hentry category-performance category-tools category-web-development tag-aft tag-onload tag-rendering tag-speed-index tag-webpagetest">
+        	            	<h1>Moving beyond window.onload()</h1>
             
-			<p class="meta"&gt;May 13, 2013 9:13 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comments" title="Comment on Moving beyond window.onload()"&gt;11 Comments</a&gt;</p&gt;<!-- .entry-meta --&gt;
+			<p class="meta">May 13, 2013 9:13 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comments" title="Comment on Moving beyond window.onload()">11 Comments</a></p><!-- .entry-meta -->
 
-			<p&gt;[Originally posted in the <a href="http://calendar.perfplanet.com/2012/moving-beyond-window-onload/"&gt;2012 Performance Calendar</a&gt;. Reposting here for folks who missed it.]</p&gt;
-<p&gt;There’s an elephant in the room that we’ve been ignoring for years:</p&gt;
-<p style="padding-left: 30px;"&gt;<em&gt;window.onload is not the best metric for measuring website speed</em&gt;</p&gt;
-<p&gt;We haven’t actually been “ignoring” this issue. We’ve acknowledged it, but we haven’t coordinated our efforts to come up with a better replacement. Let’s do that now.</p&gt;
-<h2&gt;window.onload is so Web 1.0</h2&gt;
-<p&gt;What we’re after is a metric that captures the user’s <em&gt;perception</em&gt; of when the page is ready. Unfortunately, <code&gt;perception.ready()</code&gt; isn’t on any browser’s roadmap. So we need to find a metric that is a good proxy.</p&gt;
-<p&gt;Ten years ago, <code&gt;window.onload</code&gt; was a good proxy for the user’s perception of when the page was ready. Back then, pages were mostly HTML and images. JavaScript, CSS, DHTML, and Ajax were less common, as were the delays and blocked rendering they introduce. It wasn’t perfect, but <code&gt;window.onload</code&gt; was close enough. Plus it had other desirable attributes:</p&gt;
-<ul&gt;
-<li&gt;<strong&gt;standard across browsers</strong&gt; - <code&gt;window.onload</code&gt; means the same thing across all browsers. (The only exception I’m aware of is that <a title="JavaScript Performance" href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/"&gt;IE 6-9 don’t wait for async scripts before firing <code&gt;window.onload</code&gt;</a&gt;, while most other browsers do.)</li&gt;
-<li&gt;<strong&gt;measurable by 3rd parties</strong&gt; – <code&gt;window.onload</code&gt; is a page milestone that can be measured by someone other than the website owner, e.g., metrics services like <a href="http://www.keynote.com/"&gt;Keynote Systems</a&gt; and tools like <a href="http://yahoo.github.com/boomerang/doc/"&gt;Boomerang</a&gt;. It doesn’t require website owners to add custom code to their pages.</li&gt;
-<li&gt;<strong&gt;measurable for real users</strong&gt; – Measuring <code&gt;window.onload</code&gt; is a lightweight operation, so it can be performed on real user traffic without harming the user experience.</li&gt;
-</ul&gt;
-<h2&gt;Web 2.0 is more dynamic</h2&gt;
-<p&gt;Fast forward to today and we see that <code&gt;window.onload</code&gt; doesn’t reflect the user perception as well as it once did.</p&gt;
-<p&gt;There are some cases where a website renders quickly but <code&gt;window.onload</code&gt; fires much later. In these situations the user perception of the page is fast, but <code&gt;window.onload</code&gt; says the page is slow. A good example of this is <a title="Black &amp; Decker Gyro Screwdriver - Amazon.com" href="http://www.amazon.com/gp/product/B008R5259Y/"&gt;Amazon product pages</a&gt;. Amazon has done a great job of getting content that’s above-the-fold to render quickly, but all the below-the-fold reviews and recommendations produce a high <code&gt;window.onload</code&gt; value. Looking at these <a href="http://www.webpagetest.org/video/compare.php?tests=121212_KF_V7Y-r%3A3-c%3A0&amp;thumbSize=200&amp;ival=1000&amp;end=visual"&gt;Amazon WebPagetest results</a&gt; we see that above-the-fold is almost completely rendered at 2.0 seconds, but <code&gt;window.onload</code&gt; doesn’t happen until 5.2 seconds. (The relative sizes of the scrollbar thumbs shows that a lot of content was added below-the-fold.)</p&gt;
-<table style="margin-bottom: 0.5em;"&gt;
-<tbody&gt;
-<tr&gt;
-<td&gt;<a href="http://www.webpagetest.org/results/12/12/12/KF/V7Y/video_3/frame_0020.jpg"&gt;<img title="Amazon 2.0 seconds" alt="" src="http://stevesouders.com/images/amazon-2-0.png" width="240" /&gt;</a&gt;<br /&gt;
-<i&gt;Amazon – 2.0 seconds (~90% rendered)</i&gt;</td&gt;
-<td&gt;<a href="http://www.webpagetest.org/results/12/12/12/KF/V7Y/video_3/frame_0038.jpg"&gt;<img title="Amazon 5.2 seconds" alt="" src="http://stevesouders.com/images/amazon-5-2.png" width="240" /&gt;</a&gt;<br /&gt;
-<i&gt;Amazon – 5.2 seconds (onload)</i&gt;</td&gt;
-</tr&gt;
-</tbody&gt;
-</table&gt;
-<p&gt;But the opposite is also true. Heavily dynamic websites load much of the visible page after <code&gt;window.onload</code&gt;. For these websites, <code&gt;window.onload</code&gt; reports a value that is faster than the user’s perception. A good example of this kind of dynamic web app is <a href="https://gmail.com/"&gt;Gmail</a&gt;. Looking at the <a href="http://www.webpagetest.org/video/compare.php?tests=121212_KK_VED-r%3A2-c%3A0&amp;thumbSize=200&amp;ival=1000&amp;end=visual"&gt;WebPagetest results for Gmail</a&gt; we see that <code&gt;window.onload</code&gt; is 3.3 seconds, but at that point only the progress bar is visible. The above-the-fold content snaps into place at 4.8 seconds. It’s clear that in this example <code&gt;window.onload</code&gt; is not a good approximation for the user’s perception of when the page is ready.</p&gt;
-<table style="margin-bottom: 0.5em;"&gt;
-<tbody&gt;
-<tr&gt;
-<td&gt;<a href="http://www.webpagetest.org/results/12/12/12/KK/VED/video_2/frame_0033.jpg"&gt;<img title="Gmail 3.3 seconds" alt="" src="http://stevesouders.com/images/gmail-3-3.png" width="240" /&gt;</a&gt;<br /&gt;
-<i&gt;Gmail – 3.3 seconds (onload)</i&gt;</td&gt;
-<td&gt;<a href="http://www.webpagetest.org/results/12/12/12/KK/VED/video_2/frame_0048.jpg"&gt;<img title="Gmail 4.8 seconds" alt="" src="http://stevesouders.com/images/gmail-4-8.png" width="240" /&gt;</a&gt;<br /&gt;
-<i&gt;Gmail – 4.8 seconds (~90% rendered)</i&gt;</td&gt;
-</tr&gt;
-</tbody&gt;
-</table&gt;
-<h2&gt;it’s about rendering, not downloads</h2&gt;
-<p&gt;The examples above aren’t meant to show that Amazon is fast and Gmail is slow. Nor is it intended to say whether all the content should be loaded before <code&gt;window.onload</code&gt; vs. after. The point is that today’s websites are too dynamic to have their perceived speed reflected accurately by <code&gt;window.onload</code&gt;.</p&gt;
-<p&gt;The reason is because <code&gt;window.onload</code&gt; is based on when the page’s resources are downloaded. In the old days of only text and images, the readiness of the page’s content was closely tied to its resource downloads. But with the growing reliance on JavaScript, CSS, and Ajax the perceived speed of today’s websites is better reflected by when the page’s content is rendered. The use of <a title="JavaScript growth" href="http://httparchive.org/trends.php#bytesJS&amp;reqJS"&gt;JavaScript</a&gt; and <a title="CSS growth" href="http://httparchive.org/trends.php#bytesCSS&amp;reqCSS"&gt;CSS</a&gt; is growing. As the adoption of these dynamic techniques increases, so does the gap between <code&gt;window.onload</code&gt; and the user’s perception of website speed. In other words, this problem is just going to get worse.</p&gt;
-<p&gt;The conclusion is clear: the replacement for <code&gt;window.onload</code&gt; must focus on rendering.</p&gt;
-<h2&gt;what “it” feels like</h2&gt;
-<p&gt;This new performance metric should <strong&gt;take rendering into consideration</strong&gt;. It should be more than “first paint”. Instead, it should capture when the above-the-fold content is (mostly) rendered.</p&gt;
-<p&gt;I’m aware of two performance metrics that exist today that are focused on rendering. Both are available in <a href="http://www.webpagetest.org/"&gt;WebPagetest</a&gt;. <a href="http://assets.en.oreilly.com/1/event/62/Above%20the%20Fold%20Time_%20Measuring%20Web%20Page%20Performance%20Visually%20Presentation.pdf"&gt;Above-the-fold render time (PDF)</a&gt; was developed at Google. It finds the point at which the page’s content reaches its final rendering, with intelligence to adapt for animated GIFs, streaming video, rotating ads, etc. The other technique, called <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index"&gt;Speed Index</a&gt; and developed by <a href="https://plus.google.com/104759401447358500786/posts"&gt;Pat Meenan</a&gt;, gives the “average time at which visible parts of the page are displayed”. Both of these techniques use a series of screenshots to do their analysis and have the computational complexity that comes with image analysis.</p&gt;
-<p&gt;In other words, it’s not feasible to perform these rendering metrics on real user traffic in their current form. That’s important because, in addition to incorporating rendering, this new metric must maintain the attributes mentioned previously that make <code&gt;window.onload</code&gt; so appealing: <strong&gt;standard across browsers</strong&gt;,<strong&gt; measurable by 3rd parties</strong&gt;, and<strong&gt; measurable for real users</strong&gt;.</p&gt;
-<p&gt;Another major drawback to <code&gt;window.onload</code&gt; is that it doesn’t work for single page web apps (like Gmail). These web apps only have one <code&gt;window.onload</code&gt;, but typically have several other Ajax-based “page loads” during the user session where some or most of the page content is rewritten. It’s important that this new metric <strong&gt;works for Ajax apps</strong&gt;.</p&gt;
-<h2&gt;ball rolling</h2&gt;
-<p&gt;I completely understand if you’re frustrated by my lack of implementation specifics. Measuring rendering is complex. The point at which the page is (mostly) rendered is so obvious when flipping through the screenshots in WebPagetest. Writing code that measures that in a consistent, non-impacting way is really hard. My officemate pointed me to this thread from the W3C Web Performance Working Group talking about <a title="W3C Web Performance Q&amp;A" href="http://web.archiveorange.com/archive/v/YQtl0oLQ1Go7F1RASmV5"&gt;measuring first paint</a&gt; that highlights some of the challenges.</p&gt;
-<p&gt;To make matters worse, the new metric that I’m discussing is likely much more complex than measuring first paint. I believe we need to measure when the above-the-fold content is (mostly) rendered. What exactly is “above-the-fold”? What is “mostly”?</p&gt;
-<p&gt;Another challenge is moving the community away from <code&gt;window.onload</code&gt;. The primary performance metric in popular tools such as <a href="http://www.webpagetest.org/"&gt;WebPagetest</a&gt;, <a href="http://support.google.com/analytics/bin/answer.py?hl=en&amp;answer=1205784"&gt;Google Analytics Site Speed</a&gt;, <a href="https://secure.torbit.com/insight/"&gt;Torbit Insight</a&gt;, <a href="http://www.soasta.com/products/mpulse/"&gt;SOASTA (LogNormal) mPulse</a&gt;, and my own <a href="http://httparchive.org/"&gt;HTTP Archive</a&gt; is <code&gt;window.onload</code&gt;. I’ve heard that some IT folks even have their bonuses based on the <code&gt;window.onload</code&gt; metrics reported by services like <a href="http://keynote.com/"&gt;Keynote Systems</a&gt; and <a href="http://www.compuware.com/application-performance-management/gomez-apm-products.html"&gt;Gomez</a&gt;.</p&gt;
-<p&gt;It’s going to take time to define, implement, and transition to a better performance metric. But we have to get the ball rolling. Relying on <code&gt;window.onload</code&gt; as the primary performance metric doesn’t necessarily produce a faster user experience. And yet making our websites faster for users is what we’re <em&gt;really</em&gt; after. We need a metric that more accurately tracks our progress toward this ultimate goal.</p&gt;
+			<p>[Originally posted in the <a href="http://calendar.perfplanet.com/2012/moving-beyond-window-onload/">2012 Performance Calendar</a>. Reposting here for folks who missed it.]</p>
+<p>There’s an elephant in the room that we’ve been ignoring for years:</p>
+<p style="padding-left: 30px;"><em>window.onload is not the best metric for measuring website speed</em></p>
+<p>We haven’t actually been “ignoring” this issue. We’ve acknowledged it, but we haven’t coordinated our efforts to come up with a better replacement. Let’s do that now.</p>
+<h2>window.onload is so Web 1.0</h2>
+<p>What we’re after is a metric that captures the user’s <em>perception</em>&nbsp;of when the page is ready. Unfortunately, <code>perception.ready()</code>&nbsp;isn’t on any browser’s roadmap. So we need to find a metric that is a good proxy.</p>
+<p>Ten years ago,&nbsp;<code>window.onload</code>&nbsp;was a good proxy for the user’s perception of when the page was ready. Back then, pages were mostly HTML and images. JavaScript, CSS, DHTML, and Ajax were less common, as were the delays and blocked rendering they introduce. It wasn’t perfect, but&nbsp;<code>window.onload</code>&nbsp;was close enough. Plus it had other desirable attributes:</p>
+<ul>
+<li><strong>standard across browsers</strong> -&nbsp;<code>window.onload</code>&nbsp;means the same thing across all browsers. (The only exception I’m aware of is that <a title="JavaScript Performance" href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/">IE 6-9 don’t wait for async scripts before firing&nbsp;<code>window.onload</code></a>, while most other browsers do.)</li>
+<li><strong>measurable by 3rd parties</strong> – <code>window.onload</code>&nbsp;is a page milestone that can be measured by someone other than the website owner,&nbsp;e.g., metrics services like <a href="http://www.keynote.com/">Keynote Systems</a>&nbsp;and tools like&nbsp;<a href="http://yahoo.github.com/boomerang/doc/">Boomerang</a>. It doesn’t require website owners to add custom code to their pages.</li>
+<li><strong>measurable for real users</strong> – Measuring&nbsp;<code>window.onload</code>&nbsp;is a lightweight operation, so it can be performed on real user traffic without harming the user experience.</li>
+</ul>
+<h2>Web 2.0 is more dynamic</h2>
+<p>Fast forward to today and we see that <code>window.onload</code>&nbsp;doesn’t reflect the user perception as well as it once did.</p>
+<p>There are some cases where a website renders quickly but <code>window.onload</code>&nbsp;fires much later. In these situations the user perception of the page is fast, but <code>window.onload</code>&nbsp;says the page is slow.&nbsp;A good example of this is <a title="Black &amp; Decker Gyro Screwdriver - Amazon.com" href="http://www.amazon.com/gp/product/B008R5259Y/">Amazon product pages</a>. Amazon has done a great job of getting content that’s above-the-fold to render quickly, but all the below-the-fold reviews and recommendations produce a high&nbsp;<code>window.onload</code>&nbsp;value. Looking at these <a href="http://www.webpagetest.org/video/compare.php?tests=121212_KF_V7Y-r%3A3-c%3A0&amp;thumbSize=200&amp;ival=1000&amp;end=visual">Amazon WebPagetest results</a> we see that above-the-fold is almost completely rendered at 2.0 seconds, but&nbsp;<code>window.onload</code>&nbsp;doesn’t happen until 5.2 seconds. (The relative sizes of the scrollbar thumbs shows that a lot of content was added below-the-fold.)</p>
+<table style="margin-bottom: 0.5em;">
+<tbody>
+<tr>
+<td><a href="http://www.webpagetest.org/results/12/12/12/KF/V7Y/video_3/frame_0020.jpg"><img title="Amazon 2.0 seconds" alt="" src="http://stevesouders.com/images/amazon-2-0.png" width="240" /></a><br />
+<i>Amazon – 2.0 seconds (~90% rendered)</i></td>
+<td><a href="http://www.webpagetest.org/results/12/12/12/KF/V7Y/video_3/frame_0038.jpg"><img title="Amazon 5.2 seconds" alt="" src="http://stevesouders.com/images/amazon-5-2.png" width="240" /></a><br />
+<i>Amazon – 5.2 seconds (onload)</i></td>
+</tr>
+</tbody>
+</table>
+<p>But the opposite is also true. Heavily dynamic websites load much of the visible page after&nbsp;<code>window.onload</code>. For these websites, <code>window.onload</code>&nbsp;reports a value that is faster than the user’s perception. A good example of this kind of dynamic web app is <a href="https://gmail.com/">Gmail</a>. Looking at the <a href="http://www.webpagetest.org/video/compare.php?tests=121212_KK_VED-r%3A2-c%3A0&amp;thumbSize=200&amp;ival=1000&amp;end=visual">WebPagetest results for Gmail</a> we see that&nbsp;<code>window.onload</code>&nbsp;is 3.3 seconds, but at that point only the progress bar is visible. The above-the-fold content snaps into place at&nbsp;4.8 seconds.&nbsp;It’s clear that in this example <code>window.onload</code>&nbsp;is not a good approximation for the user’s perception of when the page is ready.</p>
+<table style="margin-bottom: 0.5em;">
+<tbody>
+<tr>
+<td><a href="http://www.webpagetest.org/results/12/12/12/KK/VED/video_2/frame_0033.jpg"><img title="Gmail 3.3 seconds" alt="" src="http://stevesouders.com/images/gmail-3-3.png" width="240" /></a><br />
+<i>Gmail – 3.3 seconds (onload)</i></td>
+<td><a href="http://www.webpagetest.org/results/12/12/12/KK/VED/video_2/frame_0048.jpg"><img title="Gmail 4.8 seconds" alt="" src="http://stevesouders.com/images/gmail-4-8.png" width="240" /></a><br />
+<i>Gmail – 4.8 seconds (~90% rendered)</i></td>
+</tr>
+</tbody>
+</table>
+<h2>it’s about rendering, not downloads</h2>
+<p>The examples above aren’t meant to show that Amazon is fast and Gmail is slow. Nor is it intended to say whether all the content should be loaded before&nbsp;<code>window.onload</code>&nbsp;vs. after. The point is that today’s websites are too dynamic to have their perceived speed reflected accurately by&nbsp;<code>window.onload</code>.</p>
+<p>The reason is because&nbsp;<code>window.onload</code>&nbsp;is based on when the page’s resources are downloaded. In the old days of only text and images, the readiness of the page’s content was closely tied to its resource downloads. But with the growing reliance on JavaScript, CSS, and Ajax the perceived speed of today’s websites is better reflected by when the page’s content is rendered. The use of <a title="JavaScript growth" href="http://httparchive.org/trends.php#bytesJS&amp;reqJS">JavaScript</a> and <a title="CSS growth" href="http://httparchive.org/trends.php#bytesCSS&amp;reqCSS">CSS</a>&nbsp;is growing. As the adoption of these dynamic techniques increases, so does the gap between <code>window.onload</code>&nbsp;and the user’s perception of website speed. In other words, this problem is just going to get worse.</p>
+<p>The conclusion is clear: the replacement for&nbsp;<code>window.onload</code>&nbsp;must focus on rendering.</p>
+<h2>what “it” feels like</h2>
+<p>This new performance metric should <strong>take rendering into consideration</strong>. It should be more than “first paint”. Instead, it should capture when the above-the-fold content is (mostly) rendered.</p>
+<p>I’m aware of two performance metrics that exist today that are focused on rendering. Both are available in <a href="http://www.webpagetest.org/">WebPagetest</a>. <a href="http://assets.en.oreilly.com/1/event/62/Above%20the%20Fold%20Time_%20Measuring%20Web%20Page%20Performance%20Visually%20Presentation.pdf">Above-the-fold render time (PDF)</a>&nbsp;was developed at Google. It finds the point at which the page’s content reaches its final rendering, with intelligence to adapt for animated GIFs, streaming video, rotating ads, etc. The other technique, called <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index">Speed Index</a> and developed by <a href="https://plus.google.com/104759401447358500786/posts">Pat Meenan</a>, gives the “average time at which visible parts of the page are displayed”. Both of these techniques use a series of screenshots to do their analysis and have the computational complexity that comes with image analysis.</p>
+<p>In other words, it’s not feasible to perform these rendering metrics on real user traffic in their current form. That’s important because, in addition to incorporating rendering, this new metric must maintain the attributes mentioned previously that make&nbsp;<code>window.onload</code>&nbsp;so appealing: <strong>standard across browsers</strong>,<strong> measurable by 3rd parties</strong>, and<strong> measurable for real users</strong>.</p>
+<p>Another major drawback to&nbsp;<code>window.onload</code>&nbsp;is that it doesn’t work for single page web apps (like Gmail). These web apps only have one <code>window.onload</code>, but typically have several other Ajax-based “page loads” during the user session where some or most of the page content is rewritten. It’s important that this new metric <strong>works for Ajax apps</strong>.</p>
+<h2>ball rolling</h2>
+<p>I completely understand if you’re frustrated by my lack of implementation specifics. Measuring rendering is complex. The point at which the page is (mostly) rendered is so obvious when flipping through the screenshots in WebPagetest. Writing code that measures that in a consistent, non-impacting way is really hard. My officemate pointed me to this thread from the W3C Web Performance Working Group talking about <a title="W3C Web Performance Q&amp;A" href="http://web.archiveorange.com/archive/v/YQtl0oLQ1Go7F1RASmV5">measuring first paint</a>&nbsp;that highlights some of the challenges.</p>
+<p>To make matters worse, the new metric that I’m discussing is likely much more complex than measuring first paint. I believe we need to measure when the above-the-fold content is (mostly) rendered. What exactly is “above-the-fold”? What is “mostly”?</p>
+<p>Another challenge is moving the community away from&nbsp;<code>window.onload</code>. The primary performance metric in popular tools such as <a href="http://www.webpagetest.org/">WebPagetest</a>, <a href="http://support.google.com/analytics/bin/answer.py?hl=en&amp;answer=1205784">Google Analytics Site Speed</a>, <a href="https://secure.torbit.com/insight/">Torbit Insight</a>, <a href="http://www.soasta.com/products/mpulse/">SOASTA (LogNormal) mPulse</a>, and my own <a href="http://httparchive.org/">HTTP Archive</a>&nbsp;is&nbsp;<code>window.onload</code>. I’ve heard that some IT folks even have their bonuses based on the&nbsp;<code>window.onload</code>&nbsp;metrics reported by services like <a href="http://keynote.com/">Keynote Systems</a> and <a href="http://www.compuware.com/application-performance-management/gomez-apm-products.html">Gomez</a>.</p>
+<p>It’s going to take time to define, implement, and transition to a better performance metric. But we have to get the ball rolling. Relying on <code>window.onload</code>&nbsp;as the primary performance metric doesn’t necessarily produce a faster user experience. And yet making our websites faster for users is what we’re <em>really</em> after. We need a metric that more accurately tracks our progress toward this ultimate goal.</p>
 
-<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"&gt;<div class="wp_rp_content"&gt;<h3 class="related_post_title"&gt;Related Posts</h3&gt;<ul class="related_post wp_rp" style="visibility: visible"&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/" class="wp_rp_title"&gt;JavaScript Performance</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2013/02/26/reloading-post-onload-resources/" class="wp_rp_title"&gt;Reloading post-onload resources</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2010/03/05/webpagetest-org-top-tool/" class="wp_rp_title"&gt;WebPagetest.org &#8211; top tool</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2009/12/10/speed-tracer/" class="wp_rp_title"&gt;Speed Tracer &#8211; visibility into the browser</a&gt;</li&gt;<li &gt;<a href="http://www.stevesouders.com/blog/2011/02/10/blaze-io-launches-wpt-with-mobile-devices/" class="wp_rp_title"&gt;Blaze.io launches WPT with mobile devices</a&gt;</li&gt;</ul&gt;<div class="wp_rp_footer"&gt;<a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts"&gt;Zemanta</a&gt;</div&gt;</div&gt;</div&gt;
+<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"><div class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul class="related_post wp_rp" style="visibility: visible"><li><a href="http://www.stevesouders.com/blog/2012/01/13/javascript-performance/" class="wp_rp_title">JavaScript Performance</a></li><li><a href="http://www.stevesouders.com/blog/2013/02/26/reloading-post-onload-resources/" class="wp_rp_title">Reloading post-onload resources</a></li><li><a href="http://www.stevesouders.com/blog/2010/03/05/webpagetest-org-top-tool/" class="wp_rp_title">WebPagetest.org – top tool</a></li><li><a href="http://www.stevesouders.com/blog/2009/12/10/speed-tracer/" class="wp_rp_title">Speed Tracer – visibility into the browser</a></li><li><a href="http://www.stevesouders.com/blog/2011/02/10/blaze-io-launches-wpt-with-mobile-devices/" class="wp_rp_title">Blaze.io launches WPT with mobile devices</a></li></ul><div class="wp_rp_footer"><a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts">Zemanta</a></div></div></div>
             
             			
-		</div&gt;<!-- #post-## --&gt;
+		</div><!-- #post-## -->
 
 
 		
-			<div id="comments"&gt;
+			<div id="comments">
 
-			<h3 id="comments-title"&gt;11 Responses to <em&gt;Moving beyond window.onload()</em&gt;</h3&gt;
-
-
-			<ol class="commentlist"&gt;
-				<li class="comment even thread-even depth-1" id="li-comment-60075"&gt;
-<div id="comment-60075"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http://getify.me' rel='external nofollow' class='url'&gt;Kyle Simpson</a&gt;</strong&gt; | 13-May-13 at 9:43 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60075"&gt;Permalink</a&gt; |  </p&gt;
+			<h3 id="comments-title">11 Responses to <em>Moving beyond window.onload()</em></h3>
 
 
-<p&gt;Three cheers! Completely agree with the spirit of this post. I think this transition is long overdue and super critical to taking the next steps in web perf optimization.</p&gt;
-<p&gt;I&#8217;m not sure I agree that rendering is really the right target for this next step, though. I could have a background texture image that fills all the pixels above the fold with &#8220;content&#8221; but it&#8217;s not the content a user cares about.</p&gt;
-<p&gt;When I talk about the shortcomings of `window.onload`, I usually say, &#8220;what we really need for an event is &#8216;meaningfully-interactive&#8217;&#8221;. And I have tried and tried to conceive of a way for a browser (or 3rd party lib) to automatically determine that reliably for a site.</p&gt;
-<p&gt;I now think what we need to do is have a way (or multiple ways) for a site to signal to the browser (and other 3rd party libs), &#8220;hey, I&#8217;m &#8216;meaningfully interactive&#8217; now.&#8221;</p&gt;
-<p&gt;This event would ideally be fired by the page&#8217;s code (or markup) shortly after the DOMContentLoaded was fired, but a a complex app could delay it longer if there was more stuff that it felt it needed to load before a user could have a meaningful experience with the site.</p&gt;
-<p&gt;By contrast, a simple text blog post sort of site could fire it immediately after the text is painted, because for that site, &#8220;meaningful interaction&#8221; is passive visual reading of the text.</p&gt;
-<p&gt;I kind of envision an optional HTTP header and/or meta-tag that could specify one of a preset of triggers, like &#8220;first-paint&#8221;, &#8220;DOMContentLoaded&#8221;, &#8220;onload&#8221;, or several other possible choices. If not present, it might default to &#8220;onload&#8221; for legacy sake.</p&gt;
-<p&gt;Many sites would be able to make good usage of those preset values, to slightly customize how &#8220;ready&#8221; is defined for them. If such a tag/header was found the browser could use that, and then fire a &#8220;InteractionReady&#8221; event on the page so that a third-party lib could detect it.</p&gt;
-<p&gt;Or, a more complex app could set the header/value to &#8220;none&#8221;, and then their app could manually fire the &#8220;InteractionReady&#8221; event themselves at whatever point the app felt was appropriate.</p&gt;
-<p&gt;The polyfill for this for older browsers is straightforward: FT for the event name in the window object, and if not present (older browser), add a window.onload handler that artificially fires a custom DOM event called &#8220;InteractionReady&#8221;.</p&gt;
-<p&gt;Anyway, this is just an idea of how I&#8217;d like to see this kind of thing proceed. I&#8217;m sure there&#8217;s plenty of details to work out. Hopefully your post gets the ball rolling. :)</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60076"&gt;
-<div id="comment-60076"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http://www.catchpoint.com' rel='external nofollow' class='url'&gt;Drit Suljoti</a&gt;</strong&gt; | 13-May-13 at 10:01 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60076"&gt;Permalink</a&gt; |  </p&gt;
+			<ol class="commentlist">
+				<li class="comment even thread-even depth-1" id="li-comment-60075">
+<div id="comment-60075">
+<p class="comment-metadata">
+<strong><a href="http://getify.me" rel="external nofollow" class="url">Kyle Simpson</a></strong> | 13-May-13 at 9:43 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60075">Permalink</a> |  </p>
 
 
-<p&gt;Steve &#8211; I think everyone agrees that &#8220;onload&#8221; metric is not sufficient. It is useful in some cases and completely useless in other cases. However, it is the one metric you can accurately measure across browsers and you know what it means for a given page (assuming you know well the page design and implementation).<br /&gt;
-While understanding rendering and measuring this properly is key , it might not be sufficient for a lot of cases.<br /&gt;
-We are all looking for a metric that measures when the page is ready for the end user perform the tasks at hand. Obviously reading/viewing is primary task in all cases for the web, but in a lot of cases there are other tasks. In your Gmail inbox example the user needs to view the emails, an than click and view a specific thread. In Amazon the end user might want to add to the cart or search again. The challenge with browsers is that things can be visible, but the user cannot interact therefore not perform these other “non-viewing” actions. Nothing more frustrating than waiting for items to be clickable, or a button to appear.</p&gt;
-<p&gt;Onload fails at this sometimes, so do the rendering metrics. Therefore if there is initiative to better measure “rendering time”, we also need to take a look at “time to interact”.</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment even thread-even depth-1" id="li-comment-60077"&gt;
-<div id="comment-60077"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;Jason</strong&gt; | 13-May-13 at 12:55 pm | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60077"&gt;Permalink</a&gt; |  </p&gt;
+<p>Three cheers! Completely agree with the spirit of this post. I think this transition is long overdue and super critical to taking the next steps in web perf optimization.</p>
+<p>I’m not sure I agree that rendering is really the right target for this next step, though. I could have a background texture image that fills all the pixels above the fold with “content” but it’s not the content a user cares about.</p>
+<p>When I talk about the shortcomings of `window.onload`, I usually say, “what we really need for an event is ‘meaningfully-interactive’”. And I have tried and tried to conceive of a way for a browser (or 3rd party lib) to automatically determine that reliably for a site.</p>
+<p>I now think what we need to do is have a way (or multiple ways) for a site to signal to the browser (and other 3rd party libs), “hey, I’m ‘meaningfully interactive’ now.”</p>
+<p>This event would ideally be fired by the page’s code (or markup) shortly after the DOMContentLoaded was fired, but a a complex app could delay it longer if there was more stuff that it felt it needed to load before a user could have a meaningful experience with the site.</p>
+<p>By contrast, a simple text blog post sort of site could fire it immediately after the text is painted, because for that site, “meaningful interaction” is passive visual reading of the text.</p>
+<p>I kind of envision an optional HTTP header and/or meta-tag that could specify one of a preset of triggers, like “first-paint”, “DOMContentLoaded”, “onload”, or several other possible choices. If not present, it might default to “onload” for legacy sake.</p>
+<p>Many sites would be able to make good usage of those preset values, to slightly customize how “ready” is defined for them. If such a tag/header was found the browser could use that, and then fire a “InteractionReady” event on the page so that a third-party lib could detect it.</p>
+<p>Or, a more complex app could set the header/value to “none”, and then their app could manually fire the “InteractionReady” event themselves at whatever point the app felt was appropriate.</p>
+<p>The polyfill for this for older browsers is straightforward: FT for the event name in the window object, and if not present (older browser), add a window.onload handler that artificially fires a custom DOM event called “InteractionReady”.</p>
+<p>Anyway, this is just an idea of how I’d like to see this kind of thing proceed. I’m sure there’s plenty of details to work out. Hopefully your post gets the ball rolling. :)</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60076">
+<div id="comment-60076">
+<p class="comment-metadata">
+<strong><a href="http://www.catchpoint.com" rel="external nofollow" class="url">Drit Suljoti</a></strong> | 13-May-13 at 10:01 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60076">Permalink</a> |  </p>
 
 
-<p&gt;I have had to address this problem for a purely practical reason:  test automation is very hard if you can&#8217;t figure out when the page is done.  </p&gt;
-<p&gt;To test a page, Selenium has to click on elements.  If those elements don&#8217;t exist yet, you get a test failure.</p&gt;
-<p&gt;If you have enough tests, you&#8217;re guaranteed that at least one of them will click &#8216;too soon&#8217; and then every test run results in failures that have to be evaluated by hand.  I have found this to be exhausting for everyone involved so we try to avoid this.</p&gt;
-<p&gt;What we&#8217;ve done is put a DOM element in the page that gets modified when the page has &#8216;settled&#8217;.  We still occasionally forget to do that and run into test failures, but mostly we can fix them.</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60078"&gt;
-<div id="comment-60078"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http://AllThingsQuality.com' rel='external nofollow' class='url'&gt;Joe Strazzere</a&gt;</strong&gt; | 14-May-13 at 5:33 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60078"&gt;Permalink</a&gt; |  </p&gt;
+<p>Steve – I think everyone agrees that “onload” metric is not sufficient. It is useful in some cases and completely useless in other cases. However, it is the one metric you can accurately measure across browsers and you know what it means for a given page (assuming you know well the page design and implementation).<br />
+While understanding rendering and measuring this properly is key , it might not be sufficient for a lot of cases.<br />
+We are all looking for a metric that measures when the page is ready for the end user perform the tasks at hand. Obviously reading/viewing is primary task in all cases for the web, but in a lot of cases there are other tasks. In your Gmail inbox example the user needs to view the emails, an than click and view a specific thread. In Amazon the end user might want to add to the cart or search again. The challenge with browsers is that things can be visible, but the user cannot interact therefore not perform these other “non-viewing” actions. Nothing more frustrating than waiting for items to be clickable, or a button to appear.</p>
+<p>Onload fails at this sometimes, so do the rendering metrics. Therefore if there is initiative to better measure “rendering time”, we also need to take a look at “time to interact”.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60077">
+<div id="comment-60077">
+<p class="comment-metadata">
+<strong>Jason</strong> | 13-May-13 at 12:55 pm | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60077">Permalink</a> |  </p>
 
 
-<p&gt;Well said!</p&gt;
-<p&gt;This is the problem with virtually every metric. We want &#8220;making our websites faster for users&#8221;. But it&#8217;s hard to define, and hard to measure. So we settle for something that is easier to measure, but isn&#8217;t quite what we really want. And then we cross or fingers and hope there is some correlation between what we measure and what we actually want. Sadly, many metrics degrade into well-intentioned folklore, best-practices, and a cargo cult mentality.</p&gt;
-<p&gt;I applaud your efforts! I look forward to some progress toward anything which can accurately indicate &#8220;faster for users&#8221;, yet works across browsers and is external to the site under test.</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment even thread-even depth-1" id="li-comment-60079"&gt;
-<div id="comment-60079"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;Charlie</strong&gt; | 14-May-13 at 6:15 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60079"&gt;Permalink</a&gt; |  </p&gt;
+<p>I have had to address this problem for a purely practical reason:  test automation is very hard if you can’t figure out when the page is done.  </p>
+<p>To test a page, Selenium has to click on elements.  If those elements don’t exist yet, you get a test failure.</p>
+<p>If you have enough tests, you’re guaranteed that at least one of them will click ‘too soon’ and then every test run results in failures that have to be evaluated by hand.  I have found this to be exhausting for everyone involved so we try to avoid this.</p>
+<p>What we’ve done is put a DOM element in the page that gets modified when the page has ‘settled’.  We still occasionally forget to do that and run into test failures, but mostly we can fix them.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60078">
+<div id="comment-60078">
+<p class="comment-metadata">
+<strong><a href="http://AllThingsQuality.com" rel="external nofollow" class="url">Joe Strazzere</a></strong> | 14-May-13 at 5:33 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60078">Permalink</a> |  </p>
 
 
-<p&gt;It&#8217;s worth noting that vendors are avid followers of your work. Keynote has added additional metrics to their product to give approximate timings for user experience:<br /&gt;
-<a href="http://www.keynote.com/mykeynote/help/components.asp#user_ex" rel="nofollow"&gt;http://www.keynote.com/mykeynote/help/components.asp#user_ex</a&gt;</p&gt;
-<p&gt;I&#8217;ve haven&#8217;t looked at it in any detail but I believe that it is no longer exclusive to Internet Explorer.</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60081"&gt;
-<div id="comment-60081"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http:www.catchpoint.com/' rel='external nofollow' class='url'&gt;Leo Vasiliou</a&gt;</strong&gt; | 14-May-13 at 9:17 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60081"&gt;Permalink</a&gt; |  </p&gt;
+<p>Well said!</p>
+<p>This is the problem with virtually every metric. We want “making our websites faster for users”. But it’s hard to define, and hard to measure. So we settle for something that is easier to measure, but isn’t quite what we really want. And then we cross or fingers and hope there is some correlation between what we measure and what we actually want. Sadly, many metrics degrade into well-intentioned folklore, best-practices, and a cargo cult mentality.</p>
+<p>I applaud your efforts! I look forward to some progress toward anything which can accurately indicate “faster for users”, yet works across browsers and is external to the site under test.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60079">
+<div id="comment-60079">
+<p class="comment-metadata">
+<strong>Charlie</strong> | 14-May-13 at 6:15 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60079">Permalink</a> |  </p>
 
 
-<p&gt;Steve,</p&gt;
-<p&gt;Nothing is perfect (therefore everything comes with some type of imperfection).  Asking which metric is like asking which statistical calculation (Arithmetic Mean versus Geometric Mean versus etc).  If the answer is contextual, then suggest ReadyState or OnLoad are still two of the least imperfect metrics available.</p&gt;
-<p&gt;Leo</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment even thread-even depth-1" id="li-comment-60082"&gt;
-<div id="comment-60082"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http://www.jaredbarnett.com' rel='external nofollow' class='url'&gt;Jared Barnett</a&gt;</strong&gt; | 15-May-13 at 9:23 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60082"&gt;Permalink</a&gt; |  </p&gt;
+<p>It’s worth noting that vendors are avid followers of your work. Keynote has added additional metrics to their product to give approximate timings for user experience:<br />
+<a href="http://www.keynote.com/mykeynote/help/components.asp#user_ex" rel="nofollow">http://www.keynote.com/mykeynote/help/components.asp#user_ex</a></p>
+<p>I’ve haven’t looked at it in any detail but I believe that it is no longer exclusive to Internet Explorer.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60081">
+<div id="comment-60081">
+<p class="comment-metadata">
+<strong><a href="http:www.catchpoint.com/" rel="external nofollow" class="url">Leo Vasiliou</a></strong> | 14-May-13 at 9:17 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60081">Permalink</a> |  </p>
 
 
-<p&gt;Steve,</p&gt;
-<p&gt;Kudos for taking initiative on this. Something worth mentioning for the masses is that you already have page load screenshots on HTTP Archive for those who want to start going down the image analysis route. I&#8217;m not sure how easy it is to consume those images in bulk, but they are there nonetheless and give us the ability to identify some of the differences you mentioned (i.e. gmail vs amazon). </p&gt;
-<p&gt;All the best,<br /&gt;
-Jared</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60088"&gt;
-<div id="comment-60088"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http://www.thetrainline.com' rel='external nofollow' class='url'&gt;Paul Mead</a&gt;</strong&gt; | 21-May-13 at 5:59 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60088"&gt;Permalink</a&gt; |  </p&gt;
+<p>Steve,</p>
+<p>Nothing is perfect (therefore everything comes with some type of imperfection).  Asking which metric is like asking which statistical calculation (Arithmetic Mean versus Geometric Mean versus etc).  If the answer is contextual, then suggest ReadyState or OnLoad are still two of the least imperfect metrics available.</p>
+<p>Leo</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60082">
+<div id="comment-60082">
+<p class="comment-metadata">
+<strong><a href="http://www.jaredbarnett.com" rel="external nofollow" class="url">Jared Barnett</a></strong> | 15-May-13 at 9:23 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60082">Permalink</a> |  </p>
 
 
-<p&gt;Hi</p&gt;
-<p&gt;The way I look at this is the best way to over come such a complex task as determining when a site is ready to use, as far as real humans are concerned, is to use those users and their brains to do all the heavy lifting.</p&gt;
-<p&gt;A metric that determines when the users begin interacting with content in relation to the start of the browsers work (HTTP GET, AJAX fired etc), would be the most useful, and probably fairly easy to implement &#8211; JS at top of the page (yes I know that is a sin) that watches the mouse/keyboard for user behaviour in the region of the browser display (or more specific areas of the DOM for AJAX events) (clearly you&#8217;d want to ignore users reading their emails whilst waiting for a page to load).</p&gt;
-<p&gt;Clearly this is only of use in systems where RUM is possible (not dev, test, CI etc).</p&gt;
-<p&gt;Paul</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment even thread-even depth-1" id="li-comment-60113"&gt;
-<div id="comment-60113"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http://makethemclick.com.au/library' rel='external nofollow' class='url'&gt;Mark</a&gt;</strong&gt; | 16-Jul-13 at 2:56 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60113"&gt;Permalink</a&gt; |  </p&gt;
+<p>Steve,</p>
+<p>Kudos for taking initiative on this. Something worth mentioning for the masses is that you already have page load screenshots on HTTP Archive for those who want to start going down the image analysis route. I’m not sure how easy it is to consume those images in bulk, but they are there nonetheless and give us the ability to identify some of the differences you mentioned (i.e. gmail vs amazon). </p>
+<p>All the best,<br />
+Jared</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60088">
+<div id="comment-60088">
+<p class="comment-metadata">
+<strong><a href="http://www.thetrainline.com" rel="external nofollow" class="url">Paul Mead</a></strong> | 21-May-13 at 5:59 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60088">Permalink</a> |  </p>
 
 
-<p&gt;So do all those third party scripts really slow a site down? </p&gt;
-<p&gt;After looking at my site recently I was horrified to discover  that third party services like Outbrain, Disqus and Share this were adding something like 1.5Meg to my pages.</p&gt;
-<p&gt;I mean my content only takes up 50k, which would give me a code to text ration of over 99%</p&gt;
-<p&gt;PS Your spam question is very confusing.</p&gt;
-<p&gt;That can&#8217;t be good, or does it not matter anymore?</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60114"&gt;
-<div id="comment-60114"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;<a href='http://makethemclick.com.au/library' rel='external nofollow' class='url'&gt;Mark</a&gt;</strong&gt; | 16-Jul-13 at 2:59 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60114"&gt;Permalink</a&gt; |  </p&gt;
+<p>Hi</p>
+<p>The way I look at this is the best way to over come such a complex task as determining when a site is ready to use, as far as real humans are concerned, is to use those users and their brains to do all the heavy lifting.</p>
+<p>A metric that determines when the users begin interacting with content in relation to the start of the browsers work (HTTP GET, AJAX fired etc), would be the most useful, and probably fairly easy to implement – JS at top of the page (yes I know that is a sin) that watches the mouse/keyboard for user behaviour in the region of the browser display (or more specific areas of the DOM for AJAX events) (clearly you’d want to ignore users reading their emails whilst waiting for a page to load).</p>
+<p>Clearly this is only of use in systems where RUM is possible (not dev, test, CI etc).</p>
+<p>Paul</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60113">
+<div id="comment-60113">
+<p class="comment-metadata">
+<strong><a href="http://makethemclick.com.au/library" rel="external nofollow" class="url">Mark</a></strong> | 16-Jul-13 at 2:56 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60113">Permalink</a> |  </p>
 
 
-<p&gt;Hmm, no way to edit my comment. above. The PS should be at the very end for the whole comment to read properly.</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-<li class="comment even thread-even depth-1" id="li-comment-60122"&gt;
-<div id="comment-60122"&gt;
-<p class="comment-metadata"&gt;
-<strong&gt;pd</strong&gt; | 24-Jul-13 at 9:05 pm | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60122"&gt;Permalink</a&gt; |  </p&gt;
+<p>So do all those third party scripts really slow a site down? </p>
+<p>After looking at my site recently I was horrified to discover  that third party services like Outbrain, Disqus and Share this were adding something like 1.5Meg to my pages.</p>
+<p>I mean my content only takes up 50k, which would give me a code to text ration of over 99%</p>
+<p>PS Your spam question is very confusing.</p>
+<p>That can’t be good, or does it not matter anymore?</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60114">
+<div id="comment-60114">
+<p class="comment-metadata">
+<strong><a href="http://makethemclick.com.au/library" rel="external nofollow" class="url">Mark</a></strong> | 16-Jul-13 at 2:59 am | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60114">Permalink</a> |  </p>
 
 
-<p&gt;Surely there are a whole variety of browser internal events that may have never hitherto been exposed to page content, that we can get browser companies to allow us to use. It shouldn&#8217;t be too hard to keep the finite certainty of using non-qualitative metrics. We need to get events such as CSS rendering completed (pre animations), images rendered (as opposed to just loaded, thus factoring in progressive loading). Browsers already have scroll methods so they know when an element is outside the viewport. That information just needs to be refined so that we can start looking at above-the-fold timing.</p&gt;
-<p&gt;As usual the technicalities may not be that hard, it&#8217;s the human factor of getting all the browser vendors, standards committees and developer communities to agree! That process continues to take too long, even if it is getting faster.</p&gt;
-</div&gt;
-</li&gt;<!-- #comment-## --&gt;
-			</ol&gt;
+<p>Hmm, no way to edit my comment. above. The PS should be at the very end for the whole comment to read properly.</p>
+</div>
+</li><!-- #comment-## -->
+<li class="comment even thread-even depth-1" id="li-comment-60122">
+<div id="comment-60122">
+<p class="comment-metadata">
+<strong>pd</strong> | 24-Jul-13 at 9:05 pm | <a href="http://www.stevesouders.com/blog/2013/05/13/moving-beyond-window-onload/#comment-60122">Permalink</a> |  </p>
 
 
+<p>Surely there are a whole variety of browser internal events that may have never hitherto been exposed to page content, that we can get browser companies to allow us to use. It shouldn’t be too hard to keep the finite certainty of using non-qualitative metrics. We need to get events such as CSS rendering completed (pre animations), images rendered (as opposed to just loaded, thus factoring in progressive loading). Browsers already have scroll methods so they know when an element is outside the viewport. That information just needs to be refined so that we can start looking at above-the-fold timing.</p>
+<p>As usual the technicalities may not be that hard, it’s the human factor of getting all the browser vendors, standards committees and developer communities to agree! That process continues to take too long, even if it is getting faster.</p>
+</div>
+</li><!-- #comment-## -->
+			</ol>
 
 
 
 
 
-</div&gt;<!-- #comments --&gt;
 
 
-</div&gt; <!-- end div id="content" --&gt;
-</div&gt;
-<div id="footer" class="containerwrapperpadded"&gt;
-<p&gt;&copy; Steve Souders</p&gt;
-</div&gt;
-</body&gt;
-</html&gt;
+</div><!-- #comments -->
 
-<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
 
-Page Caching using disk: enhanced
-Database Caching 16/32 queries in 0.443 seconds using disk
-
- Served from: www.stevesouders.com @ 2013-09-30 03:15:29 by W3 Total Cache --&gt;
-        </textarea>
-        </div>
-        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-        <script src="../js/clearly.js"></script>
-        <script>
-            var html = window.__getMyClearlyResults().html;
-            $('#main_content_wrap').html(html);
-        </script>
-  </body>
+</div> <!-- end div id="content" -->
+</div>
+<div id="footer" class="containerwrapperpadded">
+<p>© Steve Souders</p>
+</div>
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>var html = window.__getMyClearlyResults().html;$("html").html(html);$("html").show()</script>
+</div></body>
 </html>

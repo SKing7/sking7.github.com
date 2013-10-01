@@ -1,308 +1,294 @@
-<!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8" />
+  <title>When Not to Use YUI // Speaker Deck</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css" />
+  <link href="https://d2dfho4r6t7asi.cloudfront.net/assets/legacy/application-8eea3018c44774923202cfac61e2e7b6.css" media="screen" rel="stylesheet" type="text/css" />
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    <title></title>
-  </head>
-  <body>
-        <!-- MAIN CONTENT -->
-        <div id="main_content_wrap" class="outer">
-        <textarea style="visibility:none" id="html-area">
-<!DOCTYPE html&gt;
-<html&gt;
-<head&gt;
-  <meta charset="UTF-8"&gt;
-  <title&gt;When Not to Use YUI // Speaker Deck</title&gt;
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge"&gt;
-  <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&subset=latin,latin-ext' rel='stylesheet' type='text/css'&gt;
-  <link href="https://d2dfho4r6t7asi.cloudfront.net/assets/legacy/application-8eea3018c44774923202cfac61e2e7b6.css" media="screen" rel="stylesheet" type="text/css" /&gt;
+<script src="https://d2dfho4r6t7asi.cloudfront.net/assets/application-c4d0e1b4292e3aa96cd5014b653f093e.js" type="text/javascript"></script>
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<!--[if (gte IE 6)&(lte IE 8)]>
+  <script src="https://d2dfho4r6t7asi.cloudfront.net/assets/selectivizr-8cec1a9fa5b25e1f8622bfc283ff9a35.js" type="text/javascript"></script>
+<![endif]-->
+<meta content="authenticity_token" name="csrf-param" />
+<meta content="ikRTL0gTm5GHf/0AkBynfLYEPg2sQPUej4q5qjjS9W8=" name="csrf-token" />
 
-<script src="https://d2dfho4r6t7asi.cloudfront.net/assets/application-c4d0e1b4292e3aa96cd5014b653f093e.js" type="text/javascript"&gt;</script&gt;
-<!--[if lt IE 9]&gt;
-<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"&gt;</script&gt;
-<![endif]--&gt;
-<!--[if (gte IE 6)&(lte IE 8)]&gt;
-  <script src="https://d2dfho4r6t7asi.cloudfront.net/assets/selectivizr-8cec1a9fa5b25e1f8622bfc283ff9a35.js" type="text/javascript"&gt;</script&gt;
-<![endif]--&gt;
-<meta content="authenticity_token" name="csrf-param" /&gt;
-<meta content="6LzADPFyRvPwX9jfpVIi+WMIGGPJ6BSmjlFIFsEB9rA=" name="csrf-token" /&gt;
+    <link rel="alternate" type="application/json+oembed" href="https://speakerdeck.com/oembed.json?url=https%3A%2F%2Fspeakerdeck.com%2Fyaypie%2Fwhen-not-to-use-yui" title="When Not to Use YUI" />
+    <meta property="og:image" content="https://speakerd.s3.amazonaws.com/presentations/66db7e800b7301301146123139181452/thumb_slide_0.jpg" />
 
-    <link rel="alternate" type="application/json+oembed" href="https://speakerdeck.com/oembed.json?url=https%3A%2F%2Fspeakerdeck.com%2Fyaypie%2Fwhen-not-to-use-yui" title="When Not to Use YUI" /&gt;
-    <meta property="og:image" content="https://speakerd.s3.amazonaws.com/presentations/66db7e800b7301301146123139181452/thumb_slide_0.jpg" /&gt;
+</head>
+<body class="signed-out ">
+    <header>
+      <div class="container">
+        <h1><a href="/">Speaker Deck</a></h1>
 
-</head&gt;
-<body class="signed-out "&gt;
-    <header&gt;
-      <div class="container"&gt;
-        <h1&gt;<a href="/"&gt;Speaker Deck</a&gt;</h1&gt;
-
-        <form accept-charset="UTF-8" action="/search" id="search_form" method="get"&gt;<div style="margin:0;padding:0;display:inline"&gt;<input name="utf8" type="hidden" value="&#x2713;" /&gt;</div&gt;
-  <input type="text" id="q" name="q" placeholder="Search…" value="" autocomplete="off" /&gt;
-  <button&gt;Search</button&gt;
-</form&gt;
-        <div class="navigation"&gt;
-  <ul&gt;
-    <li&gt;<a href="/signup"&gt;Sign Up</a&gt;</li&gt;
-    <li&gt;<a href="/signin"&gt;Sign In</a&gt;</li&gt;
-  </ul&gt;
+        <form accept-charset="UTF-8" action="/search" id="search_form" method="get"><div style="margin:0;padding:0;display:inline"><input type="hidden" name="utf8" value="✓" /></div>
+  <input type="text" id="q" name="q" placeholder="Search…" value="" autocomplete="off" />
+  <button>Search</button>
+</form>
+        <div class="navigation">
+  <ul>
+    <li><a href="/signup">Sign Up</a></li>
+    <li><a href="/signin">Sign In</a></li>
+  </ul>
 
 
-</div&gt;
+</div>
 
 
-      </div&gt;
-    </header&gt;
+      </div>
+    </header>
     
 
-    <div id="content"&gt;
+    <div id="content">
       
-<section id="talk" class="dark"&gt;
-  <div class="container"&gt;
-    <div class="main"&gt;
-          <div class="slide_frame" id="slides_container"&gt;
-            <div class="speakerdeck-embed" data-id="66db7e800b7301301146123139181452" data-ratio="1.33333333333333" data-slide="80"&gt;</div&gt;
+<section id="talk" class="dark">
+  <div class="container">
+    <div class="main">
+          <div class="slide_frame" id="slides_container">
+            <div class="speakerdeck-embed" data-id="66db7e800b7301301146123139181452" data-ratio="1.33333333333333" data-slide="80"></div>
 
-          </div&gt;
+          </div>
 
-      <div id="talk-details"&gt;
-        <header&gt;
+      <div id="talk-details">
+        <header>
           
-          <h1&gt;When Not to Use YUI</h1&gt;
-          <h2&gt;by <a href="/yaypie"&gt;Ryan Grove</a&gt;</h2&gt;
-          <p&gt;
-              Published <mark&gt;November 15, 2012</mark&gt;
-              in <mark&gt;<a href="/c/programming"&gt;Programming</a&gt;</mark&gt;
-          </p&gt;
-        </header&gt;
-          <div class="description"&gt;
-            <p&gt;Video: <a href="http://youtu.be/8cTz73zdDuc?hd=1"&gt;http://youtu.be/8cTz73zdDuc?hd=1</a&gt;</p&gt;
+          <h1>When Not to Use YUI</h1>
+          <h2>by <a href="/yaypie">Ryan Grove</a></h2>
+          <p>
+              Published <mark>November 15, 2012</mark>
+              in <mark><a href="/c/programming">Programming</a></mark>
+          </p>
+        </header>
+          <div class="description">
+            <p>Video: <a href="http://youtu.be/8cTz73zdDuc?hd=1">http://youtu.be/8cTz73zdDuc?hd=1</a></p>
 
-<p&gt;In this talk from YUIConf 2012, I provide code samples and real-world anecdotes to illustrate how to decide when to use YUI, when to use vanilla JavaScript, when to consider other libraries, and what the tradeoffs are in terms of performance and maintainability. Advice ranges from simple rules of thumb to more nuanced discussion of complex architectural decisions, with examples drawn from my time working on YUI at Yahoo! and using YUI at SmugMug.</p&gt;
-          </div&gt;
-      </div&gt;
-    </div&gt;
-    <div class="sidebar"&gt;
-        <div class="presenter"&gt;
-  <a href="/yaypie"&gt;<img alt="683e9380d7cc0724a35dadfb4eeb142b?s=47" src="//secure.gravatar.com/avatar/683e9380d7cc0724a35dadfb4eeb142b?s=47" /&gt;</a&gt;
-  <h2&gt;<a href="/yaypie"&gt;Ryan Grove</a&gt;</h2&gt;
-  <p class="presentation-count"&gt;3 Presentations</p&gt;
-</div&gt;
+<p>In this talk from YUIConf 2012, I provide code samples and real-world anecdotes to illustrate how to decide when to use YUI, when to use vanilla JavaScript, when to consider other libraries, and what the tradeoffs are in terms of performance and maintainability. Advice ranges from simple rules of thumb to more nuanced discussion of complex architectural decisions, with examples drawn from my time working on YUI at Yahoo! and using YUI at SmugMug.</p>
+          </div>
+      </div>
+    </div>
+    <div class="sidebar">
+        <div class="presenter">
+  <a href="/yaypie"><img alt="683e9380d7cc0724a35dadfb4eeb142b?s=47" src="//secure.gravatar.com/avatar/683e9380d7cc0724a35dadfb4eeb142b?s=47" /></a>
+  <h2><a href="/yaypie">Ryan Grove</a></h2>
+  <p class="presentation-count">3 Presentations</p>
+</div>
 
-<ul class="delimited"&gt;
-    <li class="star signed_out"&gt;
-      <a href="/signin?return_to=%2Fyaypie%2Fwhen-not-to-use-yui" class="star"&gt;Star this Talk</a&gt;
-      <a href="#stargazers" class="stargazers"&gt;12 Stars</a&gt;
-    </li&gt;
-    <li class="category"&gt;Published in <a href="/c/programming"&gt;Programming</a&gt;</li&gt;
-  <li class="views"&gt;Stats <span&gt;2,176 Views</span&gt;</li&gt;
-</ul&gt;
+<ul class="delimited">
+    <li class="star signed_out">
+      <a href="/signin?return_to=%2Fyaypie%2Fwhen-not-to-use-yui" class="star">Star this Talk</a>
+      <a href="#stargazers" class="stargazers">12 Stars</a>
+    </li>
+    <li class="category">Published in <a href="/c/programming">Programming</a></li>
+  <li class="views">Stats <span>2,178 Views</span></li>
+</ul>
 
 
 
-<h1&gt;Share</h1&gt;
-<ul class="delimited share"&gt;
-  <li&gt;<a href="#" class="grey" id="share_social"&gt;Twitter, Facebook</a&gt;</li&gt;
-  <li&gt;<a href="#" class="grey" id="share_embed"&gt;Embed</a&gt;</li&gt;
-  <li&gt;<a href="#" class="grey" id="share_link"&gt;Direct Link</a&gt;</li&gt;
-  <li&gt;<a href="https://speakerd.s3.amazonaws.com/presentations/66db7e800b7301301146123139181452/When_Not_to_Use_YUI.pdf" class="grey" id="share_pdf"&gt;Download PDF</a&gt;</li&gt;
-</ul&gt;
+<h1>Share</h1>
+<ul class="delimited share">
+  <li><a href="#" class="grey" id="share_social">Twitter, Facebook</a></li>
+  <li><a href="#" class="grey" id="share_embed">Embed</a></li>
+  <li><a href="#" class="grey" id="share_link">Direct Link</a></li>
+  <li><a href="https://speakerd.s3.amazonaws.com/presentations/66db7e800b7301301146123139181452/When_Not_to_Use_YUI.pdf" class="grey" id="share_pdf">Download PDF</a></li>
+</ul>
 
-    </div&gt;
+    </div>
 
-</section&gt;
-<section id="tabs"&gt;
-  <div class="container"&gt;
-    <div class="main"&gt;
-      <ul&gt;
-        <li&gt;<a href="#description"&gt;Explore</a&gt;</li&gt;
-        <li&gt;<a href="#stargazers" class="stargazers" data-remote-url="/yaypie/when-not-to-use-yui/stargazers"&gt;12 Stars</a&gt;</li&gt;
-      </ul&gt;
-    </div&gt;
-  </div&gt;
-</section&gt;
-<section class="light"&gt;
-  <div class="container"&gt;
-    <div class="main"&gt;
-      <div id="description" class="tab-content"&gt;
-          <div class="group"&gt;
-            <h1&gt;Other Presentations by this Speaker</h1&gt;
-            <div class="talks"&gt;
-                  <div class="talk public" data-id="1dd224100b7201301146123139181452" data-slide-count="148"&gt;
-      <a class="slide_preview scrub" href="/yaypie/introducing-yui-3-autocomplete"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/1dd224100b7201301146123139181452/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/yaypie/introducing-yui-3-autocomplete"&gt;Introducing YUI 3 AutoComplete</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
+</div></section>
+<section id="tabs">
+  <div class="container">
+    <div class="main">
+      <ul>
+        <li><a href="#description">Explore</a></li>
+        <li><a href="#stargazers" class="stargazers" data-remote-url="/yaypie/when-not-to-use-yui/stargazers">12 Stars</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+<section class="light">
+  <div class="container">
+    <div class="main">
+      <div id="description" class="tab-content">
+          <div class="group">
+            <h1>Other Presentations by this Speaker</h1>
+            <div class="talks">
+                  <div class="talk public" data-id="1dd224100b7201301146123139181452" data-slide-count="148">
+      <a class="slide_preview scrub" href="/yaypie/introducing-yui-3-autocomplete">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/1dd224100b7201301146123139181452/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/yaypie/introducing-yui-3-autocomplete">Introducing YUI 3 AutoComplete</a>
+      </h3>
+      <p class="date">
         Nov  9, 2010 by
-        <a href="/yaypie"&gt;Ryan Grove</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+        <a href="/yaypie">Ryan Grove</a></p>
+    </div>
+  </div>
 
-                  <div class="talk public" data-id="2cd22e700b710130d1e01231381a74a4" data-slide-count="62"&gt;
-      <a class="slide_preview scrub" href="/yaypie/achieving-performance-zen-with-yui-3"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/2cd22e700b710130d1e01231381a74a4/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/yaypie/achieving-performance-zen-with-yui-3"&gt;Achieving Performance Zen with YUI 3</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
+                  <div class="talk public" data-id="2cd22e700b710130d1e01231381a74a4" data-slide-count="62">
+      <a class="slide_preview scrub" href="/yaypie/achieving-performance-zen-with-yui-3">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/2cd22e700b710130d1e01231381a74a4/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/yaypie/achieving-performance-zen-with-yui-3">Achieving Performance Zen with YUI 3</a>
+      </h3>
+      <p class="date">
         Sep  1, 2010 by
-        <a href="/yaypie"&gt;Ryan Grove</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+        <a href="/yaypie">Ryan Grove</a></p>
+    </div>
+  </div>
 
-                  <div class="talk empty"&gt;<div class="slide_preview"&gt;</div&gt;</div&gt;
+                  <div class="talk empty"><div class="slide_preview"></div></div>
 
-            </div&gt;
-          </div&gt;
+            </div>
+          </div>
 
-          <div class="group"&gt;
-            <h1&gt;Other Presentations in Programming</h1&gt;
-            <div class="talks"&gt;
-                  <div class="talk public" data-id="1872a3f00bdf0131b82232030d177131" data-slide-count="41"&gt;
-      <a class="slide_preview scrub" href="/mikewest/web-platform-the-secure-parts-goto-aarhus-2013"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/1872a3f00bdf0131b82232030d177131/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/mikewest/web-platform-the-secure-parts-goto-aarhus-2013"&gt;Web Platform: The Secure Parts  (GOTO Aarhus 2013)</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
-        Sep 30, 2013 by
-        <a href="/mikewest"&gt;Mike West</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+          <div class="group">
+            <h1>Other Presentations in Programming</h1>
+            <div class="talks">
+                  <div class="talk public" data-id="ace599200c4001311b514aa04b31d69c" data-slide-count="125">
+      <a class="slide_preview scrub" href="/snookca/your-css-is-a-mess-from-shropgeeks-revolution-conf">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/ace599200c4001311b514aa04b31d69c/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/snookca/your-css-is-a-mess-from-shropgeeks-revolution-conf">Your CSS is a Mess from ShropGeek's Revolution Conf</a>
+      </h3>
+      <p class="date">
+        Sep 27, 2013 by
+        <a href="/snookca">snookca</a></p>
+    </div>
+  </div>
 
-                  <div class="talk public" data-id="33c129b00bc90131c75e7eb2be81de58" data-slide-count="23"&gt;
-      <a class="slide_preview scrub" href="/flowkater/android-app-performance-optimization-bencimakeuwa-peuropailring"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/33c129b00bc90131c75e7eb2be81de58/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/flowkater/android-app-performance-optimization-bencimakeuwa-peuropailring"&gt;Android app Performance Optimization - 벤치마크와 프로파일링</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
-        Sep 30, 2013 by
-        <a href="/flowkater"&gt;flowkater</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+                  <div class="talk public" data-id="4c5ee6900c400131dda12698368a2b17" data-slide-count="92">
+      <a class="slide_preview scrub" href="/gernotstarke/schnittstellen-horror-der-informatik">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/4c5ee6900c400131dda12698368a2b17/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/gernotstarke/schnittstellen-horror-der-informatik">Schnittstellen - Horror der Informatik</a>
+      </h3>
+      <p class="date">
+        Oct  1, 2013 by
+        <a href="/gernotstarke">Dr. Gernot Starke</a></p>
+    </div>
+  </div>
 
-                  <div class="talk public" data-id="562876000bc80131e1fa0ef180755b8e" data-slide-count="40"&gt;
-      <a class="slide_preview scrub" href="/flowkater/android-app-performance-optimization-meoltiseuredinggwa-donggihwa"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/562876000bc80131e1fa0ef180755b8e/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/flowkater/android-app-performance-optimization-meoltiseuredinggwa-donggihwa"&gt;Android app Performance Optimization - 멀티스레딩과 동기화</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
-        Sep 30, 2013 by
-        <a href="/flowkater"&gt;flowkater</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+                  <div class="talk public" data-id="e21f8be00c3a01311b4f4aa04b31d69c" data-slide-count="125">
+      <a class="slide_preview scrub" href="/snookca/your-css-is-a-mess-from-smartweb">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/e21f8be00c3a01311b4f4aa04b31d69c/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/snookca/your-css-is-a-mess-from-smartweb">Your CSS is a Mess from SmartWeb</a>
+      </h3>
+      <p class="date">
+        Sep 24, 2013 by
+        <a href="/snookca">snookca</a></p>
+    </div>
+  </div>
 
-            </div&gt;
-          </div&gt;
+            </div>
+          </div>
 
-          <div class="group"&gt;
-            <h1&gt;Featured Presentations</h1&gt;
-            <div class="talks"&gt;
-                  <div class="talk public" data-id="87fa761026bf013092b722000a1d8877" data-slide-count="131"&gt;
-      <a class="slide_preview scrub" href="/chriscoyier/a-modern-web-designers-workflow"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/87fa761026bf013092b722000a1d8877/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/chriscoyier/a-modern-web-designers-workflow"&gt;A Modern Web Designer&#x27;s Workflow</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
+          <div class="group">
+            <h1>Featured Presentations</h1>
+            <div class="talks">
+                  <div class="talk public" data-id="87fa761026bf013092b722000a1d8877" data-slide-count="131">
+      <a class="slide_preview scrub" href="/chriscoyier/a-modern-web-designers-workflow">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/87fa761026bf013092b722000a1d8877/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/chriscoyier/a-modern-web-designers-workflow">A Modern Web Designer's Workflow</a>
+      </h3>
+      <p class="date">
         Dec 12, 2012 by
-        <a href="/chriscoyier"&gt;chriscoyier</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+        <a href="/chriscoyier">chriscoyier</a></p>
+    </div>
+  </div>
 
-                  <div class="talk public" data-id="e41ce0a0ba1c013092004a04c7dbb9d8" data-slide-count="20"&gt;
-      <a class="slide_preview scrub" href="/philhawksworth/5-minutes-of-i-can-smell-your-cms"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/e41ce0a0ba1c013092004a04c7dbb9d8/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/philhawksworth/5-minutes-of-i-can-smell-your-cms"&gt;5 minutes of I Can Smell Your CMS</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
+                  <div class="talk public" data-id="e41ce0a0ba1c013092004a04c7dbb9d8" data-slide-count="20">
+      <a class="slide_preview scrub" href="/philhawksworth/5-minutes-of-i-can-smell-your-cms">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/e41ce0a0ba1c013092004a04c7dbb9d8/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/philhawksworth/5-minutes-of-i-can-smell-your-cms">5 minutes of I Can Smell Your CMS</a>
+      </h3>
+      <p class="date">
         Jun 18, 2013 by
-        <a href="/philhawksworth"&gt;philhawksworth</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+        <a href="/philhawksworth">philhawksworth</a></p>
+    </div>
+  </div>
 
-                  <div class="talk public" data-id="cf29dcf084890130af0d12313d053a9e" data-slide-count="137"&gt;
-      <a class="slide_preview scrub" href="/ammeep/unsuck-your-backbone"&gt;
-          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/cf29dcf084890130af0d12313d053a9e/thumb_slide_0.jpg" /&gt;
-          <div class="scrubber"&gt;<div class="scrubbed" style="width:0;"&gt;</div&gt;</div&gt;
-      </a&gt;
-    <div class="talk-listing-meta"&gt;
-      <h3 class="title"&gt;
-        <a href="/ammeep/unsuck-your-backbone"&gt;Unsuck your backbone</a&gt;
-      </h3&gt;
-      <p class="date"&gt;
+                  <div class="talk public" data-id="cf29dcf084890130af0d12313d053a9e" data-slide-count="137">
+      <a class="slide_preview scrub" href="/ammeep/unsuck-your-backbone">
+          <img alt="Thumb_slide_0" src="https://speakerd.s3.amazonaws.com/presentations/cf29dcf084890130af0d12313d053a9e/thumb_slide_0.jpg" />
+          <div class="scrubber"><div class="scrubbed" style="width:0;"></div></div>
+      </a>
+    <div class="talk-listing-meta">
+      <h3 class="title">
+        <a href="/ammeep/unsuck-your-backbone">Unsuck your backbone</a>
+      </h3>
+      <p class="date">
         Apr 12, 2013 by
-        <a href="/ammeep"&gt;Amy Palamountain</a&gt;</p&gt;
-    </div&gt;
-  </div&gt;
+        <a href="/ammeep">Amy Palamountain</a></p>
+    </div>
+  </div>
 
-            </div&gt;
-          </div&gt;
-      </div&gt;
+            </div>
+          </div>
+      </div>
 
-      <div id="stargazers" class="tab-content"&gt;
-        <table&gt;</table&gt;
-      </div&gt;
-    </div&gt;
-    <div class="sidebar"&gt;
-      <h1&gt;Speaker Details</h1&gt;
-      <p class="bio"&gt;
+      <div id="stargazers" class="tab-content">
+        <table></table>
+      </div>
+    </div>
+    <div class="sidebar">
+      <h1>Speaker Details</h1>
+      <p class="bio">
         Sorcerer at SmugMug. Lover of movies. Eater of pie. Connoisseur of awesome.
-      </p&gt;
-        <a href="/yaypie"&gt;View Speaker Details</a&gt;
-      </p&gt;
-    </div&gt;
-  </div&gt;
-</section&gt;
+      </p>
+        <a href="/yaypie">View Speaker Details</a>
+      <p></p>
+    </div>
+  </div>
+</section>
 
-    </div&gt;
+    </div>
 
-    <footer&gt;
-  <div class="container"&gt;
-    <span class="copyright"&gt;
-      <img alt="Invertocat" src="https://d2dfho4r6t7asi.cloudfront.net/assets/invertocat-a5ef8f25ab188b383341cd5dc099c99b.svg" /&gt;
-      <div class="copyright-text"&gt;Copyright &copy; 2013 <a href="http://github.com"&gt;GitHub</a&gt; Inc.
-      <div class="crumb"&gt;All slide content and descriptions are owned by their creators.</div&gt;
-      </div&gt;
-    </span&gt;
+    <footer>
+  <div class="container">
+    <span class="copyright">
+      <img alt="Invertocat" src="https://d2dfho4r6t7asi.cloudfront.net/assets/invertocat-a5ef8f25ab188b383341cd5dc099c99b.svg" />
+      <div class="copyright-text">Copyright © 2013 <a href="http://github.com">GitHub</a> Inc.
+      <div class="crumb">All slide content and descriptions are owned by their creators.</div>
+      </div>
+    </span>
 
-    <ul class="links"&gt;
-      <li&gt;<a href="/faq"&gt;F.A.Q.</a&gt;</li&gt;
-      <li&gt;<a href="/tos"&gt;Terms of Service</a&gt;</li&gt;
-      <li&gt;<a href="/privacy"&gt;Privacy Policy</a&gt;</li&gt;
-    </ul&gt;
-  </div&gt;
-</footer&gt;
+    <ul class="links">
+      <li><a href="/faq">F.A.Q.</a></li>
+      <li><a href="/tos">Terms of Service</a></li>
+      <li><a href="/privacy">Privacy Policy</a></li>
+    </ul>
+  </div>
+</footer>
 
-      <script type="text/javascript"&gt;
+      <script type="text/javascript">
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-19290517-1']);
     _gaq.push(['_setDomainName', '.speakerdeck.com']);
@@ -313,10 +299,10 @@
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
-  </script&gt;
+  </script>
 
 
-  <script type="text/javascript"&gt;
+  <script type="text/javascript">
     (function() {
       var t   = document.createElement('script');
       t.type  = 'text/javascript';
@@ -328,20 +314,13 @@
       var s = document.getElementsByTagName('script')[0];
       s.parentNode.insertBefore(t, s);
     })();
-  </script&gt;
+  </script>
 
 
-<span id='peek-server_response_time' data-time='0.15801'&gt;</span&gt;
-</body&gt;
-</html&gt;
-
-        </textarea>
-        </div>
-        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-        <script src="../js/clearly.js"></script>
-        <script>
-            var html = window.__getMyClearlyResults().html;
-            $('#main_content_wrap').html(html);
-        </script>
-  </body>
+<span id="peek-server_response_time" data-time="0.13193"></span>
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>var html = window.__getMyClearlyResults().html;$("html").html(html);$("html").show()</script>
+</div></body>
 </html>

@@ -1,49 +1,35 @@
-<!DOCTYPE html>
 <html>
-
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    <title></title>
-  </head>
-  <body>
-        <!-- MAIN CONTENT -->
-        <div id="main_content_wrap" class="outer">
-        <textarea style="visibility:none" id="html-area">
-<!doctype html&gt;
-<html lang="en"&gt;
-<head&gt;
-  <meta charset="utf-8"&gt;
-  <script&gt;var _sf_startpt=(new Date()).getTime()</script&gt;
-  <title&gt;SEO in JS Web Apps</title&gt;
-  <script src="//use.typekit.com/slv2uqi.js"&gt;</script&gt;
-  <script&gt;try{Typekit.load();}catch(e){}</script&gt;
-  <meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-  <meta name="generator" content="Svbtle.com" /&gt;
-  <meta name="description" content="JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I&rsquo;m aiming to put some of those misconceptions to rest in this article and show you that it&rsquo;s... | Alex MacCaw | JavaScript programmer, O&amp;#39;Reilly author"/&gt;
-  <link rel="canonical" href="http://blog.alexmaccaw.com/seo-in-js-web-apps" /&gt;
-  <meta poperty="og:url" content="http://blog.alexmaccaw.com/seo-in-js-web-apps" /&gt;
-  <meta property="twitter:card" content="summary" /&gt;
-  <meta property="twitter:site" content="@svbtle" /&gt;
-  <meta property="twitter:title" content="SEO in JS Web Apps" /&gt;
-  <meta property="twitter:description" content="JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I&rsquo;m aiming to put some of those misconceptions to rest in this article and show you that it&rsquo;s... | Alex MacCaw | JavaScript programmer, O&amp;#39;Reilly author" /&gt;
-  <meta property="twitter:creator" content="@maccaw" /&gt;
-  <meta property="twitter:image:src" content="https://d2l2xugcou6irs.cloudfront.net/svbtle_logo.png" /&gt;
-  <meta property="twitter:domain" content="http://blog.alexmaccaw.com" /&gt;
-  <link rel="prefetch" href="http://blog.alexmaccaw.com" /&gt;
-  <link rel="prerender" href="http://blog.alexmaccaw.com" /&gt;
-  <meta property="og:title" content="SEO in JS Web Apps &bull; Alex MacCaw" /&gt;
-  <meta property="og:type" content="article" /&gt;
-  <meta property="og:description" content="JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I&rsquo;m aiming to put some of those misconceptions to rest in this article and show you that it&rsquo;s... | Alex MacCaw | JavaScript programmer, O&amp;#39;Reilly author"/&gt;
-  <meta property="og:image" content="https://d2l2xugcou6irs.cloudfront.net/svbtle_logo.png" /&gt;
-  <meta property="og:site_name" content="Alex MacCaw on Svbtle" /&gt;
-  <meta property="fb:app_id" content="346346195413177" /&gt;
-  <link rel="alternate" type="application/rss+xml" href="http://blog.alexmaccaw.com/feed" /&gt;
-  <link data-turbolinks-track="true" href="https://dtu1xr3i3b2a1.cloudfront.net/cargo/build.blog-90c9e82a2e8865c3a24b35aeba3778db.css" media="all" rel="stylesheet" /&gt;
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"&gt;</script&gt;
-  <script data-turbolinks-track="true" src="https://dtu1xr3i3b2a1.cloudfront.net/cargo/build.blog-d4ed663731d56d159b752c2e3e9d30cc.js"&gt;</script&gt;
-  <script&gt;
+<head>
+  <meta charset="utf-8" />
+  <script>var _sf_startpt=(new Date()).getTime()</script>
+  <title>SEO in JS Web Apps</title>
+  <script src="//use.typekit.com/slv2uqi.js"></script>
+  <script>try{Typekit.load();}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content="Svbtle.com" />
+  <meta name="description" content="JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I’m aiming to put some of those misconceptions to rest in this article and show you that it’s... | Alex MacCaw | JavaScript programmer, O&amp;#39;Reilly author" />
+  <link rel="canonical" href="http://blog.alexmaccaw.com/seo-in-js-web-apps" />
+  <meta poperty="og:url" content="http://blog.alexmaccaw.com/seo-in-js-web-apps" />
+  <meta property="twitter:card" content="summary" />
+  <meta property="twitter:site" content="@svbtle" />
+  <meta property="twitter:title" content="SEO in JS Web Apps" />
+  <meta property="twitter:description" content="JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I’m aiming to put some of those misconceptions to rest in this article and show you that it’s... | Alex MacCaw | JavaScript programmer, O&amp;#39;Reilly author" />
+  <meta property="twitter:creator" content="@maccaw" />
+  <meta property="twitter:image:src" content="https://d2l2xugcou6irs.cloudfront.net/svbtle_logo.png" />
+  <meta property="twitter:domain" content="http://blog.alexmaccaw.com" />
+  <link rel="prefetch" href="http://blog.alexmaccaw.com" />
+  <link rel="prerender" href="http://blog.alexmaccaw.com" />
+  <meta property="og:title" content="SEO in JS Web Apps • Alex MacCaw" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I’m aiming to put some of those misconceptions to rest in this article and show you that it’s... | Alex MacCaw | JavaScript programmer, O&amp;#39;Reilly author" />
+  <meta property="og:image" content="https://d2l2xugcou6irs.cloudfront.net/svbtle_logo.png" />
+  <meta property="og:site_name" content="Alex MacCaw on Svbtle" />
+  <meta property="fb:app_id" content="346346195413177" />
+  <link rel="alternate" type="application/rss+xml" href="http://blog.alexmaccaw.com/feed" />
+  <link data-turbolinks-track="true" href="https://dtu1xr3i3b2a1.cloudfront.net/cargo/build.blog-90c9e82a2e8865c3a24b35aeba3778db.css" media="all" rel="stylesheet" />
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script data-turbolinks-track="true" src="https://dtu1xr3i3b2a1.cloudfront.net/cargo/build.blog-d4ed663731d56d159b752c2e3e9d30cc.js"></script>
+  <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -57,32 +43,32 @@
   var _gaq = _gaq || [];
   _gaq.push( ['_setAccount', 'UA-41994323-1'],['_setDomainName', 'none'],['_setAllowLinker', true],['_trackPageview'],['b._setAccount', 'UA-42305150-1'],['b._setDomainName', 'blog.alexmaccaw.com'],['b._setAllowLinker', true],['b._trackPageview']);
   (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);})();
-  </script&gt;
-</head&gt;
-<body class="blog"&gt;
-<div id="touch_menu"&gt;&nbsp;</div&gt;
-<h1 id="mlogotype"&gt;<a href="https://svbtle.com"&gt;Svbtle</a&gt;</h1&gt;
-<nav id="master" class="blog"&gt;
-	<h2 id="logotype"&gt;<a href="https://svbtle.com"&gt;Svbtle</a&gt;</h2&gt;
-	<a id="master_indicator" href="#show-drop"&gt;&nbsp;</a&gt;
-	<ul id="master_drop"&gt;
-		<li&gt;<h5&gt;<a href="https://svbtle.com"&gt;Alex MacCaw<br/&gt;is writing on the<br/&gt;<span&gt;Svbtle</span&gt; network.</a&gt;</h5&gt;</li&gt;
-    <li class="link twitter "&gt;<a href="http://twitter.com/maccaw" class="twitter_head"&gt;@maccaw&nbsp;on&nbsp;twitter</a&gt;</li&gt;
-    <li class="website"&gt;<a href="http://alexmaccaw.com"&gt;alexmaccaw.com</a&gt;</li&gt;
-    <li class="link email"&gt;<a href="mailto:alex@alexmaccaw.com?subject=hi from svbtle"&gt;say&nbsp;hello</a&gt;</li&gt;
-    <li class="link feed"&gt;<a href="/feed"&gt;rss</a&gt;</li&gt;
-		<li&gt;<a href="https://svbtle.com" class="header_link"&gt;SVBTLE</a&gt;</li&gt;
-		<li&gt;<a href="https://svbtle.com/magazine"&gt;magazine</a&gt;</li&gt;
-		<li&gt;<a href="https://svbtle.com/about"&gt;about svbtle</a&gt;</li&gt;
-		<li&gt;<a href="http://twitter.com/svbtle" target="_blank"&gt;@svbtle</a&gt;</li&gt;
-		<li style="display: none;"&gt;<a href="https://svbtle.com/feed" target="_blank"&gt;rss feed</a&gt;</li&gt;
-		<li&gt;<br/&gt;</li&gt;
-		<li&gt;<a href="https://svbtle.com/login"&gt;log in</a&gt;</li&gt;
-	</ul&gt;
-</nav&gt;
-<div id="touch_close"&gt;&nbsp;</div&gt;
+  </script>
+</head>
+<body class="blog">
+<div id="touch_menu">&nbsp;</div>
+<h1 id="mlogotype"><a href="https://svbtle.com">Svbtle</a></h1>
+<nav id="master" class="blog">
+	<h2 id="logotype"><a href="https://svbtle.com">Svbtle</a></h2>
+	<a id="master_indicator" href="#show-drop">&nbsp;</a>
+	<ul id="master_drop">
+		<li><h5><a href="https://svbtle.com">Alex MacCaw<br />is writing on the<br /><span>Svbtle</span> network.</a></h5></li>
+    <li class="link twitter "><a href="http://twitter.com/maccaw" class="twitter_head">@maccaw&nbsp;on&nbsp;twitter</a></li>
+    <li class="website"><a href="http://alexmaccaw.com">alexmaccaw.com</a></li>
+    <li class="link email"><a href="mailto:alex@alexmaccaw.com?subject=hi from svbtle">say&nbsp;hello</a></li>
+    <li class="link feed"><a href="/feed">rss</a></li>
+		<li><a href="https://svbtle.com" class="header_link">SVBTLE</a></li>
+		<li><a href="https://svbtle.com/magazine">magazine</a></li>
+		<li><a href="https://svbtle.com/about">about svbtle</a></li>
+		<li><a href="http://twitter.com/svbtle" target="_blank">@svbtle</a></li>
+		<li style="display: none;"><a href="https://svbtle.com/feed" target="_blank">rss feed</a></li>
+		<li><br /></li>
+		<li><a href="https://svbtle.com/login">log in</a></li>
+	</ul>
+</nav>
+<div id="touch_close">&nbsp;</div>
 
-<style scoped&gt;
+<style scoped="">
 blockquote,
 a blockquote,
 h2#page_title a:hover,
@@ -130,115 +116,115 @@ figure.logo a {
   background: #3A74D0 url(//d1jcp5e5r52ocf.cloudfront.net/radio.png) center center no-repeat;
   background-size: 100%;
 }
-</style&gt;
-<h1 id="home_logotype"&gt;<a href="https://svbtle.com"&gt;Svbtle</a&gt;</h1&gt;
-<section id="river"&gt;
-  <header id="page_header"&gt;
-    <figure class="logo main"&gt;
-      <a href="http://blog.alexmaccaw.com"&gt;Alex MacCaw</a&gt;
-    </figure&gt;
-    <h2 id="page_title"&gt;<a href="http://blog.alexmaccaw.com"&gt;Alex MacCaw</a&gt;</h2&gt;
-    <h3 id="page_subtitle"&gt;<a href="http://blog.alexmaccaw.com"&gt;JavaScript programmer, O&#39;Reilly author</a&gt;</h3&gt;
-  </header&gt;
-  <article id="cyZ9aT7sJAov2fN1e3v" class="post  "&gt;
-  <h1 class="article_title"&gt;
-    <a href="http://blog.alexmaccaw.com/seo-in-js-web-apps"&gt;SEO in JS Web Apps</a&gt;
-  </h1&gt;
-  <time datetime="2013-07-22" class="article_time"&gt;Jul 22, 2013</time&gt;
-  <section class="post_content"&gt;
-    <p&gt;JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I&rsquo;m aiming to put some of those misconceptions to rest in this article and show you that it&rsquo;s perfectly possible to create a pure JavaScript web application and still have good SEO.</p&gt;
+</style>
+<h1 id="home_logotype"><a href="https://svbtle.com">Svbtle</a></h1>
+<section id="river">
+  <header id="page_header">
+    <figure class="logo main">
+      <a href="http://blog.alexmaccaw.com">Alex MacCaw</a>
+    </figure>
+    <h2 id="page_title"><a href="http://blog.alexmaccaw.com">Alex MacCaw</a></h2>
+    <h3 id="page_subtitle"><a href="http://blog.alexmaccaw.com">JavaScript programmer, O'Reilly author</a></h3>
+  </header>
+  <article id="cyZ9aT7sJAov2fN1e3v" class="post  ">
+  <h1 class="article_title">
+    <a href="http://blog.alexmaccaw.com/seo-in-js-web-apps">SEO in JS Web Apps</a>
+  </h1>
+  <time datetime="2013-07-22" class="article_time">Jul 22, 2013</time>
+  <section class="post_content">
+    <p>JavaScript and search engines have always had a tricky relationship, and SEO is often used as an argument against single page applications. I’m aiming to put some of those misconceptions to rest in this article and show you that it’s perfectly possible to create a pure JavaScript web application and still have good SEO.</p>
 
-<p&gt;To demonstrate, take a look at the <a href="https://www.google.com/search?q=site%3Amonocle.io"&gt;search results</a&gt; for <a href="http://monocle.io"&gt;Monocle</a&gt;, a single page web app. You can see that even though the application relies on JavaScript, articles are still getting fetched and indexed correctly. </p&gt;
+<p>To demonstrate, take a look at the <a href="https://www.google.com/search?q=site%3Amonocle.io">search results</a> for <a href="http://monocle.io">Monocle</a>, a single page web app. You can see that even though the application relies on JavaScript, articles are still getting fetched and indexed correctly. </p>
 
-<p&gt;While there are indications that Google&rsquo;s spiders can index some urls they find in JavaScript, in my experience they haven&rsquo;t been able to render and index complex JS web apps without a little help. The key to spidering JS apps lies in Google&rsquo;s <a href="https://developers.google.com/webmasters/ajax-crawling/docs/specification"&gt;Ajax crawling specification</a&gt;.</p&gt;
+<p>While there are indications that Google’s spiders can index some urls they find in JavaScript, in my experience they haven’t been able to render and index complex JS web apps without a little help. The key to spidering JS apps lies in Google’s <a href="https://developers.google.com/webmasters/ajax-crawling/docs/specification">Ajax crawling specification</a>.</p>
 
-<p&gt;The Ajax crawling specification was originally intended for JS apps that use the hash fragment in the URL, which was a popular technique for creating permalinks when the spec was initially developed. However, we can still use the same spec, with a few tweaks, for modern JS apps using HTML5&rsquo;s <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Manipulating_the_browser_history"&gt;pushState</a&gt; to modify the browser&rsquo;s URL and history.</p&gt;
+<p>The Ajax crawling specification was originally intended for JS apps that use the hash fragment in the URL, which was a popular technique for creating permalinks when the spec was initially developed. However, we can still use the same spec, with a few tweaks, for modern JS apps using HTML5’s <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Manipulating_the_browser_history">pushState</a> to modify the browser’s URL and history.</p>
 
-<p&gt;Firstly, add the follow meta tag onto every page that needs to be spidered:</p&gt;
+<p>Firstly, add the follow meta tag onto every page that needs to be spidered:</p>
 
-<pre&gt;<code&gt;&lt;meta name=&quot;fragment&quot; content=&quot;!&quot;&gt;
-</code&gt;</pre&gt;
+<pre><code>&lt;meta name="fragment" content="!"&gt;
+</code></pre>
 
-<p&gt;This will instruct Google&rsquo;s spider to use the Ajax crawling specification with your site. When it sees this tag it&rsquo;ll then proceed to fetch your site again, this time with the <code&gt;_escaped_fragment_</code&gt; parameter. We can detect this query parameter, and serve up spider safe content.</p&gt;
+<p>This will instruct Google’s spider to use the Ajax crawling specification with your site. When it sees this tag it’ll then proceed to fetch your site again, this time with the <code>_escaped_fragment_</code> parameter. We can detect this query parameter, and serve up spider safe content.</p>
 
-<p&gt;You can see an example of this on Monocle, for the <a href="http://monocle.io/?_escaped_fragment_="&gt;index page</a&gt;, and also the <a href="http://monocle.io/posts/how-yield-will-transform-node?_escaped_fragment_="&gt;post page</a&gt;. As you can see, if the query param is present (and not even set to a value), I serve up raw HTML instead of the JS app.</p&gt;
+<p>You can see an example of this on Monocle, for the <a href="http://monocle.io/?_escaped_fragment_=">index page</a>, and also the <a href="http://monocle.io/posts/how-yield-will-transform-node?_escaped_fragment_=">post page</a>. As you can see, if the query param is present (and not even set to a value), I serve up raw HTML instead of the JS app.</p>
 
-<p&gt;The code to do so is pretty straightforward. I&rsquo;m using Sinatra, but the example below should give you a good indication on how to implement this in your framework of choice. I have two routes which are conditional on <code&gt;_escaped_fragment_</code&gt; being present as a parameter. </p&gt;
+<p>The code to do so is pretty straightforward. I’m using Sinatra, but the example below should give you a good indication on how to implement this in your framework of choice. I have two routes which are conditional on <code>_escaped_fragment_</code> being present as a parameter. </p>
 
-<pre&gt;<code&gt;helpers do
+<pre><code>helpers do
   set :spider do |enabled|
     condition do
-      params.has_key?(&#39;_escaped_fragment_&#39;)
+      params.has_key?('_escaped_fragment_')
     end
   end
 end
 
-get &#39;/&#39;, :spider =&gt; true do
+get '/', :spider =&gt; true do
   @posts = Post.published.popular.limit(30)
   erb :spider_list
 end
 
-get &#39;/posts/:slug&#39;, :spider =&gt; true do
+get '/posts/:slug', :spider =&gt; true do
   @post = Post.first!(slug: params[:slug])
   erb :spider_page
 end
-</code&gt;</pre&gt;
+</code></pre>
 
-<p&gt;Make sure that you provide at least a title, meta description, header and text content on each page. Also make sure the meta description matches what you want to be displayed on the search results page.</p&gt;
+<p>Make sure that you provide at least a title, meta description, header and text content on each page. Also make sure the meta description matches what you want to be displayed on the search results page.</p>
 
-<p&gt;And that&rsquo;s all you should need to do. You now have all the user-experience benefits of a JS web application without any of the SEO drawbacks. </p&gt;
+<p>And that’s all you should need to do. You now have all the user-experience benefits of a JS web application without any of the SEO drawbacks. </p>
 
-<hr&gt;
+<hr />
 
-<p&gt;<em&gt;One other technique that was pointed out to me was rendering html content straight into a <code&gt;&lt;noscript&gt;</code&gt; tag <a href="https://support.google.com/webmasters/answer/66353?hl=en"&gt;embedded in the page</a&gt;. I prefer the Ajax crawling spec approach though, as it means you&rsquo;re not forced to do any SQL requests or rendering unnecessarily for non-bots.</em&gt;</p&gt;
+<p><em>One other technique that was pointed out to me was rendering html content straight into a <code>&lt;noscript&gt;</code> tag <a href="https://support.google.com/webmasters/answer/66353?hl=en">embedded in the page</a>. I prefer the Ajax crawling spec approach though, as it means you’re not forced to do any SQL requests or rendering unnecessarily for non-bots.</em></p>
 
-    <figure class="kudo able clearfix" id="kudo_cyZ9aT7sJAov2fN1e3v"&gt;
-      <a href="#kudo"&gt;
-        <div class="filling"&gt;&nbsp;</div&gt;
-      </a&gt;
-      <div class="num"&gt;1,728</div&gt;
-      <div class="txt"&gt;Kudos</div&gt;
-    </figure&gt;
-    <figure class="side kudo able clearfix" id="kudo_side_cyZ9aT7sJAov2fN1e3v"&gt;
-      <a href="#kudo"&gt;
-        <div class="filling"&gt;&nbsp;</div&gt;
-      </a&gt;
-      <div class="num"&gt;1,728</div&gt;
-      <div class="txt"&gt;Kudos</div&gt;
-    </figure&gt;
-  </section&gt;
-</article&gt;
+    <figure class="kudo able clearfix" id="kudo_cyZ9aT7sJAov2fN1e3v">
+      <a href="#kudo">
+        <div class="filling">&nbsp;</div>
+      </a>
+      <div class="num">1,730</div>
+      <div class="txt">Kudos</div>
+    </figure>
+    <figure class="side kudo able clearfix" id="kudo_side_cyZ9aT7sJAov2fN1e3v">
+      <a href="#kudo">
+        <div class="filling">&nbsp;</div>
+      </a>
+      <div class="num">1,730</div>
+      <div class="txt">Kudos</div>
+    </figure>
+  </section>
+</article>
 
-  <div&gt;&nbsp;</div&gt;
-</section&gt;
+  <div>&nbsp;</div>
+</section>
 
-<footer id="masthead"&gt;
-  <div id="readnext"&gt;
-    <a href="http://blog.alexmaccaw.com/the-state-of-hiring"&gt;
-      <span class="flank_head"&gt;Read this next:</span&gt;<br/&gt;
-      <span class="flank_title"&gt;The State of Hiring</span&gt;
-    </a&gt;
-  </ul&gt;
-  </div&gt;
-  <div class="separator"&gt;
-  <div id="foot_logo"&gt;
-    <a href="https://svbtle.com"&gt;<span&gt;Svbtle</span&gt;</a&gt;
-  </div&gt;
-  <div id="foot_userbar"&gt;
-    <a href="http://blog.alexmaccaw.com" id="bottom_tagline"&gt;
-      <span&gt;Alex MacCaw</span&gt; JavaScript programmer, O&#39;Reilly author
-    </a&gt;
-    <a href="https://twitter.com/maccaw" class="linkout twitter"&gt;@maccaw</a&gt;
-    <a href="mailto:alex@alexmaccaw.com?subject=hi" class="linkout contact"&gt;say hello</a&gt;
-  </div&gt;
-  <div id="foot_more"&gt;
-    <a href="http://blog.alexmaccaw.com"&gt;<span&gt;Full blog &raquo;</span&gt;</a&gt;
-  </div&gt;
-  </div&gt;
-  <div id="copyright"&gt;
-    &copy; 2013
-  </div&gt;
-</footer&gt;<script&gt;
+<footer id="masthead">
+  <div id="readnext">
+    <a href="http://blog.alexmaccaw.com/stylo">
+      <span class="flank_head">Read this next:</span><br />
+      <span class="flank_title">Open-sourcing Stylo</span>
+    </a>
+  
+  </div>
+  <div class="separator">
+  <div id="foot_logo">
+    <a href="https://svbtle.com"><span>Svbtle</span></a>
+  </div>
+  <div id="foot_userbar">
+    <a href="http://blog.alexmaccaw.com" id="bottom_tagline">
+      <span>Alex MacCaw</span> JavaScript programmer, O'Reilly author
+    </a>
+    <a href="https://twitter.com/maccaw" class="linkout twitter">@maccaw</a>
+    <a href="mailto:alex@alexmaccaw.com?subject=hi" class="linkout contact">say hello</a>
+  </div>
+  <div id="foot_more">
+    <a href="http://blog.alexmaccaw.com"><span>Full blog »</span></a>
+  </div>
+  </div>
+  <div id="copyright">
+    © 2013
+  </div>
+</footer><script>
   // CBEAT
   var _sf_async_config = { uid: 1721, domain: 'svbtle.com'};
   (function() {
@@ -254,16 +240,10 @@ end
     window.onload = (typeof window.onload != 'function') ?
       loadChartbeat : function() { oldonload(); loadChartbeat(); };
   })();
-</script&gt;
-</body&gt;
-</html&gt;
-        </textarea>
-        </div>
-        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-        <script src="../js/clearly.js"></script>
-        <script>
-            var html = window.__getMyClearlyResults().html;
-            $('#main_content_wrap').html(html);
-        </script>
-  </body>
+</script>
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>var html = window.__getMyClearlyResults().html;$("html").html(html);$("html").show()</script>
+</div></body>
 </html>

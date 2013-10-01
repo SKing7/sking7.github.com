@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+<html><body>
 
 <head> 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <title>Coding Horror: Progressive Image Rendering</title> 
 <link rel="stylesheet" href="http://www.codinghorror.com/blog/styles-site.css" type="text/css" /> 
 <link rel="stylesheet" href="http://www.codinghorror.com/blog/styles-site-mobile.css" type="text/css" media="handheld" /> 
 <link rel="stylesheet" href="http://www.codinghorror.com/blog/styles-site-print.css" type="text/css" media="print" /> 
 <link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/codinghorror/" /> 
-<link rel="canonical" href="http://www.codinghorror.com/blog/2005/12/progressive-image-rendering.html">
-<link rel="apple-touch-icon" href="http://www.codinghorror.com/.a/6a0120a85dcdae970b017615c1941f970c-pi">
+<link rel="canonical" href="http://www.codinghorror.com/blog/2005/12/progressive-image-rendering.html" />
+<link rel="apple-touch-icon" href="http://www.codinghorror.com/.a/6a0120a85dcdae970b017615c1941f970c-pi" />
 
 <script> 
 var TPApp = {};
@@ -24,11 +24,11 @@ TPApp.app_uri = "http://www.typepad.com/";
 <div id="header"> 
 
 <div style="float:left; "> 
-<a href="http://www.codinghorror.com/blog/"><img src="http://www.codinghorror.com/blog/images/coding-horror-official-logo-small.png" alt="I &lt;3 Steve McConnell" height="91" width="100"></a>
+<a href="http://www.codinghorror.com/blog/"><img src="http://www.codinghorror.com/blog/images/coding-horror-official-logo-small.png" alt="I &lt;3 Steve McConnell" height="91" width="100" /></a>
 </div> 
 <div style="float:left; margin-top:10px;"> 
-<a href="http://www.codinghorror.com/blog/"><img alt="Coding Horror" src="http://www.codinghorror.com/blog/images/coding-horror-text.png" height="25" width="275"></a><br/> 
-<span class="description">programming and human factors<br/>by Jeff Atwood</span> 
+<a href="http://www.codinghorror.com/blog/"><img alt="Coding Horror" src="http://www.codinghorror.com/blog/images/coding-horror-text.png" height="25" width="275" /></a><br /> 
+<span class="description">programming and human factors<br />by Jeff Atwood</span> 
 </div> 
 
 <div style="float:right; margin-top:20px;" id="searchbox"> 
@@ -56,51 +56,50 @@ TPApp.app_uri = "http://www.typepad.com/";
 <h3 class="date">December 14, 2005</h3> 
 
 <p>
-I&#39;m a big fan of showing the user visual feedback as soon as possible, whether you&#39;re <a href="http://www.codinghorror.com/blog/archives/000444.html">downloading a web page</a> or <a href="http://www.codinghorror.com/blog/archives/000177.html">rendering a windows form</a>.
-<p>
-Images already render progressively in a web browser -- but you can do even better. <b>Simply save your GIF or PNG images with the &quot;interlaced&quot; option, or your JPEG images with the &quot;progressive&quot; option.</b>
-<p>
+I'm a big fan of showing the user visual feedback as soon as possible, whether you're <a href="http://www.codinghorror.com/blog/archives/000444.html">downloading a web page</a> or <a href="http://www.codinghorror.com/blog/archives/000177.html">rendering a windows form</a>.
+</p><p>
+Images already render progressively in a web browser -- but you can do even better. <b>Simply save your GIF or PNG images with the "interlaced" option, or your JPEG images with the "progressive" option.</b>
+</p><p>
 Stephan Lavavej has a great page outlining <a href="http://nuwen.net/png.html">the difference between fancy interlacing and plain old progressive rendering</a>:
-<p>
+</p><p>
 <blockquote>
-There are four ways to transmit an image over the Internet. Over a fast connection there won&#39;t be any apparent difference, but over a modem connection the difference is stunningly obvious. Choosing the right way can make your connection seem much faster than it really is.
+There are four ways to transmit an image over the Internet. Over a fast connection there won't be any apparent difference, but over a modem connection the difference is stunningly obvious. Choosing the right way can make your connection seem much faster than it really is.
 <p>
 <ol>
 <li><b>Wait until every bit of image data has been sucked through the modem before displaying the whole image</b>. So blindingly dumb that not even Internet Explorer does it.
-<li><b>Display image data as it is received, resulting in a top-down filling in of the image</b>. One variant -- the one that everyone has seen -- of JPEG does this. This is noninterlaced display, and both GIF and PNG are capable of it as well. Non-interlaced images are smaller than interlaced images.
-<li><b>Use a one-dimensional interlacing scheme</b>. This is how GIF interlacing works. Every eighth horizontal line is transmitted in the first &quot;pass&quot;, filling up the dimensions of the image in 1/8th of the time that the entire image will take to download. The next pass transmits every fourth line, making the image less distorted. The next pass transmits every second line, making the image even less distorted, and the fourth and final pass transmits the remaining lines.
-<li><b>Use a two-dimensional interlacing scheme</b>. This is how PNG interlacing works. Instead of four passes through the image, PNG makes seven passes. In 1/64 of the time that the whole image will take to display, one pass is already completed, showing the image in a very rough manner. Successive passes fill in more information, never distorting the pixels by more than a factor of two to one.
-</li></li></li></li></ol></p></blockquote>
-<p>
-Here&#39;s a demo of simple progressive as-received rendering:
-<p>
+</li><li><b>Display image data as it is received, resulting in a top-down filling in of the image</b>. One variant -- the one that everyone has seen -- of JPEG does this. This is noninterlaced display, and both GIF and PNG are capable of it as well. Non-interlaced images are smaller than interlaced images.
+</li><li><b>Use a one-dimensional interlacing scheme</b>. This is how GIF interlacing works. Every eighth horizontal line is transmitted in the first "pass", filling up the dimensions of the image in 1/8th of the time that the entire image will take to download. The next pass transmits every fourth line, making the image less distorted. The next pass transmits every second line, making the image even less distorted, and the fourth and final pass transmits the remaining lines.
+</li><li><b>Use a two-dimensional interlacing scheme</b>. This is how PNG interlacing works. Instead of four passes through the image, PNG makes seven passes. In 1/64 of the time that the whole image will take to display, one pass is already completed, showing the image in a very rough manner. Successive passes fill in more information, never distorting the pixels by more than a factor of two to one.
+</li></ol></p></blockquote>
+</p><p>
+Here's a demo of simple progressive as-received rendering:
+</p><p>
 
 <img alt="Hello Kitty, standard progressive rendering" border="0" class="at-xid-6a0120a85dcdae970b0128776fcab6970c" height="248" src="http://codinghorror.typepad.com/.a/6a0120a85dcdae970b0128776fcab6970c-pi" width="310" />
-<p>
-And here&#39;s a demo of the superior PNG style two-dimensional interlaced rendering: 
-<p>
+</p><p>
+And here's a demo of the superior PNG style two-dimensional interlaced rendering: 
+</p><p>
 
 <img alt="Hello Kitty, PNG style two-dimensional interlaced rendering" border="0" class="at-xid-6a0120a85dcdae970b0128776fcadb970c" height="248" src="http://codinghorror.typepad.com/.a/6a0120a85dcdae970b0128776fcadb970c-pi" width="310" />
-<p>
-You don&#39;t get this for free, of course -- <b>turning this feature on adds about 20% to the size of PNG images, and about 10% to the size of JPEG and GIF images.</b> Whether this improved rendering behavior is worth the bandwidth cost I leave as an exercise to the reader.
-<p>
-I am not aware of any browsers that actually bilinearly interpolate the low-resolution incremental images, as shown in the sample screenshots on <a href="http://nuwen.net/png.html">Stefan&#39;s page</a>. But that would be really cool! Why doesn&#39;t Firefox add this?
-<p>
-<p></p></p></p></p></p></p></p></p></p></p></p></p>
+</p><p>
+You don't get this for free, of course -- <b>turning this feature on adds about 20% to the size of PNG images, and about 10% to the size of JPEG and GIF images.</b> Whether this improved rendering behavior is worth the bandwidth cost I leave as an exercise to the reader.
+</p><p>
+I am not aware of any browsers that actually bilinearly interpolate the low-resolution incremental images, as shown in the sample screenshots on <a href="http://nuwen.net/png.html">Stefan's page</a>. But that would be really cool! Why doesn't Firefox add this?
+</p><p>
+</p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
 
 
  
 <div class="posted">Posted by Jeff Atwood</div> 
 
-<div id="nrelate_related_placeholder"></div> <script async type="text/javascript"
-src="http://static.nrelate.com/rcw_js/0.50.0/loader.min.js"></script>
+<div id="nrelate_related_placeholder"></div> <script async="" type="text/javascript" src="http://static.nrelate.com/rcw_js/0.50.0/loader.min.js"></script>
 
 <div class="footernav">
   
-  <div style="float:left;"><a rel="prev" href="http://www.codinghorror.com/blog/2005/12/ui-follies-volume-iii.html">&laquo;&nbsp;UI Follies, Volume III</a></div> 
+  <div style="float:left;"><a rel="prev" href="http://www.codinghorror.com/blog/2005/12/ui-follies-volume-iii.html">«&nbsp;UI Follies, Volume III</a></div> 
   
   
-  <div style="float:right;"><a rel="next" href="http://www.codinghorror.com/blog/2005/12/this-just-in-internet-makes-books-obsolete.html">This Just In: Internet Makes Books Obsolete&nbsp;&raquo;</a></div> 
+  <div style="float:right;"><a rel="next" href="http://www.codinghorror.com/blog/2005/12/this-just-in-internet-makes-books-obsolete.html">This Just In: Internet Makes Books Obsolete&nbsp;»</a></div> 
   
 </div>
 
@@ -113,17 +112,17 @@ src="http://static.nrelate.com/rcw_js/0.50.0/loader.min.js"></script>
 
 
   <div class="comments-body jeff_atwood"> 
-  <p>  I prefer to set the absolute width and height for an image, so that the page layout doesn&#39;t jump around whilst being loaded</p>
+  <p>  I prefer to set the absolute width and height for an image, so that the page layout doesn't jump around whilst being loaded</p>
 
-<p>I agree-- definitely a best practice-- but that&#39;s a seperate issue.</p>
+<p>I agree-- definitely a best practice-- but that's a seperate issue.</p>
 
 <p>  In practice, the user is forced to look at a fuzzy full-size proxy for the image while all the bits are loading. Is it done? Well, it looks kind of fuzzy.</p>
 
-<p>I hadn&#39;t ever considered it this way, but I think he (and you) may be right. Interlaced rendering may violate the &quot;Don&#39;t Make Me Think&quot; canon.</p>
+<p>I hadn't ever considered it this way, but I think he (and you) may be right. Interlaced rendering may violate the "Don't Make Me Think" canon.</p>
 
-<p>If the difference between the loaded and unloaded states is very large, I think it&#39;s OK. For example, in the non-interlaced case, the difference is HUGE and obvious. Blank white space vs. image? No contest.</p>
+<p>If the difference between the loaded and unloaded states is very large, I think it's OK. For example, in the non-interlaced case, the difference is HUGE and obvious. Blank white space vs. image? No contest.</p>
 
-<p>Interlaced rendering starts out OK. There&#39;s no way something that blocky could possibly be a complete image, right? But as the image becomes ever more detailed, discriminating between the current &quot;pretty good rendering&quot; and &quot;even better rendering&quot; becomes a challenge.</p>
+<p>Interlaced rendering starts out OK. There's no way something that blocky could possibly be a complete image, right? But as the image becomes ever more detailed, discriminating between the current "pretty good rendering" and "even better rendering" becomes a challenge.</p>
 
 <p>Hmm.</p>
   <span class="comments-post" style="margin-left:20px">Jeff Atwood on December 15, 2005  1:36 AM</span> 
@@ -132,21 +131,21 @@ src="http://static.nrelate.com/rcw_js/0.50.0/loader.min.js"></script>
   <div class="comments-body jeff_atwood"> 
   <p> What made you pick that particular sample image?</p>
 
-<p>I&#39;m just keeping it real -- Hello Kitty is all up in this beeyotch. ;)</p>
+<p>I'm just keeping it real -- Hello Kitty is all up in this beeyotch. ;)</p>
   <span class="comments-post" style="margin-left:20px">Jeff Atwood on December 15, 2005  1:37 AM</span> 
   </div>
 
   <div class="comments-body oren_hurvitz"> 
-  <p>Philip Greenspun makes a good case against interlaced images. His point is that interlaced images cause the user unnecessary anxiety because you aren&#39;t sure when the image has stopped loading. This is true, in my experience.</p>
+  <p>Philip Greenspun makes a good case against interlaced images. His point is that interlaced images cause the user unnecessary anxiety because you aren't sure when the image has stopped loading. This is true, in my experience.</p>
 
-<p>From a href=&quot;http://philip.greenspun.com/panda/images&quot;http://philip.greenspun.com/panda/images/a :</p>
+<p>From a href="http://philip.greenspun.com/panda/images"http://philip.greenspun.com/panda/images/a :</p>
 
-<p>&quot;Some people like interlaced or &quot;progressive&quot; images, which load gradually. The theory behind these formats is that the user can at least look at a fuzzy full-size proxy for the image while all the bits are loading. In practice, the user is forced to look at a fuzzy full-size proxy for the image while all the bits are loading. Is it done? Well, it looks kind of fuzzy. Oh wait, the top of the image seems to be getting a little more detail. Maybe it is done now. It is still kind of fuzzy, though. Maybe the photographer wasn&#39;t using a tripod. Oh wait, it seems to be clearing up now...&quot;</p>
+<p>"Some people like interlaced or "progressive" images, which load gradually. The theory behind these formats is that the user can at least look at a fuzzy full-size proxy for the image while all the bits are loading. In practice, the user is forced to look at a fuzzy full-size proxy for the image while all the bits are loading. Is it done? Well, it looks kind of fuzzy. Oh wait, the top of the image seems to be getting a little more detail. Maybe it is done now. It is still kind of fuzzy, though. Maybe the photographer wasn't using a tripod. Oh wait, it seems to be clearing up now..."</p>
   <span class="comments-post" style="margin-left:20px">Oren Hurvitz on December 15, 2005  5:43 AM</span> 
   </div>
 
   <div class="comments-body peter_bridger"> 
-  <p>I must say I find the interlaced rendering distracting. I prefer to set the absolute width and height for an image, so that the page layout doesn&#39;t jump around whilst being loaded.</p>
+  <p>I must say I find the interlaced rendering distracting. I prefer to set the absolute width and height for an image, so that the page layout doesn't jump around whilst being loaded.</p>
   <span class="comments-post" style="margin-left:20px">Peter Bridger on December 15, 2005  8:10 AM</span> 
   </div>
 
@@ -158,15 +157,15 @@ src="http://static.nrelate.com/rcw_js/0.50.0/loader.min.js"></script>
   </div>
 
   <div class="comments-body jeff_atwood"> 
-  <p>  had read STL&#39;s (as he refers to himself) page some time ago, had forgotten about it</p>
+  <p>  had read STL's (as he refers to himself) page some time ago, had forgotten about it</p>
 
 <p>I do recommend reading more pages on his site. Mania and self-obsession has never been so entertai--, er, informative! </p>
 
 <p><a href="http://nuwen.net/" rel="nofollow">http://nuwen.net/</a></p>
 
-<p>It&#39;s all good, but here&#39;s my favorite section (in the 2004 news):<br />
+<p>It's all good, but here's my favorite section (in the 2004 news):<br />
 --<br />
-I hate blogs for a couple of reasons. First, most people are fundamentally not interesting. Second, blogs are a very poor way to organize information. Now, I realize that my news posts tend to be pretty bloggy, and for that I apologize. While I think my views are pretty interesting, I don&#39;t think I&#39;m all that interesting myself, and my news posts are definitely not organized. That said, I&#39;m now going to describe some things that I&#39;ve been doing recently.<br />
+I hate blogs for a couple of reasons. First, most people are fundamentally not interesting. Second, blogs are a very poor way to organize information. Now, I realize that my news posts tend to be pretty bloggy, and for that I apologize. While I think my views are pretty interesting, I don't think I'm all that interesting myself, and my news posts are definitely not organized. That said, I'm now going to describe some things that I've been doing recently.<br />
 --</p>
 
 <p>The comedy, it writes itself!</p>
@@ -174,7 +173,7 @@ I hate blogs for a couple of reasons. First, most people are fundamentally not i
   </div>
 
   <div class="comments-body mt"> 
-  <p>Indeed. I remember seeing a few threads on [H] or Ars about STL and his egomania, it was all quite funny. Despite all that I still think he&#39;s pretty bright and some of his pages are quite interesting. He&#39;s quite the character. Works at Microsoft now... If I have to be thankful for one thing, it&#39;s that he&#39;s the reason I got hooked on Vernor Vinge novels!</p>
+  <p>Indeed. I remember seeing a few threads on [H] or Ars about STL and his egomania, it was all quite funny. Despite all that I still think he's pretty bright and some of his pages are quite interesting. He's quite the character. Works at Microsoft now... If I have to be thankful for one thing, it's that he's the reason I got hooked on Vernor Vinge novels!</p>
   <span class="comments-post" style="margin-left:20px">MT on December 16, 2005  8:43 AM</span> 
   </div>
 
@@ -183,19 +182,19 @@ I hate blogs for a couple of reasons. First, most people are fundamentally not i
 
 <p>Personally I like the fuzzy - clear process, and the width/height already set is a plus.</p>
 
-<p>I had read STL&#39;s (as he refers to himself) page some time ago, had forgotten about it. Funny that you should link to STL&#39;s page. Small world after all.</p>
+<p>I had read STL's (as he refers to himself) page some time ago, had forgotten about it. Funny that you should link to STL's page. Small world after all.</p>
   <span class="comments-post" style="margin-left:20px">MT on December 16, 2005  9:29 AM</span> 
   </div>
 
   <div class="comments-body nicolas"> 
-  <p>I know I&#39;m answering to a really old post, but anyway...</p>
+  <p>I know I'm answering to a really old post, but anyway...</p>
 
 <p>Progressive JPEG images are usually slightly SMALLER than normal ones. Interlaced PNGs are actually bigger though.</p>
   <span class="comments-post" style="margin-left:20px">Nicolas on December 16, 2007  9:05 AM</span> 
   </div>
 
   <div class="comments-body mvark"> 
-  <p>Do progressively rendered images show up &#39;progressively&#39; on all modern browsers? </p>
+  <p>Do progressively rendered images show up 'progressively' on all modern browsers? </p>
   <span class="comments-post" style="margin-left:20px">mvark on January  8, 2008  4:10 AM</span> 
   </div>
 
@@ -219,7 +218,7 @@ I hate blogs for a couple of reasons. First, most people are fundamentally not i
 
 </div> <!-- blog -->
 
-<div id="footer">Content &copy; 2013 <a rel="author" href="https://profiles.google.com/codinghorror1">Jeff Atwood</a>.  Logo image used with permission of the author. &copy; 1993 Steven C. McConnell. All Rights Reserved.</div>  
+<div id="footer">Content © 2013 <a rel="author" href="https://profiles.google.com/codinghorror1">Jeff Atwood</a>.  Logo image used with permission of the author. © 1993 Steven C. McConnell. All Rights Reserved.</div>  
 
 </div> <!-- container -->
 
@@ -227,14 +226,14 @@ I hate blogs for a couple of reasons. First, most people are fundamentally not i
 
 
 <div class="side">
-<div class="sidetitle">Newer &raquo;</div>
+<div class="sidetitle">Newer »</div>
 <a href="http://www.codinghorror.com/blog/2005/12/this-just-in-internet-makes-books-obsolete.html">This Just In: Internet Makes Books Obsolete</a>
 </div>
 
 
 
 <div class="side">
-<div class="sidetitle" style="padding-top:5px">&laquo; Older</div>
+<div class="sidetitle" style="padding-top:5px">« Older</div>
 <a href="http://www.codinghorror.com/blog/2005/12/ui-follies-volume-iii.html">UI Follies, Volume III</a>
 </div> 
 
@@ -256,12 +255,12 @@ I hate blogs for a couple of reasons. First, most people are fundamentally not i
 
 <div id="influads_block" class="influads_block" style="width:208px !important; align:center;"> </div>
 
-<script async>
+<script async="">
 (function(){var acc='acc_843d584_pub';var st='css';var or='130';var e=document.getElementsByTagName('script')[0];var d=document.createElement('script');d.src=('https:' == document.location.protocol ?'https://' : 'http://') +'engine.influads.com/show/'+or+'/'+st+'/'+acc;d.type='text/javascript';d.async=true;d.defer=true; e.parentNode.insertBefore(d,e);})();
 </script>
 
 <div id="hireme" class="hireme codinghorror" style="min-height:220px"></div>
-<script async>
+<script async="">
     setTimeout(function () {
         var a = document.createElement("script");
         var b = document.getElementsByTagName('script')[0];
@@ -277,16 +276,16 @@ I hate blogs for a couple of reasons. First, most people are fundamentally not i
 
 <p></p> 
 <div class="sidetitle">Resources</div> 
-<a href="/blog/2004/02/about-me.html">About Me</a><br/>
-<a href="http://twitter.com/codinghorror">@codinghorror</a><br/>
-<a href="http://www.discourse.org">discourse.org</a><br/>
-<a href="http://stackexchange.com">stackexchange.com</a><br/>
+<a href="/blog/2004/02/about-me.html">About Me</a><br />
+<a href="http://twitter.com/codinghorror">@codinghorror</a><br />
+<a href="http://www.discourse.org">discourse.org</a><br />
+<a href="http://stackexchange.com">stackexchange.com</a><br />
 <a href="/blog/2004/02/recommended-reading-for-developers.html">Recommended Reading</a>
 <p></p>
 <div class="syndicate"> 
-<a href="http://feeds.feedburner.com/codinghorror" rel="alternate" type="application/rss+xml"><img src="http://www.feedburner.com/fb/images/pub/feed-icon16x16.png" width=16 height=16 alt="" style="vertical-align:middle;border:0"/>&nbsp;Subscribe in a reader</a> 
-<br/> 
-<a href="http://feedburner.google.com/fb/a/mailverify?uri=codinghorror&amp;loc=en_US"><img src="/blog/images/mail.png" width=16 height=16 alt="" style="vertical-align:middle;border:0"/>&nbsp;Subscribe via email</a> 
+<a href="http://feeds.feedburner.com/codinghorror" rel="alternate" type="application/rss+xml"><img src="http://www.feedburner.com/fb/images/pub/feed-icon16x16.png" width="16" height="16" alt="" style="vertical-align:middle;border:0" />&nbsp;Subscribe in a reader</a> 
+<br /> 
+<a href="http://feedburner.google.com/fb/a/mailverify?uri=codinghorror&amp;loc=en_US"><img src="/blog/images/mail.png" width="16" height="16" alt="" style="vertical-align:middle;border:0" />&nbsp;Subscribe via email</a> 
 <p></p>
 <div class="side"> 
 Coding Horror has been continuously published since 2004. Browse the <b><a href="http://www.codinghorror.com/blog/archives.html">complete post archives</a></b>.
@@ -320,8 +319,8 @@ var sc_partition=25;
 var sc_security="dcff5548"; 
 </script> 
  
-<script async src="http://www.statcounter.com/counter/counter.js"></script> 
-<noscript><a href="http://www.statcounter.com/"><img  src="http://c26.statcounter.com/counter.php?sc_project=2600027&amp;java=0&amp;security=dcff5548&amp;invisible=0" alt="web metrics"></a> </noscript> 
+<script async="" src="http://www.statcounter.com/counter/counter.js"></script> 
+<noscript><a href="http://www.statcounter.com/"><img src="http://c26.statcounter.com/counter.php?sc_project=2600027&amp;java=0&amp;security=dcff5548&amp;invisible=0" alt="web metrics" /></a> </noscript> 
 
 <!-- Begin comScore Tag -->
 <script>
@@ -339,13 +338,12 @@ COMSCORE.beacon({
 });
 </script>
 <noscript>
-  <img src="http://b.scorecardresearch.com/b?c1=2&c2=6035669&c3=&c4=http%3A%2F%2Fwww.codinghorror.com%2Fblog%2F2005%2F12%2Fprogressive-image-rendering.html&c5=&c6=&c15=&cv=1.3&cj=1" style="display:none" width="0" height="0" alt="" />
+  <img src="http://b.scorecardresearch.com/b?c1=2&amp;c2=6035669&amp;c3=&amp;c4=http%3A%2F%2Fwww.codinghorror.com%2Fblog%2F2005%2F12%2Fprogressive-image-rendering.html&amp;c5=&amp;c6=&amp;c15=&amp;cv=1.3&amp;cj=1" style="display:none" width="0" height="0" alt="" />
 </noscript>
 <!-- End comScore Tag -->
 <!-- ph=1 -->
-        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-        <script src="../js/clearly.js"></script>
-        <script>
-            var html = window.__getMyClearlyResults().html;
-            document.write(html);
-        </script>
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>var html = window.__getMyClearlyResults().html;$("html").html(html);$("html").show()</script>
+</div></body></html>
