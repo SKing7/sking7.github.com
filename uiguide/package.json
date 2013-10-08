@@ -1,0 +1,16 @@
+{
+  "name": "uiguide",
+  "version": "0.0.0",
+  "description": "UIGuide of FE.web",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "repository": "",
+  "author": "liuzhe",
+  "license": "BSD",
+  "readmeFilename": "README.md"
+}
