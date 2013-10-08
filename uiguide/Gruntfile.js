@@ -5,14 +5,27 @@ module.exports = function(grunt) {
         dist: {                            // Target
           files: [{                         // Dictionary of files
             expand: true,
-            cwd: 'static/commonui/',       // 'destination': 'source'
+            cwd: 'static/commonui/scss', 
             src: ['**/*.scss'],
-            dest: ['static/commonui/css/baseui'],
+            dest: 'static/commonui/css',
             ext: '.css'
           }]
         }
       }
     });
+    grunt.initConfig({
+    styledocco: {
+        dist: {
+            options: {
+                name: 'UIGuide'
+            },
+            files: {
+                'docs': ['static/commonui/css/**/*.css']
+            }
+        }
+    }
+    });
     grunt.loadNpmTasks('grunt-contrib-sass');
-    grunt.registerTask('default', ['sass']);
+    grunt.loadNpmTasks('grunt-styledocco');
+    grunt.registerTask('default', ['styledocco']);
 };
