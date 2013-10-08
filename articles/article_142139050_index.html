@@ -1,0 +1,219 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>那些优雅的数据结构(1) : BloomFilter——大规模数据处理利器 - 苍梧 - 博客园</title>
+<link type="text/css" rel="stylesheet" href="/bundles/blog-common.css?v=khzmKabxZgWXO4B1SeV5aB_JjUAcnozq9T1NkxUqCUc1" />
+<link id="MainCss" type="text/css" rel="stylesheet" href="http://common.cnblogs.com/Skins/HabaHaba/style.css?id=20131001" />
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/heaad/rss" />
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/heaad/rsd.xml" />
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/heaad/wlwmanifest.xml" />
+<script src="http://common.cnblogs.com/script/jquery.js" type="text/javascript"></script>  
+<script type="text/javascript">var currentBlogApp = 'heaad';</script>
+<script src="/bundles/blog-common.js?v=Zgi_hexJE-jPq79-1OZxDk2fhVgZhxfC0PLT_MHGLDk1" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+
+<table width="100%" class="Framework" cellspacing="0" cellpadding="0">
+	<tr>
+		<td colspan="2">
+			
+<div id="top">
+<table width="100%" cellpadding="8" cellspacing="0">
+	<tr>
+		<td nowrap="">
+			<h1><a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/heaad/">停止更新</a></h1>
+			blog停止更新。希望这点资料可以帮助到你。
+		</td>
+	</tr>
+</table>
+</div>
+<div id="sub">
+<div class="BlogStats">posts - 19, comments - 177, trackbacks - 0, articles - 0</div></div>
+
+
+</td>
+	</tr>
+	<tr>
+		<td class="LeftCell">
+			<div id="leftmenu">
+                
+                    
+<h3>导航</h3>
+<ul>
+	<li>
+		<a id="MyLinks2_HomeLink" href="http://www.cnblogs.com/">博客园</a>
+	</li><li>
+		<a id="MyLinks2_MyHomeLink" href="http://www.cnblogs.com/heaad/">首页</a>
+	</li><li>
+		<a id="MyLinks2_NewPostLink" rel="nofollow" href="http://www.cnblogs.com/heaad/admin/EditPosts.aspx?opt=1">新随笔</a>
+	</li><li>
+		<a id="MyLinks2_ContactLink" accesskey="9" rel="nofollow" href="http://space.cnblogs.com/msg/send/%e8%8b%8d%e6%a2%a7">联系</a>
+	</li><li>
+		<a id="MyLinks2_XMLLink" href="http://www.cnblogs.com/heaad/rss"><img src="http://www.cnblogs.com/images/xml.gif" alt="订阅" /></a><a id="MyLinks2_Syndication" href="http://www.cnblogs.com/heaad/rss">订阅</a>
+	</li><li>
+		<a id="MyLinks2_Admin" rel="nofollow" href="http://www.cnblogs.com/heaad/admin/EditPosts.aspx">管理</a></li>
+</ul>
+
+                    
+<h3>公告</h3>
+<div id="news">
+	<div id="blog-news"></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+                    <div id="blog-calendar-block" style="display:none"><div id="blog-calendar"></div>
+</div>
+                    <div id="blog-sidecolumn"></div><script type="text/javascript">loadBlogSideColumn();</script>
+                	        
+			</div>
+		</td>
+		<td class="MainCell" width="100%">
+			<div id="main">
+				
+
+	<div class="post">
+		<div class="posthead">
+			<h2>
+				<a id="cb_post_title_url" class="singleposttitle" href="http://www.cnblogs.com/heaad/archive/2011/01/02/1924195.html">那些优雅的数据结构(1) : BloomFilter——大规模数据处理利器</a>
+			</h2>
+ 			Posted on <span id="post-date">2011-01-02 19:08</span> <a href="http://www.cnblogs.com/heaad/">苍梧</a> 阅读(<span id="post_view_count">...</span>) 评论(<span id="post_comment_count">...</span>)  <a href="http://www.cnblogs.com/heaad/admin/EditPosts.aspx?postid=1924195" rel="nofollow">编辑</a> <a href="#" onclick="AddToWz(1924195);return false;">收藏</a>
+			<script type="text/javascript">var allowComments=true,isLogined=false,cb_blogId=55806,cb_entryId=1924195,cb_blogApp=currentBlogApp,cb_blogUserGuid='323033f4-1936-de11-9510-001cf0cd104b',cb_entryCreatedDate='2011/1/2 19:08:00';loadViewCount(cb_entryId);</script>
+			
+		</div>
+		<div class="postbody"><div id="cnblogs_post_body"><p>&nbsp;</p>
+<p style="padding-left: 30px;">&nbsp;</p>
+<p style="text-align: center;"><span style="font-size: 16px;"><strong>BloomFilter——大规模数据处理利器</strong></span></p>
+<p style="text-align: center;"><span style="font-size: medium;"><span style="font-size: 16px; line-height: 24px;"><strong>&nbsp;</strong></span></span></p>
+<p><span style="font-size: 15px;">　　Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 16px;"><strong>一</strong><strong>. </strong><strong>实例</strong><strong>&nbsp;</strong></span></p>
+<p><span style="font-size: 15px;">　　为了说明Bloom Filter存在的重要意义，举一个实例：</span></p>
+<p><span style="font-size: 15px;">　　假设要你写一个网络蜘蛛（web crawler）。由于网络间的链接错综复杂，蜘蛛在网络间爬行很可能会形成“环”。为了避免形成“环”，就需要知道蜘蛛已经访问过那些URL。给一个URL，怎样知道蜘蛛是否已经访问过呢？稍微想想，就会有如下几种方案：</span></p>
+<p><span style="font-size: 15px;">　　1. 将访问过的URL保存到数据库。</span></p>
+<p><span style="font-size: 15px;">　　2. 用HashSet将访问过的URL保存起来。那只需接近O(1)的代价就可以查到一个URL是否被访问过了。</span></p>
+<p><span style="font-size: 15px;">　　3. URL经过MD5或SHA-1等单向哈希后再保存到HashSet或数据库。</span></p>
+<p><span style="font-size: 15px;">　　4. Bit-Map方法。建立一个BitSet，将每个URL经过一个哈希函数映射到某一位。</span></p>
+<p><span style="font-size: 15px;">　　方法1~3都是将访问过的URL完整保存，方法4则只标记URL的一个映射位。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;">　　以上方法在数据量较小的情况下都能完美解决问题，但是当数据量变得非常庞大时问题就来了。</span></p>
+<p><span style="font-size: 15px;">　　方法1的缺点：数据量变得非常庞大后关系型数据库查询的效率会变得很低。而且每来一个URL就启动一次数据库查询是不是太小题大做了？</span></p>
+<p><span style="font-size: 15px;">　　方法2的缺点：太消耗内存。随着URL的增多，占用的内存会越来越多。就算只有1亿个URL，每个URL只算50个字符，就需要5GB内存。</span></p>
+<p><span style="font-size: 15px;">　　方法3：由于字符串经过MD5处理后的信息摘要长度只有128Bit，SHA-1处理后也只有160Bit，因此方法3比方法2节省了好几倍的内存。</span></p>
+<p><span style="font-size: 15px;">　　方法4消耗内存是相对较少的，但缺点是单一哈希函数发生冲突的概率太高。还记得数据结构课上学过的Hash表冲突的各种解决方法么？若要降低冲突发生的概率到1%，就要将BitSet的长度设置为URL个数的100倍。</span></p>
+<p><span style="font-size: 16px;"><span style="line-height: 22px;">&nbsp;</span></span></p>
+<p><span style="font-size: 15px;">　　实质上上面的算法都忽略了一个重要的隐含条件：允许小概率的出错，不一定要100%准确！也就是说少量url实际上没有没网络蜘蛛访问，而将它们错判为已访问的代价是很小的——大不了少抓几个网页呗。&nbsp;</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><span style="font-size: 16px;"><strong>二</strong><strong>. Bloom Filter</strong><strong>的算法</strong></span><strong>&nbsp;</strong></span></p>
+<p><span style="font-size: medium;"><span style="font-size: 15px; line-height: 22px;">&nbsp;</span></span></p>
+<p><span style="font-size: 15px;">　　废话说到这里，下面引入本篇的主角——Bloom Filter。其实上面方法4的思想已经很接近Bloom Filter了。方法四的致命缺点是冲突概率高，为了降低冲突的概念，Bloom Filter使用了多个哈希函数，而不是一个。</span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp; 　Bloom Filter算法如下：</span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp;　&nbsp;创建一个m位BitSet，先将所有位初始化为0，然后选择k个不同的哈希函数。第i个哈希函数对字符串str哈希的结果记为h（i，str），且h（i，str）的范围是0到m-1 。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><strong>(1) </strong><strong>加入字符串过程</strong><strong>&nbsp;</strong></span></p>
+<p><span style="font-size: 15px;"><strong>&nbsp;</strong></span></p>
+<p><span style="font-size: 15px;">　　下面是每个字符串处理的过程，首先是将字符串str“记录”到BitSet中的过程：</span></p>
+<p><span style="font-size: 15px;">　　对于字符串str，分别计算h（1，str），h（2，str）…… h（k，str）。然后将BitSet的第h（1，str）、h（2，str）…… h（k，str）位设为1。</span></p>
+<p>&nbsp;<img style="display: block; margin-left: auto; margin-right: auto;" src="http://pic002.cnblogs.com/images/2011/63234/2011010219003441.jpg" alt="" /></p>
+<p style="text-align: center;"><span style="font-size: 15px;">　　图1.Bloom Filter加入字符串过程</span></p>
+<p><span style="font-size: 15px;">　　很简单吧？这样就将字符串str映射到BitSet中的k个二进制位了。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><strong>(2) </strong><strong>检查字符串是否存在的过程</strong><strong>&nbsp;</strong></span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;">　　下面是检查字符串str是否被BitSet记录过的过程：</span></p>
+<p><span style="font-size: 15px;">　　对于字符串str，分别计算h（1，str），h（2，str）…… h（k，str）。然后检查BitSet的第h（1，str）、h（2，str）…… h（k，str）位是否为1，若其中任何一位不为1则可以判定str一定没有被记录过。若全部位都是1，则“认为”字符串str存在。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;">　　若一个字符串对应的Bit不全为1，则可以肯定该字符串一定没有被Bloom Filter记录过。（这是显然的，因为字符串被记录过，其对应的二进制位肯定全部被设为1了）</span></p>
+<p><span style="font-size: 15px;">　　但是若一个字符串对应的Bit全为1，实际上是不能100%的肯定该字符串被Bloom Filter记录过的。（因为有可能该字符串的所有位都刚好是被其他字符串所对应）这种将该字符串划分错的情况，称为false positive 。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><strong>(3) </strong><strong>删除字符串过程</strong><strong>&nbsp;</strong></span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp; 字符串加入了就被不能删除了，因为删除会影响到其他字符串。实在需要删除字符串的可以使用Counting bloomfilter(CBF)，这是一种基本Bloom Filter的变体，CBF将基本Bloom Filter每一个Bit改为一个计数器，这样就可以实现删除字符串的功能了。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;">　　Bloom Filter跟单哈希函数Bit-Map不同之处在于：Bloom Filter使用了k个哈希函数，每个字符串跟k个bit对应。从而降低了冲突的概率。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><span style="font-size: 16px;"><strong>三</strong><strong>. Bloom Filter</strong><strong>参数选择</strong></span><strong>&nbsp;</strong></span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><strong>&nbsp;&nbsp; (1)</strong><strong>哈希函数选择</strong> </span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp; 　　哈希函数的选择对性能的影响应该是很大的，一个好的哈希函数要能近似等概率的将字符串映射到各个Bit。选择k个不同的哈希函数比较麻烦，一种简单的方法是选择一个哈希函数，然后送入k个不同的参数。</span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp; <strong>(2)Bit</strong><strong>数组大小选择</strong><strong>&nbsp;</strong></span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp; 　　哈希函数个数k、位数组大小m、加入的字符串数量n的关系可以参考<a href="http://pages.cs.wisc.edu/~cao/papers/summary-cache/node8.html" target="_blank">参考文献1</a>。该文献证明了对于给定的m、n，当 k = ln(2)* m/n 时出错的概率是最小的。</span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp; 　　同时该文献还给出特定的k，m，n的出错概率。例如：根据参考文献1，哈希函数个数k取10，位数组大小m设为字符串个数n的20倍时，false positive发生的概率是0.0000889 ，这个概率基本能满足网络爬虫的需求了。 &nbsp;</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><strong>四</strong><strong>. Bloom Filter</strong><strong>实现代码</strong><strong>&nbsp;</strong></span></p>
+<p><span style="font-size: 15px;">&nbsp;&nbsp;　&nbsp;下面给出一个简单的Bloom Filter的Java实现代码：</span></p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<div><!--<br /><br />Code highlighting produced by Actipro CodeHighlighter (freeware)<br />http://www.CodeHighlighter.com/<br /><br />--><span style="font-size: 14px;"><span style="color: #0000ff;">import</span><span style="color: #000000;"> java.util.BitSet;<br /><br /></span><span style="color: #0000ff;">public</span><span style="color: #0000ff;">class</span><span style="color: #000000;"> BloomFilter <br />{<br /></span><span style="color: #008000;">/*</span><span style="color: #008000;"> BitSet初始分配2^24个bit </span><span style="color: #008000;">*/</span><span style="color: #000000;"> <br /></span><span style="color: #0000ff;">private</span><span style="color: #0000ff;">static</span><span style="color: #0000ff;">final</span><span style="color: #0000ff;">int</span><span style="color: #000000;"> DEFAULT_SIZE </span><span style="color: #000000;">=</span><span style="color: #000000;">1</span><span style="color: #000000;">&lt;&lt;</span><span style="color: #000000;">25</span><span style="color: #000000;">; <br /></span><span style="color: #008000;">/*</span><span style="color: #008000;"> 不同哈希函数的种子，一般应取质数 </span><span style="color: #008000;">*/</span><span style="color: #000000;"><br /></span><span style="color: #0000ff;">private</span><span style="color: #0000ff;">static</span><span style="color: #0000ff;">final</span><span style="color: #0000ff;">int</span><span style="color: #000000;">[] seeds </span><span style="color: #000000;">=</span><span style="color: #0000ff;">new</span><span style="color: #0000ff;">int</span><span style="color: #000000;">[] { </span><span style="color: #000000;">5</span><span style="color: #000000;">, </span><span style="color: #000000;">7</span><span style="color: #000000;">, </span><span style="color: #000000;">11</span><span style="color: #000000;">, </span><span style="color: #000000;">13</span><span style="color: #000000;">, </span><span style="color: #000000;">31</span><span style="color: #000000;">, </span><span style="color: #000000;">37</span><span style="color: #000000;">, </span><span style="color: #000000;">61</span><span style="color: #000000;"> };<br /></span><span style="color: #0000ff;">private</span><span style="color: #000000;"> BitSet bits </span><span style="color: #000000;">=</span><span style="color: #0000ff;">new</span><span style="color: #000000;"> BitSet(DEFAULT_SIZE);<br /></span><span style="color: #008000;">/*</span><span style="color: #008000;"> 哈希函数对象 </span><span style="color: #008000;">*/</span><span style="color: #000000;"> <br /></span><span style="color: #0000ff;">private</span><span style="color: #000000;"> SimpleHash[] func </span><span style="color: #000000;">=</span><span style="color: #0000ff;">new</span><span style="color: #000000;"> SimpleHash[seeds.length];<br /><br /></span><span style="color: #0000ff;">public</span><span style="color: #000000;"> BloomFilter() <br />{<br /></span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (</span><span style="color: #0000ff;">int</span><span style="color: #000000;"> i </span><span style="color: #000000;">=</span><span style="color: #000000;">0</span><span style="color: #000000;">; i </span><span style="color: #000000;">&lt;</span><span style="color: #000000;"> seeds.length; i</span><span style="color: #000000;">++</span><span style="color: #000000;">)<br />{<br />func[i] </span><span style="color: #000000;">=</span><span style="color: #0000ff;">new</span><span style="color: #000000;"> SimpleHash(DEFAULT_SIZE, seeds[i]);<br />}<br />}<br /><br /></span><span style="color: #008000;">//</span><span style="color: #008000;"> 将字符串标记到bits中</span><span style="color: #008000;"><br /></span><span style="color: #0000ff;">public</span><span style="color: #0000ff;">void</span><span style="color: #000000;"> add(String value) <br />{<br /></span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (SimpleHash f : func) <br />{<br />bits.set(f.hash(value), </span><span style="color: #0000ff;">true</span><span style="color: #000000;">);<br />}<br />}<br /><br /></span><span style="color: #008000;">//</span><span style="color: #008000;">判断字符串是否已经被bits标记</span><span style="color: #008000;"><br /></span><span style="color: #0000ff;">public</span><span style="color: #0000ff;">boolean</span><span style="color: #000000;"> contains(String value) <br />{<br /></span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (value </span><span style="color: #000000;">==</span><span style="color: #0000ff;">null</span><span style="color: #000000;">) <br />{<br /></span><span style="color: #0000ff;">return</span><span style="color: #0000ff;">false</span><span style="color: #000000;">;<br />}<br /></span><span style="color: #0000ff;">boolean</span><span style="color: #000000;"> ret </span><span style="color: #000000;">=</span><span style="color: #0000ff;">true</span><span style="color: #000000;">;<br /></span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (SimpleHash f : func) <br />{<br />ret </span><span style="color: #000000;">=</span><span style="color: #000000;"> ret </span><span style="color: #000000;">&amp;&amp;</span><span style="color: #000000;"> bits.get(f.hash(value));<br />}<br /></span><span style="color: #0000ff;">return</span><span style="color: #000000;"> ret;<br />}<br /><br /></span><span style="color: #008000;">/*</span><span style="color: #008000;"> 哈希函数类 </span><span style="color: #008000;">*/</span><span style="color: #000000;"><br /></span><span style="color: #0000ff;">public</span><span style="color: #0000ff;">static</span><span style="color: #0000ff;">class</span><span style="color: #000000;"> SimpleHash <br />{<br /></span><span style="color: #0000ff;">private</span><span style="color: #0000ff;">int</span><span style="color: #000000;"> cap;<br /></span><span style="color: #0000ff;">private</span><span style="color: #0000ff;">int</span><span style="color: #000000;"> seed;<br /><br /></span><span style="color: #0000ff;">public</span><span style="color: #000000;"> SimpleHash(</span><span style="color: #0000ff;">int</span><span style="color: #000000;"> cap, </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> seed) <br />{<br /></span><span style="color: #0000ff;">this</span><span style="color: #000000;">.cap </span><span style="color: #000000;">=</span><span style="color: #000000;"> cap;<br /></span><span style="color: #0000ff;">this</span><span style="color: #000000;">.seed </span><span style="color: #000000;">=</span><span style="color: #000000;"> seed;<br />}<br /><br /></span><span style="color: #008000;">//</span><span style="color: #008000;">hash函数，采用简单的加权和hash</span><span style="color: #008000;"><br /></span><span style="color: #0000ff;">public</span><span style="color: #0000ff;">int</span><span style="color: #000000;"> hash(String value) <br />{<br /></span><span style="color: #0000ff;">int</span><span style="color: #000000;"> result </span><span style="color: #000000;">=</span><span style="color: #000000;">0</span><span style="color: #000000;">;<br /></span><span style="color: #0000ff;">int</span><span style="color: #000000;"> len </span><span style="color: #000000;">=</span><span style="color: #000000;"> value.length();<br /></span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (</span><span style="color: #0000ff;">int</span><span style="color: #000000;"> i </span><span style="color: #000000;">=</span><span style="color: #000000;">0</span><span style="color: #000000;">; i </span><span style="color: #000000;">&lt;</span><span style="color: #000000;"> len; i</span><span style="color: #000000;">++</span><span style="color: #000000;">) <br />{<br />result </span><span style="color: #000000;">=</span><span style="color: #000000;"> seed </span><span style="color: #000000;">*</span><span style="color: #000000;"> result </span><span style="color: #000000;">+</span><span style="color: #000000;"> value.charAt(i);<br />}<br /></span><span style="color: #0000ff;">return</span><span style="color: #000000;"> (cap </span><span style="color: #000000;">-</span><span style="color: #000000;">1</span><span style="color: #000000;">) </span><span style="color: #000000;">&amp;</span><span style="color: #000000;"> result;<br />}<br />}<br />}<br /></span></span></div>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;"><strong>参考文献：</strong></span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px;">[1]Pei Cao. Bloom Filters - the math.</span></p>
+<p><span style="font-size: 15px;">http://pages.cs.wisc.edu/~cao/papers/summary-cache/node8.html</span></p>
+<p><span style="font-size: 15px;">[2]Wikipedia. Bloom filter. </span></p>
+<p><span style="font-size: 15px;"><a href="http://en.wikipedia.org/wiki/Bloom_filter">http://en.wikipedia.org/wiki/Bloom_filter</a></span></p></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="blog_post_info">
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"></div>
+</div>
+
+</div>
+	</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" id="lnk_RefreshComments" onclick="return RefreshCommentList();">刷新评论</a><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a></div>
+<div id="comment_form_container"></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="site_nav_under"><a href="http://www.cnblogs.com/" target="_blank" title="程序员的网上家园">博客园首页</a><a href="http://q.cnblogs.com/" target="_blank" title="程序员问答社区">博问</a><a href="http://news.cnblogs.com/" target="_blank" title="IT新闻">新闻</a><a href="http://home.cnblogs.com/ing/" target="_blank">闪存</a><a href="http://job.cnblogs.com/" target="_blank">程序员招聘</a><a href="http://kb.cnblogs.com/" target="_blank">知识库</a></div>
+<div id="ad_under_post_holder"></div>
+<script type="text/javascript">
+var enableGoogleAd = true;
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+loadAdUnderPost();
+</script>
+<div id="HistoryToday" class="c_ad_block"></div>
+<script type="text/javascript">
+loadBlogSignature();
+LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate);
+GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+</script>
+<script type="text/javascript">
+    $.ajax({ url: 'http://counter.cnblogs.com/blog/post/' + cb_entryId, type: 'get', dataType: 'script', cache: true });
+</script>
+</div>
+
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" class="FooterCell">
+			
+<p id="footer">
+	Powered by: 
+	<br />
+	
+	<a id="Footer1_Hyperlink3" name="Hyperlink1" href="http://www.cnblogs.com/"><font face="Verdana">博客园</font></a>
+	<br />
+	Copyright © 苍梧
+</p>
+		</td>
+	</tr>
+</table>
+
+
+<script type="text/javascript" src="http://common.cnblogs.com/script/google-analytics.js"></script>
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>
+var html = window.__getMyClearlyResults().html;
+$("html").html(html);
+$("body").append('<link type="text/css" href="../css/article.css">')</script>
+</div></body>
+</html>
