@@ -1,1 +1,1 @@
-styledocco -n "UIGuide" -o doc -s doc  static/css/commonui/
+styledocco -n "UIGuide" -o doc -s doc  static/commonui/css
