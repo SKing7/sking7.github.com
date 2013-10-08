@@ -1,6 +1,6 @@
 {
   "name": "uiguide",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "UIGuide of FE.web",
   "main": "index.js",
   "directories": {
@@ -8,6 +8,9 @@
   },
   "scripts": {
     "test": ""
+  },
+  "devDependencies": {
+    "styledocco": "0.6.3"
   },
   "repository": "",
   "author": "liuzhe",
