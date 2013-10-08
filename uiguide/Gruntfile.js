@@ -4,11 +4,11 @@ module.exports = function(grunt) {
       sass: {                              // Task
         dist: {                            // Target
           files: [{                         // Dictionary of files
-            'expand': true,
-            'cwd': 'static/commonui/',       // 'destination': 'source'
-            'src': ['scss/*.scss'],
-            'dest': ['css'],
-            'ext': '.css'
+            expand: true,
+            cwd: 'static/commonui/',       // 'destination': 'source'
+            src: ['**/*.scss'],
+            dest: ['static/commonui/css/baseui'],
+            ext: '.css'
           }]
         }
       }
