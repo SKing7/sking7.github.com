@@ -1,0 +1,525 @@
+<html>
+
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="ttw" content="cfanq3r" />
+<title>You can’t create a button | NCZOnline</title>
+
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.0.0pr2/build/cssfonts/fonts-min.css&amp;3.0.0pr2/build/cssreset/reset-min.css&amp;3.0.0pr2/build/cssbase/base-context-min.css" />
+<link rel="stylesheet" href="http://www.nczonline.net/blog/wp-content/themes/nczonline_v2/style.css" type="text/css" media="screen" />
+        <link rel="alternate" type="application/rss+xml" title="NCZOnline - Blog" href="http://feeds.nczonline.net/blog/" />
+        <link rel="alternate" type="application/rss+xml" title="NCZOnline - JavaScript Links" href="http://feeds.nczonline.net/links/javascript/" />
+        <link rel="alternate" type="application/rss+xml" title="NCZOnline - Articles" href="http://feeds.nczonline.net/articles/" />
+
+<link rel="pingback" href="http://www.nczonline.net/blog/xmlrpc.php" />
+<link rel="alternate" type="application/rss+xml" title="NCZOnline » You can’t create a button Comments Feed" href="http://www.nczonline.net/blog/2013/01/29/you-cant-create-a-button/feed/" />
+<link rel="stylesheet" id="contact-form-7-css" href="http://www.nczonline.net/blog/wp-content/plugins/contact-form-7/styles.css?ver=2.4.4" type="text/css" media="all" />
+<script type="text/javascript" src="http://www.nczonline.net/blog/wp-includes/js/jquery/jquery.js?ver=1.8.3"></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.nczonline.net/blog/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.nczonline.net/blog/wp-includes/wlwmanifest.xml" /> 
+<link rel="prev" title="What the NFL can teach us about diversity in technology" href="http://www.nczonline.net/blog/2013/01/21/what-the-nfl-can-teach-us-about-diversity-in-technology/" />
+<link rel="next" title="What technical recruiters can learn from online dating" href="http://www.nczonline.net/blog/2013/02/05/what-technical-recruiters-can-learn-from-online-dating/" />
+<meta name="generator" content="WordPress 3.5.2" />
+<link rel="canonical" href="http://www.nczonline.net/blog/2013/01/29/you-cant-create-a-button/" />
+<link rel="shortlink" href="http://www.nczonline.net/blog/?p=3342" />
+
+<!-- All in One SEO Pack 1.6.13.4 by Michael Torbert of Semper Fi Web Design[334,393] -->
+<meta name="description" content="One of the most important aspects of accessibility is managing focus and user interaction. By default, all links and form controls can get focus. That allows" />
+<!-- /all in one seo pack -->
+</head>
+<body>
+    <div id="doc">
+        <div id="hd">
+            <div id="subhd">
+                <h1><acronym title="Nicholas C. Zakas">NCZ</acronym>Online</h1>
+            </div>
+            <ul class="clearfix">
+                <li class="hide-offscreen"><a href="#content">Skip to content</a></li>
+                <li class="first"><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/writing/">Writing</a></li>
+                <li><a href="/speaking/">Speaking</a></li>
+                <li><a href="/consulting/">Consulting</a></li>
+                <li><a href="/downloads/">Downloads</a></li>
+                <li><a rel="me" href="/about/">About</a></li>
+                <li><a href="/contact/">Contact</a></li>
+            </ul>
+        </div>
+        <div id="bd" class="clearfix">
+            <div id="content" class="yui-cssbase">
+
+	    
+		<!--<div class="navigation">
+			<div class="alignleft">&laquo; <a href="http://www.nczonline.net/blog/2013/01/21/what-the-nfl-can-teach-us-about-diversity-in-technology/" rel="prev">What the NFL can teach us about diversity in technology</a></div>
+			<div class="alignright"><a href="http://www.nczonline.net/blog/2013/02/05/what-technical-recruiters-can-learn-from-online-dating/" rel="next">What technical recruiters can learn from online dating</a> &raquo;</div>
+		</div>-->
+
+                <div class="post" id="post-3342">
+                    <div class="post-head">
+                        <h1>You can’t create a button</h1>
+                        <p class="byline">Posted at January 29, 2013 07:00 am by Nicholas C. Zakas</p>                        
+                        <p class="tags">Tags: <a href="http://www.nczonline.net/blog/tag/accessibility/" rel="tag">Accessibility</a>, <a href="http://www.nczonline.net/blog/tag/aria/" rel="tag">ARIA</a>, <a href="http://www.nczonline.net/blog/tag/javascript/" rel="tag">JavaScript</a></p>
+                    </div>
+                    <div class="post-content">
+                        <p>One of the most important aspects of accessibility is managing focus and user interaction. By default, all links and form controls can get focus. That allows you to use the tab key to navigate between them and, when one of the elements has focus, activate it by pressing the enter key. This paradigm works amazingly well regardless of the complexity of your web application. As long as a keyboard-only user is able to navigate between links and form controls then it’s possible to navigate the application.</p>
+<p>Unfortunately, sometimes web developers try to get a bit too clever in creating their interfaces. What if I want something to look like a link but act like a button? Then you end up seeing a lot of code that looks like this:</p>
+<pre><code>&lt;a href="#" onclick="doSomething()"&gt;I'm a button&lt;/a&gt;</code></pre>
+<p>That code should turn your stomach a little bit. It’s a link that goes nowhere and does nothing. All it does is attach an <code>onclick</code> event handler to give it a purpose. Because the desired appearance for this element currently is link-like, the markup uses a link and JavaScript.</p>
+<p>Those who are familiar with ARIA may “fix” the problem by using the following:</p>
+<pre><code>&lt;a href="#" role="button" onclick="doSomething()"&gt;I'm a button&lt;/a&gt;</code></pre>
+<p>By setting the ARIA role to button, you’re now telling the browser and screen readers that this link should be interpreted as a button (that does an action on the page) rather than a link (that navigates you away). This has the same problem as the previous code except that you’re trying to trick the browser into treating the link as if it were a button. In reality, it would be most appropriate to just use button:</p>
+<pre><code>&lt;button onclick="doSomething()"&gt;I'm a button&lt;/button&gt;</code></pre>
+<p>The markup to use should never be based on the appearance of a UI element. Instead, you should try to figure out the real purpose of that element and use the appropriate markup. You can always style button to look like a link or a link to look like a button, but those are purely visual distinctions that don’t change the action.</p>
+<p>If these were the worst sins of web applications that I have seen, I would be pretty happy. However, there is another even more disturbing trend that I’m seeing. Some Web applications are actually trying to create their own buttons by mixing and matching different parts of HTML, CSS, and JavaScript. Here’s an example:</p>
+<pre><code>&lt;div tabindex="0" role="button" onclick="doSomething()"&gt;I'm a button&lt;/div&gt;</code></pre>
+<p>This is a valiant attempt at creating a button out of a <code>&lt;div&gt;</code>. By setting the <code>tabindex</code> attribute, the developer has assured that keyboard users can navigate to it by using the tab key. The value of 0 adds the elements into the normal tab order so it can receive focus just like any other link or button without affecting the overall tabbing order. The <code>role</code> informs the browser and screen readers that this element should be treated as a button and the <code>onclick</code> describes the behavior of the button. </p>
+<p>To anyone using a mouse, assuming the styling is correct, there is no distinction between this element and an actual button. You move the mouse over and click down and an action happens. If you’re using a keyboard, however, there is a subtle but important difference between this and a regular button: almost all browsers will not fire the <code>click</code> event when the element has focus and the enter key is pressed. Internet Explorer, Chrome, Firefox, and Safari all ignore the enter key in this situation (Opera is the only one that fires <code>click</code>). </p>
+<p>The enter key fires the <code>click</code> event when used on links and buttons by default. If you try to create your own button, as in the previous example, the enter key has no effect and therefore the user cannot perform that action. </p>
+<p>This horrible pattern is found most frequently in Google products. Perhaps the most ironic usage is in Gmail. When you press the ? key, a dialog pops up showing you available keyboard shortcuts and allowing you to enable more advanced shortcuts.  </p>
+<p><a href="http://www.nczonline.net/blog/wp-content/uploads/2013/01/gmail.png"><img src="http://www.nczonline.net/blog/wp-content/uploads/2013/01/gmail-300x153.png" alt="Gmail keyboard shortcuts dialog" width="300" height="153" class="alignnone size-medium wp-image-3344" /></a></p>
+<p>It looks like the word “Enable” is a link, so you press tab a few times to give it focus and press enter. Nothing happens. Why? Because the link is actually  neither a linkage nor a button, it’s a <code>&lt;span&gt;</code>. Here’s the actual code:</p>
+<pre><code>&lt;span id=":s7.pl" role="link" class="aoy" tabindex="1"&gt;Enable&lt;/span&gt;</code></pre>
+<p>Almost exactly the problematic pattern mentioned earlier in this post. So basically in order to turn on keyboard shortcuts you need to be able to use a mouse. In fact, many of the buttons on Gmail are made in this way. If not for the keyboard shortcuts it would basically be unusable without a mouse.</p>
+<p>Gmail isn’t the only Google site that uses this pattern. It can be found throughout the network of Google sites, including Google Groups and Google Analytics (which also hides focus rectangles). This alone makes Google products incredibly challenging to use for sighted users who don’t use pointing devices.</p>
+<p>If you expect the user to interact with something, then you need to use either a link or button. These have the correct behaviors both in terms of getting focus and activating when the enter key is pressed. Links should be used whenever the action is a navigation (changes the URL) and buttons should be used for all other actions. You can easily styled these to create the visual effect that you want, but nothing can replace the  accessibility of the native links and buttons.</p>
+                        <p class="disclaimer">Disclaimer: Any viewpoints and opinions expressed in this article are those of Nicholas C. Zakas and do not, in any way, reflect those of my employer, my colleagues, <a href="http://www.wrox.com/">Wrox Publishing</a>, <a href="http://www.oreilly.com/">O'Reilly Publishing</a>, or anyone else. I speak only for myself, not for them.</p>            
+            
+            <script src="http://feeds.feedburner.com/~s/nczonline?i=http://www.nczonline.net/blog/2013/01/29/you-cant-create-a-button/" type="text/javascript" charset="utf-8"></script>
+                        <p>
+						<!--You can follow any responses to this entry through the  feed.<br />-->
+
+													Both comments and pings are currently closed.
+
+										</p>
+                    </div>
+                </div>
+                <div class="post-footer clearfix">
+                    <div class="post-footer-posts">
+<h2>Related Posts</h2>
+<ul class="yui3-cssbase">
+<li><a href="http://www.nczonline.net/blog/2013/04/01/making-accessible-icon-buttons/">Making accessible icon buttons</a></li><li><a href="http://www.nczonline.net/blog/2013/02/12/making-an-accessible-dialog-box/">Making an accessible dialog box</a></li><li><a href="http://www.nczonline.net/blog/2009/11/10/introduction-to-web-accessibility/">Introduction to web accessibility</a></li><li><a href="http://www.nczonline.net/blog/2013/10/07/node-js-and-the-new-web-front-end/">Node.js and the new web front-end</a></li><li><a href="http://www.nczonline.net/blog/2013/09/10/understanding-ecmascript-6-arrow-functions/">Understanding ECMAScript 6 arrow functions</a></li></ul>                    </div>   
+                    <div class="post-footer-books">
+                        <h2>Further reading</h2>
+                <ul class="books">
+                    <li><a href="https://leanpub.com/oopinjavascript"><img src="/_images/oopinjs.png" width="100" height="126" alt="Principles of Object-Oriented Programming in JavaScript" /></a></li>
+                    <li><a href="http://www.amazon.com/Maintainable-JavaScript-Nicholas-C-Zakas/dp/1449327680?tag=nczonline-20"><img src="/_images/maintainablejs.png" width="100" height="126" alt="Maintainable JavaScript" /></a></li>
+                    <li><a href="http://www.amazon.com/Professional-JavaScript-Developers-Nicholas-Zakas/dp/1118026691/ref=sr_1_13?tag=nczonline-20"><img src="/_images/pro_js_3e.png" width="100" height="126" alt="Professional JavaScript for Web Developers, 3rd Edition" /></a></li>
+
+</ul>                    </div>                  
+                </div>
+	
+<!-- You can start editing here. -->
+<div id="comments" class="post-comments">
+
+	<h2 id="hComments">34 Comments</h2>
+	        <div class="post-comment alt" id="comment-29612">
+            <p>So do you suggest we only use the button tag when interacting with Javascript? What if we want a click handler but its not necessarily a button? Also what about the crawl-ability of buttons and their values, do we know the differences with Googles take on these?</p>
+<p>Great post, thanks.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://ajamdonut.com" rel="external nofollow" class="url">Adam Dougherty</a></cite> on January 29th, 2013 at 7:27 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29623">
+            <p>Oh, there are too many problems with buttons. Assuming you wan’t to style them nicely.<br />
+On FF you need to kill the inner focus, on IE you need hacks to vertically center the text (different hacks for different versions), on Opera you need to kill the “press-down” effect. Too much CSS hackery and generally not worth the trouble.</p>
+					
+			            <p class="post-comment-byline"><cite>Priit Pirita</cite> on January 29th, 2013 at 8:12 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29626">
+            <p>@Priit – I think you’re making a bigger deal out of this than necessary. I’ve managed to get nice looking buttons using a reset style sheet and just a few styles.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 29th, 2013 at 9:21 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29628">
+            <p>@Adam – yes, that’s what I’m saying. If you want a click handler then you definitely want a button. What I think you’re saying is you might want to click handler that looks like a link, which you can still do by styling the button with CSS.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 29th, 2013 at 9:22 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29633">
+            <p>What about an additional keypress event?</p>
+<p>My first choice is always a button, but when not possible (styling issues), I do this:</p>
+<p><code><br />
+<a>Button</a><br />
+</code></p>
+<p><code><br />
+myButton.addEventListener('click', myAction, false);<br />
+myButton.addEventListener('keypress', function(event){<br />
+  if (event.keyCode === 13) myAction(event);<br />
+}, false);<br />
+</code></p>
+<p>Not to mention the additional complexity, nor the approach which is too “concrete” (we explicitly address the case of a keyboard / enter key, so it’s kind of wrong by design), do you see something wrong with this method?</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://pierrebertet.net/" rel="external nofollow" class="url">Pierre Bertet</a></cite> on January 29th, 2013 at 9:53 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29634">
+            <p>Oups:</p>
+<p><code><br />
+&lt;a role="button" tabindex="0"&gt;Button&lt;/a&gt;<br />
+</code></p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://pierrebertet.net/" rel="external nofollow" class="url">Pierre Bertet</a></cite> on January 29th, 2013 at 9:55 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29635">
+            <p>@Pierre – At that point, you’re just piling hack on top of hack. Why not just use a button? Except for old IE, you can style buttons to look just like links (or anything else).</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 29th, 2013 at 9:56 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29640">
+            <p>The &lt;button&gt; element has a default type of “submit” – so in your use case, you’d want to add `type=”button”` so that it’s a no-op when JS is disabled.</p>
+<p>I find it to be best to always explicitly specify a &lt;button&gt; type.</p>
+<p>Your comment is awaiting moderation.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://twitter.com/ljharb" rel="external nofollow" class="url">LJHarb</a></cite> on January 29th, 2013 at 10:24 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29641">
+            <p>@Nicholas – <q>Why not just use a button?</q></p>
+<p>That’s what I do most of the time, I totally agree about the pile of hacks. I was just curious to read your opinion about this solution.</p>
+<p>Buttons are extremely hard to style right, and it’s very verbose (we have to deal specifically with: IE on multiple versions, Firefox, Chrome, Safari, Opera, active and focus, and active-then-release-outside). Not to mention the case where you want to style your button exactly like the links of your website (e.g. a small “cancel”, “remove”).</p>
+<p>Anyway, as I said, I prefer the CSS solution most of the time: this is already the most hacked part in the web stack, so I prefer to keep my JS and my HTML as clean as possible (ie not very clean when we talk about a complex web app&nbsp;:]&nbsp;).</p>
+<p>That said, I totally understand that the <code>a role=button</code> + JS could be preferred, and while I always prefer to use the right tool for the job (which is obviously a button), I happened to choose this solution (can’t remember exactly why).</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://pierrebertet.net/" rel="external nofollow" class="url">Pierre Bertet</a></cite> on January 29th, 2013 at 10:27 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29642">
+            <p>What about links, that just open popus or show some hidden content (they are usually decorated with dashed or dotted underline)? They don’t change url, so should we use button tags for them?</p>
+					
+			            <p class="post-comment-byline"><cite>Vladislav Shkodin</cite> on January 29th, 2013 at 10:34 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29643">
+            <p>@Pierre – I may be missing something, but I’ve never had as much trouble as you described here. I style buttons as links on WellFurnished and it works absolutely fine. In IE8 and below there is a slight alignment discrepancy, but other than that, I find styling buttons to be very easy. There are also a large amount of examples of how to style buttons online.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 29th, 2013 at 10:36 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29644">
+            <p>@Vladislav – If you click only to execute some JavaScript, then that should be a button. If you click to navigate in some way, that should be a link. So opening a dialog would be a button, same with expand/collapse.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 29th, 2013 at 10:39 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29646">
+            <p>Nicholas, there’s my reset styles from past project. Notice that prerquisite of this to work is position:relative.<br />
+If you need to verticall center the text, like height == line-height, then more 1px adjustments is needed <img src="http://www.nczonline.net/blog/wp-includes/images/smilies/icon_smile.gif" alt=":-)" class="wp-smiley" /> </p>
+<p>/* BUTTONS AND LINKS TO LOOK EXACLTY LIKE LINK (default, resetted style) */<br />
+button.a {<br />
+	top: 0px;<br />
+	position: relative;<br />
+	display:inline-block;<br />
+	background:none;<br />
+	margin:0;<br />
+	padding:0;<br />
+	border-width:0;<br />
+	text-decoration:underline;<br />
+	cursor:pointer;<br />
+	height: 18px;<br />
+	margin-left: 1ex; /* margin-left to previous inline element is 0, so set */<br />
+	overflow:visible;</p>
+<p>}</p>
+<p>button.a::-moz-focus-inner{<br />
+	padding:0;<br />
+	border:none;<br />
+}</p>
+<p>/* remove button pressed effect */<br />
+/* OPERA */<br />
+@media all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0) {<br />
+	button.a:active {<br />
+		top: -1px;<br />
+		left: -1px;<br />
+	}<br />
+}<br />
+/*IE8*/<br />
+button.a:active {<br />
+	top: -1px\9;<br />
+	left: -1px\9;<br />
+}</p>
+<p>/*IE6*/<br />
+button.a {<br />
+	_top: 1px;<br />
+	_margin-top: -1px;<br />
+}</p>
+					
+			            <p class="post-comment-byline"><cite>Priit Pirita</cite> on January 29th, 2013 at 11:21 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29650">
+            <p>Reminds me that I once wrote 10,000 words on <a href="http://koranteng.blogspot.com/2005/05/unloved-html-button-and-other.html" rel="nofollow">The Unloved HTML Button and Other Folktales</a>. I am continually amazed about designers who misuse links when a button would do.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://koranteng.blogspot.com/" rel="external nofollow" class="url">Koranteng Ofosu-Amaah</a></cite> on January 29th, 2013 at 11:33 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29651">
+            <p>@Nicholas Yes, I think that you mean relatively simple buttons, with minor and acceptable style issues, which is indeed easy. I am talking about perfectly styling buttons, with the possibility to do everything you can already do with a <code>&lt;a&gt;</code>. At this point, the discussion may become highly subjective, I guess we should talk about actual demos&nbsp;:-)</p>
+<p>PS: That’s exactly the debate I was trying to avoid ha ha, I’m (almost) as convinced as you about the buttons. I just wanted to know if you had another real issue in mind, out of the enter key. I know it’s conceptually broken.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://pierrebertet.net/" rel="external nofollow" class="url">Pierre Bertet</a></cite> on January 29th, 2013 at 12:13 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29655">
+            <p>@Pierre – We are talking about the same thing. <img src="http://www.nczonline.net/blog/wp-includes/images/smilies/icon_smile.gif" alt=":-)" class="wp-smiley" />  All I can say is that I think people make too much out of styling buttons. It is much easier than it used to be especially when you can use <code>appearance</code> in some browsers.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 29th, 2013 at 1:19 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29656">
+            <p>@Priit – ah, as you soon as you add relative positioning, you’re in for a world of hurt. If you just set <code>display: inline</code>, you’re able to eliminate a lot of the other properties because they don’t apply to inline elements.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 29th, 2013 at 1:21 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29696">
+            <p>This completely renders everything that Twitter’s Bootstrap library does, invalid. They do EVERYTHING with <a> tags. I wonder what they would have to say when they read this.</a></p>
+					
+			            <p class="post-comment-byline"><cite>Aninoy Mahapatra</cite> on January 29th, 2013 at 10:27 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29697">
+            <p>*with <a> tags*</a></p>
+					
+			            <p class="post-comment-byline"><cite>Aninoy Mahapatra</cite> on January 29th, 2013 at 10:28 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29706">
+            <p>Thank you! This is such a huge pet peeve… I really don’t get this trend of using whatever element to make buttons, when you can get focus, tab indexing, and accessibility for free using the proper elements. </p>
+<p>BTW, styling aside, any pros to using button over input type=button? I find myself using the latter still, but I don’t know if buttons get preferential treatment in screen readers.</p>
+					
+			            <p class="post-comment-byline"><cite>Alex</cite> on January 30th, 2013 at 1:08 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29707">
+            <p>I’m curious to know what you think of ‘hijaxing’ links that have *useful* hash references:</p>
+<p><a href="#custom_dialog" rel="nofollow">Open dialog</a></p>
+<p>    …</p>
+<p>This is a pattern has the useful property of containing a reference to the element that has state – in this case the custom_dialog – so when the dialog is open it’s easy to give all the buttons that reference it a little hint of style:</p>
+<p>jQuery(‘.button[href="#' + this.id + '"]‘).addClass(‘active_button’);</p>
+<p>And of course, if the dialog is hidden only when JS is available, it’s content is also accessible when the page is not enhanced. It’s a pattern I’ve been using for every UI element with state – slideshows, menus, tabs, etc. Originally I did it because button elements used to be much harder to style consistently than they are today, but actually think the link offers some advantages.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://stephband.info" rel="external nofollow" class="url">Stephen Band</a></cite> on January 30th, 2013 at 1:13 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29709">
+            <p>Pants. HTML fail. That first block of code should be:</p>
+<p>&lt;a class=”button” role=”button” href=”#custom_dialog”&gt;Open dialog&lt;/a&gt;</p>
+<p>&lt;div id=”custom_dialog”&gt;<br />
+    …<br />
+&lt;/div&gt;</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://stephband.info" rel="external nofollow" class="url">Stephen Band</a></cite> on January 30th, 2013 at 1:16 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29748">
+            <p>I have an extension to @Vladislav’s case.  I have a link/button that runs Javascript when you click it, but has a fallback url if you middle click/cmd click to open in a new tab or if you have JS disabled. For example it opens a dialog on left click, but navigates to those same details at another url when you middle click.</p>
+<p>Seems like only a link would work since I need the href value for middle clicking. Am I missing something?</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://noiregrets.com" rel="external nofollow" class="url">Adam Ahmed</a></cite> on January 30th, 2013 at 12:03 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29754">
+            <p>@Adam – If there’s the possibility of navigating to a URL, even as a fallback, then it is correct to use a link.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.nczonline.net/" rel="external nofollow" class="url">Nicholas C. Zakas</a></cite> on January 30th, 2013 at 12:45 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29769">
+            <p>If you choose style over accessibility on the web, you’re doing it wrong.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://jonathanstark.com" rel="external nofollow" class="url">Jonathan Stark</a></cite> on January 30th, 2013 at 7:29 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29780">
+            <p>So true! I have always wondered why they use  tags for Buttons. The worst part, I have seen guys implementing the same in their products. They simply ignore the part that div’s are not meant to be used as button. Only because they have a notion set in their mind that “Whatever Google does is always Right!!”</p>
+					
+			            <p class="post-comment-byline"><cite>Vijay</cite> on January 31st, 2013 at 1:00 am</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29886">
+            <p>[...] You can’t create a button – “If you expect the user to interact with something, then you need to use either a link or button … Links should be used whenever the action is a navigation (changes the URL) and buttons should be used for all other actions. [...]</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.brucelawson.co.uk/2013/reading-list-39/" rel="external nofollow" class="url">Bruce Lawson’s personal site&nbsp; : Reading List</a></cite> on February 1st, 2013 at 7:49 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29929">
+            <p>Great post, I’m thinking of creating a website: <a href="http://www.stopusinglinksforbuttons.com" rel="nofollow">http://www.stopusinglinksforbuttons.com</a> as I’m sick of seeing links being misused or even worse using semantically meaningless span’s / div’s (shame on you Google but its rife throughout the web). The common styling complaint is a non-issue, I’ve worked on many website/app builds where buttons needed to be heavily styled &amp; I’ve always managed to style them perfectly, you just need to know the specific CSS to include, starting with a Normalize style sheet will help you out. The accessibility gains you get from using the correct element for the job (a button/input element in this case) far outweighs any styling concerns which I’ve never experienced.</p>
+					
+			            <p class="post-comment-byline"><cite>Chris Pearce</cite> on February 1st, 2013 at 6:41 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-29944">
+            <p>[...] You can’t create a button – Nicholas C. Zakas on accessibility concerns around links and buttons and things that look like links and buttons. [...]</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.barryvan.com.au/2013/02/reading-list-2013-02-02/" rel="external nofollow" class="url">Reading list 2013-02-02 « barryvan</a></cite> on February 2nd, 2013 at 12:36 am</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-29984">
+            <p>This discussion is a result of sins of early days of web. What’s reason for two different elements that both perform some action on click (or click-like) event? What makes A element a link is HREF attribute. It could have been reused for JavaScript actions. It didn’t happened because A has been also used as a fragment marker, so lack of HREF disables button-like semantics (it should be NAME attribute presence instead). BUTTON on the other hand has apparently been introduced solely to look as UI button (whatever they say).</p>
+<p>I prefer to use A for clickable elements, avoid CSS hacks, and wait until web will be mature enough. I hope standards will treat accessibility seriously some day, and don’t require to write silly ROLE=BUTTON and the like.</p>
+<p>BTW. Anyone knows how to style disabled BUTTON cross browser?</p>
+					
+			            <p class="post-comment-byline"><cite>Jan Bobrowski</cite> on February 2nd, 2013 at 3:34 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-30151">
+            <p>@Aninoy  Looks like it is up to the developer just what exactly they use:<br />
+<a href="http://twitter.github.com/bootstrap/base-css.html#buttons" rel="nofollow">http://twitter.github.com/bootstrap/base-css.html#buttons</a></p>
+<p>Their button groups sample is all pretty much done with button:<br />
+<a href="http://twitter.github.com/bootstrap/components.html#buttonGroups" rel="nofollow">http://twitter.github.com/bootstrap/components.html#buttonGroups</a></p>
+					
+			            <p class="post-comment-byline"><cite>Pete</cite> on February 5th, 2013 at 1:00 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-30315">
+            <p>Thanks for the great article, Nicholas. Twittering…</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.webaxe.org" rel="external nofollow" class="url">Web Axe</a></cite> on February 6th, 2013 at 10:24 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment alt" id="comment-30490">
+            <p>Interesting blog post and discussion. I think that the <code>button</code> element is an interesting but problematic element in (X)HTML. </p>
+<p>It is interesting because you can use markup in the button label, even things like images can be used.<br />
+But it is also problematic because it can leave buttons that does nothing when Javascript is disabled/not available and in user agents that lack support for the button element you can end up with just the button label and no styling. The <code>button</code> element was also added fairly late to HTML so it makes little sense to use this element for input/reset buttons instead of the buttons created using the <code>input</code> element. That leaves buttons with other uses.</p>
+<p>Take this example, you want to have button on the bottom of a blog that says “Load 5 more blog posts” that retrieves 5 more blog posts and adds them to the current page. Just like it have been pointed out in this discussion this should be a link because it can be solved by navigating to other pages and a script could change what happens when you activate the button. This would work in more or less any user agent regardless of how old and outdated it is.</p>
+<p>But should this link have the <code>role=button</code>? Well I think that depends on if Javascript support is available or not. If no Javascript support is available then it is just a regular link to another URL, it makes no sense to use <code>role=button</code>. The script should add this role (or maybe change the <code>a</code> element to a <code>button</code> element?) when it changes what happens when the link is activated.</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://peterwinnberg.name/" rel="external nofollow" class="url">Peter Winnberg</a></cite> on February 8th, 2013 at 3:16 pm</p>
+                    </div>
+
+	
+	        <div class="post-comment" id="comment-30652">
+            <p>[...] You can’t create a button [...]</p>
+					
+			            <p class="post-comment-byline"><cite><a href="http://www.recreateweb.com.au/accessibility/reading-lists/accessibility-related-reading-list-february-12-2013/" rel="external nofollow" class="url">Accessibility Related Reading List – February 12 2013 | Recreate Web</a></cite> on February 11th, 2013 at 11:41 am</p>
+                    </div>
+
+	
+	
+ 
+
+<p>Comments are automatically closed after 14 days.</p>
+<!-- end post-comments div -->
+</div>
+	
+        </div>
+            <div id="sidebar">
+                <h1 class="hide-offscreen">Additional Information</h1>
+                <h2>More of Me</h2>
+                    <ul>
+        <li><a href="http://www.twitter.com/slicknet/">Twitter</a> <a href="https://twitter.com/slicknet" class="twitter-follow-button" data-show-count="false">Follow @slicknet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></li>
+        <li><a href="http://www.linkedin.com/in/nzakas">LinkedIn</a></li>
+        <li><a href="http://www.github.com/nzakas/">GitHub</a></li>
+        <li><a href="http://www.slideshare.net/nzakas/presentations/">Slideshare</a></li>
+        <li><a href="http://amazon.com/author/nzakas/">Amazon</a></li>
+        <li><a href="https://plus.google.com/u/3/116766524979258968594/?rel=author" rel="author">Google+</a></li>
+    </ul>
+                <h2>Subscribe by Email</h2>
+<form action="http://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open('http://feedburner.google.com/fb/a/mailverify?uri=nczonline', 'popupwindow', 'scrollbars=yes,width=550,height=520');return true"><p><label for="email-sub">Enter your email address:</label></p><p><input type="email" style="width:140px" name="email" id="email-sub" /></p><input type="hidden" value="nczonline" name="uri" /><input type="hidden" name="loc" value="en_US" /><input type="submit" value="Subscribe" /></form>
+                <h2>My Books</h2>
+                                <ul class="books">
+                    <li><a href="https://leanpub.com/oopinjavascript"><img src="/_images/oopinjs.png" width="100" height="126" alt="Principles of Object-Oriented Programming in JavaScript" /></a></li>
+                    <li><a href="http://www.amazon.com/Maintainable-JavaScript-Nicholas-C-Zakas/dp/1449327680?tag=nczonline-20"><img src="/_images/maintainablejs.png" width="100" height="126" alt="Maintainable JavaScript" /></a></li>
+                    <li><a href="http://www.amazon.com/Professional-JavaScript-Developers-Nicholas-Zakas/dp/1118026691/ref=sr_1_13?tag=nczonline-20"><img src="/_images/pro_js_3e.png" width="100" height="126" alt="Professional JavaScript for Web Developers, 3rd Edition" /></a></li>
+
+                    <li><a href="http://www.amazon.com/gp/product/059680279X?ie=UTF8&amp;tag=nczonline-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=059680279X"><img src="/_images/hpjs.png" width="100" height="126" alt="High Performance JavaScript" /></a></li>
+                    <!--<li><a href="http://www.amazon.com/gp/product/0470109491?ie=UTF8&tag=nczonline-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0470109491"><img src="/_images/pro_ajax_2e.png" width="100" height="126" alt="Professional Ajax, 2nd Edition" /></a></li>
+                    <li><a href="http://www.amazon.com/gp/product/0596522304?ie=UTF8&tag=nczonline-20&link_code=as3&camp=211189&creative=373489&creativeASIN=0596522304"><img src="/_images/even_faster.png" width="100" height="126" alt="Even Faster Web Sites" /></a></li>--></ul>
+							
+			
+			
+			
+
+			
+
+			
+
+
+			<h2>Payin' Bills</h2>
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-3277025206066821";
+/* Sidebar Square */
+google_ad_slot = "5274533795";
+google_ad_width = 200;
+google_ad_height = 200;
+//-->
+</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-3277025206066821";
+/* Sidebar 2 */
+google_ad_slot = "6800512966";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+            </div>
+        <!-- end #bd div -->
+        </div>
+        <div id="ft">
+            <p>Content copyright © 2004-2011 Nicholas C. Zakas. All Rights Reserved. All code examples on all pages, unless otherwise indicated, are <a href="http://www.nczonline.net/blog/sitelicense">BSD licensed</a>. <a href="http://feeds.nczonline.net/blog/">Blog Feed</a></p>
+        </div>
+
+    <!-- end #doc div -->
+    </div>
+
+	<script type="text/javascript" src="http://www.nczonline.net/blog/wp-content/plugins/contact-form-7/jquery.form.js?ver=2.52"></script>
+<script type="text/javascript" src="http://www.nczonline.net/blog/wp-content/plugins/contact-form-7/scripts.js?ver=2.4.4"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-6849003-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>
+var html = window.__getMyClearlyResults().html;
+$("html").html(html);
+$("body").append('<link type="text/css" href="../css/article.css">')</script>
+</div></body>
+</html>

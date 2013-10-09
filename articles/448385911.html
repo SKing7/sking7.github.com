@@ -1,0 +1,523 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Grunt : 基于任务的Javascript项目构建工具 - 资源 - 伯乐在线</title>
+<link rel="stylesheet" href="http://hao.jobbole.com/wp-content/themes/wiki/style.css" type="text/css" media="screen" />
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/themes/wiki/js/application.js"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/themes/wiki/js/jquery.livesearch.js"></script>
+
+<script type="text/javascript">
+/* <![CDATA[ */
+	$(document).ready(function() {
+		$('#s').liveSearch({ajaxURL: 'http://hao.jobbole.com/index.php?ajax=1&s='});
+	});
+/* ]]> */
+</script>
+
+<!--[if IE 6]>
+<link rel="stylesheet" href="http://hao.jobbole.com/wp-content/themes/wiki/css/ie.css" type="text/css" media="screen" />
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/themes/wiki/js/jquery.pngFix.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+$(document).ready(function(){
+	$(document).pngFix();
+});
+/* ]]> */
+</script>  
+<![endif]-->
+
+<link rel="alternate" type="application/rss+xml" title="资源 – 伯乐在线 RSS Feed" href="http://hao.jobbole.com/feed/" />
+<link rel="alternate" type="application/atom+xml" title="资源 – 伯乐在线 Atom Feed" href="http://hao.jobbole.com/feed/atom/" />
+<link rel="pingback" href="http://hao.jobbole.com/xmlrpc.php" />
+
+
+<!-- This site is optimized with the Yoast WordPress SEO plugin v1.4.13 - http://yoast.com/wordpress/seo/ -->
+<meta name="description" content="Grunt 是一个基于任务的Javascript项目构建工具 (Javascript Task Runner)。当执行重复的任务，比如：压缩，编译，单元测试，代码检测等，任务运行器可以简化你的工作，让它变得更简单。当你配置好构建工具后，它可以帮助你和团队完成大部分的琐事，而你几乎不需要花费任何精力。" />
+<link rel="canonical" href="http://hao.jobbole.com/gruntjs-javascript-task-runner/" />
+<meta property="og:locale" content="zh_CN" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Grunt : 基于任务的Javascript项目构建工具 - 资源 - 伯乐在线" />
+<meta property="og:description" content="Grunt 是一个基于任务的Javascript项目构建工具 (Javascript Task Runner)。当执行重复的任务，比如：压缩，编译，单元测试，代码检测等，任务运行器可以简化你的工作，让它变得更简单。当你配置好构建工具后，它可以帮助你和团队完成大部分的琐事，而你几乎不需要花费任何精力。" />
+<meta property="og:url" content="http://hao.jobbole.com/gruntjs-javascript-task-runner/" />
+<meta property="og:site_name" content="资源 - 伯乐在线" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-coffeescript.jpg" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-handlebars.jpg" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-jade.jpg" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-jshint.jpg" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-less.jpg" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-requirejs.jpg" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-sass.jpg" />
+<meta property="og:image" content="http://gruntjs.com/img/logo-sylus.jpg" />
+<!-- / Yoast WordPress SEO plugin. -->
+
+<link rel="alternate" type="application/rss+xml" title="资源 - 伯乐在线 » Grunt : 基于任务的Javascript项目构建工具 评论 Feed" href="http://hao.jobbole.com/gruntjs-javascript-task-runner/feed/" />
+<link rel="stylesheet" id="v48fv_images-css" href="http://hao.jobbole.com/wp-content/plugins/mu-widgets/library/base/public/css/images.css?ver=1.2.v48fv" type="text/css" media="all" />
+<link rel="stylesheet" id="v48fv_front-css" href="http://hao.jobbole.com/wp-content/plugins/mu-widgets/library/base/public/css/front.css?ver=1.2.v48fv" type="text/css" media="all" />
+<link rel="stylesheet" id="v48fv_common-css" href="http://hao.jobbole.com/wp-content/plugins/mu-widgets/library/base/public/css/common.css?ver=1.2.v48fv" type="text/css" media="all" />
+<link rel="stylesheet" id="bbp-default-bbpress-css" href="http://hao.jobbole.com/wp-content/plugins/bbpress/templates/default/css/bbpress.css?ver=2.3.2" type="text/css" media="screen" />
+<link rel="stylesheet" id="bp-legacy-css-css" href="http://hao.jobbole.com/wp-content/plugins/buddypress/bp-templates/bp-legacy/css/buddypress.css?ver=1.7.2" type="text/css" media="screen" />
+<link rel="stylesheet" id="wp-postratings-css" href="http://hao.jobbole.com/wp-content/plugins/wp-postratings/postratings-css.css?ver=1.63" type="text/css" media="all" />
+<link rel="stylesheet" id="bpbbpst-bbpress-widget-css-css" href="http://hao.jobbole.com/wp-content/plugins/buddy-bbpress-support-topic/css/bpbbpst-bbpress-widget.css?ver=3.5.2" type="text/css" media="all" />
+<link rel="stylesheet" id="core3.0-css" href="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0" type="text/css" media="all" />
+<link rel="stylesheet" id="core-Default3.0-css" href="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/styles/shCoreDefault.css?ver=3.0" type="text/css" media="all" />
+<link rel="stylesheet" id="theme-Default3.0-css" href="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?ver=3.0" type="text/css" media="all" />
+<script type="text/javascript" src="http://hao.jobbole.com/wp-includes/js/comment-reply.min.js?ver=3.5.2"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-includes/js/jquery/jquery.js?ver=1.8.3"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var BP_DTheme = {"my_favs":"\u6211\u7684\u6536\u85cf","accepted":"\u5df2\u63a5\u53d7","rejected":"\u5df2\u62d2\u7edd","show_all_comments":"\u663e\u793a\u8be5\u8bdd\u9898\u6240\u6709\u8bc4\u8bba","show_all":"\u663e\u793a\u5168\u90e8","comments":"\u8bc4\u8bba","close":"\u5173\u95ed","view":"\u67e5\u770b","mark_as_fav":"\u6536\u85cf","remove_fav":"\u79fb\u9664\u6536\u85cf"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/buddypress/bp-templates/bp-legacy/js/buddypress.js?ver=1.7.2"></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://hao.jobbole.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://hao.jobbole.com/wp-includes/wlwmanifest.xml" /> 
+<link rel="shortlink" href="http://hao.jobbole.com/?p=851" />
+
+		<script type="text/javascript">
+			/* <![CDATA[ */
+			
+						jQuery(document).ready( function() {
+
+				/* Use backticks instead of <code> for the Code button in the editor */
+				if ( typeof( edButtons ) !== 'undefined' ) {
+					edButtons[110] = new QTags.TagButton( 'code', 'code', '`', '`', 'c' );
+					QTags._buttonsInit();
+				}
+
+				/* Tab from topic title */
+				jQuery( '#bbp_topic_title' ).bind( 'keydown.editor-focus', function(e) {
+					if ( e.which !== 9 )
+						return;
+
+					if ( !e.ctrlKey && !e.altKey && !e.shiftKey ) {
+						if ( typeof( tinymce ) !== 'undefined' ) {
+							if ( ! tinymce.activeEditor.isHidden() ) {
+								var editor = tinymce.activeEditor.editorContainer;
+								jQuery( '#' + editor + ' td.mceToolbar > a' ).focus();
+							} else {
+								jQuery( 'textarea.bbp-the-content' ).focus();
+							}
+						} else {
+							jQuery( 'textarea.bbp-the-content' ).focus();
+						}
+
+						e.preventDefault();
+					}
+				});
+
+				/* Shift + tab from topic tags */
+				jQuery( '#bbp_topic_tags' ).bind( 'keydown.editor-focus', function(e) {
+					if ( e.which !== 9 )
+						return;
+
+					if ( e.shiftKey && !e.ctrlKey && !e.altKey ) {
+						if ( typeof( tinymce ) !== 'undefined' ) {
+							if ( ! tinymce.activeEditor.isHidden() ) {
+								var editor = tinymce.activeEditor.editorContainer;
+								jQuery( '#' + editor + ' td.mceToolbar > a' ).focus();
+							} else {
+								jQuery( 'textarea.bbp-the-content' ).focus();
+							}
+						} else {
+							jQuery( 'textarea.bbp-the-content' ).focus();
+						}
+
+						e.preventDefault();
+					}
+				});
+			});
+						/* ]]> */
+		</script>
+
+	
+	<script type="text/javascript">var ajaxurl = 'http://hao.jobbole.com/wp-admin/admin-ajax.php';</script>
+
+
+<!-- Comment Rating plugin Version: 2.9.32 by Bob King, http://wealthynetizen.com/, dynamic comment voting & styling. --> 
+<style type="text/css" media="screen">
+   .ckrating_highly_rated {background-color:#FFFFCC !important;}
+   .ckrating_poorly_rated {opacity:0.6;filter:alpha(opacity=60) !important;}
+   .ckrating_hotly_debated {background-color:#FFF0F5 !important;}
+</style>
+
+<link rel="stylesheet" href="http://hao.jobbole.com/wp-content/themes/wiki/style_blue.css" type="text/css" media="screen" />
+<style type="text/css">
+<!--
+.post-ratings {
+	width: 300px;
+	float: left;
+}
+.post-ratings img {
+	top: 3px;
+	position: relative;
+}
+-->
+</style>
+</head>
+<body>
+<div id="header_wrap">
+  <div id="header">
+	
+	<a href="http://hao.jobbole.com/">
+	<img src="http://hao.jobbole.com/wp-content/themes/wiki/images/jobbole-hao-logo.gif" alt="Logo" class="logo" />
+	</a>
+	
+                <ul class="navigation">
+	  <li><a href="http://hao.jobbole.com" title="Home">资源首页</a></li>
+          <li><a href="http://hao.jobbole.com/submit-resource/">推荐资源</a></li>
+	  <li><a target="_blank" href="http://www.jobbole.com/news/">资讯</a></li>
+	  <li><a target="_blank" href="http://blog.jobbole.com/">博客</a></li>
+	  <li><a target="_blank" href="http://www.jobbole.com/groups/">小组</a></li>
+	  <li><a target="_blank" href="http://tz.jobbole.com/">编程挑战</a></li>
+	  	  <li><a target="_blank" href="http://www.jobbole.com/register">注册</a></li>
+	  <li><a target="_blank" href="http://www.jobbole.com/wp-login.php">登录</a></li>
+	               
+        </ul>
+        </div>
+</div>
+
+<div id="page_wrap">
+  <div id="page" class="clearfix">
+    
+    <div id="sidebar">
+        
+        <h3 class="search">搜索资源</h3>
+        <div id="livesearch">
+        <div class="ajax-loading"></div>
+            <form method="get" action="http://hao.jobbole.com" autocomplete="off">
+            	<fieldset>
+                <input type="text" value="" name="s" id="s" class="text" style="margin-bottom: 10px;" />
+                </fieldset>
+            </form>            
+        </div>
+        
+                
+                <h3 class="folder">资源分类</h3>
+        <ul id="navigation">
+          	<li class="cat-item cat-item-67 current-cat-parent"><a href="http://hao.jobbole.com/category/web-front-end/" title="查看 Web前端开发 下的所有文章">Web前端开发</a>
+<ul class="children">
+	<li class="cat-item cat-item-76"><a href="http://hao.jobbole.com/category/web-front-end/front-end-typography/" title="查看 字体与排版 下的所有文章">字体与排版</a>
+</li>
+	<li class="cat-item cat-item-68"><a href="http://hao.jobbole.com/category/web-front-end/front-end-guides/" title="查看 学习指南 下的所有文章">学习指南</a>
+</li>
+	<li class="cat-item cat-item-110"><a href="http://hao.jobbole.com/category/web-front-end/front-end-security/" title="查看 安全 下的所有文章">安全</a>
+</li>
+	<li class="cat-item cat-item-70 current-cat"><a href="http://hao.jobbole.com/category/web-front-end/front-end-workflow/" title="查看 工作流 下的所有文章">工作流</a>
+</li>
+	<li class="cat-item cat-item-78"><a href="http://hao.jobbole.com/category/web-front-end/front-end-programming-markup-languages/" title="查看 开发与标记语言 下的所有文章">开发与标记语言</a>
+</li>
+	<li class="cat-item cat-item-94"><a href="http://hao.jobbole.com/category/web-front-end/front-end-performance/" title="查看 性能 下的所有文章">性能</a>
+</li>
+	<li class="cat-item cat-item-96"><a href="http://hao.jobbole.com/category/web-front-end/front-end-package-management/" title="查看 打包管理 下的所有文章">打包管理</a>
+</li>
+	<li class="cat-item cat-item-72"><a href="http://hao.jobbole.com/category/web-front-end/front-end-cross-browser/" title="查看 浏览器兼容 下的所有文章">浏览器兼容</a>
+</li>
+	<li class="cat-item cat-item-103"><a href="http://hao.jobbole.com/category/web-front-end/front-end-cha/" title="查看 聊天 下的所有文章">聊天</a>
+</li>
+	<li class="cat-item cat-item-99"><a href="http://hao.jobbole.com/category/web-front-end/front-end-error-handling-debug/" title="查看 错误处理与调试 下的所有文章">错误处理与调试</a>
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-2"><a href="http://hao.jobbole.com/category/tech-tools/" title="查看 开发工具/平台/库 下的所有文章">开发工具/平台/库</a>
+<ul class="children">
+	<li class="cat-item cat-item-13"><a href="http://hao.jobbole.com/category/tech-tools/ide/" title="查看 IDE 下的所有文章">IDE</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="http://hao.jobbole.com/category/tech-tools/dev-lib/" title="查看 开发库 下的所有文章">开发库</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://hao.jobbole.com/category/tech-tools/db/" title="查看 数据库 下的所有文章">数据库</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="http://hao.jobbole.com/category/tech-tools/mobile-tech-tools/" title="查看 移动开发 下的所有文章">移动开发</a>
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-5"><a href="http://hao.jobbole.com/category/tech-website/" title="查看 技术网站 下的所有文章">技术网站</a>
+<ul class="children">
+	<li class="cat-item cat-item-6"><a href="http://hao.jobbole.com/category/tech-website/tech-guide/" title="查看 教程 下的所有文章">教程</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://hao.jobbole.com/category/tech-website/tech-news/" title="查看 资讯 下的所有文章">资讯</a>
+</li>
+	<li class="cat-item cat-item-12"><a href="http://hao.jobbole.com/category/tech-website/tech-qa/" title="查看 问答和社区 下的所有文章">问答和社区</a>
+</li>
+</ul>
+</li>
+        </ul>
+                     
+    </div>
+    <div id="content">
+      <div id="crumb">
+        <a href="http://hao.jobbole.com">Home</a> &nbsp;›&nbsp; <a href="http://hao.jobbole.com/category/web-front-end/" title="查看 Web前端开发 中的全部文章">Web前端开发</a> &nbsp;›&nbsp; Grunt : 基于任务的Javascript项目构建工具      </div>
+      <div class="post_wrap">
+                      
+        <div class="single" id="post-851">
+          <h1>Grunt : 基于任务的Javascript项目构建工具</h1>
+
+
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style" style="display: block; margin: 0 0px; clear: both;"><span class="jiathis_txt"></span>
+<a class="jiathis_button_tsina"></a>
+<a class="jiathis_button_weixin"></a>
+<a class="jiathis_button_qzone"></a>
+<a class="jiathis_button_renren"></a>
+<a class="jiathis_button_douban"></a>
+<a class="jiathis_button_fb"></a>
+<a class="jiathis_button_googleplus"></a>
+<a class="jiathis_button_twitter"></a>
+<a class="jiathis_button_readitlater"></a>
+<a class="jiathis_button_evernote"></a>
+<a class="jiathis_button_ydnote"></a>
+<a href="http://www.jiathis.com/share?uid=1745061" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+<a class="jiathis_counter_style"></a>
+</div>
+
+<script type="text/javascript">
+var jiathis_config={
+	data_track_clickback:true,
+	summary:"",
+	hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1745061" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<br /><br />
+
+          <p><strong>Grunt</strong> 是一个<strong>基于任务的Javascript项目构建工具</strong> (<strong>Javascript Task Runner</strong>)。以下把Task Runner简称为构建工具。</p>
+<p><strong>为什么需要构建工具？</strong></p>
+<p>简单讲就是自动化。当执行重复的任务，比如：压缩，编译，单元测试，代码检测等，构建工具可以简化你的工作，让它变得更简单。当你配置好构建工具后，它可以帮助你和团队完成大部分的琐事，而你几乎不需要花费任何精力。</p>
+<p><strong>为什么使用Grunt?</strong></p>
+<p>Grunt拥有一个成熟的生态体系，而且日益变得越来越庞大。借助数百个可供选择的插件，你可以使用Grunt来自动化几乎所有的事情，而你仅仅需要花费非常少的精力。如果没有满足你需求的插件，你还可以自己写一个Grunt插件，然后发布到npm，也是很简单的事情。</p>
+<p><strong>Grunt插件列表</strong></p>
+<p>很多你需要的任务已经有对应的Grunt插件，而且每天都有新的插件在发布。以下列出了一些你可能已经听说过的。从<a href="http://gruntjs.com/plugins" target="_blank">这里</a>可以查看全部的<a href="http://gruntjs.com/plugins" target="_blank">Grunt插件列表</a>。</p>
+<p><a href="https://npmjs.org/package/grunt-contrib-coffee"><img alt="CoffeeScript" src="http://gruntjs.com/img/logo-coffeescript.jpg" /></a><a href="https://npmjs.org/package/grunt-contrib-handlebars"><img alt="Handlebars" src="http://gruntjs.com/img/logo-handlebars.jpg" /></a><a href="https://npmjs.org/package/grunt-contrib-jade"><img alt="Jade" src="http://gruntjs.com/img/logo-jade.jpg" /></a><a href="https://npmjs.org/package/grunt-contrib-jshint"><img alt="JSHint" src="http://gruntjs.com/img/logo-jshint.jpg" /></a><a href="https://npmjs.org/package/grunt-contrib-less"><img alt="Less" src="http://gruntjs.com/img/logo-less.jpg" /></a><a href="https://npmjs.org/package/grunt-contrib-requirejs"><img alt="Require.js" src="http://gruntjs.com/img/logo-requirejs.jpg" /></a><a href="https://npmjs.org/package/grunt-contrib-sass"><img alt="Sass" src="http://gruntjs.com/img/logo-sass.jpg" /></a><a href="https://npmjs.org/package/grunt-contrib-stylus"><img alt="Stylus" src="http://gruntjs.com/img/logo-sylus.jpg" /></a></p>
+<p><strong>如何开始</strong></p>
+<p>在你的项目中使用Grunt，请参见这个<a href="http://gruntjs.com/getting-started" target="_blank">指南</a>。然后，看看<a href="http://gruntjs.com/sample-gruntfile" target="_blank">Gruntfile实例</a>，了解更多有关于<a href="http://gruntjs.com/configuring-tasks" target="_blank">构建工具配置</a>。</p>
+<p><strong>预览</strong></p>
+<p>虽然安装Grunt是简单，但在你的项目中把Grunt跑起来却稍微有点负责。看一下在这个<a href="https://github.com/cowboy/jquery-tiny-pubsub" target="_blank">示例项目</a>中运行Grunt的输出示例。</p>
+<pre class="brush: bash; gutter: true">$ grunt
+ Running "jshint:gruntfile" (jshint) task
+ &gt;&gt; 1 file lint free.
+Running "jshint:src" (jshint) task
+ &gt;&gt; 1 file lint free.
+Running "jshint:test" (jshint) task
+ &gt;&gt; 1 file lint free.
+Running "qunit:files" (qunit) task
+ Testing test/tiny-pubsub.html....OK
+ &gt;&gt; 4 assertions passed (23ms)
+Running "clean:files" (clean) task
+ Cleaning "dist"...OK
+Running "concat:dist" (concat) task
+ File "dist/ba-tiny-pubsub.js" created.
+Running "uglify:dist" (uglify) task
+ File "dist/ba-tiny-pubsub.min.js" created.
+ Uncompressed size: 389 bytes.
+ Compressed size: 119 bytes gzipped (185 bytes minified).
+Done, without errors.</pre>
+<p><a href="http://gruntjs.com/" target="_blank">Grunt官方网站</a></p>
+          
+	  {{ <b>特别说明</b> }}<br />1. 该资源由 <a target="_blank" href="http://www.jobbole.com/">伯乐在线</a> - <a target="_blank" href="http://www.jobbole.com/members/huangyuliang">黄余粮</a> 整理并收录到资源库。欢迎您也参与<a target="_blank" href="http://hao.jobbole.com/submit-resource/">推荐资源</a>。<br />2.《Grunt : 基于任务的Javascript项目构建工具》 将会持续不断地在这里更新，本文<span style="color:red;">禁止任何形式的转载</span>。<br /><br />
+	  <p class="tags">标签: <a href="http://hao.jobbole.com/tag/grunt/" rel="tag">grunt</a>, <a href="http://hao.jobbole.com/tag/javascript/" rel="tag">JavaScript</a>, <a href="http://hao.jobbole.com/tag/task-runner/" rel="tag">task runner</a>, <a href="http://hao.jobbole.com/tag/%e6%9e%84%e5%bb%ba%e5%b7%a5%e5%85%b7/" rel="tag">构建工具</a></p>
+	<script type="text/javascript"><!--
+	google_ad_client = "ca-pub-7056282119617872";
+	google_ad_slot = "9907395220";
+	google_ad_width = 728;
+	google_ad_height = 90;
+	//-->
+	</script>
+	<script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+	</script>
+	
+          <!-- div class="rating_wrap clearfix">
+               
+              <div class="improve">
+            	  <div><span><strong>Have questions regarding this resource</strong> <a href="http://qa.isystemadmin.com">Ask Questions Here</a></span> </div>
+              </div>              
+          </div -->
+	  
+          
+          
+          
+          
+            
+          <br class="clear" /> 
+          
+          <h3 class="related">相似资源</h3><div id="related"><ul><li><a href="http://hao.jobbole.com/togetherjs/" rel="follow" title="TogetherJS：用于在线实时协作的JS库">TogetherJS：用于在线实时协作的JS库</a></li><li><a href="http://hao.jobbole.com/converse-js/" rel="follow" title="Converse.js：开源的XMPP聊天客户端">Converse.js：开源的XMPP聊天客户端</a></li><li><a href="http://hao.jobbole.com/sjcl/" rel="follow" title="SJCL：斯坦福大学JS加密库">SJCL：斯坦福大学JS加密库</a></li><li><a href="http://hao.jobbole.com/browsershots/" rel="follow" title="BrowserShots:网页兼容测试">BrowserShots:网页兼容测试</a></li><li><a href="http://hao.jobbole.com/pingdom/" rel="follow" title="Pingdom：网站速度测试">Pingdom：网站速度测试</a></li></ul></div> 
+           
+
+                    
+                    
+          
+                    
+          
+          <br class="clear" /> 
+                      
+            
+<!-- You can start editing here. -->
+
+
+			<!-- If comments are open, but there are no comments. -->
+
+	 
+
+<div id="respond">
+
+<h3>发表评论</h3>
+
+<div id="cancel-comment-reply">
+	<small><a rel="nofollow" id="cancel-comment-reply-link" href="/gruntjs-javascript-task-runner/#respond" style="display:none;">点击这里取消回复。</a></small>
+</div>
+
+<p>要发表评论，您必须先<a href="http://hao.jobbole.com/wp-login.php?redirect_to=http%3A%2F%2Fhao.jobbole.com%2Fgruntjs-javascript-task-runner%2F">登录</a>。</p>
+</div>
+
+            
+                      
+
+          
+        </div>
+                    	    </div>
+    </div>
+  </div>
+</div>
+
+<div class="clear"></div>
+<div id="footer_wrap">
+  <div id="footer">
+	<p class="left">© 2013 伯乐在线&nbsp;&nbsp;
+	<a href="http://www.miibeian.gov.cn" target="_blank" rel="nofollow">京ICP备10038840号</a>
+
+	</p>
+	
+	<p class="right">
+		<a href="http://www.jobbole.com">首页</a>&nbsp;&nbsp;
+		<a href="http://hao.jobbole.com">资源首页</a>&nbsp;&nbsp;
+		<a href="http://www.jobbole.com/about-us">关于我们</a>&nbsp;&nbsp;
+		<a href="http://www.jobbole.com/contact-us/">联系我们</a>&nbsp;&nbsp;
+		<a href="http://www.jobbole.com/contact-us/">广告投放</a>&nbsp;&nbsp;
+		<a href="http://www.jobbole.com/contact-us/">网站合作</a>&nbsp;&nbsp;
+		<a href="http://www.jobbole.com/terms-of-use/">使用条款</a>
+
+	</p>
+  </div>
+</div>
+
+<!-- Generated in 0.461 seconds. (102 q) -->
+
+	
+<!-- WP SyntaxHighlighter Ver.1.7.3 Begin -->
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shCore.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shLegacy.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shAutoloader.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAppleScript.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAS3.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushBash.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushColdFusion.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCpp.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCSharp.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCss.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushDelphi.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushDiff.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushErlang.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushGroovy.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJava.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJavaFX.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJScript.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPerl.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPhp.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPlain.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPowerShell.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPython.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushRuby.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushSass.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushScala.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushSql.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushVb.js?ver=3.0"></script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushXml.js?ver=3.0"></script>
+<script type="text/javascript">//<![CDATA[
+	SyntaxHighlighter.autoloader(
+	"applescript	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAppleScript.js?ver=3.0"
+	,"as3 actionscript3	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAS3.js?ver=3.0"
+	,"bash shell	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushBash.js?ver=3.0"
+	,"cf coldfusion	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushColdFusion.js?ver=3.0"
+	,"cpp c	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCpp.js?ver=3.0"
+	,"c# c-sharp csharp	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCSharp.js?ver=3.0"
+	,"css	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCss.js?ver=3.0"
+	,"delphi pas pascal	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushDelphi.js?ver=3.0"
+	,"diff patch	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushDiff.js?ver=3.0"
+	,"erl erlang	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushErlang.js?ver=3.0"
+	,"groovy	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushGroovy.js?ver=3.0"
+	,"java	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJava.js?ver=3.0"
+	,"jfx javafx	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJavaFX.js?ver=3.0"
+	,"js jscript javascript	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJScript.js?ver=3.0"
+	,"perl pl	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPerl.js?ver=3.0"
+	,"php	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPhp.js?ver=3.0"
+	,"plain text	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPlain.js?ver=3.0"
+	,"ps powershell	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPowerShell.js?ver=3.0"
+	,"py python	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPython.js?ver=3.0"
+	,"rails ror ruby rb	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushRuby.js?ver=3.0"
+	,"sass scss	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushSass.js?ver=3.0"
+	,"scala	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushScala.js?ver=3.0"
+	,"sql	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushSql.js?ver=3.0"
+	,"vb vbnet	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushVb.js?ver=3.0"
+	,"xml xhtml xslt html	http://hao.jobbole.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushXml.js?ver=3.0"
+	);
+	SyntaxHighlighter.defaults['auto-links'] = true;
+	SyntaxHighlighter.defaults['quick-code'] = true;
+	SyntaxHighlighter.defaults['title'] = '';
+	SyntaxHighlighter.defaults['class-name'] = 'notranslate';
+	SyntaxHighlighter.defaults['collapse'] = false;
+	SyntaxHighlighter.defaults['first-line'] = 1;
+	SyntaxHighlighter.defaults['gutter'] = true;
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['smart-tabs'] = true;
+	SyntaxHighlighter.defaults['tab-size'] = 4;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+ SyntaxHighlighter.config.stripBrs = true;
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = "Can't find brush for: ";
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = "Brush wasn't configured for html-script option: ";
+	SyntaxHighlighter.all();
+	dp.SyntaxHighlighter.HighlightAll('code')
+//]]></script>
+<!-- WP SyntaxHighlighter Ver.1.7.3 End -->
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/comment-rating/ck-karma.js?ver=3.5.2"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var ratingsL10n = {"plugin_url":"http:\/\/hao.jobbole.com\/wp-content\/plugins\/wp-postratings","ajax_url":"http:\/\/hao.jobbole.com\/wp-admin\/admin-ajax.php","text_wait":"Please rate only 1 post at a time.","image":"stars","image_ext":"gif","max":"5","show_loading":"1","show_fading":"1","custom":"0"};
+var ratings_mouseover_image=new Image();ratings_mouseover_image.src=ratingsL10n.plugin_url+"/images/"+ratingsL10n.image+"/rating_over."+ratingsL10n.image_ext;;
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-postratings/postratings-js.js?ver=1.63"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var viewsCacheL10n = {"admin_ajax_url":"http:\/\/hao.jobbole.com\/wp-admin\/admin-ajax.php","post_id":"851"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://hao.jobbole.com/wp-content/plugins/wp-postviews/postviews-cache.js?ver=1.64"></script>
+
+<script type="text/javascript">//<![CDATA[
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-41916397-1']);
+_gaq.push(['_setCustomVar',1,'logged-in','administrator',1],['_trackPageview']);
+(function () {
+	var ga = document.createElement('script');
+	ga.type = 'text/javascript';
+	ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0];
+	s.parentNode.insertBefore(ga, s);
+})();
+//]]></script>
+
+
+<div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="../js/clearly.js"></script>
+<script>
+var html = window.__getMyClearlyResults().html;
+$("html").html(html);
+$("body").append('<link type="text/css" href="../css/article.css">')</script>
+</div></body>
+</html>
