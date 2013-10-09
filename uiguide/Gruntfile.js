@@ -5,9 +5,9 @@ module.exports = function(grunt) {
             dist: {                            // Target
               files: [{                         // Dictionary of files
                 expand: true,
-                cwd: 'static/commonui/scss', 
+                cwd: 'static/commonui/www/scss', 
                 src: ['**/*.scss'], //路径会映射到目标目录的层级
-                dest: 'static/commonui/css',
+                dest: 'static/commonui/www/css',
                 ext: '.css'
               }]
             }
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
                     name: 'UIGuide'
                 },
                 files: {
-                    'docs': ['static/commonui/css'] //制定目录会根据下面的目录结构生成菜单的层级
+                    'docs': ['static/commonui/www/css'] //制定目录会根据下面的目录结构生成菜单的层级
                 }
             }
         }
