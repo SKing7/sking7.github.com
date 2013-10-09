@@ -14,16 +14,16 @@ module.exports = function(grunt) {
       }
     });
     grunt.initConfig({
-    styledocco: {
-        dist: {
-            options: {
-                name: 'UIGuide'
-            },
-            files: {
-                'docs': ['static/commonui/css/**/*.css']
+        styledocco: {
+            dist: {
+                options: {
+                    name: 'UIGuide'
+                },
+                files: {
+                    'docs': ['static/commonui/css']
+                }
             }
         }
-    }
     });
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-styledocco');
