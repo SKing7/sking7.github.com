@@ -111,7 +111,7 @@
 <li><strong>Anything defined on the page can be overriden or added through the console.</strong></li>
 <li><strong>This interactive mode is called «&nbsp;read evaluate print loop&nbsp;» known as REPL.</strong></li>
 <li><strong>ScratchPad in Firefox offers a great REPL workflow.</strong></li>
-</ul><h5><a name="start"></a>Getting started</h5><p>If you come from other languages like C#, C++ or ActionScript, you may have been used to installing lots of tools, compilers, debuggers. One of the very cool things with JavaScript is that all your really need is a text editor and a browser. When embedded in HTML, JavaScript code can be either inlined inside a script tag:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407893307501571" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+</ul><h5><a name="start"></a>Getting started</h5><p>If you come from other languages like C#, C++ or ActionScript, you may have been used to installing lots of tools, compilers, debuggers. One of the very cool things with JavaScript is that all your really need is a text editor and a browser. When embedded in HTML, JavaScript code can be either inlined inside a script tag:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fb49785426649" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 &lt;script&gt;
 
 // some javascript code
@@ -123,7 +123,7 @@
 				</td>
 						<td><div><p><span>&lt;script&gt;</span></p><p><span>// some javascript code</span></p><p><span>&lt;/script&gt;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0061 seconds] --><p>Or referenced and placed in external .js files, which is a better practice:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4078d9985676395" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0070 seconds] --><p>Or referenced and placed in external .js files, which is a better practice:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fb7d589522380" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 &lt;script src="js/main.js"&gt;&lt;/script&gt;</textarea></p><div><table>
 					<tr>
 				<td data-settings="show">
@@ -131,7 +131,7 @@
 				</td>
 						<td><div><p><span>&lt;script </span><span>src</span><span>=</span><span>"js/main.js"</span><span>&gt;</span><span>&lt;/script&gt;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0010 seconds] --><p>By default, our JavaScript code will be executed synchronously in the order the browser parses the page, from top to bottom. As a result, placing your JavaScript code at the beginning of the page is discouraged; this would cause the browser to wait until the script is executed to start displaying anything on the page. For now, we will stick to a general good practice and place our code just before the end of the body tag:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4078e3642196739" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0010 seconds] --><p>By default, our JavaScript code will be executed synchronously in the order the browser parses the page, from top to bottom. As a result, placing your JavaScript code at the beginning of the page is discouraged; this would cause the browser to wait until the script is executed to start displaying anything on the page. For now, we will stick to a general good practice and place our code just before the end of the body tag:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fb88105788462" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 ...
 
 &lt;script src="js/main.js"&gt;&lt;/script&gt;
@@ -143,7 +143,7 @@
 				</td>
 						<td><div><p><span>.</span><span>.</span><span>.</span></p><p><span>&lt;script </span><span>src</span><span>=</span><span>"js/main.js"</span><span>&gt;</span><span>&lt;/script&gt;</span></p><p><span>&lt;/body&gt;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0029 seconds] --><p>That way, content on the page be displayed first, and once the display list (DOM) is loaded, our code will be executed. This will also ensure that our scripts have access to the DOM and that all objects can be scripted. We will be spending some time on the order of execution of JavaScript in a future article about the DOM. HTML5 introduced some interesting new capabilities in terms of sequencing and order of JavaScript execution that we will cover too.</p><h5><a name="dynamic"></a>A dynamically typed language</h5><p>JavaScript is a dynamically typed language, meaning that any variable can hold any data type. If you are coming from a statically typed language, this may sound scary to you. In JavaScript there is no static typing and there will probably never be. Sadly, it is often perceived that having an explicit typing of variables is required to get type checking. It is actually not necessarily required. Types can be inferred (<a href="http://en.wikipedia.org/wiki/Type_inference">type-inference</a>) automatically and propagated everywhere and provide solid code completion and type checking even with languages like JavaScript. TypeScript from Microsoft is a good example of this.</p><div><p>Given the absence of a typing system, JavaScript will never enforce the type of a variable, so you would not be able to rely on types to implicitly perform conversions. Remember, JavaScript does not rely on a static compiler, the VM directly interprets the source code and compiles it to native code at runtime using the JIT. To create an array in JavaScript, you could use the new keyword with the Array function constructor:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4078ec149498182" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0012 seconds] --><p>That way, content on the page be displayed first, and once the display list (DOM) is loaded, our code will be executed. This will also ensure that our scripts have access to the DOM and that all objects can be scripted. We will be spending some time on the order of execution of JavaScript in a future article about the DOM. HTML5 introduced some interesting new capabilities in terms of sequencing and order of JavaScript execution that we will cover too.</p><h5><a name="dynamic"></a>A dynamically typed language</h5><p>JavaScript is a dynamically typed language, meaning that any variable can hold any data type. If you are coming from a statically typed language, this may sound scary to you. In JavaScript there is no static typing and there will probably never be. Sadly, it is often perceived that having an explicit typing of variables is required to get type checking. It is actually not necessarily required. Types can be inferred (<a href="http://en.wikipedia.org/wiki/Type_inference">type-inference</a>) automatically and propagated everywhere and provide solid code completion and type checking even with languages like JavaScript. TypeScript from Microsoft is a good example of this.</p><div><p>Given the absence of a typing system, JavaScript will never enforce the type of a variable, so you would not be able to rely on types to implicitly perform conversions. Remember, JavaScript does not rely on a static compiler, the VM directly interprets the source code and compiles it to native code at runtime using the JIT. To create an array in JavaScript, you could use the new keyword with the Array function constructor:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fb94411939223" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 var scores = new Array();</textarea></p><div><table>
 					<tr>
 				<td data-settings="show">
@@ -151,7 +151,7 @@ var scores = new Array();</textarea></p><div><table>
 				</td>
 						<td><div><p><span>var</span><span> </span><span>scores</span><span> </span><span>=</span><span> </span><span>new</span><span> </span><span>Array</span><span>(</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0010 seconds] --><p>Or simply (using the literal syntax):</p><!-- Crayon Syntax Highlighter v2.3.0 --><!-- [Format Time: 0.0009 seconds] --><p>Note that no types are specified. At runtime the scores variable will be evaluated as an array:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4078fd965856001" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0012 seconds] --><p>Or simply (using the literal syntax):</p><!-- Crayon Syntax Highlighter v2.3.0 --><!-- [Format Time: 0.0010 seconds] --><p>Note that no types are specified. At runtime the scores variable will be evaluated as an array:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fba8263651252" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 var scores = [];
 
 // outputs: true
@@ -162,7 +162,7 @@ console.log ( scores instanceof Array );</textarea></p><div><table>
 				</td>
 						<td><div><p><span>var</span><span> </span><span>scores</span><span> </span><span>=</span><span> </span><span>[</span><span>]</span><span>;</span></p><p><span>// outputs: true</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>scores </span><span>instanceof</span><span> </span><span>Array</span><span> </span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0015 seconds] --><p>Because types cannot be enforced, variables can hold any type at anytime:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407906818109699" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0018 seconds] --><p>Because types cannot be enforced, variables can hold any type at anytime:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fbb2162683949" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // store an array
 var scores = [];
 
@@ -180,7 +180,7 @@ scores = "Hello";</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// store an array</span></p><p><span>var</span><span> </span><span>scores</span><span> </span><span>=</span><span> </span><span>[</span><span>]</span><span>;</span></p><p><span>// store a number</span></p><p><span>scores</span><span> </span><span>=</span><span> </span><span>5</span><span>;</span></p><p><span>// store an object</span></p><p><span>scores</span><span> </span><span>=</span><span> </span><span>{</span><span>}</span><span>;</span>&nbsp;</p><p><span>// store a string</span></p><p><span>scores</span><span> </span><span>=</span><span> </span><span>"Hello"</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0019 seconds] --><p>If we try to call an undefined API, no errors will be captured at compile time given that there is no compilation happening statically:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40790e564462134" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0024 seconds] --><p>If we try to call an undefined API, no errors will be captured at compile time given that there is no compilation happening statically:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fbbc471828749" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 var scores = [];&nbsp;
 
 scores.foo();</textarea></p><div><table>
@@ -190,7 +190,7 @@ scores.foo();</textarea></p><div><table>
 				</td>
 						<td><div><p><span>var</span><span> </span><span>scores</span><span> </span><span>=</span><span> </span><span>[</span><span>]</span><span>;</span>&nbsp;</p><p><span>scores</span><span>.</span><span>foo</span><span>(</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0011 seconds] --><p>Because the foo method is not available on Array, we will get a runtime exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407917282338634" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0014 seconds] --><p>Because the foo method is not available on Array, we will get a runtime exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fbc5906095096" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 Uncaught TypeError: Object&nbsp; has no method 'foo'</textarea></p><div><table>
 					<tr>
 				<td data-settings="show">
@@ -198,7 +198,7 @@ Uncaught TypeError: Object&nbsp; has no method 'foo'</textarea></p><div><table>
 				</td>
 						<td><div><p><span>Uncaught </span><span>TypeError:</span><span> </span><span>Object</span>&nbsp;<span> </span><span>has </span><span>no </span><span>method</span><span> </span><span>'foo'</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0008 seconds] --><p>Same thing for even the simplest object:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40791f736452573" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0011 seconds] --><p>Same thing for even the simplest object:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fbcf040746786" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 var myObject = {};
 
 myObject.foo();</textarea></p><div><table>
@@ -208,7 +208,7 @@ myObject.foo();</textarea></p><div><table>
 				</td>
 						<td><div><p><span>var</span><span> </span><span>myObject</span><span> </span><span>=</span><span> </span><span>{</span><span>}</span><span>;</span></p><p><span>myObject</span><span>.</span><span>foo</span><span>(</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0011 seconds] --><p>Which would trigger the following runtime exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407926365793423" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0013 seconds] --><p>Which would trigger the following runtime exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fbd9117015392" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 Uncaught TypeError: Object&nbsp; has no method 'foo'</textarea></p><div><table>
 					<tr>
 				<td data-settings="show">
@@ -216,7 +216,7 @@ Uncaught TypeError: Object&nbsp; has no method 'foo'</textarea></p><div><table>
 				</td>
 						<td><div><p><span>Uncaught </span><span>TypeError:</span><span> </span><span>Object</span>&nbsp;<span> </span><span>has </span><span>no </span><span>method</span><span> </span><span>'foo'</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0008 seconds] --><p>Browsers report errors like this one through the JavaScript console, and usually include the line that triggered the exception. The exception was uncaught in the example, but we update the code to catch it using the try catch clause:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40792e924265052" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0010 seconds] --><p>Browsers report errors like this one through the JavaScript console, and usually include the line that triggered the exception. The exception was uncaught in the example, but we update the code to catch it using the try catch clause:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fbe3917001705" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 var scores = [];
 
 try {
@@ -231,13 +231,13 @@ try {
 				</td>
 						<td><div><p><span>var</span><span> </span><span>scores</span><span> </span><span>=</span><span> </span><span>[</span><span>]</span><span>;</span></p><p><span>try</span><span> </span><span>{</span></p><p>&nbsp;<span> </span><span>scores</span><span>.</span><span>foo</span><span>(</span><span>)</span><span>;</span></p><p><span>}</span><span> </span><span>catch</span><span> </span><span>(</span><span>e</span><span>)</span><span> </span><span>{</span></p><p>&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>'API not available!'</span><span>)</span><span>;</span></p><p><span>}</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0021 seconds] --><p>We will get back to error handling soon, but for now let’s move for now on to some more essentials concepts like variable declaration.</p><p><strong>Memo</strong></p><ul>
+				</table></div></div><!-- [Format Time: 0.0026 seconds] --><p>We will get back to error handling soon, but for now let’s move for now on to some more essentials concepts like variable declaration.</p><p><strong>Memo</strong></p><ul>
 <li><strong>JavaScript is a dynamically typed language.</strong></li>
 <li><strong>No typing is required, types are evaluated at runtime.</strong></li>
 <li><strong>Types cannot be enforced.</strong></li>
 <li><strong>Therefore, a variable can hold any type at anytime.</strong></li>
 <li><strong>If an object does not have an API available, the error will be triggered at runtime</strong>.</li>
-</ul><h5><a name="variables-scope"></a>Variables and scope</h5><p>Variables are declared using the var keyword:</p><!-- Crayon Syntax Highlighter v2.3.0 --><!-- [Format Time: 0.0008 seconds] --><p>But omitting the var keyword will also work and declare the variable as global:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40793f701276272" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+</ul><h5><a name="variables-scope"></a>Variables and scope</h5><p>Variables are declared using the var keyword:</p><!-- Crayon Syntax Highlighter v2.3.0 --><!-- [Format Time: 0.0009 seconds] --><p>But omitting the var keyword will also work and declare the variable as global:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fbf8285805885" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // declare a global variable
 score = 12;</textarea></p><div><table>
 					<tr>
@@ -246,7 +246,7 @@ score = 12;</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// declare a global variable</span></p><p><span>score</span><span> </span><span>=</span><span> </span><span>12</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0007 seconds] --><p>As you can imagine, this is not recommended and you should always use var when declaring variables. So why is that? The var keyword actually dictates the scope. In the code below we use a local variable inside the foo function, making it inaccessible from outside:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407948723271817" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0011 seconds] --><p>As you can imagine, this is not recommended and you should always use var when declaring variables. So why is that? The var keyword actually dictates the scope. In the code below we use a local variable inside the foo function, making it inaccessible from outside:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc01215663289" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 function foo() {
     // declare the variable locally
 &nbsp;&nbsp;&nbsp; var score = 12;
@@ -266,7 +266,7 @@ foo2();</textarea></p><div><table>
 				</td>
 						<td><div><p><span>function</span><span> </span><span>foo</span><span>(</span><span>)</span><span> </span><span>{</span></p><p><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span>// declare the variable locally</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>var</span><span> </span><span>score</span><span> </span><span>=</span><span> </span><span>12</span><span>;</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>score</span><span> </span><span>)</span><span>;</span></p><p><span>}</span></p><p><span>function</span><span> </span><span>foo2</span><span>(</span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>score</span><span> </span><span>)</span><span>;</span></p><p><span>}</span></p><p><span>// triggers: Uncaught ReferenceError: score is not defined</span></p><p><span>foo2</span><span>(</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0031 seconds] --><p>Notice that when running the code above, the error is caught at runtime; remember that there is no static compiler involved which would catch this error ahead of time.&nbsp;Omitting the var keyword would make the variable global to all functions:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407950320989649" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0038 seconds] --><p>Notice that when running the code above, the error is caught at runtime; remember that there is no static compiler involved which would catch this error ahead of time.&nbsp;Omitting the var keyword would make the variable global to all functions:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc0c580900817" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 function foo() {
 &nbsp;&nbsp; &nbsp;// define the variable globally
 &nbsp;&nbsp;&nbsp; score = 12;
@@ -289,7 +289,7 @@ foo2();</textarea></p><div><table>
 				</td>
 						<td><div><p><span>function</span><span> </span><span>foo</span><span>(</span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;<span> </span>&nbsp;<span>// define the variable globally</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>score</span><span> </span><span>=</span><span> </span><span>12</span><span>;</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>score</span><span> </span><span>)</span><span>;</span></p><p><span>}</span></p><p><span>function</span><span> </span><span>foo2</span><span>(</span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>score</span><span> </span><span>)</span><span>;</span></p><p><span>}</span></p><p><span>// outputs: 12</span></p><p><span>foo</span><span>(</span><span>)</span><span>;</span></p><p><span>// outputs: 12</span></p><p><span>foo2</span><span>(</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0032 seconds] --><p>Another important behavior when working with variables is hoisting. This behavior allows you to reference a variable before it is defined. Trying to reference an nonexistent variable will trigger an exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407959931302270" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0039 seconds] --><p>Another important behavior when working with variables is hoisting. This behavior allows you to reference a variable before it is defined. Trying to reference an nonexistent variable will trigger an exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc16888549197" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // triggers: Uncaught ReferenceError: a is not defined
 console.log ( a );</textarea></p><div><table>
 					<tr>
@@ -298,7 +298,7 @@ console.log ( a );</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// triggers: Uncaught ReferenceError: a is not defined</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>a</span><span> </span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0009 seconds] --><p>But, referencing a variable declared later with var works, returning its default, unset value undefined:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407961332691903" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0011 seconds] --><p>But, referencing a variable declared later with var works, returning its default, unset value undefined:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc20217312722" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // outputs: undefined
 console.log ( a );
 
@@ -310,7 +310,7 @@ var a = 'Hello';</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// outputs: undefined</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>a</span><span> </span><span>)</span><span>;</span></p><p><span>// variable a declared later</span></p><p><span>var</span><span> </span><span>a</span><span> </span><span>=</span><span> </span><span>'Hello'</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0014 seconds] --><p>What happens behind the scenes is that all the variables are moved to the top of the context block and declared first, but initialization happens where the variables are defined by our code. We will see in an upcoming section that the same behavior applies to functions too. JavaScript 1.5 introduces the concept of constants that we also have in some other languages. Constants are very important and should actually be the default in most of your programs.</p><p>Mutability is a common source of bugs. Some languages like functional programming languages rely on immutability by default. Using the keyword const will guarantee your value cannot be changed after initialization. In the code below, we define a constant named LIMIT:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40796a720182477" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0016 seconds] --><p>What happens behind the scenes is that all the variables are moved to the top of the context block and declared first, but initialization happens where the variables are defined by our code. We will see in an upcoming section that the same behavior applies to functions too. JavaScript 1.5 introduces the concept of constants that we also have in some other languages. Constants are very important and should actually be the default in most of your programs.</p><p>Mutability is a common source of bugs. Some languages like functional programming languages rely on immutability by default. Using the keyword const will guarantee your value cannot be changed after initialization. In the code below, we define a constant named LIMIT:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc2a425225998" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // define a constant
 const LIMIT = 512;
 
@@ -322,7 +322,7 @@ console.log ( LIMIT );</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// define a constant</span></p><p><span>const</span><span> </span><span>LIMIT</span><span> </span><span>=</span><span> </span><span>512</span><span>;</span></p><p><span>// outputs: 512</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>LIMIT</span><span> </span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0013 seconds] --><p>Note that our constant is uppercase, which is a best practice to easily spot immutability. If you try to change the value at runtime, the original value is preserved:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407972305072160" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0017 seconds] --><p>Note that our constant is uppercase, which is a best practice to easily spot immutability. If you try to change the value at runtime, the original value is preserved:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc34071254767" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // define a constant
 const LIMIT = 512;
 
@@ -340,13 +340,13 @@ console.log ( LIMIT );</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// define a constant</span></p><p><span>const</span><span> </span><span>LIMIT</span><span> </span><span>=</span><span> </span><span>512</span><span>;</span></p><p><span>// outputs: 512</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>LIMIT</span><span> </span><span>)</span><span>;</span>&nbsp;</p><p><span>// try to overwrite</span></p><p><span>LIMIT</span><span> </span><span>=</span><span> </span><span>45</span><span>;</span></p><p><span>// outputs: 512</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>LIMIT</span><span> </span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0022 seconds] --><p>You may be surprised that no runtime exception is triggered. Actually, some browsers do, like Firefox, since version 13. Unfortunately, as of today, the const keyword is supported in Firefox and Chrome but not in Safari, or IE 9 and 10, which dramatically reduces the reach of this feature. As a result, the const keyword should not be used if you intend to reach a broad audience and a wide variety of browsers. ECMAScript 6 defines const but with different semantics and similar to variables declared with the let statement, where constants declared as const will be block scoped (a concept we will cover in the Functions section).</p><p><strong>Memo</strong></p><ul>
+				</table></div></div><!-- [Format Time: 0.0027 seconds] --><p>You may be surprised that no runtime exception is triggered. Actually, some browsers do, like Firefox, since version 13. Unfortunately, as of today, the const keyword is supported in Firefox and Chrome but not in Safari, or IE 9 and 10, which dramatically reduces the reach of this feature. As a result, the const keyword should not be used if you intend to reach a broad audience and a wide variety of browsers. ECMAScript 6 defines const but with different semantics and similar to variables declared with the let statement, where constants declared as const will be block scoped (a concept we will cover in the Functions section).</p><p><strong>Memo</strong></p><ul>
 <li><strong>The var keyword defines the scope.</strong></li>
 <li><strong>Omitting the var keyword will make the variable global.</strong></li>
 <li><strong>It is always recommend to use local variables inside functions to prevent conflicts and introduction of states.</strong></li>
 <li><strong>The const keyword introduced in JavaScript 1.5 introduces immutability but is not widely supported yet.</strong></li>
 <li><strong>Constants are part of the Harmony proposal (ECMAScript 6).</strong></li>
-</ul><h5><a name="conversions"></a>Type conversions</h5><p>As we saw earlier, because of JavaScript’s dynamic nature, types cannot be enforced. This can be a limitation for debugging, because any variable can basically hold any type, you may be taken by surprise if, for instance, no runtime exception will be triggered due to an implicit runtime conversion failing. JavaScript actually performs implicit type conversions at runtime at different occasions. First, when using numeric and string values with the + operator, the String type has precedence and concatenation is always performed:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40797c062650281" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+</ul><h5><a name="conversions"></a>Type conversions</h5><p>As we saw earlier, because of JavaScript’s dynamic nature, types cannot be enforced. This can be a limitation for debugging, because any variable can basically hold any type, you may be taken by surprise if, for instance, no runtime exception will be triggered due to an implicit runtime conversion failing. JavaScript actually performs implicit type conversions at runtime at different occasions. First, when using numeric and string values with the + operator, the String type has precedence and concatenation is always performed:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc40141168280" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // gives: "3hello";
 var a = 3 + "hello";
 
@@ -358,7 +358,7 @@ var b = "hello" + true;</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// gives: "3hello";</span></p><p><span>var</span><span> </span><span>a</span><span> </span><span>=</span><span> </span><span>3</span><span> </span><span>+</span><span> </span><span>"hello"</span><span>;</span></p><p><span>// gives: "hellotrue"</span></p><p><span>var</span><span> </span><span>b</span><span> </span><span>=</span><span> </span><span>"hello"</span><span> </span><span>+</span><span> </span><span>true</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0017 seconds] --><p>When using other arithmetic operators, the Number type has precedence:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407984824277215" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0020 seconds] --><p>When using other arithmetic operators, the Number type has precedence:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc4a315196621" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // outputs: 9
 var a = 10 - "1";
 
@@ -373,7 +373,7 @@ var c = 10 / "2";</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// outputs: 9</span></p><p><span>var</span><span> </span><span>a</span><span> </span><span>=</span><span> </span><span>10</span><span> </span><span>-</span><span> </span><span>"1"</span><span>;</span></p><p><span>// outputs: 20</span></p><p><span>var</span><span> </span><span>b</span><span> </span><span>=</span><span> </span><span>10</span><span> </span><span>*</span><span> </span><span>"2"</span><span>;</span></p><p><span>// outputs: 5</span></p><p><span>var</span><span> </span><span>c</span><span> </span><span>=</span><span> </span><span>10</span><span> </span><span>/</span><span> </span><span>"2"</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0023 seconds] --><p>Implicit conversions to Number will also happen when using the == or != operators with the Number, String and Boolean types:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40798d695558204" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0026 seconds] --><p>Implicit conversions to Number will also happen when using the == or != operators with the Number, String and Boolean types:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc54888069281" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // outputs: true
 console.log ("1" == 1); // equals to 1 == 1
 
@@ -394,7 +394,7 @@ console.log ("true" == true); // equals to NaN == 1</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// outputs: true</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>==</span><span> </span><span>1</span><span>)</span><span>;</span><span> </span><span>// equals to 1 == 1</span></p><p><span>// outputs: true</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>==</span><span> </span><span>true</span><span>)</span><span>;</span><span> </span><span>// equals to 1 == 1</span></p><p><span>// outputs: false</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>!=</span><span> </span><span>1</span><span>)</span><span>;</span><span> </span><span>// equals to 1 != 1</span></p><p><span>// outputs: false</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>!=</span><span> </span><span>true</span><span>)</span><span>;</span><span> </span><span>// equals to 1 != 1</span></p><p><span>// outputs: false</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"true"</span><span> </span><span>==</span><span> </span><span>true</span><span>)</span><span>;</span><span> </span><span>// equals to NaN == 1</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0037 seconds] --><p>To avoid implicit conversions and verify that both types and values are equal, you can rely on the strict equality (===) or strict inequality (!==) operators, which will never perform automatic conversion implicitly:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa407996768814415" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0047 seconds] --><p>To avoid implicit conversions and verify that both types and values are equal, you can rely on the strict equality (===) or strict inequality (!==) operators, which will never perform automatic conversion implicitly:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc5e441996599" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // outputs: false
 console.log ("1" === 1);
 
@@ -412,7 +412,7 @@ console.log ("1" !== true);</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// outputs: false</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>===</span><span> </span><span>1</span><span>)</span><span>;</span></p><p><span>// outputs: false</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>===</span><span> </span><span>true</span><span>)</span><span>;</span></p><p><span>// outputs: true</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>!==</span><span> </span><span>1</span><span>)</span><span>;</span></p><p><span>// outputs: true</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span>"1"</span><span> </span><span>!==</span><span> </span><span>true</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0028 seconds] --><p>It is therefore a good practice to use the strict operators to reduce the risks of ambiguity. If we need to convert data explicitly, we can use the appropriates types conversion functions:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa40799f390183726" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0034 seconds] --><p>It is therefore a good practice to use the strict operators to reduce the risks of ambiguity. If we need to convert data explicitly, we can use the appropriates types conversion functions:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc68689458776" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // convert a string to a number
 var a = Number ("3");
 
@@ -430,7 +430,7 @@ console.log ( a, b, c );</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// convert a string to a number</span></p><p><span>var</span><span> </span><span>a</span><span> </span><span>=</span><span> </span><span>Number</span><span> </span><span>(</span><span>"3"</span><span>)</span><span>;</span></p><p><span>// convert a boolean to a number</span></p><p><span>var</span><span> </span><span>b</span><span> </span><span>=</span><span> </span><span>Number</span><span> </span><span>(</span><span>true</span><span>)</span><span>;</span></p><p><span>// tries to convert a non numeric string to a number</span></p><p><span>var</span><span> </span><span>c</span><span> </span><span>=</span><span> </span><span>Number</span><span> </span><span>(</span><span>"Hello"</span><span>)</span><span>;</span></p><p><span>// outputs: 3 1 "NaN"</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>a</span><span>,</span><span> </span><span>b</span><span>,</span><span> </span><span>c</span><span> </span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0037 seconds] --><p>In the same way, converting a string to a number can be done using the parseInt and parseFloat functions:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079a8374044275" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0037 seconds] --><p>In the same way, converting a string to a number can be done using the parseInt and parseFloat functions:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc72522404582" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 // convert a string to a number
 var a = parseInt ( "4 chicken" );&nbsp;
 
@@ -445,13 +445,13 @@ console.log ( a, b );</textarea></p><div><table>
 				</td>
 						<td><div><p><span>// convert a string to a number</span></p><p><span>var</span><span> </span><span>a</span><span> </span><span>=</span><span> </span><span>parseInt</span><span> </span><span>(</span><span> </span><span>"4 chicken"</span><span> </span><span>)</span><span>;</span>&nbsp;</p><p><span>// convert a boolean to a number</span></p><p><span>var</span><span> </span><span>b</span><span> </span><span>=</span><span> </span><span>parseFloat</span><span> </span><span>(</span><span> </span><span>"1.5 pint"</span><span> </span><span>)</span><span>;</span></p><p><span>// outputs: 4 1.5</span></p><p><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>a</span><span>,</span><span> </span><span>b</span><span> </span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0026 seconds] --><p>We saw earlier that JavaScript can throw runtime exceptions, let’s spend a few minutes on this now.</p><p><strong>Memo</strong></p><ul>
+				</table></div></div><!-- [Format Time: 0.0030 seconds] --><p>We saw earlier that JavaScript can throw runtime exceptions, let’s spend a few minutes on this now.</p><p><strong>Memo</strong></p><ul>
 <li><strong>Implicit conversion to String is performed when using the + operator.</strong></li>
 <li><strong>Implicit conversion to Number is performed when using other arithmetic operators.</strong></li>
 <li><strong>Implicit conversion to Number is performed when using the equality and inequality operators with the Number, Boolean and String types.</strong></li>
 <li><strong>To avoid implicit conversions, it is recommended to use the strict equality and inequality operators.</strong></li>
 <li><strong>Explicit conversion can be done using the proper conversion functions.</strong></li>
-</ul><h5><a name="exceptions"></a>Runtime exceptions</h5><p>In all projects we have to deal with runtime exceptions. In JavaScript, as we saw earlier, these can be triggered by the runtime itself or explicitly by our code. For example, if you try to call a method not available on an object, this will trigger a runtime exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079b2251646025" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+</ul><h5><a name="exceptions"></a>Runtime exceptions</h5><p>In all projects we have to deal with runtime exceptions. In JavaScript, as we saw earlier, these can be triggered by the runtime itself or explicitly by our code. For example, if you try to call a method not available on an object, this will trigger a runtime exception:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc7d508769029" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 var scores = [];
 
 // triggers: Uncaught TypeError: Object&nbsp; has no method 'foo'
@@ -462,7 +462,7 @@ scores.foo();</textarea></p><div><table>
 				</td>
 						<td><div><p><span>var</span><span> </span><span>scores</span><span> </span><span>=</span><span> </span><span>[</span><span>]</span><span>;</span></p><p><span>// triggers: Uncaught TypeError: Object&nbsp; has no method 'foo'</span></p><p><span>scores</span><span>.</span><span>foo</span><span>(</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0013 seconds] --><p>At any time, if we need to throw an exception ourselves, we can use the throw keyword with Error object:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079bb781077204" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0014 seconds] --><p>At any time, if we need to throw an exception ourselves, we can use the throw keyword with Error object:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc87269728613" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 throw new Error ('Oops, there is a problem');</textarea></p><div><table>
 					<tr>
 				<td data-settings="show">
@@ -470,7 +470,7 @@ throw new Error ('Oops, there is a problem');</textarea></p><div><table>
 				</td>
 						<td><div><p><span>throw</span><span> </span><span>new</span><span> </span><span>Error</span><span> </span><span>(</span><span>'Oops, there is a problem'</span><span>)</span><span>;</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0009 seconds] --><p>As expected, a runtime exception needs to be handled otherwise the console will output the following message:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079c3611757171" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0010 seconds] --><p>As expected, a runtime exception needs to be handled otherwise the console will output the following message:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc91396671721" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 Uncaught Error: Oops, there is a problem</textarea></p><div><table>
 					<tr>
 				<td data-settings="show">
@@ -478,7 +478,7 @@ Uncaught Error: Oops, there is a problem</textarea></p><div><table>
 				</td>
 						<td><div><p><span>Uncaught </span><span>Error:</span><span> </span><span>Oops</span><span>,</span><span> </span><span>there </span><span>is</span><span> </span><span>a</span><span> </span><span>problem</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0010 seconds] --><p>To handle errors, we can use the try catch statement. The message property in thrown Errors contains the error message:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079cc345125995" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0012 seconds] --><p>To handle errors, we can use the try catch statement. The message property in thrown Errors contains the error message:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fc9a646390125" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 try {
 &nbsp;&nbsp;&nbsp; throw new Error ('Oops, there is a problem');
 
@@ -492,7 +492,7 @@ try {
 				</td>
 						<td><div><p><span>try</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>throw</span><span> </span><span>new</span><span> </span><span>Error</span><span> </span><span>(</span><span>'Oops, there is a problem'</span><span>)</span><span>;</span></p><p><span>}</span><span> </span><span>catch</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;<span> </span><span>// outputs: Oops, there is a problem catched!</span></p><p>&nbsp;&nbsp;&nbsp;<span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>e</span><span>.</span><span>message</span><span> </span><span>+</span><span> </span><span>' catched!'</span><span>)</span><span>;</span></p><p><span>}</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0026 seconds] --><p>If we need some logic to be executed whether or not an error is thrown after code has executed in the try block, we use the finally statement:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079d4488160517" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0030 seconds] --><p>If we need some logic to be executed whether or not an error is thrown after code has executed in the try block, we use the finally statement:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fca4702133531" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 try {
 &nbsp;&nbsp;&nbsp; throw new Error ('Oops, there is a problem');
 
@@ -510,7 +510,7 @@ try {
 				</td>
 						<td><div><p><span>try</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>throw</span><span> </span><span>new</span><span> </span><span>Error</span><span> </span><span>(</span><span>'Oops, there is a problem'</span><span>)</span><span>;</span></p><p><span>}</span><span> </span><span>catch</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>// outputs: Oops, there is a problem catched!</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>e</span><span>.</span><span>message</span><span> </span><span>+</span><span> </span><span>' catched!'</span><span>)</span><span>;</span></p><p><span>}</span><span> </span><span>finally</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>// outputs: Code triggered at all times</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>'Code triggered at all times'</span><span> </span><span>)</span><span>;</span></p><p><span>}</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0035 seconds] --><p>Note that conditional catch cannot be done the same way as in languages like ActionScript or C#, by placing the appropriate type in the catch block to redirect the exception automatically. In JavaScript we use a single catch block and have the appropriate type test inside that same block:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079de850107735" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0044 seconds] --><p>Note that conditional catch cannot be done the same way as in languages like ActionScript or C#, by placing the appropriate type in the catch block to redirect the exception automatically. In JavaScript we use a single catch block and have the appropriate type test inside that same block:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fcae382276858" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 try {
 &nbsp;&nbsp;&nbsp; throw new Error ('Oops, there is a problem');
 
@@ -531,7 +531,7 @@ try {
 				</td>
 						<td><div><p><span>try</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>throw</span><span> </span><span>new</span><span> </span><span>Error</span><span> </span><span>(</span><span>'Oops, there is a problem'</span><span>)</span><span>;</span></p><p><span>}</span><span> </span><span>catch</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>if</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>instanceof</span><span> </span><span>BufferError</span><span> </span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span> </span><span>// handle buffer error</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>}</span><span> </span><span>else</span><span> </span><span>if</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>instanceof</span><span> </span><span>ParseError</span><span> </span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span> </span><span>// handle parse error</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>}</span></p><p><span>}</span><span> </span><span>finally</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>// outputs: Code triggered at all times</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>'Code triggered at all times'</span><span> </span><span>)</span><span>;</span></p><p><span>}</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0045 seconds] --><p>Note that the JavaScript specification details the ability to inline the if directly inside the catch block.</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079e7905173433" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0056 seconds] --><p>Note that the JavaScript specification details the ability to inline the if directly inside the catch block.</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fcb8514341055" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 try {
 &nbsp;&nbsp;&nbsp; throw new Error ('Oops, there is a problem');
 
@@ -551,7 +551,7 @@ try {
 				</td>
 						<td><div><p><span>try</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>throw</span><span> </span><span>new</span><span> </span><span>Error</span><span> </span><span>(</span><span>'Oops, there is a problem'</span><span>)</span><span>;</span></p><p><span>}</span><span> </span><span>catch</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>if</span><span> </span><span>e</span><span> </span><span>instanceof</span><span> </span><span>BufferError</span><span> </span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>// handle buffer error</span></p><p><span>}</span><span> </span><span>catch</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>if</span><span> </span><span>e</span><span> </span><span>instanceof</span><span> </span><span>ParseError</span><span> </span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>// handle parsing error</span></p><p><span>}</span><span> </span><span>finally</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>// outputs: Code triggered at all times</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>console</span><span>.</span><span>log</span><span> </span><span>(</span><span> </span><span>'Code triggered at all times'</span><span> </span><span>)</span><span>;</span></p><p><span>}</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0041 seconds] --><p>Unfortunately, this feature is not part of the ECMAScript specification and will not work in most browsers except Firefox, which again has excellent support for the latest JavaScript’s features. You can rely on Firefox for testing this feature, but don’t rely on it for a real project. What about performance? In JavaScript, exception handling does not have much impact on performance either, except if you use try catch inside a function. So make sure you don’t do this:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079f0009970050" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0051 seconds] --><p>Unfortunately, this feature is not part of the ECMAScript specification and will not work in most browsers except Firefox, which again has excellent support for the latest JavaScript’s features. You can rely on Firefox for testing this feature, but don’t rely on it for a real project. What about performance? In JavaScript, exception handling does not have much impact on performance either, except if you use try catch inside a function. So make sure you don’t do this:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fcc3983595551" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 function test() {
 &nbsp;&nbsp;&nbsp; try {
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; var s = 0;
@@ -565,7 +565,7 @@ function test() {
 				</td>
 						<td><div><p><span>function</span><span> </span><span>test</span><span>(</span><span>)</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>try</span><span> </span><span>{</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span>&nbsp;&nbsp;&nbsp;<span> </span><span>var</span><span> </span><span>s</span><span> </span><span>=</span><span> </span><span>0</span><span>;</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span>&nbsp;&nbsp;&nbsp;<span> </span><span>for</span><span> </span><span>(</span><span>var</span><span> </span><span>i</span><span> </span><span>=</span><span> </span><span>0</span><span>;</span><span> </span><span>i</span><span> </span><span>&lt;</span><span> </span><span>10000</span><span>;</span><span> </span><span>i</span><span>++</span><span>)</span><span> </span><span>s</span><span> </span><span>=</span><span> </span><span>i</span><span>;</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span>&nbsp;&nbsp;&nbsp;<span> </span><span>return</span><span> </span><span>s</span><span>;</span></p><p>&nbsp;&nbsp;&nbsp;<span> </span><span>}</span><span> </span><span>catch</span><span> </span><span>(</span><span> </span><span>e</span><span> </span><span>)</span><span> </span><span>{</span><span>}</span><span>;</span></p><p><span>}</span></p></div></td>
 					</tr>
-				</table></div></div><!-- [Format Time: 0.0039 seconds] --><p>But instead, move the try catch outside of the function:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-52554fa4079f9630582570" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
+				</table></div></div><!-- [Format Time: 0.0049 seconds] --><p>But instead, move the try catch outside of the function:</p><!-- Crayon Syntax Highlighter v2.3.0 --><div id="crayon-525559c17fccd689613473" data-settings=" minimize scroll-mouseover"><p><textarea wrap="off" data-settings="dblclick" readonly="">
 function test() {
 &nbsp;&nbsp;&nbsp; var s = 0;
 &nbsp;&nbsp;&nbsp; for (var i = 0; i &lt; 10000; i++) s = i;
