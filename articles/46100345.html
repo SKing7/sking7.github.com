@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>Understanding hidden classes in v8 » Debuggable</h1>
 <div id="content"><cake:nocache>
 			
 	</cake:nocache><div><div><p>Posted on 1/9/10 by 
@@ -23,5 +25,6 @@ guessed that example 2 is a nifty 10x faster than example 1.</p><p>For those fam
 who don't, let me explain.</p><p>In example 1, every time you are setting a property on the <code>o</code> object, v8 is
 creating a new hidden class that defines the "data structure" of the <code>o</code> object
 to optimize property lookup performance.</p><p>In example 2, we are initializing these "hidden classes" the first time we create
-our <code>o</code> object. So when we are overwriting these properties later on, it is blazing fast, because v8 already knows how to efficiently lookup those properties.</p><p>So if you're writing node.js code, the lesson learned here is that it is much faster to work with existing properties in v8, than to add new ones.</p><p>In my next version of dirty I am planning to take advantage of this behavior by pre-allocating properties before they are actually used. This will probably require a little trickery to map user-defined keys to pre-allocated properties, but it should result in an overall 10x performance boost for setting new keys.</p><p>Let me know what you think / if you have other clever v8 hacks to speed stuff up : ).</p><p>--fg</p><p>PS: You can read more about hidden classes in the <a href="http://code.google.com/apis/v8/design.html#prop_access">v8 docs</a>.</p><p><img src="http://debuggable.com/posts/tick/4c7e81e4-1330-4398-8bd2-761bcbdd56cb" /></p></div></body>
+our <code>o</code> object. So when we are overwriting these properties later on, it is blazing fast, because v8 already knows how to efficiently lookup those properties.</p><p>So if you're writing node.js code, the lesson learned here is that it is much faster to work with existing properties in v8, than to add new ones.</p><p>In my next version of dirty I am planning to take advantage of this behavior by pre-allocating properties before they are actually used. This will probably require a little trickery to map user-defined keys to pre-allocated properties, but it should result in an overall 10x performance boost for setting new keys.</p><p>Let me know what you think / if you have other clever v8 hacks to speed stuff up : ).</p><p>--fg</p><p>PS: You can read more about hidden classes in the <a href="http://code.google.com/apis/v8/design.html#prop_access">v8 docs</a>.</p><p><img src="http://debuggable.com/posts/tick/4c7e81e4-1330-4398-8bd2-761bcbdd56cb" /></p></div></div>
+</body>
 </html>

@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>揭开 iOS 7 之 Multipath TCP 的面纱</h1>
 <div id="post-1852"><div><p>看到中文圈似乎讨论 iOS 7 的这个特性的还不多，于是我稍微研究了一下这个「Mutlipath TCP」，写点心得。过程是这样的：</p><p>Olivier Bonaventure 通过&nbsp;Wireshark （一个网络数据包监控工具）发现了他升级了 iOS 7 的 iPad 在使用 Siri 的时候会建立 Mutlipath TCP 连接，由此断定 iOS 7 已经内置了 Mutlipath TCP 的支持。见《<a href="http://perso.uclouvain.be/olivier.bonaventure/blog/html/2013/09/18/mptcp.html">Apple seems to also believe in Multipath TCP</a>》</p><p>Mutlipath TCP，是一套基于当前 TCP/IP 协议的一个扩展，所谓扩展即是能兼容当前协议，又能带来不少新特性。那么 Multipath TCP 有什么特别之处呢？这里通过一个简单的例子来说明好了。</p><blockquote>假如我手中的 iPhone 同时开启了 3G 和 WiFi 连接（大多数情况也是这样），这个时候我通过 App Store 更新一个 100M 的软件。按照以往的情况，App Store 的软件更新是会优先通过 WiFi 进行的，3G 在此刻是闲置状态。</blockquote><blockquote>但是在 Multipath TCP 的支援下，尽管只通过 App Store 更新一个软件，建立起了一个网络连接，但是它却可以同时利用 3G 和 WiFi 建立 Mutlpath 连接，通过多点优化网络下载，且互为备份。</blockquote><blockquote>假如这个时候 WiFi 断了，以前的情况是，App Store 更新中断，需要人工干预恢复或重新下载。而在 Mutlipath TCP 的优化下，只要 3G 没断，App Store 就能继续更新下载。除非 3G 也断了，才宣告此次连接失败。</blockquote><p>总之，在 Multipath TCP 的支持下，终端设备可以同时利用多个网络设备达到优化网络连接速度、稳定性，一个网络的中断也不会影响全局，大大增强了设备的可移动性和连接可靠性。而在服务端，特别是数据中心层面，则可以利用 Multipath TCP 利用多个网络设置来大大增强网络的吞吐量。</p><p>可以说，Multipath TCP 就是 Internet 的未来。</p><p>那么，Multipath TCP 现在的发展状况如何呢？这可是一个大项目，研究并努力了5年，直到在2013年初才正式制定完成，不过很快相关的实现和利用都来了：</p><ul>
 <li>Linux 内核已经有了一个单独实现的 Multipath TCP 0.87，基于Linux 3.10，只是一个实验分支，不知道什么时候才会合并到主干；</li>
 <li>iOS 7 是首个正式采用 Multipath TCP 的商用操作系统，在这里可以看到，Apple 拥抱和利用新技术是多么的迅速。另外 iPhone 5s 的 A7 64 位芯片也算是一项。</li>
@@ -14,5 +16,6 @@
         
         <small> » <a href="#comments">You can leave a comment.</a></small>
         
-        </p></div></div></body>
+        </p></div></div></div>
+</body>
 </html>

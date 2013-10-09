@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>浏览器的渲染原理简介 | 酷壳 - CoolShell.cn</h1>
 <div><p>看到这个标题大家一定会想到这篇神文《<a href="http://taligarsiel.com/Projects/howbrowserswork1.htm" target="_blank">How Browsers Work</a>》，这篇文章把浏览器的很多细节讲得很细，而且也被<a href="http://ux.sohu.com/topics/50972d9ae7de3e752e0081ff" target="_blank">翻译成了中文</a>。为什么我还想写一篇呢？因为两个原因，</p><p>1）这篇文章太长了，阅读成本太大，不能一口气读完。</p><p>2）花了大力气读了这篇文章后可以了解很多，但似乎对工作没什么帮助。</p><p>所以，我准备写下这篇文章来解决上述两个问题。希望你能在上班途中，或是坐马桶时就能读完，并能从中学会一些能用在工作上的东西。</p><h4>浏览器工作大流程</h4><p>废话少说，先来看个图：</p><p><img alt="" src="http://coolshell.cn//wp-content/uploads/2013/05/Render-Process.jpg" width="712" height="231" /></p><p>从上面这个图中，我们可以看到那么几个事：</p><p>1）浏览器会解析三个东西：</p><ul>
 <li>一个是HTML/SVG/XHTML，事实上，Webkit有三个C++的类对应这三类文档。解析这三种文件会产生一个DOM Tree。</li>
 </ul><ul>
@@ -98,5 +100,6 @@ el.style.cssText += "; left: " + left + "px; top: " + top + "px;";</pre><p><stro
 <p><cite><a href="http://www.w3.org/TR/CSS21/tables.html#fixed-table-layout">Fixed layout, CSS 2.1 Specification</a></cite></p></blockquote><blockquote><p>This algorithm may be inefficient since it requires the user agent to have access to all the content in the table before determining the final layout and may demand more than one pass.</p>
 <p><cite><a href="http://www.w3.org/TR/CSS21/tables.html#auto-table-layout">Automatic layout, CSS 2.1 Specification</a></cite></p></blockquote><h4>几个工具和几篇文章</h4><p>有时候，你会也许会发现在IE下，你不知道你修改了什么东西，结果CPU一下子就上去了到100%，然后过了好几秒钟repaint/reflow才完成，这种事情以IE的年代时经常发生。所以，我们需要一些工具帮我们看看我们的代码里有没有什么不合适的东西。</p><ul>
 <li>Chrome下，Google的<a href="http://code.google.com/webtoolkit/speedtracer/">SpeedTracer</a>是个非常强悍的工作让你看看你的浏览渲染的成本有多大。其实Safari和Chrome都可以使用开发者工具里的一个Timeline的东东。</li>
-</ul><p>最后，别忘了下面这几篇提高浏览器性能的文章：</p><h4>参考</h4></div></body>
+</ul><p>最后，别忘了下面这几篇提高浏览器性能的文章：</p><h4>参考</h4></div></div>
+</body>
 </html>

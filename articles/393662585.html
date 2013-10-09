@@ -1,8 +1,14 @@
+<!doctype html>
 <html>
 <head>
 <meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>iTunes 11 歌曲列表的着色算法是如何实现的？ - 博客</title>
+<link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>iTunes 11 歌曲列表的着色算法是如何实现的？ - 博客</h1>
 <div><b>本文由 <a href="http://blog.jobbole.com">伯乐在线</a> - <a href="http://blog.jobbole.com/author/jobbole/">伯乐在线读者</a> 翻译自 <a target="_blank" href="http://stackoverflow.com/questions/13637892/how-does-the-algorithm-to-color-the-song-list-in-itunes-11-work">Stackoverflow</a>。转载请参见文章末尾处的要求。</b>
 <p>2012年11月份 LuisEspinoza 在Stackoverflow上提问：“最新版的 iTunes 11专辑里歌曲列表非常漂亮，可以从专辑封面给歌曲列表里的字体和背景提取出颜色。有没有人知道这个算法是如何实现的？”</p><p>针对这个问题，Seth Thompson&nbsp;的回答所得投票最高，感谢<strong><a title="袁欣_Jason" href="http://weibo.com/1883102275" target="_blank">@袁欣_Jason</a></strong>&nbsp;的热心翻译。</p><p><img src="http://i.stack.imgur.com/SNXX2.png" alt="Third Example" width="574" height="349" /></p><h3>以下是&nbsp;Seth Thompson&nbsp;的回答</h3><p><img src="http://i.imgur.com/qodsu.png" alt="Example 1" width="574" height="479" /></p><p>在Mathematica中，我用专辑封片图片做为输入，近似模拟出了iTune 11的着色算法：</p><p><img src="http://i.imgur.com/lhVJv.png" alt="Output 1" /></p><p><strong>我是如何做到的</strong></p><p>经过反复尝试，我想出了一种算法，经过我的测试，对大约 80% 的专辑都有效。</p><p><strong>计算颜色的差异</strong></p><p>这个算法就是要寻找图片的主色。能够找到这个主色的先决条件是两种颜色之间的差异是可计量的。其中一种方法就是计算出这两种颜色在RGB颜色空间中的欧式距离（Euclidean distance），不过人对颜色的感知与这种计算出的欧式距离并不匹配。</p><p>因此我写了一个函数，用来将 RGB 颜色转换成&nbsp;<a href="http://en.wikipedia.org/wiki/YUV" target="_blank">YUV</a>&nbsp;格式，这种颜色空间可以更好的模拟人的色觉：</p><pre>convertToYUV[rawRGB_] :=
     Module[{yuv},
@@ -59,5 +65,6 @@ title = highlights[[1]];
 
 songs = highlights[[2]];</pre><p align="left">.1是指将两种颜色区分对待的最小色差，.2是指找出的主色之间的最小色差，.5指的是主色跟背景颜色之间的最小色差（值越大对比度越高）</p><pre>Graphics[{background, Disk[]}]
 Graphics[{title, Disk[]}]
-Graphics[{songs, Disk[]}]</pre><p align="left"><img src="http://i.imgur.com/VIufx.png" alt="Final Output" /></p><p align="left"><strong>注释说明</strong><strong></strong></p><p>这个算法对大部分专辑图片都有效。我用上面的色差参数测试，约80%的专辑封面都可以生成正确的颜色。有一些是因为专辑封面是黑白的，导致无法返回高亮色。我的算法没有处理这些特例，不过能不能完全模拟iTunes并不重要。如果一个专辑封面少于两种高亮色，专辑标题会变成黑色或者白色，这取决于跟背景的最佳对比度。歌曲的标题会变成其中一种返回的高亮色，如果没有返回的颜色，那么歌曲的标题颜色会有一些融于背景之中。</p><p><strong>其他例子</strong></p><p><img src="http://i.imgur.com/YPxA3.png" alt="More Examples" width="574" height="584" /></p><p>原文链接： <a target="_blank" ref="nofollow" href="http://stackoverflow.com/questions/13637892/how-does-the-algorithm-to-color-the-song-list-in-itunes-11-work">Stackoverflow</a>&nbsp;&nbsp;&nbsp;翻译： <a href="http://blog.jobbole.com"> 伯乐在线 </a> - <a href="http://blog.jobbole.com/author/jobbole/">伯乐在线读者</a><br />译文链接： <a href="http://blog.jobbole.com/42748/">http://blog.jobbole.com/42748/</a><br />[ <span><b>转载必须在正文中标注并保留原文链接、译文链接和译者等信息。</b></span>]</p></div></body>
+Graphics[{songs, Disk[]}]</pre><p align="left"><img src="http://i.imgur.com/VIufx.png" alt="Final Output" /></p><p align="left"><strong>注释说明</strong><strong></strong></p><p>这个算法对大部分专辑图片都有效。我用上面的色差参数测试，约80%的专辑封面都可以生成正确的颜色。有一些是因为专辑封面是黑白的，导致无法返回高亮色。我的算法没有处理这些特例，不过能不能完全模拟iTunes并不重要。如果一个专辑封面少于两种高亮色，专辑标题会变成黑色或者白色，这取决于跟背景的最佳对比度。歌曲的标题会变成其中一种返回的高亮色，如果没有返回的颜色，那么歌曲的标题颜色会有一些融于背景之中。</p><p><strong>其他例子</strong></p><p><img src="http://i.imgur.com/YPxA3.png" alt="More Examples" width="574" height="584" /></p><p>原文链接： <a target="_blank" ref="nofollow" href="http://stackoverflow.com/questions/13637892/how-does-the-algorithm-to-color-the-song-list-in-itunes-11-work">Stackoverflow</a>&nbsp;&nbsp;&nbsp;翻译： <a href="http://blog.jobbole.com"> 伯乐在线 </a> - <a href="http://blog.jobbole.com/author/jobbole/">伯乐在线读者</a><br />译文链接： <a href="http://blog.jobbole.com/42748/">http://blog.jobbole.com/42748/</a><br />[ <span><b>转载必须在正文中标注并保留原文链接、译文链接和译者等信息。</b></span>]</p></div></div>
+</body>
 </html>

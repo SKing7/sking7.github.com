@@ -1,0 +1,87 @@
+body {
+    font-family: "PT Serif";
+    font-size: 16px;
+    line-height: 1.5;
+    color: #1f0909;
+    text-align: left;
+    background-color: #f3f2ee;
+}
+.m-content {
+    width:36em;
+    padding-left: 2em;
+    padding-top:4em;
+    padding-right: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+pre {
+    font-size:1.15em;
+}
+pre, code, tt {
+    font-size: .875em;
+    line-height: 1.714285em;
+}
+pre code, code pre {
+    font-size: 1.15em;
+}
+h1, h2, h3, h4, h5, h6 {
+
+    margin-bottom: 1.5em;
+    text-align:left;
+    font-weight:bold;
+}
+h1 {
+}
+h3 { 
+    font-size: 1.125em;
+    margin-top: 2.67em;
+}
+a { 
+    color: #1f0909;
+}
+a:visited {
+    color: #1f0909;
+}
+h1 a, h2 a, a h1, a h2 {
+color: #1f0909;
+}
+pre, code {
+    font-family: Inconsolata;
+}
+@font-face {
+  font-family: 'PT Serif';
+  font-style: normal;
+  font-weight: 400;
+  src: local('PT Serif'), local('PTSerif-Regular'), url(http://themes.googleusercontent.com/static/fonts/ptserif/v5/sDRi4fY9bOiJUbgq53yZCXYhjbSpvc47ee6xR_80Hnw.woff) format('woff');
+}
+@font-face {
+  font-family: 'PT Serif';
+  font-style: normal;
+  font-weight: 700;
+  src: local('PT Serif Bold'), local('PTSerif-Bold'), url(http://themes.googleusercontent.com/static/fonts/ptserif/v5/QABk9IxT-LFTJ_dQzv7xpLrIa-7acMAeDBVuclsi6Gc.woff) format('woff');
+}
+@font-face {
+  font-family: 'PT Serif';
+  font-style: italic;
+  font-weight: 400;
+  src: local('PT Serif Italic'), local('PTSerif-Italic'), url(http://themes.googleusercontent.com/static/fonts/ptserif/v5/03aPdn7fFF3H6ngCgAlQzL3hpw3pgy2gAi-Ip7WPMi0.woff) format('woff');
+}
+@font-face {
+  font-family: 'PT Serif';
+  font-style: italic;
+  font-weight: 700;
+  src: local('PT Serif Bold Italic'), local('PTSerif-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/ptserif/v5/Foydq9xJp--nfYIx2TBz9XbFhgvWbfSbdVg11QabG8w.woff) format('woff');
+}
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Inconsolata'), url(http://themes.googleusercontent.com/static/fonts/inconsolata/v6/BjAYBlHtW3CJxDcjzrnZCLrIa-7acMAeDBVuclsi6Gc.woff) format('woff');
+}
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Inconsolata Bold'), local('Inconsolata-Bold'), url(http://themes.googleusercontent.com/static/fonts/inconsolata/v6/AIed271kqQlcIRSOnQH0yRbnBKKEOwRKgsHDreGcocg.woff) format('woff');
+}

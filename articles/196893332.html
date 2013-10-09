@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>Markdown Rendering | GitHub API</h1>
 <div><h2 id="render-an-arbitrary-markdown-document">Render an arbitrary Markdown document</h2><pre><code>POST /markdown
 </code></pre><h3 id="input">Input</h3><dl>
 <dt>text</dt>
@@ -32,5 +34,6 @@
   <span>"mode"</span><span>:</span> <span>"gfm"</span><span>,</span>
   <span>"context"</span><span>:</span> <span>"github/gollum"</span>
 <span>}</span></code></pre><h3 id="response">Response</h3><pre><code>&lt;p&gt;Hello world &lt;a href="http://github.com/github/linguist/issues/1" class="issue-link" title="This is a simple issue"&gt;github/linguist#1&lt;/a&gt; &lt;strong&gt;cool&lt;/strong&gt;, and &lt;a href="http://github.com/github/gollum/issues/1" class="issue-link" title="This is another issue"&gt;#1&lt;/a&gt;!&lt;/p&gt;</code></pre><h2 id="render-a-markdown-document-in-raw-mode">Render a Markdown document in raw mode</h2><pre><code>POST /markdown/raw
-</code></pre><h3 id="input-1">Input</h3><p>The raw API is not JSON-based. It takes a Markdown document as plaintext (<code>text/plain</code> or <code>text/x-markdown</code>) and renders it as plain Markdown without a repository context (just like a README.md file is rendered – this is the simplest way to preview a readme online).</p><h3 id="response-1">Response</h3><pre><code>&lt;p&gt;Hello world github/linguist#1 &lt;strong&gt;cool&lt;/strong&gt;, and #1!&lt;/p&gt;</code></pre></div></body>
+</code></pre><h3 id="input-1">Input</h3><p>The raw API is not JSON-based. It takes a Markdown document as plaintext (<code>text/plain</code> or <code>text/x-markdown</code>) and renders it as plain Markdown without a repository context (just like a README.md file is rendered – this is the simplest way to preview a readme online).</p><h3 id="response-1">Response</h3><pre><code>&lt;p&gt;Hello world github/linguist#1 &lt;strong&gt;cool&lt;/strong&gt;, and #1!&lt;/p&gt;</code></pre></div></div>
+</body>
 </html>

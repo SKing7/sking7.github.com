@@ -4,8 +4,11 @@
 <meta charset="utf-8"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>防御XSS的七条原则 | Web应用安全实验室</title>
+<link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>防御XSS的七条原则 | Web应用安全实验室</h1>
 <div><p><b>前言</b></p><p>本文将会着重介绍防御XSS攻击的一些原则，需要读者对于XSS有所了解，至少知道XSS漏洞的基本原理，如果您对此不是特别清楚，请参考这两篇文章：《<a href="https://www.owasp.org/index.php/XSS#Stored_and_Reflected_XSS_Attacks" target="_blank">Stored and Reflected XSS Attack</a>》《<a href="https://www.owasp.org/index.php/DOM_Based_XSS" target="_blank">DOM Based XSS</a>》</p><p>攻击者可以利用XSS漏洞向用户发送攻击脚本，而用户的浏览器因为没有办法知道这段脚本是不可信的，所以依然会执行它。对于浏览器而言，它认为这段脚本是来自可以信任的服务器的，所以脚本可以光明正大地访问Cookie，或者保存在浏览器里被当前网站所用的敏感信息，甚至可以知道用户电脑安装了哪些软件。这些脚本还可以改写HTML页面，进行钓鱼攻击。</p><p>虽然产生XSS漏洞的原因各种各样，对于漏洞的利用也是花样百出，但是如果我们遵循本文提到防御原则，我们依然可以做到防止XSS攻击的发生。</p><p>有人可能会问，防御XSS的核心不就是在输出不可信数据的时候进行编码，而现如今流行的Web框架（比如Rails）大多都在默认情况下就对不可信数据进行了HTML编码，帮我们做了防御，还用得着我们自己再花时间研究如何防御XSS吗？答案是肯定的，对于将要放置到HTML页面body里的不可信数据，进行HTML编码已经足够防御XSS攻击了，甚至将HTML编码后的数据放到HTML标签（TAG）的属性（attribute）里也不会产生XSS漏洞（但前提是这些属性都正确使用了引号），但是，如果你将HTML编码后的数据放到了&lt;SCRIPT&gt;标签里的任何地方，甚至是HTML标签的事件处理属性里（如onmouseover），又或者是放到了CSS、URL里，XSS攻击依然会发生，在这种情况下，HTML编码不起作用了。所以就算你到处使用了HTML编码，XSS漏洞依然可能存在。下面这几条规则就将告诉你，如何<b>在正确的地方使用正确的编码</b>来消除XSS漏洞。</p><p><b>原则1：不要在页面中插入任何不可信数据，除非这些数已经据根据下面几个原则进行了编码</b></p><p>第一条原则其实是“Secure By Default”原则：不要往HTML页面中插入任何不可信数据，除非这些数据已经根据下面几条原则进行了编码。</p><p>之所以有这样一条原则存在，是因为HTML里有太多的地方容易形成XSS漏洞，而且形成漏洞的原因又有差别，比如有些漏洞发生在HTML标签里，有些发生在HTML标签的属性里，还有的发生在页面的&lt;Script&gt;里，甚至有些还出现在CSS里，再加上不同的浏览器对页面的解析或多或少有些不同，使得有些漏洞只在特定浏览器里才会产生。如果想要通过XSS过滤器（XSS Filter）对不可信数据进行转义或替换，那么XSS过滤器的过滤规则将会变得异常复杂，难以维护而且会有被绕过的风险。</p><p>所以实在想不出有什么理由要直接往HTML页面里插入不可信数据，就算是有XSS过滤器帮你做过滤，产生XSS漏洞的风险还是很高。</p><table width="782.0" cellspacing="0" cellpadding="0">
 <tbody>
 <tr>
@@ -149,5 +152,6 @@
 <td valign="top">\HH</td>
 </tr>
 </tbody>
-</table></div></body>
+</table></div></div>
+</body>
 </html>

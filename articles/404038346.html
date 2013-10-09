@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>图灵社区 : 阅读 : 从VOA慢速英语的网站上下载Mp3与PDF文本的Python脚本</h1>
 <div><p>想通过听写练习来提高自己的英语听力。<a href="http://www.voanews.com/learningenglish/home/">VOA慢速英语</a>语速很慢（约100－120字/分钟），发音标准清晰，内容丰富（包括新闻、词汇谚语、人物故事等），提供录音及文本下载，是非常不错的入门听写材料。</p><p>为什么要写脚本来下载呢？首先，虽然VOA有对应的Podcast节目，更新方便，但下载链接在大陆是无法访问的，只能看到节目有更新，就是无法下载。其次，每天手动到VOA网站上去下载，似乎太傻瓜，这种重复性地工作应该要自动化处理的。</p><p>从网页中抓取内容是非常常见的应用，处理流程一般就是下载网页，用正则或其他解析html的工具提取需要的链接，再下载链接内容。在写这个脚本的过程中，遇到并解决了以下几个问题，记录在此。</p><ul>
 <li>提取节目的下载链接</li>
 <li>下载内容时显示进度条</li>
@@ -43,5 +45,6 @@ else:
 </code></pre><h2>使用Socks代理来解决GFW的问题</h2><p>首先感谢<a href="http://blog.csdn.net/mscf/article/details/7552297">这个博客</a>的分享。Python可以通过SocksiPy模块来使用Socks代理。SocksiPy的下载与安装见<a href="http://socksipy.sourceforge.net/">官网</a>。这部分的代码如下：</p><pre><code>import socks
 socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1', 9050, rdns=False)
 socket.socket = socks.socksocket
-</code></pre><p>这里首先设置了socks的代理信息，<code>socks.PROXY_TYPE_SOCKS5</code>表示类型为socks5，<code>127.0.0.1</code>与<code>9050</code>分别是代理的IP与端口。我这里使用的是本机作为代理。然后用具有代理功能的套接字覆盖系统缺省的套接字，后续连接就全部走代理了，非常方便。</p><p>完整代码请访问这个<a href="https://gist.github.com/yinchuan/6069808">gist</a>。最后是程序运行截图：<img src="/download/01YZBHKEh9Zn" alt="enter image description here" /></p></div></body>
+</code></pre><p>这里首先设置了socks的代理信息，<code>socks.PROXY_TYPE_SOCKS5</code>表示类型为socks5，<code>127.0.0.1</code>与<code>9050</code>分别是代理的IP与端口。我这里使用的是本机作为代理。然后用具有代理功能的套接字覆盖系统缺省的套接字，后续连接就全部走代理了，非常方便。</p><p>完整代码请访问这个<a href="https://gist.github.com/yinchuan/6069808">gist</a>。最后是程序运行截图：<img src="/download/01YZBHKEh9Zn" alt="enter image description here" /></p></div></div>
+</body>
 </html>

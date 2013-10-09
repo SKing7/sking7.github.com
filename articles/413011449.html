@@ -4,11 +4,15 @@
 <meta charset="utf-8"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>  Chrome 疯狂的密码保存策略 - 爱范儿 · Beats of Bits</title>
+<link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>  Chrome 疯狂的密码保存策略 - 爱范儿 · Beats of Bits</h1>
 <div id="entry-content"><p><a href="http://www.ifanr.com/328760/hackers_security_password-100004008-orig" rel="attachment wp-att-328766"><img alt="hackers_security_password-100004008-orig" src="http://cdn.ifanr.cn/wp-content/uploads/2013/08/hackers_security_password-100004008-orig.jpg" width="600" height="375" /></a></p><p>在登录各种网站的过程中，我们常常会使用不同的用户名和密码，这会造成记忆上的负担。如果你是 Chrome 用户，在登录新网站的时候，会看到它保存密码的提示，并且很可能点了“确定”。这样做的话，你可以自动登录各种网站，而且在不同的电脑同步，真的非常方便。不过，你是否考虑过安全问题？</p><p>或许你会想，Google 肯定把密码加密后保存在系统之中了吧，或者干脆就是保存在云端。如果是这样，准备震惊一下自己和小伙伴们吧。现实情况是，Chrome 并没有给你的密码加密，更可怕的是，任何一个人都能够看到你的密码，无需任何黑客技术。</p><p>进入设置，查看“密码和表单”项目，点击“管理已保存的密码”，（或者直接访问 Chrome://settings/passwords），你会发现自己保存的所有用户名和密码。没错，密码都是以小黑点显示的。但是，如果你点击一下，就会发现在密码后面出现了“显示”二字，点击它，你就能看到密码了。就是这么简单。</p><p>Google 的天才工程师竟然也会犯愚蠢的错误！等等，等等，这样明显的安全漏洞不可能是错误，应该是一种功能吧？恭喜你猜对了。因为 Chrome 安全主管说，这的确是故意的，而且他们不打算做出什么改变。</p><p>软件开发者 <a href="http://blog.elliottkember.com/chromes-insane-password-security-strategy">Elliott Kember</a> 在博客上撰文提到了这个问题，在他看来，Chrome 保存密码的策略是疯狂的。每次他向懂技术的人反映这个问题，得到的答复是这样的：</p><ul>
 <li>用 1Pass</li>
 <li>当别人直接接触到计算机的时候，它已经不安全了</li>
 <li>密码管理就应该是这个样子的</li>
-</ul><p>问题是，普通用户并不知道密码是这样保存的。</p><blockquote><p>找一个不懂技术的人。借用他们的电脑。访问 Chrome://settings/passwords，然后在密码行那里点击“显示”，看看他们会怎么说。我打赌他们不会说，“密码管理就是这个样子的。”</p></blockquote><p>Elliott Kember 的文章在 hackernews 上获得了很大关注，于是 Chrome 安全主管 <a href="https://news.ycombinator.com/item?id=6166731">Justin Schuh</a> 也来回复了。</p><p>他说，Elliot Kember 完全是小白用户的看法，他们花费了多年的时间考虑这个问题，并且有大量的数据支持这个决定，在他看来，如果有人入侵了你的系统用户账号，即使再多的安全措施也是无用的。密码加密的想法虽然出自好意，但是 Chrome 团队不想给用户安全的错觉或者鼓励危险的行为。那不是他们处理安全问题的方式。</p><p>啊？</p><p>“安全的错觉”？难道普通用户会去设置里了解明文保存的事实么？如果 Chrome 明确提示说“密码会以明文”保存，或许用户不会有“安全的错觉”，但在没有更多提示的情况下，用户反而会产生“安全的错觉”吧。另外，根据 Google 工程师的逻辑，一旦坏人进了你的家门，所有的东西都有危险，所以任何柜子都不要加锁么？古怪的逻辑，而且在现实中，安全问题一定是来自专业黑客么？</p><p>我们不知道 Google 的天才工程师是否会改变想法。但是，如果你注重安全问题的话，赶快把保存的密码全部删除，然后在 Chrome 提示你保存密码的时候，点击“否”吧。</p><p>图片来自 <a href="http://www.pcworld.com/article/2030489/tripwire-acquires-ncircle-to-form-new-security-giant.html">pcworld</a></p></div></body>
+</ul><p>问题是，普通用户并不知道密码是这样保存的。</p><blockquote><p>找一个不懂技术的人。借用他们的电脑。访问 Chrome://settings/passwords，然后在密码行那里点击“显示”，看看他们会怎么说。我打赌他们不会说，“密码管理就是这个样子的。”</p></blockquote><p>Elliott Kember 的文章在 hackernews 上获得了很大关注，于是 Chrome 安全主管 <a href="https://news.ycombinator.com/item?id=6166731">Justin Schuh</a> 也来回复了。</p><p>他说，Elliot Kember 完全是小白用户的看法，他们花费了多年的时间考虑这个问题，并且有大量的数据支持这个决定，在他看来，如果有人入侵了你的系统用户账号，即使再多的安全措施也是无用的。密码加密的想法虽然出自好意，但是 Chrome 团队不想给用户安全的错觉或者鼓励危险的行为。那不是他们处理安全问题的方式。</p><p>啊？</p><p>“安全的错觉”？难道普通用户会去设置里了解明文保存的事实么？如果 Chrome 明确提示说“密码会以明文”保存，或许用户不会有“安全的错觉”，但在没有更多提示的情况下，用户反而会产生“安全的错觉”吧。另外，根据 Google 工程师的逻辑，一旦坏人进了你的家门，所有的东西都有危险，所以任何柜子都不要加锁么？古怪的逻辑，而且在现实中，安全问题一定是来自专业黑客么？</p><p>我们不知道 Google 的天才工程师是否会改变想法。但是，如果你注重安全问题的话，赶快把保存的密码全部删除，然后在 Chrome 提示你保存密码的时候，点击“否”吧。</p><p>图片来自 <a href="http://www.pcworld.com/article/2030489/tripwire-acquires-ncircle-to-form-new-security-giant.html">pcworld</a></p></div></div>
+</body>
 </html>

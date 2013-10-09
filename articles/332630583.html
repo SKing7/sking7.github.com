@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>CSS Preload Scanner in WebKit</h1>
 <div>
 							<p>In WebKit world, <a href="https://www.webkit.org/blog/166/optimizing-page-loading-in-web-browser/">preload scanner</a> refers to a side parser which kicks in if the main HTML parser is halted by a blocking script loading. Because this preload scanner can see what <a href="https://github.com/WebKit/webkit/blob/master/Source/WebCore/html/parser/HTMLPreloadScanner.cpp#L89">other resources</a> (e.g. stylesheets, images, inputs) are to be fetched, it can trigger the associated network requests as early as possible, without waiting for the main parser to finish, thereby <a href="http://gent.ilcore.com/2011/01/webkit-preloadscanner.html">improving the overall loading time</a>. Now, what about speculatively loading dependent resources on a stylesheet instead of the main HTML file? Fortunately, WebKit has something called <em>CSS Preload Scanner</em>.</p>
 <p>During the <a href="https://www.webkit.org/blog/1273/the-html5-parsing-algorithm/">implementation</a> of a standard-compliant HTML5 parser in WebKit, the preload scanner <a href="http://trac.webkit.org/changeset/61366">got cleaned up</a>. While the bulk of the scanning still resides in the main <code>HTMLPreloadScanner</code>, a small portion went into its own <code>CSSPreloadScanner</code>. Like its HTML cousin, the job of CSS Preload Scanner is to scan the stylesheet for resources which can be fetched early. For now, it only supports CSS <a href="http://www.w3.org/TR/CSS21/cascade.html#at-import">@import rule</a>.</p>
@@ -27,5 +29,6 @@ body { background-color: white }
 <p><strong>Note</strong>: Special thanks to <a href="http://www.igvita.com/">Ilya Grigorik</a> for reviewing the draft of this blog post.</p>
 							
 												
-						</div></body>
+						</div></div>
+</body>
 </html>

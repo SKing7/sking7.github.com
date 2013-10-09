@@ -4,8 +4,11 @@
 <meta charset="utf-8"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Pushing and Popping with the History API</title>
+<link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>Pushing and Popping with the History API</h1>
 <div><p>Until recently, we developers couldn’t to do much with the state and history of the browser. We could check the number of items in the history and push users forwards and backwards, but this provides little benefit to the user. With the rise of more dynamic web pages, we need more control. Thankfully, HTML5 gives us that control by extending the JavaScript History API.</p><section id="the-point">
 <h2>What’s the point? <a href="#the-point">#</a></h2>
 <p>It goes without saying that URLs are important. They’re <em>the</em> method of accessing the vast collections of information and resources on the web, and more recently, they’ve begun representing the intended state of a web application. You can copy these URLs and share them with your friends or use them to create links from any HTML document. They’re the veins of the web, and they need to be looked after.</p>
@@ -127,5 +130,6 @@ history.replaceState({
 </section><section id="closing">
 <h2>Closing thoughts <a href="#closing">#</a></h2>
 <p>URLs go beyond just the browsing session of a user. They’re historically important markers for resources that could very well remain in use for many years to come. Before you embark on developing your site’s JavaScript, you should give thought to the <a href="http://warpspire.com/posts/url-design/">design of your URLs</a>. Make them meaningful and organised. Make sure you can directly access them without JavaScript. Only then should you add your JavaScript to enhance the browsing experience.</p>
-</section></div></body>
+</section></div></div>
+</body>
 </html>

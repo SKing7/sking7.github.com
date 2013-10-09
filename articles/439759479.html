@@ -1,11 +1,18 @@
+<!doctype html>
 <html>
 <head>
 <meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Exclude grep from your grepped output of ps (alias included in description)</title>
+<link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>Exclude grep from your grepped output of ps (alias included in description)</h1>
 <div id="terminal-display-main"><div><a></a><a></a><a></a><a></a><img src="/images/terminal-options.gif" /><p style="display: inline;">
         Terminal - Exclude grep from your grepped output of ps (alias included in description)    </p></div><div><div id="sample-output-402"><p>
                 This is sample output - yours may be different.
             </p></div><div><p>
-                Exclude grep from your grepped output of ps (alias included in description)            </p><div><p>Surround the first letter of what you are grepping with square brackets and you won't have to spawn a second instance of grep -v. You could also use an alias like this (albeit with sed):</p><p>alias psgrep='ps aux | grep $(echo $1 | sed "s/^\(.\)/[\1]/g")'</p></div></div></div></div></body>
+                Exclude grep from your grepped output of ps (alias included in description)            </p><div><p>Surround the first letter of what you are grepping with square brackets and you won't have to spawn a second instance of grep -v. You could also use an alias like this (albeit with sed):</p><p>alias psgrep='ps aux | grep $(echo $1 | sed "s/^\(.\)/[\1]/g")'</p></div></div></div></div></div>
+</body>
 </html>

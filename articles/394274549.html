@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Managing Responsive Breakpoints in Javascript</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Managing Responsive Breakpoints in Javascript</h1>
+<div><p>Responsive design is increasingly popular with separate mobile/desktop sites being replaced by a hybrid approach where websites are able to respond to the users needs.</p><p>In responsive design, media queries are used &nbsp;to allow sites to change the appearance of the page &nbsp;based&nbsp;on the browser thing like browser width and browser height. To enable support for media queries in older browsers we simply include respond.js in the page. Unfortunately things are not quite as simple in javascript, browsers do not come with a simple way to add javascript to a specific state so we are left to fend for ourselves in this area.</p><p>A simple way to handle resizing would be to write a state manager which uses the browser resize event. &nbsp;It would store the name of your current state in a variable and then update as required. A sample of how this might look is shown below (also can be found in this <a href="https://gist.github.com/jonathan-fielding/5867484" target="_blank">gist</a>).</p><pre>var stateManager = (function () {
+	var state = null;
+
+	var setState = function () {
+		if ($('body').width() &lt; 768) {
+			if (state !== "mobile") {
+				state = "mobile";
+				displayMobile();
+			}
+		}
+		else {
+			if (state !== "desktop") {
+				state = "desktop";
+				displayDesktop();
+			}
+		}
+	};
+
+	var resizePage = function () {
+		setState();
+
+		if (state === "mobile") {
+			resizeMobile();
+		}
+		else {
+			resizeDesktop();
+		}
+	};
+
+	var displayMobile = function () {
+		//When mobile state is shown this fires
+	};
+
+	var displayDesktop = function () {
+		//When desktop state is shown this fires
+	};
+
+	var resizeMobile = function () {
+		//When mobile state is resized this fires
+	};
+
+	var resizeDesktop = function () {
+		//When desktop state is resized this fires
+	};
+
+	return {
+		init: function () {
+			setState();
+			$(window).on('resize', resizePage);
+		},
+		getState: function () {
+			return state;
+		}
+	};
+
+} ());
+
+function(window){
+	stateManager.init();
+}(window, undefined);</pre><p>When working with multiple states though, it is important to remember that there are some gotchas when changing state in javascript:</p><ul>
+<li><span>Manipulated DOM elements – Any elements that needed to be manipulated with js may need to be manipulated again when you change state.</span></li>
+<li>Performance – As the majority of browsers constantly fire resize as the browser is resized the browser can suffer from slow down so it is important to take this into account when adding code to the resize.</li>
+</ul><p>In newer browsers we also have access the <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.matchMedia">matchMedia API</a>&nbsp;which is an alternative to using the resize method mentioned above however to use in older browsers we have to use a polyfill. The matchMedia API also does not cater for having ‘state’ specific resize events, which the above code does handle, therefore it may make sense to have a mix of the two approaches to provide the best experience.</p><h2>Libraries</h2><p>There are a couple of libraries which allow you to manage responsive state within javascript, two of which are enquire.js and SimpleStateManager.</p><h3><a title="enquire.js" href="http://wicky.nillia.ms/enquire.js/" target="_blank">enquire.js</a></h3><p>enquire.js takes the same media query syntax used in CSS and allows you to add&nbsp;JavaScript callbacks for media queries&nbsp;<em>matching and unmatching</em>. The benefit of this approach is that developers will already be familiar with the syntax from working with media queries in CSS however to achieve this it relies upon the&nbsp;matchMedia API which is not available in older browsers. This means that to use enquire.js in older browsers (IE8 and below) you will need to use a polyfill.</p><h3><a title="SimpleStateManager" href="https://github.com/jonathan-fielding/SimpleStateManager" target="_blank">SimpleStateManager</a></h3><p>SimpleStateManager is a fairly new alternative to enquire.js, it provides its own API for creating states rather than trying to replicate CSS media queries. The benefit of SimpleStateManager is that it works in older browsers without the need for a polyfill, the current version also has a smaller filesize than enquire.js. The main disadvantage is that it only allows you to add one method per responsive ‘state’, the current roadmap suggests that this will be fixed in the future as a v2 feature.</p><h2>Summary</h2><p>While it isn’t overly difficult to write your own script to manage states, both enquire.js and SimpleStateManager are able to make your job easier. Personally the API used by SimpleStateManger feels easier to use, you simply provide the upper width limit of a state and it automatically knows the lower limit based on any states you have added for lower widths where as enquire.js requires you to provide a full media query to define the constraints of when that state is active. Using javascript that is able to respond to different responsive states is going to become more important as responsive sites start to use more javascript aimed at a particular state, leveraging libraries will save time and allow you to be consistent with the way responsive states are handled across projects.</p></div></div>
+</body>
+</html>

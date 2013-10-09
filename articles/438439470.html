@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>Hacker News 排名算法工作原理 -- 算法 -- IT技术博客大学习 -- 共学习 共进步！</h1>
 <div><p> &nbsp; &nbsp;这篇文章我要向大家介绍<a href="http://news.ycombinator.com/" target="_blank">Hacker News</a>网站的文章排名算法工作原理，以及如何在自己的应用里使用这种算法。这个算法非常的简单，但却在突出热门文章和遴选新文章上表现的异常优秀。<br /></p><h3>深入 news.arc 程序代码</h3><p> &nbsp; &nbsp;Hacker News是用Arc语言开发的，这是一种Lisp方言，由Y Combinator投资公司创始人<a href="http://www.paulgraham.com/" target="_blank">Paul Graham</a>创造。Hacker News的开源的，你可以在<a href="http://arclanguage.org/" target="_blank">arclanguage.org</a>找到它的源代码。深入发掘 news.arc 程序，你会找到这段排名算法代码，就是下面这段：</p><pre>; Votes divided by the age in hours to the gravityth power.
 ; Would be interesting to scale gravity in a slider.
 
@@ -62,5 +64,6 @@ G = 比重，news.arc里缺省值是1.8</pre><p> &nbsp; &nbsp;正如你看到的
 													<li><a href="http://blogread.cn/it/article/5549?f=sa">数学之美：StackOverflow问答排名算法 &nbsp;&nbsp; <span>(阅读：1600)</span></a></li>
 													<li><a href="http://blogread.cn/it/article/6653?f=sa">Reddit排名算法工作原理 &nbsp;&nbsp; <span>(阅读：400)</span></a></li>
 												
-					</ol></div></body>
+					</ol></div></div>
+</body>
 </html>

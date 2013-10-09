@@ -4,8 +4,11 @@
 <meta charset="utf-8"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>如何让搜索引擎抓取AJAX内容？ - 阮一峰的网络日志</title>
+<link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>如何让搜索引擎抓取AJAX内容？ - 阮一峰的网络日志</h1>
 <div id="main-content"><!-- div class="asset-body" --><p>越来越多的网站，开始采用<a href="http://en.wikipedia.org/wiki/Single-page_application">"单页面结构"</a>（Single-page application）。</p><!-- /div --><!-- div id="more" class="asset-more" --><p>整个网站只有一张网页，采用<a href="http://zh.wikipedia.org/wiki/AJAX">Ajax</a>技术，根据用户的输入，加载不同的内容。</p><p><img src="http://image.beekka.com/blog/201307/bg2013071603.jpg" /></p><p>这种做法的好处是用户体验好、节省流量，缺点是AJAX内容无法被搜索引擎抓取。举例来说，你有一个网站。</p><blockquote><pre><code>
 　　http://example.com  
 　　
@@ -67,5 +70,6 @@
 　　　　&lt;/body&gt;
 　　&lt;/html&gt;
 　　
-</code></pre></blockquote><p>仔细看上面这段代码，你会发现有一个noscript标签，这就是奥妙所在。</p><p>我们把所有要让搜索引擎收录的内容，都放在noscript标签之中。这样的话，用户依然可以执行AJAX操作，不用刷新页面，但是搜索引擎会收录每个网页的主要内容！</p><p>===================================</p><p>[通知]</p><p>接下来三周，我外出旅行，暂停更新网志。</p><p>大家可以从 <a href="http://www.ruanyifeng.com/tweets/">http://www.ruanyifeng.com/tweets/</a>，了解我的行程。欢迎关注。</p><p>（完）<br /></p><!-- /div --></div></body>
+</code></pre></blockquote><p>仔细看上面这段代码，你会发现有一个noscript标签，这就是奥妙所在。</p><p>我们把所有要让搜索引擎收录的内容，都放在noscript标签之中。这样的话，用户依然可以执行AJAX操作，不用刷新页面，但是搜索引擎会收录每个网页的主要内容！</p><p>===================================</p><p>[通知]</p><p>接下来三周，我外出旅行，暂停更新网志。</p><p>大家可以从 <a href="http://www.ruanyifeng.com/tweets/">http://www.ruanyifeng.com/tweets/</a>，了解我的行程。欢迎关注。</p><p>（完）<br /></p><!-- /div --></div></div>
+</body>
 </html>

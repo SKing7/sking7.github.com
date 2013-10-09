@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="../css/article.css" />
 </head>
 <body>
+<div class="m-content">
+<h1>使用ImageMagick为你的网站减重（2） - Hooopo</h1>
 <div><p>以前写过一篇博客《<a href="http://hooopo.iteye.com/blog/620498">使用ImageMagick为你的网站减重</a>》，涉及到的手段是：</p><ol><li>在服务器端把图片缩放到合适的尺寸，避免在前端用css缩放图片。</li><li>用imagemagick的strip功能移出图片里的EXIF等多余信息。</li><li>压缩JPEG图片的质量，减少图片体积。</li></ol><h2>Lossless Compress With <a href="https://github.com/toy/image_optim">image_optim</a></h2><p>上面的手段都是针对用户上传的JPEG图片。对于网站自身的banner或logo等图片也可以通过各种工具进行无损压缩来减少图片体积。</p><p><a href="https://github.com/toy/image_optim">image_optim</a>&nbsp;是一个Ruby的gem，可以组合调用<b>&nbsp;</b><b><a href="http://advancemame.sourceforge.net/doc-advpng.html">advpng</a>&nbsp;</b><a href="http://www.lcdf.org/gifsicle/"><b>gifsicle</b></a><b>&nbsp;</b><b>jpegoptim jpegtran</b><b>&nbsp;</b><a href="http://optipng.sourceforge.net/"><b>optipng</b></a><b>&nbsp;</b><a href="http://pmt.sourceforge.net/pngcrush/"><b>pngcrush</b></a><b>&nbsp;</b><b><a href="http://www.advsys.net/ken/util/pngout.htm">pngout</a>&nbsp;</b>等图片优化工具。使用方法非常简单，并且可以看到每个图片优化的大小：</p><pre><code>image_optim app/assets/images/*.{jpg,png,gif}
 </code></pre>
 
@@ -29,5 +31,6 @@ exiftool progressive.jpg |grep Encoding # 检测转换的结果,如果为Progres
 &nbsp; &nbsp; end
 &nbsp; &nbsp; img
 end
-</code></pre><h2>How to Detect Progressive JPEG</h2><p>有一种说法是用file或identify命令获取到图片的类型为JFIF即是Progressive JPEG，但是经过多次试验，这个结论不靠谱，最靠谱的是上面使用的exiftool。</p><h3>相关链接</h3><ol><li>http://www.codinghorror.com/blog/2005/12/progressive-image-rendering.html<br /></li><li>http://www.zhangxinxu.com/wordpress/2013/01/progressive-jpeg-image-and-so-on/<br /></li><li>http://www.yuiblog.com/blog/2008/12/05/imageopt-4/<br /></li><li>http://hooopo.iteye.com/blog/620498<br /></li><li>http://imageoptim.com/<br /></li></ol></div></body>
+</code></pre><h2>How to Detect Progressive JPEG</h2><p>有一种说法是用file或identify命令获取到图片的类型为JFIF即是Progressive JPEG，但是经过多次试验，这个结论不靠谱，最靠谱的是上面使用的exiftool。</p><h3>相关链接</h3><ol><li>http://www.codinghorror.com/blog/2005/12/progressive-image-rendering.html<br /></li><li>http://www.zhangxinxu.com/wordpress/2013/01/progressive-jpeg-image-and-so-on/<br /></li><li>http://www.yuiblog.com/blog/2008/12/05/imageopt-4/<br /></li><li>http://hooopo.iteye.com/blog/620498<br /></li><li>http://imageoptim.com/<br /></li></ol></div></div>
+</body>
 </html>

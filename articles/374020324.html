@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+			  JavaScript Timing: Accuracy vs Precision 
+		</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>
+			  JavaScript Timing: Accuracy vs Precision 
+		</h1>
+<div>
+							<p>When analyzing the performance of a JavaScript-based application, stopwatch is often a convenient tool. Just like any other timing measurements in real life, it is important to ensure that this produces a valid and confident result. Thus, we need to avoid some factors which may reduce its <em>accuracy</em> and <em>precision</em>.</p>
+<p>Imagine you are running on a track and you have five stopwatches giving wildly varying timing measurements of your performance. In this scenario, it is difficult to put a lot of confidence in the numbers. This is why many JavaScript-related benchmarks often come with a warning that the tested application should be the only one running. The goal is to minimize any random side activities which may cause some variations.</p>
+<p>In the wikipedia page on <a href="http://en.wikipedia.org/wiki/Accuracy_and_precision">Accuracy and precision</a>, we find:</p>
+<blockquote><p>
+..the <strong>accuracy</strong> of a measurement system is <em>the degree of closeness</em> of measurements of a quantity to that quantity’s actual (true) value.
+</p></blockquote>
+<p>and also</p>
+<blockquote><p>The <strong>precision</strong> of a measurement system, also called reproducibility or <em>repeatability</em>, is the degree to which repeated measurements under unchanged conditions show the same results.
+</p></blockquote>
+<p>In addition, the <a href="http://en.wikipedia.org/wiki/Accuracy_and_precision#Accuracy_versus_precision:_the_target_analogy">target analogy</a> is usually quite effective to demonstrate the concept. In the context of JavaScript world, you can also think of a <a href="http://en.wikipedia.org/wiki/Darts#Dartboard">dartboard</a> (after all, no JavaScript discussion is complete until Dart is mentioned).</p>
+<a href="http://ariya.ofilabs.com/2013/06/javascript-timing-accuracy-vs-precision.html/accuracy_precision" rel="attachment wp-att-1094"><img src="http://ariya.ofilabs.com/wp-content/uploads/2013/06/accuracy_precision.png" alt="accuracy_precision" /></a>
+<p>In order to get <a href="http://ejohn.org/blog/javascript-benchmark-quality/">high-quality benchmark results</a>, it is important to look at several factors: accuracy, errors, running time. This is why if you write tests for <a href="http://jsperf.com/">JSPerf</a>, each measurement is displayed in <em>ops/sec</em> and relative <a href="http://en.wikipedia.org/wiki/Margin_of_error">margin of error</a>. Should you directly use <a href="http://benchmarkjs.com/">Benchmark.js</a> (which powers JSPerf), this is also easy to retrieved using <a href="http://benchmarkjs.com/docs#stats_rme">Benchmark.prototype.stats.rme</a>. This is just one of the crucial considerations to ensure that your benchmark is <a href="http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/">bulletproof</a>.</p>
+<p>Even if we finally obtain a result with a low margin of error, we still need to ensure that it is an accurate one. In a few cases, particularly with microbenchmarks, what is being measured may <em>not</em> reflect the reality. Modern JavaScript engine can perform <a href="http://mrale.ph/blog/2012/12/15/microbenchmarks-fairy-tale.html">various optimizations</a> which falsify the measurement (among others) <a href="http://en.wikipedia.org/wiki/Loop-invariant_code_motion">loop-invariant code motion</a>, <a href="http://en.wikipedia.org/wiki/Constant_folding">constant propagation</a>, <a href="http://en.wikipedia.org/wiki/Dead_code_elimination">dead code elimination</a>.</p>
+<p>As a quick illustration, consider the following loop you want to time:</p>
+
+<div><table><tr><td><pre><span>for</span> <span>(</span><span>var</span> i <span>=</span> <span>0</span><span>;</span> i <span>&lt;</span> <span>100</span><span>;</span> <span>++</span>i<span>)</span> <span>{</span>
+  sum <span>+=</span> <span>Math</span>.<span>sqrt</span><span>(</span><span>2</span><span>)</span> <span>*</span> i<span>;</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>If a JavaScript engine (with loop-invariant code motion support) detects that this loop should be optimized, it may see that the <code>Math.sqrt(2)</code> can be computed once and placed outside the loop. In other words, the actual loop looks like as if you would have written it as the following fragment. This may or may not be what you want, hence it is important to carefully review such a loop.</p>
+
+
+<div><table><tr><td><pre><span>var</span> temp <span>=</span> <span>Math</span>.<span>sqrt</span><span>(</span><span>2</span><span>)</span><span>;</span>
+<span>for</span> <span>(</span><span>var</span> i <span>=</span> <span>0</span><span>;</span> i <span>&lt;</span> <span>100</span><span>;</span> <span>++</span>i<span>)</span> <span>{</span>
+  sum <span>+=</span> temp <span>*</span> i<span>;</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>Dead code elimination is also known to offset timing analysis. Early published results of <a href="http://blogs.msdn.com/b/ie/archive/2010/11/17/html5-and-real-world-site-performance-seventh-ie9-platform-preview-available-for-developers.aspx">Internet Explorer 9 performance</a> showed <a href="http://digitizor.com/2010/11/17/internet-explorer-9-caught-cheating-in-sunspider-benchmark/">near-instant completion</a> of some SunSpider tests, it turned out that this is <a href="http://arstechnica.com/information-technology/2010/11/lies-damned-lies-and-benchmarks-is-ie9-cheating-at-sunspider/">attributed</a> to its ability to eliminate dead code.</p>
+<p>Next time you throw some benchmark numbers, think carefully about its accuracy and precision!</p>
+
+							
+												
+						</div></div>
+</body>
+</html>
