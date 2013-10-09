@@ -1,94 +1,12 @@
+<!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile" />
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Frontend SPOF | High Performance Web Sites</title>
-<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" />
-<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites » Frontend SPOF Comments Feed" href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/feed/" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /> 
-<link rel="prev" title="cross-browser Greasemonkey scripts" href="http://www.stevesouders.com/blog/2010/05/18/cross-browser-greasemonkey-scripts/" />
-<link rel="next" title="Velocity is coming fast June 22-24" href="http://www.stevesouders.com/blog/2010/06/04/velocity-is-coming-fast-june-22-24/" />
-<meta name="generator" content="WordPress 3.6.1" />
-<link rel="canonical" href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/" />
-<link rel="shortlink" href="http://www.stevesouders.com/blog/?p=1300" />
-<script type="text/javascript">
-	window._wp_rp_static_base_url = 'http://dtmvdvtzf8rz0.cloudfront.net/static/';
-	window._wp_rp_wp_ajax_url = "http://www.stevesouders.com/blog/wp-admin/admin-ajax.php";
-	window._wp_rp_plugin_version = '2.6';
-	window._wp_rp_post_id = '1300';
-	window._wp_rp_num_rel_posts = '5';
-</script>
-
-<script>
-(function(d, s) {
-	var js = d.getElementsByTagName(s)[0],
-		ln = d.createElement(s);
-	ln.src = '//lognormal.net/boomerang/8fa4fc2785a82fae20c596ca4f45d1b218a9ab12ffef741d09b29532';
-	js.parentNode.insertBefore(ln, js);
-})(document, 'script');
-</script>
-
-<script type="text/javascript">
-// GOOGLE ANALYTICS
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-15026169-1']);
-_gaq.push(['_setSiteSpeedSampleRate', 100]);
-_gaq.push(['_trackPageview']);
-
-(function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-</script>
 </head>
-
 <body>
-<div id="header">
-	<div class="containerwrapper">
-  		<h1 id="logo"><a href="http://stevesouders.com/"><span>SteveSouders.com</span></a></h1>
-        <ul id="topnav">
-        <li><a href="http://stevesouders.com/about.php">about</a></li>
-        <li><a href="http://stevesouders.com/contact.php">contact</a></li>
-        <li class="last"> <a href="http://twitter.com/#!/souders/"><img src="/images/twitter-icon.png" width="16" height="16" border="0" style="vertical-align: bottom;" /></a>
-        </li></ul>
-	</div>    
-</div>
-<div id="contentWrapper" class="containerwrapper">
-<div id="sidebar">
-<div id="search-3" class="widget widget_search"><form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/">
-				<div>
-					<label class="screen-reader-text" for="s">Search for:</label>
-					<input type="text" value="" name="s" id="s" />
-					<input type="submit" id="searchsubmit" value="Search" />
-				</div>
-			</form></div><div id="custom-recent-posts-3" class="widget custom-recent-posts"><h3 class="blockheader">Most Recent Posts</h3>		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;">
-        		<li><a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark">Domain Sharding revisited</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-future/" rel="bookmark">Web performance for the future</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/07/16/activetable-bookmarklet/" rel="bookmark">ActiveTable bookmarklet</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/07/15/twitter-widget-update/" rel="bookmark">Twitter widget update</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/06/16/browser-busy-indicators/" rel="bookmark">Browser Busy Indicators</a></li>
-				</ul>
-		<a href="http://www.stevesouders.com/blog/archives/">View Archive</a></div><div id="text-3" class="widget widget_text"><h3 class="blockheader">Feeds</h3>			<div class="textwidget"><a href="http://www.stevesouders.com/blog/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/feed/">Posts</a><br />
-<a href="http://www.stevesouders.com/blog/comments/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/comments/feed/">Comments</a></div>
-		</div>        
-</div><div id="content">
-
-
-
-		<div id="post-1300" class="post-1300 post type-post status-publish format-standard hentry category-browsers category-firefox category-ie8 category-internet-explorer category-performance category-web-development tag-custom-fonts tag-font-face tag-spof">
-        	            	<h1>Frontend SPOF</h1>
-            
-			<p class="meta">June 1, 2010 7:49 pm | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comments" title="Comment on Frontend SPOF">9 Comments</a></p><!-- .entry-meta -->
-
-			<p>My evangelism of high performance web sites started off in the context of quality code and development best practices. It’s easy for a style of coding to permeate throughout a company. Developers switch teams. Code is copied and pasted (especially in the world of web development). If everyone is developing in a high performance way, that’s the style that will characterize how the company codes.</p>
-<p>This argument of promoting development best practices gained traction in the engineering quarters of the companies I talked to, but performance improvements continued to get backburnered in favor of new features and content that appealed to the business side of the organization. Improving performance wasn’t considered as important as other changes. Everyone assumed users wanted new features and that’s what got the most attention.</p>
-<p>It became clear to me that we needed to show a business case for web performance. That’s why the theme for <a href="http://en.oreilly.com/velocity2009">Velocity 2009</a> was “the impact of performance on the bottom line”. Since then there have been <a href="http://blog.mozilla.com/metrics/category/website-optimization/">numerous</a> <a href="http://radar.oreilly.com/2009/07/velocity-making-your-site-fast.html">studies</a> <a href="http://www.stevesouders.com/blog/2009/07/27/wikia-fast-pages-retain-users/">released</a> <a href="http://carsonified.com/blog/business/fred-wilsons-10-golden-principles-of-successful-web-apps/">that</a> <a href="http://www.watchingwebsites.com/archives/proof-that-speeding-up-websites-improves-online-business">have</a> <a href="http://googlewebmastercentral.blogspot.com/2010/04/using-site-speed-in-web-search-ranking.html">shown</a> that improving performance <em>does</em> improve the bottom line. As a result, I’m seeing the business side of many web companies becoming strong advocates for <a href="http://www.stevesouders.com/blog/2010/05/07/wpo-web-performance-optimization/">Web Performance Optimization</a>.</p>
-<p>But there are still occasions when I have a hard time convincing a team that focusing on web performance, specifically frontend performance, is important. Shaving off hundreds (or even thousands) of milliseconds just doesn’t seem worthwhile to them. That’s when I pull out the big guns and explain that <em>loading scripts and stylesheets in the typical way creates a frontend single point of failure that can bring down the entire site</em>.</p>
-<h2>Examples of Frontend SPOF</h2>
-<p>The thought that simply adding a script or stylesheet to your web page could make the entire site unavailable surprises many people. Rather than focusing on CSS mistakes and JavaScript errors, the key is to think about what happens when a resource request times out. With this clue, it’s easy to create a test case:</p>
-<pre style="margin-left: 20px; margin-right: 20px; background: #F0F0F0; padding: 8px; margin-bottom: 0;">&lt;html&gt;
+<div id="post-1300"><p>June 1, 2010 7:49 pm | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comments" title="Comment on Frontend SPOF">9 Comments</a></p><!-- .entry-meta --><p>My evangelism of high performance web sites started off in the context of quality code and development best practices. It’s easy for a style of coding to permeate throughout a company. Developers switch teams. Code is copied and pasted (especially in the world of web development). If everyone is developing in a high performance way, that’s the style that will characterize how the company codes.</p><p>This argument of promoting development best practices gained traction in the engineering quarters of the companies I talked to, but performance improvements continued to get backburnered in favor of new features and content that appealed to the business side of the organization. Improving performance wasn’t considered as important as other changes. Everyone assumed users wanted new features and that’s what got the most attention.</p><p>It became clear to me that we needed to show a business case for web performance. That’s why the theme for <a href="http://en.oreilly.com/velocity2009">Velocity 2009</a> was “the impact of performance on the bottom line”. Since then there have been <a href="http://blog.mozilla.com/metrics/category/website-optimization/">numerous</a> <a href="http://radar.oreilly.com/2009/07/velocity-making-your-site-fast.html">studies</a> <a href="http://www.stevesouders.com/blog/2009/07/27/wikia-fast-pages-retain-users/">released</a> <a href="http://carsonified.com/blog/business/fred-wilsons-10-golden-principles-of-successful-web-apps/">that</a> <a href="http://www.watchingwebsites.com/archives/proof-that-speeding-up-websites-improves-online-business">have</a> <a href="http://googlewebmastercentral.blogspot.com/2010/04/using-site-speed-in-web-search-ranking.html">shown</a> that improving performance <em>does</em> improve the bottom line. As a result, I’m seeing the business side of many web companies becoming strong advocates for <a href="http://www.stevesouders.com/blog/2010/05/07/wpo-web-performance-optimization/">Web Performance Optimization</a>.</p><p>But there are still occasions when I have a hard time convincing a team that focusing on web performance, specifically frontend performance, is important. Shaving off hundreds (or even thousands) of milliseconds just doesn’t seem worthwhile to them. That’s when I pull out the big guns and explain that <em>loading scripts and stylesheets in the typical way creates a frontend single point of failure that can bring down the entire site</em>.</p><h2>Examples of Frontend SPOF</h2><p>The thought that simply adding a script or stylesheet to your web page could make the entire site unavailable surprises many people. Rather than focusing on CSS mistakes and JavaScript errors, the key is to think about what happens when a resource request times out. With this clue, it’s easy to create a test case:</p><pre>&lt;html&gt;
 &lt;head&gt;
 &lt;script src="http://www.snippet.com/main.js" type="text/javascript"&gt;
   &lt;/script&gt;
@@ -96,251 +14,26 @@ _gaq.push(['_trackPageview']);
 &lt;body&gt;
 Here's my page!
 &lt;/body&gt;
-&lt;/html&gt;</pre>
-<p>This HTML page looks pretty normal, but if snippet.com is overloaded the entire page is blank waiting for main.js to return. This is true in all browsers.</p>
-<p>Here are some examples of frontend single points of failure and the browsers they impact. You can click on the Frontend SPOF test links to see the actual test page.</p>
-<table style="border: 2px solid #777;" border="0" cellspacing="0" cellpadding="0">
-<tbody>
-<tr>
-<th style="background: #333; color: #fff; padding: 4px;">Frontend SPOF test</th>
-<th style="background: #333; color: #fff; padding: 4px;">Chrome</th>
-<th style="background: #333; color: #fff; padding: 4px;">Firefox</th>
-<th style="background: #333; color: #fff; padding: 4px;">IE</th>
-<th style="background: #333; color: #fff; padding: 4px;">Opera</th>
-<th style="background: #333; color: #fff; padding: 4px;">Safari</th>
-</tr>
-<tr>
-<td style="padding: 4px 4px; border: 1px solid #777;"><a href="http://stevesouders.com/tests/spof/slow-script.php">External Script</a></td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">blank below</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">blank below</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">blank below</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">blank below</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">blank below</td>
-</tr>
-<tr>
-<td style="padding: 4px 4px; border: 1px solid #777;"><a href="http://stevesouders.com/tests/spof/slow-stylesheet.php">Stylesheet</a></td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">blank below</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">blank below</td>
-</tr>
-<tr>
-<td style="padding: 4px 4px; border: 1px solid #777;"><a href="http://stevesouders.com/tests/spof/slow-font.php">inlined @font-face</a></td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #FFFFD6;">delayed</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #FFFFD6;">delayed</td>
-</tr>
-<tr>
-<td style="padding: 4px 4px; border: 1px solid #777;"><a href="http://stevesouders.com/tests/spof/slow-font-stylesheet.php">Stylesheet with @font-face</a></td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #FFFFD6;">delayed</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">totally blank*</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #FFFFD6;">delayed</td>
-</tr>
-<tr>
-<td style="padding: 4px 4px; border: 1px solid #777;"><a href="http://stevesouders.com/tests/spof/slow-font-script.php">Script then @font-face</a></td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #FFFFD6;">delayed</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #F7D6D6;">totally blank*</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #DFFCD8;">flash</td>
-<td style="padding: 4px 4px; border: 1px solid #777; text-align: center; background: #FFFFD6;">delayed</td>
-</tr>
-</tbody>
-</table>
-<p>* Internet Explorer 9 does not display a blank page, but does “flash” the element.</p>
-<p>The failure cases are highlighted in red. Here are the four possible outcomes sorted from worst to best:</p>
-<ul>
+&lt;/html&gt;</pre><p>This HTML page looks pretty normal, but if snippet.com is overloaded the entire page is blank waiting for main.js to return. This is true in all browsers.</p><p>Here are some examples of frontend single points of failure and the browsers they impact. You can click on the Frontend SPOF test links to see the actual test page.</p><p>* Internet Explorer 9 does not display a blank page, but does “flash” the element.</p><p>The failure cases are highlighted in red. Here are the four possible outcomes sorted from worst to best:</p><ul>
 <li><em>totally blank</em> – Nothing in the page is rendered – the entire page is blank.</li>
 <li><em>blank below</em> – All the DOM elements below the resource in question are not rendered.</li>
 <li><em>delayed</em> – Text that uses the @font-face style is invisible until the font file arrives.</li>
 <li><em>flash</em> – DOM elements are rendered immediately, and then redrawn if necessary after the stylesheet or font has finished downloading.</li>
-</ul>
-<h2>Web Performance avoids SPOF</h2>
-<p>It turns out that there are web performance best practices that, in addition to making your pages faster, also avoid most of these frontend single points of failure. Let’s look at the tests one by one.</p>
-<dl>
+</ul><h2>Web Performance avoids SPOF</h2><p>It turns out that there are web performance best practices that, in addition to making your pages faster, also avoid most of these frontend single points of failure. Let’s look at the tests one by one.</p><dl>
 <dt><strong><a href="http://stevesouders.com/tests/spof/slow-script.php">External Script</a></strong>&nbsp;</dt>
-<dd style="margin-bottom: 10px;">All browsers block rendering of elements below an external script until the script arrives and is parsed and executed. Since many sites put scripts in the HEAD, this means the entire page is typically blank. That’s why I believe the most important web performance coding pattern for today’s web sites is to <a href="http://www.stevesouders.com/blog/2009/04/27/loading-scripts-without-blocking/">load JavaScript asynchronously</a>. Not only does this improve performance, but it avoids making external scripts a possible SPOF.&nbsp;</dd>
+<dd>All browsers block rendering of elements below an external script until the script arrives and is parsed and executed. Since many sites put scripts in the HEAD, this means the entire page is typically blank. That’s why I believe the most important web performance coding pattern for today’s web sites is to <a href="http://www.stevesouders.com/blog/2009/04/27/loading-scripts-without-blocking/">load JavaScript asynchronously</a>. Not only does this improve performance, but it avoids making external scripts a possible SPOF.&nbsp;</dd>
 <dt><strong><a href="http://stevesouders.com/tests/spof/slow-stylesheet.php">Stylesheet</a></strong>&nbsp;</dt>
-<dd style="margin-bottom: 10px;">Browsers are split on how they handle stylesheets. Firefox and Opera charge ahead and render the page, and then flash the user if elements have to be redrawn because their styling changed. Chrome, Internet Explorer, and Safari delay rendering the page until the stylesheets have arrived. (Generally they only delay rendering elements below the stylesheet, but in <a href="http://stevesouders.com/hpws/css-bottom.php">some cases</a> IE will delay rendering everything in the page.) If rendering is blocked and the stylesheet takes a long time to download, or times out, the user is left staring at a blank page. There’s not a lot of advice on loading stylesheets without blocking page rendering, primarily because it would introduce the <a href="http://www.bluerobot.com/web/css/fouc.asp/">flash of unstyled content</a>.</dd>
+<dd>Browsers are split on how they handle stylesheets. Firefox and Opera charge ahead and render the page, and then flash the user if elements have to be redrawn because their styling changed. Chrome, Internet Explorer, and Safari delay rendering the page until the stylesheets have arrived. (Generally they only delay rendering elements below the stylesheet, but in <a href="http://stevesouders.com/hpws/css-bottom.php">some cases</a> IE will delay rendering everything in the page.) If rendering is blocked and the stylesheet takes a long time to download, or times out, the user is left staring at a blank page. There’s not a lot of advice on loading stylesheets without blocking page rendering, primarily because it would introduce the <a href="http://www.bluerobot.com/web/css/fouc.asp/">flash of unstyled content</a>.</dd>
 <dt><strong><a href="http://stevesouders.com/tests/spof/slow-font.php">inlined @font-face</a></strong>&nbsp;</dt>
-<dd style="margin-bottom: 10px;">I’ve blogged before about the <a href="http://www.stevesouders.com/blog/2009/10/13/font-face-and-performance/">performance implications of using @font-face</a>. When the @font-face style is declared in a STYLE block in the HTML document, the SPOF issues are dramatically reduced. Firefox, Internet Explorer, and Opera avoid making these custom font files a SPOF by rendering the affected text and then redrawing it after the font file arrives. Chrome and Safari don’t render the customized text at all until the font file arrives. I’ve drawn these cells in yellow since it could cause the page to be unusable for users using these browsers, but most sites only use custom fonts on a subset of the page.</dd>
+<dd>I’ve blogged before about the <a href="http://www.stevesouders.com/blog/2009/10/13/font-face-and-performance/">performance implications of using @font-face</a>. When the @font-face style is declared in a STYLE block in the HTML document, the SPOF issues are dramatically reduced. Firefox, Internet Explorer, and Opera avoid making these custom font files a SPOF by rendering the affected text and then redrawing it after the font file arrives. Chrome and Safari don’t render the customized text at all until the font file arrives. I’ve drawn these cells in yellow since it could cause the page to be unusable for users using these browsers, but most sites only use custom fonts on a subset of the page.</dd>
 <dt><strong><a href="http://stevesouders.com/tests/spof/slow-font-stylesheet.php">Stylesheet with @font-face</a></strong>&nbsp;</dt>
-<dd style="margin-bottom: 10px;">Inlining your @font-face style is the key to avoiding having font files be a single point of failure. If you inline your @font-face styles and the font file takes forever to return or times out, the worst case is the affected text is invisible in Chrome and Safari. But at least the rest of the page is visible, and everything is visible in Firefox, IE, and Opera. Moving the @font-face style to a stylesheet not only slows down your site (by requiring two sequential downloads to render text), but it also creates a special case in Internet Explorer 7 &amp; 8 where the entire page is blocked from rendering. IE 6 is only slightly better – the elements below the stylesheet are blocked from rendering (but if your stylesheet is in the HEAD this is the same outcome).</dd>
+<dd>Inlining your @font-face style is the key to avoiding having font files be a single point of failure. If you inline your @font-face styles and the font file takes forever to return or times out, the worst case is the affected text is invisible in Chrome and Safari. But at least the rest of the page is visible, and everything is visible in Firefox, IE, and Opera. Moving the @font-face style to a stylesheet not only slows down your site (by requiring two sequential downloads to render text), but it also creates a special case in Internet Explorer 7 &amp; 8 where the entire page is blocked from rendering. IE 6 is only slightly better – the elements below the stylesheet are blocked from rendering (but if your stylesheet is in the HEAD this is the same outcome).</dd>
 <dt><strong><a href="http://stevesouders.com/tests/spof/slow-font-script.php">Script then @font-face</a></strong>&nbsp;</dt>
 <dd>Inlining your @font-face style isn’t enough to avoid the entire page SPOF that occurs in IE. You also have to make sure the inline STYLE block isn’t preceded by a SCRIPT tag. Otherwise, your entire page is blank in IE waiting for the font file to arrive. If that file is slow to return, your users are left staring at a blank page.</dd>
-</dl>
-<h2>SPOF is bad</h2>
-<p>Five years ago most of the attention on web performance was focused on the backend. Since then we’ve learned that 80% of the time users wait for a web page to load is the responsibility of the frontend. I feel this same bias when it comes to identifying and guarding against single points of failure that can bring down a web site – the focus is on the backend and there’s not enough focus on the frontend. For larger web sites, the days of a single server, single router, single data center, and other backend SPOFs are way behind us. And yet, most major web sites include scripts and stylesheets in the typical way that creates a frontend SPOF. Even more worrisome – many of these scripts are from third parties for social widgets, web analytics, and ads.</p>
-<p>Look at the scripts, stylesheets, and font files in your web page from a worst case scenario perspective. Ask yourself:</p>
-<ul>
+</dl><h2>SPOF is bad</h2><p>Five years ago most of the attention on web performance was focused on the backend. Since then we’ve learned that 80% of the time users wait for a web page to load is the responsibility of the frontend. I feel this same bias when it comes to identifying and guarding against single points of failure that can bring down a web site – the focus is on the backend and there’s not enough focus on the frontend. For larger web sites, the days of a single server, single router, single data center, and other backend SPOFs are way behind us. And yet, most major web sites include scripts and stylesheets in the typical way that creates a frontend SPOF. Even more worrisome – many of these scripts are from third parties for social widgets, web analytics, and ads.</p><p>Look at the scripts, stylesheets, and font files in your web page from a worst case scenario perspective. Ask yourself:</p><ul>
 <li>Is your web site’s availability dependent on these resources?</li>
 <li>Is it possible that if one of these resources timed out, users would be blocked from seeing your site?</li>
 <li>Are any of these single point of failure resources from a third party?</li>
 <li>Would you rather embed resources in a way that avoids making them a frontend SPOF?</li>
-</ul>
-<p>Make sure you’re aware of your frontend SPOFs, track their availability and latency closely, and embed them in your page in a non-blocking way whenever possible.</p>
-<div style="background: #D6EBEA; padding: 2px 8px 2px 8px; margin-top: 1em; margin-bottom: 1em;"><strong>Update Oct 12:</strong> Pat Meenan created a <a href="http://blog.patrickmeenan.com/2011/10/testing-for-frontend-spof.html">blackhole server</a> that you can use to detect frontend SPOF in webpages.</div>
-
-<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"><div class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul class="related_post wp_rp" style="visibility: visible"><li><a href="http://www.stevesouders.com/blog/2009/10/13/font-face-and-performance/" class="wp_rp_title">@font-face and performance</a></li><li><a href="http://www.stevesouders.com/blog/2009/02/09/john-resig-drop-in-javascript-performance/" class="wp_rp_title">John Resig: Drop-in JavaScript Performance</a></li><li><a href="http://www.stevesouders.com/blog/2010/02/12/5e-speculative-background-images/" class="wp_rp_title">5e speculative background images</a></li><li><a href="http://www.stevesouders.com/blog/2008/12/17/state-of-performance-2008/" class="wp_rp_title">State of Performance 2008</a></li><li><a href="http://www.stevesouders.com/blog/2010/02/15/browser-performance-wishlist/" class="wp_rp_title">Browser Performance Wishlist</a></li></ul><div class="wp_rp_footer"><a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts">Zemanta</a></div></div></div>
-            
-            			
-		</div><!-- #post-## -->
-
-
-		
-			<div id="comments">
-
-			<h3 id="comments-title">9 Responses to <em>Frontend SPOF</em></h3>
-
-
-			<ol class="commentlist">
-				<li class="comment even thread-even depth-1" id="li-comment-2125">
-<div id="comment-2125">
-<p class="comment-metadata">
-<strong><a href="http://jpv.typepad.com" rel="external nofollow" class="url">jpvincent</a></strong> | 02-Jun-10 at 4:07 am | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-2125">Permalink</a> |  </p>
-
-
-<p>about putting scripts at the bottom, i found a way I didnt saw elsewhere for those who dont want to rewrite portion of JS code like Facebook or Google Analytics did : </p>
-<p>- save the onerror then mute the JS errors on the page<br />
-- display page, including inline JS calls<br />
-- put back the default JS error handler<br />
-- include the JS<br />
-- list the  of the page, eval them</p>
-<p>more code and graphics here (post in french, sorry)<br />
-<a href="http://jpv.typepad.com/blog/2010/05/performances-web-put-scripts-at-the-bottom-oui-mais-comment-.html" rel="nofollow">http://jpv.typepad.com/blog/2010/05/performances-web-put-scripts-at-the-bottom-oui-mais-comment-.html</a></p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2126">
-<div id="comment-2126">
-<p class="comment-metadata">
-<strong><a href="http://jpv.typepad.com" rel="external nofollow" class="url">jpvincent</a></strong> | 02-Jun-10 at 4:08 am | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-2126">Permalink</a> |  </p>
-
-
-<p>last step is<br />
-- list the &lt;script&gt; of the page, eval() them</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-2127">
-<div id="comment-2127">
-<p class="comment-metadata">
-<strong>Balázs Galambosi</strong> | 02-Jun-10 at 7:55 am | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-2127">Permalink</a> |  </p>
-
-
-<p>There is nothing deferred about Google Analytics’ async snippet, it is only loaded in a non-blocking way.</p>
-<p>In fact it is supposed to be put in the [1] whereas we were told to place the old one right before the  tag.[2]</p>
-<p>So it is less deferred now, than it was before. The reason it has changed is that now you can place it in the head without worrying about other elements to be delayed as a consequence. Also, you get more accurate statistics because there are less things that may delay or block your tracking (as this article points out).</p>
-<p>Anyway, shutting down error handling is not one of those so-called “best practices”.</p>
-<p>If you want to solve it more elegantly you may want to check out Peter Michaux article about after-DOM-load execution. [3]</p>
-<p>For basic things, Facebook’s way is enough. But what they do is they use a global event handler for all the events on the page, so there is no need to attach them inline or after the onload. Thus, the functionality of elements are handled in one place instead of tons of small event handlers. It scales nicely if you ask me. :) [4]</p>
-<p>There are also some nice techniques about deferred execution on this blog. [5]</p>
-<p>Finally, tweaking is always the worst thing to do, rewriting or refactoring code can be costly in a short term, but with some hours of work now you can save weeks of confusion later. Especially if you are working in a team.</p>
-<p>[1] <a href="http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html" rel="nofollow">http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html</a></p>
-<p>[2] <a href="http://code.google.com/apis/analytics/docs/tracking/gaTrackingOverview.html" rel="nofollow">http://code.google.com/apis/analytics/docs/tracking/gaTrackingOverview.html</a></p>
-<p>[3] <a href="http://peter.michaux.ca/articles/the-window-onload-problem-really-solved" rel="nofollow">http://peter.michaux.ca/articles/the-window-onload-problem-really-solved</a></p>
-<p>[4] <a href="http://www.slideshare.net/makinde/javascript-primer" rel="nofollow">http://www.slideshare.net/makinde/javascript-primer</a></p>
-<p>[5] <a href="http://www.stevesouders.com/blog/2009/12/07/downloading-javascript-as-strings/" rel="nofollow">http://www.stevesouders.com/blog/2009/12/07/downloading-javascript-as-strings/</a></p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2128">
-<div id="comment-2128">
-<p class="comment-metadata">
-<strong>Balázs Galambosi</strong> | 02-Jun-10 at 7:58 am | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-2128">Permalink</a> |  </p>
-
-
-<p>stripping tags, bites :) wordpress hasn’t got htmlspecialchars() or somethin’? …</p>
-<p>Anyaways, errata: “In fact it is supposed to be put in the {head}[1] whereas we were told to place the old one right before the tag {/body}.[2]“</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-2130">
-<div id="comment-2130">
-<p class="comment-metadata">
-<strong><a href="http://jpv.typepad.com" rel="external nofollow" class="url">jpvincent</a></strong> | 03-Jun-10 at 2:56 am | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-2130">Permalink</a> |  </p>
-
-
-<p>when I say “inline JS”, I’m not talking about stuff like Peter Michaux is using &lt;input onfocus=”…”&gt; but rather<br />
-&lt;script&gt;<br />
-MY.enrichForm(‘myid’);<br />
-&lt;/script&gt;</p>
-<p>and the problem I tried to solve was having put JS dependancies at the bottom of the page but JS functions still called inline. Ideally, I would have made a big page manager waiting for the body.onload before running the functions, but that’s not the way my site’s framework works</p>
-<p>for the new async ga.js the calling of the methods (say _trackPageview and _setAccount) are defered, until the full file is there. Yes it’s loaded in a non-obstrusive way, but the innovation of GA was that you can call all of the GA methods without the JS dependancy being actually here.</p>
-<p>FB solves the problem of calling a JS action that is defined in a file that is still not arrived by having a generic listener, that will extract info from the markup to know what to do and get via XHR the JS+HTML (if needed) generated on the server-side.</p>
-<p>both solutions were requiring more changes than I wanted to, and the one I finally found is perfectly maintainable</p>
-<p>In my technique, the muting of the JS errors just lasts the time of loading the HTML, to prevent inline JS call to warn the user, then I re-enable the default one. The functionality of the error handling is preserved.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2131">
-<div id="comment-2131">
-<p class="comment-metadata">
-<strong>Balázs Galambosi</strong> | 03-Jun-10 at 5:45 pm | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-2131">Permalink</a> |  </p>
-
-
-<p>Inline scripts are a bad practice. Again, the idea is to separate the markup(HTML) from the presentation(CSS) and extra functionality(JS).</p>
-<p>Moreover: “<b>Inline scripts block rendering</b>, just like external scripts, but are worse. External scripts only block the rendering of elements below them in the page. Inline scripts block the rendering of everything in the page.” [1]</p>
-<p>I also think that browsers don’t appreciate bunch of meaningless code inside the page, for you may not catch errors, but they will still try to parse and execute it over and over again.</p>
-<p>You can put your inline scripts into js files, that are included at the end of the page by some server side logic depending on the request url.</p>
-<p>Or it is not that hard to write code that deals with HTML elements by checking if they are actually there. So you can make the whole thing external and enjoy the advantages of caching.</p>
-<p>Also, during loading of the HTML lot of things can happen. Event listeners can go mad, users can cause problems that you may not be prepared for. Silencing error handler is a very very bad practice.</p>
-<p>No offense, using this technique is one thing, but encouraging others to use it as well is just plain awful.</p>
-<p>The best tweaking is no tweaking.</p>
-<p>[1] <a href="http://www.stevesouders.com/blog/2009/05/06/positioning-inline-scripts/" rel="nofollow">http://www.stevesouders.com/blog/2009/05/06/positioning-inline-scripts/</a></p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-4031">
-<div id="comment-4031">
-<p class="comment-metadata">
-<strong>Michael</strong> | 02-Aug-12 at 10:19 pm | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-4031">Permalink</a> |  </p>
-
-
-<p>Thanks for the great article.</p>
-<p>However, it’s still unclear to me, if Front End SPOF is better solved by: a) async loading third party scripts, or b) putting all s at the bottom of the .  </p>
-<p>What’s the diff when speaking about SPOF?</p>
-<p>Thanks again!</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-4032">
-<div id="comment-4032">
-<p class="comment-metadata">
-<strong><a href="http://stevesouders.com" rel="external nofollow" class="url">Steve Souders</a></strong> | 03-Aug-12 at 9:08 am | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-4032">Permalink</a> |  </p>
-
-
-<p>@Michael: Async is better because it’ll render the snippets sooner but won’t block the main content of the page. Also, depending on the browser, it will allow the onload event to fire.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-23279">
-<div id="comment-23279">
-<p class="comment-metadata">
-<strong>Nick Salyzyn</strong> | 14-Feb-13 at 1:49 pm | <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/#comment-23279">Permalink</a> |  </p>
-
-
-<p>This would be a good spot to discuss base64 encoded fonts placed directly in the css file.  In the same way you might use background-image: url(data:image/png;base64,…);</p>
-</div>
-</li><!-- #comment-## -->
-			</ol>
-
-
-
-
-
-
-
-</div><!-- #comments -->
-
-
-</div> <!-- end div id="content" -->
-</div>
-<div id="footer" class="containerwrapperpadded">
-<p>© Steve Souders</p>
-</div>
-<div>
-<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-<script src="../js/clearly.js"></script>
-<script>
-var html = window.__getMyClearlyResults().html;
-$("html").html(html);
-$("body").append('<link type="text/css" href="../css/article.css">')</script>
-</div></body>
+</ul><p>Make sure you’re aware of your frontend SPOFs, track their availability and latency closely, and embed them in your page in a non-blocking way whenever possible.</p><div><strong>Update Oct 12:</strong><p style="display: inline;"> Pat Meenan created a </p><a href="http://blog.patrickmeenan.com/2011/10/testing-for-frontend-spof.html">blackhole server</a><p style="display: inline;"> that you can use to detect frontend SPOF in webpages.</p></div></div></body>
 </html>

@@ -1,404 +1,32 @@
 <html>
 <head>
-<meta charset="utf-8" />
-<title>Effectively managing memory at Gmail scale - HTML5 Rocks</title>
-<meta name="description" content="Learn how you to effectively manage memory at GMail scale." />
-<meta name="keywords" content="html5,html 5,html5 demos,html5 examples,javascript,css3,notifications,geolocation,web workers,apppcache,file api,filereader,indexeddb,offline,audio,video,drag and drop,chrome,sse,mobile" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
-<script type="text/javascript">window.mod_pagespeed_start = Number(new Date());</script><link rel="shortcut icon" href="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/xfavicon.ico.pagespeed.ic.ue6LRTzc6n.png" />
-<link rel="alternate" type="application/rss+xml" title="HTML5 Rocks RSS" href="http://feeds.feedburner.com/html5rocks" />
-<meta itemprop="name" content="Effectively Managing Memory at Gmail scale - HTML5 Rocks" />
-<meta itemprop="description" content="Learn how you to effectively manage memory at GMail scale." />
-<meta itemprop="image" content="http://www.html5rocks.com/static/images/html5rocks-logo-wings.png" />
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:site" content="@ChromiumDev" />
-<meta name="twitter:creator" content="@johnmccutchan" />
-<meta property="og:type" content="article" />
-<meta property="og:title" content="Effectively Managing Memory at Gmail scale - HTML5 Rocks" />
-<meta property="og:url" content="http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/" />
-<meta property="og:description" content="Learn how you to effectively manage memory at GMail scale." />
-<meta property="og:image" content="http://www.html5rocks.com/static/images/profiles/johnmccutchan.png" />
-<meta property="og:site_name" content="HTML5 Rocks - A resource for open web HTML5 developers" />
-<link rel="author" href="https://www.google.com/profiles/106737154382790678002" />
-<link rel="publisher" href="https://plus.google.com/111395306401981598462" />
-<style media="all">body ::-webkit-scrollbar{height:16px;overflow:visible;width:16px}body ::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.2);background-clip:padding-box;border-style:solid;border-color:transparent;min-height:28px;padding:100px 0px 0px;box-shadow: rgba(0, 0, 0, 0.0980392) 1px 1px 0px inset, rgba(0, 0, 0, 0.0666667) 0px -1px 0px inset;border-width:1px 1px 1px 6px}body ::-webkit-scrollbar-button{height:0px;width:0px}body ::-webkit-scrollbar-track{background-clip:padding-box;border-style:solid;border-color:transparent;border-width:0px 0px 0px 4px}body ::-webkit-scrollbar-corner{background-color:transparent;background-position:initial initial;background-repeat:initial initial}article,aside,details,figcaption,figure,footer,header,hgroup,nav,section{display:block}audio:not([controls]) {display:none}html{font-size:100%;overflow-y:scroll}body{margin:0px;font-size:13px;line-height:1.231;overflow:hidden}body,button,input,select,textarea{font-family:sans-serif;color:#222}*::-moz-selection{background-color:#f04530;color:#fff;text-shadow:none;background-position:initial initial;background-repeat:initial initial}::selection{background-color:#f04530;color:#fff;text-shadow:none;background-position:initial initial;background-repeat:initial initial}a{color:#508b88;text-decoration:none}a:visited{color:#508b88}a:hover,a:focus{color:#f04530}a:focus{outline:dotted thin}a:hover,a:active{outline:0px}b,strong{font-weight:bold}pre,code,kbd,samp{font-family:'Source Code Pro',monospace;font-size:1em}pre{white-space:pre-wrap;word-wrap:break-word}q::before,q::after{content:none}ul,ol{margin:1em 0px;padding:0px 0px 0px 40px}nav ul,nav ol{list-style:none none;margin:0px;padding:0px}img{border:0px;vertical-align:middle}svg:not(:root) {overflow:hidden}figure{margin:0px}form{margin:0px}label{cursor:pointer}button,input,select,textarea{font-size:100%;margin:0px;vertical-align:baseline}button,input{line-height:normal}input[type="search"]{-webkit-appearance:textfield;box-sizing:content-box}input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}button::-moz-focus-inner,input::-moz-focus-inner{border:0px;padding:0px}input:invalid,textarea:invalid{background-color:#f0dddd}button:not([disabled]):hover, button:not([disabled]):focus {border-color:#000}button:not([disabled]):active {background-image:-webkit-linear-gradient(top,#e3e3e3 40%,#f9f9f9 70%);background-position:initial initial;background-repeat:initial initial}.pattern-bg{background-color:#eee!important}.pattern-bg-lighter, article.sectioned > section:not(#classes) {box-shadow:#ccc 1px 1px 10px;background-color:#fff!important}body[data-href="home"] .pattern-bg-lighter, body[data-href="gaming"] .pattern-bg-lighter, body[data-href="business"] .pattern-bg-lighter, body[data-href="home"] article.sectioned > section:not(#classes), body[data-href="gaming"] article.sectioned > section:not(#classes), body[data-href="business"] article.sectioned > section:not(#classes) {-webkit-box-shadow:none;box-shadow:none}h1,h2,h3,h4,h5{font-weight:normal;line-height:1.125}hgroup h1,hgroup h2,hgroup h3{text-transform:uppercase}h1{font-size:35px;font-weight:300;margin:0px 0px .25em}h2{font-size:26px;margin:1em 0px .5em}h3{font-size:20px;font-weight:300;margin:1em 0px .5em}h2:first-child,h3:first-child,.profile h2{margin:0px 0px .5em}p{font-size:14px;line-height:1.5}a{-webkit-transition:color .2s}strong{font-weight:600}header.main nav,.subheader div,.nav{display:block;margin:0px auto;width:1000px}.page{display:block;position:relative;margin:4.5em auto;width:1000px}.page.current{top:0px}article article,article.sectioned,article section,header section{margin-top:0px;padding:0px;background-position:0px 50%;background-repeat:initial initial}article article,article section{margin:0px}article,section,article.sectioned section,section.link_target,#updates,.page header{margin:0px auto 2%;padding:1.75% 2%;overflow:hidden}.page header{position:relative;overflow:visible}body[data-href="gaming"] .page header.two_columns p:first-child,body[data-href="business"] .page header.two_columns p:first-child{margin-top:0px}.page header hgroup{float:left;padding-right:2%;width:34%}.page header section{float:left;width:64%}.page header hgroup h1{font-weight:300;margin:0px 0px .5em}.page header hgroup h1 span,.page header hgroup h2{color:#5fa4a0;font-size:34px;font-weight:800;margin:0px}.page header hgroup h1+h2{margin-top:-.5em}.page header h3{font-size:22px;font-weight:300;text-transform:uppercase}.page header section,.page header aside{font-size:15px;margin:.25em 0px 0px}.page header section p{margin:0px 0px 1em}.page header p:last-child{margin-bottom:0px}.page header hgroup,.page header section,.page header .share,.page section{position:relative}.page header .share{position:absolute;bottom:15px;left:15px;z-index:2;display:block}.page header .share li{border-top-style:none!important}.page header .share a{background-image:none!important;padding-right:5px!important;background-position:initial initial!important;background-repeat:initial initial!important}.page header .share a img{width:32px;height:32px}.page header .share ul{list-style:none;margin:0px;padding:0px}.page header .share li{display:inline}.class_name,.browser_name{background-color:transparent;color:#333;font-size:11px;font-weight:400;line-height:1;padding:3px 5px;position:absolute;top:-15px;left:0px;opacity:0;text-align:center;text-transform:uppercase;-webkit-transition:all .1s ease-in-out;display:inline-block;background-position:initial initial;background-repeat:initial initial}.class:hover .class_name,.browser:hover .browser_name,.class:focus .class_name,.browser:focus .browser_name{opacity:1}.browsers{float:left;margin:0px .75em 0px .25em}.browser{float:left;height:17px;width:17px;background-image:url(http://www.html5rocks.com/static/images/browser_logos.png);background-color:transparent;opacity:.25;margin:-1px .25em 0px 0px;position:relative;background-position:0% 0%;background-repeat:no-repeat no-repeat}.browser_name{left:-3px}.browser.ie .browser_name{white-space:nowrap}.browser.chrome{background-position:0% 0%}.browser.ff{background-position:-17px 0%}.browser.safari{background-position:-35px 0%}.browser.ie{background-position:-52px 0%}.browser.opera{background-position:-69px 0%}.browser.supported{opacity:1}.browser .support{display:none}.page header a[href^="http"]:not([href*="html5rocks."]), .tutorials a[href^="http"]:not([href*="html5rocks."]), .feed-section a[href^="http"]:not([href*="html5rocks"]), .info-section a[href^="http"]:not([href*="html5rocks."]), article section a[href^="http"]:not([href*="html5rocks"]), a[rel="external"] {background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760);background-color:transparent;padding-right:16px;background-position:100% 50%;background-repeat:no-repeat no-repeat}body,input{font-family:'Open Sans',sans-serif;font-weight:400}header.main{background-color:#ed4732;width:100%;position:fixed;left:0px;top:0px;z-index:10;-webkit-font-smoothing:antialiased;font-weight:600;background-position:initial initial;background-repeat:initial initial}header.main #home_horns{display:none}header.main h1{display:none;color:#fff;font-size:1em;margin:0px;padding:0px 0px .2em .5em}header.main h1 a{color:#fff;font-weight:800}header.main nav ul{margin:.1em;padding:.4em .6em}header.main nav ul li{font-size:13px;display:inline-block}header.main nav ul li a{display:block;margin:.1em;padding:.4em;max-width:125px;white-space:nowrap}header.main nav .home{display:none}#title,header.main nav a{text-transform:uppercase}header.main nav a,header.main nav a:hover,header.main nav a:focus{color:#fff!important}header.main h1{display:none}#search_hide,#features_hide{padding:19px 0px 26px;cursor:pointer!important}#search_show{float:right}#search_show img{padding-left:4px;vertical-align:-2px}.gsc-completion-container td:hover,.gsc-completion-container td:focus{background-color:#4b7c7a;cursor:pointer!important;background-position:initial initial;background-repeat:initial initial}.subheader .features{padding-top:8px;padding-bottom:8px;overflow:hidden}.subheader .features #features_hide{padding-top:21px}.subheader .features #features_hide,.subheader .features h2{float:left}.subheader .features h2{color:#fff;font-size:48px;font-weight:300;margin:0px;padding:5px 0px 0px 15px;text-transform:uppercase}.subheader .features ul{list-style:none;float:left;margin:0px;padding:10px 0px 0px 20px;width:710px}.subheader .features ul li{float:left;margin:0px;padding:2px 0px}.subheader .features ul li a{background-image:url(http://www.html5rocks.com/static/images/subheader_classes.png);color:#fff;float:left;padding:3px 0px 4px 30px;text-transform:uppercase;width:112px;background-repeat:no-repeat no-repeat}.subheader .features ul li a.offline{background-position:0px 2px}.subheader .features ul li a.storage{background-position:0px -48px}.subheader .features ul li a.connectivity{background-position:0px -98px}.subheader .features ul li a.file_access{background-position:0px -149px}.subheader .features ul li a.semantics{background-position:0px -198px}.subheader .features ul li a.multimedia{background-position:0px -248px}.subheader .features ul li a.graphics{background-position:0px -298px}.subheader .features ul li a.presentation{background-position:0px -348px}.subheader .features ul li a.performance{background-position:0px -398px}.subheader .features ul li a.nuts_and_bolts{background-position:0px -448px}.subheader .features ul li a h3{font-size:14px;margin:0px}.watermark{position:fixed;left:50%;margin-left:-605px;top:30px;z-index:2;padding:20px;opacity:.65;width:68px;height:116px;background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760);-webkit-transition: opacity 300ms ease-in-out, top 150ms ease-in-out;background-position:50% 50%;background-repeat:no-repeat no-repeat}.watermark:hover,.watermark:focus{opacity:1}.nav,.nav:hover,.nav:focus{text-shadow:#000 0px 0px 5px;color:#fff;overflow:hidden;cursor:pointer!important}.arrow_up,.arrow_right,.arrow_down,.arrow_left,nav.paginator a.previous,nav.paginator a.next{background-image:url(http://www.html5rocks.com/static/images/nav_arrows.png);font-size:14px;font-style:italic;text-align:center;text-transform:uppercase;background-repeat:no-repeat no-repeat}nav.paginator{display:none;position:fixed;left:50%;top:65px;margin-left:500px;width:100px;height:250px;overflow:hidden;z-index:2}nav.paginator ul{display:none;margin:0px;padding:0px}nav.paginator a.previous,nav.paginator a.next{display:block;text-shadow:#bbb 0px 0px 3px;overflow:hidden;position:absolute;width:100px;cursor:pointer!important}nav.paginator a.previous{padding:0px 0px 55px;background-position:50% -683px}nav.paginator a.next{padding:55px 0px 0px;top:135px;background-position:50% -500px}nav.paginator.features a{color:#555}nav.paginator.features a:hover,nav.paginator.features a:focus{color:#000}.page .cds-banner,body[data-href="home"] #banner{height:100px;background-image:url(http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/static/images/conferences/xcds-home-thin.png.pagespeed.ic.zCWfwP3MBI.png);background-size:contain;padding:0px;margin-bottom:3%;background-position:50% 50%;background-repeat:no-repeat no-repeat}.page .cds-banner a,body[data-href="home"] #banner a{display:block;width:100%;height:100%;text-indent:-9999em;font-size:0px}@media screen and (min-width:440px){.page .cds-banner,body[data-href="home"] #banner{background-image: url(http://www.html5rocks.com/static/images/conferences/cds-home-mid.png), -webkit-linear-gradient(top, rgb(99, 167, 224) 0px, rgb(67, 147, 213) 100%);background-attachment: initial, initial;background-origin: initial, initial;background-clip: initial, initial;background-size: initial, initial;height:120px;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:4px;border-bottom-left-radius:4px;background-position:0% 0%;background-repeat:no-repeat}}@media screen and (min-width:770px){.page .cds-banner,body[data-href="home"] #banner{background-image:url(http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/static/images/conferences/xcds-home.png.pagespeed.ic.DG99w9VZ8X.png);background-size:contain;height:120px;margin:-2% 0px 2%;background-position:50% 50%;background-repeat:no-repeat no-repeat}.page .cds-banner{height:80px;background-image:url(http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/static/images/conferences/xcds-article.png.pagespeed.ic.TuFKWTbBb5.png);background-size:contain;margin:-1.5% 0px .5%;background-position:50% 50%;background-repeat:no-repeat no-repeat}}#classes li a:hover,#classes li a:focus{color:#5fa4a0}#classes li.offline a:hover,#classes li.offline a:focus{background-position:-121px 25px}#classes li.storage a:hover,#classes li.storage a:focus{background-position:-121px -117px}#classes li.connectivity a:hover,#classes li.connectivity a:focus{background-position:-121px -258px}#classes li.file_access a:hover,#classes li.file_access a:focus{background-position:-121px -399px}#classes li.semantics a:hover,#classes li.semantics a:focus{background-position:-121px -540px}#classes li.multimedia a:hover,#classes li.multimedia a:focus{background-position:-121px -681px}#classes li.graphics a:hover,#classes li.graphics a:focus{background-position:-121px -822px}#classes li.presentation a:hover,#classes li.presentation a:focus{background-position:-121px -963px}#classes li.performance a:hover,#classes li.performance a:focus{background-position:-121px -1104px}#classes li.nuts_and_bolts a:hover,#classes li.nuts_and_bolts a:focus{background-position:-121px -1245px}img[itemprop="photo"]{-webkit-transition:all .3s ease-out}.profile:hover img[itemprop="photo"],.profile:focus img[itemprop="photo"],img[itemprop="photo"]:hover{}.profile .urls li a:hover,.profile .urls li a:focus{opacity:1}.profile:hover .list-articles{color:#5fa4a0}.profile:focus .list-articles{color:#5fa4a0}body[data-href="profiles"] .profile:first-child, body[data-href="profiles"] .profile:nth-child(3n+1) {margin-left:0px}body[data-href="home"] .profile:first-child, body[data-href="home"] .profile:nth-child(4n+1) {margin-left:0px}body[data-href="features-offline"] .outline_nav_toggle,body[data-href="features-storage"] .outline_nav_toggle,body[data-href="features-connectivity"] .outline_nav_toggle,body[data-href="features-file_access"] .outline_nav_toggle,body[data-href="features-semantics"] .outline_nav_toggle,body[data-href="features-multimedia"] .outline_nav_toggle,body[data-href="features-graphics"] .outline_nav_toggle,body[data-href="features-presentation"] .outline_nav_toggle,body[data-href="features-performance"] .outline_nav_toggle,body[data-href="features-nuts_and_bolts"] .outline_nav_toggle,article.tutorial .outline_nav_toggle{display:block}.outline_nav_toggle{display:none;position:fixed;left:50%;top:145px;margin-left:525px;width:30px;height:30px;padding:10px;z-index:3;cursor:pointer!important}.outline_nav_toggle img{position:absolute;top:10px;left:10px;-webkit-transition:all .25s ease-in-out;z-index:4}.outline_nav_toggle img.show{z-index:5}nav.outline{display:none;background-color:#bebebe;position:absolute;right:50%;top:20px;padding:20px;border-top-left-radius:5px;border-top-right-radius:5px;border-bottom-right-radius:5px;border-bottom-left-radius:5px;box-shadow:#bbb 0px 0px 10px 0px;overflow:auto;max-height:525px;z-index:3}nav.outline h3{font-size:16px;font-weight:300;margin:0px;text-transform:uppercase}nav.outline.toc{width:300px}nav.outline.toc ul{margin-left:1.5em;margin-bottom:1em}nav.outline.toc ul:last-child{margin-bottom:0px}nav.outline.toc a{margin-left:-1.5em;text-indent:1.5em}nav.outline.toc li{margin:.5em 0px}nav.outline.features{width:130px}nav.outline.features ul{margin:.75em 0px -.5em}nav.outline.features li{margin:0px}nav.outline.features li a{display:block}nav.outline.features li a.section_title{font-size:13px;padding:.25em 0px .25em 18px;background-position:0% 50%;background-repeat:no-repeat no-repeat}nav.outline.features li a.offline{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.storage{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.connectivity{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.file_access{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.semantics{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.multimedia{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.graphics{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.presentation{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.performance{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features li a.nuts_and_bolts{background-image:url(http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/?ModPagespeedFilters=compute_critical_css,decode_rewritten_urls,flatten_css_imports,inline_css,inline_import_to_link,rewrite_css&ModPagespeedCssFlattenMaxBytes=0&ModPagespeedCssImageInlineMaxBytes=0&ModPagespeedCssInlineMaxBytes=10485760)}nav.outline.features ul ul{display:none;margin:0px 0px .75em}nav.outline.features ul ul a{font-size:12px;font-weight:400;padding:.3em 0px .3em 18px}section.support table + table thead th:nth-child(1)::first-letter {text-transform:none}section.support thead th:nth-child(1) {left:0px}section.support thead th:nth-child(2) {left:65px}section.support thead th:nth-child(3) {left:135px}section.support thead th:nth-child(4) {left:208px}section.support thead th:nth-child(5) {left:278px}section li{margin-bottom:.75em}article.tutorial{margin-left:340px;position:relative;overflow:visible}article.tutorial .outline_nav_toggle{position:static;top:0px;left:0px;width:inherit;height:inherit;padding:0px;margin:0px}article.tutorial nav.outline.toc{margin:0px;width:280px;position:absolute;top:0px;left:-340px;box-shadow:none;display:block!important;opacity:1!important}article.tutorial nav.outline h3{text-transform:none;margin-bottom:1em}article.tutorial h1:target,article.tutorial h2:target,article.tutorial h3:target,article.tutorial h4:target,article.tutorial h5:target{padding-top:50px}section.cc,section.disqus{margin-left:340px;position:relative;overflow:visible}.tutorial_listing .tag:hover,.tutorial_listing .tag:focus{color:#333}header.tutorial{padding:1em .9em;box-sizing:border-box}header.tutorial hgroup+section{margin-top:0px}header.tutorial .byline{float:left;width:100%;overflow:hidden}header.tutorial section h3,header.tutorial section{color:#333;font-size:13px;text-transform:none}header.tutorial .byline{margin-top:.75em}header.tutorial .byline hgroup{float:none;padding:0px;width:100%}header.tutorial .byline img{float:left;width:50px;height:50px;margin:.2em .75em 0px 0px}header.tutorial .browser_support{font-size:12px;padding-top:1em;width:632px}header.tutorial .browser_support h3{float:left;font-size:12px;font-weight:600;line-height:1.5;margin:0px;text-transform:uppercase}header.tutorial .browser_support p{float:left;font-size:12px;line-height:1.5;margin:0px}header.tutorial .compatible-block{font-size:small;font-style:italic}header.tutorial #notcompatible{color:red}header.tutorial #compatible{color:green}header.tutorial .date time{display:inline-block}article.tutorial figure{display:block;text-align:center}article.tutorial figure img{max-width:100%;height:auto}article.tutorial h4{font-size:16px;font-weight:300;margin:0px 0px .25em}article.tutorial .talkinghead::before{content:'';position:absolute;left:-20px;top:10px;width:50px;height:50px;border-top-left-radius:50%;border-top-right-radius:50%;border-bottom-right-radius:50%;border-bottom-left-radius:50%;background-position:-10px -10px;background-repeat:no-repeat no-repeat}.tooltip:hover::after{content:attr(data-tooltip);position:absolute;background-color:rgba(0,0,0,.85098);padding:5px 9px;color:#fff;border-top-left-radius:3px;border-top-right-radius:3px;border-bottom-right-radius:3px;border-bottom-left-radius:3px;left:0px;top:25px;width:390px;z-index:100;background-position:initial initial;background-repeat:initial initial}.page header .disqus_comments{clear:both;float:left;display:block;font-size:13px;font-weight:600;margin:1em 0px 0px}.cc p{font-size:85%;text-align:center}pre.prettyprint{margin:1em auto;padding:1em}pre .pun,code .pun{color:#fff}pre .pln,code .pln{color:#fff}pre.prettyprint,code.prettyprint{color:#fff;background-color:#444;border-top-left-radius:8px;border-top-right-radius:8px;border-bottom-right-radius:8px;border-bottom-left-radius:8px}header.main,#logo,.watermark,nav,.nav,.share,.byline img,#html5badge,.disqus_comments,section.disqus{-webkit-user-select:none}.hidden{visibility:hidden;display:none!important}.visuallyhidden.focusable:active,.visuallyhidden.focusable:focus{clip:auto;height:auto;margin:0px;overflow:visible;position:static;width:auto}.clearfix::before,.clearfix::after{content:'';display:table}.clearfix::after{clear:both}.clearfix{zoom:1}@media screen and (min-width:480px){.pattern-bg{background-color:#eee!important}.pattern-bg-lighter, article.sectioned > section:not(#classes) {box-shadow:#ccc 1px 1px 10px;background-color:#fff!important}.page header .share{position:static!important}}@media screen and (min-width:768px){.subheader{background-color:#65a8a5;height:auto;background-position:initial initial;background-repeat:initial initial}.subheader::before{content:'';display:block;z-index:-1}.subheader::after{-webkit-box-shadow:black 0px 3px 12px 5px;box-shadow:black 0px 3px 12px 5px;content:'';display:block;z-index:-1;position:relative;top:-10px}.subheader .search{font-size:48px;padding-top:10px;text-align:center}.subheader .search label{color:#fff;padding-left:5px;text-transform:uppercase}.subheader .search input{background-color:rgba(253,253,253,.2);border:3px solid transparent;color:#182a29;font-style:italic;text-indent:5px;width:580px;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:4px;border-bottom-left-radius:4px;margin-left:7px;outline:0px!important;background-position:initial initial;background-repeat:initial initial}.subheader .search input[placeholder]::-webkit-input-placeholder{color:rgba(61,107,104,.4)}.subheader .search input:focus{border-color:rgba(61,107,104,.4)}.subheader .search input::-webkit-input-placeholder{color:#b0d2d0;padding-left:15px}input[type="search"]::-webkit-search-decoration,input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit-search-results-button,input[type="search"]::-webkit-search-results-decoration{display:none}.page header .share{position:static!important}}@media screen and (min-width:860px){.page header .share{position:absolute!important}}@media screen and (min-width:1000px){header.main,.watermark,article.tutorial nav.outline.toc.fixed{-webkit-transform:translateZ(0px)}article.sectioned section.one_half:nth-child(2n+1), .thirds section.one_third:nth-child(3n+1), article.sectioned section.one_third:first-child {margin-left:0px}nav.outline.toc{box-shadow:#ccc 1px 1px 10px!important}.pattern-bg-lighter, article.sectioned > section:not(#classes) {border-top-left-radius:5px;border-top-right-radius:5px;border-bottom-right-radius:5px;border-bottom-left-radius:5px}}@media screen and (max-width:1000px){#search_show span{display:none}.page,.page header,header,.subheader div,.nav,#updates_list{width:inherit!important}.page{margin:0px!important;width:100%!important}.page.current{margin-top:0px}header.main{padding:0px;position:static;height:inherit;overflow:hidden;width:100%}header.main nav{height:inherit;width:100%}header hgroup+section{float:none}article.tutorial,section.cc,section.disqus{margin-left:0px}nav.outline.toc{margin-bottom:2em;padding:0px;max-height:none;width:100%;position:static!important;box-shadow:none!important}article,section,article.sectioned section,section.link_target,.page header{padding:1em 1.25em}.page header .share li{position:static}.page header .share ul{margin-top:1em}.page header .share li{display:inline}body[data-href="home"] .one_third:first-child{margin-left:0px!important}body[data-href="home"] article.profile:nth-child(3n+1) {margin-left:0px!important}body[data-href="profiles"] .profile:first-child, body[data-href="profiles"] .profile:nth-child(3n+1) {margin-left:2%}body[data-href="profiles"] .profile:first-child, body[data-href="profiles"] .profile:nth-child(2n+1) {margin-left:0px}}@media screen and (max-width:860px){#contrib_menu{display:none}#search_show span{display:none}header.main nav ul li#search_show{float:right}header.main .subheader.features{background-color:#5fa4a0;float:left;width:100%;background-position:initial initial;background-repeat:initial initial}header.main .subheader.features h2{display:none}header.main .subheader #features_hide{float:left;padding:2px 0px 0px 10px;width:24px;height:24px}header.main .subheader .features ul{float:left;margin:0px;padding:0px 0px .5em;width:inherit}header.main .subheader .features li{float:left}header.main .subheader.search{background-color:#65a8a5;padding:5px;font-size:1.6em;clear:both;margin:0px!important}header.main .subheader.search label span,header.main .subheader.search img{display:none}header.main .subheader.search input{width:100%;box-sizing:border-box}.page header.two_columns section,.page header hgroup,.page header section{float:none;width:100%}.page header>hgroup:first-child{display:none}}@media screen and (max-width:768px){#profiles_menu{display:none}#contrib_menu{display:none}#search_show span{display:none}header.main{padding-bottom:0px!important}header.main #home_horns{float:left;margin:.1em;padding:.4em .6em;display:block!important}header.main #home_horns img{width:12px;height:24px}header.main nav li:first-child,.nav{display:none}body[data-href="home"] .one_third,body[data-href="home"] .one_third:first-child{float:none!important;margin-left:0px!important;width:inherit!important}.page{margin:0px!important}section{float:none!important}}@media screen and (max-width:600px){#slides_menu{display:none}#profiles_menu{display:none}#contrib_menu{display:none}#search_show span{display:none}article.tutorial .outline_nav_toggle{position:fixed;bottom:0px;right:0px;left:0px;height:2em;margin:0px;padding:5px;background-color:#ec4936;-webkit-transition:top .2s ease-in-out;width:100%!important;top:auto!important;overflow-y:hidden!important}article.tutorial .outline_nav_toggle h3{margin:0px!important}article.tutorial .outline_nav_toggle ul{display:none}article.tutorial .outline_nav_toggle.activated ul a:active{color:#ddd}article.tutorial .outline_nav_toggle.activated ul a:visited{color:#ddd}article.tutorial .outline_nav_toggle.activated ul ul a:active{color:#bbb!important}article.tutorial .outline_nav_toggle.activated ul ul ul a:visited{color:#bbb!important}article.tutorial .outline_nav_toggle.activated ul ul ul a:active{color:#999!important}article.tutorial .outline_nav_toggle.activated ul ul ul a:visited{color:#999!important}article.tutorial nav{color:#fff;height:100%;text-align:center;margin-right:0px;margin-bottom:0px;margin-left:0px;background-color:#ec4936!important;width:100%!important;margin-top:4px!important}body[data-href="home"] #updates.feed li:first-child{border-top-width:0px}body[data-href="home"] article.profile:nth-child(3n+1) {margin-left:2%!important}body[data-href="home"] article.profile:nth-child(2n+1) {margin-left:0px!important}nav.toc{bottom:0px;left:0px;right:0px;height:5px;background-color:#ed4732;position:fixed!important}.page header .share{position:static!important}}@media screen and (max-width:480px){#features_show{display:none}#slides_menu{display:none}#profiles_menu{display:none}#contrib_menu{display:none}#search_show span{display:none}nav.outline{max-height:none!important}.page,.page.current,.page header{margin-top:0px!important}.page header.tutorial h1{font-size:25px!important}header.main h1{display:none;float:left}header.main h1{margin:.1em;padding:.4em .6em}header.tutorial .browser_support{}header.main nav ul li#features_show{margin:0px;padding:0px}header.main .subheader.search{margin:.15em 0px 0px .5em}header.main .subheader .features ul{margin-left:12px;width:360px}header.main .subheader .features ul li{width:160px}body[data-href="home"] article.profile:nth-child(3n+1) {margin-left:0px!important}body[data-href="home"] article.profile:nth-child(2n+1) {margin-left:0px!important}}.main .subheader .features ul li{width:160px}body[data-href="home"] article.profile:nth-child(3n+1) {margin-left:0px!important}body[data-href="home"] article.profile:nth-child(2n+1) {margin-left:0px!important}</style>
-<link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet" />
-<link rel="apple-touch-icon" href="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/static/images/identity/HTML5_Badge_64.png.pagespeed.ce.S0LMUsq9YG.png" />
-<link rel="apple-touch-icon-precomposed" href="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/static/images/identity/HTML5_Badge_64.png.pagespeed.ce.S0LMUsq9YG.png" />
-<script src="/static/js/modernizr.custom.82437.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<!--[if lt IE 9]>
-  <script src="http://html5shim.googlecode.com/svn/trunk/html5-els.js"></script>
-  <![endif]-->
-<style>figure img{border:1px solid #ccc}</style>
+<meta charset="utf-8"/>
 </head>
-<body data-href="tutorials-memory-effectivemanagement" onload="" class="pattern-bg">
-<header class="main">
-<a id="home_horns" href="/en/"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAyCAYAAABGQBuoAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NEU2NTFGRTQwNjE0MTFFMTg0RjdERTE0MzFDQTlGQjQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NEU2NTFGRTUwNjE0MTFFMTg0RjdERTE0MzFDQTlGQjQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4MUQyMTY2QjA2MTMxMUUxODRGN0RFMTQzMUNBOUZCNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4MUQyMTY2QzA2MTMxMUUxODRGN0RFMTQzMUNBOUZCNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgNr19cAAAJFSURBVHja7FfrUcMwDE56/U/YIGxQJsBMQJmg6QTQCRomKBukGzBCywTpBikTpEwQJE4CxbFTOzF3cIfudM7Jsb5I1itRJKhpmhlw1XzTDjiJQhAqAq6JM+CcQUIBzEmhErJPkFAAHWUIpoOe0aFIT85nplEgQrfCUgjRGmTLIBbQ/X0FBTE+N5NABsxofYrj+ISMzygIBWClXwOwpvyo6K7QxwXLcN920DWK8JK3wCkpewBOSIaUeecBPKb0la2SIWSP+lktSVUrKiUA1aSaDpViTUyh2yebGCzBkMP6cwS+gpC7hnVJoZiFuGRWfgvKcY1gRV+fyO+DAS5oZeUnzapkVB2Rfjb0CC7j/ndAQixSB8uXcz9o7bnSlJQfe5SjRfewdxjinSklz7JHOdJ+bKm40eRzWleGTF1oFZQznQOkc8GcmZklADjRCq7xIgml7MVYGSgyShuIKGwVvZfbZIYPK6WSss8Sz7BXer0KCkJ66s5MFQLEVG37QPKByguXKU/2AuXg88oUTeeAJKGCVNtPheLKZLVLy3wGfgO+s+xjlr9iSfceM33vwfT+j48tsenCRIkepxzo7092LlG050HWgXY+harx+YWinGiR1w8IvL/RmoyklW3qcAEwdS6dkjGXzIffab2Mu7S3WTfkH63WKwIijHERTxlbw9aCppJB7U6SEvJMvLvjKBPNvxVFPonGc9MGaz41dOXtYIsFuRhF5OiCTWneZ4EXgEdz8gbgyXvD7ZMyNxM/g0aA/3J9lj4EGABt/PzEJtkxBQAAAABJRU5ErkJggg==" alt="HTML5 Rocks" width="24" height="50" /></a>
-<h1 id="title">
-<a href="/en/" title="HTML5 Rocks">HTML5 Rocks</a>
-</h1>
-<nav>
-<ul>
-<li id="home_menu"><a class="home" href="/en/" rel="home">Home</a></li>
-<li id="tutorials_menu"><a href="/en/tutorials/?page=1" class="tutorials">Tutorials</a></li>
-<li id="updates_menu"><a href="/en/updates/" class="updates">Updates</a></li>
-<li id="features_show"><a href="#features">HTML5 Features</a></li>
-<li id="slides_menu"><a href="/en/slides" class="slides">Slides</a></li>
-<li id="resources_menu"><a href="/en/resources" class="resources">Resources</a></li>
-<li id="profiles_menu"><a href="/en/profiles" class="profiles">Who We Are</a></li>
-<li id="contrib_menu"><a href="https://github.com/html5rocks/www.html5rocks.com/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a></li>
-<li id="search_show">
-<a href="#search_form">
-<span>Search</span>
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RjM0OTMyOUNEN0FEMTFFMEJDMEZDMjAwMjNDNjc0MDciIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RjM0OTMyOUREN0FEMTFFMEJDMEZDMjAwMjNDNjc0MDciPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpFNzMzOTM2MUQ3OTkxMUUwQkMwRkMyMDAyM0M2NzQwNyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpFNzMzOTM2MkQ3OTkxMUUwQkMwRkMyMDAyM0M2NzQwNyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pj/umaQAAACdSURBVHjanFLbDQMhDAtMwAiM0lFuBEa4DW4ERmk7ASPQDRghTSSfRKvAPSz5J45D5ODJADM/hE/+RRUuNIKKaGzCDUNSNyhbpgixCIOhZ+jrSIiTjfTl5v/qang55z40xlsYvCEEugqEcbSqplutcBrCiZNw0ugU+zm0cQWreY7OVHC7DDN39WVmCmcDyZdNMBbzGx3AiYnu4CvAALKABcbyDrXxAAAAAElFTkSuQmCC" width="14" height="14" alt="" />
-</a>
-</li>
-</ul>
-</nav>
-<div class="subheader search" style="display: none;" id="search_form">
-<div class="search">
-<form action="/en/search" id="cse-search-box" role="search">
-<img id="search_hide" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAdCAYAAABWk2cPAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RjM0OTMyQTREN0FEMTFFMEJDMEZDMjAwMjNDNjc0MDciIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RjM0OTMyQTVEN0FEMTFFMEJDMEZDMjAwMjNDNjc0MDciPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpGMzQ5MzJBMkQ3QUQxMUUwQkMwRkMyMDAyM0M2NzQwNyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpGMzQ5MzJBM0Q3QUQxMUUwQkMwRkMyMDAyM0M2NzQwNyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Ps3igWgAAAFzSURBVHjazJfPSsNAEMZ3EygoBAoepD0VBA+Cp76AvoCvkWfK0+gLeBI8FISc2lMhsFBBCPGbMKGrZP/qNh342LKdzI/Z7OxOpPCwruvmGEgX0OWIywH6hBopZeOKJx2wJYYraCb87QvaA74NggJG2dwEwsbgH4AfnFAAKbOV+D+rAd4boQmAo+BMAxaJgGQrjn+EYiJPCNTBuZ7ptWXTrKHCM3DB/mM2Y46QTL+HcoPzM7SDSkg5gBW0gB4NPi30lnHR55ZgJQeqLBnrwNISizjzAWqzjQP8G7hxxOuhPu/LBA4F9s9kjqW1gZcRwH6JaSOtA7f+rZatCgT+PBxOaVlkllRCTzxWPB8EbSOAtKRbHkPBbeYoeBNweEZFgBVBm0igiAQ3kxyDUmtLFgbHB+jV8zUMB/6L4f8dtTFSu9ru/tie+LQv74D2G0nQD7rdE5dnzZxjnWJCJQTXHP9MGrPJWtDJmu3knxUIePJb5luAAQDWPZwf40bkcAAAAABJRU5ErkJggg==" width="29" height="29" alt="" />
-<label><input type="search" name="q" id="q" autocomplete="off" placeholder="Search" /></label>
-</form>
-</div>
-</div>
-<div class="subheader features" style="display: none;" id="features" tabindex="0">
-<div class="features">
-<img id="features_hide" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAdCAYAAABWk2cPAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RjM0OTMyQTREN0FEMTFFMEJDMEZDMjAwMjNDNjc0MDciIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RjM0OTMyQTVEN0FEMTFFMEJDMEZDMjAwMjNDNjc0MDciPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpGMzQ5MzJBMkQ3QUQxMUUwQkMwRkMyMDAyM0M2NzQwNyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpGMzQ5MzJBM0Q3QUQxMUUwQkMwRkMyMDAyM0M2NzQwNyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Ps3igWgAAAFzSURBVHjazJfPSsNAEMZ3EygoBAoepD0VBA+Cp76AvoCvkWfK0+gLeBI8FISc2lMhsFBBCPGbMKGrZP/qNh342LKdzI/Z7OxOpPCwruvmGEgX0OWIywH6hBopZeOKJx2wJYYraCb87QvaA74NggJG2dwEwsbgH4AfnFAAKbOV+D+rAd4boQmAo+BMAxaJgGQrjn+EYiJPCNTBuZ7ptWXTrKHCM3DB/mM2Y46QTL+HcoPzM7SDSkg5gBW0gB4NPi30lnHR55ZgJQeqLBnrwNISizjzAWqzjQP8G7hxxOuhPu/LBA4F9s9kjqW1gZcRwH6JaSOtA7f+rZatCgT+PBxOaVlkllRCTzxWPB8EbSOAtKRbHkPBbeYoeBNweEZFgBVBm0igiAQ3kxyDUmtLFgbHB+jV8zUMB/6L4f8dtTFSu9ru/tie+LQv74D2G0nQD7rdE5dnzZxjnWJCJQTXHP9MGrPJWtDJmu3knxUIePJb5luAAQDWPZwf40bkcAAAAABJRU5ErkJggg==" width="29" height="29" alt="" />
-<h2>Features</h2>
-<ul>
-<li>
-<a href="/en/features/offline" class="offline">
-<h3>Offline</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/storage" class="storage">
-<h3>Storage</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/connectivity" class="connectivity">
-<h3>Connectivity</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/file_access" class="file_access">
-<h3>File Access</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/semantics" class="semantics">
-<h3>Semantics</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/multimedia" class="multimedia">
-<h3>Audio/Video</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/graphics" class="graphics">
-<h3>3D/Graphics</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/presentation" class="presentation">
-<h3>Presentation</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/performance" class="performance">
-<h3>Performance</h3>
-</a>
-</li>
-<li>
-<a href="/en/features/nuts_and_bolts" class="nuts_and_bolts">
-<h3>Nuts &amp; Bolts</h3>
-</a>
-</li>
-</ul>
-</div>
-</div>
-</header>
-<a class="watermark" href="/"></a>
-<nav class="paginator features">
-<ul class="offline">
-<li><a class="next" href="/en/features/storage">Storage</a></li>
-</ul>
-<ul class="storage">
-<li><a class="previous" href="/en/features/offline">Offline</a></li>
-<li><a class="next" href="/en/features/connectivity">Connectivity</a></li>
-</ul>
-<ul class="connectivity">
-<li><a class="previous" href="/en/features/storage">Storage</a></li>
-<li><a class="next" href="/en/features/file_access">File Access</a></li>
-</ul>
-<ul class="file_access">
-<li><a class="previous" href="/en/features/connectivity">Connectivity</a></li>
-<li><a class="next" href="/en/features/semantics">Semantics</a></li>
-</ul>
-<ul class="semantics">
-<li><a class="previous" href="/en/features/file_access">File Access</a></li>
-<li><a class="next" href="/en/features/multimedia">Audio/Video</a></li>
-</ul>
-<ul class="multimedia">
-<li><a class="previous" href="/en/features/semantics">Semantics</a></li>
-<li><a class="next" href="/en/features/graphics">3D/Graphics</a></li>
-</ul>
-<ul class="graphics">
-<li><a class="previous" href="/en/features/multimedia">Audio/Video</a></li>
-<li><a class="next" href="/en/features/presentation">Presentation</a></li>
-</ul>
-<ul class="presentation">
-<li><a class="previous" href="/en/features/graphics">3D/Graphics</a></li>
-<li><a class="next" href="/en/features/performance">Performance</a></li>
-</ul>
-<ul class="performance">
-<li><a class="previous" href="/en/features/presentation">Presentation</a></li>
-<li><a class="next" href="/en/features/nuts_and_bolts">Nuts &amp; Bolts</a></li>
-</ul>
-<ul class="nuts_and_bolts">
-<li><a class="previous" href="/en/features/performance">Performance</a></li>
-</ul>
-</nav>
-<div class="outline_nav_toggle deactivated">
-<img class="show" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAeCAYAAADU8sWcAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OTAyRDZFQUJFOEVFMTFFMDg2NkJGNDlCNjE5NENEMzIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OTAyRDZFQUNFOEVFMTFFMDg2NkJGNDlCNjE5NENEMzIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5MDJENkVBOUU4RUUxMUUwODY2QkY0OUI2MTk0Q0QzMiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5MDJENkVBQUU4RUUxMUUwODY2QkY0OUI2MTk0Q0QzMiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pprl4SwAAAIcSURBVHjazFfNasJAEI6ptiIGBCUQbfAWxWu96EUfwAY8tg+gD1A8F+99gfoA9ijoA9he9GKvIt5EMRJyEFKKDQidlaSIyW5iYkgHhiyZzX4zk/nbEOWAJpNJGh4V4DudGYttn8Bz4EGxWJw7OTfkALQBXKPOIwTeASXeXYEDcEMH9kLIG21QYu0IHECRS1+BBeoypAI3rX4F7TMwpcdHF86uEsF9AD6mZ1BAsHQ7CJ7g8WB3wmazia1Wq7imaWHjXSaTUbPZrOpAAQn4EX6B+geuR3Wf9NVisWBGo9HtdruNWckjkci+UCjI5XJ5baMAyoLOMfgLPKq43cPhkJ/NZqwT3yYSie96vT6PRqN7QgCKyHpat/ps4FwuR7VaLdN+5JleryfsdrsrQgDWjICrkFzt1OJTBcbjcZqw5d4ArxIKDec2tJHSoMQ1RiygtKZxqYU+lGWZ8ZJb0+k0RRALNKZJUMvlkvGa2JIkxUngYWxNVNUbYy2KokmeSqUObCWDlKQURbGtfDQVIGEtZxjmx1j3++b6g1ItmUxaypw2HFpPehPxPK96tYzjuC9Sz6f1xm9VqTSWZT0pAOVWsQPHThtQAiW3wPl8XkYG4IAP5RUWH7gDUKdCh5wLjOp7qVQiNZhB4I3FAEdVrhtISw10mDhSoOvjGGUaJE8rXBOXeheg9ukEG+jo/L8uDRe8Lr0B6MD1Xc3vi+KvAAMAMUEG36eXLzcAAAAASUVORK5CYII=" alt="" />
-<img class="hide" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAeCAYAAADU8sWcAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OTAyRDZFQUZFOEVFMTFFMDg2NkJGNDlCNjE5NENEMzIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OTAyRDZFQjBFOEVFMTFFMDg2NkJGNDlCNjE5NENEMzIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5MDJENkVBREU4RUUxMUUwODY2QkY0OUI2MTk0Q0QzMiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5MDJENkVBRUU4RUUxMUUwODY2QkY0OUI2MTk0Q0QzMiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PlXiDkoAAAIdSURBVHjaxFfNasJAEN6sSkUIBOLBFktF0Junek+96wOU3tt76716tw/Q3msfQO8a8GhP3iKIpdJ6MBAIiEWE7shaos1m18SfD4ZFd2a/mc3szqyEBNHtdq/IAJKlsgmDSjufz7dF1pQESG/JcE1ERuL4JtIgTrz4IiekEN0TkVPkH+BEhTjx7jaJGcQlMtQDEiNq/0zX40dOFR/R7lElO9Bgku+ReIWyMxklB/EZGV55iTWbzUL9fl+xbftk9Z8syz+ZTMaKRqMLDrlN5IY48AU/wo6Jey9iINV1/XwwGKhu851OB6XTaVPTtE8PJ2TKU/6LnER9CYnBIh6Px7Fms5mdz+ch3r5GIpFFsVg0EonE1EPtDk7AKttLuyAGgB7og52HWsl51DSWVqvVuhAldjoAdh4qSz5Mt9z1W/d6PdWyrJiftAY7sGd9e+DFjHt6ieFwqAQ5Vxz7LPbK8NFoFIicYy+HRRaJx+NIVVVhUtM00WQy4ephdEQIRQ5RiESyLTC98lyRTCatIItz7G1Muw9XpFKpQOQcewPTQu8afS6XMxVFmfohBjuwZ0XtvF511iKFQuED7uttiEEf7DxUdGe2N1haUCCgUIg6IFhY6pv1vEa7U18lFSBQUhHtbstHbyYkl968tsd7Za2PW7vhaH9VPQQxs2/fQyP5j5j3aIA6X9nBo+GBEBtBnkulLZ2AxHrz/Vw6xEPxV4ABAB9p/+75XTbuAAAAAElFTkSuQmCC" alt="" />
-<nav class="outline features">
-<h3>HTML5 Features</h3>
-<ul>
-<li class="offline">
-<a href="/en/features/offline" class="section_title offline">Offline</a>
-<ul>
-<li><a href="/en/features/offline#intro">Intro</a></li>
-<li><a href="/en/features/offline#support">Browser Support</a></li>
-<li><a href="/en/features/offline#updates">What’s New</a></li>
-<li><a href="/en/features/offline#demos">Demos</a></li>
-<li><a href="/en/features/offline#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/offline#resources">Resources</a></li>
-</ul>
-</li>
-<li class="storage">
-<a href="/en/features/storage" class="section_title storage">Storage</a>
-<ul>
-<li><a href="/en/features/storage#intro">Intro</a></li>
-<li><a href="/en/features/storage#support">Browser Support</a></li>
-<li><a href="/en/features/storage#updates">What’s New</a></li>
-<li><a href="/en/features/storage#demos">Demos</a></li>
-<li><a href="/en/features/storage#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/storage#resources">Resources</a></li>
-</ul>
-</li>
-<li class="connectivity">
-<a href="/en/features/connectivity" class="section_title connectivity">Connectivity</a>
-<ul>
-<li><a href="/en/features/connectivity#intro">Intro</a></li>
-<li><a href="/en/features/connectivity#support">Browser Support</a></li>
-<li><a href="/en/features/connectivity#updates">What’s New</a></li>
-<li><a href="/en/features/connectivity#demos">Demos</a></li>
-<li><a href="/en/features/connectivity#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/connectivity#resources">Resources</a></li>
-</ul>
-</li>
-<li class="file_access">
-<a href="/en/features/file_access" class="section_title file_access">File Access</a>
-<ul>
-<li><a href="/en/features/file_access#intro">Intro</a></li>
-<li><a href="/en/features/file_access#support">Browser Support</a></li>
-<li><a href="/en/features/file_access#updates">What’s New</a></li>
-<li><a href="/en/features/file_access#demos">Demos</a></li>
-<li><a href="/en/features/file_access#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/file_access#resources">Resources</a></li>
-</ul>
-</li>
-<li class="semantics">
-<a href="/en/features/semantics" class="section_title semantics">Semantics</a>
-<ul>
-<li><a href="/en/features/semantics#intro">Intro</a></li>
-<li><a href="/en/features/semantics#support">Browser Support</a></li>
-<li><a href="/en/features/semantics#updates">What’s New</a></li>
-<li><a href="/en/features/semantics#demos">Demos</a></li>
-<li><a href="/en/features/semantics#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/semantics#resources">Resources</a></li>
-</ul>
-</li>
-<li class="multimedia">
-<a href="/en/features/multimedia" class="section_title multimedia">Audio/Video</a>
-<ul>
-<li><a href="/en/features/multimedia#intro">Intro</a></li>
-<li><a href="/en/features/multimedia#support">Browser Support</a></li>
-<li><a href="/en/features/multimedia#updates">What’s New</a></li>
-<li><a href="/en/features/multimedia#demos">Demos</a></li>
-<li><a href="/en/features/multimedia#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/multimedia#resources">Resources</a></li>
-</ul>
-</li>
-<li class="graphics">
-<a href="/en/features/graphics" class="section_title graphics">3D/Graphics</a>
-<ul>
-<li><a href="/en/features/graphics#intro">Intro</a></li>
-<li><a href="/en/features/graphics#support">Browser Support</a></li>
-<li><a href="/en/features/graphics#updates">What’s New</a></li>
-<li><a href="/en/features/graphics#demos">Demos</a></li>
-<li><a href="/en/features/graphics#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/graphics#resources">Resources</a></li>
-</ul>
-</li>
-<li class="presentation">
-<a href="/en/features/presentation" class="section_title presentation">Presentation</a>
-<ul>
-<li><a href="/en/features/presentation#intro">Intro</a></li>
-<li><a href="/en/features/presentation#support">Browser Support</a></li>
-<li><a href="/en/features/presentation#updates">What’s New</a></li>
-<li><a href="/en/features/presentation#demos">Demos</a></li>
-<li><a href="/en/features/presentation#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/presentation#resources">Resources</a></li>
-</ul>
-</li>
-<li class="performance">
-<a href="/en/features/performance" class="section_title performance">Performance</a>
-<ul>
-<li><a href="/en/features/performance#intro">Intro</a></li>
-<li><a href="/en/features/performance#updates">What’s New</a></li>
-<li><a href="/en/features/performance#themes">Themes</a></li>
-<li><a href="/en/features/performance#technologies">Technologies</a></li>
-<li><a href="/en/features/performance#techniques">Techniques</a></li>
-<li><a href="/en/features/performance#tools">Tools</a></li>
-<li><a href="/en/features/performance#further_reading">Further Reading</a></li>
-</ul>
-</li>
-<li class="nuts_and_bolts">
-<a href="/en/features/nuts_and_bolts" class="section_title nuts_and_bolts">Nuts &amp; Bolts</a>
-<ul>
-<li><a href="/en/features/nuts_and_bolts#intro">Intro</a></li>
-<li><a href="/en/features/nuts_and_bolts#support">Browser Support</a></li>
-<li><a href="/en/features/nuts_and_bolts#updates">What’s New</a></li>
-<li><a href="/en/features/nuts_and_bolts#demos">Demos</a></li>
-<li><a href="/en/features/nuts_and_bolts#in_the_wild">In the Wild</a></li>
-<li><a href="/en/features/nuts_and_bolts#resources">Resources</a></li>
-</ul>
-</li>
-</ul>
-</nav>
-</div>
-<div class="page current loaded" id="tutorials-memory-effectivemanagement">
-<header class="tutorial clearfix pattern-bg-lighter">
-<hgroup>
-<h1>HTML5 Rocks</h1>
-<h2><a href="/en/tutorials/">Tutorials</a></h2>
-</hgroup>
-<section>
-<h1>Effectively Managing Memory at Gmail scale</h1>
-<section class="byline">
-<a href="/profiles/#johnmccutchan"><img src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/static/images/profiles/75/xjohnmccutchan.75.png.pagespeed.ic.esO8ZXdtji.jpg" itemprop="photo" alt="John McCutchan" title="John McCutchan" width="75" height="75" /></a>
-<hgroup>
-<h3>
-By <strong><a href="/profiles/#johnmccutchan">John McCutchan</a></strong>
-&amp; <strong><a href="/profiles/#loreenalee">Loreena Lee</a></strong>
-</h3>
-</hgroup>
-<div class="date">
-<time pubdate="">Published <strong>June 12, 2013</strong></time>
-</div>
-</section>
-<section class="browser_support">
-<h3>Supported browsers:</h3>
-<span class="browsers">
-<span class="browser opera ">
-<span class="browser_name">Opera</span>
-<span class="support">
-unsupported
-</span>
-</span>
-<span class="browser ie ">
-<span class="browser_name">IE</span>
-<span class="support">
-unsupported
-</span>
-</span>
-<span class="browser safari ">
-<span class="browser_name">Safari</span>
-<span class="support">
-unsupported
-</span>
-</span>
-<span class="browser ff ">
-<span class="browser_name">Firefox</span>
-<span class="support">
-unsupported
-</span>
-</span>
-<span class="browser chrome supported">
-<span class="browser_name">Chrome</span>
-<span class="support">
-supported
-</span>
-</span>
-</span>
-<div class="compatible-block">
-<p id="notcompatible" class="hidden">
-Your browser may not support all of the functionality in this article.
-</p>
-<p id="compatible" class="hidden">
-Your browser appears to support the functionality in this article.
-</p>
-</div>
-</section>
-<a href="#disqus_thread" data-disqus-identifier="http://www.html5rocks.com/tutorials/memory/effectivemanagement/" class="disqus_comments">Leave a comment</a>
-</section>
-<span class="share">
-<ul>
-<li class="googleplus"><a href="https://plus.google.com/share?url=http://www.html5rocks.com/tutorials/memory/effectivemanagement/" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img src="https://www.gstatic.com/images/icons/gplus-32.png" alt="Share on Google+" /></a></li>
-<li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=http://www.html5rocks.com/tutorials/memory/effectivemanagement/" target="_blank"><img src="/static/images/facebook.png" alt="Share on Facebook" width="48" height="48" /></a></li>
-<li class="twitter">
-<a href="https://twitter.com/share?url=http://www.html5rocks.com/tutorials/memory/effectivemanagement/&amp;text=Effectively Managing Memory at Gmail scale&amp;lang=en&amp;via=ChromiumDev&amp;related=ChromiumDev" target="_blank">
-<img src="/static/images/twitter.png" width="48" height="48" />
-</a></li>
-</ul>
-</span>
-</header>
-<article class="cds-banner">
-<a href="http://developer.chrome.com/devsummit" target="_blank">Chrome Dev Summit</a>
-</article>
-<article class="tutorial pattern-bg-lighter">
-<div class="outline_nav_toggle">
-<nav class="outline toc pattern-bg-lighter">
-<h3>Table of Contents</h3>
-<ul><li><a href="#toc-introduction">Introduction</a></li><li><a href="#toc-watch-the-movie">Google I/O 2013 Session</a></li><li><a href="#toc-gmail-problem">Gmail, we have a problem...</a></li><li><a href="#toc-basics">Memory Management Basics</a><ul><li><a href="#toc-primitives">Primitive Types</a><ul><li><a href="#toc-what-about-arrays">What About Arrays?</a></li><li><a href="#toc-terminology">Terminology</a></li></ul></li><li><a href="#toc-object-graph">Object Graph</a></li><li><a href="#toc-when-garbage">When Does a Value Become Garbage?</a></li><li><a href="#toc-what-is-a-leak">What is a Memory Leak in JavaScript?</a></li><li><a href="#toc-bloat">What is Bloat?</a></li><li><a href="#toc-gc">What is Garbage Collection?</a></li></ul></li><li><a href="#toc-v8-gc">V8 Garbage Collector in Detail</a><ul><li><a href="#toc-generational">Generational Collector</a></li><li><a href="#toc-young">Young Generation</a></li><li><a href="#toc-old-generation">Old Generation</a></li><li><a href="#toc-v8-gc-summary">V8 GC Summary</a></li></ul></li><li><a href="#toc-fixing-gmail">Fixing Gmail</a><ul><li><a href="#toc-tools-techniques">Tools and Techniques</a><ul><li><a href="#toc-performance-memory">Field Data and performance.memory API</a></li><li><a href="#toc-memory-scale">Measuring Memory At Scale</a></li><li><a href="#toc-identify-memory">Identifying a Memory Problem with the DevTools Timeline</a></li><li><a href="#toc-problem-exists">Proving a problem exists</a></li><li><a href="#toc-object-tracker">Using the Object Tracker</a></li></ul></li></ul></li><li><a href="#toc-resolving-crisis">Resolving Gmail's Memory Crisis</a></li><li><a href="#toc-call-to-action">Call to Action</a></li><li><a href="#toc-conslusion">Conclusion</a></li></ul>
-</nav>
-</div>
-<section>
+<body>
+<div>
 <h2 id="toc-introduction">Introduction</h2>
-<p><span></span>
-</p>
+
 <p><span>While JavaScript employs garbage collection for automatic memory management, it is not a substitute for effective memory management in applications. JavaScript applications suffer from the same memory related problems that native applications do, such as memory leaks and bloat, yet they must also deal with garbage collection pauses. Large-scale applications like Gmail encounter the same problems facing your smaller applications. Read on to learn how the Gmail team used Chrome DevTools to identify, isolate, and fix their memory problems.</span>
 </p>
 <h2 id="toc-watch-the-movie">Google I/O 2013 Session</h2>
 <p>We presented this material at Google I/O 2013. Check out the video below:</p>
-<iframe width="560" height="315" src="http://www.youtube.com/embed/x9Jlu_h_Lyw" frameborder="0" allowfullscreen=""></iframe>
+
 <h2 id="toc-gmail-problem">Gmail, we have a problem...</h2>
-<p><span></span>
-</p>
+
 <p><span>The Gmail team was facing a serious problem. Anecdotes of Gmail tabs consuming multiple gigabytes of memory on resource-constrained laptops and desktops were being heard increasingly frequently, often with a conclusion of bringing the entire browser down. Stories of CPUs being pinned at 100%, unresponsive apps, and Chrome sad tabs (“He’s dead, Jim.”). The team was at a loss as to how to even begin diagnosing the problem, let alone fix it. They had no idea how widespread the problem was and the available tools didn’t scale up to large </span><span>applications</span><span>. The team joined forces with the Chrome teams, and together they developed new techniques to triage memory problems, improved existing tools, and enabled the collection of memory data from the field. But, before getting to the tools, let’s cover the basics of JavaScript memory management.</span>
 </p>
 <h2 id="toc-basics">Memory Management Basics</h2>
-<p><span></span>
-</p>
+
 <p><span>Before you can effectively manage memory in JavaScript you must understand the fundamentals. This section will cover primitive types, the object graph, and provide definitions for memory bloat in general and a memory leak in JavaScript. Memory in JavaScript can be conceptualized as a graph and because of this </span>
 <span><a href="http://en.wikipedia.org/wiki/Graph_theory">Graph theory</a>
 </span><span>&nbsp;plays a part in JavaScript memory management and the </span><span><a href="https://developers.google.com/chrome-developer-tools/docs/heap-profiling">Heap Profiler</a></span><span>.</span>
 </p>
 <h3 id="toc-primitives">Primitive Types</h3>
-<p><span></span>
-</p>
+
 <p><span>JavaScript has three primitive types:</span>
 </p>
-<p><span></span>
-</p>
-<ol class="c9" start="1">
+
+<ol start="1">
 <li><span>Number (e.g. 4, 3.14159)</span>
 </li>
 <li><span>Boolean (true or false)</span>
@@ -406,27 +34,21 @@ Your browser appears to support the functionality in this article.
 <li><span>String (“Hello World”)</span>
 </li>
 </ol>
-<p><span></span>
-</p>
+
 <p><span>These primitive types cannot reference any other values. In the object graph these values are always leaf or terminating nodes, meaning they never have an outgoing edge.</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>There is only one container type: the Object. In JavaScript the Object is an </span><span><a href="http://en.wikipedia.org/wiki/Associative_array">associative array</a></span><span>. A non-empty object is an inner node with outgoing edges to other values (nodes).</span>
 </p>
-<p><span></span>
-</p>
+
 <h4 id="toc-what-about-arrays">What About Arrays?</h4>
-<p><span></span>
-</p>
+
 <p><span>An Array in JavaScript is actually an Object that has numeric keys. This is a simplification, because JavaScript runtimes will optimize Array-like Objects and represent them under the hood as arrays. </span>
 </p>
-<p><span></span>
-</p>
+
 <h4 id="toc-terminology">Terminology</h4>
-<p><span></span>
-</p>
-<ol class="c9" start="1">
+
+<ol start="1">
 <li><span>Value</span><span>&nbsp;- An instance of a primitive type, Object, Array, etc.</span>
 </li>
 <li><span>Variable</span><span>&nbsp;-</span><span>&nbsp;A name that references a value.</span>
@@ -434,139 +56,106 @@ Your browser appears to support the functionality in this article.
 <li><span>Property</span><span>&nbsp;- A name in an Object that references a value.</span>
 </li>
 </ol>
-<p><span></span>
-</p>
+
 <h3 id="toc-object-graph">Object Graph</h3>
-<p><span></span>
-</p>
+
 <p><span>All values in JavaScript are part of the object graph. The graph begins with roots, for example, the </span><span><a href="https://developer.mozilla.org/en-US/docs/DOM/window">window object</a></span><span>. &nbsp;Managing the lifetime of GC roots is not in your control, as they are created by the browser and destroyed when the page is unloaded. Global variables are actually properties on </span>
 <span>window</span><span>.</span>
 </p>
-<p><span></span>
-</p>
+
 <p>
 <figure>
-<script pagespeed_no_defer="">(function(){var d=window,e=document,f="documentElement",g="scrollTop",k="prototype",l="body",m="getAttribute",n="",p="1",q="data",r="img",s="load",t="number",u="on",v="onload",w="pagespeed_lazy_position",x="pagespeed_lazy_replaced_functions",y="pagespeed_lazy_src",z="position",A="relative",B="resize",C="scroll",D="src",E=function(a,b,c){if(a.addEventListener)a.addEventListener(b,c,!1);else if(a.attachEvent)a.attachEvent(u+b,c);else{var h=a[u+b];a[u+b]=function(){c.call(this);h&&h.call(this)}}};d.pagespeed=d.pagespeed||{};var F=d.pagespeed,G=function(a){this.d=[];this.a=0;this.b=!1;this.n=a;this.e=null;this.i=0;this.j=200;this.c=!1};G[k].r=function(){var a=0;typeof d.pageYOffset==t?a=d.pageYOffset:e[l]&&e[l][g]?a=e[l][g]:e[f]&&e[f][g]&&(a=e[f][g]);var b=d.innerHeight||e[f].clientHeight||e[l].clientHeight;return{top:a,bottom:a+b,height:b}};G[k].m=function(a){var b=a[m](w);if(b)return parseInt(b,0);var b=a.offsetTop,c=a.offsetParent;c&&(b+=this.m(c));b=Math.max(b,0);a.setAttribute(w,b);return b};
-G[k].q=function(a){var b=this.m(a);return{top:b,bottom:b+a.offsetHeight}};G[k].p=function(a,b){if(a.currentStyle)return a.currentStyle[b];if(e.defaultView&&e.defaultView.getComputedStyle){var c=e.defaultView.getComputedStyle(a,null);if(c)return c.getPropertyValue(b)}return a.style&&a.style[b]?a.style[b]:n};
-G[k].o=function(a){if(!this.c&&(0==a.offsetHeight||0==a.offsetWidth))return!1;if(this.p(a,z)==A)return!0;var b=this.r(),c=a.getBoundingClientRect();c?(a=c.top-b.height,b=c.bottom):(c=this.q(a),a=c.top-b.bottom,b=c.bottom-b.top);return a<=this.a&&0<=b+this.a};
-G[k].l=function(a){this.k(a);var b=this;d.setTimeout(function(){var c=a[m](y);if(null!=c)if((b.b||b.o(a))&&-1!=a.src.indexOf(b.n)){var h=a.parentNode,H=a.nextSibling;h&&h.removeChild(a);a.g&&(a.getAttribute=a.g);a.removeAttribute(v);a.removeAttribute(y);a.removeAttribute(x);h&&h.insertBefore(a,H);a.src=c}else b.d.push(a)},0)};G[k].loadIfVisible=G[k].l;G[k].t=function(){this.b=!0;this.f()};G[k].loadAllImages=G[k].t;G[k].f=function(){var a=this.d,b=a.length;this.d=[];for(var c=0;c<b;++c)this.l(a[c])};
-G[k].h=function(a,b){return a.a?null!=a.a(b):null!=a[m](b)};G[k].u=function(){for(var a=e.getElementsByTagName(r),b=0;b<a.length;++b){var c=a[b];this.h(c,y)&&this.k(c)}};G[k].overrideAttributeFunctions=G[k].u;G[k].k=function(a){var b=this;this.h(a,x)||(a.g=a[m],a.getAttribute=function(a){a.toLowerCase()==D&&b.h(this,y)&&(a=y);return this.g(a)},a.setAttribute(x,p))};
-F.s=function(a,b){var c=new G(b);F.lazyLoadImages=c;E(d,s,function(){c.c=!0;c.b=a;c.a=200;c.f()});0!=b.indexOf(q)&&((new Image).src=b);var h=function(){if(!(c.c&&a||c.e)){var b=c.j;(new Date).getTime()-c.i>c.j&&(b=0);c.e=d.setTimeout(function(){c.i=(new Date).getTime();c.f();c.e=null},b)}};E(d,C,h);E(d,B,h)};F.lazyLoadInit=F.s;})();
-
-pagespeed.lazyLoadInit(false, "//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif");
-</script><img height="324" pagespeed_lazy_src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/en/tutorials/memory/effectivemanagement/images/Nx324ximage04.png.pagespeed.ic.2lGWUDdb3g.jpg" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
+<img height="324" pagespeed_lazy_src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/en/tutorials/memory/effectivemanagement/images/Nx324ximage04.png.pagespeed.ic.2lGWUDdb3g.jpg" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
 </figure>
 </p>
 <h3 id="toc-when-garbage">When Does a Value Become Garbage?</h3>
-<p><span></span>
-</p>
+
 <p><span>A value becomes garbage when there is no path from a root to the value. In other words, starting at the roots and exhaustively searching all Object properties and variables that are alive in the <a href="http://en.wikipedia.org/wiki/Call_stack">stack frame</a>, a value cannot be reached, it has become garbage.</span>
 </p>
-<p><span></span>
-</p>
+
 <p>
 <figure>
 <img height="290" pagespeed_lazy_src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/en/tutorials/memory/effectivemanagement/images/Nx290ximage03.png.pagespeed.ic.inDoS03DnR.png" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
 </figure>
 </p>
 <h3 id="toc-what-is-a-leak">What is a Memory Leak in JavaScript?</h3>
-<p><span></span>
-</p>
+
 <p><span>A </span><span>memory leak</span><span>&nbsp;in JavaScript most commonly occurs when there are DOM nodes that are not reachable from the page’s </span><span>DOM tree,</span><span>&nbsp;but are still referenced by a JavaScript object. While modern browsers are making it increasingly difficult to inadvertently create leaks, it’s still easier than one might think. Let’s say you append an element to the DOM tree like this:</span>
 </p>
-<p><span></span>
-</p>
-<pre class="prettyprint">
+
+<pre>
 email.message = document.createElement(“div”);
 displayList.appendChild(email.message);
 </pre>
 <p><span>And later, you remove the element from the display list:</span>
 </p>
-<p><span></span>
-</p>
-<pre class="prettyprint">
+
+<pre>
 displayList.removeAllChildren();
 </pre>
-<p><span></span>
+
+<p><span>As long as <pre>email</pre> exists, the DOM element referenced by message will not be removed, even though it is now detached from the page’s DOM tree.</span>
 </p>
-<p><span>As long as <pre class="prettyprint">email</pre> exists, the DOM element referenced by message will not be removed, even though it is now detached from the page’s DOM tree.</span>
-</p>
-<p><span></span>
-</p>
+
 <h3 id="toc-bloat">What is Bloat?</h3>
-<p><span></span>
-</p>
+
 <p><span>Your page is </span><span><a href="http://en.wikipedia.org/wiki/Software_bloat">bloated</a></span><span>&nbsp;when you’re using more memory than necessary for optimal page speed. Indirectly, memory leaks also cause bloat but that is not by design. An application cache that does not have any size bound is a common source of memory bloat. Also, your page can be bloated by host data, for example, pixel data loaded from images.</span>
 </p>
 <h3 id="toc-gc">What is Garbage Collection?</h3>
-<p><span></span>
-</p>
+
 <p><span>Garbage collection is how memory is reclaimed in JavaScript. The browser decides when this happens. During a </span><span>collection</span><span>, all script execution on your page is suspended while live values are discovered by a traversal of the object graph starting at the GC roots. All the values which are not </span>
 <span><a href="http://en.wikipedia.org/wiki/Reachability">reachable</a>
 </span><span>&nbsp;are classified as garbage. Memory for garbage values is reclaimed by the memory manager.</span>
 </p>
-<p><span>&nbsp;</span>
-</p>
+
 <h2 id="toc-v8-gc">V8 Garbage Collector in Detail</h2>
-<p><span></span>
-</p>
+
 <p><span>To help further understand how garbage collection happens, let’s take a look at the V8 garbage collector in detail. V8 uses a generational collector. Memory is divided into two generations: the young and the old. Allocation and collection within the young generation is fast and frequent. Allocation and collection within the old generation is slower and less frequent.</span>
 </p>
 <h3 id="toc-generational">Generational Collector</h3>
-<p><span></span>
-</p>
+
 <p><span>V8 uses a two generation collector. The age of an value is defined as the number of bytes allocated since it was allocated. In practice, the age of an value is often approximated by the number of young generation collections that it survived. After a value is sufficiently old it is tenured into the old generation. </span>
 </p>
 <p><span><br />In practice, freshly allocated values do not live long. A study of Smalltalk programs, showed that only 7% of values survive after a young generation collection. Similar studies across runtimes found that on average between, 90% and 70% &nbsp;of freshly allocated values are never tenured into the old generation. </span>
 </p>
 <h3 id="toc-young">Young Generation</h3>
-<p><span></span>
-</p>
+
 <p><span>The young generation heap in V8 is split into two spaces, named </span><span>from</span><span>&nbsp;and </span><span>to</span><span>. Memory is allocated from the </span><span>to</span><span>&nbsp;space. Allocating is very fast, until, the </span>
 <span>to</span><span>&nbsp;space is full at which point a young generation collection is triggered. Young generation collection first swaps the </span><span>from</span><span>&nbsp;and </span><span>to</span><span>&nbsp;space, the old </span>
 <span>to</span><span>&nbsp;space (now the </span><span>from</span><span>&nbsp;space) is scanned and all live values are copied into the </span><span>to</span><span>&nbsp;space or tenured into the old generation. A typical young generation collection will take on the order of 10 milliseconds (ms).</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>Intuitively, you should understand that each allocation your application makes brings you closer exhausting the </span><span>to</span><span>&nbsp;space and incurring a GC pause. Game developers, take note: to ensure a 16ms frame time (required to achieve 60 frames per second), your application must make zero allocations, because a single young generation collection will eat up most of the frame time.</span>
 </p>
-<p><span></span>
-</p>
+
 <p>
 <figure>
 <img height="381" pagespeed_lazy_src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/en/tutorials/memory/effectivemanagement/images/Nx381ximage01.png.pagespeed.ic.vYcc87dZ7v.png" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
 </figure>
 </p>
 <h3 id="toc-old-generation">Old Generation</h3>
-<p><span></span>
-</p>
+
 <p><span>The old generation heap in V8 uses a </span><span><a href="http://en.wikipedia.org/wiki/Mark-compact_algorithm">mark-compact algorithm</a></span><span>&nbsp;for collection. Old generation allocations occur whenever a value is tenured from the young generation to the old generation. Whenever an old generation collection occurs a young generation collection is done as well. Your application will paused on the order of </span><span>seconds</span><span>. In practice this is acceptable because old generation collections are infrequent.</span>
 </p>
-<p><span></span>
-</p>
+
 <h3 id="toc-v8-gc-summary">V8 GC Summary</h3>
-<p><span></span>
-</p>
+
 <p><span>Automatic memory management with garbage collection is great for developer productivity, but, each time you allocate a value, you move ever closer to a garbage collection pause. Garbage collection pauses can ruin the feel of your application by introducing jank. Now that you understand how JavaScript manages memory, you can make the right choices for your application.</span>
 </p>
 <h2 id="toc-fixing-gmail">Fixing Gmail</h2>
-<p><span></span>
-</p>
+
 <p><span>Over the past year, numerous features and bug fixes have made their way into the Chrome DevTools making them more powerful than ever. In addition, the browser itself made a key change to the performance.memory API making it possible for Gmail and any other application to collect memory statistics from the field. Armed with these awesome tools, w</span><span>hat once seemed like an impossible task soon became an exciting game of tracking down culprits.</span>
 </p>
 <h3 id="toc-tools-techniques">Tools and Techniques</h3>
 <h4 id="toc-performance-memory">Field Data and performance.memory API</h4>
-<p><span></span>
-</p>
+
 <p><span>As of Chrome 22, the </span><span><a href="http://docs.webplatform.org/wiki/apis/timing/properties/memory">performance.memory API</a></span><span>&nbsp;is enabled by default. &nbsp;For long-running applications like Gmail, data from real users is invaluable. This information allows us to distinguish between power users-- those who spend 8-16 hours a day on Gmail, receiving hundreds of messages a day-- from more average users who spend a few minutes a day in Gmail, receiving a dozen or so messages a week. &nbsp;</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>This API returns three pieces of data:</span>
 </p>
-<p><span></span>
-</p>
-<ol class="c9" start="1">
+
+<ol start="1">
 <li><span>jsHeapSizeLimit</span><span>&nbsp;- The amount of memory (in bytes) that the JavaScript heap is limited to.</span>
 </li>
 <li><span>totalJSHeapSize</span><span>&nbsp;- The amount of memory (in bytes) that the JavaScript heap has allocated including free space.</span>
@@ -574,38 +163,31 @@ displayList.removeAllChildren();
 <li><span>usedJSHeapSize</span><span>&nbsp;- The amount of memory (in bytes) currently being used.</span>
 </li>
 </ol>
-<p><span></span>
-</p>
+
 <p><span>One thing to keep in mind is that the API returns memory values for the entire Chrome process. Although it is not the default mode, under certain circumstances, Chrome may open multiple tabs in the same renderer process. This means that the values returned by performance.memory may contain the memory footprint of other browser tabs in addition to the one containing your app.</span>
 </p>
 <h4 id="toc-memory-scale">Measuring Memory At Scale</h4>
-<p><span></span>
-</p>
+
 <p><span>Gmail instrumented their JavaScript to use the performance.memory API to collect memory information approximately once every 30 minutes. &nbsp;Because many Gmail users leave the app up for days at a time, the team was able to track memory growth over time as well as overall memory footprint statistics. Within a few days of instrumenting Gmail to collect memory information from a random sampling of users, the team had enough data to understand how widespread the memory problems were among average users. They set a baseline and used the stream of incoming data to track progress toward the goal of reducing memory consumption. Eventually this data would also be used to catch any memory regressions.</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>Beyond tracking purposes, the field measurements also provide a keen insight into the correlation between memory footprint and application performance. &nbsp;Contrary to the popular belief that “more memory results in better performance”, the Gmail team found that the larger the memory footprint, the longer latencies were for common Gmail actions. Armed with this revelation, they were more motivated than ever to rein in their memory consumption.</span>
 </p>
-<p><span></span>
-</p>
+
 <p>
 <figure>
 <img height="186" pagespeed_lazy_src="images/image05.png" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
 </figure>
 </p>
 <h4 id="toc-identify-memory">Identifying a Memory Problem with the DevTools Timeline</h4>
-<p><span></span>
-</p>
+
 <p><span>The first step in solving any performance problem is to prove that the problem exists, create a reproducible test, and take a baseline measurement of the problem. Without a reproducible program, you cannot reliably measure the problem. Without a baseline measurement you don’t know by how much you’ve improved performance.</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>The DevTools </span><span>Timeline panel </span><span>is an ideal candidate for proving that the problem exists. It </span><span>gives a complete overview of where time is spent when loading and interacting with your web app or page. All events, from loading resources to parsing JavaScript, calculating styles, garbage collection pauses, and repainting are plotted on a timeline. For the purposes of investigating memory issues, the Timeline panel also has a Memory mode which tracks total allocated memory, number of DOM nodes, number of window objects, and the number of event listeners allocated.</span>
 </p>
 <h4 id="toc-problem-exists">Proving a problem exists</h4>
-<p><span></span>
-</p>
+
 <p><span>Start by identifying a sequence of actions you suspect to be leaking memory. Start recording the timeline, and perform the sequence of actions. &nbsp;Use the trash can button at the bottom to force a full garbage collection. &nbsp;If, after a few iterations, you see a </span>
 <span><a href="http://en.wikipedia.org/wiki/Sawtooth_wave">sawtooth</a>
 </span><span>&nbsp;shaped graph, you are allocating lots of shortly lived objects. But if the sequence of actions is not expected to result in any retained memory, and the DOM node count does not drop down back to the baseline where you began, you have good reason to suspect there is a leak. </span>
@@ -615,22 +197,18 @@ displayList.removeAllChildren();
 <img height="347" pagespeed_lazy_src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/en/tutorials/memory/effectivemanagement/images/Nx347ximage02.png.pagespeed.ic.YJTDuRinbZ.png" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
 </figure>
 </p>
-<p><span></span>
-</p>
+
 <p><span>Once you’ve confirmed that the problem exists, you can get help identifying the source of the problem from the DevTools Heap Profiler.</span>
 </p>
-<p><span></span>
-</p>
+
 <h4>Finding Memory Leaks with the DevTools Heap Profiler</h4>
-<p><span></span>
-</p>
+
 <p><span>The Profiler panel provides both a CPU profiler and a Heap profiler. Heap profiling works by taking a snapshot of the object graph. Before a snapshot is taken both the young and old generations are garbage collected. In other words, you will only see values which were alive when the snapshot was taken.</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>There is too much functionality in the the Heap profiler to cover sufficiently in this article, but </span><span><a href="https://developers.google.com/chrome-developer-tools/docs/heap-profiling">detailed documentation</a></span><span>&nbsp;can be found on the Google Developers site</span><span>. We’ll focus here on the all new Object Tracker, available now via an experiment on the latest Chrome builds. &nbsp;To enable the Object Tracker:</span>
 </p>
-<ol class="c2" start="1">
+<ol start="1">
 <li><span>Make sure you have the latest </span><span><a href="https://www.google.com/intl/en/chrome/browser/canary.html">Chrome Canary</a></span><span>. </span>
 </li>
 <li><span>Navigate to about:flags, and make sure “Enable Developer Tools experiments” is enabled. You will need to restart Chrome to activate the experiments. &nbsp;</span>
@@ -641,12 +219,10 @@ displayList.removeAllChildren();
 </li>
 </ol>
 <h4 id="toc-object-tracker">Using the Object Tracker</h4>
-<p><span></span>
-</p>
+
 <p><span>The Object Tracker combines the detailed snapshot information of the Heap Profiler with the incremental updating and tracking of the Timeline panel. Start a recording, perform a sequence of actions, then stop the recording for analysis. The Object Tracker takes heap snapshots periodically throughout the recording (as frequently as every 50 ms!) and one final snapshot at the end of the recording.</span>
 </p>
-<p><span></span>
-</p>
+
 <p>
 <figure>
 <img height="339" pagespeed_lazy_src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/en/tutorials/memory/effectivemanagement/images/image00.png.pagespeed.ce.-l6ZTV9hS-.png" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
@@ -654,123 +230,58 @@ displayList.removeAllChildren();
 </p>
 <p><span>The bars at the top indicate when new objects are found in the heap. &nbsp;The height of each bar corresponds to the size of the recently allocated objects, and the color of the bars indicate whether or not those objects are still live in the final heap snapshot: blue bars indicate objects that are still live at the end of the timeline, gray bars indicate objects that were allocated during the timeline, but have since been garbage collected.</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>In the example above, an action was performed 10 times. &nbsp;The sample program caches five objects, so the last five blue bars are expected. &nbsp;But the leftmost blue bar indicates a potential problem. You can then use the sliders in the timeline above to zoom in on that particular snapshot and see the objects that were recently allocated at that point. &nbsp;Clicking on a specific object in the heap will show its retaining tree in the bottom portion of the heap snapshot. Examining the retaining path to the object should give you enough information to understand why the object was not collected, and you can make the necessary code changes to remove the unnecessary reference.</span>
 </p>
 <h2 id="toc-resolving-crisis">Resolving Gmail's Memory Crisis</h2>
-<p><span></span>
-</p>
+
 <p><span>By using the tools and techniques discussed above, the Gmail team was able to identify a few categories of bugs: &nbsp;unbounded caches, infinitely growing arrays of callbacks waiting for something to happen that never actually happens, and event listeners unintentionally retaining their targets. By fixing these issues, the overall memory usage of Gmail was dramatically reduced. Users in the 99% percent used 80% less memory than before and the memory consumption of the median users dropped by nearly 50%.</span>
 </p>
-<p><span></span>
-</p>
+
 <p>
 <figure>
 <img height="350" pagespeed_lazy_src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/en/tutorials/memory/effectivemanagement/images/Nx350ximage06.png.pagespeed.ic.q1Myzwy4oN.jpg" src="//1-ps.googleusercontent.com/h/www.gstatic.com/psa/static/1.gif" onload="pagespeed.lazyLoadImages.loadIfVisible(this);" />
 </figure>
 </p>
-<p><span></span>
-</p>
-<p><span></span>
-</p>
+
+
 <p><span>Because Gmail used less memory the GC pause latency was reduced, increasing the overall user experience.</span>
 </p>
-<p><span></span>
-</p>
+
 <p><span>Also of note, with the Gmail team collecting statistics on memory usage, they were able to uncover garbage collection regressions inside Chrome. Specifically, two fragmentation bugs were discovered when Gmail’s memory data began showing a dramatic increase in the gap between total memory allocated and live memory.</span>
 </p>
-<p><span></span>
-</p>
+
 <h2 id="toc-call-to-action">Call to Action</h2>
-<p><span></span>
-</p>
+
 <p><span>Ask yourself these questions:<br /></span>
 </p>
-<ol class="c9" start="1">
-<li class="c3 c6"><span>How much memory is my app using?</span>
+<ol start="1">
+<li><span>How much memory is my app using?</span>
 </li>
 </ol>
-<p><span></span>
-</p>
+
 <p><span>It’s possible that you are using too much memory which contrary to popular belief has a net negative on overall application performance. It’s hard to know exactly what the right number is, but, be sure to verify that any extra caching your page is using has a measurable performance impact.</span>
 </p>
-<p><span></span>
-</p>
-<ol class="c9" start="1">
+
+<ol start="1">
 <li><span>Is my page leak free?</span>
 </li>
 </ol>
-<p><span></span>
-</p>
+
 <p><span>If your page has memory leaks it can not only impact your page's performance but other tabs as well. Use the object tracker to help narrow in on any leaks.</span>
 </p>
-<p><span></span>
-</p>
-<ol class="c9" start="1">
+
+<ol start="1">
 <li><span>How frequently is my page GCing?</span>
 </li>
 </ol>
-<p><span></span>
-</p>
+
 <p><span>You can see any GC pause using </span><span><a href="https://developers.google.com/chrome-developer-tools/docs/timeline">Timeline panel</a></span><span>&nbsp;in </span><span><a href="https://developers.google.com/chrome-developer-tools/">Chrome Developer Tools</a></span><span>. If your page is GCing frequently, chances are you are allocating too frequently, churning through your young generation memory. </span>
 </p>
-<p><span></span>
-</p>
+
 <h2 id="toc-conslusion">Conclusion</h2>
-<p><span></span>
-</p>
+
 <p><span>We started off in a crisis. Covered the core basics of memory management in JavaScript and V8 in particular. You learned how to use the tools, including the new object tracker feature available in the latest builds of Chrome. The Gmail team, armed with this knowledge, solved their memory usage problem and saw improved performance. You can do the same with your web apps!</span>
 </p>
-</section>
-</article>
-<section class="cc pattern-bg-lighter">
-<p>
-Except as otherwise <a href="http://code.google.com/policies.html#restrictions">noted</a>, the content of this page is licensed under the <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 License</a>, and code samples are licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a>.
-</p>
-</section>
-<section class="disqus pattern-bg-lighter">
-<div id="disqus_thread"></div>
-<noscript>
-<p class="center">
-<strong>
-<a href="http://disqus.com/?ref_noscript">Please enable JavaScript to view the comments powered by Disqus.</a>
-</strong>
-</p>
-</noscript>
-<script type="text/javascript" pagespeed_no_defer="">pagespeed.lazyLoadImages.overrideAttributeFunctions();</script><script>function _prettyPrint(){if(typeof customPrettyPrintLanguage!='undefined'){customPrettyPrintLanguage();}
-prettyPrint();}</script>
-<script async="" src="//apis.google.com/js/plusone.js"></script>
-<script async="" src="/static/js/prettify.min.js" onload="_prettyPrint()"></script>
-<script async="" src="//platform.twitter.com/widgets.js"></script>
-<script>var disqus_shortname='html5rocks';var disqus_identifier='http://www.html5rocks.com/tutorials/memory/effectivemanagement/';var disqus_url='http://www.html5rocks.com/tutorials/memory/effectivemanagement/';var disqus_developer=0;var disqus_config=function(){var funky_language_code_mapping={'de':'de_inf','es':'es_ES','pt':'pt_EU','sr':'sr_CYRL','sv':'sv_SE','zh':'zh_HANT'};this.language=funky_language_code_mapping['en']||'en';};function subbed(){try{_gaq.push(['_trackEvent','Commented']);}catch(err){}}
-function getSub(){var tk=document.querySelector('button.btn.submit');if(tk==null){window.setTimeout(getSub,1000);}
-else{tk.addEventListener('click',subbed);}}
-window.addEventListener('load',function(e){var c=document.createElement('script');c.type='text/javascript';c.src='http://'+disqus_shortname+'.disqus.com/count.js';var dsq=document.createElement('script');dsq.type='text/javascript';dsq.src='http://'+disqus_shortname+'.disqus.com/embed.js';var s=document.getElementsByTagName('script')[0],sp=s.parentNode;sp.insertBefore(c,s);sp.insertBefore(dsq,s);},false);function outgoing(url){try{_gaq.push(['_trackEvent','Outbound Links',url]);}catch(err){}}
-var externLinks=document.querySelectorAll('article.tutorial a[href^="http"]:not([target])');for(var i=0,a;a=externLinks[i];++i){a.target='_blank';a.addEventListener('click',new Function('outgoing('+'"'+a.href.replace(/.*?:\/\//g,"")+'"'+');'));}
-console.log(disqus_shortname+", "+disqus_url+", "+disqus_developer+", "+disqus_identifier);</script>
-</section>
-</div>
-<script>(function(){$(document).keydown(function(e){if(e.keyCode===27){$('#search_hide, #features_hide').click();}});$('.outline_nav_toggle').click(function(e){$(this).toggleClass('activated');$(this).find('nav.outline').fadeToggle('fast');});$('#features_show a').click(function(){$('#search_hide').click();if($(this).hasClass('current')){$('.subheader.features').hide();$(this).removeClass('current');$('.watermark').css('top','30px');$('#features_show a').focus();}else{$('.main nav .current').removeClass('current');$(this).addClass('current');$('.subheader.features').show();$('.watermark').css('top','100px');$('#features').focus();}
-if(/#features$/.test(this.href))return false;});$('#features_hide').click(function(){$('#features_show').removeClass('current');$('.subheader.features').hide();$('.watermark').css('top','30px');$('#features_show a').focus();});window.isCompatible=function(){return null;};if(isCompatible()===false){document.getElementById('notcompatible').className='';}else if(isCompatible()===true){document.getElementById('compatible').className='';}
-if(/^\?utm_/.test(document.location.search)&&window.history.replaceState){window.history.replaceState({},'',document.location.href.replace(/\?utm_.*/,''));}
-if($('.toc').length&&$(window).width()>1000){var top=$('.toc').offset().top-50;$(window).scroll(function(event){var y=$(this).scrollTop();if(y>=top){$('.toc').addClass('fixed').removeClass('bottom');}else{$('.toc').removeClass('fixed').removeClass('bottom');}});}})();</script>
-<script>var _gaq=_gaq||[];_gaq.push(['_setAccount','UA-15028909-1']);_gaq.push(['_setSiteSpeedSampleRate',50]);_gaq.push(['_trackPageview']);(function(){var ga=document.createElement('script');ga.type='text/javascript';ga.async=true;ga.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);})();</script>
-<script defer="" src="/static/js/search.min.js"></script>
-<script pagespeed_no_defer="">(function(){var e=window,f=Math,g="round",h="performance",k="&rit_script=",r="&rit_link=",y="&rit_img=",z="&rit_css=",A="&nttfb=",B="&nfd=",C="&ndt=",D="&nct=",E="&nbt=",F="&mfd=",G="&attfb=",H="&afd=",I="&adt=",J="&act=",K="&abt=",L="";e.pagespeed=e.pagespeed||{};var M=e.pagespeed;
-M.getResourceTimingData=function(){if(e[h]&&(e[h].getEntries||e[h].webkitGetEntries)){for(var s=0,t=0,l=0,u=0,m=0,v=0,n=0,w=0,p=0,x=0,q=0,c={},d=e[h].getEntries?e[h].getEntries():e[h].webkitGetEntries(),b=0;b<d.length;b++){var a=d[b].duration;0<a&&(s+=a,++l,t=f.max(t,a));a=d[b].connectEnd-d[b].connectStart;0<a&&(v+=a,++n);a=d[b].domainLookupEnd-d[b].domainLookupStart;0<a&&(u+=a,++m);a=d[b].initiatorType;c[a]?++c[a]:c[a]=1;a=d[b].requestStart-d[b].fetchStart;0<a&&(x+=a,++q);a=d[b].responseStart-d[b].requestStart;
-0<a&&(w+=a,++p)}return H+(l?f[g](s/l):0)+B+l+F+f[g](t)+J+(n?f[g](v/n):0)+D+n+I+(m?f[g](u/m):0)+C+m+K+(q?f[g](x/q):0)+E+q+G+(p?f[g](w/p):0)+A+p+(c.css?z+c.css:L)+(c.link?r+c.link:L)+(c.script?k+c.script:L)+(c.img?y+c.img:L)}return L};M.getResourceTimingData=M.getResourceTimingData;})();
-(function(){var c=encodeURIComponent,f=window,h="performance",k="unload:",l="on",m="load:",n="load",p="ets=",q="beforeunload",r="EventStart",s="?",t="=",u="&url=",v="&ttfb=",w="&req_start=",x="&ref=",y="&r",z="&nt=",A="&nrp=",B="&nav=",C="&ifr=1",D="&ifr=0",E="&htmlAt=",F="&fp=",G="&dwld=",H="&dom_c=",I="&dns=",J="&connect=",K="&ccul=",L="&ccrl=",M="&ccos=",N="&ccis=",O="&cces=",P="&b_csi=",Q="&",R="";f.pagespeed=f.pagespeed||{};var S=f.pagespeed,T=function(a,d,b,e){this.d=a;this.a=d;this.b=b;this.e=e};S.beaconUrl=R;
-T.prototype.c=function(){var a=this.d,d=f.mod_pagespeed_start,b=Number(new Date)-d,a=a+(-1==a.indexOf(s)?s:Q),a=a+p+(this.a==n?m:k),a=a+b;if(this.a!=q||!f.mod_pagespeed_loaded){a+=y+this.a+t;if(f[h]){var b=f[h].timing,e=b.navigationStart,g=b.requestStart,a=a+(b[this.a+r]-e),a=a+(B+(b.fetchStart-e)),a=a+(I+(b.domainLookupEnd-b.domainLookupStart)),a=a+(J+(b.connectEnd-b.connectStart)),a=a+(w+(g-e)),a=a+(v+(b.responseStart-g)),a=a+(G+(b.responseEnd-b.responseStart)),a=a+(H+(b.domContentLoadedEventStart-
-e));f[h].navigation&&(a+=z+f[h].navigation.type);e=-1;b.msFirstPaint?e=b.msFirstPaint:f.chrome&&f.chrome.loadTimes&&(e=Math.floor(1E3*f.chrome.loadTimes().firstPaintTime));e-=g;0<=e&&(a+=F+e)}else a+=b;S.getResourceTimingData&&f.parent==f&&(a+=S.getResourceTimingData());a+=f.parent!=f?C:D;this.a==n&&(f.mod_pagespeed_loaded=!0,(b=f.mod_pagespeed_num_resources_prefetched)&&(a+=A+b),(b=f.mod_pagespeed_prefetch_start)&&(a+=E+(d-b)));S.panelLoader&&(d=S.panelLoader.getCsiTimingsString(),d!=R&&(a+=P+d));
-S.criticalCss&&(d=S.criticalCss,a+=N+d.total_critical_inlined_size+O+d.total_original_external_size+M+d.total_overhead_size+L+d.num_replaced_links+K+d.num_unreplaced_links);this.b!=R&&(a+=this.b);document.referrer&&(a+=x+c(document.referrer));a+=u+c(this.e);S.beaconUrl=a;(new Image).src=a}};S.f=function(a,d,b,e){var g=new T(a,d,b,e);f.addEventListener?f.addEventListener(d,function(){g.c()},!1):f.attachEvent(l+d,function(){g.c()})};S.addInstrumentationInit=S.f;})();
-
-pagespeed.addInstrumentationInit('http://1-ps.googleusercontent.com/beacon?org=110_1_vo', 'load', '&s_ttfb=261&id=1381317009910001', 'http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/');</script><div>
-<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-<script src="../js/clearly.js"></script>
-<script>
-var html = window.__getMyClearlyResults().html;
-$("html").html(html);
-$("body").append('<link type="text/css" href="../css/article.css">')</script>
 </div></body>
 </html>

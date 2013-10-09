@@ -1,265 +1,14 @@
+<!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Five Patterns to Help You Tame Asynchronous JavaScript - Tech.Pro</title>
-       
-        <link rel="icon" href="http://tech.pro/favicon.ico" />
-        <link rel="shortcut icon" href="http://tech.pro/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="57x57" href="//tpstatic.com/img/root/techpro/apple-touch-icon-114x114.png" />
-        <link rel="apple-touch-icon" sizes="114x114" href="//tpstatic.com/img/root/techpro/apple-touch-icon-114x114.png" />
-        <link rel="apple-touch-icon" sizes="72x72" href="//tpstatic.com/img/root/techpro/apple-touch-icon-144x144.png" />
-        <link rel="apple-touch-icon" sizes="144x144" href="//tpstatic.com/img/root/techpro/apple-touch-icon-144x144.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="search" type="application/opensearchdescription+xml" title="Tech.Pro" href="/OpenSearch" />
-        <script type="text/javascript" src="//use.typekit.net/wsf0avv.js"></script>
-        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-        <link href="//tpstatic.com/bundles/css/bootstrap?v=pfT5OW9kXDWaj6LD9DsIHJM2wLvIExsAA_6Kl1jBrCg1" rel="stylesheet" />
-
-        <link href="//tpstatic.com/bundles/css/master?v=ycx2nddpz23olXFboQ5eDucRc6JD4n3Wm18D5U0z0zY1" rel="stylesheet" />
-
-        
-        
-    <link href="http://tech.pro/blog/1402/five-patterns-to-help-you-tame-asynchronous-javascript" rel="canonical" />
-    <meta name="twitter:card" value="summary" />
-    <meta name="twitter:site" value="@techdotpro" />
-    <meta name="twitter:creator" value="ifandelse" />
-
-    <meta content="article" property="og:type" />
-<meta content="Five Patterns to Help You Tame Asynchronous JavaScript" property="og:title" />
-<meta content="http://tech.pro/blog/1402/five-patterns-to-help-you-tame-asynchronous-javascript" property="og:url" />
-<meta content="//tpstatic.com/img/usermedia/zSvgVinS40ykaVRODOoqzg/original.png" property="og:image" />
-<meta content="248957485211620" property="og:app_id" />
-<meta content="Tech.Pro" property="og:site_name" />
-
-    <meta content="Jim Cowart" property="og:article:author" />
-    <meta content="Blog" property="og:article:section" />
-<meta content="07/01/2013 22:07:34" property="og:article:published_time" />
-    <meta content="Tech.Pro" property="og:site_name" />
-    <meta content="You can hardly write ten lines of JavaScript before you're confronted with asynchronous behavior. In this post we're going to look at 5 patterns that can help..." property="og:description" />
-    <meta content="You can hardly write ten lines of JavaScript before you're confronted with asynchronous behavior. In this post we're going to look at 5 patterns that can help..." name="description" />
-<link href="https://plus.google.com/111043802019079447961/posts" rel="author" />
-    
-<meta content="JavaScript" property="og:article:tag" /><meta content="Async" property="og:article:tag" /><meta content="Events" property="og:article:tag" /><meta content="Promises" property="og:article:tag" /><meta content="Patterns" property="og:article:tag" />    <meta content="(Tag#744) - JavaScript,(Tag#1350) - Async,(Tag#1180) - Events,(Tag#1482) - Promises,(Tag#1483) - Patterns" name="keywords" />
-    <link href="//tpstatic.com/bundles/css/articles?v=EZNsbTwIH5WlbPnzzw-O_sf-HMGuSvG2MXiNuCTy14s1" rel="stylesheet" />
-
-
-        <script type="text/javascript">window.tprq=[];TP = { ready: function (f) { tprq.push(f); } };</script>
-        <!--[if lt IE 9]>
-        <script src="//tpstatic.com/scripts/ext/html5shiv.js"></script>
-        <![endif]-->
-        
-    </head>
-    <body>
-        
-        
-
-        <div id="tp-alerts">
-            
-        </div>
-        
-        <div class="bg-container">
-            <span id="mobile_menu_link">Menu</span>
-            <div class="container">
-
-                <div id="navbar" class="navbar">
-                    <div id="top-nav">
-    <span itemscope="" itemtype="http://schema.org/Organization">
-        <a class="logo" href="/" itemprop="url">Tech.Pro</a>
-        <meta itemprop="img" content="http://tech.pro/apple-touch-icon-144x144.png" />
-    </span>
-    <ul id="nav-tools" class="navigation pull-right">
-        <li>
-            <a id="createProfile" href="/register?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript&amp;returnTitle=Five%20Patterns%20to%20Help%20You%20Tame%20Asynchronous%20JavaScript" rel="nofollow">Create a Profile</a>
-            <span class="muted" style="margin: 0 6px;display: inline-block;">or</span>
-            <a class="-login" href="/login?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript" rel="nofollow">Login</a>
-        </li>
-    </ul>
-    <ul id="tp-main-nav" class="navigation">
-        <li class="dropdown active">
-            <a href="http://tech.pro/">Content</a>
-            <ul class="dropdown-menu">
-                <li><a href="/">Feed</a></li>
-                <li><a href="/tutorials">Tutorials</a></li>
-                <li><a href="/blogs">Blogs</a></li>
-                <li><a href="/links">Links</a></li>
-                <li><a href="/questions">Q&amp;A</a></li>
-            </ul>
-            <div class="indicator"></div>
-        </li>
-        <li class="dropdown ">
-            <a href="http://tech.pro/profiles">Network</a>
-            <ul class="dropdown-menu">
-                <li><a href="/profiles">Profiles</a></li>
-                <li><a href="/authors">Authors</a></li>
-                <li><a href="/projects">Projects</a></li>
-                <li><a href="/network">My Network</a></li>
-            </ul>
-            <div class="indicator"></div>
-        </li>
-        
-        <li class="dropdown ">
-            <a href="http://tech.pro/about-us">More</a>
-            <ul class="dropdown-menu">
-                <li><a href="/how-it-works">How Tech.Pro Works</a></li>
-                <li><a href="/about-us">About Us</a></li>
-                <li><a href="/contact-us">Contact Us</a></li>
-                <li><a href="/sitemap">Site Map</a></li>
-            </ul>
-            <div class="indicator"></div>
-        </li>
-            <li class="mobile-nav"><a href="/login?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript">Login</a></li>
-            <li class="mobile-nav"><a href="/register?returnUrl=%2Fblog%2F1402%2Ffive-patterns-to-help-you-tame-asynchronous-javascript">Create a Profile</a></li>
-    </ul>
-</div>
-<div id="sub-nav">
-    
-    <!-- ko stopBinding: true -->
-    <form class="-global-search" id="global-search-form" data-bind="submit: search">
-        <div id="global-search" class="dropdown">
-                            
-            <input type="text" class="search-input -tooltip no-jq-placeholder" placeholder="Search Tech.Pro" title="Search Tech.Pro" data-bind="value: searchValue, hasfocus: hasfocus" />
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><b class="caret"></b></a>
-            <span class="global-search-button" data-bind=""></span>
-            <ul class="search-options dropdown-menu pull-right" data-bind="foreach: searchOptions">
-                <li>
-                    <label class="radio">
-                        <input type="radio" name="globalsearchRadio" data-bind="value: value, checked: $parent.selectedOption" />&nbsp;
-                        <span data-bind="text: title"></span>
-                    </label>
-                </li>
-            </ul>
-        </div>
-    </form>
-    <!-- /ko -->
-    
-    <ul class="action-bar horizontal-list">
-        <li class="first">SHARE:</li>
-            <li class="actions-item -tooltip" title="Post a Tutorial" data-tp="tutorial">
-                <i class="tp-post-type smallmedium tutorial">&nbsp;</i>
-            </li>
-            <li class="actions-item -tooltip" title="Post a Blog" data-tp="blog">
-                <i class="tp-post-type smallmedium blog">&nbsp;</i>
-            </li>
-            <li class="actions-item -tooltip" title="Share a Link" data-tp="link">
-                <i class="tp-post-type smallmedium link">&nbsp;</i>
-            </li>
-            <li class="actions-item -tooltip" title="Ask a Question" data-tp="question">
-                <i class="tp-post-type smallmedium question">&nbsp;</i>
-            </li>
-    </ul>
-    
-        <ul class="navigation">
-                <li><a class="" href="/">Feed</a></li>
-                <li><a class="" href="/tutorials">Tutorials</a></li>
-                <li><a class="" href="/blogs">Blogs</a></li>
-                <li><a class="" href="/links">Links</a></li>
-                <li><a class="" href="/questions">Q&amp;A</a></li>
-        </ul>
-
-</div>
-
-                </div>
-                
-
-
-
-<table class="tp-signup-banner" border="0" cellpadding="0" cellspacing="0">
-    <tr>
-<td class="signup-logo"><img src="//tpstatic.com/img/layout/techpro/joinBannerImage.png" /></td>        <td class="tagline"><span class="tagline-text">The nerd table is now the cool table.</span></td>
-        <td class="signup-action">
-            <a id="signupbannerjoinnow" class="btn btn-yellow" href="/how-it-works">
-                learn more
-            </a>
-        </td>
-    </tr>
-</table>
-<script>
-    TP.ready(function () {
-        $("#signupBannerJoinNow").click(function() {
-            TP.trackEvent({ category: "join_now_click", action: "The nerd table is now the cool table." });
-        });
-    })
-</script>
-
-
-
-<div id="content-wrapper">
-
-    <div class="sidebar-wrapper clearfix">       
-        <div class="pane content-pane main-body clearfix">
-            
-
-
-
-<div itemscope="" itemtype="http://schema.org/Article" class="-entity" data-tp="{&quot;id&quot;:1402,&quot;type&quot;:&quot;article&quot;,&quot;score&quot;:21}">
-    <div class="clearfix -article-profile">
-        <div class="pull-right" style="text-align: right; margin: 0 0 8px 0;">
-
-            <ul class="tp-tag-list" itemprop="keywords">
-    <a class="tp-tag" data-tp="{&quot;id&quot;:744}">
-        JavaScript
-    </a>
-    <a class="tp-tag" data-tp="{&quot;id&quot;:1350}">
-        Async
-    </a>
-    <a class="tp-tag" data-tp="{&quot;id&quot;:1180}">
-        Events
-    </a>
-    <a class="tp-tag" data-tp="{&quot;id&quot;:1482}">
-        Promises
-    </a>
-    <a class="tp-tag" data-tp="{&quot;id&quot;:1483}">
-        Patterns
-    </a>
-            </ul>
-
-        </div>
-
-            <span class="tp-author-card" itemscope="" itemprop="author" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar small pull-left" data-tp="{&quot;id&quot;:16747}">
-        <img width="24" height="24" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=24" itemprop="image" />
-    </a>
-
-        <span>
-            <a class="author" href="http://tech.pro/jimcowart" itemprop="url">
-                <span itemprop="name">Jim Cowart</span>
-            </a>
-                <br />
-                <span class="post-date">posted <time datetime="2013-07-01T22:07:34" itemprop="datePublished">3 months ago</time></span>
-        </span>
-    </span>
-
-
-        <span class="tp-entity-tools">
-
-                            <span title="Flag Post" class="-flag -tooltip"><i class="tp-di-icon">K</i> </span> 
-        </span>
-    </div>
-
-
-    <div>
-        
-        <h1 class="tp-article-title" itemprop="headline">Five Patterns to Help You Tame Asynchronous JavaScript</h1>
-    </div>
-    <div class="tp-body clean-type center-images clearfix" itemprop="articleBody">
-             <img class="tp-article-image" src="//tpstatic.com/img/usermedia/zSvgVinS40ykaVRODOoqzg/cropped-w220-h220.png" itemprop="image" />   
-        
-        <!-- ko stopBinding: true --><p>You can hardly write ten lines of JavaScript before you're confronted with asynchronous behavior. In this post we're going to look at 5 patterns that can help you tame the beast - or at least keep it at bay. It would be nearly impossible to cover each pattern in depth in this post alone, but my aim is to provide enough information to get you started, with an additional reading section at the end.</p>
-
-<p>Let me emphasize here that none of these patterns are <em>only</em> asynchronous. In fact, all of them work well in synchronous contexts also. </p>
-
-<h1 id="whats_asynchronous_a_quick_primer">What's 'Asynchronous'? A Quick Primer…</h1>
-
-<p>Your JavaScript code is executed in an event loop, on a single thread. The reality is that <em>all</em> JavaScript executes synchronously - it's the event loop that allows you to queue up an action that won't take place until the loop is available some time <em>after</em> the code that queued the action has finished executing. So code is said to execute asynchronoulsy when it is queued to run sometime after the event loop is available. Or, as Trevor Burnham said in his book <a href="http://pragprog.com/book/tbajs/async-javascript">Async JavaScript</a>:</p>
-
-<blockquote>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Five Patterns to Help You Tame Asynchronous JavaScript</title>
+</head>
+<body>
+<div itemprop="articleBody"><img src="//tpstatic.com/img/usermedia/zSvgVinS40ykaVRODOoqzg/cropped-w220-h220.png" itemprop="image" /><!-- ko stopBinding: true --><p>You can hardly write ten lines of JavaScript before you're confronted with asynchronous behavior. In this post we're going to look at 5 patterns that can help you tame the beast - or at least keep it at bay. It would be nearly impossible to cover each pattern in depth in this post alone, but my aim is to provide enough information to get you started, with an additional reading section at the end.</p><p>Let me emphasize here that none of these patterns are <em>only</em> asynchronous. In fact, all of them work well in synchronous contexts also. </p><p>Your JavaScript code is executed in an event loop, on a single thread. The reality is that <em>all</em> JavaScript executes synchronously - it's the event loop that allows you to queue up an action that won't take place until the loop is available some time <em>after</em> the code that queued the action has finished executing. So code is said to execute asynchronoulsy when it is queued to run sometime after the event loop is available. Or, as Trevor Burnham said in his book <a href="http://pragprog.com/book/tbajs/async-javascript">Async JavaScript</a>:</p><blockquote>
   <p>"Events can be queued while code is running, but they can't fire until the runtime is free."</p>
-</blockquote>
-
-<p>Enough talk, code is proof:</p>
-
-<pre><code>function maybe() {
+</blockquote><p>Enough talk, code is proof:</p><pre><code>function maybe() {
     console.log("…execute async, maybe?");
 }
 
@@ -271,15 +20,7 @@ function proveIt() {
 }
 
 proveIt();
-</code></pre>
-
-<p>Running this in Chrome's JavaScript console will give you the following:</p>
-
-<p><img src="http://tpstatic.com/img/usermedia/K9z3UePCckizCYzBPYKxJg/original.png" alt="Async Proof" /></p>
-
-<p>We used <code>setTimeout</code> in the above example to queue up the <code>maybe</code> function to execute 0 milliseconds after the event loop is available. The event loop won't be available until it completes its current execution stack - in this case, the rest of the <code>proveIt</code> function which includes two <code>console.log</code> statements &amp; the return. As soon as the <code>proveIt</code> function returns, the runtime is free, and the queued up <code>maybe</code> function can execute. You can actually see where <code>proveIt</code> returns in the above output: where you see the string "and you'll…" printed on the console. You can tell from the console output that at this point, <code>proveIt</code> has completed, and our queued <code>maybe</code> function's output appears after that.</p>
-
-<blockquote>
+</code></pre><p>Running this in Chrome's JavaScript console will give you the following:</p><p><img src="http://tpstatic.com/img/usermedia/K9z3UePCckizCYzBPYKxJg/original.png" alt="Async Proof" /></p><p>We used <code>setTimeout</code> in the above example to queue up the <code>maybe</code> function to execute 0 milliseconds after the event loop is available. The event loop won't be available until it completes its current execution stack - in this case, the rest of the <code>proveIt</code> function which includes two <code>console.log</code> statements &amp; the return. As soon as the <code>proveIt</code> function returns, the runtime is free, and the queued up <code>maybe</code> function can execute. You can actually see where <code>proveIt</code> returns in the above output: where you see the string "and you'll…" printed on the console. You can tell from the console output that at this point, <code>proveIt</code> has completed, and our queued <code>maybe</code> function's output appears after that.</p><blockquote>
   <p>Just in case <code>setTimeout</code> is new to you (or you are new to JavaScript), two async 'primitives' exist across all major runtimes:</p>
   
   <ul>
@@ -288,15 +29,7 @@ proveIt();
   </ul>
   
   <p>For more information, check out the MDN articles on <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.setTimeout">setTimeout</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.setInterval">setInterval</a>. Some environments provide additional async primitives: node.js has <a href="http://nodejs.org/api/process.html#process_process_nexttick_callback"><code>process.nextTick</code></a> and many browsers support <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.requestAnimationFrame"><code>requestAnimationFrame</code></a> - which also provides a means to queue a callback to be invoked before a repaint.</p>
-</blockquote>
-
-<p>Even our contrived example above shows you that the JavaScript code you write will need to handle the reality of asynchronicity. Whether it's waiting for an AJAX response, a button click, a mouseover or any number of other possibilities, there's no escape. No need to worry - we have the tools to meet the challenge. The first one we'll cover is the foundation upon which all the others stand.</p>
-
-<h1 id="callbacks">1.) Callbacks</h1>
-
-<p>Callbacks are the currency…the fundamental building block…the <em>lynchpin</em> of asynchronicity in JavaScript. No matter where you go from here, the higher-level abstractions are just intelligent wrappers (for good reason, btw) around plain, vanilla callbacks. If you're new to JavaScript – and depending on what language you hail from –&nbsp;seeing functions passed as arguments might be a bit unfamiliar, but don't fret, it's easy and fun:</p>
-
-<pre><code>// plain, non-jQuery version of hooking up an event handler
+</blockquote><p>Even our contrived example above shows you that the JavaScript code you write will need to handle the reality of asynchronicity. Whether it's waiting for an AJAX response, a button click, a mouseover or any number of other possibilities, there's no escape. No need to worry - we have the tools to meet the challenge. The first one we'll cover is the foundation upon which all the others stand.</p><p>Callbacks are the currency…the fundamental building block…the <em>lynchpin</em> of asynchronicity in JavaScript. No matter where you go from here, the higher-level abstractions are just intelligent wrappers (for good reason, btw) around plain, vanilla callbacks. If you're new to JavaScript – and depending on what language you hail from –&nbsp;seeing functions passed as arguments might be a bit unfamiliar, but don't fret, it's easy and fun:</p><pre><code>// plain, non-jQuery version of hooking up an event handler
 var clickity = document.getElementById("clickity");
 clickity.addEventListener("click", function (e) {
     //console log, since it's like ALL real world scenarios, amirite?
@@ -307,11 +40,7 @@ clickity.addEventListener("click", function (e) {
 $("#clickity").on("click", function (e) {
     console.log("Alas, someone is pressing my buttons…");
 });
-</code></pre>
-
-<p>Even if you're new to JavaScript, if you've spent <em>any</em> amount of time in the web, you've probably written something similar to the above code. Both <code>addEventListener</code> and <code>on</code> take a callback argument - the second argument being passed. This function will be invoked when the <code>click</code> event occurs. At the moment, we're just taking advantage of the fact our DOM element (presumably a button) has the underlying functionality to store the callback we pass to it and invoke it later when the event occurs (btw - this is an implementation of the <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer Pattern</a>, more on that later when we talk about Events). However, it's very easy to write your own objects to be capable of invoking callbacks:</p>
-
-<pre><code>var worker = {
+</code></pre><p>Even if you're new to JavaScript, if you've spent <em>any</em> amount of time in the web, you've probably written something similar to the above code. Both <code>addEventListener</code> and <code>on</code> take a callback argument - the second argument being passed. This function will be invoked when the <code>click</code> event occurs. At the moment, we're just taking advantage of the fact our DOM element (presumably a button) has the underlying functionality to store the callback we pass to it and invoke it later when the event occurs (btw - this is an implementation of the <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer Pattern</a>, more on that later when we talk about Events). However, it's very easy to write your own objects to be capable of invoking callbacks:</p><pre><code>var worker = {
     updateCustomer: function (customerInfo, cb) {
         $.ajax({
             url: "/some/api",
@@ -335,17 +64,9 @@ $("#clickity").on("click", function (e) {
 worker.updateCustomer(currentCustomer, function (err, data) {
     alert(err || data); // *sigh*, who really uses alerts these days?!
 });
-</code></pre>
-
-<blockquote>
+</code></pre><blockquote>
   <p>There are some problems with the above <code>worker</code> instance (it's tightly coupling AJAX &amp; DOM updates, for one), but we'll overlook those <em>for now</em>.</p>
-</blockquote>
-
-<p>Since functions in JavaScript are <a href="http://en.wikipedia.org/wiki/First-class_function">first class citizens</a>, we are able to pass them as arguments to other functions. In our example above, the <code>updateCustomer</code> method takes two arguments, the second of which – <code>cb</code> – is a callback function that is to be invoked once <code>updateCustomer</code> has completed executing. This is the essence of passing callbacks, and writing methods that take callback arguments - it doesn't get much lower-level than this. This is often referred to as "<a href="http://en.wikipedia.org/wiki/Continuation-passing_style">continuation passing style</a>" (CPS). The callback is the "continuation", and the invoked function passes control to it as it invokes it, passing in the result(s).</p>
-
-<p>I should mention that you will often run into situations where you want to specify the "context" of your callback function (i.e. - what <code>this</code> will be inside the function when invoked by the method to which you are passing it). You will need to bind your function (in most cases) prior to passing it as an argument. For example:</p>
-
-<pre><code>// assuming we have a notifier instance, with a "showAlert" method on it...
+</blockquote><p>Since functions in JavaScript are <a href="http://en.wikipedia.org/wiki/First-class_function">first class citizens</a>, we are able to pass them as arguments to other functions. In our example above, the <code>updateCustomer</code> method takes two arguments, the second of which – <code>cb</code> – is a callback function that is to be invoked once <code>updateCustomer</code> has completed executing. This is the essence of passing callbacks, and writing methods that take callback arguments - it doesn't get much lower-level than this. This is often referred to as "<a href="http://en.wikipedia.org/wiki/Continuation-passing_style">continuation passing style</a>" (CPS). The callback is the "continuation", and the invoked function passes control to it as it invokes it, passing in the result(s).</p><p>I should mention that you will often run into situations where you want to specify the "context" of your callback function (i.e. - what <code>this</code> will be inside the function when invoked by the method to which you are passing it). You will need to bind your function (in most cases) prior to passing it as an argument. For example:</p><pre><code>// assuming we have a notifier instance, with a "showAlert" method on it...
 
 // ES5 bind function (or using a shim)
 worker.updateCustomer(currentCustomer, function(err, data) {
@@ -362,13 +83,7 @@ worker.updateCustomer(currentCustomer, _.bind(function(err, data) {
 worker.updateCustomer(currentCustomer, $.proxy(function(err, data) {
     this.showAlert(err || data);
 }, notifier));
-</code></pre>
-
-<p>In the examples above, we've bound the "this" context of our callback to be the <code>notifier</code> instance, so that <code>this.showAlert</code> inside our callback function will be the same as if the worker had access to call <code>notifier.showAlert</code>. But why is this useful?</p>
-
-<p>The method we pass our callback into may belong to an instance that has no knowledge of (nor even a reference to) the object calling it - this is a good thing! It's called separation of concerns &amp; encapsulation. However, if we're passing a callback that's actually a <em>method</em> on the calling object, we have to bind the context, or we're going to have a bad experience. Let's check a slightly modified example:</p>
-
-<pre><code>var updateForm = {
+</code></pre><p>In the examples above, we've bound the "this" context of our callback to be the <code>notifier</code> instance, so that <code>this.showAlert</code> inside our callback function will be the same as if the worker had access to call <code>notifier.showAlert</code>. But why is this useful?</p><p>The method we pass our callback into may belong to an instance that has no knowledge of (nor even a reference to) the object calling it - this is a good thing! It's called separation of concerns &amp; encapsulation. However, if we're passing a callback that's actually a <em>method</em> on the calling object, we have to bind the context, or we're going to have a bad experience. Let's check a slightly modified example:</p><pre><code>var updateForm = {
     submit: function() {
         // get the data and store it in currentCustomer
         worker.updateCustomer(currentCustomer, this.showAlert.bind(this));
@@ -377,29 +92,13 @@ worker.updateCustomer(currentCustomer, $.proxy(function(err, data) {
         // I don't care how, just show an alert :-)
     }
 };
-</code></pre>
-
-<p>We could spend an entire post on binding and context alone, but we'll stop there. If you're interested in reading more, I recommend checking out "<a href="http://freshbrewedcode.com/jimcowart/2013/02/12/getting-into-context-binds/">Getting Into Context Binds</a>".</p>
-
-<h2 id="callback_conclusion">Callback Conclusion</h2>
-
-<h3 id="pros">Pros</h3>
-
-<ul>
+</code></pre><p>We could spend an entire post on binding and context alone, but we'll stop there. If you're interested in reading more, I recommend checking out "<a href="http://freshbrewedcode.com/jimcowart/2013/02/12/getting-into-context-binds/">Getting Into Context Binds</a>".</p><h2 id="callback_conclusion">Callback Conclusion</h2><h3 id="pros">Pros</h3><ul>
 <li><strong>Simplicity</strong> - Callbacks are simple! (The caveat being that you are responsible for maintaining the correct context, if needed.) You pass a function, it gets invoked at some point in the future.</li>
 <li><strong>Lightweight</strong> - No extra libs required. Functions-as-first-class-citizens is built into the language. No need for additional code to make it work.</li>
-</ul>
-
-<h3 id="cons">Cons</h3>
-
-<ul>
+</ul><h3 id="cons">Cons</h3><ul>
 <li><strong>Can Be An Insufficient Abstraction</strong> - Sometimes you need additional 'sugar'. This is where patterns 2-5 will come into play, each build upon the foundation of callbacks in different ways.</li>
 <li><strong>Complex When Nested</strong> - Callbacks are difficult to read, debug and maintain when deeply nested. The goto-example these days to describe this problem is "the pyramid of doom". </li>
-</ul>
-
-<p>Let's take a look:</p>
-
-<pre><code>var allTheCustomerThings;
+</ul><p>Let's take a look:</p><pre><code>var allTheCustomerThings;
 $("#getCustomer").click(function (cust) {
     var id = $("#cust-id").val();
     getCustomer(id, function (cust) {
@@ -416,29 +115,11 @@ $("#getCustomer").click(function (cust) {
         });
     });
 });
-</code></pre>
-
-<p>The deeper the nesting, the more you see the pyramid. This is both a <em>real problem</em> and a <em>straw man</em>. It's real problem in that I've seen it happen - but primarily by developers new to JavaScript and/or developers not spending the time to properly plan and architect their application. It's a straw man in that it's often blindly cited as <em>the knee-jerk reason</em> to use promises, without proper attention being paid to good design, even <em>if</em> promises are used to mitigate the nesting. (There are legitimate and compelling reasons to use promises, of course! But I can just as easily slap promises on a terribly written code base only to eliminate nesting.) Low level patterns don't fix higher level design problems - so be sure to think through how you are modeling a problem in code if you end up with deep callback nesting, and consider it both a code <em>and</em> design smell that should prompt you to address the systemic issue(s) with the overall design and not just the nesting strategy.</p>
-
-<h1 id="observer_pattern_a.k.a._events">2.) Observer Pattern (a.k.a. Events)</h1>
-
-<p>One of the cons of plain callbacks – that it can be an insufficient abstraction" – is the perfect segue to where events can be useful. What if we don't want to keep passing a callback each time we invoke the target method? What if we wanted our own callback to be invoked if <em>another piece of calling code</em> also invoked the target method? The <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer Pattern</a> fits well here.</p>
-
-<p>The what?!</p>
-
-<p>The Observer Pattern isn't hard at all. You have a <em>subject</em> that emits events (often referred to as an "event emitter"), and <em>observers</em>, which register callbacks with the <em>subject</em> to be notified as to when those events occur. In other words, let's assume <a href="http://dougneiner.com/">Doug Neiner</a> and I are playing Halo 4. <a href="http://freshbrewedcode.com/alexrobson/">Alex Robson</a> tells me that he'd like to know when Doug steals one of my kills. In this case, I am the subject and Alex is the observer. Unfortunately, Alex will want to <a href="http://davidwalsh.name/function-debounce">debounce</a> his callback, since he will receive <em>a lot</em> of event notifications.</p>
-
-<p>There are a few key details to bear in mind with the Observer Pattern:</p>
-
-<ul>
+</code></pre><p>The deeper the nesting, the more you see the pyramid. This is both a <em>real problem</em> and a <em>straw man</em>. It's real problem in that I've seen it happen - but primarily by developers new to JavaScript and/or developers not spending the time to properly plan and architect their application. It's a straw man in that it's often blindly cited as <em>the knee-jerk reason</em> to use promises, without proper attention being paid to good design, even <em>if</em> promises are used to mitigate the nesting. (There are legitimate and compelling reasons to use promises, of course! But I can just as easily slap promises on a terribly written code base only to eliminate nesting.) Low level patterns don't fix higher level design problems - so be sure to think through how you are modeling a problem in code if you end up with deep callback nesting, and consider it both a code <em>and</em> design smell that should prompt you to address the systemic issue(s) with the overall design and not just the nesting strategy.</p><p>One of the cons of plain callbacks – that it can be an insufficient abstraction" – is the perfect segue to where events can be useful. What if we don't want to keep passing a callback each time we invoke the target method? What if we wanted our own callback to be invoked if <em>another piece of calling code</em> also invoked the target method? The <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer Pattern</a> fits well here.</p><p>The what?!</p><p>The Observer Pattern isn't hard at all. You have a <em>subject</em> that emits events (often referred to as an "event emitter"), and <em>observers</em>, which register callbacks with the <em>subject</em> to be notified as to when those events occur. In other words, let's assume <a href="http://dougneiner.com/">Doug Neiner</a> and I are playing Halo 4. <a href="http://freshbrewedcode.com/alexrobson/">Alex Robson</a> tells me that he'd like to know when Doug steals one of my kills. In this case, I am the subject and Alex is the observer. Unfortunately, Alex will want to <a href="http://davidwalsh.name/function-debounce">debounce</a> his callback, since he will receive <em>a lot</em> of event notifications.</p><p>There are a few key details to bear in mind with the Observer Pattern:</p><ul>
 <li>Observers must have a direct reference to the subject.</li>
 <li>Subjects are responsible for maintaining the internal state of subscriber callbacks</li>
 <li>JavaScript implementations of this pattern usually involve subscriber callback method signatures of 0-n arguments (in other words, every event could have a different signature).</li>
-</ul>
-
-<p>Let's demonstrate the Observer pattern in code, describing our Halo 4 example (you can view this in a fiddle <a href="http://jsfiddle.net/ifandelse/gstrW/">here</a>):</p>
-
-<pre><code>// This observer object can be mixed into any object, giving it the basic
+</ul><p>Let's demonstrate the Observer pattern in code, describing our Halo 4 example (you can view this in a fiddle <a href="http://jsfiddle.net/ifandelse/gstrW/">here</a>):</p><pre><code>// This observer object can be mixed into any object, giving it the basic
 // API necessary to add and remove subscribers as well as emit events
 var observer = {
     // 'subscribers' will keep track of subscribers by event name
@@ -509,76 +190,24 @@ jim.dangItDoug(++i);
 jim.dangItDoug(++i);
 jim.dangItDoug(++i);
 jim.dangItDoug(++i);
-</code></pre>
-
-<p>Many popular libaries already provide built-in event-emitting behavior – backbone.js &amp; jQuery, for example. There are several other stand-alone implementations worth checking out as well – here are a few:</p>
-
-<ul>
-<li><a href="https://github.com/Wolfy87/EventEmitter">EventEmitter</a></li>
-<li><a href="https://github.com/hij1nx/EventEmitter2">EventEmitter2</a></li>
-<li><a href="https://github.com/postaljs/monologue.js">monologue.js</a></li>
-</ul>
-
-<h2 id="events_conclusion">Events Conclusion</h2>
-
-<h3 id="pros">Pros</h3>
-
-<ul>
+</code></pre><p>Many popular libaries already provide built-in event-emitting behavior – backbone.js &amp; jQuery, for example. There are several other stand-alone implementations worth checking out as well – here are a few:</p><h2 id="events_conclusion">Events Conclusion</h2><h3 id="pros">Pros</h3><ul>
 <li><strong>Encourages Good De-coupling</strong> - Using the Observer pattern will help you tease apart behaviors in your application since it's forcing you to think through the interactions that can occur. This leads to well-encapsulated components, and typically results in a design more resistant to the traps of deeply nested callbacks.</li>
 <li><strong>Lends Itself to Testability</strong> - Due to the bias towards de-coupling that comes with this approach, you end up with components that are testable in isolation and easy to mock in most cases.</li>
-</ul>
-
-<h3 id="cons">Cons</h3>
-
-<ul>
+</ul><h3 id="cons">Cons</h3><ul>
 <li><strong>Direct Reference Required</strong> - This is the Achilles' heel for event-emitters. If you have a subject that's <em>very</em> interesting to most of your application, you will end up passing a reference to it everywhere. This begins to undermine any 'loose coupling' gains you've racked up, creating a kind of tight coupling that can be harder to detect until you have to change the subject's API and break most of your app in the process.</li>
-</ul>
-
-<h2 id="elephant_meet_room">Elephant, Meet Room</h2>
-
-<p>So, let's tackle what I've avoided until now:</p>
-
-<ul>
+</ul><h2 id="elephant_meet_room">Elephant, Meet Room</h2><p>So, let's tackle what I've avoided until now:</p><ul>
 <li>Many popular libraries (like jQuery) provide what looks like an "Observer pattern" implementation, when in fact they are acting as a mediator between observer and subject yet still presenting the API as if it were being called directly on the subject. This isn't a problem, of course! It's just good to know how things work.</li>
 <li>Many of these implementations provide event-emitting behaviors, with the intent that the API is on the prototype, or mixed-in as instance members, etc. However, many developers take these event-emitting libraries and create a singleton instance and use this instance as a generalized "emitter", so subjects no longer have the on/off/etc. calls themselves. When this happens, we are, in my opinion, leaving the observer pattern behind and we've begun to wander into the territory of messaging.</li>
-</ul>
-
-<h1 id="messaging">3.) Messaging</h1>
-
-<p>Well, it turns out that <a href="http://freshbrewedcode.com/jonathancreamer/">Jonathan Creamer</a> found out Alex is watching some friends play Halo 4 and he's curious to hear how things are going. Only problem is, he has no idea how to get to my house and, in fact, doesn't want to leave his own house. So he calls Alex and asks to be notified whenever we win or lose, when we start a game, and when we earn a medal. Alex is now acting as a mediator, or broker. Jonathan isn't subscribing directly to me or Doug (in fact, he may not have any idea who's playing), instead he's told Alex what he's interested in, and Alex will relay any relevant information back to Jonathan, whether it comes from me, Doug or someone else. This is the essence of "messaging" in JavaScript.</p>
-
-<p>This is much like the Observer pattern, in that we have observers interested in events occuring - but we've introduced a third party to handle managing subscriptions and matching events (which we'll now refer to as messages) to the correct subscribers. There's some debate about the best pattern name to apply here, but here are some descriptions that can be legitimately argued:</p>
-
-<ul>
+</ul><p>Well, it turns out that <a href="http://freshbrewedcode.com/jonathancreamer/">Jonathan Creamer</a> found out Alex is watching some friends play Halo 4 and he's curious to hear how things are going. Only problem is, he has no idea how to get to my house and, in fact, doesn't want to leave his own house. So he calls Alex and asks to be notified whenever we win or lose, when we start a game, and when we earn a medal. Alex is now acting as a mediator, or broker. Jonathan isn't subscribing directly to me or Doug (in fact, he may not have any idea who's playing), instead he's told Alex what he's interested in, and Alex will relay any relevant information back to Jonathan, whether it comes from me, Doug or someone else. This is the essence of "messaging" in JavaScript.</p><p>This is much like the Observer pattern, in that we have observers interested in events occuring - but we've introduced a third party to handle managing subscriptions and matching events (which we'll now refer to as messages) to the correct subscribers. There's some debate about the best pattern name to apply here, but here are some descriptions that can be legitimately argued:</p><ul>
 <li><a href="http://en.wikipedia.org/wiki/Mediator_pattern">Mediator</a> - "Communication between objects is encapsulated within a mediator. Objects no longer communicate directly with each other, but instead communicate through the mediator."</li>
 <li><a href="http://martinfowler.com/eaaDev/EventAggregator.html">Event Aggregator</a> - "Channel events from multiple objects into a single object to simplify registration for clients."</li>
 <li><a href="http://www.enterpriseintegrationpatterns.com/MessageBroker.html">(Client-side) Message Broker</a> - "Receives messages from multiple destinations, determines the correct destination &amp; routes the message."</li>
-</ul>
-
-<h3 id="regardless_of_the_actual_pattern_used_people_still_call_it_pubsub._sigh.">Regardless of the actual pattern used, people still call it "PubSub". Sigh.</h3>
-
-<p><img src="http://tpstatic.com/img/usermedia/koA2LFNktkOvqh06Rl4_mw/original.png" alt="3rd Party Facepalm" /></p>
-
-<p>I personally lean towards "message broker", though I'm guilty of using all three pattern names to describe this approach. Regardless, it's important to realize that we aren't trying to re-create full blown server-side message brokers (i.e. - RabbitMQ or ZeroMQ). Instead, this approach accepts the weaknesses that can appear with the Observer pattern, especially in larger applications, and provides one common dependency (the message bus) for all subscribers and publishers to use, rather than requiring direct references to subjects be passed all over the application. Here are some common features of JavaScript message bus implementations:</p>
-
-<ul>
+</ul><h3 id="regardless_of_the_actual_pattern_used_people_still_call_it_pubsub._sigh.">Regardless of the actual pattern used, people still call it "PubSub". Sigh.</h3><p><img src="http://tpstatic.com/img/usermedia/koA2LFNktkOvqh06Rl4_mw/original.png" alt="3rd Party Facepalm" /></p><p>I personally lean towards "message broker", though I'm guilty of using all three pattern names to describe this approach. Regardless, it's important to realize that we aren't trying to re-create full blown server-side message brokers (i.e. - RabbitMQ or ZeroMQ). Instead, this approach accepts the weaknesses that can appear with the Observer pattern, especially in larger applications, and provides one common dependency (the message bus) for all subscribers and publishers to use, rather than requiring direct references to subjects be passed all over the application. Here are some common features of JavaScript message bus implementations:</p><ul>
 <li>The message "payload" uses a structured envelope, rather than 0-n arguments passed into a callback. This envelope contains the data of the message as well as other metadata about the message (event name, channel name, timestamp, etc.). <em>Inlcuding behavior on a message is strongly discouraged. Ideally, the entire message envelope should be preserved if passed to <code>JSON.stringify</code>.</em></li>
 <li>Subscriber callbacks have a consistent signature. Thanks to the above point, subscriber callbacks usually end up with a 1 or 2 argument method signature that's consistent for every message.</li>
 <li>Where the Observer pattern might have "event" names, messages in JavaScript usually have "topics" that can often be hierarchical (or namespaced). This opens the door for wildcard bindings - we'll see that in a moment.</li>
 <li>Some, not all, implementations allow topics to be segmented by 'channel' - a logical grouping of topics – for both performance and architectural reasons.</li>
-</ul>
-
-<h2 id="why_would_i_choose_this_over_events">Why Would I Choose This Over Events?</h2>
-
-<p>You wouldn't. In fact, some of the most elegant scenarios I've seen used the Observer and Message Broker patterns in tandem. As you look at your application's JavaScript, you'll often see several distinct "bounded contexts" (to steal and liberally twist a phrase from <a href="http://gorodinski.com/blog/2012/04/03/bounded-contexts-as-a-strategic-pattern-beyond-ddd/">Mr. Evans</a>). Within these contexts (for example, a Backbone view and model), the Observer pattern fits very well, since the observers already have a direct reference to the subject. However, it's often the case that separate "contexts" (often in separate modules) within the application are interested in the same data. Instead of coupling those separate modules just to share the data, we can have both modules subscribe to a message bus. So - using messaging in tandem with events can help you de-couple components at a different level of abstraction as you move from finer grained instance-to-instance communication (events) up to module-to-module communication (messaging).</p>
-
-<p>Another important benefit arises if you follow the general rule of "Don't publish behavior on a message" (in other words, your message data shouldn't have functions, only data). You now have the ability to easily extend the reach of your messages across iframes, Web Workers or even websocket connections. <a href="https://github.com/postaljs/postal.js">postal.js</a> – a library I've written – has a <a href="https://github.com/postaljs/postal.federation">federation</a> add-on that allows this kind of bridging. These approaches will become more important as larger numbers of web applications are taking advantage of background processing in Web Workers and iframes.</p>
-
-<h2 id="less_talk_more_code">Less Talk, More Code</h2>
-
-<p>This example is using <a href="https://github.com/postaljs/postal.js">postal.js</a> – a JavaScript message bus implemention I've created:</p>
-
-<pre><code>var jonathan = (function() {
+</ul><h2 id="why_would_i_choose_this_over_events">Why Would I Choose This Over Events?</h2><p>You wouldn't. In fact, some of the most elegant scenarios I've seen used the Observer and Message Broker patterns in tandem. As you look at your application's JavaScript, you'll often see several distinct "bounded contexts" (to steal and liberally twist a phrase from <a href="http://gorodinski.com/blog/2012/04/03/bounded-contexts-as-a-strategic-pattern-beyond-ddd/">Mr. Evans</a>). Within these contexts (for example, a Backbone view and model), the Observer pattern fits very well, since the observers already have a direct reference to the subject. However, it's often the case that separate "contexts" (often in separate modules) within the application are interested in the same data. Instead of coupling those separate modules just to share the data, we can have both modules subscribe to a message bus. So - using messaging in tandem with events can help you de-couple components at a different level of abstraction as you move from finer grained instance-to-instance communication (events) up to module-to-module communication (messaging).</p><p>Another important benefit arises if you follow the general rule of "Don't publish behavior on a message" (in other words, your message data shouldn't have functions, only data). You now have the ability to easily extend the reach of your messages across iframes, Web Workers or even websocket connections. <a href="https://github.com/postaljs/postal.js">postal.js</a> – a library I've written – has a <a href="https://github.com/postaljs/postal.federation">federation</a> add-on that allows this kind of bridging. These approaches will become more important as larger numbers of web applications are taking advantage of background processing in Web Workers and iframes.</p><h2 id="less_talk_more_code">Less Talk, More Code</h2><p>This example is using <a href="https://github.com/postaljs/postal.js">postal.js</a> – a JavaScript message bus implemention I've created:</p><pre><code>var jonathan = (function() {
     // postal allows you to group topics by channel.
     // Here we get a channel for "xbox" related topics.
     // From it we can publish and subscribe.
@@ -632,36 +261,14 @@ _.each(['newgame', 'newmedal', 'lostgame', 'wongame'], function(evnt){
         chan.publish(evnt, data);
     });
 });
-</code></pre>
-
-<p>The above example is just a <em>taste</em> of messaging. We have a websocket connection, over which we're subscribing to <code>newgame</code>, <code>newmedal</code>, <code>lostgame</code> and <code>wongame</code> events. As we handle those websocket events (which will happen asynchronously, btw), we publish the received data to our local message bus and any subscriber will receive the message without having to know anything about the websocket connection, nor any other subscriber to the same data. This kind of loose coupling lends itself to good testability, portability (across boundaries such as iframes and Web Workers) and composability. When messaging is the communications glue between your modules, the message is the contract. As long as you honor the contract – or even go a step further and version your message types – you can compose your app of any number of drop-in modules that subscribe to the topics they need and adhere to message contracts on what they publish.</p>
-
-<h2 id="messaging_conclusion">Messaging Conclusion</h2>
-
-<h3 id="pros">Pros</h3>
-
-<ul>
+</code></pre><p>The above example is just a <em>taste</em> of messaging. We have a websocket connection, over which we're subscribing to <code>newgame</code>, <code>newmedal</code>, <code>lostgame</code> and <code>wongame</code> events. As we handle those websocket events (which will happen asynchronously, btw), we publish the received data to our local message bus and any subscriber will receive the message without having to know anything about the websocket connection, nor any other subscriber to the same data. This kind of loose coupling lends itself to good testability, portability (across boundaries such as iframes and Web Workers) and composability. When messaging is the communications glue between your modules, the message is the contract. As long as you honor the contract – or even go a step further and version your message types – you can compose your app of any number of drop-in modules that subscribe to the topics they need and adhere to message contracts on what they publish.</p><h2 id="messaging_conclusion">Messaging Conclusion</h2><h3 id="pros">Pros</h3><ul>
 <li><strong>Promotes clean separation of concerns</strong> - you don't have to build a large app. Instead, build several smaller ones and use messaging for communications between them.</li>
 <li><strong>Very testable</strong> - it's super easy to fake a message or test for message output.</li>
 <li><strong>Complements events nicely</strong> - Observer pattern 'events' work nicely for local concerns. Messaging complements this when those events need to be promoted to app-level messages.</li>
-</ul>
-
-<h3 id="cons">Cons</h3>
-
-<ul>
+</ul><h3 id="cons">Cons</h3><ul>
 <li><strong>Can be prone to "boilerplate proliferation"</strong> - you can mitigate this by writing app-specific helpers</li>
 <li><strong>Can be confusing to devs who are new to the concept in general</strong> - take the proper time to explain and teach.</li>
-</ul>
-
-<h1 id="promises">4.) Promises</h1>
-
-<p>Promises provide a very powerful way to express asynchronous code. Instead of "<a href="http://en.wikipedia.org/wiki/Continuation-passing_style">continuation passing style</a>" (which we see with plain callbacks), our target methods return a promise - an "eventual value". The <a href="http://wiki.commonjs.org/wiki/Promises/A">Promises/A spec</a> defines a promise as "an object that has a function as the value for the property then". The <code>then</code> property on a promise is a method that takes a success and (optional) error callback argument, and returns a new promise. Under the hood, a promise can be in 1 of 3 states: unfulfilled, fulfilled or failed. Once it has been fulfilled (resolved) or failed (rejected), the state should NOT change again. Success callbacks are invoked when the promise is fulfilled, error callbacks when it fails. If the success handler(s) are added after the promise has already been fulfilled, they will be queued on the event loop and invoked as soon as the runtime is free** (same goes for error – if the promise failed – and 'finally' callbacks). </p>
-
-<p><em>**UPDATE: The original version of this post stated that queued callbacks on resolved promises were invoked immediately - this is not correct. Each major implementation I've checked effectively uses a setTimeout of 0ms (or an equivalent). Thanks to Calvin Metcalf for pointing this out.</em></p>
-
-<p>You get an idea of the power a promise provides when you see it in action. Consider this nested-callback-laden login viewmodel:</p>
-
-<pre><code>// fictional viewmodel for a mobile login screen
+</ul><p>Promises provide a very powerful way to express asynchronous code. Instead of "<a href="http://en.wikipedia.org/wiki/Continuation-passing_style">continuation passing style</a>" (which we see with plain callbacks), our target methods return a promise - an "eventual value". The <a href="http://wiki.commonjs.org/wiki/Promises/A">Promises/A spec</a> defines a promise as "an object that has a function as the value for the property then". The <code>then</code> property on a promise is a method that takes a success and (optional) error callback argument, and returns a new promise. Under the hood, a promise can be in 1 of 3 states: unfulfilled, fulfilled or failed. Once it has been fulfilled (resolved) or failed (rejected), the state should NOT change again. Success callbacks are invoked when the promise is fulfilled, error callbacks when it fails. If the success handler(s) are added after the promise has already been fulfilled, they will be queued on the event loop and invoked as soon as the runtime is free** (same goes for error – if the promise failed – and 'finally' callbacks). </p><p><em>**UPDATE: The original version of this post stated that queued callbacks on resolved promises were invoked immediately - this is not correct. Each major implementation I've checked effectively uses a setTimeout of 0ms (or an equivalent). Thanks to Calvin Metcalf for pointing this out.</em></p><p>You get an idea of the power a promise provides when you see it in action. Consider this nested-callback-laden login viewmodel:</p><pre><code>// fictional viewmodel for a mobile login screen
 // the ugly nested callback version
 var loginViewModel = (function () {
   var login = function () {
@@ -691,11 +298,7 @@ var loginViewModel = (function () {
       });
   };
 }());
-</code></pre>
-
-<p>What would this look like if we could use promises instead?</p>
-
-<pre><code>// Converted to use promises
+</code></pre><p>What would this look like if we could use promises instead?</p><pre><code>// Converted to use promises
 var loginViewModel = (function () {
   var login = function () {
     var username = $('#loginUsername').val();
@@ -718,15 +321,7 @@ var loginViewModel = (function () {
     login: login
   };
 }());
-</code></pre>
-
-<p>Arguments over 'readability' are often a time-sucking-black-hole-of-subjectivity, but this is an instance where I will definitely argue that promises made this code <em>much</em> more readable. The important thing to realize is that this isn't just syntactic/API sugar. Promises enable developers to think and express asynchronous code in a more synchronous way - giving you back return values (promises) and enabling error handling in a convenient way. Note that in our snippet above, the very last <code>then</code> call handles <em>any</em> error that could occur while logging in, loading the users model, or navigating to the notesView.html view.</p>
-
-<h2 id="taking_it_further">Taking it Further</h2>
-
-<p>While the basline of the spec defines a promise as an object that has a function value for the <code>then</code> property, popular promise libraries provide additional utilities that you will quickly become addicted to! For example, the <a href="https://github.com/kriskowal/q">Q</a> library provides a <code>spread</code> method that allows you to pass an array of promises, and the result of each promise will be passed, in order, as arguments to the fulfillment handler. Let's re-visit one of our callback examples and apply this:</p>
-
-<pre><code>// In this refactor, our getCustomer, getContacts, getOrders &amp;
+</code></pre><p>Arguments over 'readability' are often a time-sucking-black-hole-of-subjectivity, but this is an instance where I will definitely argue that promises made this code <em>much</em> more readable. The important thing to realize is that this isn't just syntactic/API sugar. Promises enable developers to think and express asynchronous code in a more synchronous way - giving you back return values (promises) and enabling error handling in a convenient way. Note that in our snippet above, the very last <code>then</code> call handles <em>any</em> error that could occur while logging in, loading the users model, or navigating to the notesView.html view.</p><h2 id="taking_it_further">Taking it Further</h2><p>While the basline of the spec defines a promise as an object that has a function value for the <code>then</code> property, popular promise libraries provide additional utilities that you will quickly become addicted to! For example, the <a href="https://github.com/kriskowal/q">Q</a> library provides a <code>spread</code> method that allows you to pass an array of promises, and the result of each promise will be passed, in order, as arguments to the fulfillment handler. Let's re-visit one of our callback examples and apply this:</p><pre><code>// In this refactor, our getCustomer, getContacts, getOrders &amp;
 // getAccountsRecv methods now all return promises
 $("#getCustomer").click(function(cust) {
     var id = $("#cust-id").val();
@@ -745,53 +340,17 @@ $("#getCustomer").click(function(cust) {
         }
     );
 });
-</code></pre>
-
-<p>If you've used promises before, it's quite likely that your library of choice provides shorthand methods for adding only a success, or error or "finally" callback. jQuery provides <code>done</code>, <code>fail</code> and <code>always</code>. Q provides <code>fail</code> (or <code>catch</code>) and <code>fin</code>. Due to the overwhelming populariy of jQuery, I've encountered many developers that think promises are defined by <code>done</code>, <code>fail</code> and <code>always</code> being present, rather than <code>then</code>. This leads me to a complaint…<em>*pulls pin, throws grenade*</em>…</p>
-
-<h2 id="conversation_grenades">Conversation Grenades</h2>
-
-<p>My first exposure to promise implementations in JavaScript was through jQuery. When I compared it to the Promises/A spec, I was very frustrated! jQuery didn't return a new promise from <code>then</code> (until version 1.8) - so developers depending on jQuery were not only <em>not</em> getting the full power of promises, but they were, IMO, cranking out a lot of code that didn't play well with other promise implementations that <em>did</em> follow the spec. Using a properly implemented promises library should mean that you "<a href="http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/">can write very extensive libraries that are entirely agnostic to the implementation of the promises they accept</a>". I don't think anyone has explained this issue better than Domenic Denicola in his post "<a href="http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/">You're Missing the Point of Promises</a>" – I highly recommend reading it. If all the major promise lib authors would follow his advice, my complaints about having a non-standard promise implementation forced on me when I use libs that take it as a dependency would disappear entirely.</p>
-
-<h2 id="promises_conclusion">Promises Conclusion</h2>
-
-<h3 id="pros">Pros</h3>
-
-<ul>
+</code></pre><p>If you've used promises before, it's quite likely that your library of choice provides shorthand methods for adding only a success, or error or "finally" callback. jQuery provides <code>done</code>, <code>fail</code> and <code>always</code>. Q provides <code>fail</code> (or <code>catch</code>) and <code>fin</code>. Due to the overwhelming populariy of jQuery, I've encountered many developers that think promises are defined by <code>done</code>, <code>fail</code> and <code>always</code> being present, rather than <code>then</code>. This leads me to a complaint…<em>*pulls pin, throws grenade*</em>…</p><h2 id="conversation_grenades">Conversation Grenades</h2><p>My first exposure to promise implementations in JavaScript was through jQuery. When I compared it to the Promises/A spec, I was very frustrated! jQuery didn't return a new promise from <code>then</code> (until version 1.8) - so developers depending on jQuery were not only <em>not</em> getting the full power of promises, but they were, IMO, cranking out a lot of code that didn't play well with other promise implementations that <em>did</em> follow the spec. Using a properly implemented promises library should mean that you "<a href="http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/">can write very extensive libraries that are entirely agnostic to the implementation of the promises they accept</a>". I don't think anyone has explained this issue better than Domenic Denicola in his post "<a href="http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/">You're Missing the Point of Promises</a>" – I highly recommend reading it. If all the major promise lib authors would follow his advice, my complaints about having a non-standard promise implementation forced on me when I use libs that take it as a dependency would disappear entirely.</p><h2 id="promises_conclusion">Promises Conclusion</h2><h3 id="pros">Pros</h3><ul>
 <li><strong>Reduces Complexity of Nesting &amp; Flow</strong> - Flattening pyramids of doom is nearly always a win. Being able to express certain aspects of asynchronous code in a synchronous style (with return values, etc.) empowers developers at nearly any level to quickly understand what a section of code is doing.</li>
 <li><strong>Results Can be "Cached"</strong> - If you need to keep a resolved promise around, any additional success handlers added to it are invoked (as soon as the runtime is free) and passed the resulting value. This can save you some boilerplate as well as prevent unnecessary operations (like a duplicate AJAX request, for example).</li>
-</ul>
-
-<h3 id="cons">Cons</h3>
-
-<ul>
+</ul><h3 id="cons">Cons</h3><ul>
 <li><strong>Results Can be "Cached"</strong> - Wait - wasn't this a PRO?! Yes - but it's a double-edged sword. If you're keeping promise instances around, avoid doing so for values that frequently change (and, for example, might require another HTTP request to fetch the latest).</li>
 <li><strong>Opinionated on OSS APIs</strong> - If you're an open source author writing libraries for general consumption, please use a spec-compliant library! When you don't, you force a highly opinionated dependency on consuming developers.</li>
 <li><strong>Many Non-Spec-Adhering Implementations Exist</strong> - Choosing one of these can get you past that:
-<ul>
-<li><a href="https://github.com/kriskowal/q">Q</a></li>
-<li><a href="https://github.com/cujojs/when">when.js</a></li>
-<li><a href="https://github.com/tildeio/rsvp.js">RSVP.js</a></li>
-</ul></li>
-</ul>
-
-<h2 id="one_more_thought">One More Thought</h2>
-
-<p>Promises are not the only alternative to plain callbacks. We've already discussed eventing and messaging, and we're about to discuss finite state machines (FSMs). In my experience I've found promises to be a powerful tool for concise units of behavior (handling a login, handling an HTTP request, etc.). However, I've seen promises used in longer-running workflows where an FSM is better suited to the task, and also in high level UI management between views where something more reactive (events, messaging) would have been a better choice.</p>
-
-<h1 id="finite_state_machines">5.) Finite State Machines</h1>
-
-<p>Sometimes you need an abstraction that can react differently to the same input. No - I promise I didn't just lose my marbles. Consider a client-side router in a single page app: you may want any attempts to navigate while the user isn't authenticated, to do <em>nothing</em> other than direct them to the login screen. However, once they are authenticated, the same attempts to navigate should actually take them to the desired view(s), etc. A Finite State Machine (FSM) can manage this sort of behavior in a concise and extendable way.</p>
-
-<p>In <a href="http://www.icenium.com/blog/icenium-team-blog/2013/05/09/is-this-thing-on-(part-2)">another post</a>, I described FSMs this way:</p>
-
-<blockquote>
+</li>
+</ul><h2 id="one_more_thought">One More Thought</h2><p>Promises are not the only alternative to plain callbacks. We've already discussed eventing and messaging, and we're about to discuss finite state machines (FSMs). In my experience I've found promises to be a powerful tool for concise units of behavior (handling a login, handling an HTTP request, etc.). However, I've seen promises used in longer-running workflows where an FSM is better suited to the task, and also in high level UI management between views where something more reactive (events, messaging) would have been a better choice.</p><p>Sometimes you need an abstraction that can react differently to the same input. No - I promise I didn't just lose my marbles. Consider a client-side router in a single page app: you may want any attempts to navigate while the user isn't authenticated, to do <em>nothing</em> other than direct them to the login screen. However, once they are authenticated, the same attempts to navigate should actually take them to the desired view(s), etc. A Finite State Machine (FSM) can manage this sort of behavior in a concise and extendable way.</p><p>In <a href="http://www.icenium.com/blog/icenium-team-blog/2013/05/09/is-this-thing-on-(part-2)">another post</a>, I described FSMs this way:</p><blockquote>
   <p>"A finite state machine is a "computational abstraction" – in other words, it's something we use in order to compute a yes or no answer to a question – that is capable of reacting differently to the same input, given a change in its internal state."</p>
-</blockquote>
-
-<p>You're already using state machines, and may not even realize it. The most basic of FSMs can be produced by a simple switch statement:</p>
-
-<pre><code>var fsmLite = (function(){
+</blockquote><p>You're already using state machines, and may not even realize it. The most basic of FSMs can be produced by a simple switch statement:</p><pre><code>var fsmLite = (function(){
     var _state = "notReady";
     var _result;
     // We're watching a subject somewhere to know
@@ -833,43 +392,19 @@ $("#getCustomer").click(function(cust) {
         }
     };
 }());
-</code></pre>
-
-<p>The above example responds differently to the same input (<code>doSomething</code>), depending on the <code>_state</code> value. It also demonstrates a few other FSM characteristics:</p>
-
-<ul>
+</code></pre><p>The above example responds differently to the same input (<code>doSomething</code>), depending on the <code>_state</code> value. It also demonstrates a few other FSM characteristics:</p><ul>
 <li>It has a finite number of states in which it can exist</li>
 <li>It can only exist in one state at a given time</li>
 <li>It accepts input</li>
 <li>It might produce output (in this case, the <code>_result</code> value passed to the <code>callback</code>)</li>
 <li>It can transition from one state to another</li>
-</ul>
-
-<h2 id="promises_are_specialized_state_machines">Promises are Specialized State Machines</h2>
-
-<p>You might have already put these together, but a promise is an FSM. It can be in one of three states: unfulfilled, fulfilled or failed. It accepts input (at least) from callers using the <code>then</code> method. It transitions from unfulfilled to fulfilled or failed, and won't transition again. Let's take a look at a directed graph representation of a promise-FSM (this is a common way to represent FSMs visually):</p>
-
-<p><img src="http://tpstatic.com/img/usermedia/78OqSwBM20ScyMjHZVDGkQ/original.png" alt="Promise FSM Directed Graph" /></p>
-
-<p>Each circle represents a state in which the promise can exist. The arrows represent the input each state handles (<code>then</code>, <code>fulfill</code> and <code>fail</code>). If the arrow points back to the state, this means the input does not cause a transition to a new state. If the input <em>does</em> cause a transition, the arrow points to the new state. Both the <code>Fulfilled</code> and <code>Failed</code> states have "entry actions" - behavior performed as soon as we enter the state (listed next to the "E:" on the state bubble).</p>
-
-<h2 id="when_would_i_use_this">When Would I Use This?</h2>
-
-<p>Once you grasp the nature of an FSM, it's hard to <em>not</em> see areas where it could serve well. A few of the areas I've encountered where FSMs have been a huge help are:</p>
-
-<ul>
+</ul><h2 id="promises_are_specialized_state_machines">Promises are Specialized State Machines</h2><p>You might have already put these together, but a promise is an FSM. It can be in one of three states: unfulfilled, fulfilled or failed. It accepts input (at least) from callers using the <code>then</code> method. It transitions from unfulfilled to fulfilled or failed, and won't transition again. Let's take a look at a directed graph representation of a promise-FSM (this is a common way to represent FSMs visually):</p><p><img src="http://tpstatic.com/img/usermedia/78OqSwBM20ScyMjHZVDGkQ/original.png" alt="Promise FSM Directed Graph" /></p><p>Each circle represents a state in which the promise can exist. The arrows represent the input each state handles (<code>then</code>, <code>fulfill</code> and <code>fail</code>). If the arrow points back to the state, this means the input does not cause a transition to a new state. If the input <em>does</em> cause a transition, the arrow points to the new state. Both the <code>Fulfilled</code> and <code>Failed</code> states have "entry actions" - behavior performed as soon as we enter the state (listed next to the "E:" on the state bubble).</p><h2 id="when_would_i_use_this">When Would I Use This?</h2><p>Once you grasp the nature of an FSM, it's hard to <em>not</em> see areas where it could serve well. A few of the areas I've encountered where FSMs have been a huge help are:</p><ul>
 <li><strong>Online/Offline connectivity</strong>. (In fact I have a <a href="http://www.icenium.com/blog/icenium-team-blog/2013/04/23/is-this-thing-on-(part-1)">series on this topic already</a>.)</li>
 <li><strong>Managing Views</strong>. For example, a Backbone view might be in an "accepting-input" or "not-accepting-input" state. The view still presents the same API to any calling code, but will respond differently based on the state. This is useful for submitting forms or any number of other scenarios.</li>
 <li><strong>Initialization/Bootstrapping</strong>. Standing up a single page app, or a <a href="https://github.com/a2labs/amqp-bootstrapper">RabbitMQ client</a> in node.js (just to name two examples) can involve a number of asynchronous calls that need to be performed in a certain order, and may involve a need to replay part or all of that workflow. FSMs fit this like a glove.</li>
 <li><strong>State-based Routing</strong>. I mentioned this in the leading example. You might want your client side router to behave differently based on some state in the app.</li>
 <li><strong>Wizard/Step-Driven UI</strong>. You can use an FSM to control a wizard-style workflow - and even have sibling/reactive FSMs that drive menu-ing, etc. in tandem with the wziard FSM.</li>
-</ul>
-
-<h2 id="can_i_get_some_help_here">Can I Get Some Help Here?</h2>
-
-<p>Rolling your own FSM is easy - but you might quickly outgrow the limited capabilities. I created <a href="https://github.com/ifandelse/machina.js">machina.js</a> because I wanted a low-level FSM utility library packed with some powerful features. Let's convert our switch-based FSM above to a machina FSM (be sure to read the comments!):</p>
-
-<pre><code>var fsm = new machina.Fsm({
+</ul><h2 id="can_i_get_some_help_here">Can I Get Some Help Here?</h2><p>Rolling your own FSM is easy - but you might quickly outgrow the limited capabilities. I created <a href="https://github.com/ifandelse/machina.js">machina.js</a> because I wanted a low-level FSM utility library packed with some powerful features. Let's convert our switch-based FSM above to a machina FSM (be sure to read the comments!):</p><pre><code>var fsm = new machina.Fsm({
 
     // This will be the FSM's starting state
     initialState: "notReady",
@@ -938,816 +473,16 @@ $("#getCustomer").click(function(cust) {
         this.handle("do.something");
     }
 });
-</code></pre>
-
-<p>So, machina provides features such as (but not limited to): </p>
-
-<ul>
+</code></pre><p>So, machina provides features such as (but not limited to): </p><ul>
 <li>providing custom post-construction initialization behavior</li>
 <li>deferring input until a later time without requiring the caller to do anything</li>
 <li>the ability to provide "catch-all" handlers to match unexpected input (this isn't shown above - check the <a href="https://github.com/ifandelse/machina.js/tree/master/example">examples in the repo</a> for more information)</li>
 <li>FSMs are event emitters, so other components can observe them as subjects</li>
 <li>_onEnter and _onExit handlers for any state (not shown above)</li>
-</ul>
-
-<h2 id="fsm_conclusion">FSM Conclusion</h2>
-
-<h3 id="pros">Pros</h3>
-
-<ul>
+</ul><h2 id="fsm_conclusion">FSM Conclusion</h2><h3 id="pros">Pros</h3><ul>
 <li><strong>Extremely Versatile</strong> - FSMs can model so many real-world problems, it's hard to find a scenario that they don't work well for.</li>
 <li><strong>Wokflow</strong> - FSMs handle long-running, asynchronous workflow well.</li>
-</ul>
-
-<h3 id="cons">Cons</h3>
-
-<ul>
+</ul><h3 id="cons">Cons</h3><ul>
 <li><strong>Lesser known Pattern</strong> - FSM awareness in the JavaScript developer community <em>appears</em> to be low. As a result, the pattern is often not known, feared or rejected as too complex.</li>
-</ul>
-
-<h2 id="complementary_patterns">Complementary Patterns</h2>
-
-<p>You'll notice that our FSM above makes use of continuation-passing as well as events. In fact, our entire journey through these 5 patterns has progressively advanced to higher-level abstractions. Don't be surprised to see yourself mixing these patterns together to produce the abstraction you need. If anything, focusing on <em>just</em> the lower level pattern of passing callbacks and using promises to eliminate nesting has, in my opinion, done our community a disservice. In addition to grasping these patterns, we need to see the potential of higher-level abstractions which we can create from these patterns working <em>together</em>.</p>
-
-<h1 id="wrapping_up">Wrapping Up</h1>
-
-<p>So - we survived our whirlwind tour together through these 5 patterns. It's worth emphasizing that these aren't the <em>only</em> five that can be useful in taming asynchronous code, but I do consider them "<em>must-know</em>". I'm interested in your feedback and war stories, as well. What have you found to be useful in this space?</p>
-
-<h1 id="additional_reading">Additional Reading</h1>
-
-<h2 id="callbackscontinuation_passing_style">Callbacks/Continuation Passing Style</h2>
-
-<ul>
-<li><a href="http://www.2ality.com/2012/06/continuation-passing-style.html">"Asynchronous programming and continuation-passing style in JavaScript"</a> by <a href="https://twitter.com/rauschma">Dr. Axel Rauschmayer</a></li>
-<li><a href="http://recurial.com/programming/understanding-callback-functions-in-javascript/">A beginner's primer on callbacks in JavaScript</a> </li>
-<li><a href="http://matt.might.net/articles/by-example-continuation-passing-style/">By example: Continuation-passing style in JavaScript</a></li>
-<li><a href="http://callbackhell.com/">callbackhell.com</a> (thanks to @maxogden for the suggestion)</li>
-</ul>
-
-<h2 id="eventing__messaging">Eventing &amp; Messaging</h2>
-
-<ul>
-<li><a href="http://www.freshbrewedcodes.com/jimcowart/2013/02/07/client-side-messaging-essentials/">Client-side Messaging Essentials</a></li>
-<li>Client-side Messaging in JavaScript – <a href="http://www.freshbrewedcodes.com/jimcowart/2011/12/05/client-side-messaging-with-postal-js-part-1/">Part 1</a>, <a href="http://www.freshbrewedcodes.com/jimcowart/2012/02/02/client-side-messaging-in-javascript-part-2-postal-js/">Part 2</a> and <a href="http://www.freshbrewedcodes.com/jimcowart/2012/03/19/client-side-messaging-in-javascript-part-3-anti-patterns/">Part 3 (anti-patterns)</a></li>
-<li><a href="http://www.freshbrewedcodes.com/jimcowart/2013/02/26/cross-frame-messaging-with-postal-xframe/">Cross Frame Messaging with postal.xframe</a></li>
-<li><a href="http://addyosmani.com/largescalejavascript/">Patterns For Large-Scale JavaScript Application Architecture</a></li>
-<li><a href="http://lostechies.com/derickbailey/2013/02/06/managing-events-as-relationships-not-just-references/">Managing Events as Relationships, Not Just References</a></li>
-<li><a href="http://lostechies.com/derickbailey/2013/03/18/event-aggregator-andorvs-mediator-a-tale-of-two-patterns/">Event Aggregator And/Or/vs Mediator: A Tale Of Two Patterns</a></li>
-</ul>
-
-<h3 id="libraries">Libraries</h3>
-
-<ul>
-<li><a href="https://github.com/postaljs/postal.js">postal.js</a> (shameless plug on my part)</li>
-<li><a href="https://github.com/Wolfy87/EventEmitter">EventEmitter</a></li>
-<li><a href="https://github.com/hij1nx/EventEmitter2">EventEmitter2</a></li>
-<li><a href="https://github.com/postaljs/monologue.js">monologue.js</a></li>
-<li><a href="https://github.com/millermedeiros/js-signals">js-signals</a></li>
-<li><a href="https://github.com/cujojs/msgs">msgs</a></li>
-</ul>
-
-<h2 id="promises">Promises</h2>
-
-<ul>
-<li><a href="http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/">You're Missing the Point of Promises</a></li>
-<li><a href="http://www.kendoui.com/blogs/teamblog/posts/13-03-28/what-is-the-point-of-promises.aspx">What's the Point of Promises</a></li>
-<li><a href="http://promises-aplus.github.io/promises-spec/">Promises/A+ spec</a></li>
-<li><a href="http://pragprog.com/book/tbajs/async-javascript">Async JavaScript (book by Trevor Burnham)</a></li>
-</ul>
-
-<h3 id="libraries">Libraries</h3>
-
-<ul>
-<li><a href="https://github.com/kriskowal/q">Q</a></li>
-<li><a href="https://github.com/cujojs/when">when.js</a></li>
-<li><a href="https://github.com/tildeio/rsvp.js">RSVP.js</a></li>
-</ul>
-
-<h2 id="finite_state_machines">Finite State Machines</h2>
-
-<ul>
-<li><a href="http://blog.markwshead.com/869/state-machines-computer-science/">State Machines – Basics of Computer Science</a></li>
-<li><a href="http://machina-js.org/">http://machina-js.org/</a> (shameless plug!)</li>
-<li><a href="http://www.ibm.com/developerworks/library/wa-finitemach1/">Finite state machines in JavaScript, Part 1</a> (great additional reading resources on this one)</li>
-<li><a href="http://learnyousomeerlang.com/finite-state-machines">Learn You Some Erlang - Finite State Machines</a></li>
-<li><a href="http://www.cs.hmc.edu/~keller/cs60book/12%2520Finite-State%2520Machines.pdf">Harvey Mudd CS paper on FSMs</a></li>
-<li><a href="http://en.wikipedia.org/wiki/Finite-state_machine">Finite State Machine - Wikipedia</a></li>
-<li>Is This Thing On? - <a href="http://www.icenium.com/blog/icenium-team-blog/2013/04/23/is-this-thing-on-(part-1)">Part 1</a>, <a href="http://www.icenium.com/blog/icenium-team-blog/2013/05/09/is-this-thing-on-(part-2)">Part 2</a>, <a href="http://www.icenium.com/blog/icenium-team-blog/2013/05/30/is-this-thing-on-(part-3)">Part 3</a> and <a href="http://www.icenium.com/blog/icenium-team-blog/2013/06/04/is-this-thing-on-(part-4)">Part 4</a></li>
-<li><a href="http://code.dougneiner.com/presentations/machina/">Taking Control With machina.js (presentation by Doug Neiner)</a></li>
-</ul>
-
-<h3 id="libraries">Libraries</h3>
-
-<ul>
-<li><a href="https://github.com/ifandelse/machina.js">machina.js</a></li>
-<li><a href="https://github.com/nickfargo/state">state</a></li>
-<li><a href="https://github.com/jakesgordon/javascript-state-machine">javascript-state-machine</a></li>
-</ul>
-<!-- /ko -->
-    </div>
-    
-    
-    <span class="hide" itemscope="" itemprop="publisher" itemtype="http://schema.org/Organization">
-        <a href="http://tech.pro/" itemprop="url">Tech.Pro</a>
-    </span>
-
-    
-    
-
-        <table class="tp-like-bar">
-        <tr>
-            <td class="tp-like-cell">
-                <a class="btn btn-large btn-like -vote -article1402 no-tooltip" data-tp="{&quot;id&quot;:1402,&quot;type&quot;:&quot;article&quot;,&quot;score&quot;:21}">
-                    <span class="icon-thumbs-up icon-white"></span>
-                    <span class="unlike-lbl">Unlike this</span>
-                    <span class="like-lbl">Like this post</span>
-                </a>
-            </td>
-            <td width="100%" height="45"><hr /></td>
-                <td nowrap="true" valign="middle">
-                    <div class="social-media">
-                        <ul class="social-list unstyled horizontal-list pull-right">
-                            <li title="Tweet this Post" class="btn-social twitter -tooltip"></li>
-                            <li title="Share on Facebook" class="btn-social facebook -tooltip"></li>
-                            <li title="Share on Google+" class="btn-social googleplus -tooltip"></li>
-                        </ul>
-                    </div>
-                </td>
-        </tr>
-    </table>
-
-    
-    
-
-    
-        <div id="comment-container">
-                <h3>Post a Comment</h3>
-    <div class="tp-add-comment clearfix">
-        <form class="-add-comment">
-            <input type="text" class="tp-comment-text-box" placeholder="Add a Comment" />
-           
-        </form>
-    </div>
-                            <h3 class="tp-comment-header">Comments (<span class="-comment-count"></span>)</h3>    
-                <div class="tp-comment-area">
-                    
-<ul class="tp-comment-list -parents">
-    <li id="comment-21768" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21768,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar large" data-tp="{&quot;id&quot;:16747}">
-        <img width="48" height="48" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/jimcowart" itemprop="url"><span itemprop="name">Jim Cowart</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-10T18:54:56" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>Thanks Roman!</p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: none">
-            
-                    </ul>
-    </li>
-    <li id="comment-21767" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21767,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar large" data-tp="{&quot;id&quot;:16747}">
-        <img width="48" height="48" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/jimcowart" itemprop="url"><span itemprop="name">Jim Cowart</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-10T18:54:44" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>Thank you very much!</p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: none">
-            
-                    </ul>
-    </li>
-    <li id="comment-21766" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21766,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar large" data-tp="{&quot;id&quot;:16747}">
-        <img width="48" height="48" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/jimcowart" itemprop="url"><span itemprop="name">Jim Cowart</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-10T18:54:34" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>Yes! That's actually a post I hope to write at some point soon as well.</p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: none">
-            
-                    </ul>
-    </li>
-    <li id="comment-21752" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21752,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/derroman" class="tp-gravatar large" data-tp="{&quot;id&quot;:16997}">
-        <img width="48" height="48" alt="Roman" src="http://www.gravatar.com/avatar/321d6b8bd6830cfee136c9c96ad84f6d.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/derroman" itemprop="url"><span itemprop="name">Roman</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-08T20:48:54" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>Wow. I've really enjoyed your very well-founded article. It's very good to read more about basics (again), even one is programming for a long time.</p>
-
-<p>In addition in a way funny and therefor refreshing tech articles as this one are extremely rare. </p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: none">
-            
-                    </ul>
-    </li>
-    <li id="comment-21751" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21751,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/claudeberube" class="tp-gravatar large" data-tp="{&quot;id&quot;:16993}">
-        <img width="48" height="48" alt="Claude Berube" src="http://www.gravatar.com/avatar/3d958d8de02646fb60a27ac11b343a2d.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/claudeberube" itemprop="url"><span itemprop="name">Claude Berube</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-08T15:51:28" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>Surely one of the best pattern articles I have seen around for a while.  Examples are functional and well explained. Surely, this will help healing spaghetti coders.  </p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: none">
-            
-                    </ul>
-    </li>
-    <li id="comment-21750" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21750,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/rhysbrettbowen" class="tp-gravatar large" data-tp="{&quot;id&quot;:16992}">
-        <img width="48" height="48" alt="Rhys Brett-Bowen" src="http://www.gravatar.com/avatar/73a6940effbe10ff697b37a0732c883a.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/rhysbrettbowen" itemprop="url"><span itemprop="name">Rhys Brett-Bowen</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-08T15:19:14" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>How about Functional Reactive programming, or streams? Basically controlling how received information flows.</p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: none">
-            
-                    </ul>
-    </li>
-    <li id="comment-21749" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21749,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/simonfan" class="tp-gravatar large" data-tp="{&quot;id&quot;:16977}">
-        <img width="48" height="48" alt="Simon Fan" src="http://www.gravatar.com/avatar/dfe88f1a0d1edb4e3c813bba1b176a26.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/simonfan" itemprop="url"><span itemprop="name">Simon Fan</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-05T22:47:06" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>Great job! Thank you so much for sharing this. I've always read (and loved) the concept of postal.js, but to tell the truth I've had lots of difficulty in finding out the right occasions to use it. The FSM is very straightforward, it is something I've implemented unconsciously (and in bad quality) in multiple projects I've worked on.</p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: none">
-            
-                    </ul>
-    </li>
-    <li id="comment-21743" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21743,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/calvinmetcalf" class="tp-gravatar large" data-tp="{&quot;id&quot;:16960}">
-        <img width="48" height="48" alt="Calvin Metcalf" src="http://www.gravatar.com/avatar/e8153037a068f1c32e546f82729a64a5.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/calvinmetcalf" itemprop="url"><span itemprop="name">Calvin Metcalf</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-03T12:04:11" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>On promises your close, they have to wait until the next event loop, and in the browser using setTimeout is the simplest way to do it but you can use <a href="https://github.com/NobleJS/setImmediate">other faster techniques</a></p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" style="display:none;" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: block">
-            
-    <li id="comment-21744" class="tp-comment -comment  -entity" data-tp="{&quot;id&quot;:21744,&quot;parent&quot;:21743,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemprop="comment" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar input" data-tp="{&quot;id&quot;:16747}">
-        <img width="30" height="30" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=30" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/jimcowart" itemprop="url"><span itemprop="name">Jim Cowart</span></a>
-    </span>
-    <span class="tp-timestamp"> <time datetime="2013-07-03T14:27:06" itemprop="commentTime">3 months ago</time></span>
-
-            
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-                <!-- ko stopBinding: true --><p>Calvin - thanks for pointing this out. I've updated the post to reflect this.</p>
-<!-- /ko -->
-            </div>
-        </div>
-    </li>
-    <li id="comment-21745" class="tp-comment -comment  -entity" data-tp="{&quot;id&quot;:21745,&quot;parent&quot;:21743,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemprop="comment" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/calvinmetcalf" class="tp-gravatar input" data-tp="{&quot;id&quot;:16960}">
-        <img width="30" height="30" alt="Calvin Metcalf" src="http://www.gravatar.com/avatar/e8153037a068f1c32e546f82729a64a5.png?d=retro&amp;s=30" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/calvinmetcalf" itemprop="url"><span itemprop="name">Calvin Metcalf</span></a>
-    </span>
-    <span class="tp-timestamp"> <time datetime="2013-07-03T17:10:08" itemprop="commentTime">3 months ago</time></span>
-
-            
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-                <!-- ko stopBinding: true --><p>that's just for browsers btw node uses process.nextTick</p>
-<!-- /ko -->
-            </div>
-        </div>
-    </li>
-    <li id="comment-21746" class="tp-comment -comment  -entity" data-tp="{&quot;id&quot;:21746,&quot;parent&quot;:21743,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemprop="comment" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar input" data-tp="{&quot;id&quot;:16747}">
-        <img width="30" height="30" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=30" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/jimcowart" itemprop="url"><span itemprop="name">Jim Cowart</span></a>
-    </span>
-    <span class="tp-timestamp"> <time datetime="2013-07-03T22:14:03" itemprop="commentTime">3 months ago</time></span>
-
-            
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-                <!-- ko stopBinding: true --><p>yep - I didn't source dive Q or when specifically, but assumed if they detected node as the env, they'd opt for nextTick. Hopefully saying "a setTimeout of 0ms (or an equivalent)" makes enough sense to most folks there...</p>
-<!-- /ko -->
-            </div>
-        </div>
-    </li>
-                    </ul>
-    </li>
-    <li id="comment-21738" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21738,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/manuelmartone" class="tp-gravatar large" data-tp="{&quot;id&quot;:16046}">
-        <img width="48" height="48" alt="Manuel S. Martone" src="//tpstatic.com/img/usermedia/XWvl0Ll8WEqij9pudN35tg/cropped-w48-h48.png" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/manuelmartone" itemprop="url"><span itemprop="name">Manuel S. Martone</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-02T15:29:07" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>I wish first of all thank you about writing a post like that, this because today the first problem is about writing good and fine code, writing good and fine architectures, and then worry about asynchronism and things like that...
-Using patterns and practices you exposed (well known) here I think should be a MUST for every developer, thinking in that way should be a MUST, but unfortunately the great part of developers just knows dirty and spaghetti thinking and code writing..</p>
-
-<p>After that premise, which I thought was necessary to talk about, very fine article! Thanks because I lack the knowledge of javascript frameworks and patterns  in that way, so  this post light my mind..
-This is just what I was looking for
-Thanks</p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" style="display:none;" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: block">
-            
-    <li id="comment-21740" class="tp-comment -comment  -entity" data-tp="{&quot;id&quot;:21740,&quot;parent&quot;:21738,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemprop="comment" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar input" data-tp="{&quot;id&quot;:16747}">
-        <img width="30" height="30" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=30" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/jimcowart" itemprop="url"><span itemprop="name">Jim Cowart</span></a>
-    </span>
-    <span class="tp-timestamp"> <time datetime="2013-07-02T18:38:56" itemprop="commentTime">3 months ago</time></span>
-
-            
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-                <!-- ko stopBinding: true --><p>Thanks for the kind words - glad the post was helpful!</p>
-<!-- /ko -->
-            </div>
-        </div>
-    </li>
-                    </ul>
-    </li>
-    <li id="comment-21734" class="tp-comment parent -comment -entity" data-tp="{&quot;id&quot;:21734,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/balupton" class="tp-gravatar large" data-tp="{&quot;id&quot;:16951}">
-        <img width="48" height="48" alt="Benjamin Lupton" src="http://www.gravatar.com/avatar/9400cb5aeb155ccec614652542fd274d.png?d=retro&amp;s=48" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/balupton" itemprop="url"><span itemprop="name">Benjamin Lupton</span></a>
-    </span>
-    <span class="tp-timestamp">posted <time datetime="2013-07-02T10:02:10" itemprop="commentTime">3 months ago</time></span>
-
-            <div class="tp-comment-tools">
-                        </div>
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-<!-- ko stopBinding: true --><p>I wonder where task groups would fit into this? https://github.com/bevry/taskgroup - they are by far my favourite way to interact with asynchronous tasks! Just create a group and add the tasks to it! Need to group tasks together, create a new group or a sub group! Easy peasy.</p>
-<!-- /ko -->            </div>
-            <a class="tp-reply-toggle -children-toggle" style="display:none;" itemprop="replyToUrl">
-                <i class="tp-di-icon">i</i> Reply
-            </a>
-        </div>
-        <ul class="tp-comment-list child -children" style="display: block">
-            
-    <li id="comment-21739" class="tp-comment -comment  -entity" data-tp="{&quot;id&quot;:21739,&quot;parent&quot;:21734,&quot;type&quot;:&quot;c&quot;}" itemscope="" itemprop="comment" itemtype="http://schema.org/UserComments">
-        <div class="tp-comment-content">
-                <span itemscope="" itemprop="creator" itemtype="http://schema.org/Person">
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar input" data-tp="{&quot;id&quot;:16747}">
-        <img width="30" height="30" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=30" itemprop="image" />
-    </a>
-
-        <a class="tp-author" href="http://tech.pro/jimcowart" itemprop="url"><span itemprop="name">Jim Cowart</span></a>
-    </span>
-    <span class="tp-timestamp"> <time datetime="2013-07-02T18:38:11" itemprop="commentTime">3 months ago</time></span>
-
-            
-
-            <div class="tp-comment-body clean-type -body" itemprop="commentText">
-                <!-- ko stopBinding: true --><p>I'd say it fits into the "higher-level abstractions which we can create from these patterns working together" part I mentioned towards the end. That's a good thing, IMO. Solving fork/join in JavaScript by hand is a major PITA - you're solving it with higher level abstractions to make it expressive &amp; functional.</p>
-<!-- /ko -->
-            </div>
-        </div>
-    </li>
-                    </ul>
-    </li>
-    </ul>
-
-
-
-
-
-                </div>
-        </div>
-</div>
-
-
-
-        </div>
-            <div id="sidebar" class="pane sidebar">
-                
-    
-        <div class="stats-sidebar">
-        
-        <div class="stat-widget likes -vote -article1402 -tooltip" data-tp="{&quot;id&quot;:1402,&quot;type&quot;:&quot;article&quot;,&quot;score&quot;:21}">
-            <div class="wdg-box">
-                <span class="img"></span>
-                <span class="lbl">Likes</span>
-            </div>
-            <div class="lbl-box">
-                <span class="indicator"></span>
-                <span class="amt -score">21</span>
-            </div>
-        </div>
-        
-        <div class="stat-widget views pull-right">
-            <div class="wdg-box">
-                <span class="img"></span>
-                <span class="lbl">Views</span>
-            </div>
-            <div class="lbl-box">
-                <span class="indicator"></span>
-                <span class="amt">35k</span>
-            </div>
-        </div>
-        
-    </div>
-
-    
-    <div class="tp-about-author tp-box">
-        <div class="header">About the Author</div>
-            <a href="http://tech.pro/jimcowart" class="tp-gravatar pull-left" data-tp="{&quot;id&quot;:16747}">
-        <img width="36" height="36" alt="Jim Cowart" src="http://www.gravatar.com/avatar/50f0d186eeb223478981dec5d786233b.png?d=retro&amp;s=36" itemprop="image" />
-    </a>
-    <div style="margin-top: 2px">
-        <a class="member-name author" href="http://tech.pro/jimcowart">Jim Cowart</a>
-    </div>
-    <div>
-                <a class="-follow" data-tp="{&quot;id&quot;:16747,&quot;type&quot;:&quot;m&quot;}">Follow</a>
-
-    </div>
-
-        <br />
-        <p>Husband, father, architect, developer, tea drinker, @ifandelse on Twitter.
-Opinions are my own. Unless they're good.</p>
-        <hr class="full-hr" style="margin-top: 15px;" />
-    </div>
-    
-        <div id="mHDUtVmU-ECk0mxmL4mT8Q">
-        <div style="width: 180px; height: 150px; margin-bottom: 20px;"></div>
-    </div>
-    <script type="text/javascript">
-        TP.ready(function () {
-            TP.adQueue.push({ adguid: 'mHDUtVmU-ECk0mxmL4mT8Q', sizeId: 4 });
-                });
-    </script>
-
-
-    <div class="tp-box">
-        <h3>Want to write with us?</h3>
-        <p>
-            Anyone can write at Tech.Pro. Writing at Tech.Pro can help you 
-            get recognized, spread knowledge, and
-            inspire others.
-            <br />
-                    <a style="margin-top: 10px;" class="btn" href="/write-with-us">Write &amp; Win</a>
-        </p>
-    </div>
-<div class="tp-box">
-    <h3 class="header">Invite a Friend</h3>
-    <div class="tp-box-content">
-        <p>
-            Tech.Pro is a communications platform and will become more useful to you as your colleagues join the site.
-            Go ahead and invite a few today and start reaping the benefits of membership.
-            
-        </p>
-        <p>
-            <a class="btn btn-primary" href="/account/invite-others">Invite a Friend</a>
-        </p>
-    </div>
-</div>
-    
-
-    
-        <div id="m_peelKQcUKvs8CA1PUWRQ" class="tp-box-content"></div>
-    <script type="text/javascript">
-        TP.ready(function () {
-            $.get('/ajax/post/related?id=1402&title=Five+Patterns+to+Help+You+Tame+Asynchronous+JavaScript&pg=1', function (response, status) {  
-                $('#m_peelKQcUKvs8CA1PUWRQ').html(response);
-                TP.minSidebarHeight();
-            });
-        });
-    </script>
-
-    
-    
-    
-    
-        <div class="tp-box">
-        <h3>Tech.Pro Daily Email</h3>
-        <p>
-            Get the latest content from Tech.Pro delivered to your Inbox each day. 
-                Simply create an account to subscribe.
-                <br />
-            <a style="margin-top: 10px;" type="submit" class="btn" href="http://tech.pro/register">Subscribe</a>
-        </p>
-    </div>
-
-
-
-            </div>    
-    </div>
-    <div id="footer">
-        
-
-
-<div class="row-fluid wrapper">
-
-    <div class="span2 logo-wrapper" style="text-align: center">
-        <a id="footerLogo2" href="http://tech.pro/"></a>
-        <div class="footer-copyright">
-            Copyright © 2013 Tech.Pro
-        </div>
-    </div>
-    <div class="span8 link-lists-container">
-
-        <ul class="footer-link-list pull-left">
-            <li><a href="/">Feed</a></li>
-            
-            <li><a href="http://tech.pro/tutorials">Tutorials</a></li>
-            <li><a href="http://tech.pro/blogs">Blogs</a></li>
-            <li><a href="/links">Links</a></li>
-            <li><a href="/questions">Q&amp;A</a></li>
-            
-        </ul>
-
-        <ul class="footer-link-list  pull-left">
-            <li><a href="/profiles">People</a></li>
-            <li><a href="/profiles">Profiles</a></li>
-            <li><a href="/authors">Authors</a></li>
-            <li><a href="/projects">Projects</a></li>
-            <li></li>
-            <li><a href="http://tech.pro/network">My Network</a></li>
-            
-        </ul>
-
-        
-
-        <ul class="footer-link-list  pull-left">
-            <li><a href="http://tech.pro/how-it-works">More</a></li>
-            <li><a href="http://tech.pro/how-it-works">How TechPro Works</a></li>
-            
-            <li><a href="http://tech.pro/about-us">About Us</a></li>
-            <li><a href="http://tech.pro/contact-us">Contact Us</a></li>
-            <li><a href="http://tech.pro/sitemap">Site Map</a></li>
-        </ul>
-
-       
-
-    </div>
-    <div class="span2 footer-social-container">
-        <ul class="footer-social-list">
-            <li>
-                <a href="http://blog.tech.pro" target="_blank">
-                    <span class="img blog"></span>
-                    Blog
-                </a>
-            </li>
-            <li>
-                <a href="http://twitter.com/techdotpro" target="_blank">
-                    <span class="img twitter"></span>
-                    Twitter
-                </a>
-            </li>
-            <li>
-                <a href="http://www.facebook.com/TechDotPro" target="_blank">
-                    <span class="img facebook"></span>
-                    Facebook
-                </a>
-            </li>
-        </ul>
-        <!--END: Social Icons-->
-
-    </div>
-
-</div>
-
-
-<!--END: Logo & Links-->
-
-
-
-
-
-
-        
-
-
-
-    </div>
-</div>
-
-
-
-
-            </div>
-        </div>
-        <div id="fb-root"></div>
-
-        <script src="//tpstatic.com/bundles/js/core?v=OKtDTSKZ7zJK5xytIi0Qd4MC1jGcoZ9yPYq2oi4WFdo1"></script>
-
-        <script type="text/javascript">
-            window.TP = new TechProApp($.extend({isAnonymous:true,verbose:false,rootUrl:"tech.pro",staticUrl:"tpstatic.com",userImagesRoot:"http://tpstatic.com/img/usermedia/",tenant:{site:"TechPro",twitterAccount:"techdotpro",title:"Tech.Pro"},needTemplates:true},{$: jQuery}));
-            TP.init();
-                        
-            var globalSearchViewModel = new GlobalSearchViewModel({"searchValue":"","selectedOption":"posts","searchOptions":["Profiles","Projects","Questions","Links","Posts"]});
-            ko.applyBindings(globalSearchViewModel, document.getElementById("global-search-form"));
-
-        </script>
-        
-
-    <script type="text/javascript">
-        TP.ready(function() {
-            TP.registerView('article', 1402);
-            TP.bindVotingArea(".stats-sidebar, .tp-like-bar");
-            //todo eventually reimplement along with the follow section
-            TP.bindComments({
-                entityId: 1402,
-                entityType: 'article',
-                listSelector: "#comment-container",
-                countSelector:".-comment-count",
-                currentCount: 15
-            });
-            TP.bindFollowingArea(".sidebar");
-            if (!TP.isAnonymous) {
-                $.get("/ajax/post/votes?ids=1402", function(response) {
-                    TP.showVoteStatus(response.data);
-                });
-            }
-            TP.bindFlags(".-article-profile", "article");
-        });
-        
-        TP.bindSocialShare({"title":"Five Patterns to Help You Tame Asynchronous JavaScript","url":"http://tech.pro/blog/1402/five-patterns-to-help-you-tame-asynchronous-javascript","twitterUsername":"ifandelse","image":"//tpstatic.com/img/usermedia/zSvgVinS40ykaVRODOoqzg/original.png","summary":"You can hardly write ten lines of JavaScript before you're confronted with asynchronous behavior...."});
-
-    </script>
-        <script type="text/javascript">
-            var _gaq = _gaq || [];
-            _gaq.push(['b._setAccount', 'UA-41497949-1']);
-            _gaq.push(['b._trackPageview']);
-        </script>
-
-    <script src="//tpstatic.com/scripts/track_reader.js"></script>
-
-
-        <script type="text/javascript">
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-32414873-1']);
-_gaq.push(['_setDomainName', 'tech.pro']);
-_gaq.push(['_trackPageview']);
-_gaq.push(['_setCustomVar',2,'Author','16747 - Jim Cowart',3]);
-_gaq.push(['_setCustomVar',4,'PublishDate','07/01/13',3]);
-_gaq.push(['_setCustomVar',3,'Tag','JavaScript',3]);
-_gaq.push(['_setCustomVar',3,'Tag','Async',3]);
-_gaq.push(['_setCustomVar',3,'Tag','Events',3]);
-_gaq.push(['_setCustomVar',3,'Tag','Promises',3]);
-_gaq.push(['_setCustomVar',3,'Tag','Patterns',3]);
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-</script>
-
-            <script type="text/javascript">
-                setTimeout(function() {
-                    var a = document.createElement("script");
-                    var b = document.getElementsByTagName("script")[0];
-                    a.src = document.location.protocol + "//dnn506yrbagrg.cloudfront.net/pages/scripts/0014/4685.js?" + Math.floor(new Date().getTime() / 3600000);
-                    a.async = true;
-                    a.type = "text/javascript";
-                    b.parentNode.insertBefore(a, b);
-                }, 1);
-            </script>
-        
-    <div>
-<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-<script src="../js/clearly.js"></script>
-<script>
-var html = window.__getMyClearlyResults().html;
-$("html").html(html);
-$("body").append('<link type="text/css" href="../css/article.css">')</script>
-</div></body>
+</ul><h2 id="complementary_patterns">Complementary Patterns</h2><p>You'll notice that our FSM above makes use of continuation-passing as well as events. In fact, our entire journey through these 5 patterns has progressively advanced to higher-level abstractions. Don't be surprised to see yourself mixing these patterns together to produce the abstraction you need. If anything, focusing on <em>just</em> the lower level pattern of passing callbacks and using promises to eliminate nesting has, in my opinion, done our community a disservice. In addition to grasping these patterns, we need to see the potential of higher-level abstractions which we can create from these patterns working <em>together</em>.</p><p>So - we survived our whirlwind tour together through these 5 patterns. It's worth emphasizing that these aren't the <em>only</em> five that can be useful in taming asynchronous code, but I do consider them "<em>must-know</em>". I'm interested in your feedback and war stories, as well. What have you found to be useful in this space?</p><h2 id="callbackscontinuation_passing_style">Callbacks/Continuation Passing Style</h2><h2 id="eventing__messaging">Eventing &amp; Messaging</h2><h3 id="libraries">Libraries</h3><h2 id="promises">Promises</h2><h3 id="libraries">Libraries</h3><h2 id="finite_state_machines">Finite State Machines</h2><h3 id="libraries">Libraries</h3><!-- /ko --></div></body>
 </html>
