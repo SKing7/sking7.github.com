@@ -1,86 +1,17 @@
+<!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="keywords" content="web performance faster web sites high performance web sites website optimization best practices javascript css web development mobile" />
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>I  | High Performance Web Sites</title>
-<link rel="stylesheet" type="text/css" media="all" href="http://www.stevesouders.com/blog/wp-content/themes/SteveSouders/style.css" />
-<link rel="alternate" type="application/rss+xml" title="High Performance Web Sites » I &lt;3 image bytes Comments Feed" href="http://www.stevesouders.com/blog/2013/04/26/i/feed/" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stevesouders.com/blog/xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stevesouders.com/blog/wp-includes/wlwmanifest.xml" /> 
-<link rel="prev" title="HTML5 VIDEO bytes on iOS" href="http://www.stevesouders.com/blog/2013/04/21/html5-video-bytes-on-ios/" />
-<link rel="next" title="How fast are we going now?" href="http://www.stevesouders.com/blog/2013/05/09/how-fast-are-we-going-now/" />
-<meta name="generator" content="WordPress 3.6.1" />
-<link rel="canonical" href="http://www.stevesouders.com/blog/2013/04/26/i/" />
-<link rel="shortlink" href="http://www.stevesouders.com/blog/?p=3536" />
-<script type="text/javascript">
-	window._wp_rp_static_base_url = 'http://dtmvdvtzf8rz0.cloudfront.net/static/';
-	window._wp_rp_wp_ajax_url = "http://www.stevesouders.com/blog/wp-admin/admin-ajax.php";
-	window._wp_rp_plugin_version = '2.6';
-	window._wp_rp_post_id = '3536';
-	window._wp_rp_num_rel_posts = '5';
-</script>
-
-<script>
-(function(d, s) {
-	var js = d.getElementsByTagName(s)[0],
-		ln = d.createElement(s);
-	ln.src = '//lognormal.net/boomerang/8fa4fc2785a82fae20c596ca4f45d1b218a9ab12ffef741d09b29532';
-	js.parentNode.insertBefore(ln, js);
-})(document, 'script');
-</script>
-
-<script type="text/javascript">
-// GOOGLE ANALYTICS
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-15026169-1']);
-_gaq.push(['_setSiteSpeedSampleRate', 100]);
-_gaq.push(['_trackPageview']);
-
-(function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-</script>
+<link rel="stylesheet" href="../css/article.css" />
 </head>
-
 <body>
-<div id="header">
-	<div class="containerwrapper">
-  		<h1 id="logo"><a href="http://stevesouders.com/"><span>SteveSouders.com</span></a></h1>
-        <ul id="topnav">
-        <li><a href="http://stevesouders.com/about.php">about</a></li>
-        <li><a href="http://stevesouders.com/contact.php">contact</a></li>
-        <li class="last"> <a href="http://twitter.com/#!/souders/"><img src="/images/twitter-icon.png" width="16" height="16" border="0" style="vertical-align: bottom;" /></a>
-        </li></ul>
-	</div>    
-</div>
-<div id="contentWrapper" class="containerwrapper">
-<div id="sidebar">
-<div id="search-3" class="widget widget_search"><form role="search" method="get" id="searchform" class="searchform" action="http://www.stevesouders.com/blog/">
-				<div>
-					<label class="screen-reader-text" for="s">Search for:</label>
-					<input type="text" value="" name="s" id="s" />
-					<input type="submit" id="searchsubmit" value="Search" />
-				</div>
-			</form></div><div id="custom-recent-posts-3" class="widget custom-recent-posts"><h3 class="blockheader">Most Recent Posts</h3>		<ul style="list-style-type: none; margin-left: 20px; text-indent: -20px;">
-        		<li><a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" rel="bookmark">Domain Sharding revisited</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/08/27/web-performance-for-the-future/" rel="bookmark">Web performance for the future</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/07/16/activetable-bookmarklet/" rel="bookmark">ActiveTable bookmarklet</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/07/15/twitter-widget-update/" rel="bookmark">Twitter widget update</a></li>
-				<li><a href="http://www.stevesouders.com/blog/2013/06/16/browser-busy-indicators/" rel="bookmark">Browser Busy Indicators</a></li>
-				</ul>
-		<a href="http://www.stevesouders.com/blog/archives/">View Archive</a></div><div id="text-3" class="widget widget_text"><h3 class="blockheader">Feeds</h3>			<div class="textwidget"><a href="http://www.stevesouders.com/blog/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/feed/">Posts</a><br />
-<a href="http://www.stevesouders.com/blog/comments/feed/"><img src="/blog/wp-content/uploads/2011/02/feed.png" width="10" height="10" /> </a><a href="http://www.stevesouders.com/blog/comments/feed/">Comments</a></div>
-		</div>        
-</div><div id="content">
-
-
-
-		<div id="post-3536" class="post-3536 post type-post status-publish format-standard hentry category-browsers category-javascript category-performance category-uncategorized category-web-development tag-preloader tag-responsive-images">
-        	            	<h1>I <3 image="" bytes<="" h1="">
+<div class="m-content">
+<h1>I  | High Performance Web Sites</h1>
+<div>
             
-			<p class="meta">April 26, 2013 10:08 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comments" title="Comment on I ">17 Comments</a></p><!-- .entry-meta -->
+			<p>April 26, 2013 10:08 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comments" title="Comment on I ">17 Comments</a></p><!-- .entry-meta -->
 
 			<p>Much of my work on web performance has focused on JavaScript and CSS, starting with the early rules&nbsp;<a href="http://developer.yahoo.com/blogs/ydn/high-performance-sites-rule-6-move-scripts-bottom-7200.html">Move Scripts to the Bottom</a> and <a href="http://developer.yahoo.com/blogs/ydn/high-performance-sites-rule-5-put-stylesheets-top-7197.html">Put Stylesheets at the Top</a>&nbsp;from back in 2007(!). To emphasize these best practices I used to say, “JS and CSS are the most important bytes in the page”.</p>
 <p>A few months ago I realized that wasn’t true. <em>Images are the most important bytes in the page.</em></p>
@@ -93,12 +24,11 @@ _gaq.push(['_trackPageview']);
 <li>start render – When the page starts rendering.</li>
 <li>onload – When window.onload fires.</li>
 </ul>
-<p>I extracted the 50th and 90th percentile values for these measurements across the world’s top 300K URLs. As shown, <em>nothing is rendered for the first third of page load time!</em><i><br />
-</i></p>
-<table class="basictable">
+<p>I extracted the 50th and 90th percentile values for these measurements across the world’s top 300K URLs. As shown, <em>nothing is rendered for the first third of page load time!</em><i><br /></i></p>
+<table>
 <tbody>
 <tr>
-<td class="label" colspan="4">Table 1. Time milestones during page load</td>
+<td colspan="4">Table 1. Time milestones during page load</td>
 </tr>
 <tr>
 <th></th>
@@ -107,20 +37,20 @@ _gaq.push(['_trackPageview']);
 <th>onload</th>
 </tr>
 <tr>
-<td class="txt">50th percentile</td>
-<td class="num">610 ms</td>
-<td class="num">2227 ms</td>
-<td class="num">6229 ms</td>
+<td>50th percentile</td>
+<td>610 ms</td>
+<td>2227 ms</td>
+<td>6229 ms</td>
 </tr>
 <tr>
-<td class="txt">90th percentile</td>
-<td class="num">1780 ms</td>
-<td class="num">5112 ms</td>
-<td class="num">15969 ms</td>
+<td>90th percentile</td>
+<td>1780 ms</td>
+<td>5112 ms</td>
+<td>15969 ms</td>
 </tr>
 </tbody>
 </table>
-<h3><span style="font-size: 1.17em;">Preloading</span></h3>
+<h3><span>Preloading</span></h3>
 <p>The fact that rendering doesn’t start until the page is 1/3 into the overall page load time is eye-opening. Looking at both the 50th and 90th percentile stats from the HTTP Archive, rendering starts ~32-36% into the page load time. It takes ~10% of the overall page load time to get the first byte. Thus, for ~22-26% of the page load time the browser has bytes to process but nothing is drawn on the screen. During this time the browser is typically downloading and parsing scripts and stylesheets – both of which block rendering on the page.</p>
 <p>It used to be that the browser was largely idle during this early loading phase (after TTFB and before start render). That’s because when an older browser started downloading a script,&nbsp;<a title="High Performance Web Sites: Rule 6  Move Scripts to the Bottom" href="http://developer.yahoo.com/blogs/ydn/high-performance-sites-rule-6-move-scripts-bottom-7200.html">all other downloads were blocked</a>. This is still visible in&nbsp;<a title="Browserscope" href="http://www.browserscope.org/?category=network&amp;v=1&amp;ua=IE%206,IE%207,IE%208,IE%209,IE%2010">IE 6&amp;7</a>. Browser vendors realized that while it’s true that constructing the DOM has to wait for a script to download and execute, there’s no reason other resources deeper in the page couldn’t be&nbsp;<em>fetched</em> in parallel. Starting with IE 8 in 2009, browsers started looking past the currently downloading script for other resources (i.e, SCRIPT, IMG, LINK, and IFRAME tags) and <em>preloading</em> those requests in parallel. One study showed preloading makes&nbsp;<a title="The WebKit PreloadScanner" href="http://gent.ilcore.com/2011/01/webkit-preloadscanner.html">pages load ~20% faster</a>. Today, all major browsers support preloading. In these&nbsp;<a href="http://www.browserscope.org/?category=network&amp;v=1&amp;ua=Chrome%202,Firefox%202,IE%208,iPhone%202,Opera%2012,Opera%20Mobile%2010,Safari%201">Browserscope results</a>&nbsp;I show the earliest version of each major browser where preloading was first supported.</p>
 <p>(As an aside, I think preloading is the single biggest performance improvement browsers have ever made. Imagine today, with the abundance of scripts on web pages, what performance would be like if each script was downloaded sequentially and blocked all other downloads.)</p>
@@ -129,7 +59,7 @@ _gaq.push(['_trackPageview']);
 <blockquote><p>I’ll be honest. I’m tired of pushing for resp images and increasingly inclined to encourage devs to use JS to simply break pre-loaders.</p></blockquote>
 <p>The “resp images” Jason refers to are techniques by which image requests are generated by JavaScript. This is generally used to adapt the size of images for different screen sizes. One example is <a href="https://github.com/scottjehl/picturefill">Picturefill</a>. When you combine “pre-loaders” and “resp images” an issue arises – the preloader looks ahead for IMG tags and fetches their SRC, but responsive image techniques typically don’t have a SRC, or have a stub image such as a 1×1 transparent pixel. This defeats the benefits of preloading for images. So there’s a tradeoff:</p>
 <ul>
-<li><span style="line-height: 13px;">Don’t use responsive images so that the preloader can start downloading images sooner, but the images might be larger than needed for the current device and thus take longer to download (and cost more for limited cellular data plans).</span></li>
+<li><span>Don’t use responsive images so that the preloader can start downloading images sooner, but the images might be larger than needed for the current device and thus take longer to download (and cost more for limited cellular data plans).</span></li>
 <li>Use responsive images which doesn’t take advantage of preloading which means the images are loaded later after the required JS is downloaded and executed, and the IMG DOM elements have been created.</li>
 </ul>
 <p>As Jason says in a follow-up <a href="https://twitter.com/grigs/status/327430930895609858">tweet</a>:</p>
@@ -138,250 +68,9 @@ _gaq.push(['_trackPageview']);
 <p>In my opinion, this is too late in the page load process to initiate the image requests, and will likely cause the web page to render later than it would if the preloader was used to download images. Again, I don’t have data comparing the two techniques. Also, I’m not sure how the preloader works with the responsive image techniques done via markup. (Jason has a blog post that touches on that,&nbsp;<a href="http://blog.cloudfour.com/the-real-conflict-behind-picture-and-srcset/">The real conflict behind &lt;picture&gt; and @srcset</a>.)</p>
 <p>Ideally we’d have a responsive image solution in markup that would work with preloaders. Until then, I’m nervous about recommending to the dev community at large to move toward responsive images at the expense of defeating preloading. I expect browsers will add more benefits to preloading, and I’d like websites to be able to take advantage of those benefits both now and in the future.</p>
 
-<div class="wp_rp_wrap  wp_rp_momma" id="wp_rp_first"><div class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul class="related_post wp_rp" style="visibility: visible"><li><a href="http://www.stevesouders.com/blog/2009/04/27/loading-scripts-without-blocking/" class="wp_rp_title">Loading Scripts Without Blocking</a></li><li><a href="http://www.stevesouders.com/blog/2012/12/03/the-perception-of-speed/" class="wp_rp_title">The Perception of Speed</a></li><li><a href="http://www.stevesouders.com/blog/2010/12/06/evolution-of-script-loading/" class="wp_rp_title">Evolution of Script Loading</a></li><li><a href="http://www.stevesouders.com/blog/2010/02/12/5e-speculative-background-images/" class="wp_rp_title">5e speculative background images</a></li><li><a href="http://www.stevesouders.com/blog/2010/02/07/browser-script-loading-roundup/" class="wp_rp_title">Browser script loading roundup</a></li></ul><div class="wp_rp_footer"><a class="wp_rp_backlink" target="_blank" rel="nofollow" href="http://www.zemanta.com/?wp-related-posts">Zemanta</a></div></div></div>
+
             
             			
-		</3></h1></div><!-- #post-## -->
-
-
-		
-			<div id="comments">
-
-			<h3 id="comments-title">17 Responses to <em>I <3 image="" bytes<="" em=""></3></em></h3>
-
-
-			<ol class="commentlist">
-				<li class="comment even thread-even depth-1" id="li-comment-60032">
-<div id="comment-60032">
-<p class="comment-metadata">
-<strong><a href="http://aaronfranks.com" rel="external nofollow" class="url">Aaron</a></strong> | 26-Apr-13 at 11:12 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60032">Permalink</a> |  </p>
-
-
-<p>The tweet about “using JS to break preloaders” reminds me of mobify.js (<a href="http://www.mobify.com/mobifyjs/" rel="nofollow">http://www.mobify.com/mobifyjs/</a>). Unfortunately it requires a script in the , but can rewrite images and other resources before the browser loads them. Haven’t used it, but learned about it recently and the approach looks promising.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60033">
-<div id="comment-60033">
-<p class="comment-metadata">
-<strong><a href="http://aaronfranks.com" rel="external nofollow" class="url">Aaron</a></strong> | 26-Apr-13 at 11:13 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60033">Permalink</a> |  </p>
-
-
-<p>^ should read: “Unfortunately it requires a script in the *head tag*, …”</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-60034">
-<div id="comment-60034">
-<p class="comment-metadata">
-<strong><a href="http://www.brettjankord.com" rel="external nofollow" class="url">Brett Jankord</a></strong> | 26-Apr-13 at 11:29 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60034">Permalink</a> |  </p>
-
-
-<p>One technique that I really like for resp. images that I *think* works well with the preloader is the technique Guy Podjarny’s talked about in his post: Introducing LQIP – Low Quality Image Placeholders (<a href="http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/" rel="nofollow">http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/</a>)</p>
-<p>No doubt, its not a perfect solution, but its one that I’ve found useful. Ideally browsers would implement the proposed picture element and build their APIs and preload scanner to work w/ this new element.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60035">
-<div id="comment-60035">
-<p class="comment-metadata">
-<strong><a href="http://andyhume.net" rel="external nofollow" class="url">Andy Hume</a></strong> | 26-Apr-13 at 12:47 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60035">Permalink</a> |  </p>
-
-
-<p>It’s not a binary decision either. You can choose to load the most important images via the pre-parser and defer other less important imagery to load via JavaScript.</p>
-<p>I think this is best expressed by Paul Lloyd’s presentation at Responsiveconf a few months ago:</p>
-<p><a href="https://speakerdeck.com/paulrobertlloyd/the-edge-of-the-web?slide=22" rel="nofollow">https://speakerdeck.com/paulrobertlloyd/the-edge-of-the-web?slide=22</a></p>
-<p>The BBC mobile site does a good job of this:</p>
-<p><a href="https://speakerdeck.com/paulrobertlloyd/the-edge-of-the-web" rel="nofollow">https://speakerdeck.com/paulrobertlloyd/the-edge-of-the-web</a></p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-60036">
-<div id="comment-60036">
-<p class="comment-metadata">
-<strong><a href="http://blog.cloudfour.com" rel="external nofollow" class="url">Jason Grigsby</a></strong> | 26-Apr-13 at 1:04 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60036">Permalink</a> |  </p>
-
-
-<p>Thanks Steve for taking the time to test and write this up. My tweet was a obvious moment of frustration. I haven’t been advocating breaking the pre-parser and in several conversations have been cautioning against it based on the feedback that you’ve given in the past.</p>
-<p>That said, I do feel there is a big disconnect between what browser implementers are interested in pursuing (e.g., client hints using device widths) and what people trying to make responsive design see as the true problem we’re trying to solve (e.g., element queries).</p>
-<p>I rarely get the sense from implementers and people working on standards that they really “get” what people are trying to accomplish with images in responsive designs. I will acknowledge that the Internet is a poor medium to convey the types of feedback that we need to know that someone has truly understood what we’re saying. So it is entirely possible that they do get it, but disagree or feel it isn’t possible.</p>
-<p>So there is still a part of me that feels like we should just build solutions that solve our problems, take the performance hit, and then let the adoption of those approaches prove to implementors that some rethinking needs to be done.</p>
-<p>And I believe this is already happening. The BBC and Guardian are doing it. Akamai sells an FEO approach that is based on wrestling control of image loading away from the pre-parser by replacing all imgs with a data uri transparent gif and then inserting the proper image source via JavaScript. Given Akamai’s marketshare and the number of large companies that are struggling with responsive images, that solution alone could break pre-parsing on a large number of sites.</p>
-<p>Which leads me to wonder, is it worth our while to continue to try to convince skeptical implementors or should we simply promote more solutions like what BBC, Guardian and Akamai are doing? Which is a quicker path to getting a long term solution to the problem?</p>
-<p>Maybe some short-term breaking of things is a necessary step to get things moving forward. That’s the the conclusion I’ve come to except in my moments of despair—the tweet you saw was one of those moments—but it is crossing my mind with increasing frequency.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60037">
-<div id="comment-60037">
-<p class="comment-metadata">
-<strong><a href="http://blog.cloudfour.com" rel="external nofollow" class="url">Jason Grigsby</a></strong> | 26-Apr-13 at 1:24 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60037">Permalink</a> |  </p>
-
-
-<p>Argh, I kept rewriting that last sentence trying to get the tone right and still managed to end up with a broken and incoherent sentence.</p>
-<p>What I was trying to say is that I haven’t yet concluded that we need to take this approach, but I find myself pondering which approach would get quicker results with increasing frequency.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor even thread-even depth-1 author" id="li-comment-60038">
-<div id="comment-60038">
-<p class="comment-metadata">
-<strong><a href="http://stevesouders.com" rel="external nofollow" class="url">Steve Souders</a></strong> | 26-Apr-13 at 2:06 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60038">Permalink</a> |  </p>
-
-
-<p>Brett: Yes, Guypo’s (Akamai’s) LQIP would work with today’s preloaders.</p>
-<p>Jason: It was a good, necessary tweet. Everyone needs to get more invested. It caught my eye, and I’m sure it caught the eye of browser developers. I’m nervous about recommending techniques that make performance worse – but I’m biased. Akamai’s FEO approach (LQIP) works with plain IMG tags – so it takes advantage of the preloader. (Or is there another technique you’re referring to?) Before we advocate breaking things I’d like to have a Responsive Images Summit with web devs and browser devs and see if we can’t find common ground. You and I had a long email thread on the alternatives, and I still wasn’t closer to see a clear solution.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60039">
-<div id="comment-60039">
-<p class="comment-metadata">
-<strong><a href="http://blog.cloudfour.com" rel="external nofollow" class="url">Jason Grigsby</a></strong> | 26-Apr-13 at 2:25 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60039">Permalink</a> |  </p>
-
-
-<p>The Akamai technique I’m talking about isn’t the LQIP that Guy has blogged about. As far as I can tell, the technique I saw is being used for both their responsive images and their on-demand image loading solutions that are options within the FEO package. I’m unclear where LQIP fits in the offering.</p>
-<p>For responsive images, Akamai reads the markup of the page and replaces any links to images with data uris. You can see this in action on Guy’s site:<br />
-<a href="http://www.guypo.com/uncategorized/real-world-rwd-performance-take-2/" rel="nofollow">http://www.guypo.com/uncategorized/real-world-rwd-performance-take-2/</a></p>
-<p>A typical img tag in his source looks like this:</p>
-<p>img class=”alignnone  wp-image-3380″ alt=”2013-page-size-per-resolution” src=”data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAQAICRAEAOw==” blzsrc=”http://www.guypo.com/wp-content/uploads/2013/03/2013-page-size-per-resolution.png” blzjit=”1″ width=”511″ height=”336″</p>
-<p>But when the JS executes, it replaces the placeholder image with a link to the correct image. The DOM of the rendered page shows:<br />
-img class=”alignnone  wp-image-3381″ alt=”2013-page-size-small-vs-big” src=”http://www.guypo.com/wp-content/uploads/2013/03/2013-page-size-small-vs-big1.png” blzsrc=”http://www.guypo.com/wp-content/uploads/2013/03/2013-page-size-small-vs-big1.png” blzjit=”1″ width=”512″ height=”447″</p>
-<p>Unfortunately, most of the examples I have of Akamai’s FEO implementation are not responsive designs so I can’t point to this technique being used for responsive images, but as far as I understand, this is the approach used for any clients that sign up for the responsive images portion of the FEO solution.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-60043">
-<div id="comment-60043">
-<p class="comment-metadata">
-<strong>Guypo</strong> | 26-Apr-13 at 5:20 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60043">Permalink</a> |  </p>
-
-
-<p>First off, to clarify re Akamai’s FEO: We have quite a few image related optimization, but two very commonly used ones are Responsive Images and Images On-Demand (only load images in the visible area, load others as they scroll into view). Both of those indeed use a script loader for images, breaking the pre-parser. It’s a very smart script loader, which kicks in early and squeezes the most out of the browser, but there’s no ignoring the fact it breaks the pre-parser.</p>
-<p>It’s worth noting that we do compensate for that a bit with other optimizations like DNS prefetching (something the pre-parser may have done) and by making scripts and CSS async (if the scripts on the page don’t block the parser, the pre-parser is less critical), but even without those we see huge value in these optimizations. </p>
-<p>While I didn’t collect broad data across many websites, I can say my experience shows the vast majority of pages – especially ones where at least 50% of the page is “below the fold” – benefit more from lazy loading images than from the pre-parser. The extra cost of downloading many images that aren’t actually needed (at least at first), and of those contending for bandwidth with what DOES need to get render far outweighs the value from what I can tell.</p>
-<p>In an old presentation of mine I show examples on mobile websites (Walmart &amp; MSNBC’s sites at the time), where load times were drastically improved thanks to that optimization alone. That type of impact is quite common. Here’s the deck (slides 19-21): <a href="http://www.slideshare.net/guypod/unravelling-mobile-web-performance/19/" rel="nofollow">http://www.slideshare.net/guypod/unravelling-mobile-web-performance/19/</a></p>
-<p>One disclaimer on this topic: Today, the pre-parser offers relatively little value to images, because CSS and JS block the download of those images. However, in a SPDY or HTTP 2 world, it’s possible this equation would change. Hopefully by then we’ll have browser support for capabilities like the picture element or img defer (<a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=17842" rel="nofollow">https://www.w3.org/Bugs/Public/show_bug.cgi?id=17842</a>), and won’t need to face the dilema.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-60044">
-<div id="comment-60044">
-<p class="comment-metadata">
-<strong><a href="http://stevesouders.com" rel="external nofollow" class="url">Steve Souders</a></strong> | 26-Apr-13 at 5:32 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60044">Permalink</a> |  </p>
-
-
-<p>Guypo: Thanks for commenting! Is “Responsive Images” different from LQIP? Do you recommend people do both? If not, which one do you recommend? Seems like the best solution would be to do the first N images (assumed to be above-the-fold) as IMG to take advantage of the preloader, and do the rest lazy loading. Have you tried that? Doing them all using a JS lazy-load technique would, again, seem to render later than using the preloader (esp. since lazy-loading doesn’t reduce the size of the image). Did you mean to say CSS and JS *DON’T* block the download of images? (You said they *DO* block which isn’t true AFAIK.) And the reason JS and CSS don’t block image downloads is because of the preloader – so images *DO* benefit from pre-parsing.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-60045">
-<div id="comment-60045">
-<p class="comment-metadata">
-<strong>Guypo</strong> | 26-Apr-13 at 7:23 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60045">Permalink</a> |  </p>
-
-
-<p>Responsive Images means downloading a smaller image to a smaller screen, while LQIP means downloading a small image first and a large image after. The two have overlap in value, but they’re not the same.</p>
-<p>If you use LQIP only, then on a small screen you’re still wasting bytes when you download the full quality image – but at least you’re doing it after onload. If you use responsive images only, then on a large screen you have a slower user experience waiting for the full res image to download. </p>
-<p>What we do is combined the two – download a low quality image first, and then download the screen-size-dependent fully quality image after. </p>
-<p>Regarding making the first N images regular img tags, that only works if you indeed know the images would show up (and in that case, it’ll indeed make them faster). However, that’s often a difficult task, as it depend on the screen/window size. It’s even harder to estimate that in responsive websites.</p>
-<p>Lastly, CSS &amp; JS *DO* block image downloads under certain conditions – which are almost always met. Pretty much every website you’ll browse has a “stair” at the front, during which JS &amp; CSS files are downloaded (not blocking each other), and only then images are downloaded. AIUI, this is intentional by the browsers, and is their way of prioritizing JS &amp; CSS by having them not contend for bandwidth with images.</p>
-<p>A few quick examples:<br />
-CNN: <a href="http://www.webpagetest.org/result/130427_NA_91c6e9c7fb110ea81be17ead4e4f8e10/1/details/" rel="nofollow">http://www.webpagetest.org/result/130427_NA_91c6e9c7fb110ea81be17ead4e4f8e10/1/details/</a><br />
-Fidelity: <a href="http://www.webpagetest.org/result/130427_TV_cda3854d1a54c925f0e1309fc19a8231/1/details/" rel="nofollow">http://www.webpagetest.org/result/130427_TV_cda3854d1a54c925f0e1309fc19a8231/1/details/</a><br />
-Target: <a href="http://www.webpagetest.org/result/130427_8S_0f557a96d2628f765a735bb66e0a9fb5/1/details/" rel="nofollow">http://www.webpagetest.org/result/130427_8S_0f557a96d2628f765a735bb66e0a9fb5/1/details/</a></p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment byuser comment-author-sowrock bypostauthor odd alt thread-odd thread-alt depth-1 author" id="li-comment-60047">
-<div id="comment-60047">
-<p class="comment-metadata">
-<strong><a href="http://stevesouders.com" rel="external nofollow" class="url">Steve Souders</a></strong> | 26-Apr-13 at 11:01 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60047">Permalink</a> |  </p>
-
-
-<p>Guypo: Very nice combining LQIP with responsive images for the second higher resolution image. This achieves both goals – the preloader kicks off the low res image request early so the user sees something quickly, and then JS kicks off the high res image request with the appropriate size to make it faster and reduce data costs.</p>
-<p>I wouldn’t dismiss the “first N” idea. You don’t have to know which images would show up. If you underestimate then the other above-the-fold images will still load, just a little later. If you overestimate then you downloaded some extra images, but that’s okay, too. So you could combine first N, LQIP, and responsive images.</p>
-<p>When it comes to blocking, none of the major browsers block images when JS and CSS are downloading.</p>
-<p>Chrome assigns priorities to resources, and gives JS and CSS a higher priority than images. This prioritization can affect the order of requests and can result in the delay of image requests in some situations (to avoid bw contention as you say), but in other situations JS, CSS, and images download in parallel without blocking. For example, if the JS and CSS are in the <a href="http://stevesouders.com/cuzillion/?c0=bj1hfff2_0_f&amp;c1=bi3hfff2_0_f" rel="nofollow">BODY</a> instead of <a href="http://stevesouders.com/cuzillion/?c0=hj1hfff2_0_f&amp;c1=bi3hfff2_0_f" rel="nofollow">HEAD</a> then they all download together. This explains the CNN example. it was done using Chrome so there’s a lot of JS &amp; CSS at the top (because they have a higher priority), but once the BODY is created then images download in parallel with JS &amp; CSS, as seen in requests 124-126, 137-140, etc.</p>
-<p>The Fidelity and Target tests were done with IE10, which doesn’t do prioritized downloads. IN these tests we see images downloading in parallel with JS &amp; CSS even at the very beginning. There’s more JS &amp; CSS at the top simply because those occur first in the HEAD (where there aren’t any images), but images aren’t blocked. See request 5 in Fidelity and request 13 in Target, for example.</p>
-<p>The reason blocking came up was you were saying the preloader doesn’t benefit images very much. There’s certainly huge benefit when there’s a script in the BODY – the preloader will see images deeper in the page and launch those requests in parallel. There’s even benefit with lots of scripts in the HEAD because the preloader can lookahead for IMG tags and have those queued up for fetching as soon as the prioritization logic allows. Without this the image requests would  go out in a more staggered fashion as the main parser encounter IMG tags as it created every DOM element in the page. </p>
-<p>Lots of detailed (esoteric) info there – what’s the takeaway? For me it’s: Akamai’s combined solutions looks good and plays nicely with the preloader. The preloader has benefits for images in all browsers.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-60058">
-<div id="comment-60058">
-<p class="comment-metadata">
-<strong><a href="http://penibelst.de/" rel="external nofollow" class="url">Anatol Broder</a></strong> | 29-Apr-13 at 1:58 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60058">Permalink</a> |  </p>
-
-
-<p>I have published my JS + PHP implementation called <a href="https://github.com/penibelst/imadaem-zepto" rel="nofollow">Imadaem</a> on Github. The preloaders work as expected. I use the <code>prerender</code> directive and the low quality placeholders load in the background. I use Imadaem since 2 months and tested it on every modern device from the huge Samsung TV to the handy iPhone.</p>
-<p>Feel free to spread my solution.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60060">
-<div id="comment-60060">
-<p class="comment-metadata">
-<strong><a href="http://blog.cloudfour.com" rel="external nofollow" class="url">Jason Grigsby</a></strong> | 29-Apr-13 at 10:41 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60060">Permalink</a> |  </p>
-
-
-<p>@Steve, your conclusion about Akamai’s combined solution assumes that customers will chose to combine LQIP with the responsive images or conditional images tools that Akamai offers. Some may, some may not.</p>
-<p>For those who don’t, the solution is still one that replaces img src with transparent gifs in data uris.</p>
-<p>I look at that and the amount of momentum that seems to be behind finding a solution for img defer or async, <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=17842" rel="nofollow">https://www.w3.org/Bugs/Public/show_bug.cgi?id=17842</a> , as supporting evidence in my argument that at minimum, there is a keen interest in placing more control over how the pre-parser handles images in the hands of developers.</p>
-<p>After talking to Guy during dinner last week, I realized that I’m not articulating my perspective on this issue very well. If I can’t explain it while in person, I will have a hard time doing it in a comment. I think I’m going to take a stab at writing a follow up post later this week that tries to articulate my thinking.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-60061">
-<div id="comment-60061">
-<p class="comment-metadata">
-<strong><a href="http://www.msn.com" rel="external nofollow" class="url">Amiya Gupta</a></strong> | 29-Apr-13 at 9:28 pm | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60061">Permalink</a> |  </p>
-
-
-<p>Thanks for writing about this important topic, this is a great discussion. We have taken a slightly different approach to solving the responsive design + lazy-loading images “below the fold” in MSN.</p>
-<p>MSN.com for Windows 8 (<a href="http://t.msn.com" rel="nofollow">http://t.msn.com</a> on Win8/IE10; users on other browser/OS combinations will be redirected to <a href="http://www.msn.com" rel="nofollow">http://www.msn.com</a>) is a responsive site that does dynamic detection of what’s above and below the fold instead of “first N”. The site supports multiple view modes in Windows 8 including “snap” which is 320px wide. Our image tags are constructed as follows:</p>
-<p>The data-src attribute contains an object with that maps an appropriate image url with each view mode. It doesn’t pre-fetch the smallest image like in LQIP since image aspect ratios are not fixed across views. The _llic function which is defined inline in the head selects the appropriate URL based on the window width. It also decides whether the image is above or below the fold using the image’s position (as returned by getBoundingClientRect) and window size. If the image is above the fold, the src update is scheduled immediately which triggers the network request to fetch the actual image. Requests for all other img tags are schedule after OnLoad or a failsafe timeout, whichever comes first.</p>
-<p>This approach helps ensure above-the-fold images have the most bandwidth to themselves and don’t need to compete with the ones below-the-fold. Scheduling downloads via individual events also helps ensure a slow inline script in the body doesn’t block everything from being fetched, only potentially the images after the tag.</p>
-<p>An earlier approach was to maintain a selector list for divs known to be above-the-fold (assuming the resolution was 1080p). This would have become difficult to maintain over time and had some unwanted side-effects. Once the dynamic above-the-fold detection was implemented the image fetching function was first implemented inline at the bottom of the page; this was vulnerable to slow inline scripts so we switched to individual events per image.</p>
-<p>We think this technique provides a good balance between performance and responsive design. </p>
-<p>Example waterfall: <a href="http://www.webpagetest.org/result/130430_ZD_1c749dd064262d0b78ff2ccdbe9647c7/1/details/" rel="nofollow">http://www.webpagetest.org/result/130430_ZD_1c749dd064262d0b78ff2ccdbe9647c7/1/details/</a></p>
-<p>Snap view details: <a href="http://msdn.microsoft.com/en-us/library/windows/apps/hh465371.aspx#snap_ux" rel="nofollow">http://msdn.microsoft.com/en-us/library/windows/apps/hh465371.aspx#snap_ux</a></p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-60063">
-<div id="comment-60063">
-<p class="comment-metadata">
-<strong>tomByrer</strong> | 02-May-13 at 9:55 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60063">Permalink</a> |  </p>
-
-
-<p>“A smaller filesize AND a better quality on both screen types! This is impossible.”<br />
-<a href="http://blog.netvlies.nl/design-interactie/retina-revolution/" rel="nofollow">http://blog.netvlies.nl/design-interactie/retina-revolution/</a><br />
-TR;DR: use an image size 2x as large, &amp; use very aggressive 75% compression.  You’ll need only 1 image for all pixel densities while looking great on all &amp; use small images.</p>
-<p>Hat tip: Paul Verbeek comment on HTML5Rocks.</p>
-</div>
-</li><!-- #comment-## -->
-<li class="comment even thread-even depth-1" id="li-comment-60068">
-<div id="comment-60068">
-<p class="comment-metadata">
-<strong>Thomas Traub</strong> | 05-May-13 at 11:51 am | <a href="http://www.stevesouders.com/blog/2013/04/26/i/#comment-60068">Permalink</a> |  </p>
-
-
-<p>I load the standard 72 dpi version of the images, then using javascript I load bigger versions accordingly (responsive sizes, higher resolutions):<br />
-- one solution for new sites, legacy site to be upgraded and the different use cases<br />
-- easy to implement<br />
-- an additional check on the server will not interfere and can be implemented separately </p>
-<p>Works best with a dynamic image creation solution like SLIR, <a href="https://github.com/lencioni/SLIR" rel="nofollow">https://github.com/lencioni/SLIR</a></p>
-</div>
-</li><!-- #comment-## -->
-			</ol>
-
-
-
-
-
-
-
-</div><!-- #comments -->
-
-
-</div> <!-- end div id="content" -->
-</div>
-<div id="footer" class="containerwrapperpadded">
-<p>© Steve Souders</p>
-</div>
-<div>
-<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-<script src="../js/clearly.js"></script>
-<script>
-var html = window.__getMyClearlyResults().html;
-$("html").html(html);
-$("body").append('<link type="text/css" href="../css/article.css">')</script>
-</div></body>
+		</div></div>
+</body>
 </html>
