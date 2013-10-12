@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Javascript Y Combinator</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Javascript Y Combinator</h1>
+<div id="page"><p>At the end of <a href="http://www.amazon.com/The-Little-Schemer-4th-Edition/dp/0262560992">The Little Schemer</a>, the authors lead you step-by-step through the process of deriving the Y Combinator. They do this repeatedly abstracting a <code>length</code> function–and then magically, the Y Combinator appears. It is a pretty neat trick, and certainly mind-bending on your first read through the book.</p><p>Since Javascript has first-class functions, we can derive the Y Combinator in Javascript as well. I will take a different approach than <em>The Little Schemer</em>. This approach owes a lot to a couple of blog posts I read on the subject<sup><a href="#notes">1</a></sup>.</p><p>Since this is a post about recursive functions, then we can use that old chesnut, <code>factorial</code>. Here is a possible implementation of <code>factorial</code> in Javascript:</p><div><pre><code>    <span>function</span> <span>basicFactorial</span><span>(</span><span>n</span><span>)</span> <span>{</span>
+      <span>return</span> <span>n</span> <span>===</span> <span>0</span> <span>?</span> <span>1</span> <span>:</span> <span>n</span> <span>*</span> <span>basicFactorial</span><span>(</span><span>n</span><span>-</span><span>1</span><span>);</span>
+    <span>}</span>
+    
+</code></pre></div><p>Let’s start by making a non-recursive <code>basicFactorial</code>, which we’ll call <code>nonRecursive</code>:</p><div><pre><code>    <span>function</span> <span>nonRecursive</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>return</span> <span>function</span><span>(</span><span>n</span><span>)</span> <span>{</span>
+        <span>return</span> <span>n</span> <span>===</span> <span>0</span> <span>?</span> <span>1</span> <span>:</span> <span>n</span> <span>*</span> <span>f</span><span>(</span><span>n</span><span>-</span><span>1</span><span>);</span>
+      <span>}</span>
+    <span>}</span>
+    
+</code></pre></div><p>All we’ve done here is replace the recursive call of <code>basicFactorial</code>. Instead, we pass in a function that will get called. We can pass any function that returns something that supports the <code>*</code> operator:</p><div><pre><code>    <span>nonRecursive</span><span>(</span><span>function</span><span>(</span><span>x</span><span>)</span> <span>{</span> <span>return</span> <span>0</span><span>;</span> <span>})(</span><span>100</span><span>);</span> <span>// =&gt; 0</span>
+    <span>nonRecursive</span><span>(</span><span>function</span><span>(</span><span>x</span><span>)</span> <span>{</span> <span>return</span> <span>1</span><span>;</span> <span>})(</span><span>100</span><span>);</span> <span>// =&gt; 100</span>
+    <span>nonRecursive</span><span>(</span><span>function</span><span>(</span><span>x</span><span>)</span> <span>{</span> <span>return</span> <span>10</span><span>;</span> <span>})(</span><span>100</span><span>);</span> <span>// =&gt; 1000</span>
+    <span>// ... etc.</span>
+    
+</code></pre></div><p>But it starts to get a little interesting when we pass <code>basicFactorial</code> in there. Then we get back … <code>basicFactorial</code>!</p><div><pre><code>    <span>nonRecursive</span><span>(</span><span>basicFactorial</span><span>)(</span><span>4</span><span>)</span> <span>===</span> <span>basicFactorial</span><span>(</span><span>4</span><span>);</span> 
+    <span>nonRecursive</span><span>(</span><span>basicFactorial</span><span>)(</span><span>10</span><span>)</span> <span>===</span> <span>basicFactorial</span><span>(</span><span>10</span><span>);</span> 
+    <span>nonRecursive</span><span>(</span><span>basicFactorial</span><span>)(</span><span>17</span><span>)</span> <span>===</span> <span>basicFactorial</span><span>(</span><span>17</span><span>);</span>
+    <span>// ... etc.</span>
+    
+</code></pre></div><p>In other words, <code>basicFactorial</code> is a <a href="http://mathworld.wolfram.com/FixedPoint.html">fixed point</a> of the function <code>nonRecursive</code>.</p><p>This is pointless in this case, since we have defined <code>basicFactorial</code> already. But suppose we had not defined <code>basicFactorial</code>. Wouldn’t it be nice if there was a function that we could pass <code>nonRecursive</code> to that would return the fixed point of it, i.e. the <code>factorial</code> function?</p><p>That is what the Y Combinator does. Pass <code>nonRecursive</code> to <code>Y</code>, and out comes the factorial function:</p><div><pre><code>    <span>Y</span><span>(</span><span>nonRecursive</span><span>)(</span><span>100</span><span>);</span> <span>// 9.33262154439441e+157</span>
+    
+</code></pre></div><p>Note that:</p><div><pre><code>    <span>Y</span><span>(</span><span>nonRecursive</span><span>)(</span><span>100</span><span>)</span> <span>===</span> <span>nonRecursive</span><span>(</span><span>basicFactorial</span><span>)(</span><span>100</span><span>);</span>
+    
+</code></pre></div><p>Or in other words:</p><div><pre><code>    <span>Y</span><span>(</span><span>nonRecursive</span><span>)(</span><span>100</span><span>)</span> <span>===</span> <span>nonRecursive</span><span>(</span><span>Y</span><span>(</span><span>nonRecursive</span><span>))(</span><span>100</span><span>);</span>
+    
+</code></pre></div><p>So if we have <code>Y</code>, we do not need to define <code>basicFactorial</code> <em>at all</em>, we let <code>Y</code> derive it from the non-recursive function <code>nonRecursive</code>. Now let’s look at it from the other direction, and build up to <code>Y</code>. Here again, is the functional <code>nonRecursive</code> that we want to calculate the fixed point of:</p><div><pre><code>    <span>function</span> <span>nonRecursive</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>return</span> <span>function</span><span>(</span><span>n</span><span>)</span> <span>{</span>
+        <span>return</span> <span>n</span> <span>===</span> <span>0</span> <span>?</span> <span>1</span> <span>:</span> <span>n</span> <span>*</span> <span>f</span><span>(</span><span>n</span><span>-</span><span>1</span><span>);</span>
+      <span>}</span>
+    <span>}</span>
+    
+</code></pre></div><p>As noted above, pass <code>basicFactorial</code> in, and <code>nonRecursive</code> returns <code>basicFactorial</code>. Notice that we have pretty much defined factorial in the body of <code>nonRecursive</code>: <code>return n === 0 ? 1 : n * f(n-1);</code>–why not use that? So here’s our next try: Apply <code>nonRecursive</code> to itself. This requires a small change to the body of <code>nonRecursive</code>, to self-apply the passed-in function to get the body out and apply it to the inner argument.</p><div><pre><code>    <span>function</span> <span>nonRecursive</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>return</span> <span>function</span><span>(</span><span>n</span><span>)</span> <span>{</span>
+        <span>return</span> <span>n</span> <span>===</span> <span>0</span> <span>?</span> <span>1</span> <span>:</span> <span>n</span> <span>*</span> <span>f</span><span>(</span><span>f</span><span>)(</span><span>n</span><span>-</span><span>1</span><span>);</span> 
+      <span>};</span>
+    <span>}</span>
+    <span>nonRecursive</span><span>(</span><span>nonRecursive</span><span>)(</span><span>5</span><span>);</span> <span>// =&gt; 120</span>
+    
+</code></pre></div><p>Now we want to isolate the fixed point function. Let’s wrap that in a function <code>g</code>:</p><div><pre><code>    <span>function</span> <span>nonRecursive</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>return</span> <span>function</span><span>(</span><span>x</span><span>)</span> <span>{</span>
+        <span>var</span> <span>g</span> <span>=</span> <span>function</span><span>(</span><span>q</span><span>)</span> <span>{</span>
+          <span>return</span> <span>function</span><span>(</span><span>n</span><span>)</span> <span>{</span>
+            <span>return</span> <span>n</span> <span>===</span> <span>0</span> <span>?</span> <span>1</span> <span>:</span> <span>n</span> <span>*</span> <span>q</span><span>(</span><span>n</span><span>-</span><span>1</span><span>);</span>
+          <span>};</span>
+        <span>};</span>
+        <span>return</span> <span>g</span><span>(</span><span>f</span><span>(</span><span>f</span><span>))(</span><span>x</span><span>);</span>
+      <span>};</span>
+    <span>}</span>
+    
+</code></pre></div><p>Since inner function <code>g</code> does not depend on anything in closure, we can pull it out:</p><div><pre><code>    <span>function</span> <span>g</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>return</span> <span>function</span><span>(</span><span>n</span><span>)</span> <span>{</span>
+        <span>return</span> <span>n</span> <span>===</span> <span>0</span> <span>?</span> <span>1</span> <span>:</span> <span>n</span> <span>*</span> <span>f</span><span>(</span><span>n</span><span>-</span><span>1</span><span>);</span>
+      <span>};</span>
+    <span>}</span>
+    
+</code></pre></div><p>The pulled-out function may look familiar–it’s <code>nonRecursive</code> again. Here’s what’s left over after <code>g</code> (a.k.a. <code>nonRecursive</code>) is pulled out; let’s call it <code>almostY</code>:</p><div><pre><code>    <span>function</span> <span>almostY</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>return</span> <span>function</span><span>(</span><span>x</span><span>)</span> <span>{</span>
+        <span>return</span> <span>g</span><span>(</span><span>f</span><span>(</span><span>f</span><span>))(</span><span>x</span><span>);</span>
+      <span>};</span>
+    <span>}</span>
+    <span>almostY</span><span>(</span><span>almostY</span><span>)(</span><span>5</span><span>);</span> <span>// =&gt; 120</span>
+    
+</code></pre></div><p>We’ve pulled <code>g</code> out of <code>almostY</code>, but <code>almostY</code> still depends on <code>g</code>. The final step is to wrap <code>almostY</code> in a function that takes the functional <code>g</code> as an argument. Then <code>almostY</code> will have no dependencies.</p><p>So, let’s wrap it in a function that takes our non-recursive factorial functional and returns the fixed point of it. And since this is the last step, let’s call that function <code>Y</code>:</p><div><pre><code>    <span>function</span> <span>Y</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>var</span> <span>p</span> <span>=</span> <span>function</span><span>(</span><span>h</span><span>)</span> <span>{</span>
+        <span>return</span> <span>function</span><span>(</span><span>x</span><span>)</span> <span>{</span>
+          <span>return</span> <span>f</span><span>(</span><span>h</span><span>(</span><span>h</span><span>))(</span><span>x</span><span>);</span>
+        <span>};</span>
+      <span>};</span>
+      <span>return</span> <span>p</span><span>(</span><span>p</span><span>);</span>
+    <span>}</span>
+ 
+    <span>Y</span><span>(</span><span>g</span><span>)(</span><span>6</span><span>);</span> <span>// =&gt; 720</span>
+    
+</code></pre></div><p>Holy crap! It works! But it’s not just for factorial–<code>Y</code> will provide a fixed point for any unary function, e.g.</p><div><pre><code>    <span>function</span> <span>nonRecursiveFibonacci</span><span>(</span><span>f</span><span>)</span> <span>{</span>
+      <span>return</span> <span>function</span><span>(</span><span>n</span><span>)</span> <span>{</span>
+        <span>return</span> <span>n</span> <span>&lt;</span> <span>2</span> <span>?</span> <span>n</span> <span>:</span> <span>f</span><span>(</span><span>n</span><span>-</span><span>1</span><span>)</span> <span>+</span> <span>f</span><span>(</span><span>n</span><span>-</span><span>2</span><span>);</span> 
+      <span>};</span>
+    <span>}</span>
+    <span>Y</span><span>(</span><span>nonRecursiveFibonacci</span><span>)(</span><span>10</span><span>);</span> <span>// =&gt; 55</span>
+    
+</code></pre></div><p>As presented, this version of <code>Y</code> can only handle unary functions, and it will blow up the stack for relatively low values of <code>n</code>. It is straightforward to extend <code>Y</code> to handle functions of any arity, and to memoize it.</p><h3 id="notes">Notes</h3><ol>
+<li>I found these articles helpful: <a href="http://matt.might.net/articles/implementation-of-recursive-fixed-point-y-combinator-in-javascript-for-memoization/">Fixed-point combinators in JavaScript: Memoizing recursive functions</a> and <a href="http://blog.jcoglan.com/2008/01/10/deriving-the-y-combinator/">Deriving the Y combinator</a>.</li>
+</ol><address>
+    <span>
+      <a href="/">Buzz de Cafe</a> 
+      <a href="https://github.com/buzzdecafe"><i></i></a> 
+      <a href="https://plus.google.com/u/0/109680233908242274420/posts/p/pub"><i></i></a> 
+      <a href="https://twitter.com/buzzdecafe"></a> 
+      <a href="http://lnkd.in/bVvTbzf"><i></i></a>
+    </span>
+    <span>05 September 2013</span>
+    <span></span>
+  </address></div></div>
+</body>
+</html>
