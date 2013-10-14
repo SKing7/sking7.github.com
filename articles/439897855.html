@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Scope Analysis for JavaScript Code</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Scope Analysis for JavaScript Code</h1>
+<div>
+							<p>Walking the syntax tree of a JavaScript code is often the first step towards building a specialized <a href="http://en.wikipedia.org/wiki/Static_program_analysis">static analyzer</a>. In some cases however, when the analysis involves variables and functions within the code, an additional scope analysis is necessary. This permits a more thorough examination of those variables and functions, including to check if some identifiers accidentally leak to the global scope.</p>
+<p>Of course, such a simple leak detector is not new. In my previous blog post <a href="http://ariya.ofilabs.com/2012/11/polluting-and-unused-javascript-variables.html" title="Polluting and Unused JavaScript Variables">Polluting and Unused JavaScript Variables</a>, I’ve covered two simple JavaScript utilities for catching this sloppy practice. In addition to that, I also reviewed the concept of <a href="http://ariya.ofilabs.com/2013/04/javascript-variable-scope-and-highlight.html" title="JavaScript Variable Scope and Highlight">identifier highlighting</a> and <a href="http://ariya.ofilabs.com/2013/04/rename-refactoring-for-javascript-code.html" title="Rename Refactoring for JavaScript Code">rename refactoring</a> in an editor. As a bonus of this highlighting feature, it is easy to spot the missing declaration which leads to the global leak (unless we’re in strict mode), as shown in the following screenshot of the online <a href="http://esprima.org/demo/highlight.html">highlighting demo</a>.</p>
+<p><img src="http://ariya.ofilabs.com/wp-content/uploads/2013/09/varleak.png" alt="varleak" width="512" /></p>
+<p>In the above code, <code>widht</code> is where the cursor is (hence, the yellow highlight). Due to the typo, it is not a match for the local variable declared as <code>width</code>. The problem is caught at run-time if the code is running in <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode">strict mode</a>. However, obviously it is fantastic to get noticed of the mistake ahead of time. This is where a static analysis of the scope of every variable and function will be tremendously useful.</p>
+<p>Fortunately, these days you can use a microlibrary called <strong>Escope</strong> (GitHub: <a href="https://github.com/Constellation/escope">Constellation/escope</a>) which can analyze the scope of the entire code. This adds another useful library to the existing family of <a href="http://esprima.org">Esprima</a> (for parsing), <a href="https://github.com/Constellation/estraverse">Estraverse</a> (syntax traversal tool), and <a href="https://github.com/Constellation/escodegen">Escodegen</a> (code regeneration). This arsenal of tools can be quite deadly.</p>
+<p>The detailed operation and usage of Escope is beyond the scope (pun intended) of this blog post. Instead, let me just show you one built-in feature of the library, implicit declaration at the global scope. In other words, this is a collection of all variables which leak unintentionally, as in the previous highlighting example. It is as easy as this function:</p>
+
+<div><table><tr><td><pre><span>function</span> find_leak<span>(</span>code<span>)</span> <span>{</span>
+  <span>var</span> leaks<span>,</span> syntax<span>,</span> globalScope<span>;</span>
+&nbsp;
+  leaks <span>=</span> <span>[</span><span>]</span><span>;</span>
+  syntax <span>=</span> esprima.<span>parse</span><span>(</span>code<span>,</span> <span>{</span> loc<span>:</span> <span>true</span> <span>}</span><span>)</span><span>;</span>
+  globalScope <span>=</span> escope.<span>analyze</span><span>(</span>syntax<span>)</span>.<span>scopes</span><span>[</span><span>0</span><span>]</span><span>;</span>
+  globalScope.<span>implicit</span>.<span>variables</span>.<span>forEach</span><span>(</span><span>function</span> <span>(</span>v<span>)</span> <span>{</span>
+      <span>var</span> id <span>=</span> v.<span>identifiers</span><span>[</span><span>0</span><span>]</span><span>;</span>
+      leaks.<span>push</span><span>(</span><span>{</span>
+          name<span>:</span> id.<span>name</span><span>,</span>
+          line<span>:</span> id.<span>loc</span>.<span>start</span>.<span>line</span>
+      <span>}</span><span>)</span><span>;</span>
+  <span>}</span><span>)</span><span>;</span>
+&nbsp;
+  <span>return</span> leaks<span>;</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>First we need to parse the code and store its abstract syntax tree in <code>syntax</code>. Note that location tracking is enabled because we want to locate the line number of every leaking variable. After that, scope analysis is being invoked and we grab the first one, its global scope. Now it is a matter of iterating <code>variables</code> within its implicit declaration and collecting the necessary information, i.e. the name and the location. This is the return value of the function and you can easily process it.</p>
+<p>Real-world analysis will involve more processing than just a simple global leak collection (you can even visualize the scopes). Hopefully, this simple example will spark your interest in leveraging the scope information of any piece of JavaScript code.</p>
+							
+												
+						</div></div>
+</body>
+</html>
