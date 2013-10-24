@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Sorting Networks using Higher-Order Functions of JavaScript Array</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Sorting Networks using Higher-Order Functions of JavaScript Array</h1>
+<div>
+							<p>An implementation of a sorting algorithm usually uses one or more iterating loops in the form of for/while statement. With JavaScript and its powerful Array object, these loops can be avoided since Array’s higher-order functions are enough for iterating the array. One candidate for this technique is the implementation of <strong>sorting networks</strong>.</p>
+<p>Before we start, let us do a quick refresh on some higher-order functions. In my previous blog post <a href="http://ariya.ofilabs.com/2013/10/searching-using-array-prototype-reduce.html" title="Searching using Array.prototype.reduce">Searching using Array.prototype.reduce</a>, there is an implementation of <strong>insertion sort</strong> without any loop statements at all. If we change the problem into sorting an array of numbers, the complete code will be:</p>
+
+<div><table><tr><td><pre><span>function</span> sort<span>(</span>entries<span>)</span> <span>{</span>
+  <span>return</span> <span>Array</span>.<span>apply</span><span>(</span><span>0</span><span>,</span> <span>Array</span><span>(</span>entries.<span>length</span><span>)</span><span>)</span>.<span>map</span><span>(</span><span>function</span> <span>(</span><span>)</span> <span>{</span>
+    <span>return</span> entries.<span>splice</span><span>(</span>entries.<span>reduce</span><span>(</span><span>function</span> <span>(</span>max<span>,</span> e<span>,</span> i<span>)</span> <span>{</span>
+      <span>return</span> e <span>&gt;</span> max.<span>value</span> <span>?</span> <span>{</span> index<span>:</span> i<span>,</span> value<span>:</span> e <span>}</span> <span>:</span> max<span>;</span>
+    <span>}</span><span>,</span> <span>{</span> value<span>:</span> <span>null</span> <span>}</span><span>)</span>.<span>index</span><span>,</span> <span>1</span><span>)</span>.<span>pop</span><span>(</span><span>)</span><span>;</span>
+  <span>}</span><span>)</span><span>;</span> 
+<span>}</span>
+&nbsp;
+console.<span>log</span><span>(</span>sort<span>(</span><span>[</span><span>14</span><span>,</span> <span>3</span><span>,</span> <span>77</span><span>]</span><span>)</span><span>)</span><span>;</span> <span>// [ 77, 14, 3 ]</span></pre></td></tr></table></div>
+
+<p>Like a typical insertion sort, the outer loop picks the largest value one at a time while the inner loop searches for the largest number in the working array. For the outer loop, <code>Array.apply(0, Array(N))</code> is the trick to generate a usable empty array, see my other blog post on <a href="http://ariya.ofilabs.com/2013/07/sequences-using-javascript-array.html" title="Sequences using JavaScript Array">Sequence using JavaScript Array</a>. In the inner loop, <code>reduce</code> is used to locate the largest number as well as its index. The index is needed to yank that number out of the array. At the same time, the number is being stashed into the sorting result.</p>
+<p>If you are still confused, try to deconstruct and debug the above code. When necessary, write the imperative version, possibly using the classical for loop, and compare both versions. It is quite useful to understand this properly to make it easier to follow the next part.</p>
+<p>For the <a href="http://en.wikipedia.org/wiki/Sorting_network">sorting network</a>, the process involves two steps. The first step is to build the comparator network, the second is the actual sorting process via comparison and swap according to the constructed network. For the second step, the core operation is the following function (that acts like a comparator unit):</p>
+
+<div><table><tr><td><pre><span>function</span> compareswap<span>(</span>array<span>,</span> p<span>,</span> q<span>)</span> <span>{</span>
+  <span>if</span> <span>(</span>array<span>[</span>p<span>]</span> <span>&lt;</span> array<span>[</span>q<span>]</span><span>)</span> <span>{</span>
+    <span>var</span> temp <span>=</span> array<span>[</span>q<span>]</span><span>;</span>
+    array<span>[</span>q<span>]</span> <span>=</span> array<span>[</span>p<span>]</span><span>;</span>
+    array<span>[</span>p<span>]</span> <span>=</span> temp<span>;</span>
+  <span>}</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>As an illustration, if the array to be sorted has 3 numbers only, practically the sorting will be a series of the following steps:</p>
+
+
+<div><table><tr><td><pre>compareswap<span>(</span>entries<span>,</span> <span>0</span><span>,</span> <span>1</span><span>)</span><span>;</span> 
+compareswap<span>(</span>entries<span>,</span> <span>1</span><span>,</span> <span>2</span><span>)</span><span>;</span> 
+compareswap<span>(</span>entries<span>,</span> <span>0</span><span>,</span> <span>1</span><span>)</span><span>;</span></pre></td></tr></table></div>
+
+<p>For 4-number array, it will be like:</p>
+
+<div><table><tr><td><pre>compareswap<span>(</span>entries<span>,</span> <span>0</span><span>,</span> <span>1</span><span>)</span><span>;</span> 
+compareswap<span>(</span>entries<span>,</span> <span>1</span><span>,</span> <span>2</span><span>)</span><span>;</span> 
+compareswap<span>(</span>entries<span>,</span> <span>2</span><span>,</span> <span>3</span><span>)</span><span>;</span> 
+compareswap<span>(</span>entries<span>,</span> <span>0</span><span>,</span> <span>1</span><span>)</span><span>;</span> 
+compareswap<span>(</span>entries<span>,</span> <span>1</span><span>,</span> <span>2</span><span>)</span><span>;</span> 
+compareswap<span>(</span>entries<span>,</span> <span>0</span><span>,</span> <span>1</span><span>)</span><span>;</span></pre></td></tr></table></div>
+
+<p>If we draw the sequence, the sorting network <a href="http://hoytech.github.io/sorting-networks/">annotation</a> look like the following diagram. You probably can already see the pattern here, in particular if you relate it to the previous implementation of insertion sort. There is a few alternatives to this configuration of sorting networks such as <a href="http://en.wikipedia.org/wiki/Batcher_odd%E2%80%93even_mergesort">odd-even mergesort</a>, <a href="http://en.wikipedia.org/wiki/Bitonic_sort">Bitonic</a>, and many others.</p>
+<p><img src="http://ariya.ofilabs.com/wp-content/uploads/2013/10/sn.png" alt="sn" width="275" /></p>
+<p>The comparator network simply formalizes this so that we can put every compare-and-swap action in a single loop. As long as we have the right network for the given array size, sorting is a matter of running:</p>
+
+<div><table><tr><td><pre><span>function</span> sort<span>(</span>network<span>,</span> entries<span>)</span> <span>{</span>
+  <span>for</span> <span>(</span><span>var</span> i <span>=</span> <span>0</span><span>;</span> i <span>&lt;</span> network.<span>length</span><span>;</span> <span>++</span>i<span>)</span>
+    compareswap<span>(</span>entries<span>,</span> network<span>[</span>i<span>]</span><span>,</span> network<span>[</span>i<span>]</span> <span>+</span> <span>1</span><span>)</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p><strong>Quiz</strong>: what kind of sorting algorithm is that?</p>
+<p>How to create the network? A quick way is shown below. Note that the network will be always the same for the given array size (N), thus it may make sense to <a href="http://en.wikipedia.org/wiki/Memoization">memoize</a> it in some scenarios.</p>
+
+
+<div><table><tr><td><pre><span>function</span> createNetwork<span>(</span>N<span>)</span> <span>{</span>
+  <span>var</span> network <span>=</span> <span>[</span><span>]</span><span>;</span>
+  <span>for</span> <span>(</span><span>var</span> i <span>=</span> N <span>-</span> <span>1</span><span>;</span> i <span>&gt;=</span> <span>0</span><span>;</span> <span>--</span>i<span>)</span>
+    <span>for</span> <span>(</span><span>var</span> j <span>=</span> <span>0</span><span>;</span> j <span>&lt;</span> i<span>;</span> <span>++</span>j<span>)</span>
+      network.<span>push</span><span>(</span>j<span>)</span><span>;</span>
+  <span>return</span> network<span>;</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>Obviously, why use for loop if we can leverage Array object? Here is the version, out of a gazillions other possibilities, which uses only Array’s higher-order functions. Like what I have discussed in the <a href="http://ariya.ofilabs.com/2013/07/prime-numbers-factorial-and-fibonacci-series-with-javascript-array.html" title="Prime Numbers, Factorial, and Fibonacci Series with JavaScript Array">Fibonacci series</a> construction, <code>reduce</code> can be (ab)used to accumulate elements into an array and this serves as the outer loop. The inner loop is way simpler, it only needs to create a sequence of numbers from 0 to the current limit.</p>
+
+
+<div><table><tr><td><pre><span>function</span> createNetwork<span>(</span>N<span>)</span> <span>{</span>
+  <span>return</span> <span>Array</span>.<span>apply</span><span>(</span><span>0</span><span>,</span> <span>Array</span><span>(</span>N<span>)</span><span>)</span>.<span>reduce</span><span>(</span><span>function</span> <span>(</span>network<span>,</span> _<span>,</span> y<span>)</span> <span>{</span>
+    <span>return</span> network.<span>concat</span><span>(</span><span>Array</span>.<span>apply</span><span>(</span><span>0</span><span>,</span> <span>Array</span><span>(</span>N <span>-</span> y <span>-</span> <span>1</span><span>)</span><span>)</span>.<span>map</span><span>(</span><span>function</span><span>(</span>_<span>,</span> x<span>)</span> <span>{</span>
+      <span>return</span> x<span>;</span>
+    <span>}</span><span>)</span><span>)</span><span>;</span>
+  <span>}</span><span>,</span> <span>[</span><span>]</span><span>)</span><span>;</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>Combining both these two steps give us the final code as follows (notice the same code pattern for reduce). See if you recognize the construct for each step and if you can analyze what it is doing there.</p>
+
+<div><table><tr><td><pre><span>function</span> sort<span>(</span>input<span>)</span> <span>{</span>
+  <span>var</span> array <span>=</span> input.<span>slice</span><span>(</span><span>0</span><span>)</span><span>;</span>
+  <span>Array</span>.<span>apply</span><span>(</span><span>0</span><span>,</span> <span>Array</span><span>(</span>array.<span>length</span><span>)</span><span>)</span>.<span>reduce</span><span>(</span><span>function</span> <span>(</span>network<span>,</span> _<span>,</span> y<span>)</span> <span>{</span>
+    <span>return</span> network.<span>concat</span><span>(</span><span>Array</span>.<span>apply</span><span>(</span><span>0</span><span>,</span> <span>Array</span><span>(</span>array.<span>length</span> <span>-</span> y <span>-</span> <span>1</span><span>)</span><span>)</span>
+      .<span>map</span><span>(</span><span>function</span><span>(</span>_<span>,</span> x<span>)</span> <span>{</span> <span>return</span> x<span>;</span> <span>}</span><span>)</span><span>)</span><span>;</span>
+  <span>}</span><span>,</span> <span>[</span><span>]</span><span>)</span>.<span>reduce</span><span>(</span><span>function</span><span>(</span>result<span>,</span> p<span>)</span> <span>{</span>
+    <span>if</span> <span>(</span>array<span>[</span>p<span>]</span> <span>&lt;</span> array<span>[</span>p <span>+</span> <span>1</span><span>]</span><span>)</span> <span>{</span>
+      <span>var</span> temp <span>=</span> array<span>[</span>p <span>+</span> <span>1</span><span>]</span><span>;</span>
+      array<span>[</span>p <span>+</span> <span>1</span><span>]</span> <span>=</span> array<span>[</span>p<span>]</span><span>;</span>
+      array<span>[</span>p<span>]</span> <span>=</span> temp<span>;</span>
+    <span>}</span>
+    <span>return</span> array<span>;</span>
+  <span>}</span><span>,</span> array<span>)</span><span>;</span>
+  <span>return</span> array<span>;</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>While sorting network is supposed to be well suited for parallelized comparison, it does not give us a lot of benefit in the context above. However, I hope these two different ways to implement sorting in JavaScript will inspire you to further explore the wonderful world of sorting networks.</p>
+<p><strong>Note</strong>: Special thanks to <a href="https://github.com/ikarienator">Bei Zhang</a> for his initial implementation of sorting network and for reviewing this blog post.
+
+							
+												
+						</p></div></div>
+</body>
+</html>
