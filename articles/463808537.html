@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Marco Ramilli's Blog: Hacking through images</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Marco Ramilli's Blog: Hacking through images</h1>
+<div dir="ltr" trbidi="on"><p>
+It's long time I don't write on my own blog (more then two months) and if you look at the history bar on your right you will probably figure out&nbsp; I am slowing down my blog posts a bit if compared to the past years. This happens due the amount of work my security team and I are involved on.</p><p>
+Many different and really important facts happened during the past months, from astonishing NSA revelations to huge BUGs and new Malware kit ready to be purchased. Even if there would be lots to say about all these&nbsp; I will not dig into them.&nbsp;</p><p>
+Since "things" went public today I want to share a little and dirty python script which embeds javascript code into bmp images letting those images still valid images, ready to be processed from your favorite browser.&nbsp;</p><p>
+The following&nbsp; HTML page wants to parse a bmp file and a javascript file which happen to be the same file: 2.bmp. Theoretically the file should be or a bitmap file or a javascript file. <b>Could it be a javacript and an image file at the same time</b> ? The answer should be NO. It couldn't. But let's see what we have.</p><br /><div><a href="http://1.bp.blogspot.com/-3b4u6bzWUwo/UkL_P5UNDiI/AAAAAAAALdo/HlK-aw89q1A/s1600/Screen+Shot+2013-09-25+at+5.20.04+PM.png" imageanchor="1"><img border="0" height="101" src="http://1.bp.blogspot.com/-3b4u6bzWUwo/UkL_P5UNDiI/AAAAAAAALdo/HlK-aw89q1A/s400/Screen+Shot+2013-09-25+at+5.20.04+PM.png" width="400" />&nbsp;</a></div><p>
+&nbsp;Executing this file you'll find out this result:</p><div><a href="http://1.bp.blogspot.com/-Jy6jCUuc-R0/UkL_ddq2U2I/AAAAAAAALdw/eWnc5JBe2SE/s1600/Screen+Shot+2013-09-25+at+5.14.13+PM.png" imageanchor="1"><img border="0" height="275" src="http://1.bp.blogspot.com/-Jy6jCUuc-R0/UkL_ddq2U2I/AAAAAAAALdw/eWnc5JBe2SE/s400/Screen+Shot+2013-09-25+at+5.14.13+PM.png" width="400" />&nbsp;</a></div><p>
+As you can see, both tags succesfully executed. The Image tag is showing the red Bitmap file and the script tag is doing its job by executing a JavaScript. How is it possible ? How did you write such a file ? The following images show more details about the dirty code who generates these beautiful bitmap files.</p><div><a href="http://3.bp.blogspot.com/-3ZV097iaNJo/UkMANq-imiI/AAAAAAAALd4/z1ohKEI6Ikk/s1600/Screen+Shot+2013-09-25+at+5.15.36+PM.png" imageanchor="1"><img border="0" height="276" src="http://3.bp.blogspot.com/-3ZV097iaNJo/UkMANq-imiI/AAAAAAAALd4/z1ohKEI6Ikk/s400/Screen+Shot+2013-09-25+at+5.15.36+PM.png" width="400" />&nbsp;</a></div><p>
+The creation procedure. </p><br /><div><a href="http://2.bp.blogspot.com/-AkRFU4QaW7c/UkMAPVZ_p1I/AAAAAAAALeA/yPBrk7TBZcc/s1600/Screen+Shot+2013-09-25+at+5.15.59+PM.png" imageanchor="1"><img border="0" height="335" src="http://2.bp.blogspot.com/-AkRFU4QaW7c/UkMAPVZ_p1I/AAAAAAAALeA/yPBrk7TBZcc/s400/Screen+Shot+2013-09-25+at+5.15.59+PM.png" width="400" />&nbsp;</a></div><p>
+The&nbsp; substitution procedure.</p><p>
+This is not magic at all. This is just my implementation of the BMP parsing bug many libraries have. The idea behind this python code is to create a valid BMP header within \x2F\x2A (aka \*) and then close up the end of the image through a \x2A\x2F (aka *\). To be a valid JavaScript file, you need to use the --not used-- header (\x42\x4D) as a variable and/or as a part of the code. This is why before the payload you might inject a simple expression like "=1;" or more commonly used "=a;" The following image shows the first part of a forget BMP header to exploit this eakness.</p><div><a href="http://1.bp.blogspot.com/-o5OMUE21Fu4/UkNOXmBYD4I/AAAAAAAALeQ/EGg2IzaEENg/s1600/Screen+Shot+2013-09-25+at+5.38.46+PM.png" imageanchor="1"><img border="0" height="36" src="http://1.bp.blogspot.com/-o5OMUE21Fu4/UkNOXmBYD4I/AAAAAAAALeQ/EGg2IzaEENg/s640/Screen+Shot+2013-09-25+at+5.38.46+PM.png" width="640" /></a></div><div><p style="display: inline;">
+BTW if you want to downloade the entire code, grab it&nbsp; </p><a href="http://pastebin.com/04y7ee3u" target="_blank">here</a><p style="display: inline;"> (pasteBIN).&nbsp; </p></div><p>
+Run-it as: bmp.py -i image.bmp "alert(\"test\");"</p><p>
+Don't forget, you might want to use obfuscators to better hide your javascript like the following example:</p><p>
+python bmp.py -i 2.bmp "var _0x9c4c=[\"\x48\x65\x6C\x6C\x6F\x20\x57\x6F\x72\x6C\x64\x21\",\"\x0A\",\"\x4F\x4B\"];var a=_0x9c4c[0];function MsgBox(_0xccb4x3){alert(_0xccb4x3+_0x9c4c[1]+a);} ;MsgBox(_0x9c4c[2]);"</p><p>
+Enjoy your new hackish tool !</p></div></div>
+</body>
+</html>

