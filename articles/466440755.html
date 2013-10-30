@@ -1,0 +1,381 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>What you need to know about Angular SEO</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>What you need to know about Angular SEO</h1>
+<div>
+          <header>
+            
+          </header>
+          
+          <p>Search engines, such as Google and Bing are engineered to crawl static web pages, not javascript-heavy, client-side apps. This is typical of a search engine which does not render javascript when the search bot is crawling over web pages. </p>
+
+<p>This is because our javascript-heavy apps need a javascript engine to run, like PhantomJS or v8, for instance. Web crawlers typically load a web page without using a javascript interpreter. </p>
+
+<blockquote>
+<p>Search engines do not include JS interpreters in their crawlers for good reason, they don’t need to and it slows them down and makes them more inefficient for crawling the web.</p>
+</blockquote>
+
+<p>Are we out of luck for providing good SEO for our Angular apps? This article will show you exactly what you need to know to get your app indexed <em>today</em>.</p>
+
+<h2>Getting angular apps indexed</h2>
+
+<p>There are several different ways that we can tell Google to handle indexing our app. One, the more common approach is by using a backend to serve our angular app. This has the advantage of being simple to implement without much duplication of code. </p>
+
+<p>A second approach is to render all of the content delivered by our angular app inside a <code>&lt;noscript&gt;</code> tag in our javascript. We’re not going to cover the second approach </p>
+
+<p>In this article, we’re going to walk through how you can build an SEO toolchain for your workflow, presenting a bunch of different options for you to choose what works best for you.</p>
+
+<h2>How modern search engines work with client-side apps</h2>
+
+<p>Google and other advanced search engines support the hashbang URL format, which is used to identify the current page that’s being accessed at a given URL. These search engines transform this URL into a custom URL format that enables them to be accessible by the server. </p>
+
+<p>The search engine visits the URL and expects to get the HTML that our browsers will receive, with the fully rendered HTML content. For instance, Google will turn the hashbang URL from:</p>
+<pre>http://www.ng-newsletter.com/#!/signup/page
+</pre>
+<p>Into the URL:</p>
+<pre>http://www.ng-newsletter.com/?_escaped_fragment_=/signup/page
+</pre>
+<p>Within our angular app, we will need to tell Google to handle our site slightly differently depending upon which style we handle.</p>
+
+<h3>Hashbang syntax</h3>
+
+<p>Google’s Ajax crawling specification was written and originally intended for delivering URLs with the hashbang syntax, which was an original method of creating permalinks for JS applications. </p>
+
+<p>We’ll need to configure our app to use the <code>hashPrefix</code> (default) in our routing. This will turn our routes from simply using the <code>/#/</code> syntax to the <code>/#!/</code> syntax:</p>
+<pre><span>angular</span><span>.</span><span>module</span><span>(</span><span>'myApp'</span><span>,</span> <span>[])</span>
+<span>.</span><span>config</span><span>([</span><span>'$location'</span><span>,</span> <span>function</span><span>(</span><span>$location</span><span>)</span> <span>{</span>
+  <span>$location</span><span>.</span><span>hashPrefix</span><span>(</span><span>'!'</span><span>);</span>
+<span>}]);</span>
+</pre>
+<h3>HTML5 routing mode</h3>
+
+<p>The new HTML5 pushState doesn’t work the same way as it modifies the browser’s URL and history. To get angular apps to “fool” the search bot, we can add a simple element to the header:</p>
+<pre><span>&lt;meta</span> <span>name=</span><span>"fragment"</span> <span>content=</span><span>"!"</span><span>&gt;</span>
+</pre>
+<p>This tells the Google spider to use the new crawling spec to crawl our site. When it encounters this tag, instead of crawling our site like <em>normal</em>, it will revisit the site using the <code>?_escaped_fragment_=</code> tag.</p>
+
+<p>This assumes that we’re using HTML5 mode with the <code>$location</code> service:</p>
+<pre><span>angular</span><span>.</span><span>module</span><span>(</span><span>'myApp'</span><span>,</span> <span>[])</span>
+<span>.</span><span>config</span><span>([</span><span>'$location'</span><span>,</span> 
+<span>function</span><span>(</span><span>$location</span><span>)</span> <span>{</span>
+  <span>$location</span><span>.</span><span>html5Mode</span><span>(</span><span>true</span><span>);</span>
+<span>}]);</span>
+</pre>
+<p>With the <code>_escaped_fragment_</code> in our query string, we can use our backend server to serve static HTML instead of our client-side app. </p>
+
+<p>Now, our backend can detect if the request has the <code>_escaped_fragment_</code> in the request and and we can serve static HTML back instead of our pure angular app so that the crawler can crawl our site as though it were a static site.</p>
+
+<h2>Options for handling SEO from the server-side</h2>
+
+<p>We have a number of different options available to us to make our site SEO-friendly. We’ll walk through three different ways to deliver our apps from the server-side:</p>
+
+<ul>
+<li>Using node/express middleware</li>
+<li>Use Apache to rewrite URLS</li>
+<li>Use nginx to proxy URLS</li>
+</ul>
+
+<h3>Using node/express middleware</h3>
+
+<p>To deliver static HTML using NodeJS and Express (the web application framework for NodeJS), we’ll add some middleware that will look for the <code>_escaped_fragment_</code> in our query parameters. </p>
+
+<p>In this case, this middleware will only be called if the <code>_escaped_fragment_</code> exists as a query parameter, otherwise it will continue along the call chain.</p>
+<pre><span>// In our app.js configuration
+</span><span>app</span><span>.</span><span>use</span><span>(</span><span>function</span><span>(</span><span>req</span><span>,</span> <span>res</span><span>,</span> <span>next</span><span>)</span> <span>{</span>
+  <span>var</span> <span>fragment</span> <span>=</span> <span>req</span><span>.</span><span>query</span><span>.</span><span>_escaped_fragment_</span><span>;</span>
+
+  <span>// If there is no fragment in the query params
+</span>  <span>// then we're not serving a crawler
+</span>  <span>if</span> <span>(</span><span>!</span><span>fragment</span><span>)</span> <span>return</span> <span>next</span><span>();</span>
+
+  <span>// If the fragment is empty, serve the
+</span>  <span>// index page
+</span>  <span>if</span> <span>(</span><span>fragment</span> <span>===</span> <span>""</span> <span>||</span> <span>fragment</span> <span>===</span> <span>"/"</span><span>)</span>
+    <span>fragment</span> <span>=</span> <span>"/index.html"</span><span>;</span>
+
+  <span>// If fragment does not start with '/'
+</span>  <span>// prepend it to our fragment
+</span>  <span>if</span> <span>(</span><span>fragment</span><span>.</span><span>charAt</span><span>(</span><span>0</span><span>)</span> <span>!==</span> <span>"/"</span><span>)</span>
+    <span>fragment</span> <span>=</span> <span>'/'</span> <span>+</span> <span>fragment</span><span>;</span>
+
+  <span>// If fragment does not end with '.html'
+</span>  <span>// append it to the fragment
+</span>  <span>if</span> <span>(</span><span>fragment</span><span>.</span><span>indexOf</span><span>(</span><span>'.html'</span><span>)</span> <span>==</span> <span>-</span><span>1</span><span>)</span>
+    <span>fragment</span> <span>+=</span> <span>".html"</span><span>;</span>
+
+  <span>// Serve the static html snapshot
+</span>  <span>try</span> <span>{</span>
+    <span>var</span> <span>file</span> <span>=</span> <span>__dirname</span> <span>+</span> <span>"/snapshots"</span> <span>+</span> <span>fragment</span><span>;</span>
+    <span>res</span><span>.</span><span>sendfile</span><span>(</span><span>file</span><span>);</span>
+  <span>}</span> <span>catch</span> <span>(</span><span>err</span><span>)</span> <span>{</span>
+    <span>res</span><span>.</span><span>send</span><span>(</span><span>404</span><span>);</span>
+  <span>}</span>
+<span>});</span>
+</pre>
+<p>This middleware expects our snapshots to exist in a top-level directory called ‘/snapshots’ and serve files based upon the request path.</p>
+
+<p>For instance, it will serve a request to <code>/</code> as <code>index.html</code>, while it will serve a request to <code>/about</code> as <code>about.html</code> in the snapshots directory.</p>
+
+<h3>Use Apache to rewrite URLS</h3>
+
+<p>If we’re using the <a href="http://httpd.apache.org/">apache server</a> to deliver our angular app, we can add a few lines to our configuration that will serve snapshots instead of our javascript app.</p>
+
+<p>We can use the <code>mod_rewrite</code> mod to detect if the route being requested includes the <code>_escaped_fragment_</code> query parameter or not. If it <strong>does</strong> include it, then we’ll rewrite the request to point to the static version in the <code>/snapshots</code> directory.</p>
+
+<p>In order to set the rewrite in motion, we’ll need to enable the appropriate modules:</p>
+<pre><span>$ </span>a2enmod proxy
+<span>$ </span>a2enmod proxy_http
+</pre>
+<p>Then we’ll need to reload the apache config:</p>
+<pre><span>$ </span>sudo /etc/init.d/apache2 reload
+</pre>
+<p>We can set the rewrite rules either in the virtualhost configuration for the site or the <code>.htaccess</code> file that sits at the root of the server directory.</p>
+<pre>RewriteEngine On
+Options +FollowSymLinks
+RewriteCond %<span>{</span>REQUEST_URI<span>}</span>  ^/<span>$</span>
+RewriteCond %<span>{</span>QUERY_STRING<span>}</span> ^_escaped_fragment_<span>=</span>/?<span>(</span>.<span>*</span><span>)</span><span>$</span>
+RewriteRule ^<span>(</span>.<span>*</span><span>)</span><span>$ </span>/snapshots/%1? <span>[</span>NC,L]
+</pre>
+<h3>Use nginx to proxy URLS</h3>
+
+<p>If we’re using <a href="http://wiki.nginx.org/Main">nginx</a> to serve our angular app, we can add some configuration to serve snapshots of our app if there is an <code>_escaped_fragment_</code> parameter in the query strings.</p>
+
+<p>Unlike Apache, nginx does not require us to enable a module, so we can simply update our configuration to replace the path with the question file instead.</p>
+
+<p>In our nginx configuration file (For instance, <code>/etc/nginx/nginx.conf</code>), ensure your configuration looks like this:</p>
+<pre>server <span>{</span>
+  listen 80;
+  server_name example;
+
+  <span>if</span> <span>(</span><span>$args</span> ~ <span>"_escaped_fragment_=/?(.+)"</span><span>)</span> <span>{</span>
+    <span>set</span> <span>$path</span> <span>$1</span>;
+    rewrite ^ /snapshots/<span>$path</span> last;
+  <span>}</span>
+
+  location / <span>{</span>
+    root /web/example/current/;
+    <span># Comment out if using hash urls</span>
+    <span>if</span> <span>(</span>!-e <span>$request_filename</span><span>)</span> <span>{</span>
+      rewrite ^<span>(</span>.<span>*</span><span>)</span><span>$ </span>/index.html <span>break</span>;
+    <span>}</span>
+    index index.html;
+  <span>}</span>
+<span>}</span>
+</pre>
+<p>Once this is complete, we’re good to reload our configuration:</p>
+<pre>sudo /etc/init.d/nginx reload
+</pre>
+<h2>Taking snapshots</h2>
+
+<p>We can take snapshots of our HTML app to deliver our backend app, using a tool like <a href="http://phantomjs.org/">PhantomJS</a> or <a href="http://zombie.labnotes.org/">zombie.js</a> to render our pages. When a page is requested by Google using the <code>_escaped_fragment_</code> query parameter, we can simply return and render this page.</p>
+
+<p>We’ll discuss two methods to take snapshots, using zombie.js and using a grunt tool. We’re not covering using the fantastic <a href="http://phantomjs.org/">PhantomJS</a> tool as there are plenty of great resources that demonstrate it.</p>
+
+<h2>Using Zombie to homebrew snapshots</h2>
+
+<p>To set up <a href="http://zombie.labnotes.org/">zombie.js</a>, we’ll need to install the <code>npm</code> package <code>zombie</code>:</p>
+<pre><span>$ </span>npm install zombie
+</pre>
+<p>Now, we’ll use NodeJS to save our file using <code>zombie</code>. First, a few helper methods we’ll use in the process:</p>
+<pre><span>var</span> <span>Browser</span> <span>=</span> <span>require</span><span>(</span><span>'zombie'</span><span>),</span>
+    <span>url</span>     <span>=</span> <span>require</span><span>(</span><span>'url'</span><span>),</span>
+    <span>fs</span>      <span>=</span> <span>require</span><span>(</span><span>'fs'</span><span>),</span>
+    <span>saveDir</span> <span>=</span> <span>__dirname</span> <span>+</span> <span>'/snapshots'</span><span>;</span>
+
+<span>var</span> <span>scriptTagRegex</span> <span>=</span> <span>/&lt;script\b[^&lt;]*(?:(?!&lt;\/script&gt;)&lt;[^&lt;]*)*&lt;\/script&gt;/gi</span><span>;</span>
+
+<span>var</span> <span>stripScriptTags</span> <span>=</span> <span>function</span><span>(</span><span>html</span><span>)</span> <span>{</span>
+  <span>return</span> <span>html</span><span>.</span><span>replace</span><span>(</span><span>scriptTagRegex</span><span>,</span> <span>''</span><span>);</span>
+<span>}</span>
+
+<span>var</span> <span>browserOpts</span> <span>=</span> <span>{</span>
+  <span>waitFor</span><span>:</span> <span>2000</span><span>,</span>
+  <span>loadCSS</span><span>:</span> <span>false</span><span>,</span>
+  <span>runScripts</span><span>:</span> <span>true</span>
+<span>}</span>
+
+<span>var</span> <span>saveSnapshot</span> <span>=</span> <span>function</span><span>(</span><span>uri</span><span>,</span> <span>body</span><span>)</span> <span>{</span>
+  <span>var</span> <span>lastIdx</span> <span>=</span> <span>uri</span><span>.</span><span>lastIndexOf</span><span>(</span><span>'#/'</span><span>);</span>
+
+  <span>if</span> <span>(</span><span>lastIdx</span> <span>&lt;</span> <span>0</span><span>)</span> <span>{</span>
+    <span>// If we're using html5mode
+</span>    <span>path</span> <span>=</span> <span>url</span><span>.</span><span>parse</span><span>(</span><span>uri</span><span>).</span><span>pathname</span><span>;</span>
+  <span>}</span> <span>else</span> <span>{</span>
+    <span>// If we're using hashbang mode
+</span>    <span>path</span> <span>=</span> 
+      <span>uri</span><span>.</span><span>substring</span><span>(</span><span>lastIdx</span> <span>+</span> <span>1</span><span>,</span> <span>uri</span><span>.</span><span>length</span><span>);</span>
+  <span>}</span>
+
+  <span>if</span> <span>(</span><span>path</span> <span>===</span> <span>'/'</span><span>)</span> <span>path</span> <span>=</span> <span>"/index.html"</span><span>;</span>
+
+  <span>if</span> <span>(</span><span>path</span><span>.</span><span>indexOf</span><span>(</span><span>'.html'</span><span>)</span> <span>==</span> <span>-</span><span>1</span><span>)</span>
+    <span>path</span> <span>+=</span> <span>".html"</span><span>;</span>
+
+  <span>var</span> <span>filename</span> <span>=</span> <span>saveDir</span> <span>+</span> <span>path</span><span>;</span>
+  <span>fs</span><span>.</span><span>open</span><span>(</span><span>filename</span><span>,</span> <span>'w'</span><span>,</span> <span>function</span><span>(</span><span>e</span><span>,</span> <span>fd</span><span>)</span> <span>{</span>
+    <span>if</span> <span>(</span><span>e</span><span>)</span> <span>return</span><span>;</span>
+    <span>fs</span><span>.</span><span>write</span><span>(</span><span>fd</span><span>,</span> <span>body</span><span>);</span>
+  <span>});</span>
+<span>};</span>
+</pre>
+<p>Now all we need to do is run through our pages, turn every link from a relative link into an absolute link (so the crawler can follow them), and save the resulting html.</p>
+
+<p>We’re setting a relatively high <code>waitFor</code> in the browser options above. This will cover 90% of the cases we care about. If we want to get more precise on how and when we take a snapshot, instead of waiting the 2 seconds we’ll need to modify our angular app to fire an event and listen for the event in our zombie browser. </p>
+
+<p>Since we like to automate as much as possible and prefer not to muck with our angular code, we prefer to set our timeout relatively high to attempt to let the code settle down.</p>
+
+<p>Our <code>crawlPage()</code> function:</p>
+<pre><span>var</span> <span>crawlPage</span> <span>=</span> <span>function</span><span>(</span><span>idx</span><span>,</span> <span>arr</span><span>)</span> <span>{</span>
+  <span>// location = window.location
+</span>  <span>if</span> <span>(</span><span>idx</span> <span>&lt;</span> <span>arr</span><span>.</span><span>length</span><span>)</span> <span>{</span>
+    <span>var</span> <span>uri</span> <span>=</span> <span>arr</span><span>[</span><span>idx</span><span>];</span>
+    <span>var</span> <span>browser</span> <span>=</span> <span>new</span> <span>Browser</span><span>(</span><span>browserOpts</span><span>);</span>
+    <span>var</span> <span>promise</span> <span>=</span> <span>browser</span><span>.</span><span>visit</span><span>(</span><span>uri</span><span>)</span>
+    <span>.</span><span>then</span><span>(</span><span>function</span><span>()</span> <span>{</span>
+
+      <span>// Turn links into absolute links
+</span>      <span>// and save them, if we need to
+</span>      <span>// and we haven't already crawled them
+</span>      <span>var</span> <span>links</span> <span>=</span> <span>browser</span><span>.</span><span>queryAll</span><span>(</span><span>'a'</span><span>);</span>
+      <span>links</span><span>.</span><span>forEach</span><span>(</span><span>function</span><span>(</span><span>link</span><span>)</span> <span>{</span>
+        <span>var</span> <span>href</span> <span>=</span> <span>link</span><span>.</span><span>getAttribute</span><span>(</span><span>'href'</span><span>);</span>
+        <span>var</span> <span>absUrl</span> <span>=</span> <span>url</span><span>.</span><span>resolve</span><span>(</span><span>uri</span><span>,</span> <span>href</span><span>);</span>
+        <span>link</span><span>.</span><span>setAttribute</span><span>(</span><span>'href'</span><span>,</span> <span>absUrl</span><span>);</span>
+        <span>if</span> <span>(</span><span>arr</span><span>.</span><span>indexOf</span><span>(</span><span>absUrl</span><span>)</span> <span>&lt;</span> <span>0</span><span>)</span> <span>{</span>
+          <span>arr</span><span>.</span><span>push</span><span>(</span><span>absUrl</span><span>);</span>
+        <span>}</span>
+      <span>});</span>
+
+      <span>// Save
+</span>      <span>saveSnapshot</span><span>(</span><span>uri</span><span>,</span> <span>browser</span><span>.</span><span>html</span><span>());</span>
+      <span>// Call again on the next iteration
+</span>      <span>crawlPage</span><span>(</span><span>idx</span><span>+</span><span>1</span><span>,</span> <span>arr</span><span>);</span>
+    <span>});</span>
+  <span>}</span>
+<span>}</span>
+</pre>
+<p>Now we can simply call the method on our first page:</p>
+<pre><span>crawlPage</span><span>(</span><span>0</span><span>,</span> <span>[</span><span>"http://localhost:9000"</span><span>]);</span>
+</pre>
+<h2>Using grunt-html-snapshot</h2>
+
+<p>Our prefered method of taking snapshots is by using the grunt tool <code>grunt-html-snapshot</code>. Since we use <a href="http://yeoman.io">yeoman</a> and grunt is already in our build process, we set up this task to run after we make a release of our apps.</p>
+
+<p>To install <code>grunt-html-snapshot</code>, we’ll use npm like so:</p>
+<pre>npm install grunt-html-snapshot --save-dev
+</pre>
+<p>If we’re not using <a href="http://yeoman.io">yeoman</a>, we’ll need to include this task as a grunt task in our <code>Gruntfile.js</code>:</p>
+<pre><span>grunt</span><span>.</span><span>loadNpmTasks</span><span>(</span><span>'grunt-html-snapshot'</span><span>);</span>
+</pre>
+<p>Once this is set, we’ll set some configuration about our site. To set up configuration, we’ll create a new config block in our <code>Gruntfile.js</code> that looks like:</p>
+<pre><span>htmlSnapshot</span><span>:</span> <span>{</span>
+  <span>debug</span><span>:</span> <span>{</span>
+    <span>options</span><span>:</span> <span>{}</span>
+  <span>},</span>
+  <span>prod</span><span>:</span> <span>{</span>
+    <span>options</span><span>:</span> <span>{}</span>
+  <span>}</span>
+<span>}</span>
+</pre>
+<p>Now we simply get to add our different options for the different stages:</p>
+<pre><span>htmlSnapshot</span><span>:</span> <span>{</span>
+  <span>debug</span><span>:</span> <span>{</span>
+    <span>options</span><span>:</span> <span>{</span>
+      <span>snapshotPath</span><span>:</span> <span>'snapshots/'</span><span>,</span>
+      <span>sitePath</span><span>:</span> <span>'http://127.0.0.1:9000/'</span><span>,</span>
+      <span>msWaitForPages</span><span>:</span> <span>1000</span><span>,</span>
+      <span>urls</span><span>:</span> <span>[</span>
+        <span>'/'</span><span>,</span>
+        <span>'/about'</span>
+      <span>]</span>
+    <span>}</span>
+  <span>},</span>
+  <span>prod</span><span>:</span> <span>{</span>
+    <span>options</span><span>:</span> <span>{}</span>
+  <span>}</span>
+<span>}</span>
+</pre>
+<p>To see a list of the entire available configuration options, check out the documentation page at <a href="https://github.com/cburgdorf/grunt-html-snapshot">https://github.com/cburgdorf/grunt-html-snapshot</a>.</p>
+
+<h2>Prerender.io</h2>
+
+<p>Alternatively, we can use an open-source tool such as <a href="http://prerender.io/">Prerender.io</a>, which includes a node server that renders our site on-the-fly and an express middleware that communicates with the backend to prerenderHTML on-the-fly.</p>
+
+<p>Essentially, prerender.io will take a url and returns the rendered HTML (with no script tags). Essentially, the prerender server we’ll deploy will be called from our app like so:</p>
+
+<p><code>GET http://our-prerenderserver.com/http://localhost:9000/#!/about</code></p>
+
+<p>This GET will return the rendered content of our <code>#/about</code> page.</p>
+
+<p>Setting up a prerender cluster is actually pretty easy to do. We’ll also show you how to integrate your own prerender server into your node app. Prerender.io is also avaialble for Ruby on Rails through a gem, but we won’t cover how to set it up.</p>
+
+<p>Setting up our own server to run it is pretty easy. Simply run the <code>npm install</code> to install the dependencies and run the command through either foreman or node:</p>
+<pre>npm install
+node index.js
+<span># Or through foreman</span>
+foreman start
+</pre>
+<p>The prerender library is also convenient to run on heroku:</p>
+<pre><span>$ </span>git clone https://github.com/collectiveip/prerender.git
+<span>$ </span>heroku create
+<span>$ </span>git push heroku master
+</pre>
+<p>We store our rendered HTML in S3, so we recommend you use the built-in s3 cache. Read the docs how to set this up <a href="https://github.com/collectiveip/prerender#s3-html-cache">here</a>.</p>
+
+<p>After our server is running, we just need to integrate the fetching through our app. In express, this is very easy using the node library <code>prerender-node</code>.</p>
+
+<p>To install <code>prerender-node</code>, we’ll use npm:</p>
+<pre><span>$ </span>npm install --save prerender-node
+</pre>
+<p>After this is installed, we’ll tell our express app to use this middleware:</p>
+<pre><span>var</span> <span>prerender</span> <span>=</span> 
+  <span>require</span><span>(</span><span>'prerender-node'</span><span>).</span><span>set</span><span>(</span><span>'prerenderServiceUrl'</span><span>,</span> <span>'http://our-prerenderserver.com/'</span><span>);</span>
+<span>app</span><span>.</span><span>use</span><span>(</span><span>prerender</span><span>);</span>
+</pre>
+<p>And that is it! This tells our express app that if we see a crawler request (defined by having the <code>_escaped_fragment_</code> or the user agent string), then make a GET request to our prerender service at the appropriate url and get the prerendered HTML for the page.</p>
+
+<h2>Professional alternatives</h2>
+
+<p>Although we present a relatively easy methods of creating SEO opportunities for our apps, it does take work to set it up and maintain. There are definitely professional services that offer SEO as a service. </p>
+
+<p>We recommend one of our sponsors, <a href="http://www.brombone.com/">brombone</a> that has fantastic service and great service.</p>
+
+<p>Other professional SEO services include:</p>
+
+<ul>
+<li><a href="http://getseojs.com/">SEO.js</a>, which provides node/express middleware.</li>
+<li><a href="http://www.seo4ajax.com/">SEO4Ajax</a> also looks and acts very simple to implement as well. Definitely worth checking out.</li>
+<li><a href="http://www.rankjs.com/">RankJS</a>, completely free and looks like a good service (from what we can tell).</li>
+</ul>
+
+<p>If you enjoyed this post, you should really check out our upcoming book at <a href="http://www.ng-book.com/">ng-book.com</a>. </p>
+
+
+          <div id="signupApp" ng-cloak=""><div id="topbar_signup_embed"><p style="display: inline;">
+  Get the weekly email all focused on AngularJS. </p><b>Sign up below</b><p style="display: inline;"> to receive the weekly email and exclusive content.
+  </p><form name="ngSignup" action="http://willcodeforfoo.us6.list-manage1.com/subscribe/post?u=86d6f14c7cc955128485e3b8e&amp;id=fa61364f13" method="post" id="mc-embedded-subscribe-form" target="_blank" novalidate="">
+    
+    <div><p>
+          <small ng-show="ngSignup.EMAIL.$error.required">Your email is required.</small>
+          <small ng-show="ngSignup.EMAIL.$error.minlength">Your email is required to be at least 3 characters</small>
+          <small ng-show="ngSignup.EMAIL.$error.email">That is not a valid email. Please input a valid email.</small>
+        </p></div>
+  </form></div></div>
+
+
+          <section id="sample_chapter" ng-app="ngBookApp">    <div><h3>Download a free sample of the ng-book: The Complete Book on AngularJS</h3><span><img src="http://www.ng-book.com/images/flatbook-ngbook-small.png" alt="book" /></span><p>It's free, so just enter your email address and the PDF will be sent directly to your inbox.</p></div>    <div ng-init="signedup=false" ng-show="!signuped"><div ng-show="signedup"><p>Sweet! We are glad to hear you're interested in learning AngularJS. Enjoy the free chapter. We put a lot of work into building the book series, so we hope you like it!      Talk soon</p></div><p>        We won't ever send you spam! You can unsubscribe at any time.      </p></div>  </section>
+
+          <footer>
+            
+          </footer>
+
+        </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>How to Create One-Time Events in JavaScript</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>How to Create One-Time Events in JavaScript</h1>
+<div>
+        
+        <div><figure>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">
+        <img alt="" src="http://0.gravatar.com/avatar/439aeaff7de2bae365adc3eb4947b44d?s=96&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96&amp;r=G" height="96" width="96" />      </a>
+    </figure><p>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">Craig Buckler</a>
+    </p><p>Director of OptimalWorks</p></div>
+        
+        
+        <div><p>Published <time datetime="2013-10-21" pubdate="">October 21, 2013</time></p></div>
+      </div><div>
+
+          <p>Sometimes an event need only be called once in your page. For example, clicking a thumbnail which loads and plays a video file or clicking a “more” icon which retrieves and displays extra content via Ajax. However, you’ve probably defined an event handler which is called every time that action occurs. At best, it’s a little inefficient and the browser is retaining unnecessary resources. At worst, your handler could do something unexpected or reload data which is already available.</p>
+<p>Fortunately, it’s relatively easy to create one-time event handlers in JavaScript. The process:</p>
+<ol>
+<li>A handler is assigned to an event, such as clicking an element.</li>
+<li>When the element is clicked, the handler runs.</li>
+<li>The handler is removed. Further clicks on that element will no longer call the function.</li>
+</ol>
+<h2>jQuery</h2>
+<p>Let’s look at the simplest solution first. If you’re using jQuery, there’s a little-known <code>one()</code> event binding method which implements one-time events.</p>
+<pre title="">
+$("#myelement").one( "click", function() { alert("You'll only see this once!"); } );
+</pre>
+<p>It’s used identically to other jQuery event methods. For more information, refer to <a href="http://api.jquery.com/one/">api.jquery.com/one/</a>.</p>
+<h2>Self-Removing Handlers</h2>
+<p>If you’re using raw JavaScript, any handler function can remove itself using a single line of code:</p>
+<pre title="">
+document.getElementById("myelement").addEventListener("click", handler);
+
+// handler function
+function handler(e) {
+	// remove this handler
+	e.target.removeEventListener(e.type, arguments.callee);
+
+	alert("You'll only see this once!");
+}
+</pre>
+<p>Presuming your handler event argument is named ‘e’, the line:</p>
+<pre title="">
+e.target.removeEventListener(e.type, arguments.callee);
+</pre>
+<p>will remove the handler the first time it’s invoked. It doesn’t matter what event type or name you use for your handler — it may even be an in-line anonymous function.</p>
+<p>Note I’ve used standard event calls which won’t work in IE8 and below. OldIE’s require a call to <code>detachEvent</code> and the type requires an “on” prefix, e.g. “onclick”. But, if you’re supporting oldIE’s, you’re probably using jQuery or your own custom event handler.</p>
+<p>Self-removing handlers may be the best option if you require some flexibility, e.g. you only want to unhook certain event types or remove the handler after different conditions, e.g. two or more clicks.</p>
+<h2>A One-Time Event Creation Function</h2>
+<p>Like me, you may be too lazy or forgetful to add an event removal line to every handler function. Let’s create a <code>onetime</code> function which does the hard work for us:</p>
+<pre title="">
+// create a one-time event
+function onetime(node, type, callback) {
+
+	// create event
+	node.addEventListener(type, function(e) {
+		// remove event
+		e.target.removeEventListener(e.type, arguments.callee);
+		// call handler
+		return callback(e);
+	});
+
+}
+</pre>
+<p>We can now use this function whenever we require a one-time only event:</p>
+<pre title="">
+// one-time event
+onetime(document.getElementById("myelement"), "click", handler);
+
+// handler function
+function handler(e) {
+	alert("You'll only see this once!");
+}
+</pre>
+<p>While you won’t require one-time events in every page, it’s good to find there are several options available to JavaScript developers.</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
