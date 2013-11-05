@@ -1,0 +1,544 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>12 Awesome CSS3 Features That You Can Finally Start Using</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>12 Awesome CSS3 Features That You Can Finally Start Using</h1>
+<div><p><i></i> Martin Angelov <i></i><time datetime="2013-10-25">October 25th, 2013</time></p><p>If you are like me, when you see an impressive demo of a new CSS3 feature, you can’t wait to start using it in websites. Of course, then you see that it is available in only one or two of the major browsers (and this never includes IE), so ultimately you decide to wait. I have good news for you – with the latest browser releases, there are a few awesome features that are finally supported everywhere, and you can start using them right now!</p><p>A word of caution – most of these features will not work in older versions of IE (9 and below). If these browsers are a large portion of your demographic, I am afraid that you will have to rely on fallbacks. But for the rest of us, here is what modern browsers have to offer:</p><h3>1. CSS Animations and Transitions</h3><p>CSS animations are finally available in all major browsers, even in IE (since version 10).&nbsp;There are two ways to create CSS animations. The first is very easy, it is done through animating the changes of CSS properties with the <code>transition</code> declaration. With transitions, you can create hover or mouse down effects, or you can trigger the animation by changing the style of an element with JavaScript. You can see the transition below by hovering over the planet – this will cause the rocket to close in.</p><p>The second way for defining animations is a bit more complicated – it involves the description of specific moments of the animation with the <code>@keyframe</code> rule. This allows you to have repeating animations that don’t depend on user actions or JavaScript to get triggered. Hit the <strong>Edit</strong> button to see the code.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.container{
+	width: 300px;
+	height:300px;
+	margin: 0 auto;
+	position:relative;
+	overflow:hidden;
+}
+
+.planet{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:url(http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/assets/img/planet.png) no-repeat center center;
+}
+
+.rocket{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:url(http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/assets/img/rocket.png) no-repeat 50px center;
+
+	/* Chrome still requires the -webkit- prefix */
+	-webkit-animation:orbit 2s linear infinite;
+	animation:orbit 2s linear infinite;
+
+	transition:background-position 0.8s;
+}
+
+.container:hover .rocket{
+	background-position:80px center;
+}
+
+/* Define the keyframes of the animation */
+
+@-webkit-keyframes orbit {
+	from {
+		-webkit-transform:rotate(0deg);}
+	to {
+		-webkit-transform:rotate(360deg);
+	}
+}
+
+@keyframes orbit {
+	from {
+		transform:rotate(0deg);
+
+		/* I am including the -webkit-transform properties, because
+		   Chrome might start supporting keyframe without prefix in the future,
+		   but we can't be certain whether it will support prefix-free transform
+		   at the same time */
+
+		-webkit-transform:rotate(0deg);}
+	to {
+		transform:rotate(360deg);
+		-webkit-transform:rotate(360deg);
+	}
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+	&lt;div class="planet"&gt;&lt;/div&gt;
+	&lt;div class="rocket"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre></div><p>There is much to learn about CSS animations, and I suggest that you start from <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Using_CSS_animations" target="_blank">this Mozilla Developer Network (MDN) article</a>. If you are curious about browser support, see <a href="http://caniuse.com/#feat=css-animation" target="_blank">this compatibility table</a>.</p><h3>2. Calculating Values With calc()</h3><p>Another new and awesome CSS feature is the <code>calc()</code> function. It allows you to do simple arithmetic calculations in CSS. You can use it anywhere a length or a size is required. What is even cooler, is that you can freely mix different units, like percentages and pixels. This makes a lot of layout hacks that you might have used in the past obsolete. The best news? It works in IE9 and up, prefix-free.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.container{
+
+	/* Calculate the width */
+	width: calc(100% - 40px);
+
+	background-color:#CDEBC4;
+	color:#6D8B64;
+	text-align:center;
+	padding:25px 0;
+	margin: 0 auto;
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+	&lt;p&gt;This div has 20px on either side.&lt;/p&gt;
+&lt;/div&gt;</pre></div><p>Learn more about the <code>calc()</code> function <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/calc" target="_blank">here</a>, or see a <a href="http://caniuse.com/#feat=calc" target="_blank">compatibility table</a>.</p><h3>3. Advanced Selectors</h3><p>These days, if you assign IDs to elements only so you can style them, you are probably doing it wrong. CSS 2.1 and CSS 3 introduced a number of powerful selectors that can make your layouts cleaner, and your stylesheets more awesome.</p><p>These are supported in all major browsers including IE9 and up. Hit <strong>Edit</strong> to see the source code for the example.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">/* Style the elements (nothing interesting here) */
+
+p{
+	font-size: 16px;
+	width: 420px;
+	margin: 20px auto 0;
+	text-align:center;
+}
+
+.container{
+	width: 420px;
+	margin:50px auto 0;
+	overflow: hidden;
+	padding:5px;
+}
+
+.elem{
+	width:30px;
+	height:30px;
+	margin:4px;
+	background-color:#A0DFAC;
+	float:left;
+}
+
+.elem span{
+	position:absolute;
+	top:5px;
+	left:5px;
+	right:5px;
+	bottom:5px;
+	border:2px solid #fff;
+}
+
+/* Selectors for matching the first letter and line: */
+
+p::first-letter{
+	background-color: #666;
+	color: #FFF;
+	font-size: 24px;
+	font-style:normal;
+	display: inline-block;
+	padding: 0 5px;
+	border-radius: 3px;
+	margin-right: 2px;
+	font-family: serif;
+}
+
+p::first-line{
+	font-size: 18px;
+	text-transform: smallcaps;
+	font-style: italic;
+	text-decoration: underline;
+}
+
+/* Make the first and last elements purple */
+
+.elem:first-child,
+.elem:last-child{
+	background-color:#948bd8;
+}
+
+/* Make every other element rounded */
+
+.elem:nth-child(odd){
+	border-radius:50%;
+}
+
+/* Make the sixth element red */
+
+.elem:nth-child(6){
+	background-color:#cb6364;
+}
+
+/* Style the element which contains the span */
+
+.elem:not(:empty){
+	background-color:#444;
+	position:relative;
+
+	-webkit-transform:rotate(25deg);
+	transform:rotate(25deg);
+
+}
+
+/* Target elements by attribute */
+
+.elem[data-foo=bar1]{
+	background-color:#aaa;
+}
+
+.elem[data-foo=bar2]{
+	background-color:#d7cb89;
+}
+
+/* The attribute value should start with bar. This matches both
+   of the above elements */
+
+.elem[data-foo^=bar]{
+	width: 16px;
+	height: 16px;
+	margin: 11px;
+}
+
+/* The element that follows after the one with data-foo="bar2" attribute */
+
+.elem[data-foo=bar2] + .elem{
+	background-color:#78ccd2;
+}</pre><pre data-type="html">&lt;p&gt;This is a regular paragraph of text, which has a number of awesome CSS3 styles applied..&lt;/p&gt;
+
+&lt;div class="container"&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem" data-foo="bar1"&gt;&lt;/div&gt;
+	&lt;div class="elem" data-foo="bar2"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+	&lt;div class="elem"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre></div><p>Learn more about these selectors <a href="http://www.w3.org/TR/selectors/#selectors" target="_blank">here</a>, or take a look at <a href="http://www.w3.org/TR/selectors/#selectors" target="_blank">which browsers support them</a>.</p><h3>4. Generated Content and Counters</h3><p>Generated content is a powerful tool in the hands of developers, made available by the <code>::before</code> and <code>::after</code> pseudo elements. This feature lets you use less HTML to achieve the same layouts. This is especially beneficial in cases where you need extra box shadows or other visual elements that would require extra spans or divs. In the end, you get a more minimal and semantically correct HTML.</p><p>CSS3 also gives pseudo elements access to <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Counters" target="_blank">counters</a>, which can be incremented with a CSS rule. They can also access attributes from the parent elements that contain them. See the source of the example below.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.container{
+
+	/* Set a counter named cnt to 0 */
+	counter-reset: cnt;
+
+	position:relative;
+	text-align:center;
+	padding:20px 0;
+	width:420px;
+	height: 160px;
+	margin: 0 auto;
+}
+
+/* You can style pseudo elements and give them content,
+   as if they were real elements on the page */
+
+.container::before{
+	display: block;
+	content:'Hover over these items:';
+	font-size:18px;
+	font-weight:bold;
+	text-align:center;
+	padding:15px;
+}
+
+.container span{
+	display:inline-block;
+	padding:2px 6px;
+	background-color:#78CCD2;
+	color:#186C72;
+	border-radius:4px;
+	margin:3px;
+	cursor:default;
+}
+
+/* Create a counter with a pseudo element */
+
+.container span::after{
+
+	/* Every time this rule is executed, the 
+	   counter value is increased by 1 */
+	counter-increment: cnt;
+
+	/* Add the counter value as part of the content */
+	content:" #" counter(cnt);
+
+	display:inline-block;
+	padding:4px;
+}
+
+/* Pseudo elements can even access attributes of their parent element */
+
+.container span::before{
+	position:absolute;
+	bottom:0;
+	left:0;
+	width:100%;
+	content:attr(data-title);
+	color:#666;
+
+	opacity:0;
+
+	/* Animate the transitions */
+	-webkit-transition:opacity 0.4s;
+	transition:opacity 0.4s;
+}
+
+.container span:hover::before{
+	opacity:1;
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+	&lt;span data-title="I have a wonderful title!"&gt;This is item&lt;/span&gt;
+	&lt;span data-title="These titles are shown only using CSS, no JavaScript is used!"&gt;This is item&lt;/span&gt;
+	&lt;span data-title="Hello there!"&gt;This is item&lt;/span&gt;
+	&lt;span data-title="Generated content is awesome!"&gt;This is item&lt;/span&gt;
+&lt;/div&gt;</pre></div><p>Generated content is <a href="http://caniuse.com/#feat=css-gencontent" target="_blank">supported everywhere</a>, including IE9 and up.</p><h3>5. Gradients</h3><p>Gradients give web designers the power to create smooth transitions between colors without having to resort to images. CSS gradients also look great on retina displays, because they are generated on the fly. They can be <em>linear</em> or <em>radial</em>, and can be set to repeat. They have been around for some time, but after a few minor syntax changes over the last months, they are finally available nearly everywhere, prefix-free!</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.container{
+	text-align:center;
+	padding:20px 0;
+	width:450px;
+	margin: 0 auto;
+}
+
+.container div{
+	width:100px;
+	height:100px;
+	display:inline-block;
+	margin:2px;
+
+	box-shadow: 0 0 1px rgba(0, 0, 0, 0.5) inset, 0 1px 1px #DDD;
+	border-radius:2px;
+
+	color:#666;
+	vertical-align: top;
+	line-height: 230px;
+	font-size: 12px;
+}
+
+#el1{
+	background:linear-gradient(to bottom, #8dd2d9 , #58c0c7);
+}
+
+#el2{
+	background:radial-gradient(#77d19e,#46c17b);
+}
+
+#el3{
+	background:repeating-linear-gradient(-45deg, #de9dd4, #de9dd4 5px, white 5px, white 10px);
+}
+
+#el4{
+	background:repeating-radial-gradient(#b8e7bf, #b8e7bf 5px, white 5px, white 10px);
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+	&lt;div id="el1"&gt;Linear&lt;/div&gt;
+	&lt;div id="el2"&gt;Radial&lt;/div&gt;
+	&lt;div id="el3"&gt;Repeating Lin.&lt;/div&gt;
+	&lt;div id="el4"&gt;Repeating Rad.&lt;/div&gt;
+&lt;/div&gt;</pre></div><p>See a detailed tutorial <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Using_CSS_gradients" target="_blank">here</a>, and a compatibility table <a href="http://caniuse.com/#feat=css-gradients" target="_blank">here</a>.</p><h3>6. Webfonts</h3><p>Can you imagine that there was a time when we were limited to only a handful of “web-safe” fonts and nothing else? It is hard to believe, given that today we have services like <a href="http://www.google.com/fonts/" target="_blank">Google Fonts</a> and <a href="https://typekit.com/" target="_blank">typekit</a>, which let you embed beautiful fonts by simply including a stylesheet in your page. There are even icon fonts like <a href="http://fortawesome.github.io/Font-Awesome/" target="_blank">fontawesome</a>, which contain pretty vector icons, instead of letters or numbers. This was all made possible by the <code>@font-face</code> rule, which lets you define the name, characteristics and source files for fonts, which you can later refer in your <code>font</code>/<code>font-family</code> declarations.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">h1{
+	/* Using the custom font we've included in the HTML tab: */
+	font-family: Satisfy, cursive;
+	font-weight:normal;
+	font-size:24px;
+	padding-top: 60px;
+}</pre><pre data-type="html">&lt;link href="http://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet" /&gt;
+
+&lt;h1&gt;This is my pretty webfont!&lt;/h1&gt;</pre></div><p>Note that due to security limitations in browsers, I was not able to embed a local font in the inline editor above, so I used one from Google Webfonts instead. But you can see a working example <a href="http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/06-webfonts.html" target="_blank">here</a>.</p><p>With some workarounds, webfonts work on browsers as old as IE6. The two hosted services I mentioned above handle these cases for you, so you don’t have to.</p><h3>7. Box Sizing</h3><p>The single biggest cause for headaches for CSS beginners is the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/box_model" target="_blank">box model</a>. The standardization bodies have probably had their reasons, but it doesn’t feel at all intuitive to have the CSS width and height of an element affected by its padding and borders. This little (mis)feature breaks layouts and wreaks havoc, but finally there is a way to restore our sanity by using the <code>box-sizing</code> rule. You can set it to <code>border-box</code>, which makes elements behave exactly the way you expect. See for yourself:</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.container{
+	text-align:center;
+}
+
+.container div{
+
+	/* Setting the box-sizing method: */
+	box-sizing:border-box;
+
+	/* Firefox still requires the -moz prefix */
+	-moz-box-sizing:border-box;
+
+	width:120px;
+	height:120px;
+	display:inline-block;
+	vertical-align:top;
+}
+
+/* Thanks to box-sizing, we can set whatever padding and border
+   we want, and the elements will still keep the same size */
+
+#el1{
+	color:#524480;
+	background-color:#B2A4E0;
+}
+
+#el2{
+	padding:8px;
+	border:10px solid #9ec551;
+	background-color:#fff;
+}
+
+#el3{
+	padding:32px;
+	background-color:#ccc;
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+	&lt;div id="el1"&gt;Element 1&lt;/div&gt;
+	&lt;div id="el2"&gt;Element 2&lt;/div&gt;
+	&lt;div id="el3"&gt;Element 3&lt;/div&gt;
+&lt;/div&gt;</pre></div><p>Learn more about the box-sizing rule <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing" target="_blank">here</a>, or see the <a href="http://caniuse.com/#feat=css3-boxsizing" target="_blank">compatibility table</a>.</p><h3>8. Border Images</h3><p>The <code>border-image</code> property allows you to display custom designed borders around elements. The borders are contained in a single image (sprite), with each region of that image corresponding to a different part of the border. Here is <a href="http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/assets/img/border.png" target="_blank">the image</a> used in the below example.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">p{
+	text-align:center;
+	padding:20px;
+	width:340px;
+	margin: 0 auto;
+
+	/* Set the border and border image properties */
+	border:30px solid transparent;
+	border-image:url(http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/assets/img/border.png) 30 30 round;
+}</pre><pre data-type="html">&lt;p&gt;Say hello to a fancy border image!&lt;/p&gt;</pre></div><p>For a more in-depth look, check out this <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/border-image" target="_blank">MDN page</a> and <a href="http://css-tricks.com/understanding-border-image/" target="_blank">this article</a> on CSS tricks. Border images are supported in <a href="http://caniuse.com/#feat=border-image" target="_blank">all major browsers and IE11</a>.</p><h3>9. Media Queries</h3><p>Media queries are an absolute must if you are serious about web design. They have been around for a while, but are worth a mention, because they have transformed the way we build websites.&nbsp;It used to be that you had a regular website, wide enough to fit the smallest monitor resolution used at the time, and a separate mobile website. These days, we build sites that are responsive and which adapt to the type of device, orientation and resolution.</p><p>Media queries are surprisingly easy to use – all you need to do is to enclose CSS styles in a block guarded by a <code>@media</code> rule. Each <code>@media</code> block is activated when one or more conditions are met. As an example, try resizing <a href="http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/09-media-queries.html" target="_blank">this page</a>. I have also included it in the editor below; try removing the the <code>@media</code> block to see what happens.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">/* Style the main content and the sidebar */
+
+.container{
+	width:900px;
+	margin: 0 auto;
+	overflow:hidden;
+}
+
+.main-section{
+	background-color:#CDEBC4;
+	color:#6D8B64;
+	width:520px;
+	float:left;
+	height:500px;
+}
+
+.sidebar{
+	background-color:#ccc;
+	width:350px;
+	float:right;
+	height:400px;
+}
+
+.container p{
+	padding-top:100px;
+	text-align:center;
+}
+
+.note{
+	text-align:center;
+	padding-top:60px;
+	font-style:italic;
+}
+
+/* This simple media query makes the column layout
+   linear on smaller screens */
+
+@media (max-width:900px){
+
+	.container{
+		width:100%;
+	}
+
+	.main-section, .sidebar{
+		width:auto;
+		margin-bottom:20px;
+		float:none;
+	}
+
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+
+	&lt;aside class="sidebar"&gt;&lt;p&gt;This is the sidebar&lt;p&gt;&lt;/aside&gt;
+
+	&lt;div class="main-section"&gt;
+		&lt;p&gt;The main content of the article goes here&lt;/p&gt;
+	&lt;/div&gt;
+
+&lt;/div&gt;</pre></div><p>The media query can contain checks for the device resolution and orientation, color depth, pixel density and more.&nbsp;Read an in-depth article <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Media_queries" target="_blank">here</a>, and see the <a href="http://caniuse.com/#feat=css-mediaqueries" target="_blank">compatibility table</a>.</p><h3>10. Multiple Backgrounds</h3><p>With multiple backgrounds, designers can achieve very interesting effects. They can stack different images as backgrounds of the same element. Each image (or layer) can be moved and animated independently, like you can see in the demo below (try hovering over the image with your mouse). All background-releated CSS rules can now take a comma-delimited list of properties, each for the specific background image:</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.space{
+
+	/* Pass a comma separated list of backgrounds: */
+	background:url('http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/assets/img/rocket_big.png') no-repeat center 70px, url('http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/assets/img/space.jpg') no-repeat bottom center;
+
+	width:200px;
+	height:200px;
+	margin: 0 auto;
+
+	border-radius:3px;
+
+	/* Animate the positions of both of the backgrounds */
+	transition:background-position 1s;
+}
+
+.space:hover{
+	/* The same goes for properties like background-position and repeat */
+	background-position:35% 20px, top right;
+}</pre><pre data-type="html">&lt;div class="space"&gt;&lt;/div&gt;</pre></div><p>For more information on multiple backgrounds, <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Using_multiple_backgrounds" target="_blank">see here</a>. Browser support is very good – all recent versions support the rule (<a href="http://caniuse.com/#feat=multibackgrounds" target="_blank">see the table</a>).</p><h3>11. CSS Columns</h3><p>Column-based layouts were notoriously difficult to pull off in CSS. It usually involved using JavaScript or server-side processing that splits the content into different elements. This is unnecessarily complicated and takes precious development time away from what really matters. Fortunately, now there is a way around this by using the CSS <code>columns</code> rule:</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.container{
+	width: 500px;
+	margin: 0 auto;
+}
+
+/* Creating columns is as simple as this: */
+
+.container p{
+	-moz-columns:3;
+	-webkit-columns:3;
+	columns:3;
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+	&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.&lt;/p&gt;
+&lt;/div&gt;</pre></div><p>There is <a href="http://caniuse.com/#feat=multicolumn" target="_blank">good support</a> for this rule, although it still requires prefixes. Where things break down is with the support of some of the other column-related rules and <a href="http://zomigi.com/blog/deal-breaker-problems-with-css3-multi-columns/" target="_blank">differences between browsers</a> in handling corner cases.</p><h3>12. CSS 3D Transforms</h3><p>There is nothing more flashy and full with eye-candy than an impressive 3D CSS demo. Although its utility outside of demos or portfolio sites is questionable, 3D CSS offers some powerful features to designers and developers that can win the hearts of users if done with good measure.</p><p>Browse through the source code of the following example by hitting the <strong>Edit</strong> button, to see how it was made.</p><div data-includes="[&quot;http:\/\/demo.tutorialzine.com\/2013\/10\/css3-features-you-can-finally-use\/assets\/css\/style.css&quot;]" data-autorun="1"><pre data-type="css">.container{
+
+	/* How pronounced should the 3D effects be */
+	perspective: 800px;
+	-webkit-perspective: 800px;
+
+	background: radial-gradient(#e0e0e0, #aaa);
+	width:480px;
+	height:480px;
+	margin:0 auto;
+	border-radius:6px;
+	position:relative;
+}
+
+.iphone-front,
+.iphone-back{
+
+	/* Enable 3D transforms */
+	transform-style: preserve-3d;
+	-webkit-transform-style: preserve-3d;
+
+	/* We are using two separate divs for the front and back of the
+	   phone. This will hide the divs when they are flipped, so that the
+	   opposite side can be seen:  */
+
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+
+	width:200px;
+	height:333px;
+
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin:-166px 0 0 -100px;
+
+	background:url(http://demo.tutorialzine.com/2013/10/css3-features-you-can-finally-use/assets/img/iphone.png) no-repeat left center;
+
+	/* Animate the transitions */
+	transition:0.8s;
+}
+
+.iphone-back{
+
+	/* The back side is flipped 180 deg by default */
+	transform:rotateY(180deg);
+	-webkit-transform:rotateY(180deg);
+
+	background-position:right center;
+}
+
+.container:hover .iphone-front{
+	/* When the container is hovered, flip the front side and hide it .. */
+	transform:rotateY(180deg);
+	-webkit-transform:rotateY(180deg);
+}
+
+.container:hover .iphone-back{
+	/* .. at the same time flip the back side into visibility */
+	transform:rotateY(360deg);
+	-webkit-transform:rotateY(360deg);
+}</pre><pre data-type="html">&lt;div class="container"&gt;
+	&lt;div class="iphone-front"&gt;&lt;/div&gt;
+	&lt;div class="iphone-back"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre></div><p>This code was modeled after our <a href="http://tutorialzine.com/2012/02/apple-like-login-form/" target="_blank">Apple-like Login Form</a> tutorial, which I advise you to read. If you want to learn more about 3D CSS, take a look at this <a href="http://desandro.github.io/3dtransforms/" target="_blank">detailed introduction</a>. If you don’t need to target old IE, <a href="http://caniuse.com/#feat=transforms3d" target="_blank">browser support</a> is also very good.</p><h3>Other Worthy Mentions</h3><p>There are other notable features that are worth mentioning. If you haven’t already, you should stop using prefixes for <code>border-radius</code> and <code>box-shadow</code>. You can also now use <code>data-uri</code> as background images in every browser. <code>opacity</code> is also supported everywhere, as well as the very useful <code>background-size</code> property.</p><p>There is still some time before cross-browser support lands for <code>flexbox</code>, <code>@supports</code>, <a title="Quick Tip: Have You Heard About CSS Filters Yet?" href="http://tutorialzine.com/2012/06/quick-tip-css-filters/" target="_blank">filters</a>, and <code>CSS masks</code>, but I am sure it will be worth the wait!</p><div id="author-info"><img alt="" src="http://1.gravatar.com/avatar/18635cef09f45858ce6b07c8612c9f5b?s=120&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D120&amp;r=G" height="120" width="120" /><h5>by <strong>Martin Angelov</strong></h5><p>Martin is a web developer with an eye for design from Bulgaria. He founded Tutorialzine in 2009 and publishes new tutorials weekly.</p></div><p id="categories"><a href="http://tutorialzine.com/category/articles/" title="View all posts in Articles" rel="category tag">Articles</a></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
