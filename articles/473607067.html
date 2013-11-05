@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>How to Call a JavaScript Function From a String Without Using eval</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>How to Call a JavaScript Function From a String Without Using eval</h1>
+<div>
+        
+        <div><figure>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">
+        <img alt="" src="http://0.gravatar.com/avatar/439aeaff7de2bae365adc3eb4947b44d?s=96&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96&amp;r=G" height="96" width="96" />      </a>
+    </figure><p>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">Craig Buckler</a>
+    </p><p>UK Web Developer and Writer</p></div>
+        
+        
+        <div><p>Published <time datetime="2013-10-31" pubdate="">October 31, 2013</time></p></div>
+      </div><div>
+
+          <p><code>eval</code> is evil in JavaScript! The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/eval">MDN eval page</a> states:</p>
+<blockquote><p>
+<strong>Obsolete</strong><br />This feature is obsolete. Although it is still supported by browsers, its usage is discouraged in new projects. Try to avoid using it.
+</p></blockquote>
+<p><code>eval</code> executes a string containing code, e.g.</p>
+<pre title="">
+eval("var x = 'Hello from eval!';");
+console.log(x);
+</pre>
+<p><code>eval</code> raises several issues:</p>
+<ol>
+<li>Security: your string can be injected with other commands by third-party scripts or user input.</li>
+<li>Debugging: it’s difficult to debug errors — you have no line numbers or obvious points of failure.</li>
+<li>Optimization: the JavaScript interpreter cannot necessarily pre-compile the code because it could change. While interpreters have become increasingly efficient, it’ll almost certainly run slower than native code.</li>
+</ol>
+<p>Unfortunately, <code>eval</code> is very powerful and it’s easy for less experienced developers to overuse the command.</p>
+<p>Despite the warnings, <code>eval</code> still works — even in Strict Mode — but you can normally avoid it. In the past it was primarily used for de-serializing JSON strings but we now have the safer <code>JSON.parse</code> method.</p>
+<p>However, what if we have a function name in a string, e.g.</p>
+<pre title="">
+// function we want to run
+var fnstring = "runMe";
+
+function runMe() {
+	// do stuff
+}
+</pre>
+<p>How do we execute the <code>runMe()</code> function without using <code>eval</code>? I recently encountered this situation when using the <a href="/javascript-history-pushstate/">HTML5 History API</a>; the pushState method won’t permit you to store a direct reference to a function so you need to define its name as a string. You could also face similar challenges using Web Workers or any other API where objects are serialized.</p>
+<p>The simplest and safest execution-without-eval solution is a range of conditions, e.g.</p>
+<pre title="">
+// function we want to run
+var fnstring = "runMe";
+
+switch (fnstring) {
+	case "functionX": functionX(); break;
+	case "functionY": functionY(); break;
+	case "functionZ": functionZ(); break;
+	case "runMe": runMe(); break;
+}
+</pre>
+<p>It’s safe, but fairly inefficient and painful to write if you have dozens of possible function calls.</p>
+<p>A better solution is to use the <code>window</code> object which references the current window and all items within it. We can check whether <code>fnstring</code> is available as an object within <code>window</code> and run it if it’s a function, e.g.</p>
+<pre title="">
+// function we want to run
+var fnstring = "runMe";
+
+// find object
+var fn = window[fnstring];
+
+// is object a function?
+if (typeof fn === "function") fn();
+</pre>
+<p>You can perform other checks if necessary to ensure the function has an expected name.</p>
+<p>What if the function we want to call has parameters — perhaps stored in an array? No problem; we simply use the <code>apply</code> method:</p>
+<pre title="">
+// function name and parameters to pass
+var fnstring = "runMe";
+var fnparams = [1, 2, 3];
+
+// find object
+var fn = window[fnstring];
+
+// is object a function?
+if (typeof fn === "function") fn.apply(null, fnparams);
+</pre>
+<p>So that’s another reason to stop using <code>eval</code>. As a bonus, this solution is safer, less error prone, easier to debug and will normally execute faster. I hope it helps.</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

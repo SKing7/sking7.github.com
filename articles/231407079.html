@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>How to Modify the Browser History in Complex HTML5 and JavaScript Applications</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>How to Modify the Browser History in Complex HTML5 and JavaScript Applications</h1>
+<div>
+        
+        <div><figure>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">
+        <img alt="" src="http://0.gravatar.com/avatar/439aeaff7de2bae365adc3eb4947b44d?s=96&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96&amp;r=G" height="96" width="96" />      </a>
+    </figure><p>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">Craig Buckler</a>
+    </p><p>UK Web Developer and Writer</p></div>
+        
+        
+        <div><p>Published <time datetime="2012-10-03" pubdate="">October 3, 2012</time></p></div>
+      </div><div>
+
+          <p>Don’t you love snappy titles?!</p>
+<p>Consider a sophisticated application such as webmail client. In essence, it’s a complex JavaScript program running on a single HTML page. The user loads the URL and is presented with a list of emails. They click a title and the email content is retrieved using Ajax and displayed. They now want to return to the email list; what do they do?…</p>
+<p>…click the browser’s back button.</p>
+<p>Bang. The application closes and returns to the page they were viewing prior to accessing the application. Or, if it’s a new browser tab, the back button is disabled and can’t be clicked.</p>
+<p>So we have a problem. Our webmail client doesn’t support the one browser control most users understand. There are solutions. Some involve changing the hash mark (#name) in the URL so the state can be retained. It’s not perfect, but works in all browsers.</p>
+<p>Fortunately, the problem has been addressed with the HTML5 <code>history.pushState</code> and <code>history.replaceState</code> methods in conjunction with the <code>window.onpopstate</code> event. </p>
+<p><a href="http://blogs.sitepointstatic.com/examples/tech/history-pushstate/index.html"><strong>Try the history.pushState() demonstration page…</strong></a></p>
+<p>The technique is refreshingly simple:</p>
+<ol>
+<li>When the state changes, e.g. the user opens an email, history.pushState() is passed state information and executed. This enables the back button but — importantly — does not move the user from the page.</li>
+<li>You can run history.pushState() as many times as necessary, or modify the current state using history.replaceState().</li>
+<li>When the user clicks back (or forward), the window.onpopstate event is fired. A handler function can retrieve the associated state and display the appropriate screen.</li>
+</ol>
+<p>The downside? Forget IE compatibility until v10 arrives. If you need to support IE9 and below, there are a number of shims including <a href="https://github.com/balupton/history.js">History.js</a> and <a href="https://github.com/devote/HTML5-History-API">HTML5-History-API</a>.</p>
+<p>Let’s write some code. Assume you’ve just displayed the result of an Ajax request:</p>
+<pre><code>
+// Ajax request
+...
+// display result
+...
+
+// modify history
+history.pushState(obj, title, url);
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><strong>obj</strong> is any JavaScript object. You could use this to retain state information, e.g. { “view”: “EMAILCONTENT”, “item”: 123 };</li>
+<li><strong>title</strong> is an optional title</li>
+<li><strong>url</strong> is an optional URL. The URL can be anything — the browser won’t jump to that page, but <em>could</em> if the user reloaded the page or restarted their browser. In most cases, you’ll want to use parameters or a hash name, e.g. ?view=EMAILCONTENT&amp;item=123; your application could analyze these values on start-up and return to the same place.</li>
+</ul>
+<p>history.replaceState() has identical arguments and is only used if you want to replace the current state with a new one.</p>
+<p>You now need a handler function which runs when the window popstate event fires following the browser’s back or next button being clicked:</p>
+<pre><code>
+window.addEventListener("popstate", function(e) {
+
+	// URL location
+	var location = document.location;
+
+	// state
+	var state = e.state;
+	
+	// return to last state
+	if (state.view == "EMAILCONTENT") {
+		...
+	}
+
+});
+</code></pre>
+<p>The URL location can be determined with <code>document.location</code> (<code>document.location.search</code> and <code>document.location.hash</code> return the parameters and hash name respectively).</p>
+<p>The historic state object set by pushState() or replaceState() is obtained from the event object’s <code>state</code> property. You can use the information to display the appropriate screen.</p>
+<p><a href="http://blogs.sitepointstatic.com/examples/tech/history-pushstate/index.html"><strong>Try the history.pushState() demonstration page…</strong></a></p>
+<p>Click the <strong>history.pushState</strong> button a few times then hit back to see what happens in the log.</p>
+<p>Very useful. Have you encountered back and next button issues in your web application?</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
