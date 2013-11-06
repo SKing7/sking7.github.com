@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>javascript - window.onload vs document.onload</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>javascript - window.onload vs document.onload</h1>
+<div><p>The general idea is that <strong>window.onload fires</strong> when the document's window is <strong>ready for presentation</strong> and <strong>document.onload fires</strong> when the <strong>DOM tree</strong> (built from the markup code within the document) is <strong>completed</strong>.</p><p>Ideally, subscribing to <a href="http://en.wikipedia.org/wiki/DOM_events">DOM-tree events</a>, allows offscreen-manipulations through Javascript, incurring <strong>almost no CPU load</strong>. Contrarily, <strong><code>window.onload</code></strong> can <strong>take a while to fire</strong>, when multiple external resources have yet to be requested, parsed and loaded.</p><p><strong>►Test scenario:</strong></p><p>To observe the difference and <strong>how your browser</strong> of choice <strong>implements</strong> the aforementioned <strong>event handlers</strong>, simply insert the following code within your document's - <code>&lt;body&gt;</code>- tag.</p><pre><code>&lt;script language="javascript"&gt;
+window.tdiff = []; fred = function(a,b){return a-b;};
+window.document.onload = function(e){ 
+    console.log("document.onload", e, Date.now() ,window.tdiff,  
+    (window.tdiff[0] = Date.now()) &amp;&amp; window.tdiff.reduce(fred) ); 
+}
+window.onload = function(e){ 
+    console.log("window.onload", e, Date.now() ,window.tdiff, 
+    (window.tdiff[1] = Date.now()) &amp;&amp; window.tdiff.reduce(fred) ); 
+}
+&lt;/script&gt;
+</code></pre><p><strong>►Result:</strong></p><p>Here is the resulting behavior, observable for Chrome v20 (and probably most current browsers). </p><ul>
+<li>No <code>document.onload</code> event.</li>
+<li><code>onload</code> fires twice when declared inside the <code>&lt;body&gt;</code>, once when declared inside the <code>&lt;head&gt;</code> (where the event then acts as <code>document.onload</code> ).</li>
+<li>counting and acting dependent on the state of the counter allows to emulate both event behaviors. </li>
+<li>Alternatively declare the <code>window.onload</code> event handler within the confines of the HTML-<code>&lt;head&gt;</code> element.</li>
+</ul><p><strong>►Example Project:</strong></p><p>The code above is taken from <a href="https://github.com/lsauer/KeyBoarder/tree/gh-pages">this project's</a> codebase (<code>index.html</code> and <code>keyboarder.js</code>).</p><hr /><p>For a list of <a href="https://developer.mozilla.org/en-US/docs/DOM/window#Event_handlers">event handlers of the window object</a>, please refer to the MDN documentation.</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

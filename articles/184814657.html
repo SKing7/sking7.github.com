@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Non-onload-blocking async JS  / Stoyan's phpied.com</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Non-onload-blocking async JS  / Stoyan's phpied.com</h1>
+<div id="post-1655"><div><p><strong>Update Oct 2013:</strong> for a more bulletproof version, tested in the wild, IE and all, check <a href="https://twitter.com/bluesmoon">Philip</a>'s snippet at <a href="http://www.lognormal.com/blog/2012/12/12/the-script-loader-pattern/">http://www.lognormal.com/blog/2012/12/12/the-script-loader-pattern/</a></p><p>Asynchronous JS is cool but it still blocks <code>window.onload</code> event (except in IE before 10). That's rarely a problem, because <code>window.onload</code> is increasingly less important, but still...</p><p>At my <a href="http://velocityconf.com/velocity2012/public/schedule/detail/25008">Velocity conference talk</a> today Philip "<a href="http://lognormal.com">Log Normal</a>" Tellis asked if there was a way to load async JS without blocking <code>onload</code>. I said I don't know, which in retrospect was duh! because I spoke about Meebo's non-onload-blocking frames (without providing details) earlier in the talk.</p><p>Stage fright I guess. </p><p>Minutes later in a moment of clarity I figured Meebo's way should help. Unfortunately all Meebo docs are gone from their site, but we still have their Velocity talk from earlier years (<a href="http://assets.en.oreilly.com/1/event/44/Building%20Fast%20Webapps,%20Fast%20_Lessons%20From%20Creating%20the%20Meebo%20Bar_%20Presentation.ppt">PPT</a>). There are missing pieces there but I was able to reconstruct a snippet that should load a JavaScript asynchronously without blocking onload.</p><p>Here it goes:</p><div><pre><span>(</span><span>function</span><span>(</span><span>url</span><span>)</span><span>{</span><span>
+  </span><span>var</span><span> </span><span>iframe</span><span> = </span><span>document</span><span>.</span><span>createElement</span><span>(</span><span>'</span><span>iframe</span><span>'</span><span>)</span><span>;
+  </span><span>(</span><span>iframe</span><span>.</span><span>frameElement</span><span> || </span><span>iframe</span><span>)</span><span>.</span><span>style</span><span>.</span><span>cssText</span><span> = </span><span>"</span><span>width: 0; height: 0; border: 0</span><span>"</span><span>;
+  </span><span>var</span><span> </span><span>where</span><span> = </span><span>document</span><span>.</span><span>getElementsByTagName</span><span>(</span><span>'</span><span>script</span><span>'</span><span>)</span><span>;
+  </span><span>where</span><span> = </span><span>where</span><span>[</span><span>where</span><span>.</span><span>length</span><span> - </span><span>1</span><span>]</span><span>;
+  </span><span>where</span><span>.</span><span>parentNode</span><span>.</span><span>insertBefore</span><span>(</span><span>iframe</span><span>, </span><span>where</span><span>)</span><span>;
+  </span><span>var</span><span> </span><span>doc</span><span> = </span><span>iframe</span><span>.</span><span>contentWindow</span><span>.</span><span>document</span><span>;
+  </span><span>doc</span><span>.</span><span>open</span><span>(</span><span>)</span><span>.</span><span>write</span><span>(</span><span>'</span><span>&lt;body onload="</span><span>'</span><span>+
+    </span><span>'</span><span>var js = document.createElement(</span><span>\'</span><span>script</span><span>\'</span><span>);</span><span>'</span><span>+
+    </span><span>'</span><span>js.src = </span><span>\'</span><span>'</span><span>+ </span><span>url</span><span> +</span><span>'</span><span>\'</span><span>;</span><span>'</span><span>+
+    </span><span>'</span><span>document.body.appendChild(js);"&gt;</span><span>'</span><span>)</span><span>;
+  </span><span>doc</span><span>.</span><span>close</span><span>(</span><span>)</span><span>;
+</span><span>}</span><span>)</span><span>(</span><span>'</span><span>http://www.jspatterns.com/files/meebo/asyncjs1.php</span><span>'</span><span>)</span><span>;</span></pre></div><p>The <a href="http://www.phpied.com/files/widgets/meebo.html">demo page is right here</a>. It loads a script (<code>asyncjs1.php</code>) that is intentionally delayed for 5 seconds.</p><h2>Features</h2><ul>
+<li>loads a javascript file asynchronously</li>
+<li>doesn't block <code>window.onload</code> nor <code>DOMContentLoaded</code></li>
+<li>works in Safari, Chrome, Firefox, IE6789 *</li>
+<li>works even when the script is hosted on a different domain (third party, CDN, etc), so no x-domain issues.</li>
+<li>no loading indicators, the page looks done and whenever the script arrives, it arrives and does its thing silently in the background. Good boy!</li>
+</ul><p>* The script works fine in Opera too, but blocks <code>onload</code>. Opera is weird here. Even regular async scripts block <code>DOMContentLoaded</code> which is a shame.</p><h2>Drawback</h2><p>The script (asyncjs1.php) runs is in an iframe, so all <code>document</code> and <code>window</code> references point to the iframe, not the host page.</p><p>There's an easy solution for that without changing the whole script. Just wrap it in an immediate function and pass the <code>document</code> object the script expects:</p><div><pre><span>(</span><span>function</span><span>(</span><span>document</span><span>)</span><span>{</span><span>
+ 
+  </span><span>document</span><span>.</span><span>getElementById</span><span>(</span><span>'</span><span>r</span><span>'</span><span>)</span><span>... </span><span>
+ 
+</span><span>}</span><span>)</span><span>(</span><span>parent</span><span>.</span><span>document</span><span>)</span><span>;</span></pre></div><h2>How does it work</h2><ol>
+<li>create an iframe without setting <code>src</code> to a new URL. This fires <code>onload</code> of the iframe immediately and the whole thing is completely out of the way</li>
+<li>style the iframe to make it invisible</li>
+<li>get the last <code>script</code> tag so far, which is the snippet itself. This is in order to glue the iframe to the snippet that includes it.</li>
+<li>insert the iframe into the page</li>
+<li>get a handle to the <code>document</code> object of the iframe</li>
+<li>write some HTML into that iframe document</li>
+<li>this HTML includes the desired script</li>
+</ol><p>
+          Tell your friends about this post:
+          <a href="https://facebook.com/sharer.php?u=http://www.phpied.com/non-onload-blocking-async-js/">Facebook</a>,
+          <a href="https://twitter.com/intent/tweet?url=http://www.phpied.com/non-onload-blocking-async-js/&amp;via=stoyanstefanov">Twitter</a>,
+          <a href="https://plus.google.com/share?url=http://www.phpied.com/non-onload-blocking-async-js/">Google+</a>
+        </p></div></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
