@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Javascript原型链和原型的一个误区 | 风雪之隅</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Javascript原型链和原型的一个误区 | 风雪之隅</h1>
+<div id="post-1462"><p>
+    之前我对Javascript的原型链中, 原型继承与标识符查找有些迷惑, </p><p>    如, 如下的代码:</p><pre name="code" linenum="off">
+function Foo() {};
+var foo = new Foo();
+Foo.prototype.label = "laruence";
+alert(foo.label); //output: laruence
+alert(Foo.label);//output: undefined
+</pre><p>    今天看到了如下这个图:<br /><div id="attachment_1463"><a href="http://laruence-wordpress.stor.sinaapp.com/uploads/javascript_object_layout.jpg"><img src="http://laruence-wordpress.stor.sinaapp.com/uploads/javascript_object_layout.jpg" alt="Javascript object layout" title="javascript_object_layout" width="611" height="760" /></a><p>Javascript object layout</p></div></p><p>    另外, 在<a href="http://www.mollypages.org/misc/js.mp" target="_blank">Javascript Object Hierarchy</a>看到: </p><blockquote><p>
+   The prototype is only used for properties inherited by objects/instances created by that function. The function itself does not use the associated prototype.
+</p></blockquote><p>    也就是说, 函数对象的prototype并不作用于原型链查找过程中, </p><p>    今天在firefox下发现(因为firefox通过__proto__暴露了[[prototype]]), 真正参与标识符查找的是函数对象的__proto__, </p><pre name="code" linenum="off">
+function Foo() {};
+var foo = new Foo();
+Foo.__proto__.label = "laruence";
+alert(Foo.label); //output: laruence
+alert(foo.label);//output: undefined
+</pre><p>     而, 显然的:</p><pre name="code" linenum="off">
+function Foo() {};
+alert(Foo.__proto__ === Foo.prototype); //output: false
+</pre><p>     另外, 也解释了, </p><pre name="code" linenum="off">
+alert(Object.forEach); // undefined
+
+Function.prototype.forEach = function(object, block, context) {
+    for (var key in object) {
+        if (typeof this.prototype[key] == "undefined") {
+            block.call(context, object[key], key, object);
+        }
+    }
+
+};
+
+alert(Object.forEach);
+alert(Function.forEach);
+alert(Object.forEach === Function.forEach); // true
+</pre><p>Tags: <a href="http://www.laruence.com/tag/javascript" rel="tag">javascript</a>, <a href="http://www.laruence.com/tag/prototype" rel="tag">prototype</a>, <a href="http://www.laruence.com/tag/__proto__" rel="tag">__proto__</a></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
