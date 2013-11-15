@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Vertical Percentages in CSS | Impressive Webs</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Vertical Percentages in CSS | Impressive Webs</h1>
+<div><footer>
+	<span>
+		By <span>Louis Lazaris</span>
+	</span> on <time datetime="2013-11-15T12:19:34+00:00" pubdate="">November 14th, 2013</time> |
+	</footer><p><img src="http://cdn.impressivewebs.com/2013-11/vertical-percentages.jpg" alt="Vertical Percentages in CSS" width="184" height="184" />I don’t think this happens very often. To be honest, I don’t think I’ve ever used a percentage value on a top padding/margin, or a bottom padding/margin value. Even for height values, I may have used a 100% value for a hack, but nothing else.</p><p>Nonetheless, using percentages on those vertical parts of a page are somewhat different in the way they are calculated, compared to other properties that take percentage values.</p><p>Here are the rules for percentages on vertical items:</p><ul>
+<li>A percentage value on top/bottom padding is relative to the width of the containing block</li>
+<li>A percentage value on top/bottom margin is relative to the width of the containing block</li>
+<li>A percentage value on height is relative to the height of the containing block (same for min/max height)</li>
+<li>Percentage values are not allowed on border widths (not even left and right)</li>
+</ul><p>And here’s a CodePen showing this in action, using top/bottom padding/margins set with percentages, along with a set-width container:</p><p data-height="471" data-theme-id="461" data-slug-hash="LEqmo" data-user="impressivewebs" data-default-tab="result">See the Pen <a href="http://codepen.io/impressivewebs/pen/LEqmo">Vertical Percentages</a> by Louis Lazaris (<a href="http://codepen.io/impressivewebs">@impressivewebs</a>) on <a href="http://codepen.io">CodePen</a></p><p>Notice it uses jQuery to calculate and display the total height of the element including padding. I’ve intentionally used a value of 1000px for the container and 100×100 for the element itself, just to make any percentage calculations simpler to envision.</p><p>As it stands, the total height is 300px — which is 100px (as defined in the CSS) plus 100px of top padding (which is 10% of 1000px of the container width) and 100px of bottom padding (same calculation as top).</p><p>And keep in mind that the calculations would be vastly different if I just threw some content in the boxes and let the container element expand without a set width. Then the container’s width would be dependent on the window size (or iframe size, in the case of a code embed like above).</p><p>Also, if I was using <code>box-sizing: border-box</code>, that would affect the total height value that’s displayed.</p><p>In thinking about why vertical padding and margin percentage values are relative to the containing block’s width, my guess would be that this is simply much easier to control.</p><p>Width values are commonly set, whereas heights are usually just dependent on content. In fact, I would go as far as to say it’s usually bad practice to define a height on an element (<code>min-height</code> is fine though). So if you want to actually set vertical margin/padding percentages, it would be unintuitive to set these relative to an arbitrary content-based height. Instead, it’s much easier to do the calculation based on width — because it’s much more likely that a width is being set explicitly.</p><p>Of course, I don’t know if this is the case. I can’t seem to find an explanation for this anywhere, so if anyone who works on the specs has a more technical answer, then please comment and I’ll update the article accordingly.</p><p>These links on my CSS Values reference have external links to MDN and W3C, so you can look those up to see what the spec says:</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
