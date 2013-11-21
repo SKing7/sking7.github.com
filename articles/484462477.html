@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>How to Maintain Image Aspect Ratios in Responsive Web Design</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>How to Maintain Image Aspect Ratios in Responsive Web Design</h1>
+<div>
+        
+        <div><figure>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">
+        <img alt="" src="http://0.gravatar.com/avatar/439aeaff7de2bae365adc3eb4947b44d?s=96&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96&amp;r=G" height="96" width="96" />      </a>
+    </figure><p>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">Craig Buckler</a>
+    </p><p>UK Web Developer and Writer</p></div>
+        
+        
+        <div><p>Published <time datetime="2013-11-16" pubdate="">November 16, 2013</time></p></div>
+      </div><div>
+
+          <p>Consider a typical set of image gallery thumbnails:</p>
+<pre title="">
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href="#"&gt;&lt;img src="http://lorempixel.com/320/180/abstract" /&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#"&gt;&lt;img src="http://lorempixel.com/320/180/city" /&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#"&gt;&lt;img src="http://lorempixel.com/352/198/technics" /&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p>We can show this gallery at any size in a responsive page template using CSS (essential properties shown):</p>
+<pre title="">
+ul
+{
+  width: 100%;
+  padding: 0;
+  margin: 0 0 2em 0;
+  list-style-type: none;
+}
+
+li
+{
+  float: left;
+  width: 33.3%;
+  padding: 0;
+  margin: 0;
+  background-color: #000;
+  border: 10px solid #fff;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+li a
+{
+  display: block;
+  width: 100%;
+}
+
+img
+{
+  display: block;
+  max-width: 100%;
+}
+</pre>
+<p>This works well because all our images have the same 16:9 aspect ratio. The height of the image is exactly 56.25% of the width (9 divided by 16 expressed as a percentage).</p>
+<p><img src="http://blogs.sitepointstatic.com/images/tech/896-rwd-aspect-ratio1.jpg" alt="responsive thumbnails" /></p>
+<p>However, we web designers are paranoid: people conspire against us and supply photographs in an infinite range of sizes and aspect ratios, e.g.</p>
+<pre title="">
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href="#"&gt;&lt;img src="http://lorempixel.com/320/180/abstract" /&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#"&gt;&lt;img src="http://lorempixel.com/320/320/city" /&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#"&gt;&lt;img src="http://lorempixel.com/200/150/technics" /&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><img src="http://blogs.sitepointstatic.com/images/tech/896-rwd-aspect-ratio2.jpg" alt="responsive thumbnails" /></p>
+<p>There are various solutions to this problem:</p>
+<ol>
+<li>We could resize every image by hand. That’s time-consuming and tedious.</li>
+<li>We could implement a clever automated server-based image resizing solution. That could take a while and resulting images may not be as polished or optimized as we like.</li>
+<li>We could throw a diva-like tantrum and refuse to work under such conditions. Of course, that’s unprofessional and none of us would resort to such tactics (too often).</li>
+</ol>
+<p><em>Or can we use CSS to solve the issue?</em></p>
+<p>We can, but it’s not as straight-forward as you may expect. In the old fixed-width design days we would have known the width of our image placeholder. If it was 160px, we could make the height 90px and leave early for a beer. In this example, our width is 33.3% of the container minus 20px for the border on the left and right-hand edges. It could be any size so setting a fixed height will impede our required aspect ratio.</p>
+
+<p>A little-known quirk of padding is that setting a top or bottom percentage bases it on the <strong>width</strong> of the containing block. If your block is 100px in width, <code>padding-top: 30%;</code> will equate to 30 pixels. I suspect this was done to make rendering calculations easier since element heights are normally determined by their content. Besides, if you had a fixed-height parent of 300px and set <code>padding-top: 200%;</code> on a child, the parent would become at least 600px — thus leading to a recursive cascade which breaks the web.</p>
+<p>Whatever the reason, it’s very useful since it permits you to set an intrinsic ratio, e.g.</p>
+<pre title="">
+#element
+{
+	position: relative;
+	height: 0;
+	padding: 56.25% 0 0 0;
+}
+</pre>
+<p>This element will retain a 16:9 ratio based on the width of the container. The height has been set at 0px but, since we have set <code>position: relative;</code>, we can absolutely position any child element.</p>
+<p>As far as I’m aware, the padding trick was first highlighted by <a href="http://alistapart.com/article/creating-intrinsic-ratios-for-video">Thierry Koblentz to create responsive videos</a>, but the same concept can be applied to images or any other content. Let’s update our thumbnail CSS:</p>
+<pre title="">
+li a
+{
+  display: block;
+  width: 100%;
+  position: relative;
+  height: 0;
+  padding: 56.25% 0 0 0;
+  overflow: hidden;
+}
+
+img
+{
+  position: absolute;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+</pre>
+<p>The result will show the image with black borders if it does not have a matching 16:9 dimension:</p>
+<p><img src="http://blogs.sitepointstatic.com/images/tech/896-rwd-aspect-ratio3.jpg" alt="responsive thumbnails" /></p>
+<p><a href="http://cssdeck.com/labs/rwd-image-aspect-ratio"><strong>View the demonstration code…</strong></a></p>
+<p>Play around with the CSS. Removing the image <code>max-width</code> or <code>max-height</code> can apply cropping effects rather than resizing. I hope you find it useful.</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
