@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Three Little-Known Development Console API Methods</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Three Little-Known Development Console API Methods</h1>
+<div>
+        
+        <div><figure>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">
+        <img alt="" src="http://0.gravatar.com/avatar/439aeaff7de2bae365adc3eb4947b44d?s=96&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96&amp;r=G" height="96" width="96" />      </a>
+    </figure><p>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">Craig Buckler</a>
+    </p><p>UK Web Developer and Writer</p></div>
+        
+        
+        <div><p>Published <time datetime="2013-11-25" pubdate="">November 25, 2013</time></p></div>
+      </div><div>
+
+          <p>Do you remember life before Firebug started the browser console revolution? I still have the nightmares. Today, we’re spoiled for choice and the development consoles are increasingly powerful.</p>
+<p>That said, many of us still use <code>console.log</code> as our primary debugging command. There are several other methods you may not be aware of…</p>
+<h2>console.count</h2>
+<p><code>console.count</code> displays the number of times the line was called. It can be passed an optional name parameter to identify the counter, e.g.</p>
+<pre title="">
+for (var i = 0; i &lt; 3; i++) {
+	doSomething(i);
+	console.count( "main doSomething loop:" );
+}
+</pre>
+<p><img src="http://blogs.sitepointstatic.com/images/tech/901-console-api-count.png" alt="console.count" /></p>
+<p><code>console.count</code> can be used in Chrome’s Developer Tools, Firebug and the IE11 F12 tools.</p>
+<h2>console.dir and console.dirxml</h2>
+<p>Outputting a DOM node using <code>console.log</code> is useful and will allow you to navigate to the HTML panel where you can view its position in the tree and its properties. However, you can view those details directly in the console.</p>
+<p><code>console.dir(node)</code> displays an interactive list of all object properties — like you would normally see in the DOM panel, e.g.</p>
+<pre title="">
+console.dir( document.getElementById("test") );
+</pre>
+<p><img src="http://blogs.sitepointstatic.com/images/tech/901-console-api-dir.png" alt="console.dir" /></p>
+<p><code>console.dir</code> can be used in Chrome’s Developer Tools, Firebug, Firefox’s Web Developer console and the IE11 F12 tools.</p>
+<p>Similarly, <code>console.dirxml(node)</code> displays the node and all descendants — like a section of the HTML panel, e.g.</p>
+<pre title="">
+console.dirxml( document.getElementById("test") );
+</pre>
+<p><img src="http://blogs.sitepointstatic.com/images/tech/901-console-api-dirxml.png" alt="console.dirxml" /></p>
+<p><code>console.dirxml</code> can be used in Chrome’s Developer Tools, Firebug and the IE11 F12 tools.</p>
+<h2>console.table</h2>
+<p><code>console.table</code> outputs an object or array in a tabular format which can be inspected and re-ordered by clicking the table headings, e.g.</p>
+<pre title="">
+var browsers = [
+	{ name: "Internet Explorer", vendor: "Microsoft", version: "11" },
+	{ name: "Chrome", vendor: "Google", version: "31" },
+	{ name: "Firefox", vendor: "Mozilla", version: "26" },
+	{ name: "Safari", vendor: "Apple", version: "7" },
+	{ name: "Opera", vendor: "Opera", version: "18" }
+];
+
+console.table( browsers );
+</pre>
+<p><img src="http://blogs.sitepointstatic.com/images/tech/901-console-api-table.png" alt="console.table" /></p>
+<p><code>console.dirxml</code> can be used in Chrome’s Developer Tools and Firebug. You can also specify an array as a second parameter to define different column headings.</p>
+<p>Very useful. It’s worth browsing your favorite browser console’s documentation to find other hidden gems lurking in the tools.</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
