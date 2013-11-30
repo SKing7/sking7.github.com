@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>60fps scrolling using pointer-events: none  |  The CSS Ninja</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>60fps scrolling using pointer-events: none  |  The CSS Ninja</h1>
+<div>
+					<header>
+						<small><time datetime="25/11/2013">November 25th, 2013</time></small>
+						
+					</header>
+					
+					<p>Paul Lewis did an interesting article a while back about <a href="http://www.html5rocks.com/en/tutorials/speed/unnecessary-paints/">avoiding unnecessary paints</a> through disabling hover effects as the user scrolls, which is a great approach. The down side being managing all your hover states through a parent class.<span id="more-1304"></span></p>
+<div><pre><span>.hover</span> <span>.element</span><span>:hover</span> <span>{</span>
+  <span>box</span><span>-</span><span>shadow</span><span>:</span> <span>1px</span> <span>1px</span> <span>1px</span> <span>#000</span><span>;</span>
+<span>}</span>
+</pre></div>
+<p>That approach doesn’t scale well and it creates unnecessary specificity in your CSS.</p>
+<p>The gist of the technique is on scrolling the <code>.hover</code> class is removed from the body and all your <code>.hover</code> selectors won’t match until the user stops scrolling and the class is then added back to the body. </p>
+<p>Then I saw a genius little tweet from Christian Schaefer.</p>
+
+
+<h2>Pointer-events property to the rescue</h2>
+<p>This is a much better approach as it will just make the mouse pass through the element that has the <code>pointer-events: none</code> property set. Take a look at the screencast I did showing the dramatic difference disabling hover makes.</p>
+
+<p>We get all the benefits of the original approach without introducing maintainability and specificity issues in our CSS.</p>
+<div><pre><span>.disable-hover</span> <span>{</span>
+  <span>pointer</span><span>-</span><span>events</span><span>:</span> <span>none</span><span>;</span>
+<span>}</span>
+</pre></div>
+<p>All we have to do is add the <code>.disable-hover</code> class to the body when the user begins to scroll. This then allows the users cursor to pass through the body and thus disable any hover effects.</p>
+<div><pre><span>var</span> <span>body</span> <span>=</span> <span>document</span><span>.</span><span>body</span><span>,</span>
+    <span>timer</span><span>;</span>
+
+<span>window</span><span>.</span><span>addEventListener</span><span>(</span><span>'scroll'</span><span>,</span> <span>function</span><span>()</span> <span>{</span>
+  <span>clearTimeout</span><span>(</span><span>timer</span><span>);</span>
+  <span>if</span><span>(</span><span>!</span><span>body</span><span>.</span><span>classList</span><span>.</span><span>contains</span><span>(</span><span>'disable-hover'</span><span>))</span> <span>{</span>
+    <span>body</span><span>.</span><span>classList</span><span>.</span><span>add</span><span>(</span><span>'disable-hover'</span><span>)</span>
+  <span>}</span>
+  
+  <span>timer</span> <span>=</span> <span>setTimeout</span><span>(</span><span>function</span><span>(){</span>
+    <span>body</span><span>.</span><span>classList</span><span>.</span><span>remove</span><span>(</span><span>'disable-hover'</span><span>)</span>
+  <span>},</span><span>500</span><span>);</span>
+<span>},</span> <span>false</span><span>);</span>
+</pre></div>
+<p>The code is pretty simple we clear the timeout, this is important after the initial scroll, check to see if the disable class isn’t already on the body element and then set up a delayed timer to remove the class once the user has stopped scrolling for at least 500ms.</p>
+<h2>A more robust technique</h2>
+<p>Now applying pointer-events to the body will work just fine in most cases but if pointer-events: auto is applied to any child elements they will override the parent property and cause janky scroll. </p>
+<div><pre><span>.disable-hover</span><span>,</span>
+<span>.disable-hover</span> <span>*</span> <span>{</span>
+  <span>pointer</span><span>-</span><span>events</span><span>:</span> <span>none</span> <span>!important</span><span>;</span>
+<span>}</span>
+</pre></div>
+<p>Easy solution is to do the asterisk selector and add an important to the property value so it will disable any child elements with pointer-events turned on.</p>
+<p>Take a look at the <a href="http://jsbin.com/oNiVUYe/5/quiet">testcase</a> for yourself and run some timelines to see the performance gains from this simple technique.</p>
+					
+										
+					<p>
+						Post filed under: <a href="http://www.thecssninja.com/category/css" title="View all posts in css" rel="category tag">css</a>, <a href="http://www.thecssninja.com/category/javascript" title="View all posts in javascript" rel="category tag">javascript</a>.
+					</p>
+					<p>
+						<a href="#respond">Skip to comment form</a>.
+					</p>
+					
+					
+					
+					
+<!-- You can start editing here. -->
+
+
+	
+
+	
+
+ 
+
+
+
+				</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
