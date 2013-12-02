@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Apple-like Retina Effect With jQuery</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Apple-like Retina Effect With jQuery</h1>
+<div><p><i></i> Martin Angelov <i></i><time datetime="2010-06-16">June 16th, 2010</time></p><p>Apple has long applied a winning strategy in marketing – create well designed products, have a dedicated fan base, and let the hype build up before every product release.</p><p>This is also the case with the latest version of their iPhone. But what I found interesting is the term they coined – “Retina display” and the promo image accompanying it.</p><div id="attachment_959"><a href="http://www.apple.com/iphone/"><img title="The image on apple.com that inspired it all" src="http://cdn.tutorialzine.com/wp-content/uploads/2010/06/i2.jpg" alt="The image on apple.com that inspired it all" width="620" height="260" /></a><p>The image on apple.com that inspired it all</p></div><p>What made me wonder is if it was possible to turn this static image into a fully functional “Retina effect” with only jQuery and CSS. This is exactly what we are doing today. So grab the demo files from the button above and read on.</p><blockquote><p><em><strong>UPDATE:</strong></em> Seems Apple folks have also liked the idea, and they’ve implemented it at <a href="http://www.apple.com/iphone/features/retina-display.html" target="_blank">apple.com</a>.</p></blockquote><h3>Step 1 – XHMTL</h3><p>The markup for the effect is quite straightforward. You can see that we only have a number of divs and an image.</p><h4>demo.html</h4><pre>&lt;div id="main"&gt;
+
+	&lt;div id="iphone"&gt;
+		&lt;div id="webpage"&gt;
+			&lt;img src="img/webpage.png" width="499" height="283" alt="Web Page" /&gt;
+			&lt;div id="retina"&gt;&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+
+&lt;/div&gt;</pre><p>The <strong>#iphone</strong> div displays the iphone frame. Inside it is the <strong>#webpage</strong> div with the screenshot of the webpage. The screenshot is actually displayed at half its original size, as we are using the same image for both the small version (displayed in the&nbsp; iPhone) and big version, which is shown in the rounded tooltip.</p><p>Lastly we have the retina div, which is rounded with CSS3 and displays the big version of the webpage screeshot as its background as it is moved around with the mouse.</p><div id="attachment_958"><a href="http://demo.tutorialzine.com/2010/06/apple-like-retina-effect-jquery-css/demo.html"><img title="Putting it together" src="http://cdn.tutorialzine.com/wp-content/uploads/2010/06/i1.jpg" alt="Putting it together" width="620" height="460" /></a><p>Putting it together</p></div><h3>Step 2 – CSS</h3><p>Moving to the CSS part of the tutorial. We are going to style the <em>iphone</em>, <em>webpage </em>and <em>retina </em>divs, so we make the awesome effect possible.</p><h4>styles.css</h4><pre>#iphone{
+	/* The iphone frame div */
+	width:750px;
+	height:400px;
+	background:url('img/iphone_4G.png') no-repeat center center;
+}
+
+#webpage{
+	/* Contains the webpage screenshot */
+	width:499px;
+	height:283px;
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin:-141px 0 0 -249px;
+}
+
+#retina{
+	/* The Retina effect */
+	background:url('img/webpage.png') no-repeat center center white;
+	border:2px solid white;
+
+	/* Positioned absolutely, so we can move it around */
+	position:absolute;
+	height:180px;
+	width:180px;
+
+	/* Hidden by default */
+	display:none;
+
+	/* A blank cursor, notice the default fallback */
+	cursor:url('img/blank.cur'),default;
+
+	/* CSS3 Box Shadow */
+	-moz-box-shadow:0 0 5px #777, 0 0 10px #aaa inset;
+	-webkit-box-shadow:0 0 5px #777;
+	box-shadow:0 0 5px #777, 0 0 10px #aaa inset;
+
+	/* CSS3 rounded corners */
+	-moz-border-radius:90px;
+	-webkit-border-radius:90px;
+	border-radius:90px;
+}
+
+#retina.chrome{
+	/* A special chrome version of the cursor */
+	cursor:url('img/blank_google_chrome.cur'),default;
+}
+
+#main{
+	/* The main div */
+	margin:40px auto;
+	position:relative;
+	width:750px;
+}</pre><p>By specifying an absolute positioning on the webpage div, we can apply the <a href="http://tutorialzine.com/2010/03/centering-div-vertically-and-horizontally/">vertical and horizontal centering technique</a>, effectively putting the webpage screenshot in the middle of the iphone frame.</p><p>The <em>retina </em>div is also assigned an absolute positioning, so it is possible to move it in the jQuery part of the tutorial by just specifying a top and left offsets. This div also has the webpage screenshot as its background (in its original size). Offsetting the background with the movement of the div creates the illusion that it magnifies the small screenshot below it.</p><div id="attachment_960"><a href="http://demo.tutorialzine.com/2010/06/apple-like-retina-effect-jquery-css/demo.html"><img title="The Retina Effect" src="http://cdn.tutorialzine.com/wp-content/uploads/2010/06/i31.png" alt="The Retina Effect" width="620" height="460" /></a><p>The Retina Effect</p></div><p>The retina div also has applied a border radius with a value of exactly half its width, which turns it into a perfect circle (at least in browsers which support the border-radius CSS3 property – Chrome, Safari, Opera &amp; Firefox).</p><p>And finally we hide the mouse pointer by providing a blank cursor file (Google Chrome fails to render completely blank cursors, so we provide a special 1px white cursor for it – at least it is better than nothing). The Opera browser completely ignores custom cursors and there are no workarounds, so users using this browser might not enjoy the full experience.</p><h3>Step 3 – jQuery</h3><p>If you can remember, a few months ago we did a <a href="http://tutorialzine.com/2010/02/photo-shoot-css-jquery/" target="_blank">tutorial here at Tutorialzine</a>, in which we used jQuery to create a photoshoot effect. This time we are using a similar technique to make the “retina effect”, as seen on Apple’s web site.</p><p>And since we have all the styling in place, it is a matter of some JavaScript coding with the help of the jQuery library.</p><h4>script.js</h4><pre>$(document).ready(function(){
+
+	/* This code is executed on the document ready event */
+
+	var left	= 0,
+		top		= 0,
+		sizes	= { retina: { width:190, height:190 },
+				webpage:{ width:500, height:283 } },
+		webpage	= $('#webpage'),
+		offset	= { left: webpage.offset().left, top: webpage.offset().top },
+		retina	= $('#retina');
+
+	if(navigator.userAgent.indexOf('Chrome')!=-1)
+	{
+		/*	Applying a special chrome curosor,
+			as it fails to render completely blank curosrs. */
+
+		retina.addClass('chrome');
+	}
+
+	webpage.mousemove(function(e){
+
+		left = (e.pageX-offset.left);
+		top = (e.pageY-offset.top);
+
+		if(retina.is(':not(:animated):hidden')){
+			/* Fixes a bug where the retina div is not shown */
+			webpage.trigger('mouseenter');
+		}
+
+		if(left&lt;0 || top&lt;0 || left &gt; sizes.webpage.width ||
+			top &gt; sizes.webpage.height)
+		{
+			/*	If we are out of the bondaries of the
+				webpage screenshot, hide the retina div */
+
+			if(!retina.is(':animated')){
+				webpage.trigger('mouseleave');
+			}
+			return false;
+		}
+
+		/*	Moving the retina div with the mouse
+			(and scrolling the background) */
+
+		retina.css({
+			left				: left - sizes.retina.width/2,
+			top					: top - sizes.retina.height/2,
+			backgroundPosition	: '-'+(1.6*left)+'px -'+(1.35*top)+'px'
+		});
+
+	}).mouseleave(function(){
+		retina.stop(true,true).fadeOut('fast');
+	}).mouseenter(function(){
+		retina.stop(true,true).fadeIn('fast');
+	});
+});</pre><p>In the mousemove function, the current coordinates of the mouse are passed as <em>e.pageX</em> and <em>e.pageY</em>, but they are absolute with relation to the document. Subtracting the position offset of the website div, we end up with relative coordinates for the mouse, which are later used to position the retina div.</p><p>This, combined with the blank cursor we set up in the CSS part of the tutorial, creates the retina effect in pure JavaScript and CSS.</p><h3>Conclusion</h3><p>As the Flash / HTML5 debate heated up recently, people started looking  for ways to achieve the same level of functionality that flash provides,  without depending on an external plugin. This is possible for simple  interactions, but we still have to make sure that the solution is  cross-browser compatible, which is sometimes rather impossible (think of  IE here).</p><p>Hopefully, today we made something that would easily rival an equivalent Flash solution.</p><p><strong>What do you think? How would you improve this effect?</strong></p><div id="author-info"><img alt="" src="http://1.gravatar.com/avatar/18635cef09f45858ce6b07c8612c9f5b?s=120&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D120&amp;r=G" height="120" width="120" /><h5>by <strong>Martin Angelov</strong></h5><p>Martin is a web developer with an eye for design from Bulgaria. He founded Tutorialzine in 2009 and publishes new tutorials weekly.</p></div><p id="categories"><a href="http://tutorialzine.com/category/tutorials/" title="View all posts in Tutorials" rel="category tag">Tutorials</a></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
