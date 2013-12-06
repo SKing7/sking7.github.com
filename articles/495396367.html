@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Easier Ajax With the HTML5 FormData Interface</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Easier Ajax With the HTML5 FormData Interface</h1>
+<div>
+        
+        <div><figure>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">
+        <img alt="" src="http://0.gravatar.com/avatar/439aeaff7de2bae365adc3eb4947b44d?s=96&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96&amp;r=G" height="96" width="96" />      </a>
+    </figure><p>
+      <a href="http://www.sitepoint.com/author/craig-buckler/">Craig Buckler</a>
+    </p><p>UK Web Developer and Writer</p></div>
+        
+        
+        <div><p>Published <time datetime="2013-11-29" pubdate="">November 29, 2013</time></p></div>
+      </div><div>
+
+          <p>If you’re developing a single-page application or practicing progressive enhancement techniques you’ll often need to intercept form submissions and translate them to an Ajax call. Let’s look at a typical form:</p>
+<pre title="">
+&lt;form id="myform" action="webservice.php" method="post"&gt;
+
+&lt;input type="email" name="email" /&gt;
+
+&lt;select name="job"&gt;
+&lt;option value=""&gt;role&lt;/option&gt;
+&lt;option&gt;web developer&lt;/option&gt;
+&lt;option&gt;IT professional&lt;/option&gt;
+&lt;option&gt;other&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;input type="checkbox" name="freelancer" /&gt; are you a freelancer?
+
+&lt;input type="radio" name="experience" value="4" /&gt; less than 5 year's experience
+&lt;input type="radio" name="experience" value="5" /&gt; 5 or more year's experience
+
+&lt;textarea name="comments" rows="3" cols="60"&gt;&lt;/textarea&gt;
+
+&lt;button type="submit"&gt;Submit&lt;/button&gt;
+
+&lt;/form&gt;
+</pre>
+<p>Form interception is straight-forward in jQuery because you can pass the form node to the <code>serialize</code> method to extract all field data, e.g.</p>
+<pre title="">
+$("myform").on("submit", function(e) {
+	e.preventDefault();
+	$.post(this.action, $(this).serialize());
+});
+</pre>
+<p>If you’re using raw JavaScript, you’ll need to implement similar functionality yourself. You can either manually fetch every field one-by-one or implement a generic form element data extraction loop:</p>
+<pre title="">
+document.getElementById("myform").onsubmit = function(e) {
+
+	e.preventDefault();
+	
+	var f = e.target,
+		formData = '',
+		xhr = new XMLHttpRequest();
+	
+	// fetch form values
+	for (var i = 0, d, v; i &lt; f.elements.length; i++) {
+		d = f.elements[i];
+		if (d.name &amp;&amp; d.value) {
+			v = (d.type == "checkbox" || d.type == "radio" ? (d.checked ? d.value : '') : d.value);
+			if (v) formData += d.name + "=" + escape(v) + "&amp;";
+		}
+	}
+	
+	xhr.open("POST", f.action);
+	xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+	xhr.send(formData);
+
+}
+</pre>
+<p>That’s a reasonable quantity of code even if you define it in a re-usable function. You may also require additional checks if you’ve disabled fields or made them read-only.</p>
+<p>Fortunately, a little-known <code>FormData</code> interface has been added to XMLHttpRequest2 which handles much of the hard work for you. Let’s re-write our JavaScript submit handler to use it:</p>
+<pre title="">
+document.getElementById("myform").onsubmit = function(e) {
+
+	e.preventDefault();
+	
+	var f = e.target,
+		formData = new FormData(f),
+		xhr = new XMLHttpRequest();
+	
+	xhr.open("POST", f.action);
+	xhr.send(formData);
+}
+</pre>
+<p>That’s much simpler — it’s also faster and easier to read than the jQuery alternative.</p>
+<p>The <code>FormData</code> constructor can be passed a form element node; this instructs it to retrieve and encode all field name/value pairs. You’ll also notice we didn’t need to explicitly set <code>xhr.setRequestHeader("Content-Type")</code> since data is sent in the same format defined in the form’s <code>submit()</code> method. An encoding of <code>multipart/form-data</code> is also used so you can upload files.</p>
+<p>If no form element is passed to the constructor, an empty <code>FormData</code> object is created. Which ever way it’s initialized, you can append additional name/value pairs using the <code>append</code> method, e.g.</p>
+<pre title="">
+var formData = new FormData();
+formData.append("name", "value");
+formData.append("a", 1);
+formData.append("b", 2);
+</pre>
+<p>If the value is a File or Blob, a third parameter can specify an optional filename.</p>
+<p><code>FormData</code> is supported in all modern browsers. Only IE9 and below will cause trouble but, if you’re supporting the older versions of IE, you’ll probably be using jQuery or another library which implements its own field data extraction method.</p>
+<p>For more information, refer to the <a href="https://developer.mozilla.org/en-US/docs/Web/API/FormData">FormData reference</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects">Using FormData Objects</a> on MDN.</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
