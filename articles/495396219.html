@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Moonlighting with CSS text-shadow - SitePoint</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Moonlighting with CSS text-shadow - SitePoint</h1>
+<div>
+
+          <h2>Intro</h2>
+<p>A great deal of the charm of CSS level 3 (CSS3) comes from the ability of its various features to cut down on background images and Photoshop muscle flexing, allowing us to programmatically create many of our graphic requirements instead. This brings with it many advantages – time saved, less HTTP requests and file weights, and more flexibility to name just a few. </p>
+<p>Of course, this does come with a trade off in that many of these feature don’t work in older versions of IE that we might still be required to support.</p>
+<p>In this article I’ll cover the venerable text-shadow property, taking you from basics, through interesting applications, and up to advanced considerations. Let’s go.</p>
+<h2>Basics</h2>
+<p>At its inception, text-shadow is a pretty simple property, which can be applied to any element:</p>
+<pre title="">.shadow1 {
+	  	text-shadow: 3px 3px 1px gray;
+	  }</pre>
+<p>Any textual content inside the elements your text-shadow property is applied to will have the shadow.</p>
+<p>The four values inside the property value are as follows:</p>
+<ul>
+<li>Horizontal offset from the text. Positive numbers move the shadow right, negative ones move it left</li>
+<li>Vertical offset from the text. Positive numbers move the shadow down, negative ones move it up.</li>
+<li>Blur radius of the shadow. Larger values make the shadow look more blurry</li>
+<li>Base color of the shadow. This can be any valid CSS color units, including RGBA/HSLA.</li>
+</ul>
+<p>The following images show the difference between a simple shadow with a blur radius of 1px, versus 7px:</p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure1a.png" alt="figure1a" width="767" height="105" /></p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure1b.png" alt="figure1b" width="770" height="101" /></p>
+<p>You can apply multiple shadows to a single selection of text, by simple writing multiple text-shadow values separated by commas:</p>
+<pre title=""> .shadow3 {
+	  	text-shadow: 1px 1px 1px #666,
+	  	             3px 3px 8px black;
+	  }</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure2.png" alt="figure2" width="770" height="113" /></p>
+<h2>Advanced ideas</h2>
+<p>You can take the simple syntax presented above and go as wild as you like with it. You might just want a very simple raised or inset effect:</p>
+<pre title=""> .shadow4 {
+	  	text-shadow: 1px 1px 1px red,
+	  	             2px 2px 1px red;
+	  }</pre>
+<pre title="">	   .shadow5 {
+	  	text-shadow: -1px -1px 1px #555,
+	  	             -2px -2px 1px #666;
+	  }</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure3a1.png" alt="figure3a" width="770" height="109" /></p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure3b.png" alt="figure3b" width="770" height="118" /></p>
+<p>Or something much more interesting like a sophisticated 3D effect:</p>
+<pre title=""> .shadow6 {
+        text-shadow: -1px -1px 1px #aaa,
+                     0px 4px 1px rgba(0,0,0,0.5),
+                     4px 4px 5px rgba(0,0,0,0.7),
+                     0px 0px 7px rgba(0,0,0,0.4);
+      }</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure4.png" alt="figure4" width="770" height="111" /></p>
+<p>Or even the legendary flaming text shadow – essential for any heavy metal web site:</p>
+<pre title="">.shadow7 {
+        text-shadow: 0 0 20px #fefcc9,
+                     10px -10px 30px #feec85,
+                     -20px -20px 40px #ffae34,
+                     20px -30px 35px #ec760c,
+                     -20px -40px 40px #cd4606,
+                     0 -50px 65px #973716,
+                     10px -70px 70px #451b0e;
+	  }</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure5.png" alt="figure5" width="770" height="226" /></p>
+<p>How about a more nifty, accurate inset text effect, created using background-clip: text (which is currently only supported in WebKit/Blink-based browsers, unfortunately.)</p>
+<pre title="">.shadow8 {
+        background-color: #333;
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: rgba(255,255,255,0.5) 2px 3px 6px;
+       }</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure6.png" alt="figure6" width="770" height="112" /></p>
+<p>or an over-the-top, awesomely fun giant 3D lego text?</p>
+<pre title="">.shadow9 {
+       	 text-shadow: 0 1px #808d93,
+       	              -1px 0 #cdd2d5,
+       	              -1px 2px #808d93,
+       	              -2px 1px #cdd2d5,
+       	              -2px 3px #808d93,
+       	              -3px 2px #cdd2d5,
+       	              -3px 4px #808d93,
+       	              -4px 3px #cdd2d5,
+       	              -4px 5px #808d93,
+       	              -5px 4px #cdd2d5,
+       	              -5px 6px #808d93,
+       	              -6px 5px #cdd2d5,
+       	              -6px 7px #808d93,
+       	              -7px 6px #cdd2d5,
+       	              -7px 8px #808d93,
+       	              -8px 7px #cdd2d5;
+       }</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure7.png" alt="figure7" width="770" height="140" /></p>
+<p>Bear in mind that text-shadow can even be animated using CSS animations – the following example creates a stack of different colored letter shapes, which shift back and forth in a groovy fashion.</p>
+<pre title="">.shadow10 {
+       	 color: yellow;
+       	 text-shadow: 1px 1px 2px rgba(0,0,0,0.7),
+       	              5px 5px 1px orange,
+       	              6px 6px 2px rgba(0,0,0,0.7),
+       	              10px 10px 1px red,
+       	              11px 11px 2px rgba(0,0,0,0.7),
+       	              15px 15px 1px purple,
+       	              16px 16px 2px rgba(0,0,0,0.7);
+       	 -webkit-animation: text-snake 1s infinite alternate;
+       	 -moz-animation: text-snake 1s infinite alternate;
+       	 -ms-animation: text-snake 1s infinite alternate;
+       	 animation: text-snake 1s infinite alternate;      
+       }
+
+       /* other prefixed animation blocks ommitted for brevity */
+
+       @keyframes text-snake {
+         from {
+         	text-shadow: 1px 1px 2px rgba(0,0,0,0.7),
+       	              5px 5px 1px orange,
+       	              6px 6px 2px rgba(0,0,0,0.7),
+       	              10px 10px 1px red,
+       	              11px 11px 2px rgba(0,0,0,0.7),
+       	              15px 15px 1px purple,
+       	              16px 16px 2px rgba(0,0,0,0.7);
+         }
+         to {
+         	text-shadow: -1px 1px 2px rgba(0,0,0,0.7),
+       	              -5px 5px 1px orange,
+       	              -6px 6px 2px rgba(0,0,0,0.7),
+       	              -10px 10px 1px red,
+       	              -11px 11px 2px rgba(0,0,0,0.7),
+       	              -15px 15px 1px purple,
+       	              -16px 16px 2px rgba(0,0,0,0.7);
+         }
+       }</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/figure8.png" alt="figure8" width="770" height="120" /></p>
+<p><a href="http://onsman.com/spdemo/millsdemo.html">You can see a demo of all of these examples here.</a></p>
+<h2>Cross browser comfort?</h2>
+<p>text-shadow is supported across all modern browsers, with the rather disappointing exception of IE9. Nonetheless, this is not that serious, as text shadow is nearly always a purely eye candy effect, and you should simply do a bit of testing and make sure that your text is still legible, even if the shadow fails to show. This is why I generally don’t recommend using text-shadows along with transparent text colors, even thought it can lead to some interesting possibilities.</p>
+<p>One thing to bear in mind is that calculating a lot of shadows can put a strain on the device’s CPU, so be a bit mindful of this if you are planning on using a lot of text shadowing. You might want to turn shadows off on small screen devices (via  a media query), and reconsider your plans to have pages full of moving shadowed text all over your page. Your users and clients will thank you for it!</p>
+<p>I’d like to thank <a href="http://subtlepatterns.com">subtlepatterns.com</a> for providing the awesome background texture: <a href="http://hqvectors.com">Notebook</a>.</p>
+<p>I’d also like to thank <a href="http://htmlgoodies.com">Konstantin Kichinsky</a> and <a href="http://perishablepress.com/">Jeff Starr</a> for some inspiring examples.</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
