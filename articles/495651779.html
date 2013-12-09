@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Imitating calc() Fallback or Fixed-Width Sidebar In Responsive Layout — Osvaldas Valutis</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Imitating calc() Fallback or Fixed-Width Sidebar In Responsive Layout — Osvaldas Valutis</h1>
+<div><p>Dealing with CSS browser compatibility and solving technical issues is probably the real charm (I mean it) of front-end development. None of the projects do without it. Working on one of those I finally had my first experience with CSS function <code>calc()</code>:</p><blockquote>
+	<p>With <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/calc" target="_blank">calc()</a>, you can perform calculations to determine CSS property values.</p>
+</blockquote><p>I know that you know this, and I also know that you have already seen these <a href="http://www.w3.org/TR/css3-values/#calc-notation" target="_blank">examples</a> and have even tried them at home:</p><pre>div
+{
+	width: calc( 100% - 2.5em );
+	background-position: calc( 50% + 50px );
+	margin: calc( 1.25rem - 5px );
+}</pre><p>As you see, calc() takes writing CSS to much higher level. It is so powerful that <em>front-enders</em> have no idea what to do with it yet. And with the recent appearance of KitKat (Android 4.4) the function has become <a href="http://caniuse.com/#feat=calc" target="_blank">supported</a> in all major browsers (sorry 3rd brother, Opera Mini). Moral: start using it, wisely.</p><h2>Situation</h2><p>Imagine this painfully standard situation: content and sidebar areas floated side by side, separated by gap:</p><p><img alt="Content area and sidebar areas floated side by side" src="/incoming/images/blog/imitating-calc-fallback-fixed-width-sidebar-in-responsive-layout-1.gif" /></p><p>Usually you have two <code>div</code>'s wrapped into one and styled:</p><pre>&lt;div class="container"&gt;
+	&lt;div class="content"&gt;Content&lt;/div&gt;
+	&lt;div class="sidebar"&gt;Sidebar&lt;/div&gt;
+&lt;/div&gt;</pre><pre>.container,
+.content,
+.sidebar
+{
+	box-sizing: border-box;
+}
+.container
+{
+	width: 100%;
+	max-width: 80em; /* 1280 */
+	padding: 2.5em; /* 40 */
+}
+	.content
+	{
+		width: 80%; /* 960 */
+		float: left;
+	}
+	.sidebar
+	{
+		width: 16.666%; /* 200 */
+		float: right;
+	}
+
+@media only screen and (max-width: 40em) /* 640 */
+{
+	.content,
+	.sidebar
+	{
+		width: 100%;
+		float: none;
+	}
+	.sidebar
+	{
+		margin-top: 1.25em; /* 20 */
+	}
+}</pre><p>Looks like a perfectly responsive layout and there is nothing left to add, however…</p><h2>Problem</h2><p><img alt="On the narrower viewports the sidebar becomes extremely tight and so unusable." src="/incoming/images/blog/imitating-calc-fallback-fixed-width-sidebar-in-responsive-layout-2.gif" /></p><p>The layout I worked on had quite a small initial width of the sidebar and a wide content area. Therefore, when resizing down the viewport, the sidebar becomes <em>extremely</em> tight very quickly. What to do when the sidebar gets <strong>too narrow</strong> and moving it under the content is yet <strong>too early?</strong></p><h2>Solution</h2><p><img alt="It is a fixed-width sidebar, calc(), and a fallback." src="/incoming/images/blog/imitating-calc-fallback-fixed-width-sidebar-in-responsive-layout-3.gif" /></p><p>It is a <strong>fixed-width sidebar</strong>, <strong>calc()</strong>, and a <strong>fallback</strong> for browsers that do not support this function. A minor modification of CSS classes <code>.content</code> and <code>.sidebar</code> brings these three bolds to life:</p><pre>.content
+{
+	width: 80%; /* 960 */
+	width: calc( 100% - 15em ); /* 240 */
+	float: left;
+}
+.sidebar
+{
+	width: 16.666%; /* 200 */
+	width: calc( 12.5em ); /* 200 */
+	float: right;
+}</pre><p>If you were attentive you should see that the line <strong><code>width: calc( 12.5em )</code></strong> is the trick here. Why? Let's see all these widths like in pairs – exactly what we need browsers to do.</p><p>The <em>first</em> pair is <code>width: 80%</code> (content) and <code>width: 16.666%</code> (sidebar) that does the job in calc() incompatible browsers, which will just ignore calc(). It is the <strong>callback</strong> (backup). It means that the minority of website visitors will see narrower sidebar on narrower viewports. And that should be perfectly fine for people using older browser versions.</p><p>The <em>second</em>: <code>width: calc( 100% - 15em )</code> and <code>width: calc( 12.5em )</code>. This is for newer browser versions which will override the previous width definitions. There are a couple of things to explain:</p><ul>
+	<li>Content: <code>calc( 100% - 15em )</code> = <em>100% - sidebar width - gap width</em>. Besides that this calculates the width of the content element, it also assures that the gap between the sidebar and content is always equal to <code>2.5em</code> (40px). Total win for perfectionists.</li>
+	<li>Sidebar: <code>calc( 12.5em )</code> – who said that you need to calculate something between the brackets. This little trick cheats browsers into seeing width properties in pairs and using the only understandable one for them. I called this “imitating calc() fallback”, but actually it is vice versa. Um…</li>
+</ul><p>Party… Demo time! I made a button to imitate calc() support, you may want to try it:</p><p><a href="/examples/imitating-calc-fallback-fixed-width-sidebar-in-responsive-layout" target="_blank">Demo</a></p><h2>One more thing</h2><p>Just like many other CSS features, calc() was an experimental one and only available under the <em>vendor prefixes</em> some time ago. So let's get the maximum of it:</p><pre>.content
+{
+	width: 80%; /* 960 */
+	width: -webkit-calc( 100% - 15em ); /* 240 */
+	width: -moz-calc( 100% - 15em ); /* 240 */
+	width: calc( 100% - 15em ); /* 240 */
+	float: left;
+}
+.sidebar
+{
+	width: 16.666%; /* 200 */
+	width: -webkit-calc( 12.5em ); /* 200 */
+	width: -moz-calc( 12.5em ); /* 200 */
+	width: calc( 12.5em ); /* 200 */
+	float: right;
+}</pre><p>There is a way to do without calc(), and that is by taking the advantage of CSS property <code>position</code>. However, the whole layout would fail (which you do not want) if the sidebar was higher than the content area.</p><p>Have a nice day.</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
