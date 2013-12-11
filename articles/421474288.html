@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>如何获取浏览器的DNS解析时间 | JerryQu 的小站</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>如何获取浏览器的DNS解析时间 | JerryQu 的小站</h1>
+<div><p>上一篇博客提到09年初WED团队开发的<a href="http://qgy18.imququ.com/browser-doctor/">浏览器环境检测工具</a>时，忘记说这个是<a href="http://www.aoao.org.cn/">aoao</a>同学的创意了。不过没关系，据说他又在秘密规划新版本了，再据说新版要增加的DNS解析时间计算已经开发完成，点上面那个链接就可以抢先体验。。。</p><p>好吧，参加过11年Velocity大会的同学应该都知道facebook那个算DNS解析时间的方法了，像我这种穷人家孩子参加不起VC大会的，主办方很厚道的<a href="http://velocity.oreilly.com.cn/2011/index.php?func=session&amp;name=%E7%A7%BB%E5%8A%A8%E4%BA%92%E8%81%94%E7%BD%91%E5%BA%94%E7%94%A8%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96">提供有PPT</a>可供观看。看完PPT觉得不过瘾，还是来动手实战下吧。</p><p>首先看原理：</p><pre>a &lt;= &lt;random number&gt;
+
+t1  http://a-doppler.facebook.com/test_pixel?HTTP1.0&amp;t=1&amp;size=0k
+t2  http://a-doppler.facebook.com/test_pixel?HTTP1.1&amp;t=2&amp;size=0k
+t3  http://a-doppler.facebook.com/test_pixel?HTTP1.1&amp;t=3&amp;size=0k
+t4  http://a-doppler.facebook.com/test_pixel?HTTP1.1&amp;t=4&amp;size=10k
+
+t1 = DNS + New Connection +RTT
+t2 = New Connection + RTT
+t3 = RTT
+10k /(t4–t3)~TCP bandwidth
+</pre><p>（来源：《MobilePerformanceVelocity2011.pdf》 by DavidWei.）<span id="more-91"></span></p><p>这方案有两个关键点：</p><p>1、为了避免各种DNS缓存，每组请求必须用一个从来没被用过的全新N级域名。这就要求你的域名支持泛解析。例如我为了这个实践，开了*.qgy18.com的解析。</p><p>2、每组的第一个请求响应必须以HTTP/1.0返回。我开始还没注意这个，经aoao提醒才明白，这样才可以确保后面的请求会重建Connection。</p><p>t2和t1指向同一个域名，且都需要重新建立连接，所以t2-t1是DNS解析时间；t2返回Connection: Keep-Alive，t3是在Keep-Alive指定的timeout时间内发起的新请求，且返回内容为空，所以是RTT（Round-Trip Time）；t4在t3的基础上只是把返回内容大小由0k变成10k，所以t4-t3是加载这10k资源花费的时间，这就可以得到网络带宽了。为了减少网络波动，也可以多测几次取平均值。</p><p>明白了原理就好办了，剩下的几行代码相信大家都会写，略过。</p><p>相比<a href="http://www.w3.org/TR/navigation-timing/">Navigation Timing</a>提供的统计，这种方法好处是兼容绝大部分浏览器，没有浏览器实现上的差异和bug，能较准确的反应浏览器查询DNS所花费的时长；缺点是部署起来比较麻烦。</p><p> 本文链接：<a rel="bookmark" title="Permalink to 如何获取浏览器的DNS解析时间" href="//www.imququ.com/post/how-to-get-dns-time-in-browser.html">https://www.imququ.com/post/how-to-get-dns-time-in-browser.html</a></p><p>--<acronym title="End of File">EOF</acronym>--</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
