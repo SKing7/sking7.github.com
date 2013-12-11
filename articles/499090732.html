@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Responsive Images, Part 1: Using srcset</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Responsive Images, Part 1: Using srcset</h1>
+<div>
+
+          <div><h4><a href="http://www.sitepoint.com/series/responsive-images/" title="Responsive Images">Responsive Images</a></h4><ul><li>Responsive Images, Part 1: Using srcset</li></ul></div><p>Today, I’ll give you some new food for thought on an aspect of <strong>Responsive Web Design</strong> (<abbr title="Responsive Web Design">RWD</abbr>) that is very popular right now: responsive images. RWD is not a new topic but its approach is not always easy and free of pitfalls. Especially when it comes to images, there are many unresolved issues.</p>
+<h2>Introduction</h2>
+<p>During the development of a website, we can encounter several difficulties in the management of the images. Bearing in mind the primary need for their smooth and proper display on a wide variety of devices, these difficulties may include:</p>
+<ol>
+<li>Proper optimization and weight reduction;</li>
+<li>Attention to unnecessary waste of bandwidth (we all know how the loading speed of a website is one of the major factors for the success or failure of our own website);</li>
+<li>Appropriate resolution for the device in use.</li>
+</ol>
+<p>For the first problem, tools like <a href="http://tinypng.org/">TinyPNG</a> and <a href="http://www.jpegmini.com/">JPEGmini</a> can help in reducing images’ weight and optimize them.</p>
+<p>For the second problem, on several occasions we’ve had the possibility to test the great potential of <em>media queries</em>. Thanks to them, we’ve an easy method to face the problem for background images, that is those we show using the CSS rule <code>background-image</code>. However, considering that this solution cannot be applied to images shown using the <code>&lt;img&gt;</code> tag, how could we resolve the third and last problem and set the right image resolution for the device we’re using to visit a website?</p>
+<p>In this case, there are two proposed solutions that come to the rescue: the <code>&lt;picture&gt;</code> element and the <code>srcset</code> attribute of the <code>&lt;img&gt;</code> tag.</p>
+<p>In this article, I’ll give you a general overview of the <code>srcset</code> attribute, while the <code>&lt;picture&gt;</code> element will be the topic of the very next article.</p>
+<h2>The srcset attribute</h2>
+<p>What is the main benefit we can gain from the use of this attribute? Thanks to it, web developers can target users on high-resolution displays with a high-resolution image source or different types of screens with other versions of images. In the first case users on lower pixel density displays won’t be saddled with the wasteful bandwidth cost of downloading a useless massive high-resolution image, while the latter can enjoy the power of their screen. In the second situation, we can specify a different image for different screen sizes, in order to provide an image that is more focused on the users’ device.</p>
+<p>The <code>srcset</code> attribute, in fact, allows us to specify a list of sources for an image, which will be delivered based on the pixel density or size of the user’s screen. So we can say that implementing the <code>srcset</code> attribute is a good way to provide to the browser a set of “suggestions” about the correct behavior it should have with a certain type of image. By doing so, we improve the loading of our page and the experience of our users.</p>
+<p>At this point, let’s see the basic characteristics of this attribute, the conditions to specify to make it work and the way to implement it in our code.</p>
+<p>As the W3C states, <q cite="http://www.w3.org/html/wg/drafts/srcset/w3c-srcset/">The srcset attribute allows authors to provide, in a compact manner, multiple variants of the same image at differing resolutions or for different viewport dimensions. User Agents may make their resource selection before fetching any of the resources, thus avoiding multiple resource loads and the associated performance problems in constrained bandwidth environments.</q></p>
+<p>The <code>srcset</code> attribute includes a series of comma-separated values which, on one hand, specify an image URL and, on the other hand, the conditions under which the image will be shown. Among these conditions we can find pixel density, viewport width, or both of them. A very interesting point is that the browser, based on some heuristics or user settings, can interpret what’s best for the user at the time of the page visit, and choose if fetching a lower resolution image or a high-resolution one. </p>
+<p>Envision a preference in your mobile browser allowing high-resolution images to be requested, for instance, only while connected to WiFi, or a manual browser preference allowing you to only ask for low-resolution images when the connection is weak.</p>
+<p>The code syntax is the following:</p>
+<p><code>&lt;img src="small-photo.jpg" srcset="big-photo.jpg 2x" /&gt;</code></p>
+<p>This short piece of code asks the browser to show the image with name <code>small-photo.jpg</code> unless the device has a high-resolution display (pixel density 2x, like the Retina). Please note that the other photo will be displayed only if the browser understands how to handle the attribute. The browsers that fail to interpret in a correct way the attribute will simply ignore it and show the fallback image that you have previously specified in the <code>src</code> attribute. </p>
+<p>As noted, this attribute isn’t only good for density. In those situations where it deals with the width of the screen, we can imagine it as a sort of equivalent to the <code>max-width</code> property of the media queries. To benefit from it, you have to specify the number of pixels followed by a <em>w</em> (for example <em>600w</em>). To better understand this case, let’s see another example taking a <a href="http://www.sxc.hu/browse.phtml?f=download&amp;id=1433557">beautiful shot</a> called “Autumn in Moscow” from the website <a href="http://www.sxc.hu/">Sxc.hv</a>, the dimensions of which are are 1368×700 and the weight (after optimization) 389Kb:</p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/big-photo.jpg" alt="Autumn in Moscow" width="1368" height="770" /></p>
+<p>Based on what we’ve discussed so far, what’s the advantage of letting a user surfing the Web with their smartphone download an image of a size bigger (and then heavier) than the one his device can display? Moreover, please remember the limitations of the mobile connection, a tough problem because the image will slow the loading of your page and this could lead your users to quit your website (the first thing to avoid, obviously). Having said that, what you can think about is using the same image but smaller, in size (400×225) and weight (~40Kb), as shown below. </p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2013/12/small-photo.jpg" alt="Autumn in Moscow" width="400" height="225" /></p>
+<p>It’s incredible how we can let users save bandwidth and improve their experience with just the following little shrewdness:</p>
+<p><code>&lt;img src="low-density-photo.jpg" srcset="small-photo.jpg 480w, big-photo.jpg 1024w, high-density-photo.jpg 1024w 2x" /&gt;</code></p>
+<p>This snippet uses the <code>low-density-photo.jpg</code> image as fallback and indicates a list of images for a certain number of different conditions: <code>small-photo.jpg</code> will be used for devices having a screen width less or equal to 480px, <code>big-photo.jpg</code> for devices with a screen width less or equal to 1024p and the last, <code>high-density-photo.jpg</code>, for devices with a screen width less or equal to 1024px and a high-resolution display. </p>
+<p>Now, I have some less good news for you. The only browsers that support srcset are the WebKit ones, Actually, since Chrome has moved to the Blink engine, we have to clarify that Chrome doesn’t support it anymore, eiher. </p>
+<p>In addition, you cannot set an image based on the max-width of the device’s screen, because the proposal implemented didn’t specify this possibility. The question is a little bit complicated, so check for updates constantly and read more about its specifications and the ways to implement the technique in your projects.</p>
+<p>An <a href="http://www.w3.org/html/wg/drafts/srcset/w3c-srcset/">Editor’s Draft of the W3C specification</a> for srcset has been released just today, the 2nd of December. It includes some good and clear examples of the use of this attribute. </p>
+<p>Being an Editor’s Draft, we can also say this brings the adoption of the attribute a little closer, giving all browsers motivation to accept and respect use of the srcset attribute. We can only hope.</p>
+<h2>Conclusions</h2>
+<p>In this article we’ve described how the <code>srcset</code> attribute could help developers in a better management of their websites’ images. Nevertheless, as we’ve seen, support among browsers is lacking but we are hopeful and confident that this problem will be solved very soon. </p>
+<p>In the next article, I’ll compare the <code>srcset</code> attribute with the <code>&lt;picture&gt;</code>element, to see how the latter stacks up.</p>
+
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
