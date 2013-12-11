@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+    </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var t1 = 0;
+            var t2 = 0;
+            function dnsTime(url, t) {
+                var i = new Image();
+                var start = new Date();
+                i.src = url; 
+                i.onload = function () {
+                    console.log(new Date() - start);
+                }
+            }
+            dnsTime('http://www.lzmt.dev.sankuai.com/doctor.php?h=1', 0);
+            dnsTime('http://www.lzmt.dev.sankuai.com/doctor.php?h=1', 1);
+        </script>
+    </body>
+</html>
