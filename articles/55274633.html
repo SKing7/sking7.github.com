@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Show Image Under Text (with Acceptable Fallback)</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Show Image Under Text (with Acceptable Fallback)</h1>
+<div id="post-7850">
+
+			
+
+			
+
+			
+
+			<p>WebKit supports the cool <code>background-clip</code> CSS3 property, which you can use to do some pretty neat stuff. The first time we touched on it was the <a href="http://css-tricks.com/slide-to-unlock/">iPhone Slide-to-unlock</a> idea where we set a gradient to animate through the background of the text. Then we touched on it again for the <a href="http://css-tricks.com/transparent-borders-with-background-clip/">transparent borders</a> idea. </p>
+<p>Let's take a look at using it to have an image be visibile only through the letters of the text. One more cool thing that we no longer need to drool over print designers ability to do. </p>
+<figure><img src="http://cdn.css-tricks.com/wp-content/uploads/2010/11/imagebehindtext.jpg" alt="" title="imagebehindtext" width="570" height="271" /></figure>
+<p><a href="http://css-tricks.com/examples/ImageUnderText/">View Demo</a></p>
+<h3>The Basic Idea</h3>
+<pre rel="CSS"><code>h1 {
+   color: white;  /* Fallback: assume this color ON TOP of image */
+   background: url(images/fire.jpg) no-repeat;
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+}</code></pre>
+<p>That's all there is to it. Set a background image on the element, then clip it out, and set the text fill color to transparent. </p>
+<h3>The Problem</h3>
+<p>As I'm sure everyone is painfully aware, this isn't going to work in all browsers. The current support is WebKit only. So what happens for a fallback? As you can see in the code above, you declare a <code>color</code> value as well. This value gets overridden by <code>-webkit-text-fill-color</code> in browsers that support it, so we're clear there. Then in browsers that don't support <code>-webkit-background-clip: text</code> we will see the background image in full, so we will see text on top of that background image. So if you read no further, set a color value that will be nice and visible on that background image.</p>
+<p>So we get this going on:</p>
+<figure><img src="http://cdn.css-tricks.com/wp-content/uploads/2010/11/badfallback.jpg" alt="" title="badfallback" width="570" height="297" /></figure>
+<p>Not the absolute end of the world, at least we prepared the text to be somewhat readable. But this is a <strong>long way</strong> from what we envision and what WebKit users will experience. Basically: <em>that fallback sucks, let's do better.</em></p>
+<h3>A Better Fallback</h3>
+<p>The ultimate tool for better fallbacks is <a href="http://www.modernizr.com/">Modernizr</a>. Simply include the (fairly small) JavaScript file on your page, and it adds classnames to the <code>html</code> tag of your page indicating what the current browser is capable of. It also provides an API for testing features in JavaScript, but we won't need that today.</p>
+<p>Unfortunately, Modernizr doesn't have a test for <code>background-clip</code> right out of the box. I asked one of the creators, Paul Irish, who hooked me up with this quick way to add this test. The whole bit: </p>
+<pre rel="HTML"><code>&lt;script src="modernizr-1.6.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  Modernizr.addTest('backgroundclip',function() {
+
+    var div = document.createElement('div');
+
+    if ('backgroundClip' in div.style)
+      return true;
+
+    'Webkit Moz O ms Khtml'.replace(/([A-Za-z]*)/g,function(val) { 
+      if (val+'BackgroundClip' in div.style) return true;
+    });
+
+  });
+&lt;/script&gt;</code></pre>
+<p>Now we'll know for certain if the current browser supports background-clip, or does not. If it does, the html tag will have a <code>backgroundclip</code> class, if it does not, it will have a <code>no-backgroundclip</code> class. </p>
+<p>Now we <strong>only</strong> apply the background image if we are certain the browser supports <code>background-clip</code>. </p>
+<pre rel="CSS"><code>.backgroundclip h1 {
+  background: url(images/west.jpg) -100px -40px no-repeat;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h1 {
+  color: orangered;
+}</code></pre>
+<p>Badda bing, now the fallback is a straight up solid color instead of a messy-looking image knockout. </p>
+
+<p><a href="http://css-tricks.com/examples/ImageUnderText/">View Demo</a></p>
+<h3>Related</h3>
+<p>Stephen Morley covers <a href="http://code.stephenmorley.org/html-and-css/textured-and-patterned-text/">how to do it for IE</a> with filters.</p>
+<h3>Update</h3>
+<p>Divya Manian <a href="http://nimbupani.com/using-background-clip-for-text-with-css-fallback.html">has an article</a> with an all-CSS fallback.</p>
+
+			
+		</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
