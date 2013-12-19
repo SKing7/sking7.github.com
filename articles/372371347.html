@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>web界面上的字体兼容方案_Alien的笔记</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>web界面上的字体兼容方案_Alien的笔记</h1>
+<div><p> &nbsp; &nbsp;做前端的，对web界面基本都抠的很仔细，尤其精确到1px！<br /></p><p> &nbsp; &nbsp;类似边距、宽度、高度等的，调整1px并不难，但是如果遇到不同字体的情况，要处理line-height，保证每种字体下，UI效果都非常美观，这就不是一件简单的事情了！<br /></p><p> &nbsp; &nbsp;也许大家首先能想到的是，字体嘛，默认给页面body节点设置一个font-family列表即可： &nbsp; &nbsp;</p><pre>body {
+    font-size: 12px;
+    font-family:"Microsoft Yahei", "微软雅黑", Tahoma, Arial, Helvetica, STHeiti;
+}</pre><p> &nbsp; &nbsp;但其实问题并没有这么简单,font-family列表是必然要设置的，但这个列表的具体解析，只有浏览器自己才知道，如果coder们不在这个基础上做点儿什么，是完全不知道某个用户浏览到的这个页面究竟应用到了那种字体、此时的页面排版是否美观、页面有没有出现文字很拥挤的情况、给某个节点设置的背景icon是否对其了？<br /></p><p> &nbsp; &nbsp;等等，各种问题，各种猜测。。。<br /></p><p> &nbsp; &nbsp;实际开发中，这也确实是一个问题，作为专业coder，是需要兼容各个细节的，包括这里的字体控制。<br /></p><p> &nbsp; &nbsp;<strong>任务</strong>：<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;利用Javascript编写一个组件，用于检测某用户浏览页面时，浏览器应用到了那种字体（以微软雅黑为例）。<br /></p><p> &nbsp; &nbsp;<strong>问题</strong>：<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;1、用户机器未安装雅黑字体时，需要用别的字体替代，并且要对其他样式进行修正<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;2、用户机器安装了雅黑字体时：<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;a、用户机器未开启ClearType时，雅黑字体显示出来会有锯齿，此时依然要将页面字体设置为默认，并同样对其他样式进行修正<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;b、用户机器开启了ClearType时，按照正常的模式进行渲染，不需要对其他样式进行修正<br /></p><p> &nbsp; &nbsp;<strong>方法</strong>：<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;1、页面开始渲染时，检测用户机器上是否安装了雅黑字体<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;2、检测用户机器是否开启了ClearType<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;3、如果一切如愿，给html节点增加class="ms-with-yahei"，否则增加class="ms-without-yahei"<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;4、样式修正：对html.ms-without-yahei下的样式进行复写<br /></p><p> &nbsp; &nbsp;<strong>实现</strong>：<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;只要这一切都分析好了，要实现，就很简单了，核心的部分代码就是：<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;1、检测用户机器是否安装了某种字体：<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;a、IE浏览器中，通过创建&lt;object classid="clsid:3050f819-98b5-11cf-bb82-00aa00bdce0b"&gt;&lt;/object&gt;，直接访问系统的字体库，读取字体列表，判断某种字体是否存在 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p><pre>if(qing.browser.ie){
+    _dlgHelper = qing.dom.create('object',{
+        id      : "sp-font-detect-obj",
+        classid : "clsid:3050f819-98b5-11cf-bb82-00aa00bdce0b"
+    });
+    qing.dom.setStyles(_dlgHelper,{
+        "position": "absolute",
+        "top": "-10000px",
+        "left": "-10000px",
+        "width" : "1px",
+        "height" : "1px"
+    });
+    document.body.appendChild(_dlgHelper);
+    _isInitialedInIE = true;
+}</pre><pre>//IE中，用object的classid来判断字体
+if(qing.browser.ie) {
+    if(!_isInitialedInIE) {
+        init();
+    }
+    var sysFonts = _dlgHelper.fonts;
+    if(sysFonts.count) {
+        for(var i = 1,len = sysFonts.count;i &lt;= len;i++){
+            if(isInArray(sysFonts(i),familys)) {
+                return callback(true);
+            }
+        }
+    }
+    return callback(false);
+}</pre><p> &nbsp; &nbsp; &nbsp; &nbsp; b、非IE的浏览器中，创建一个span标签，再插入一段字符，设置很大的字号和默认字体（预计所有机器都有的“Times New Roman”），获取到span的offsetWidth；再给span追加一个待检测的字体，再获取其offsetWidth；两个width进行比较，如果相同，则表明用户机器没有这种字体，否则表明用户机器确实安装了这种字体！</p><pre>/**
+ * 检查字体宽度
+ * @param {Object} family
+ */
+var checkOffsetWidth = function(family){
+    var node = document.createElement("p");
+    qing.dom.setStyles(node, {
+        "font-family":  family + ", Times New Roman",
+        "font-size": '300pt',
+        "display": "inline",
+        "position": "absolute",
+        "top": "-10000px",
+        "left": "-10000px"
+    });
+    qing.dom.addClass(node, "sp-font-detect");
+    node.innerHTML = "mmmmmmmmml";
+    document.body.appendChild(node);
+ 
+    var width = node.offsetWidth;
+    document.body.removeChild(node);
+    return width;
+};</pre><pre>/**
+ * 获取文字实际宽度
+ */
+var getDefaultWidth = function(){
+    if (!_defaultWidth) 
+        _defaultWidth = checkOffsetWidth("Times New Roman");
+    return _defaultWidth;
+};</pre><pre>//非IE浏览器中，用比较宽度的方法来判断
+else{
+    var familyWidth = 0;
+    var defaultWidth = getDefaultWidth();
+    for(var j = 0,flen = familys.length;j &lt; flen;j++){
+        familyWidth = checkOffsetWidth(familys[j]);
+        if(familyWidth !== defaultWidth){
+            return callback(true);
+        }
+    }
+    return callback(false);
+}</pre><p> &nbsp; &nbsp;2、检测用户机器是否开启了ClearType<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;a、IE下，直接通过screen.fontSmoothingEnabled获取<br /></p><p> &nbsp; &nbsp; &nbsp; &nbsp;b、非IE下，创建canvas，画一条粗线，然后获取并分析该DataURI数据</p><pre>/**
+ * 是否开启了clearType
+ *@function isClearTypeOn
+ *@return {Boolean} 如果支持，显示true；否则返回false
+ */
+var isClearTypeOn = function() {
+    if(typeof screen.fontSmoothingEnabled!="undefined")
+        return screen.fontSmoothingEnabled;
+    else
+        try {
+            var f=document.createElement("canvas");
+            f.width="35";
+            f.height="35";
+            f.style.display="none";
+            document.body.appendChild(f);
+            var o=f.getContext("2d");
+            o.textBaseline="top";
+            o.font="32px Arial";
+            o.fillStyle="black";
+            o.strokeStyle="black";
+            o.fillText("E",0,0);
+            for(var r=8;r&lt;=32;r++)
+                for(var u=1;u&lt;=32;u++) {
+                    var q=o.getImageData(u,r,1,1).data[3];
+                    if(q != 255 &amp;&amp; q != 0) {
+                        document.body.removeChild(f);
+                        return true
+                    }
+                }
+            document.body.removeChild(f);
+            return false
+        } catch(y) {
+            return null
+        }
+};</pre><p> &nbsp; &nbsp;3、在css中定义“其他字体情况下，样式的修复方案”<br /></p><pre>body, button, input, select, textarea , pre {
+    font-size: 12px;
+    font-family:"Microsoft Yahei", "微软雅黑", Tahoma, Arial, Helvetica, STHeiti;
+    _font-family:Tahoma,Arial,Helvetica,STHeiti;
+}
+html.mod-without-msyahei body {
+    font-family: Tahoma,Arial,Helvetica,STHeiti;
+}</pre><pre>/****************系统默认支持雅黑的处理**********************/
+.mod-without-msyahei .mod-blogitem .a-expand-reason{
+    background-position-y:-15px;
+}
+.mod-without-msyahei .mod-blogitem .a-collapse-reason{
+    background-position-y:3px;
+}
+.mod-without-msyahei .mod-blogitem .box-tag .q-tag{
+    _padding:5px 3px 1px;
+}
+.mod-without-msyahei .mod-blogitem .item-head .q-private {
+    line-height:23px;
+    _padding-top:3px;
+}</pre><p> &nbsp; &nbsp;4、在页面上，调用detect方法进行字体检测，并进行样式纠偏<br /></p><pre>/**
+ * 字体监测
+ * @return {[type]}
+ */
+var _fontDetect = function(){
+    qext.FontDetect.detect(['微软雅黑','Microsoft Yahei'],function(isExist){
+        //获得html节点
+        var htmlElm = qing.dom.query('html')[0];
+        //开启clearType并存在雅黑字体
+        if(isExist){
+            qing.dom.addClass(htmlElm,'mod-with-msyahei');
+        }else{
+            qing.dom.addClass(htmlElm,'mod-without-msyahei');
+        }
+    });
+};</pre><p> &nbsp; &nbsp;这样，就能保证整个页面在不同的字体情况下，UI展现都尽量保持一致性！<br /></p><p> &nbsp; &nbsp;源码：<img src="http://www.alienfe.com/fe/static/vender/ueditor/dialogs/attachment/fileTypeImages/icon_rar.gif" /><a href="http://www.alienfe.com/upload/86441338997214.rar" target="_blank" title="web界面兼容的字体方案">web界面兼容的字体方案</a></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
