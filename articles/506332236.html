@@ -1,0 +1,397 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The Essentials of Writing High Quality JavaScript</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The Essentials of Writing High Quality JavaScript</h1>
+<div><p><strong>Twice a month, we revisit some of our readers’ favorite posts from throughout the history of Nettuts+. This tutorial was first published in October, 2010.</strong></p><p>The brilliant <a href="http://www.phpied.com" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','www.phpied.com']);">Stoyan Stefanov</a>, in promotion of his book, “<a href="http://amzn.to/93szK7" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','amzn.to']);">JavaScript Patterns</a>,” was kind enough to contribute an excerpt of the book for our readers, which details the essentials of writing high quality JavaScript, such as avoiding globals, using single var declarations, pre-caching length in loops, following coding conventions, and more.</p><p> This excerpt also includes some habits not necessarily related to the code itself, but more about the overall code creation process, including writing API documentation, conducting peer reviews, and running JSLint. These habits and best practices can help you write better, more understandable, and maintainable code—code to be proud of (and be able to figure out) when revisiting it months and years down the road.</p><hr /><h2> Writing Maintainable Code</h2><p>Software bugs are costly to fix. And their cost increases over time, especially if the bugs creep into the publicly released product. It’s best if you can fix a bug right away, as soon you find it; this is when the problem your code solves is still fresh in your head. Otherwise you move on to other tasks and forget all about that particular code. Revisiting the code after some time has passed requires:</p><ul><li>Time to relearn and understand the problem</li><p><li>Time to understand the code that is supposed to solve the problem</li></p></ul><p>Another problem, specific to bigger projects or companies, is that the person who eventually fixes the bug is not the same person who created the bug (and also not the same person who found the bug). It’s therefore critical to reduce the time it takes to understand code, either written by yourself some time ago or written by another developer in the team. It’s critical to both the bottom line (business revenue) and the developer’s happiness, because we would all rather develop something new and exciting instead of spending hours and days maintaining old legacy code.</p><p>Another fact of life related to software development in general is that usually more time is spent <em>reading</em> code than <em>writing</em> it. In times when you’re focused and deep into a problem, you can sit down and in one afternoon create a considerable amount of code.</p><p>The code will probably work then and there, but as the application matures, many other things happen that require your code to be reviewed, revised, and tweaked. For example:</p><ul><li>Bugs are uncovered.</li><li>New features are added to the application.</li><li>The application needs to work in new environments (for example, new browsers appear on the market).</li><li>The code gets repurposed.</li><li>The code gets completely rewritten from scratch or ported to another architecture or even another language.</li></ul><p>As a result of the changes, the few man-hours spent writing the code initially end up in man-weeks spent reading it. That’s why creating maintainable code is critical to the success of an application.</p><p>Maintainable code means code that:</p><ul><li>Is readable</li><li> Is consistent</li><li>Is predictable</li><li> Looks as if it was written by the same person</li><li> Is documented</li></ul><hr /><h2>Minimizing Globals</h2><p>JavaScript uses functions to manage scope. A variable declared inside of a function is local to that function and not available outside the function. On the other hand, global variables are those declared outside of any function or simply used without being declared.</p><p>Every JavaScript environment has a global object accessible when you use this outside of any function. Every global variable you create becomes a property of the global object. In browsers, for convenience, there is an additional property of the global object called window that (usually) points to the global object itself. The following code snippet shows how to create and access a global variable in a browser environment:</p><pre name="code">
+myglobal = "hello"; // antipattern 
+console.log(myglobal); // "hello" 
+console.log(window.myglobal); // "hello" 
+console.log(window["myglobal"]); // "hello" 
+console.log(this.myglobal); // "hello"
+</pre><hr /><h2> The Problem with Globals<br /></h2><p>The problem with global variables is that they are shared among all the code in your JavaScript application or web page. They live in the same global namespace and there is always a chance of naming collisions—when two separate parts of an application define global variables with the same name but with different purposes.</p><p>It’s also common for web pages to include code not written by the developers of the page, for example:</p><ul><li>A third-party JavaScript library</li><li>Scripts from an advertising partner</li><li>Code from a third-party user tracking and analytics script</li><li>Different kinds of widgets, badges, and buttons</li></ul><p>Let’s say that one of the third-party scripts defines a global variable, called, for example, result. Then later in one of your functions you define another global variable called result. The outcome of that is the last result variable overwrites the previous ones, and the third-party script may just stop working.</p><p>Therefore it’s important to be a good neighbor to the other scripts that may be in the same page and use as few global variables as possible. Later in the book you learn about strategies to minimize the number of globals, such as the namespacing pattern or the self-executing immediate functions, but the most important pattern for having fewer globals is to always use var to declare variables.</p><p>It is surprisingly easy to create globals involuntarily because of two JavaScript features. First, you can use variables without even declaring them. And second, JavaScript has the notion of implied globals, meaning that any variable you don’t declare becomes a property of the global object (and is accessible just like a properly declared global variable). Consider the following example:</p><pre name="code">
+function sum(x, y) { 
+   // antipattern: implied global 
+   result = x + y; 
+   return result;
+}
+</pre><p>In this code, <code>result</code> is used without being declared. The code works fine, but after calling the function you end up with one more variable <code>result</code> in the global namespace that can be a source of problems.</p><p>The rule of thumb is to always declare variables with <code>var</code>, as demonstrated in the improved version of the <code>sum()</code> function:</p><pre name="code">
+function sum(x, y) {
+   var result = x + y;
+   return result;
+}
+</pre><p>Another antipattern that creates implied globals is to chain assignments as part of a var declaration. In the following snippet, <code>a</code> is local but <code>b</code> becomes global, which is probably not what you meant to do:</p><pre name="code">
+// antipattern, do not use 
+function foo() {
+   var a = b = 0;
+   // ...
+}
+</pre><p>If you’re wondering why that happens, it’s because of the right-to-left evaluation. First, the expression b = 0 is evaluated and in this case b is not declared. The return value of this expression is 0, and it’s assigned to the new local variable declared with var a. In other words, it’s as if you’ve typed:</p><pre name="code">
+var a = (b = 0);
+</pre><p>If you’ve already declared the variables, chaining assignments is fine and doesn’t create unexpected globals. Example:</p><pre name="code">
+function foo() { 
+   var a, b;
+   // ... a = b = 0; // both local
+}
+</pre><blockquote><p>Yet another reason to avoid globals is portability. If you want your code to run in different environments (hosts), it’s dangerous to use globals because you can accidentally overwrite a host object that doesn’t exist in your original environment (so you thought the name was safe to use) but which does in some of the others.</p></blockquote><hr /><h2> Side Effects When Forgetting var<br /></h2><p>There’s one slight difference between implied globals and explicitly defined ones—the difference is in the ability to undefine these variables using the delete operator:</p><ul><li>Globals created with var (those created in the program outside of any function) cannot be deleted.</li><li>Implied globals created without var (regardless if created inside functions) can be deleted.</li></ul><p>This shows that implied globals are technically not real variables, but they are properties of the global object. Properties can be deleted with the delete operator whereas variables cannot:</p><pre name="code">
+// define three globals 
+var global_var = 1; 
+global_novar = 2; // antipattern 
+(function () {
+   global_fromfunc = 3; // antipattern 
+}());
+
+// attempt to delete 
+delete global_var; // false 
+delete global_novar; // true 
+delete global_fromfunc; // true
+
+// test the deletion 
+typeof global_var; // "number" 
+typeof global_novar; // "undefined" 
+typeof global_fromfunc; // "undefined"
+</pre><p>In ES5 strict mode, assignments to undeclared variables (such as the two antipatterns in the preceding snippet) will throw an error.</p><hr /><h2> Access to the Global Object<br /></h2><p>In the browsers, the global object is accessible from any part of the code via the <code>window</code> property (unless you’ve done something special and unexpected such as declaring a local variable named <code>window</code>). But in other environments this convenience property may be called something else (or even not available to the programmer). If you need to access the global object without hard-coding the identifier <code>window</code>, you can do the following from any level of nested function scope:</p><pre name="code">
+var global = (function () { 
+   return this;
+}());
+</pre><p>This way you can always get the global object, because inside functions that were invoked as functions (that is, not as constrictors with <code>new</code>) this should always point to the global object. This is actually no longer the case in ECMAScript 5 in strict mode, so you have to adopt a different pattern when your code is in strict mode. For example, if you’re developing a library, you can wrap your library code in an immediate function and then from the global scope, pass a reference to this as a parameter to your immediate function.</p><hr /><h2> Single var Pattern<br /></h2><p>Using a single var statement at the top of your functions is a useful pattern to adopt. It has the following benefits:</p><ul><li>Provides a single place to look for all the local variables needed by the function</li><li>Prevents logical errors when a variable is used before it’s defined</li><li>Helps you remember to declare variables and therefore minimize globals</li><li>Is less code (to type and to transfer over the wire)</li></ul><p>The single var pattern looks like this:</p><pre name="code">
+function func() { 
+   var a = 1,
+       b = 2, 
+       sum = a + b, 
+       myobject = {}, 
+       i, 
+       j;
+   // function body...
+}
+</pre><p>You use one var statement and declare multiple variables delimited by commas. It’s a good practice to also <em>initialize</em> the variable with an initial value at the time you declare it. This can prevent logical errors (all uninitialized and declared variables are initialized with the value <code>undefined</code>) and also improve the code readability. When you look at the code later, you can get an idea about the intended use of a variable based on its initial value—for example, was it supposed to be an object or an integer?</p><p>You can also do some actual work at the time of the declaration, like the case with <code>sum = a + b</code> in the preceding code. Another example is when working with DOM (Document Object Model) references. You can assign DOM references to local variables together with the single declaration, as the following code demonstrates:</p><pre name="code">
+function updateElement() { 
+   var el = document.getElementById("result"),
+       style = el.style; 
+   // do something with el and style...
+}
+</pre><hr /><h2> Hoisting: A Problem with Scattered vars<br /></h2><p>JavaScript enables you to have multiple <code>var</code> statements anywhere in a function, and they all act as if the variables were declared at the top of the function. This behavior is known as hoisting. This can lead to logical errors when you use a variable and then you declare it further in the function. For JavaScript, as long as a variable is in the same scope (same function), it’s considered declared, even when it’s used before the var declaration. Take a look at this example:</p><pre name="code">
+// antipattern 
+myname = "global"; // global variable 
+function func() {
+    alert(myname); // "undefined" 
+    var myname = "local"; 
+    alert(myname); // "local"
+} 
+func();
+</pre><p>In this example, you might expect that the first <code>alert() </code>will prompt “global” and the second will prompt “local.” It’s a reasonable expectation because, at the time of the first alert, <code>myname</code> was not declared and therefore the function should probably “see” the global <code>myname</code>. But that’s not how it works. The first alert will say “undefined” because <code>myname</code> is considered declared as a local variable to the function. (Although the declaration comes after.) All the variable declarations get hoisted to the top of the function. Therefore to avoid this type of confusion, it’s best to declare upfront all variables you intend to use.</p><p>The preceding code snippet will behave as if it were implemented like so:</p><pre name="code">
+myname = "global"; // global variable 
+function func() {
+   var myname; // same as -&gt; var myname = undefined;
+   alert(myname); // "undefined"
+   myname = "local";
+   alert(myname); // "local" 
+}
+func();
+</pre><blockquote><p> For completeness, let’s mention that actually at the implementation level things are a little more complex. There are two stages of the code handling, where variables, function declarations, and formal parameters are created at the first stage, which is the stage of parsing and entering the context. In the second stage, the stage of runtime code execution, function expressions and unqualified identifiers (undeclared variables) are created. But for practical purposes, we can adopt the concept of hoisting, which is actually not defined by ECMAScript standard but is commonly used to describe the behavior.</p></blockquote><hr /><h2> for Loops<br /></h2><p>In <code>for</code> loops you iterate over <code>arrays</code> or array-like objects such as <code>arguments</code> and <code>HTMLCollection</code> objects. The usual <code>for</code> loop pattern looks like the following:</p><pre name="code">
+// sub-optimal loop 
+for (var i = 0; i &lt; myarray.length; i++) {
+   // do something with myarray[i]
+}
+</pre><p>A problem with this pattern is that the length of the array is accessed on every loop iteration. This can slow down your code, especially when <code>myarray</code> is not an array but an <code>HTMLCollection</code> object.</p><p><code>HTMLCollection</code>s are objects returned by DOM methods such as:</p><ul><li><code>document.getElementsByName()</code></li><li><code>document.getElementsByClassName()</code></li><li><code>document.getElementsByTagName()</code></li></ul><p>There are also a number of other <code>HTMLCollections</code>, which were introduced before the DOM standard and are still in use today. There include (among others):</p><ul><li><code>document.images</code>: All IMG elements on the page</li><li><code>document.links</code> : All A elements</li><li><code>document.forms</code> : All forms</li><li><code>document.forms[0].elements</code> : All fields in the first form on the page</li></ul><p>The trouble with collections is that they are live queries against the underlying document (the HTML page). This means that every time you access any collection’s <code>length</code>, you’re querying the live DOM, and DOM operations are expensive in general.</p><p>That’s why a better pattern for <code>for</code> loops is to cache the length of the array (or collection) you’re iterating over, as shown in the following example:</p><pre name="code">
+for (var i = 0, max = myarray.length; i &lt; max; i++) {
+   // do something with myarray[i] 
+}
+</pre><p>This way you retrieve the value of length only once and use it during the whole loop.</p><p>Caching the length when iterating over <code>HTMLCollections</code> is faster across all browsers— anywhere between two times faster (Safari 3) and 190 times (IE7).</p><p>Note that when you explicitly intend to modify the collection in the loop (for example, by adding more DOM elements), you’d probably like the length to be updated and not constant.</p><p>Following the single var pattern, you can also take the var out of the loop and make the loop like:</p><pre name="code">
+function looper() { 
+   var i = 0,
+        max, 
+        myarray = [];
+   // ...
+   for (i = 0, max = myarray.length; i &lt; max; i++) {
+      // do something with myarray[i]
+   }
+}
+</pre><p>This pattern has the benefit of consistency because you stick to the single var pattern. A drawback is that it makes it a little harder to copy and paste whole loops while refactoring code. For example, if you’re copying the loop from one function to another, you have to make sure you also carry over <code>i</code> and <code>max</code> into the new function (and probably delete them from the original function if they are no longer needed there).</p><p>One last tweak to the loop would be to substitute <code>i++</code> with either one of these expressions:</p><pre name="code">
+i=i+ 1 
+i += 1
+</pre><p>JSLint prompts you to do it; the reason being that <code>++</code> and <code>--</code> promote “excessive trickiness.” If you disagree with this, you can set the JSLint option <code>plusplus</code> to <code>false</code>. (It’s true by default.)</p><p>Two variations of the for pattern introduce some micro-optimizations because they:</p><ul><li>Use one less variable (no <code>max</code>)</li><li>Count down to <code>0</code>, which is usually faster because it’s more efficient to compare to 0 than to the length of the array or to anything other than <code>0</code></li></ul><p>The first modified pattern is:</p><pre name="code">
+var i, myarray = []; 
+for (i = myarray.length; i--;) {
+   // do something with myarray[i]
+}
+</pre><p>And the second uses a <code>while</code> loop:</p><pre name="code">
+var myarray = [],
+    i = myarray.length; 
+while (i--) {
+   // do something with myarray[i]
+}
+</pre><p>These are micro-optimizations and will only be noticed in performance-critical operations. Additionally, JSLint will complain about the use of<code> i--</code>.</p><hr /><h2> for-in Loops<br /></h2><p> <code>for-in</code> loops should be used to iterate over nonarray objects. Looping with <code>for-in</code> is also called <code>enumeration</code>.</p><p>Technically, you can also use for-in to loop over arrays (because in JavaScript arrays are objects), but it’s not recommended. It may lead to logical errors if the array object has already been augmented with custom functionality. Additionally, the order (the sequence) of listing the properties is not guaranteed in a <code>for-in</code>. So it’s preferable to use normal for loops with arrays and for-in loops for objects.</p><p>It’s important to use the method <code>hasOwnProperty()</code> when iterating over object properties to filter out properties that come down the prototype chain.</p><p>Consider the following example:</p><pre name="code">
+// the object 
+var man = {
+   hands: 2, 
+   legs: 2, 
+   heads: 1
+};
+
+// somewhere else in the code 
+// a method was added to all objects 
+if (typeof Object.prototype.clone === "undefined") {
+   Object.prototype.clone = function () {};
+}
+</pre><p>In this example we have a simple object called man defined with an object literal. Somewhere before or after man was defined, the Object prototype was augmented with a useful method called <code>clone()</code>. The prototype chain is live, which means all objects automatically get access to the new method. To avoid having the <code>clone()</code> method show up when enumerating man, you need to call <code>hasOwnProperty()</code> to filter out the prototype properties. Failing to do the filtering can result in the function <code>clone()</code> showing up, which is undesired behavior in mostly all scenarios:</p><pre name="code">
+// 1. 
+// for-in loop 
+for (var i in man) {
+   if (man.hasOwnProperty(i)) { // filter
+      console.log(i, ":", man[i]);
+   }
+} 
+/* result in the console 
+hands : 2 
+legs : 2 
+heads : 1 
+*/
+// 2. 
+// antipattern: 
+// for-in loop without checking hasOwnProperty() 
+for (var i in man) {
+   console.log(i, ":", man[i]);
+} 
+/* 
+result in the console 
+hands : 2 
+legs : 2 
+heads : 1 
+clone: function() 
+*/
+</pre><p>Another pattern for using <code>hasOwnProperty()</code> is to call that method off of the Object.prototype, like so:</p><pre name="code">
+for (var i in man) { 
+   if (Object.prototype.hasOwnProperty.call(man, i)) { // filter
+      console.log(i, ":", man[i]);
+   }
+}
+</pre><p>The benefit is that you can avoid naming collisions is case the <code>man</code> object has redefined <code>hasOwnProperty</code>. Also to avoid the long property lookups all the way to <code>Object</code>, you can use a local variable to “<em>cache</em>” it:</p><pre name="code">
+var i, hasOwn = Object.prototype.hasOwnProperty;
+for (i in man) {
+    if (hasOwn.call(man, i)) { // filter
+        console.log(i, ":", man[i]);
+    }
+}
+</pre><blockquote><p> Strictly speaking, not using <code>hasOwnProperty()</code> is not an error. Depending on the task and the confidence you have in the code, you may skip it and slightly speed up the loops. But when you’re not sure about the contents of the object (and its prototype chain), you’re safer just adding the <code>hasOwnProperty()</code> check.</p></blockquote><p>A formatting variation (which doesn’t pass JSLint) skips a curly brace and puts the if on the same line. The benefit is that the loop statement reads more like a complete thought (“for each element that has an own property <code>X</code>, do something with <code>X</code>”). Also there’s less indentation before you get to the main purpose of the loop:</p><pre name="code">
+// Warning: doesn't pass JSLint 
+var i, hasOwn = Object.prototype.hasOwnProperty;
+for (i in man) if (hasOwn.call(man, i)) { // filter
+    console.log(i, ":", man[i]);
+}
+</pre><hr /><h2>(Not) Augmenting Built-in Prototypes</h2><p>Augmenting the prototype property of constructor functions is a powerful way to add functionality, but it can be too powerful sometimes.</p><p>It’s tempting to augment prototypes of built-in constructors such as <code>Object()</code>, <code>Array()</code>, or <code>Function()</code>, but it can seriously hurt maintainability, because it will make your code less predictable. Other developers using your code will probably expect the built-in JavaScript methods to work consistently and will not expect your additions.</p><p>Additionally, properties you add to the prototype may show up in loops that don’t use <code>hasOwnProperty()</code>, so they can create confusion.</p><p>Therefore it’s best if you don’t augment built-in prototypes. You can make an exception of the rule only when all these conditions are met:</p><ul><li>It’s expected that future ECMAScript versions or JavaScript implementations will implement this functionality as a built-in method consistently. For example, you can add methods described in ECMAScript 5 while waiting for the browsers to catch up. In this case you’re just defining the useful methods ahead of time.</li><li> You check if your custom property or method doesn’t exist already—maybe already implemented somewhere else in the code or already part of the JavaScript engine of one of the browsers you support.</li><li> You clearly document and communicate the change with the team.</li></ul><p>If these three conditions are met, you can proceed with the custom addition to the prototype, following this pattern:</p><pre name="code">
+if (typeof Object.protoype.myMethod !== "function") { 
+   Object.protoype.myMethod = function () {
+      // implementation...
+   };
+}
+</pre><hr /><h2>switch Pattern</h2><p>You can improve the readability and robustness of your <code>switch</code> statements by following this pattern:</p><pre name="code">
+var inspect_me = 0, 
+    result = '';
+switch (inspect_me) { 
+case 0:
+   result = "zero";
+   break; 
+case 1:
+   result = "one";
+   break; 
+default:
+   result = "unknown";
+}
+</pre><p>The style conventions followed in this simple example are:</p><ul><li>Aligning each <code>case</code> with <code>switch</code> (an exception to the curly braces indentation rule).</li><li>Indenting the code within each case.</li><li>Ending each <code>case</code> with a clear <code>break;</code>.</li><li>Avoiding fall-throughs (when you omit the break intentionally). If you’re absolutely convinced that a fall-through is the best approach, make sure you document such cases, because they might look like errors to the readers of your code.</li><li>Ending the <code>switch</code> with a <code>default:</code> to make sure there’s always a sane result even if none of the cases matched.</li></ul><hr /><h2> Avoiding Implied Typecasting</h2><p>JavaScript implicitly typecasts variables when you compare them. That’s why comparisons such as <code>false == 0</code> or <code>"" == 0</code> return <code>true</code>.</p><p>To avoid confusion caused by the implied typecasting, always use the <code>===</code> and <code>!==</code> operators that check both the values and the type of the expressions you compare:</p><pre name="code">
+var zero = 0; 
+if (zero === false) {
+   // not executing because zero is 0, not false
+}
+
+// antipattern 
+if (zero == false) {
+   // this block is executed...
+}
+</pre><p>There’s another school of thought that subscribes to the opinion that it’s redundant to use <code>===</code> when <code>==</code> is sufficient. For example, when you use typeof you know it returns a string, so there’s no reason to use strict equality. However, JSLint requires strict equality; it does make the code look consistent and reduces the mental effort when reading code. (“Is this <code>==</code> intentional or an omission?”)</p><hr /><h2> Avoiding eval()<br /></h2><p>If you spot the use of <code>eval()</code> in your code, remember the mantra “eval() is evil.” This function takes an arbitrary string and executes it as JavaScript code. When the code in question is known beforehand (not determined at runtime), there’s no reason to use <code>eval()</code>. If the code is dynamically generated at runtime, there’s often a better way to achieve the goal without <code>eval()</code>. For example, just using square bracket notation to access dynamic properties is better and simpler:</p><pre name="code">
+// antipattern 
+var property = "name"; 
+alert(eval("obj." + property));
+
+// preferred 
+var property = "name"; 
+alert(obj[property]);
+</pre><p>Using <code>eval()</code> also has security implications, because you might be executing code (for example coming from the network) that has been tampered with. This is a common antipattern when dealing with a JSON response from an Ajax request. In those cases it’s better to use the browsers’ built-in methods to parse the JSON response to make sure it’s safe and valid. For browsers that don’t support <code>JSON.parse()</code> natively, you can use a library from JSON.org.</p><p>It’s also important to remember that passing strings to <code>setInterval()</code>, <code>setTimeout()</code>, and the <code>Function()</code> constructor is, for the most part, similar to using <code>eval()</code> and therefore should be avoided. Behind the scenes, JavaScript still has to evaluate and execute the string you pass as programming code:</p><pre name="code">
+// antipatterns 
+setTimeout("myFunc()", 1000); 
+setTimeout("myFunc(1, 2, 3)", 1000);
+
+// preferred 
+setTimeout(myFunc, 1000); 
+setTimeout(function () {
+   myFunc(1, 2, 3); 
+}, 1000);
+</pre><p>Using the new <code>Function()</code> constructor is similar to <code>eval()</code> and should be approached with care. It could be a powerful construct but is often misused. If you absolutely must use <code>eval()</code>, you can consider using new <code>Function()</code> instead. There is a small potential benefit because the code evaluated in new <code>Function()</code> will be running in a local function scope, so any variables defined with <code>var</code> in the code being evaluated will not become globals automatically. Another way to prevent automatic globals is to wrap the <code>eval()</code> call into an immediate function.</p><p>Consider the following example. Here only <code>un</code> remains as a global variable polluting the namespace:</p><pre name="code">
+console.log(typeof un);	// "undefined" 
+console.log(typeof deux); // "undefined" 
+console.log(typeof trois); // "undefined"
+
+var jsstring = "var un = 1; console.log(un);";
+eval(jsstring); // logs "1"
+
+jsstring = "var deux = 2; console.log(deux);"; 
+new Function(jsstring)(); // logs "2"
+
+jsstring = "var trois = 3; console.log(trois);"; 
+(function () {
+   eval(jsstring); 
+}()); // logs "3"
+
+console.log(typeof un); // number
+console.log(typeof deux); // undefined
+console.log(typeof trois); // undefined
+</pre><p>Another difference between <code>eval()</code> and the Function constructor is that <code>eval()</code> can interfere with the scope chain whereas <code>Function</code> is much more sandboxed. No matter where you execute <code>Function</code>, it sees only the global scope. So it can do less local variable pollution. In the following example, <code>eval()</code> can access and modify a variable in its outer scope, whereas Function cannot (also note that using Function or new Function is identical):</p><pre name="code">
+(function () { 
+   var local = 1;
+   eval("local = 3; console.log(local)"); // logs 3
+   console.log(local); // logs 3 
+}());
+
+(function () { 
+   var local = 1;
+   Function("console.log(typeof local);")(); // logs undefined 
+}());
+</pre><hr /><h2> Number Conversions with parseInt()<br /></h2><p>Using <code>parseInt()</code> you can get a numeric value from a string. The function accepts a second radix parameter, which is often omitted but shouldn’t be. The problems occur when the string to parse starts with 0: for example, a part of a date entered into a form field. Strings that start with 0 are treated as octal numbers ( base 8 ) in ECMAScript 3; however, this has changed in ES5. To avoid inconsistency and unexpected results, always specify the radix parameter:</p><pre name="code">
+var month = "06",
+    year = "09";
+month = parseInt(month, 10);
+year = parseInt(year, 10);
+</pre><p>In this example, if you omit the radix parameter like <code>parseInt(year)</code>, the returned value will be <code>0</code>, because “<code>09</code>” assumes octal number (as if you did <code>parseInt( year, 8 )</code>) and <code>09</code> is not a valid digit in base <code>8</code>.</p><p>Alternative ways to convert a string to a number include:</p><pre name="code">
++"08" // result is 8 
+Number("08") // 8
+</pre><p>These are often faster than <code>parseInt()</code>, because <code>parseInt()</code>, as the name suggests, parses and doesn’t simply convert. But if you’re expecting input such as “08 hello”, <code>parseInt()</code> will return a number, whereas the others will fail with <code>NaN</code>.</p><hr /><h2> Coding Conventions<br /></h2><p>It’s important to establish and follow coding conventions—they make your code consistent, <em>predictable</em>, and much easier to read and understand. A new developer joining the team can read through the conventions and be productive much sooner, understanding the code written by any other team member.</p><p>Many flamewars have been fought in meetings and on mailing lists over specific aspects of certain coding conventions (for example, the code indentation—tabs or spaces?). So if you’re the one suggesting the adoption of conventions in your organization, be prepared to face resistance and hear different but equally strong opinions. Remember that it’s much more important to establish and consistently follow a convention, any convention, than what the exact details of that convention will be.</p><hr /><h2> Indentation<br /></h2><p>Code without indentation is impossible to read. The only thing worse is code with inconsistent indentation, because it looks like it’s following a convention, but it may have confusing surprises along the way. It’s important to standardize the use of indentation.</p><p>Some developers prefer indentation with tabs, because anyone can tweak their editor to display the tabs with the individually preferred number of spaces. Some prefer spaces—usually four. It doesn’t matter as long as everyone in the team follows the same convention. This book, for example, uses four-space indentation, which is also the default in JSLint.</p><p>And what should you indent? The rule is simple—anything within curly braces. This means the bodies of functions, loops (<code>do, while, for, for-in</code>), <code>ifs</code>, <code>switches</code>, and <code>object</code> properties in the <code>object</code> literal notation. The following code shows some examples of using indentation:</p><pre name="code">
+function outer(a, b) {
+    var c = 1,
+        d = 2,
+        inner;
+    if (a &gt; b) {
+        inner = function () {
+            return {
+                r: c - d
+            };
+        };
+    } else {
+        inner = function () {
+            return {
+                r: c + d
+            };
+        };
+    }
+    return inner;
+}
+</pre><hr /><h2> Curly Braces<br /></h2><p>Curly braces should always be used, even in cases when they are optional. Technically, if you have only one statement in an <code>if</code> or a <code>for</code>, curly braces are not required, but you should always use them anyway. It makes the code more consistent and easier to update.</p><p>Imagine you have a for loop with one statement only. You could omit the braces and there will be no syntax error:</p><pre name="code">
+// bad practice 
+for (var i = 0; i &lt; 10; i += 1)
+   alert(i);
+</pre><p>But what if, later on, you add another line in the body of the loop?</p><pre name="code">
+// bad practice 
+for (var i = 0; i &lt; 10; i += 1)
+   alert(i); 
+   alert(i + " is " + (i % 2 ? "odd" : "even"));
+</pre><p>The second alert is outside the loop although the indentation may trick you. The best thing to do in the long run is to always use the braces, even for one-line blocks:</p><pre name="code">
+// better 
+for (var i = 0; i &lt; 10; i += 1) {
+   alert(i);
+}
+</pre><p>Similarly for if conditions:</p><pre name="code">
+// bad 
+if (true)
+   alert(1); 
+else
+   alert(2);
+
+// better 
+if (true) {
+   alert(1); 
+} else {
+   alert(2);
+}
+</pre><hr /><h2> Opening Brace Location<br /></h2><p>Developers also tend to have preferences about where the opening curly brace should be—on the same line or on the following line?</p><pre name="code">
+if (true) {
+   alert("It's TRUE!");
+}
+</pre><p>OR:</p><pre name="code">
+if (true)
+{
+   alert("It's TRUE!");
+}
+</pre><p>In this specific example, it’s a matter of preference, but there are cases in which the program might behave differently depending on where the brace is. This is because of the <code>semicolon insertion mechanism</code>—JavaScript is not picky when you choose not to end your lines properly with a semicolon and adds it for you. This behavior can cause troubles when a function returns an object literal and the opening brace is on the next line:</p><pre name="code">
+// warning: unexpected return value 
+function func() {
+   return
+  // unreachable code follows
+   {
+      name : "Batman"
+   }
+}
+</pre><p>If you expect this function to return an object with a <code>name</code> property, you’ll be surprised. Because of the implied semicolons, the function returns <code>undefined</code>. The preceding code is equivalent to this one:</p><pre name="code">
+// warning: unexpected return value 
+function func() {
+   return undefined;
+  // unreachable code follows
+   {
+      name : "Batman"
+   }
+}
+</pre><p>In conclusion, always use curly braces and always put the opening one on the same line as the previous statement:</p><pre name="code">
+function func() {
+   return {
+      name : "Batman"
+   };
+}
+</pre><blockquote><p> A note on semicolons: Just like with the curly braces, you should always use semicolons, even when they are implied by the JavaScript parsers. This not only promotes discipline and a more rigorous approach to the code but also helps resolve ambiguities, as the previous example showed.</p></blockquote><hr /><h2> White Space<br /></h2><p>The use of white space can also contribute to improved readability and consistency of the code. In written English sentences you use intervals after commas and periods. In JavaScript you follow the same logic and add intervals after list-like expressions (equivalent to commas) and end-of-statements (equivalent to completing a “thought”).</p><p>Good places to use a white space include:</p><ul><li>After the semicolons that separate the parts of a for loop: for example, <code>for (var i<br />= 0; i &lt; 10; i += 1) {...}</code></li><li> Initializing multiple variables (i and max) in a <code>for</code> loop: <code>for (var i = 0, max = 10; i &lt; max; i += 1) {...}</code></li><li> After the commas that delimit array items: <code>var a = [1, 2, 3];</code></li><li>After commas in object properties and after colons that divide property names and<br />their values: <code>var o = {a: 1, b: 2};</code></li><li> Delimiting function arguments: <code>myFunc(a, b, c)</code></li><li> Before the curly braces in function declarations: <code>function myFunc() {}</code></li><li>After <code>function</code> in anonymous function expressions: <code>var myFunc = function () {};</code></li></ul><p>Another good use for white space is to separate all operators and their operands with spaces, which basically means use a space before and after <code>+, -, *, =, </code> and so on:</p><pre name="code">
+// generous and consistent spacing 
+// makes the code easier to read 
+// allowing it to "breathe" 
+var d = 0,
+    a = b + 1;
+if (a &amp;&amp; b &amp;&amp; c) {
+    d = a % c;
+    a += d;
+}
+
+// antipattern 
+// missing or inconsistent spaces 
+// make the code confusing 
+var d = 0,
+    a = b + 1;
+if (a &amp;&amp; b &amp;&amp; c) {
+    d = a % c;
+    a += d;
+}
+</pre><p>And a final note about white space—curly braces spacing. It’s good to use a space:</p><ul><li>Before opening curly braces (<code>{</code>) in functions, <code>if-else</code> cases, loops, and object literals</li><li>Between the closing curly brace (<code>}</code>) and <code>else</code> or <code>while</code></li></ul><p> A case against liberal use of white space might be that it could increase the file size, but<br />minification takes care of this issue.</p><blockquote><p> An often-overlooked aspect of code readability is the use of vertical white space. You can use blank lines to separate units of code, just as paragraphs are used in literature to separate ideas.</p></blockquote><hr /><h2> Naming Conventions<br /></h2><p>Another way to make your code more predictable and maintainable is to adopt naming conventions. That means choosing names for your variables and functions in a consistent manner.</p><p>Below are some naming convention suggestions that you can adopt as-is or tweak to your liking. Again, having a convention and following it consistently is much more important than what that convention actually is.</p><hr /><h2> Capitalizing Constructors<br /></h2><p>JavaScript doesn’t have classes but has constructor functions invoked with <code>new</code>:</p><pre name="code">
+var adam = new Person();
+</pre><p>Because constructors are still just functions, it helps if you can tell, just by looking at a function name, whether it was supposed to behave as a constructor or as a normal function.</p><p>Naming constructors with a capital first letter provides that hint. Using lowercase for functions and methods indicates that they are not supposed to be called with <code>new</code>:</p><pre name="code">
+function MyConstructor() {...} 
+function myFunction() {...}
+</pre><hr /><h2> Separating Words<br /></h2><p>When you have multiple words in a variable or a function name, it’s a good idea to follow a convention as to how the words will be separated. A common convention is to use the so-called <em>camel case</em>. Following the camel case convention, you type the words in lowercase, only capitalizing the first letter in each word.</p><p>For your constructors, you can use <em>upper camel case</em>, as in <code>MyConstructor()</code>, and for function and method names, you can use <em>lower camel case</em>, as in <code>myFunction()</code>, <code>calculateArea()</code> and <code>getFirstName()</code>.</p><p>And what about variables that are not functions? Developers commonly use lower camel case for variable names, but another good idea is to use all lowercase words delimited by an underscore: for example, <code>first_name</code>, <code>favorite_bands</code>, and <code>old_company_name</code>. This notation helps you visually distinguish between functions and all other identifiers—primitives and objects.</p><p>ECMAScript uses camel case for both methods and properties, although the multiword property names are rare (<code>lastIndex</code> and <code>ignoreCase</code> properties of regular expression objects).</p><hr /><h2> Other Naming Patterns<br /></h2><p>Sometimes developers use a naming convention to make up or substitute language features.</p><p>For example, there is no way to define constants in JavaScript (although there are some built-in such as <code>Number.MAX_VALUE</code>), so developers have adopted the convention of using all-caps for naming variables that shouldn’t change values during the life of the program, like:</p><pre name="code">
+// precious constants, please don't touch 
+var PI = 3.14,
+    MAX_WIDTH = 800;
+</pre><p>There’s another convention that competes for the use of all caps: using capital letters for names of global variables. Naming globals with all caps can reinforce the practice of minimizing their number and can make them easily distinguishable.</p><p>Another case of using a convention to mimic functionality is the private members convention. Although you can implement true privacy in JavaScript, sometimes developers find it easier to just use an underscore prefix to denote a private method or property. Consider the following example:</p><pre name="code">
+var person = {
+    getName: function () {
+        return this._getFirst() + ' ' + this._getLast();
+    },
+
+    _getFirst: function () {
+        // ...
+    },
+    _getLast: function () {
+        // ...
+    }
+};
+</pre><p>In this example <code>getName()</code> is meant to be a public method, part of the stable API, whereas <code>_getFirst()</code> and <code>_getLast()</code> are meant to be private. They are still normal public methods, but using the underscore prefix warns the users of the person object that these methods are not guaranteed to work in the next release and shouldn’t be used directly. Note that JSLint will complain about the underscore prefixes, unless you set the option nomen: <code>false</code>.</p><p>Following are some varieties to the <code>_private</code> convention:</p><ul><li>Using a trailing underscore to mean private, as in <code>name_</code> and <code>getElements_()</code></li><li></li><li>Using one underscore prefix for <code>_protected</code> properties and two for <code>__private</code> properties</li><li>In Firefox some internal properties not technically part of the language are available, and they are named with a two underscores prefix and a two underscore suffix, such as <code>__proto__</code> and<code> __parent__</code></li></ul><hr /><h2> Writing Comments<br /></h2><p>You have to comment your code, even if it’s unlikely that someone other than you will ever touch it. Often when you’re deep into a problem you think it’s obvious what the code does, but when you come back to the code after a week, you have a hard time remembering how it worked exactly.</p><p>You shouldn’t go overboard commenting the obvious: every single variable or every single line. But you usually need to document all functions, their arguments and return values, and also any interesting or unusual algorithm or technique. Think of the comments as hints to the future readers of the code; the readers need to understand what your code does without reading much more than just the comments and the function and property names. When you have, for example, five or six lines of code performing a specific task, the reader can skip the code details if you provide a one-line description describing the <em>purpose</em> of the code and why it’s there. There’s no hard and fast rule or ratio of comments-to-code; some pieces of code (think regular expressions) may actually require more comments than code.</p><blockquote><p> The most important habit, yet hardest to follow, is to keep the comments up to date, because outdated comments can mislead and be much worse than no comments at all.</p></blockquote><hr /><h2>About the Author</h2><p> Stoyan Stefanov is a Yahoo! web developer and an <a href="http://www.amazon.com/Object-Oriented-JavaScript-Stoyan-Stefanov/dp/1847194141/?tag=w3clubs-20" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','www.amazon.com']);">author</a>, contributor, and tech reviewer of various O'Reilly books.  He speaks regularly about web development topics at conferences and on his blog at <a href="http://www.phpied.com" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','www.phpied.com']);">www.phpied.com</a>. Stoyan is the creator of the smush.it image optimization tool, YUI contributor and architect of Yahoo's performance optimization tool YSlow 2.0.</p><hr /><div><a href="http://amzn.to/93szK7"><br /><img src="http://cdn.tutsplus.com/net/uploads/legacy/820_javascript_patterns/book_javascript_patterns.jpg" data-original-url="http://d2o0t5hpnwv4c1.cloudfront.net/820_javascript_patterns/book_javascript_patterns.jpg" alt="JavaScript Patterns" /><br /></a></div><p><strong>This article is an excerpt from "<a href="http://amzn.to/93szK7" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','amzn.to']);">JavaScript Patterns</a>," by <a href="http://oreilly.com/" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','oreilly.com']);">O'Reilly Media</a>. </strong></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
