@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Seven</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Seven</h1>
+<div><div><div><p><em><strong>demo：</strong></em></p><p><a href="https://bug491549.bugzilla.mozilla.org/attachment.cgi?id=375851" target="_blank"><a href="https://bug491549.bugzilla.mozilla.org/attachment.cgi?id=375851" target="_blank">https://bug491549.bugzilla.mozilla.org/attachment.cgi?id=375851</a></a></p><p>There is a css bug I encountered today which I want to share with you guy in case it happened to you one day.</p><p>When you have html structure like this:&nbsp;</p><blockquote>
+<p>&lt;div class=”parent”&gt;</p>
+<p>&nbsp; &nbsp; &lt;div class=”child”&gt;</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; text</p>
+<p>&nbsp; &nbsp; &lt;/div&gt;</p>
+<p>&lt;/div&gt;</p>
+</blockquote><p>and you set child <em>overflow: hidden</em> and <em>display: inline-block.</em> You will find parent’s height is a little bit bigger than child’s.&nbsp;</p><p><strong><em>Fix</em></strong></p><p>The way to fix this is simple.Just apply vertical-align： top to child and it will display as expect like case 4 in the demo.</p><p><strong><em>Reason</em></strong></p><p>Actually this is not a bug, I called it a bug just because it’s not most of us will expected. the css spec said that:</p><blockquote>
+<p><span>The baseline of an ‘inline-block’ is the baseline of its last line box in the normal flow, unless it has either no in-flow line boxes or if its ‘overflow’ property has a computed value other than ‘visible’, in which case the baseline is the bottom margin edge.</span></p>
+</blockquote><p>So the reason is obvious now. Since we set overflow: hidden to child which makes the baseline of child being the bottom margin edge and expand parent.</p></div><!-- End caption --><!-- metadata end --></div><!-- text end --></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
