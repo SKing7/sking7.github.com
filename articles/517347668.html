@@ -1,0 +1,516 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A Simple Mixin Alternative to Standard CSS Grids – Development – Tuts+ Tutorials</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>A Simple Mixin Alternative to Standard CSS Grids – Development – Tuts+ Tutorials</h1>
+<div><p>Over the past few years CSS grid systems have become a very popular way of rapidly producing layout scaffolding in web design.</p><p>They can be a fantastic time-saving resource, with talented coders having intelligently crafted systems which cater to a wide array of possible layouts designers might need to create. However, this isn't the only way to approach grid-based web layouts, and today we're going to examine an alternative.</p><hr /><h2>How CSS Grid Systems Work</h2><p>A <a href="http://dev.tutsplus.com/articles/build-a-freshly-squeezed-responsive-grid-system--webdesign-14888">grid system</a> typically consists of a specific number of columns, (commonly twelve or sixteen), and the ability to set an element, (usually a div with a class applied), to a width of X of those columns.</p><p>For example, a content area might be set to nine of twelve columns, while a sidebar next to it is set to three or twelve columns. Layouts often also include a fixed-width outer container, row containers within it that wrap columns, and set width gutters between columns.</p><p>Let's take a quick look at how the classic "header, content, sidebar, footer" website layout might be built using techniques common to CSS grids:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/examplecssgrid.png" alt="examplecssgrid" width="600" height="600" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/examplecssgrid.png" alt="examplecssgrid" width="600" height="600" /></noscript><br /></figure><p>Using CSS grid systems to create layouts like this can be very quick and easy. However, while there is plenty of value on offer, there are also a number of downsides to utilizing a system like this. These downsides don't mean that CSS grid systems are "bad", only that as with any tool you should familiarize yourself with the pros and cons to properly determine if it is the right fit for your specific project.</p><hr /><h2>The Downsides to CSS Grids</h2><p>While all CSS grid systems are different, the most notable downsides that are commonly present among them include:</p><ul>
+<li><strong>Potentially high amount of unused code</strong><br />A full library of grid classes tends to be anywhere from 200 to 700 lines of code (unminified), yet in a relatively simple design much of that code may never be used.</li>
+<li><strong>Restrictions on layout</strong><br />Because grids are precalculated they tend to have set widths that are difficult to change, e.g. for containers, column widths, gutter widths. The design then becomes restricted to working with those widths.</li>
+<li><strong>Fixed pixel rather than em / rem or percentage based layouts</strong><br />Grid widths and/or media queries are often based on pixel values, preventing use of more flexible and scalable em / rem or percentage values for design.<br /><strong>Note:</strong> For information on the advantages of em / rem vs. px based design, please read <a href="http://webdesign.tutsplus.com/articles/typography-articles/taking-the-erm-out-of-ems/" title="Em based design" target="_blank">Taking the “Erm..” Out of Ems</a></li>
+<li><strong>Set number of overall columns</strong><br />Precalculated grids tend to use either twelve or sixteen columns, meaning if you want a different number of overall columns you're out of luck.</li>
+<li><strong>Non semantic markup</strong><br />Use of precalculated grid classes necessitates placement of numerous non-semantic class names throughout a document, such as "row", "col" and so on.</li>
+<li><strong>Restrictions on nesting</strong><br />Often grid systems can only have columns nested inside one another one or two times, restricting the complexity and flexibility of layout generation.</li>
+</ul><p>When it comes down to it, the real reason designers use CSS grid systems is to make layout generation quicker and easier.  So the question is:</p><blockquote><p>Can layout generation be made just as quick and easy while at the same time overcoming the limitations listed above?</p></blockquote><p>Thanks to the advent of CSS preprocessors such as <a href="http://lesscss.org/" title="LESScss.org" target="_blank">LESS</a> and <a href="http://sass-lang.com/" title="SASS" target="_blank">SASS / SCSS</a> which can work with variables, perform calculations and output CSS on an as needed basis via mixins, for a great many use cases the answer is:</p><blockquote><p>Yes it absolutely can!</p></blockquote><hr /><h2>An Alternative, Preprocessed Solution</h2><p>The key to the alternative solution we'll be covering is "mixins", available in both <a href="http://lesscss.org/" title="LESScss.org" target="_blank">LESS</a> and <a href="http://sass-lang.com/" title="SASS" target="_blank">SASS / SCSS</a>. In a nutshell, mixins are reusable packages of rules that can output different CSS depending on what information is passed to them for processing.</p><p>From here on we'll assume you have an essential understanding of what preprocessors are and how they work with mixins and variables, so if you're new to these concepts I recommend starting by reading the information provided at <a href="http://lesscss.org/" title="LESScss.org" target="_blank">http://lesscss.org/</a></p><p>Before we begin, I'll also point out that there are already some existing libraries of LESS and SASS mixins that are working to address the limitations of precalculated CSS grids, such as:</p><p>However, we'll be taking an approach that differs to these libraries in various ways. Again, there's no strictly right or wrong way to approach things, it's a matter of understanding pros and cons when deciding what approach to use for your project.</p><p><strong>Note:</strong> I'll be writing these mixins in LESS, because it can be a little harder to get LESS to perform sophisticated operations than SASS, so it will be easier for SASS users to adapt LESS mixins than the other way around.</p><p>You can use your own preferred method of compiling your preprocessor files, however I will include a basic "LESScompiler" package running on Node.js/NPM and Grunt you can use. Instructions are <a href="https://github.com/tutsplus/mixin-driven-layouts/archive/master.zip">included in the readme.md</a> file.</p><hr /><h2>Tackling the Classic Layout</h2><p>We looked above at how the ubiquitous "header, content, sidebar, footer" layout might be created using a typical set of CSS grid classes, tapping into around 200 to 700 lines of code. Now let's look at how we can create this same layout via LESS mixins, keeping the amount of CSS required to an absolute minimum, using no pixel values, and maintaining semantic markup.</p><p>First, let's look at our HTML:</p><pre>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+	&lt;meta charset="UTF-8"&gt;
+	&lt;title&gt;Classic Layout&lt;/title&gt;
+	&lt;script type='text/javascript' src='js/modernizr.js'&gt;&lt;/script&gt;
+	&lt;link rel="stylesheet" href="css/normalize.css"&gt;
+	&lt;link rel="stylesheet" href="css/classiclayout.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header&gt;
+	
+&lt;/header&gt;
+&lt;main&gt;
+	&lt;article&gt;
+
+	&lt;/article&gt;
+	&lt;aside&gt;
+
+	&lt;/aside&gt;
+&lt;/main&gt;
+&lt;footer&gt;
+
+&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre><p>Notice there is not a single class used at this stage, only pure semantic HTML5 tags. To this HTML we will apply the following LESS code, using mixins and variables that will be explained shortly:</p><pre>
+header, main, footer {
+	.Row;
+	background-color: #ccc;
+	min-height: 200 * @toRems;
+}
+
+article {
+	.Cols( 3 );
+	min-height: 500 * @toRems;
+	background-color: #ddd;
+}
+
+aside {
+	.Cols( 1 );
+	min-height: 500 * @toRems;
+	background-color: #eee;
+}</pre><p>...which will generate the following 35 lines of CSS:</p><pre>
+header,
+main,
+footer {
+  max-width: 75rem;
+  width: 100%;
+  margin: 0 auto;
+  background-color: #ccc;
+  min-height: 12.5rem;
+}
+header:before,
+main:before,
+footer:before,
+header:after,
+main:after,
+footer:after {
+  content: "";
+  display: table;
+}
+header:after,
+main:after,
+footer:after {
+  clear: both;
+}
+article {
+  width: 75%;
+  float: left;
+  min-height: 31.25rem;
+  background-color: #ddd;
+}
+aside {
+  width: 25%;
+  float: left;
+  min-height: 31.25rem;
+  background-color: #eee;
+}</pre><p>...and the result we will see in the browser, at a screen resolution of 1920 x 1080, is:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout.png" alt="classiclayout" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout.png" alt="classiclayout" width="600" height="295" /></noscript><br /></figure><p>Note that because we are not working with fixed pixel width settings, this layout already has basic responsiveness present from word go. The same layout looks like this at 1024px wide:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout1024.png" alt="classiclayout1024" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout1024.png" alt="classiclayout1024" width="600" height="295" /></noscript><br /></figure><p>And like this at 768px wide:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout768.png" alt="classiclayout768" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout768.png" alt="classiclayout768" width="600" height="295" /></noscript><br /></figure><p>We'll cover responsiveness at smaller sizes later on, but first let's check out the LESS mixins and variables used to create the layout above.</p><pre>
+//
+// Variables for em / rem use
+//
+
+@base_px: 16; //set to the most common base px size used in browsers, should generally be left at default
+
+@toRems: (1 / @base_px) + 0rem; //allows you to set values as the default px size to target, which is then converted into scalable rem values.
+
+@toEms: (1 / @base_px) + 0em; //same as above, but with em values
+
+//
+// Grid mixins
+//
+
+@default-width: 1200 * @toRems;
+
+@default-colspan: 1;
+
+@default-total_cols: 4;
+
+.Row ( @width : @default-width ) {
+	max-width: @width;
+	width: 100%;
+	margin: 0 auto;
+	// clear at the end of container
+	&amp;:before,
+	&amp;:after {
+		content:"";
+		display:table;
+	}
+	&amp;:after {
+		clear:both;
+	}
+}
+
+.Cols ( @colspan : @default-colspan; @total_cols : @default-total_cols ) {
+	width: ( @colspan * (100 / @total_cols) ) + 0%;
+	float: left;
+}</pre><p>Let's step through each element of what's going on in the above.</p><h3>Easy px to em / rem conversion</h3><pre>
+//
+// Variables for em / rem use
+//
+
+@base_px: 16; //set to the most common base px size used in browsers, should generally be left at default
+
+@toRems: (1 / @base_px) + 0rem; //allows you to set values as the default px size to target, which is then converted into scalable rem values.
+
+@toEms: (1 / @base_px) + 0em; //same as above, but with em values</pre><p>The variables in the top section of the code get us setup to easily output scalable em or rem values throughout the stylesheet instead of px values. However, using these variables will also allow us to conceptualize our design in pixels to begin with, because it's an easier mental exercise to imagine what 500px of space looks like than it is 31.25rem.</p><p>For example, in our base design we don't want the header, main or footer elements to be wider than 1200 pixels at any time. But instead of specifying <code>1200px</code> as the <code>max-width</code>, we convert that 1200 value to rems through multiplying it by the <code>@toRems</code> variable like so:</p><pre>
+1200 * @toRems;</pre><p>This will output a value of <code>75rem</code>, meaning that if a browser or user has set the default font-size to something other than the most common default of 16px, the entire site layout will scale proportionally.</p><p>The same thing can also be done to generate <code>em</code> values, by instead using the <code>@toEms</code> variable.</p><h3>.Row() mixin</h3><pre>
+@default-width: 1200 * @toRems;
+
+.Row ( @width : @default-width ) {
+	max-width: @width;
+	width: 100%;
+	margin: 0 auto;
+	// clear at the end of container
+	&amp;:before,
+	&amp;:after {
+		content:"";
+		display:table;
+	}
+	&amp;:after {
+		clear:both;
+	}
+}</pre><p>The first mixin being used is the <code>.Row()</code> mixin.</p><p>Instead of using ".container" classes, we call this mixin wherever we want an element to be centered with a maximum width. In the case of our classic layout we call this mixin on the <code>header</code>, <code>main </code>and <code>footer </code>elements.</p><p>The mixin sets a <code>max-width</code> along with a <code>width</code> of 100%. This gives us basic responsiveness through making the element automatically adjust to fill the available space whenever the viewport is smaller than the <code>max-width</code> value.</p><p>It also sets the <code>margin</code> to <code>0 auto</code> so the element will automatically be centered.</p><p>Finally, it adds the pseudo elements <code>:before</code> and <code>:after</code> and uses them to automatically clear at the end of the element. This is required so that when we start to add columns inside the element their float settings will be cleared.</p><p>The mixin accepts one parameter, a <code>@width</code> value:</p><pre>
+.Row (@width : @default-width ) {</pre><p>This value is then passed to the <code>max-width</code> property:</p><pre>
+	max-width: @width;</pre><p>When the mixin has a width parameter passed, e.g. <code>.Row( 40rem )</code>, that value will be applied to the <code>max-width</code> property.</p><p>However, if the mixin is called <em>without</em> passing a parameter, i.e. <code>.Row</code>, a default value will be used instead. That default value is stored in the <code>@default-width</code> variable, which is set where you see:</p><pre>
+@default-width: 1200 * @toRems;</pre><p>As you'll now understand from what we covered above regarding the <code>@toRems</code> variable, this means the default maximum width of any element this mixin gets used on will be 1200 pixels, converted into rem values.</p><p>By using this mixin you can now set any element to be centered at your default <code>max-width</code>, or at any other <code>max-width</code> you want to apply. This means you can change the width of the entire site just by changing the value of the <code>@default-width</code> variable. For example:</p><pre>
+@default-width: 800 * @toRems;</pre><p>...changes the base layout to:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout800.png" alt="classiclayout800" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout800.png" alt="classiclayout800" width="600" height="295" /></noscript><br /></figure><p>Or you can change the width of a single element at a time, by passing a width parameter through the mixin.</p><p>For example, applying the mixin like so:</p><pre>
+header, footer {
+	.Row;
+	background-color: #ccc;
+	min-height: 200 * @toRems;
+}
+
+main {
+	.Row( 800 * @toRems );
+	background-color: #ccc;
+}</pre><p>...would give you:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_differentwidths.png" alt="classiclayout_differentwidths" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_differentwidths.png" alt="classiclayout_differentwidths" width="600" height="295" /></noscript><br /></figure><h3>.Cols() mixin</h3><pre>
+@default-colspan: 1;
+
+@default-total_cols: 4;
+
+.Cols ( @colspan : @default-colspan; @total_cols : @default-total_cols ) {
+	width: ( @colspan * (100 / @total_cols) ) + 0%;
+	float: left;
+}</pre><p>Because we are not using fixed pixel widths, and we want our layout to remain completely flexible, all our column widths will be percentage based. We use the <code>.Cols()</code> mixin to calculate these percentages.</p><p>Based on the values you pass into the mixin, a simple formula is used to determine the percentage width value that should be applied to the element. The element's <code>float</code> value is also set to <code>left</code> so columns will sit side by side (you'll recall we automatically clear floats applied to the columns via the <code>.Row()</code> mixin).</p><p>With the <code>.Cols()</code> mixin you get to specify how many columns wide you want your element to be, just as you would with a regular CSS grid system. This is done by passing a <code>@colspan</code> parameter through the mixin, or by setting the default for the mixin via the <code>@default-colspan</code> variable.</p><p>However, unlike most CSS grid systems, you also have complete control over how many total columns that value is relative to, rather than being stuck with total columns of either 12 or 16. Total columns can be set by passing a <code>@total_cols</code> parameter through the mixin, or by setting the mixin's default via the <code>@default-total_cols</code> variable.</p><p>In our earlier example of how our "classic" layout would be built using a typical CSS grid, the content area was set to 9 out of 12 columns, (i.e. three quarters), while the sidebar was 3 out of 12 columns, (i.e. one quarter). However, for the simple purposes of this layout we really don't need all twelve columns.</p><p>All we are trying to do is set our content area to 3/4 width, and the sidebar to 1/4 of the width. So breaking the layout into twelfths would be overkill, when all we need is quarters.</p><p>Because we know we only need to break this layout into quarters, we can set the value of our <code>@default-total_cols</code> variable to 4:</p><pre>
+@default-total_cols: 4;</pre><p>Then, when we use the mixin as we have in our "classic" layout example, the mixin assumes you want your columns to be out of a possible four total columns. So to set our article element to three quarter width all we need to do is:</p><pre>
+article {
+	.Cols( 3 );
+}</pre><p>Then to set our aside / sidebar to one quarter width we simply use:</p><pre>
+aside {
+	.Cols( 1 );
+}</pre><p>However, if we decide we want to use a totally different number of total columns we can do so easily by passing different values through the <code>.Cols()</code> mixin.</p><p>This allows us to change the widths of the article and aside elements to anything we please extremely easily, for example:</p><pre>
+article {
+	.Cols( 7, 11 ); // sets this element to span 7 of a total 11 columns
+	min-height: 500 * @toRems;
+	background-color: #ddd;
+}
+
+aside {
+	.Cols( 4, 11 ); // sets this element to span 4 of a total 11 columns
+	min-height: 500 * @toRems;
+	background-color: #eee;
+}</pre><p>Which gives us:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_colschanged.png" alt="classiclayout_colschanged" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_colschanged.png" alt="classiclayout_colschanged" width="600" height="295" /></noscript><br /></figure><p>This in turn makes it very easy to add extra columns, for example if we add a second <code>aside</code> element before the <code>article</code> element in our HTML, and then change our LESS to the following:</p><pre>
+article {
+	.Cols( 5, 9 );
+	min-height: 500 * @toRems;
+	background-color: #ddd;
+}
+
+aside {
+	.Cols( 2, 9 );
+	min-height: 500 * @toRems;
+	background-color: #eee;
+}</pre><p>...we will get:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_extracol.png" alt="classiclayout_extracol" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_extracol.png" alt="classiclayout_extracol" width="600" height="295" /></noscript><br /></figure><hr /><h2>Adding Padding and Margins</h2><p>Once you start adding content inside your containers, you will of course want to be able to control the spacing around it. Right now when we add content it's going to sit flush against the edges:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_contentflush.png" alt="classiclayout_contentflush" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_contentflush.png" alt="classiclayout_contentflush" width="600" height="295" /></noscript><br /></figure><p>There are a couple of ways you can go about controlling your spacing, and which one is best to use will depend on what you are trying to achieve with the specific design you are creating.</p><h3>Adding Padding</h3><p>The easiest way to control spacing is with the simple addition of padding parameters to both the <code>.Row()</code> and <code>.Cols()</code> mixins.</p><p>Our mixin code will be adjusted to the following:</p><pre>
+@default-padding: 0;
+
+.Row ( @width : @default-width; @padding: @default-padding; ) {
+	max-width: @width;
+	width: 100%;
+	margin: 0 auto;
+	padding: @padding;
+	// clear at the end of container
+	&amp;:before,
+	&amp;:after {
+		content:"";
+		display:table;
+	}
+	&amp;:after {
+		clear:both;
+	}
+}
+
+.Cols ( @colspan : @default-colspan; @total_cols : @default-total_cols; @padding: @default-padding; ) {
+	width: ( @colspan * (100 / @total_cols) ) + 0%;
+	float: left;
+	padding: @padding;
+}</pre><p>Now we can add padding to our header, article, aside and footer elements.</p><p>Note we will also set the default <code>box-sizing</code> property throughout the design to <code>border-box</code> so padding doesn't get included in any browser calculation of the width of elements:</p><pre>
+* {
+	box-sizing:border-box;
+	-moz-box-sizing:border-box;
+}
+
+header, footer {
+	.Row ( 
+		@padding: 20 * @toRems;
+	);
+	background-color: #ccc;
+	min-height: 200 * @toRems;
+}
+
+main {
+	.Row;
+	background-color: #ccc;
+}
+
+article {
+	.Cols (
+		@colspan: 3;
+		@padding: 10 * @toRems 20 * @toRems;
+	);
+	min-height: 500 * @toRems;
+	background-color: #ddd;
+}
+
+aside {
+	.Cols (
+		@colspan: 1;
+		@padding: 10 * @toRems 20 * @toRems;
+	);
+	min-height: 500 * @toRems;
+	background-color: #eee;
+}</pre><p>This now gives us padding around each of our pieces of content:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_padded.png" alt="classiclayout_padded" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_padded.png" alt="classiclayout_padded" width="600" height="295" /></noscript><br /></figure><h3>Adding Wrapper Margins</h3><p>Sometimes the spacing you want to add to your design is on the outside of an element, not the inside, for example when you want a site's background to show through in between elements. To allow this we'll make some further additions to both the <code>.Row()</code> and <code>.Cols()</code> mixins.</p><p>To begin with, let's allow for spacing to be added above and below elements that have our <code>.Row()</code> mixin applied to them. This is easily done simply by replacing our existing <code>margin</code> property's value with a variable that can be sent as a parameter through the mixin.</p><pre>
+@default-row_margin: 0 auto;
+
+.Row ( @width : @default-width; @padding: @default-padding; @margin: @default-row_margin; ) {
+	max-width: @width;
+	width: 100%;
+	margin: @margin;
+	padding: @padding;
+	// clear at the end of container
+	&amp;:before,
+	&amp;:after {
+		content:"";
+		display:table;
+	}
+	&amp;:after {
+		clear:both;
+	}
+}</pre><p>Note that the default value for the row margin is still set to <code>0 auto</code>, so if no parameter is passed the mixin will still automatically center the element.</p><p>However if we do pass an <code>@margin</code> value through the mixin:</p><pre>
+header, footer {
+	.Row ( 
+		@padding: 20 * @toRems;
+		@margin: 10 * @toRems auto;
+	);
+	background-color: #ccc;
+	min-height: 200 * @toRems;
+}</pre><p>...we can add vertical spacing like so:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_vertspacerow.png" alt="classiclayout_vertspacerow" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_vertspacerow.png" alt="classiclayout_vertspacerow" width="600" height="295" /></noscript><br /></figure><p>Additionally, if you decide you don't want your element to center anymore, you could also do things like passing a <code>@margin</code> value of <code>0 auto 0 0</code> to left align an element, or <code>0 0 0 auto</code> to right align.</p><h3>Adding Column Gutters</h3><p>Another common feature of CSS grid systems is the ability to add gutters between columns, i.e. margins that apply in between each column, but not to the outside of the outermost columns.</p><p>Again, we can add this functionality with some additions to the <code>Cols()</code> mixin:</p><pre>
+@default-gutter: 0;
+
+.Cols ( @colspan : @default-colspan; @total_cols : @default-total_cols; @padding: @default-padding; @gutter: @default-gutter; @edge: false; ){
+	@total_gutter: (@total_cols - 1) * @gutter;
+	@spanned_gutters: (@colspan - 1) * @gutter;
+	width: ( @colspan * ( (100 - @total_gutter) / @total_cols) ) + @spanned_gutters + 0%;
+	float: left;
+	padding: @padding;
+	.IfEdge (@edge; @gutter);
+}
+
+.IfEdge ( @edge; @gutter; ) when (@edge = false) {
+	margin-right: @gutter + 0%;
+}
+
+.IfEdge ( @edge; @gutter; ) when (@edge = true) {
+	margin-right: 0;
+}</pre><p>The mixin now does two extra things. Firstly, it checks for a value via the new <code>@gutter</code> parameter, and factors it into the width calculation for the column.</p><p><strong>Note:</strong> The <code>@gutter</code> value should be a number intended for use as a percentage value e.g. 2 for a 2% gutter.</p><p>Secondly, it checks the new <code>@edge</code> variable to see if it is set to <code>true</code> or <code>false</code>. If <code>@edge</code> is set to <code>false</code> the value of the <code>@gutter</code> parameter is added to the right margin as a percentage. If <code>@edge</code> is set to <code>true</code>, the right margin is set to <code>0</code>. This allows you to specify where a column is at the edge of your layout and hence should not have a gutter applied.</p><p>To show the effect of this change to the mixin more clearly I have added two extra <code>article</code> elements to our HTML. The LESS for the <code>article</code> and <code>aside</code> elements has been adjusted to the following:</p><pre>
+article {
+	.Cols (
+		@colspan: 1;
+		@padding: 10 * @toRems 20 * @toRems;
+		@gutter: 1; //include a gutter of 1%
+	);
+	min-height: 500 * @toRems;
+	background-color: #ddd;
+}
+
+aside {
+	.Cols (
+		@colspan: 1;
+		@padding: 10 * @toRems 20 * @toRems;
+		@gutter: 1; //include a gutter of 1%
+		@edge: true; //this is the column on the edge so don't set a right margin
+	);
+	min-height: 500 * @toRems;
+	background-color: #eee;
+}</pre><p>Which now gives us:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_gutters.png" alt="classiclayout_gutters" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_gutters.png" alt="classiclayout_gutters" width="600" height="295" /></noscript><br /></figure><p>Allowing for control over vertical margins on columns is again just a matter of including some additional parameters in the mixin, adjusting it to:</p><pre>
+@default-margin_top: 0;
+
+@default-margin_bottom: 0;
+
+.Cols ( @colspan : @default-colspan; @total_cols : @default-total_cols; @padding: @default-padding; @gutter: @default-gutter; @edge: false; @margin_top : @default-margin_top; @margin_bottom : @default-margin_bottom; ){
+	@total_gutter: (@total_cols - 1) * @gutter;
+	@spanned_gutters: (@colspan - 1) * @gutter;
+	width: ( @colspan * ( (100 - @total_gutter) / @total_cols) ) + @spanned_gutters + 0%;
+	float: left;
+	padding: @padding;
+	.IfEdge (@edge; @gutter; @margin_top; @margin_bottom; );
+}
+
+.IfEdge ( @edge; @gutter; @margin_top; @margin_bottom;  ) when (@edge = false) {
+	margin: @margin_top @gutter + 0% @margin_bottom 0;
+}
+
+.IfEdge ( @edge; @gutter; @margin_top; @margin_bottom;  ) when (@edge = true) {
+	margin: @margin_top 0 @margin_bottom 0;
+}</pre><p>Top and bottom margin settings can now also be included when using the <code>.Cols()</code> mixin, for example:</p><pre>
+article {
+	.Cols (
+		@colspan: 1;
+		@padding: 10 * @toRems 20 * @toRems;
+		@gutter: 1;
+		@margin_top: 20 * @toRems;
+		@margin_bottom: 30 * @toRems;
+	);
+	min-height: 500 * @toRems;
+	background-color: #ddd;
+}
+
+aside {
+	.Cols (
+		@colspan: 1;
+		@padding: 10 * @toRems 20 * @toRems;
+		@gutter: 1;
+		@edge: true;
+		@margin_top: 20 * @toRems;
+		@margin_bottom: 30 * @toRems;
+	);
+	min-height: 500 * @toRems;
+	background-color: #eee;
+}</pre><p>Which would add vertical margins to the columns like so:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_vertmargincols.png" alt="classiclayout_vertmargincols" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_vertmargincols.png" alt="classiclayout_vertmargincols" width="600" height="295" /></noscript><br /></figure><hr /><h2>Nesting and Increasing Layout Complexity</h2><p>We'll now add another level of complexity to our example layout by increasing the number of <code>article</code> elements to six and placing them inside a <code>section</code> element wrapper, then applying our mixins to create the following layout:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_nested.png" alt="classiclayout_nested" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_nested.png" alt="classiclayout_nested" width="600" height="295" /></noscript><br /></figure><p>To achieve this layout, the HTML is now changed to:</p><pre>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+	&lt;meta charset="UTF-8"&gt;
+	&lt;title&gt;Classic Layout&lt;/title&gt;
+	&lt;script type='text/javascript' src='js/modernizr.js'&gt;&lt;/script&gt;
+	&lt;link rel="stylesheet" href="css/normalize.css"&gt;
+	&lt;link rel="stylesheet" href="css/classiclayout.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header&gt;
+	&lt;h1&gt;Site Title&lt;/h1&gt;
+&lt;/header&gt;
+&lt;main&gt;
+	&lt;section&gt;
+		&lt;h1&gt;Latest Articles&lt;/h1&gt;
+		&lt;article&gt;
+			&lt;h1&gt;Article Title&lt;/h1&gt;
+			&lt;p&gt;...&lt;/p&gt;
+		&lt;/article&gt;
+		&lt;article&gt;
+			&lt;h1&gt;Article Title&lt;/h1&gt;
+			&lt;p&gt;...&lt;/p&gt;
+		&lt;/article&gt;
+		&lt;article&gt;
+			&lt;h1&gt;Article Title&lt;/h1&gt;
+			&lt;p&gt;...&lt;/p&gt;
+		&lt;/article&gt;
+		&lt;article&gt;
+			&lt;h1&gt;Article Title&lt;/h1&gt;
+			&lt;p&gt;...&lt;/p&gt;
+		&lt;/article&gt;
+		&lt;article&gt;
+			&lt;h1&gt;Article Title&lt;/h1&gt;
+			&lt;p&gt;...&lt;/p&gt;
+		&lt;/article&gt;
+		&lt;article&gt;
+			&lt;h1&gt;Article Title&lt;/h1&gt;
+			&lt;p&gt;...&lt;/p&gt;
+		&lt;/article&gt;
+	&lt;/section&gt;
+	&lt;aside&gt;
+		&lt;p&gt;...&lt;/p&gt;
+	&lt;/aside&gt;
+&lt;/main&gt;
+&lt;footer&gt;
+	&lt;p&gt;Example Footer&lt;/p&gt;
+&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre><p>The LESS code we are using to control the layout has now been changed to:</p><pre>
+header, footer {
+	.Row ( @padding: 20 * @toRems; @margin: 10 * @toRems auto; );
+	background-color: #ccc;
+	min-height: 100 * @toRems;
+}
+
+main {
+	.Row;
+}
+
+section {
+	.Cols ( @colspan: 3; @padding: 10 * @toRems 20 * @toRems; @gutter: 1; );
+	background-color: #ddd;
+}
+
+aside {
+	.Cols ( @colspan: 1; @padding: 10 * @toRems 20 * @toRems; @gutter: 1; @edge: true; );
+	min-height: 500 * @toRems;
+	background-color: #eee;
+}
+
+article {
+	.Cols ( @colspan: 1; @total_cols: 3; @padding: 0 20 * @toRems 20 * @toRems 20 * @toRems; @margin_bottom: 20 * @toRems;  @gutter: 2; );
+	background-color: #eee;
+	&amp;:nth-of-type(3n) {
+		margin-right: 0;
+	}
+}</pre><p>To summarize what's contained in the LESS code above:</p><p>The <code>section</code> element is set to take up three columns of the default four total columns. Next to it is the <code>aside</code> element, still set to one column of four.</p><p>The <code>section</code> element is acting as a wrapper for the <code>article</code> elements. Because the <code>article</code> elements are now nested they can have all new column widths applied to them, and they will each take up a percentage of their parent element's interior. As such, each is set to one column out of three, with a gutter of 2%.</p><p>Every third <code>article</code> element is identified by using the <code>:nth-of-type(3n)</code> selector and set to have no right margin / gutter.</p><hr /><h2>Adjusting to Smaller Displays</h2><p>Earlier in the article we showed how basic responsiveness is added from the word go by using this approach. Another thing we will do differently to many others is our approach to adding breakpoints and determining behavior at these points.</p><p>Instead of trying to identify and target the exact screen sizes of various devices, we want to make our layout work at every single resolution. In this way we become device independent.</p><p>To achieve this we will simply introduce breakpoints at arbitrary widths when the layout becomes too squashed to be comfortably readable, and modify the columns to make the content presentable again.</p><p>In the case of this layout, we'll add the following media queries:</p><pre>
+article {
+	.Cols ( @colspan: 1; @total_cols: 3; @padding: 0 20 * @toRems 20 * @toRems 20 * @toRems; @margin_bottom: 20 * @toRems;  @gutter: 2; );
+	background-color: #eee;
+	@media (min-width: 68rem) {
+		&amp;:nth-of-type(3n) {
+			margin-right: 0;
+		}
+	}
+}
+
+@media (max-width: 68rem) {
+	article {
+		.Cols ( @colspan: 1; @total_cols: 2; @padding: 0 20 * @toRems 20 * @toRems 20 * @toRems; @margin_bottom: 20 * @toRems;  @gutter: 2; );
+		@media (min-width: 53rem) {
+			&amp;:nth-of-type(2n) {
+				margin-right: 0;
+			}
+		}
+	}
+}
+
+@media (max-width: 53rem) {
+	article {
+		.Cols ( @colspan: 1; @total_cols: 1; @padding: 0 20 * @toRems 20 * @toRems 20 * @toRems; @margin_bottom: 20 * @toRems;  @gutter: 0; );
+	}
+	section {
+		.Cols ( @colspan: 2; @total_cols: 3; @padding: 10 * @toRems 20 * @toRems; @gutter: 1; );
+	}
+	aside {
+		.Cols ( @colspan: 1; @total_cols: 3; @padding: 10 * @toRems 20 * @toRems; @gutter: 1; @edge: true; );
+	}
+}
+
+@media (max-width: 36rem) {
+	section {
+		.Cols ( @colspan: 1; @total_cols: 1; @padding: 10 * @toRems 20 * @toRems; @edge: true; );
+	}
+	aside {
+		.Cols ( @colspan: 1; @total_cols: 1; @padding: 10 * @toRems 20 * @toRems; @edge: true; );
+	}
+}</pre><p>As mentioned above, breakpoints are determined on a case-by-case basis for each design.</p><p>For this purpose I use the Firefox plugin <a href="https://addons.mozilla.org/en-US/firefox/addon/firesizer/" title="Firesizer" target="_blank">Firesizer</a> to give me a display of how wide my browser window is in pixels. I gradually shrink the browser width and when I identify a point that is too cramped I make a note of the display width.</p><p>Unfortunately LESS will not allow any operations to occur on the values we're using for our media queries, so we're unable to do something like <code>@media (max-width: 1000 * @toRems)</code>.</p><p>Because the <code>@toRems</code> variable can't be used here to convert the pixel value, I instead convert the width to ems using <a href="http://pxtoem.com/" title="PXtoEM" target="_blank">http://pxtoem.com/</a></p><p>After converting the identified width to <code>rem</code>s we add a breakpoint at that width and apply a new <code>.Cols()</code> mixin to the element. This can change the <code>colspan</code> value and / or the <code>totalcols</code> value depending on what looks best at that width.</p><p>Where required, we're also wrapping each <code>nth-of-type()</code> selector in a <code>min-width</code> based media query. This ensures that when the layout gets smaller and the number of columns reduces, the edge column is correctly identified as every second one instead of every third.</p><p>For example, at the first breakpoint of <code>68rem</code> I change the articles from each being one of three columns, to being one of two columns.</p><p>I also add a <code>min-width: 68rem</code> media query around the <code>:nth-of-type(3n)</code> selector so it applies only at sizes greater than <code>68rem</code>.</p><p>Then I add a new <code>:nth-of-type(2n)</code> selector to our media query for sizes lower than 68rem, that will identify every second post as needing no gutter.</p><p>These changes create the following layout when the viewport is smaller than <code>68rem</code> wide:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_2cols.png" alt="classiclayout_2cols" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_2cols.png" alt="classiclayout_2cols" width="600" height="295" /></noscript><br /></figure><p>At the next breakpoint of <code>53rem</code> I reduce the number of article columns again down to a single column, i.e. <code>@colspan</code> 1 of <code>@total_cols</code> 1, with each article stacked on top of the other.</p><p>Again I add a <code>min-width: 53rem</code> media query around the <code>nth-of-type(2n)</code> selector we added above, so it no longer applies when our articles reduce to one of one columns.</p><p>I also change the <code>section</code> width from 3 / 4 columns to 2 / 3, and I change the <code>aside</code> width from 1 / 4 width to 1 / 3. This allows a little more space for the sidebar so it's not too squashed at this width.</p><p>Now when the design is reduced to less than <code>53rem</code> in width it looks like this:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_singlearticlecol.png" alt="classiclayout_singlearticlecol" width="600" height="295" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_singlearticlecol.png" alt="classiclayout_singlearticlecol" width="600" height="295" /></noscript><br /></figure><p>Finally, at <code>36rem</code> when the layout becomes too narrow to accommodate multiple columns at all I change both the <code>section</code> and <code>aside</code> elements down to 1 / 1 columns, which pushes the <code>aside</code> down below the <code>section</code> element.</p><p>The layout now looks like this at any width less than 36rem:</p><figure>
+<img data-cfsrc="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_collapsed.png" alt="classiclayout_collapsed" width="600" height="608" /><noscript><img src="http://cdn.tutsplus.com/webdesign/uploads/2013/11/classiclayout_collapsed.png" alt="classiclayout_collapsed" width="600" height="608" /></noscript><br /></figure><hr /><h2>Wrapping Up</h2><p>We've gone through a lot of detail above on how the <code>.Row()</code> and <code>.Cols()</code> mixins work, in order to give you a full understanding so you can make even further additions or modifications to them if you choose. However, the end result of everything we've covered is actually a super-simple and easy to use layout system.</p><p>Through using <strong>just two mixins</strong>, you can now create highly complex, yet flexible and scalable layouts with virtually no restrictions, outputting only the CSS you need, and using highly semantic markup.</p><p>You can use any number of total columns you want for your grid, any width of individual columns and any width of gutters. Plus, your grids are infinitely nestable.</p><p><a href="https://github.com/tutsplus/mixin-driven-layouts/archive/master.zip">Download your own copy</a> of the mixins written for this tutorial and try them out for your next project layout!</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
