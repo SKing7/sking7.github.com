@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Evaluating JavaScript code via eval() and new Function()</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Evaluating JavaScript code via eval() and new Function()</h1>
+<div><p style="display: inline;">
+This blog post examines how one can dynamically evaluate code in JavaScript.
+
+</p><a name="more"></a><p>
+
+<h3><tt>eval()</tt></h3>
+
+<pre>
+    eval(str)
+</pre>
+
+evaluates the JavaScript code in <tt>str</tt>. For example:
+
+<pre>
+    &gt; var a = 12;
+    &gt; eval('a + 5')
+    17
+</pre>
+
+Note that <tt>eval()</tt> parses in statement context <a>[1]</a>:
+
+<pre>
+    &gt; eval('{ foo: 123 }')  // code block
+    123
+    &gt; eval('({ foo: 123 })')  // object literal
+    { foo: 123 }
+</pre>
+
+<h4><tt>eval()</tt> in strict mode</h4>
+
+For <tt>eval()</tt>, you really should use strict mode <a>[2]</a>. In sloppy mode, evaluated code can create local variables in the surrounding scope:
+
+<pre>
+    function f() {
+        eval('var foo = 1');
+        console.log(foo); // 1
+    }
+</pre>
+
+That isn’t possible in strict mode. However, evaluated code still has read and write access to variables in surrounding scopes. To prevent such access, you need to call <tt>eval()</tt> indirectly.
+
+<h4>Indirect <tt>eval()</tt> evaluates in global scope</h4>
+
+There are two ways to invoke <tt>eval()</tt>:
+<ul>
+    <li><a href="http://ecma-international.org/ecma-262/5.1/#sec-15.1.2.1.1">Directly</a>: via a direct call to a function whose name is “eval”.
+    </li>
+    <li>Indirectly: in some other way (via <tt>call()</tt>, as a method of <tt>window</tt>, by storing it under a different name and calling it there, etc.).
+    </li>
+</ul>
+
+As we have already seen, direct <tt>eval()</tt> executes code in the current scope:
+
+<pre>
+    var x = 'global';
+
+    function directEval() {
+        'use strict';
+        var x = 'local';
+
+        console.log(eval('x')); // local
+    }
+</pre>
+
+Conversely, indirect <tt>eval()</tt> executes it in global scope.
+<pre>
+    var x = 'global';
+
+    function indirectEval() {
+        'use strict';
+        var x = 'local';
+
+        // Call eval in a different way
+        console.log(eval.call(null, 'x')); // global
+        console.log(window.eval('x')); // global
+        console.log((1, eval)('x')); // global (1)
+
+        // Store eval somewhere else
+        var xeval = eval;
+        console.log(xeval('x')); // global
+        var obj = { eval: eval };
+        console.log(obj.eval('x')); // global
+    }
+</pre>
+Explanation of (1): When you refer to a variable via its name, the initial result is a so-called <a href="http://ecma-international.org/ecma-262/5.1/#sec-8.7"><i>reference</i></a>, a data structure with two main fields:
+<ul>
+    <li><i>base</i> points to the data structure in which the variable’s value is stored</li>
+    <li><i>referenced name</i> is the name of the variable</li>
+</ul>
+During a function call <tt>eval()</tt>, the function call operator (the parentheses) encounters a reference to <tt>eval</tt> and can determine the name of the function to be called. Therefore, such a function call triggers a direct <tt>eval()</tt>. You can, however force an indirect <tt>eval()</tt> by not giving the call operator a reference. That is achieved by retrieving the value of the reference before applying the operator. The comma operator does that for us in line (1). This operator evaluates the first operand and returns the result of evaluating the second operand. The evaluation always produces values, which means that references are resolved.
+
+</p><p>
+<b>Indirectly evaluated code is always sloppy.</b> That is a consequence of the code being evaluated independently of its current surroundings.
+<pre>
+    function strictFunc() {
+        'use strict';
+
+        var code = '(function () { return this }())';
+        var result = eval.call(null, code);
+        console.log(result !== undefined); // true, sloppy mode
+    }
+</pre>
+
+<h3><tt>new Function()</tt></h3>
+
+The constructor <tt>Function</tt> has the signature
+
+<pre>
+    new Function(param1, ..., paramN, funcBody)
+</pre>
+
+It creates a function whose zero or more parameters have the names <tt>param1</tt> etc. and whose body is <tt>funcBody</tt>. That is, the created function looks like this:
+<pre>
+    function («param1», ..., «paramN») {
+        «funcBody»
+    }
+</pre>
+
+Example:
+
+<pre>
+    &gt; var f = new Function('x', 'y', 'return x+y');
+    &gt; f(3, 4)
+    7
+</pre>
+
+Similar to indirect <tt>eval()</tt>, <tt>new Function()</tt> creates functions whose scope is global.
+
+<pre>
+    var x = 'global';
+
+    function strictFunc() {
+        'use strict';
+        var x = 'local';
+
+        var f = new Function('return x');
+        console.log(f()); // global
+    }
+</pre>
+Such functions are sloppy by default.
+<pre>
+    function strictFunc() {
+        'use strict';
+
+        var sl = new Function('return this');
+        console.log(sl() !== undefined); // true, sloppy mode
+
+        var st = new Function('"use strict"; return this');
+        console.log(st() === undefined); // true, strict mode
+    }
+</pre>
+
+
+<h3><tt>eval()</tt> versus <tt>new Function()</tt></h3>
+
+Normally, it is better to use <tt>new Function()</tt> than <tt>eval()</tt> to evaluate code: The function parameters provide a clear interface to the evaluated code and you don’t need the slightly awkward syntax of indirect <tt>eval()</tt> in order to ensure that the evaluated code can only access its own and global variables.
+
+<h3>Best practices</h3>
+
+<b>Normally: avoid <tt>eval()</tt> and <tt>new Function()</tt>.</b>
+Dynamically evaluating code is slow and a potential security risk.
+Very often there are better alternatives. For example, Brendan Eich recently <a href="https://twitter.com/BrendanEich/status/409805425450561537">tweeted</a> an anti-pattern used by programmers who wanted to access a property whose name was stored in a variable <tt>propName</tt>:
+<pre>
+    var value = eval('obj.'+propName);
+</pre>
+The following code is better:
+<pre>
+    var value = obj[propName];
+</pre>
+You also shouldn’t use <tt>eval()</tt> or <tt>new Function()</tt> to parse JSON data. That is unsafe. Either rely on ECMAScript 5’s built-in support for JSON <a>[3]</a> or use a library.
+</p><p>
+<b>Legitimate use cases.</b>
+There are a few legitimate, albeit advanced, use cases for <tt>eval()</tt> and <tt>new Function()</tt>: configuration data with functions (which JSON does not allow), template libraries, interpreters, command lines and module systems.
+
+<h3>Conclusion</h3>
+
+This was a relatively high-level overview of dynamically evaluating code in JavaScript. If you want to dig deeper, you can take a look at the article “<a href="http://perfectionkills.com/global-eval-what-are-the-options/">Global eval. What are the options?</a>” by kangax.
+
+</p><p>
+<b>Acknowledgement.</b>
+Mariusz Nowak (@medikoo) told me that code evaluated by Function is sloppy by default, everywhere.
+
+<h3>References</h3>
+
+<ol id="references">
+    <li><a href="http://www.2ality.com/2012/09/expressions-vs-statements.html">Expressions versus statements in JavaScript</a></li>
+    <li><a href="http://www.2ality.com/2011/01/javascripts-strict-mode-summary.html">JavaScript’s strict mode: a summary</a></li>
+    <li><a href="http://www.2ality.com/2011/08/json-api.html">JavaScript’s JSON API</a></li>
+</ol>
+</p>
+</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
