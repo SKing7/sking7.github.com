@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1></h1>
+<div>
+				<p>在很多情况下，我们需要监控输入框，例如监控某个textarea中字数的多少，在键盘输入文字的时候实时监控检测输入的字数等，虽然javascript提供了keyup, keydown, keypress等键盘事件，但是有时候输入法处于开启状态时，这些事件并不能准确的触发，幸亏我们还有一些秘密武器</p>
+
+<p>在IE浏览器下我们可以使用<strong><em>onpropertychange</em></strong>事件</p>
+
+<p>在Firefox等标准浏览器下可以使用<strong><em>oninput</em></strong>事件，具体操作如：</p>
+
+<!-- Crayon Syntax Highlighter v2.4.3 -->
+
+		<div id="crayon-52d2a0457f612340191187" data-settings=" minimize scroll-mouseover"><div><table>
+					<tr>
+				<td data-settings="show">
+					
+				</td>
+						<td><div><p><span>//假设oText为获取的某个文本输入框</span></p><p><span>oText</span><span>.</span><span>oninput</span><span> </span><span>=</span><span> </span><span>oText</span><span>.</span><span>onpropertychange</span><span> </span><span>=</span><span> </span><span>function</span><span>(</span><span>)</span><span>{</span></p><p><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span>console</span><span>.</span><span>log</span><span>(</span><span>oText</span><span>.</span><span>value</span><span>.</span><span>length</span><span>)</span><span>;</span></p><p><span>}</span></p></div></td>
+					</tr>
+				</table></div></div>
+<!-- [Format Time: 0.0022 seconds] -->
+
+
+			</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
