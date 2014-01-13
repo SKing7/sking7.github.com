@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar » PNG that works</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar » PNG that works</h1>
+<div id="pornel">
+<p>Once you sprite your images, the next step is to compress them as much as possible. <abbr>PNG</abbr> is a great format for this, but…</p>
+
+<p>Yes, it does! No, it doesn’t! Which <abbr>PNG</abbr>?</p>
+
+<p>
+<abbr>PNG</abbr> supports various combinations of color depth, transparency and color correction. Some combinations work perfectly with every piece of software produced in the last decade, and some more esoteric features are practically useless.
+</p>
+<section id="paletted">
+
+<p>
+<abbr>GIF</abbr>-like <abbr>PNG</abbr> images with simple transparency are supported in all browsers (even as old as <abbr>IE</abbr>4) <strong>without any hacks</strong>, so whenever you can use <abbr>GIF</abbr> — <em>don’t</em>. Use <abbr>PNG</abbr> instead. </p>
+<p>You’ll get the same quality and compatibility as <abbr>GIF</abbr>, but a smaller file size.
+</p>
+</section>
+<section id="24bit">
+
+<p>
+24-bit <abbr>PNG</abbr> files have perfect quality, but perfection costs a lot of bandwidth. Even though they work in all browsers, don’t use them.
+</p><p>When you need full color, but don’t need transparency, use <abbr>JPEG</abbr> instead.</p>
+</section>
+<section id="24bit+alpha">
+
+<p>This type is often mistaken for one and only true <abbr>PNG</abbr>, and infamously fails in <abbr>IE</abbr>6. There are hacks that make it work, but they’re slow and don’t mix well with other <abbr>CSS</abbr> properties.</p>
+<p>Aside from the <abbr>IE</abbr>6 problem, this type creates pretty large files. Avoid it. The silver bullet is below:</p>
+</section>
+<section id="8bit+alpha">
+
+<p>
+If you’ve only ever used Photoshop, you may believe that this type of <abbr>PNG</abbr> cannot exist. In reality it’s just Photoshop’s <abbr>PNG</abbr> support lacking.</p>
+<p>With this type of <abbr>PNG</abbr> you get file sizes smaller than <abbr>GIF</abbr>, but retain ability to use several levels of transparency.</p>
+<p>In paletted <abbr>PNG</abbr>s alpha is not a mask, but only an extra component in each palette entry. Thanks to this it gracefully degrades in <abbr>IE</abbr>6 — fully opaque pixels are displayed correctly and other pixels are completely transparent. Usually this means that <abbr>IE</abbr>6 will drop smooth edges and shadows, but the image will be good enough:</p>
+
+<p>Use this type of <abbr>PNG</abbr> whenever you want semi-transparency. You can create these files with (ex-Macromedia) Fireworks. If you’re stuck with Photoshop, you can <a href="#tools">convert 24-bit <abbr>PNG</abbr>s to 8-bit</a>.
+</p>
+</section>
+<section id="24bit+css">
+
+<p>There’s a combination of transparencies that doesn’t work even in <abbr>IE</abbr>8. If you apply <code>filter:alpha(opacity=<var>α</var>)</code> to an image that is transparent already, <abbr>IE</abbr>7-8 will revert to 1-bit transparency and apply alpha channel as a black mask.</p>
+<p>If possible, instead of relying on <abbr>CSS</abbr>, just create an image that is bit more transparent itself. If you’re only using opacity for fade-in/fade-out, you can probably ignore this problem. If you need a workaround, it’s the <a href="http://www.dillerdesign.com/experiment/DD_belatedPNG/">same as for <abbr>IE</abbr>6</a>.</p>
+</section>
+<section id="icc">
+
+<p>How red is <code>#FF0000</code>? Answer to this nearly-philosophical question depends on the monitor you have, its settings, and even lighting conditions around you.</p>
+<p>But what if you wanted colors in <abbr>PNG</abbr> to <em>exactly</em> match the color of your shoes? Color profiles are supposed to solve this oh-so-important problem.</p>
+<p>In practice they’re not useful on the Web (even when they work right, and they rarely do.)</p>
+<p>If anyone asks, images for the Web are expected to be in the <abbr>sRGB</abbr> color space with gamma 2.2.</p>
+<p>Don’t enable color management in your software, don’t embed <abbr>ICC</abbr> profiles when saving for the Web, and use a <abbr>PNG</abbr> optimizer to get rid of any profiles that were embedded.</p>
+</section>
+<section id="gamma">
+
+<p>Color intensity goes from 0 to 255. What’s the value of color that looks half as bright as 255? When <abbr>PNG</abbr> was young, different systems agreed only on one thing: it was <strong>not</strong> between 127 and 128.</p>
+<p>I’m serious. For monitors half of 255 is not 127.5. It’s <em>186!</em>  (or 173 if you have a previous version of Mac OS X.)</p>
+<p><img src="/wp-content/uploads/2010/12/gamma.png" alt="186 looks as bright as pattern of 0 and 255 pixels" /><br />If the color 186 doesn’t look almost like the 0/255 pattern, your monitor is miscalibrated or your browser’s <a href="http://www.4p8.com/eric.brasseur/gamma.html">scaling algorithm is buggy</a>.</p>
+<p>That crazy thing is called <dfn>gamma correction</dfn> and the formula for it is:</p>
+<p><span>(</span><var>color_sane_person_expects</var> ÷ 255<span>)</span><sup><sup>1</sup>⁄<sub><var>gamma</var></sub></sup> × <span title="Actually, it should be 256, but you wouldn't believe it">255</span> = <var>color_that’s_actually_used</var></p>
+<p>It’s not a <abbr>PNG</abbr> quirk. The problem dates back to <abbr>CRT</abbr> monitors which didn’t display brightness evenly — applying ¾ of maximum voltage gave only ½ of maximum brightness. Some operating systems tried to compensate for this effect, others didn’t.</p>
+<p><abbr>PNG</abbr> had good intentions to fix this mess by encoding gamma value of system/monitor that was used to create the image, allowing other systems to adjust brightness accordigly.</p>
+<p>This caused a silly problem: most browsers correct colors in <abbr>PNG</abbr>s, but <em>nothing else</em>. All colors in <abbr>GIF</abbr>s, <abbr>JPEG</abbr>s and <abbr>CSS</abbr> may be “incorrect”.</p>
+<p>To get colors in <abbr>PNG</abbr> exactly as “incorrect” as all other colors in the system, you have to remove gamma information from the files, which prevents browsers from making <abbr>PNG</abbr>s holier than the pope.</p>
+</section>
+<section id="tools">
+<h2><abbr>PNG</abbr> tools</h2>
+<section id="imageoptim">
+<h3>Optimisation</h3>
+<p>Typical <abbr>PNG</abbr>-saving programs trade compression efficiency for speed and don’t refrain from embedding useless or even problematic metadata in the files.</p>
+<p><abbr>PNG</abbr> optimizers fix this. <a href="http://www.advsys.net/ken/util/pngout.htm">PNGOUT</a> removes all junk and gives the best compression. You can also use <a href="http://optipng.sourceforge.net/">OptiPNG</a> + <a href="http://pmt.sourceforge.net/pngcrush/">Pngcrush</a> combo. They’re commandline tools. If you’d like to optimize images on a Linux server, this is a useful snippet:</p>
+<pre>find . -name '*.png' -print0 | xargs -P4 -0 -n1 pngout
+                                       <small>↑ number of CPUs</small></pre>
+<p>For the mouse-loving people I wrote <a href="http://imageoptim.pornel.net">ImageOptim</a>. It combines all the best image opti­misa­tion tools with drag’n'drop Mac <abbr>GUI</abbr>. <a href="http://trimage.org/">Trimage</a> is ImageOptim’s Linux cousin. Windows users might use <a href="http://www.ardfry.com/pngoutwin/">PNGOUTWin</a> or <a href="http://benhollis.net/software/pnggauntlet/">PNGGauntlet</a>.</p>
+<p>Whichever method you prefer, <strong>always optimize <abbr>PNG</abbr>s</strong>.</p>
+</section>
+<div><section id="imagealpha">
+<h3>Quantisation</h3>
+<p>Since Photoshop doesn’t have a full support for <abbr>PNG</abbr> with alpha yet, to get small files <em>and</em> nice transparency, you’ll need <a href="http://pngnq.sourceforge.net/">pngnq</a> or <a href="http://www.libpng.org/pub/png/apps/pngquant.html">pngquant</a>. I wrote a simple <abbr>GUI</abbr> for it: <a href="http://pornel.net/imagealpha">ImageAlpha</a>.</p>
+<p>pngnq uses a <a href="http://members.ozemail.com.au/~dekker/NEUQUANT.HTML">very cool algorithm</a> based on neural networks. Side-effect of this is that results are a bit random. Sometimes an image with less colors looks better than an image with more colors (try 255, 254, 253 colors, and so on.)<br /></p></section></div>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Solution</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>File is huge</td>
+<td>Use 256-color <abbr>PNG</abbr> instead of 24-bit (remember: 256-color type <a href="#8bit+alpha">also supports full alpha channel</a>)</td>
+</tr>
+<tr>
+<td>File is larger than <abbr>GIF</abbr></td>
+<td>Use a <a href="#imageoptim"><abbr>PNG</abbr> optimizer</a></td>
+</tr>
+<tr>
+<td>Colors in <abbr>PNG</abbr> have diff­erent bright­ness than same colors in <abbr>CSS</abbr> or <abbr>HTML</abbr></td>
+<td>Remove gamma information. <abbr>PNG</abbr> optimizers usually do it, e.g.,
+<pre>pngcrush -rem alla <var>input.png</var> <var>output.png</var></pre>
+</td>
+</tr>
+<tr>
+<td>Colors in <abbr>PNG</abbr> are still odd</td>
+<td>Make sure you use the <abbr>sRGB</abbr> color space (experiment with the <samp>Convert to the <abbr>sRGB</abbr></samp> option in Photoshop when saving for Web)</td>
+</tr>
+<tr>
+<td>Image has solid gray background in <abbr>IE</abbr>6</td>
+<td>Use <a href="#imagealpha"><abbr>PNG</abbr>8+alpha</a> instead of 24-bit</td>
+</tr>
+<tr>
+<td>Image is invisible in <abbr>IE</abbr>6</td>
+<td>Make sure the image has some fully-opaque pixels. Use <a href="http://pornel.net/pngquant">improved pngquant</a> that supports the <code>-iebug</code> flag</td>
+</tr>
+<tr>
+<td>Photoshop displays transparency wrong</td>
+<td>You’ve got <abbr>PNG</abbr>8 with alpha not supported by Photoshop. For editing, keep <abbr>PNG</abbr> in 24-bit, and convert to <abbr>PNG</abbr>8+alpha only when done. You can convert <abbr>PNG</abbr>8 to 24-bit by resaving it in Preview.app, Fireworks or with:
+<pre>pngout -s1 -c6 -force file.png</pre>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<div id="tldr"><h2>Summary</h2><p>You don’t have to read such a long article to use <abbr>PNG</abbr> properly. Quick version:</p><ul>
+<li><abbr>PNG</abbr> works since <abbr>IE</abbr>4. If you’re still using <abbr>GIF</abbr>, you’re wasting bandwidth.</li>
+<li>Use 256-color <abbr>PNG</abbr>s.</li>
+<li>Avoid 24-bit <abbr>PNG</abbr>s. Use pngquant if you want to have a cake and eat it too.</li>
+<li>Use a <abbr>PNG</abbr> optimizer. You’ll get smaller files and avoid some pitfalls.</li>
+</ul></div>
+</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
