@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>12 Devs of Xmas</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>12 Devs of Xmas</h1>
+<div><p>So Web Components – they’re hot like the centre of mince pies! Bet you want to take off the top, let the middle cool a bit, add some cream and start eating, right?</p><p>I know I do.</p><p>You may remember last year, when I wanted you to turn your phone off, close your twitter client, ignore your emails and take a couple of hours just for yourself. Well that time of year has come around again! So let’s do it, let’s make a Web Component :D</p><p>I’m pretty sure you’ve probably read about them this year, there’s also a big chance you’ve seen someone do a talk about them, (if you haven’t I highly recommend <a href="http://www.youtube.com/watch?v=U45e-zq4bTs">this wonderful talk</a> by <a href="https://twitter.com/stopsatgreen">Peter Gasston</a>), don’t worry if you haven’t though, I will do my best to explain each part as we go along – just so we’re all on the same page.</p><p>It worth noting this is an introduction, just a quick tutorial to give you a head start on all the shenanigans involved in Web Components. At the time of writing these examples only work in the latest version of Chrome (v31), I recommend <a href="http://caniuse.com/#search=web%20components">caniuse.com</a> for the latest and greatest browser support info.</p><p>You can find all the examples in this article <a href="http://rumyra.github.io/Twelve-Devs-Web-Component/">here</a> and all the code for them <a href="https://github.com/Rumyra/Twelve-Devs-Web-Component">here</a>.</p><p>So what is a Web Component. Well it’s a sort of sandboxed, reusable DOM structure. There are quite a few standards that go into making one. Take the logo for instance. Wouldn’t it be nice if that was interactive. It could be a working navigation for this site, you could hover and it could animate. Wouldn’t it be nice if you could hide away any crazy mark up you create for styling such a logo, if you could give the element a semantic name and wouldn’t it be nice if you could hand it all over for someone else to drop into their site, one component with it’s own HTML, CSS &amp; JavaScript, which didn’t interrupt any of their existing code?</p><p>It would be very nice and entirely possible with all the standards that make up Web Components.</p><p>So let us start with the first nice thing. Let’s mark up and style that logo:</p><p data-height="268" data-theme-id="1345" data-slug-hash="mGdur" data-user="Rumyra" data-default-tab="result">See the Pen <a href="http://codepen.io/Rumyra/pen/mGdur">12 Devs Interactive Logo</a> by Rumyra (<a href="http://codepen.io/Rumyra">@Rumyra</a>) on <a href="http://codepen.io">CodePen</a></p><h3>Templates</h3><p>Templates are the first thing we should look at when trying to create a Web Component. To quote the <a href="http://www.w3.org/TR/components-intro/#template-section">working draft</a>:</p><blockquote>
+  <p>The <code>&lt;template&gt;</code> element contains markup intended to be used later.</p>
+</blockquote><p>You can put markup (or <em>content</em>) encapsulated by the <code>&lt;template&gt;</code> tags anywhere in an HTML document. The content is parsed but is inert. Images aren’t downloaded, scripts aren’t passed etc… Pretty handy if we want to create a reusable/cloneable bit of markup.</p><pre><code>&lt;template id="twelve-devs-nav"&gt;
+    &lt;div class="twelve-devs-nav"&gt;
+        &lt;div class="badge-outer"&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt; 
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+        &lt;/div&gt;
+        &lt;nav&gt;
+            &lt;a href="/home"&gt;
+                &lt;span&gt;1&lt;/span&gt;
+                &lt;span&gt;2&lt;/span&gt;
+                &lt;span&gt;d&lt;/span&gt;
+                &lt;span&gt;e&lt;/span&gt;
+                &lt;span&gt;v&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+                &lt;span&gt;.&lt;/span&gt;
+                &lt;span&gt;c&lt;/span&gt;
+                &lt;span&gt;o&lt;/span&gt;
+                &lt;span&gt;.&lt;/span&gt;
+                &lt;span&gt;u&lt;/span&gt;
+                &lt;span&gt;k&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/workshops"&gt;
+                &lt;span&gt;W&lt;/span&gt;
+                &lt;span&gt;o&lt;/span&gt;
+                &lt;span&gt;r&lt;/span&gt;
+                &lt;span&gt;k&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+                &lt;span&gt;h&lt;/span&gt;
+                &lt;span&gt;o&lt;/span&gt;
+                &lt;span&gt;p&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/articles"&gt;
+                &lt;span&gt;A&lt;/span&gt;
+                &lt;span&gt;r&lt;/span&gt;
+                &lt;span&gt;t&lt;/span&gt;
+                &lt;span&gt;i&lt;/span&gt;
+                &lt;span&gt;c&lt;/span&gt;
+                &lt;span&gt;l&lt;/span&gt;
+                &lt;span&gt;e&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/events"&gt;
+                &lt;span&gt;E&lt;/span&gt;
+                &lt;span&gt;v&lt;/span&gt;
+                &lt;span&gt;e&lt;/span&gt;
+                &lt;span&gt;n&lt;/span&gt;
+                &lt;span&gt;t&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/talks"&gt;
+                &lt;span&gt;T&lt;/span&gt;
+                &lt;span&gt;a&lt;/span&gt;
+                &lt;span&gt;l&lt;/span&gt;
+                &lt;span&gt;k&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+        &lt;/nav&gt;
+        &lt;div class="badge-inner"&gt;
+            &lt;h1&gt;12&lt;/h1&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+</code></pre><p>You can access the markup to reuse or amend it via the new <code>content</code> API.</p><pre><code>var logoTemplate = document.querySelector('#twelve-devs-logo');
+var logoContent = logoTemplate.content.cloneNode(true);
+document.querySelector('#show-content').appendChild(logoContent);
+</code></pre><p>All we’ve <a href="http://rumyra.github.io/Twelve-Devs-Web-Component/template.html">done here</a> is taken the <em>content</em> out of the template, <code>#twelve-devs-logo</code>, and stuck it into an empty div <code>#show-content</code>, on the page to be rendered. Easy, but dare I say it handy.</p><h3>Enter the Shadow Dom.</h3><p>Hopefully you’ve got Chrome open by now. Go on inspect this audio element:</p><p><br />Can’t see anything but an empty audio tag right? Where is that play button, scrubber, volume control and time? It’s gotta be there somewhere…</p><p>Click on the cog icon to the bottom right of the dev tools. Under the <strong>Elements</strong> sub heading there is ‘Show Shadow DOM’ checkbox, select this and then close the Settings panel. Back in the dev tools you should now be able to expand the audio element. Keep expanding and a world of divs and inputs suddenly appear before you. All the controls are there, they are just hidden, inside the <strong>Shadow DOM</strong>.</p><p><img src="http://12devsofxmas.co.uk/wp-content/uploads/sites/2/2013/12/audio-shadow-dom.png" alt="audio-shadow-dom" width="1161" height="354" /></p><p>So now you’ve seen the <strong>Shadow DOM</strong>, let’s use it! To hide away all my crazy markup I’ve used to create the 12 Devs Logo I can make the <code>#show-content</code> div my <strong>Shadow DOM host</strong>, then populate it with the template’s content.</p><pre><code>var logoTemplate = document.querySelector('#twelve-devs-logo');
+var logoContent = logoTemplate.content.cloneNode(true);
+var shadowHost = document.querySelector('#show-content');
+var shadowRoot = shadowHost.webkitCreateShadowRoot();
+shadowRoot.appendChild(logoContent);
+</code></pre><p>It will then act like the <code>&lt;audio&gt;</code> tag and not show the inner workings when inspected.</p><p><img src="http://12devsofxmas.co.uk/wp-content/uploads/sites/2/2013/12/shadow-dom-no-style.png" alt="shadow-dom-no-style" width="941" height="529" /></p><p>But wait up – where did all our styles go? Well the <strong>Shadow DOM</strong> comes with a <strong>Shadow Boundary</strong>. This means it automatically has scope, none of the global styles or scripts affect the local mark up and none of the local styles or scripts affect the rest of the page. (It’s worth noting you can reverse this with a little JavaScript if you so wish).</p><p>So let’s amend our template to include the styles we have externally in our style sheet. They still won’t affect anything because they are within the <code>&lt;template&gt;</code> tag, which as we know from earlier are inert.</p><pre><code>&lt;template id="twelve-devs-nav"&gt;
+    &lt;style&gt;
+        div, nav, h1, audio {margin:0px;padding:0px;outline:none;border:none;font-family:sans-serif;}
+        .twelve-devs-nav {
+            position:relative;
+            width:300px; height:300px;
+            background-color:white;
+        }
+        .badge-outer {
+            width:300px; height:300px;
+        }
+        .badge-outer b {
+            display:block;
+            position:absolute; top:20px; left:50%;
+            width:150px; height:260px;
+            margin-left:-75px;
+            background-color:#4a4a4a;
+          transform-origin: center center 0 50%;
+          transform: rotate(0deg);
+        }
+        .badge-outer b:nth-of-type(2) {-webkit-transform: rotate(30deg);}
+        .badge-outer b:nth-of-type(3) {-webkit-transform: rotate(60deg);}
+        .badge-outer b:nth-of-type(4) {-webkit-transform: rotate(90deg);}
+        .badge-outer b:nth-of-type(5) {-webkit-transform: rotate(120deg);}
+        .badge-outer b:nth-of-type(6) {-webkit-transform: rotate(150deg);}
+        .badge-outer b:nth-of-type(7) {-webkit-transform: rotate(180deg);}
+        .badge-outer b:nth-of-type(8) {-webkit-transform: rotate(210deg);}
+        .badge-outer b:nth-of-type(9) {-webkit-transform: rotate(240deg);}
+        .badge-outer b:nth-of-type(10) {-webkit-transform: rotate(270deg);}
+        .badge-outer b:nth-of-type(11) {-webkit-transform: rotate(330deg);}
+
+        nav {
+            position:absolute; top:25px; left:25px;
+            background:white;
+            height:250px; width:250px;
+            border-radius:125px;
+        }
+        nav a {
+            font-size:0.9em; font-weight:bold;
+            text-transform: uppercase;
+            text-decoration: none;
+            color:#4a4a4a;
+        }
+        nav a:hover {font-size:1em; color:crimson;}
+        nav a span {
+            position:absolute; top:125px; left:117px;
+            height:15px; width:20px;
+            padding-top:94px;
+            text-align:center;
+            -webkit-transform-origin:top center;
+        }
+        nav a[href*='home'] {font-size: 0.7em;}
+        nav a[href*='home']:hover {font-size: 0.8em; color:crimson;}
+        nav a[href*='home'] span {
+            bottom:0px; right:0px;
+            padding-top:98px;
+        }
+        nav a[href*='home'] span:nth-of-type(1) {-webkit-transform:rotate(36deg);}
+        nav a[href*='home'] span:nth-of-type(2) {-webkit-transform:rotate(30deg);}
+        nav a[href*='home'] span:nth-of-type(3) {-webkit-transform:rotate(24deg);}
+        nav a[href*='home'] span:nth-of-type(4) {-webkit-transform:rotate(18deg);}
+        nav a[href*='home'] span:nth-of-type(5) {-webkit-transform:rotate(12deg);}
+        nav a[href*='home'] span:nth-of-type(6) {-webkit-transform:rotate(6deg);}
+        nav a[href*='home'] span:nth-of-type(7) {-webkit-transform:rotate(0deg);}
+        nav a[href*='home'] span:nth-of-type(8) {-webkit-transform:rotate(-6deg);}
+        nav a[href*='home'] span:nth-of-type(9) {-webkit-transform:rotate(-12deg);}
+        nav a[href*='home'] span:nth-of-type(10) {-webkit-transform:rotate(-18deg);}
+        nav a[href*='home'] span:nth-of-type(11) {-webkit-transform:rotate(-24deg);}
+        nav a[href*='home'] span:nth-of-type(12) {-webkit-transform:rotate(-30deg);}
+
+        nav a[href*='work'] span:nth-of-type(1) {-webkit-transform:rotate(300deg);}
+        nav a[href*='work'] span:nth-of-type(2) {-webkit-transform:rotate(292deg);}
+        nav a[href*='work'] span:nth-of-type(3) {-webkit-transform:rotate(284deg);}
+        nav a[href*='work'] span:nth-of-type(4) {-webkit-transform:rotate(276deg);}
+        nav a[href*='work'] span:nth-of-type(5) {-webkit-transform:rotate(268deg);}
+        nav a[href*='work'] span:nth-of-type(6) {-webkit-transform:rotate(260deg);}
+        nav a[href*='work'] span:nth-of-type(7) {-webkit-transform:rotate(252deg);}
+        nav a[href*='work'] span:nth-of-type(8) {-webkit-transform:rotate(244deg);}
+        nav a[href*='work'] span:nth-of-type(9) {-webkit-transform:rotate(236deg);}
+
+        nav a[href*='art'] span:nth-of-type(1) {-webkit-transform:rotate(220deg);}
+        nav a[href*='art'] span:nth-of-type(2) {-webkit-transform:rotate(212deg);}
+        nav a[href*='art'] span:nth-of-type(3) {-webkit-transform:rotate(204deg);}
+        nav a[href*='art'] span:nth-of-type(4) {-webkit-transform:rotate(196deg);}
+        nav a[href*='art'] span:nth-of-type(5) {-webkit-transform:rotate(188deg);}
+        nav a[href*='art'] span:nth-of-type(6) {-webkit-transform:rotate(180deg);}
+        nav a[href*='art'] span:nth-of-type(7) {-webkit-transform:rotate(172deg);}
+        nav a[href*='art'] span:nth-of-type(8) {-webkit-transform:rotate(164deg);}
+
+        nav a[href*='eve'] span:nth-of-type(1) {-webkit-transform:rotate(148deg);}
+        nav a[href*='eve'] span:nth-of-type(2) {-webkit-transform:rotate(140deg);}
+        nav a[href*='eve'] span:nth-of-type(3) {-webkit-transform:rotate(132deg);}
+        nav a[href*='eve'] span:nth-of-type(4) {-webkit-transform:rotate(124deg);}
+        nav a[href*='eve'] span:nth-of-type(5) {-webkit-transform:rotate(116deg);}
+        nav a[href*='eve'] span:nth-of-type(6) {-webkit-transform:rotate(108deg);}
+
+        nav a[href*='talk'] span:nth-of-type(1) {-webkit-transform:rotate(92deg);}
+        nav a[href*='talk'] span:nth-of-type(2) {-webkit-transform:rotate(86deg);}
+        nav a[href*='talk'] span:nth-of-type(3) {-webkit-transform:rotate(78deg);}
+        nav a[href*='talk'] span:nth-of-type(4) {-webkit-transform:rotate(70deg);}
+        nav a[href*='talk'] span:nth-of-type(5) {-webkit-transform:rotate(62deg);}
+
+        .badge-inner {
+            position:absolute; top:68px; left:68px;
+            height:165px; width:165px;
+            background: #4a4a4a;
+            border-radius:90px;
+        }
+        .badge-inner h1 {
+            padding:12px 0px 0px 15px;
+            font-size:7.6em;
+            color:white;
+            letter-spacing: -12px;
+        }
+    &lt;/style&gt;
+    &lt;div class="twelve-devs-nav"&gt;
+        &lt;div class="badge-outer"&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+            &lt;b&gt;&lt;/b&gt;
+        &lt;/div&gt;
+        &lt;nav&gt;
+            &lt;a href="/home"&gt;
+                &lt;span&gt;1&lt;/span&gt;
+                &lt;span&gt;2&lt;/span&gt;
+                &lt;span&gt;d&lt;/span&gt;
+                &lt;span&gt;e&lt;/span&gt;
+                &lt;span&gt;v&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+                &lt;span&gt;.&lt;/span&gt;
+                &lt;span&gt;c&lt;/span&gt;
+                &lt;span&gt;o&lt;/span&gt;
+                &lt;span&gt;.&lt;/span&gt;
+                &lt;span&gt;u&lt;/span&gt;
+                &lt;span&gt;k&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/workshops"&gt;
+                &lt;span&gt;W&lt;/span&gt;
+                &lt;span&gt;o&lt;/span&gt;
+                &lt;span&gt;r&lt;/span&gt;
+                &lt;span&gt;k&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+                &lt;span&gt;h&lt;/span&gt;
+                &lt;span&gt;o&lt;/span&gt;
+                &lt;span&gt;p&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/articles"&gt;
+                &lt;span&gt;A&lt;/span&gt;
+                &lt;span&gt;r&lt;/span&gt;
+                &lt;span&gt;t&lt;/span&gt;
+                &lt;span&gt;i&lt;/span&gt;
+                &lt;span&gt;c&lt;/span&gt;
+                &lt;span&gt;l&lt;/span&gt;
+                &lt;span&gt;e&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/events"&gt;
+                &lt;span&gt;E&lt;/span&gt;
+                &lt;span&gt;v&lt;/span&gt;
+                &lt;span&gt;e&lt;/span&gt;
+                &lt;span&gt;n&lt;/span&gt;
+                &lt;span&gt;t&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;a href="/talks"&gt;
+                &lt;span&gt;T&lt;/span&gt;
+                &lt;span&gt;a&lt;/span&gt;
+                &lt;span&gt;l&lt;/span&gt;
+                &lt;span&gt;k&lt;/span&gt;
+                &lt;span&gt;s&lt;/span&gt;
+            &lt;/a&gt;
+        &lt;/nav&gt;
+        &lt;div class="badge-inner"&gt;
+            &lt;h1&gt;12&lt;/h1&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+</code></pre><p><a href="http://rumyra.github.io/Twelve-Devs-Web-Component/shadow-dom.html">So here we have it</a> the logo is all Shadow DOM ready :)</p><p>Now all I feel like I need is some proper semantics for it. <code>&lt;div id="twelve-devs-logo"&gt;</code> doesn’t seem to cut it for me.</p><h3>Bring on Custom Elements</h3><p>In Chrome navigate to <em>chrome://flags</em> and enable <strong>Experimental Web Platform features</strong>, (remember to relaunch Chrome).</p><p>To create a <strong>Custom Element</strong> we need to register it via the <code>document.register()</code> method, which takes two arguments, the name of the new element (which needs to contain a hyphen), and a prototype, (optional), which must extend <code>HTMLElement</code>. So let’s create our prototype:</p><pre><code>var twelveDevsNavProto = Object.create(HTMLElement.prototype);
+</code></pre><p>This prototype comes with a <code>createdCallBack</code> method, which we can use to do all our <strong>Shadow DOM</strong> population shenanigans from earlier.</p><pre><code>twelveDevsNavProto.createdCallback = function() {
+    var shadowRoot = this.webkitCreateShadowRoot();
+    shadowRoot.appendChild(logoContent);
+};
+</code></pre><p>Now we can register a new element:</p><pre><code>var twelveDevsNavElement = document.register('twelve-devs-nav', {prototype: twelveDevsNavProto} );
+</code></pre><p>And include it in our mark up:</p><pre><code>&lt;twelve-devs-nav&gt;&lt;/twelve-devs-nav&gt;
+</code></pre><p>Well well, <a href="http://rumyra.github.io/Twelve-Devs-Web-Component/custom-element.html">there you have it</a>, a shiny new, you made it all, HTML element. Styleable, scriptable and reusable with the best of them :D</p><h3>There’s so much more</h3><p>I’ve only nibbled at the top of the mince pie so far, there’s so much more to it. If you’re excited and want to carry on here’s some further eating for the holidays:</p><p>Check out <a href="http://www.w3.org/TR/2013/WD-html-imports-20130514/">HTML Imports</a> to help you port that <strong>Custom Element</strong> around the place. Also in a bid not to overwhelm you I didn’t touch on <a href="http://www.w3.org/TR/components-intro/#decorator-section">decorators</a>, keep an eye out for them.</p><p>The <a href="http://www.w3.org/TR/components-intro/">the W3C Working Draft</a> is super helpful for further learning, as is <a href="http://css-tricks.com/modular-future-web-components/">this article</a> by <a href="https://twitter.com/rob_dodson">Rob Dodson</a> on <a href="http://css-tricks.com/">CSS Tricks</a>. As always <a href="http://www.html5rocks.com/">HTML5 Rocks</a> has a <a href="http://www.html5rocks.com/en/search?q=web+components">whole host of great articles &amp; tutorials</a>.</p><p>Both Mozilla and Google are building UI libraries based on web components. Mozilla have <a href="http://mozilla.github.io/brick/index.html">Brick</a> and Google have <a href="http://www.polymer-project.org/">Polymer</a>, both are worth checking out.</p><p>And you’re done, pat yourself on the back, another thing explored and in your arsenal for the coming year!</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
