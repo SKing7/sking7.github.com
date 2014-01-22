@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A follow up to obtaining 60fps scrolling performance  |  The CSS Ninja</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>A follow up to obtaining 60fps scrolling performance  |  The CSS Ninja</h1>
+<div>
+					<header>
+						<small><time datetime="13/01/2014">January 13th, 2014</time></small>
+						
+					</header>
+					
+					<p><a href="http://www.thecssninja.com/javascript/pointer-events-60fps">60fps scrolling article</a> got quite a few people excited but also a few smart people to point out some flaws in the approach. I was planning to just update the original article but I’ve compiled so much info about this topic that I thought it would be better to do a follow up article and dive into the detail of the techniques that I tried and some solutions to the critiques made about the last technique.<span id="more-1342"></span></p>
+<p>Take a look at the <a href="http://jsbin.com/oqUqIxU/1/quiet" target="_blank">final test case</a> that performs the best, watch the <a href="http://www.youtube.com/watch?v=MFY8UX3P-LQ" target="_blank">screencast</a> and checkout the <a href="https://github.com/ryanseddon/60fps-scroll" target="_blank">60fps-scroll repo</a>. Read on to learn why.</p>
+<h2>Critiques</h2>
+<p>There were two valid critiques that were brought up:</p>
+<ul>
+<li>Style recalculation hit when adding class to body.</li>
+<li>User clicking something while scrolling or before timeout runs.</li>
+</ul>
+<h2>Pointer-events: none not the silver bullet</h2>
+<p>The original idea of disabling <code>pointer-events</code> on the body gives you the illusion that scroll performance is great but let’s face it simple sites don’t really have scroll jank issues. Where we do see flaws in the original technique is when we it’s used on more complicated visually rich sites. By adding a class to the body we force the browser to do a style recalculation which is costly on the body as it has to traverse the whole tree to make sure this top level class doesn’t effect any children.</p>
+<p><img src="http://www.thecssninja.com/wp-content/uploads/2014/01/recalc-hit.png" alt="Style recalculation hit on more complex DOM structures" width="609" height="173" /></p>
+<p>The above image is a timeline snapshot of the more complex DOM using the older technique of changing the class on the body, as you can see this can just blow away your pursuit of 60fps scrolling before you’ve even began.</p>
+<h2>Mobile</h2>
+<p>On mobile or touch based devices this technique really has no effect as this is only relevant for mouse cursors. Running the test case in an iPhone works as normal when scrolling.</p>
+<h2>Firefox degradation</h2>
+<p>The original test case was very janky in Firefox and quite slow. Without the equivalent timeline tool it’s hard to say what the browser is exactly doing on scroll. The revised technique performs a lot better as it doesn’t trigger any repaints or high style recalculations.</p>
+<h2>What other browsers do on scroll</h2>
+<p><a href="http://www.thecssninja.com/javascript/pointer-events-60fps/comment-page-1#comment-7528" target="_blank">IE11</a> and <a href="http://www.thecssninja.com/javascript/pointer-events-60fps/comment-page-1#comment-7562" target="_blank">Firefox</a> both turn off hit testing on scroll if the users mouse doesn’t move. Safari I’m not sure what it does.</p>
+<h2>Solving clicks before the timeout has triggered</h2>
+<p>One of the critiques was what if the user clicks on something as they’re scrolling or clicks something before the timeout has ran once the user stops scrolling. </p>
+<p>We can semi-solve this via the use of <code>elementFromPoint</code> and triggering synthetic events. This won’t solve every edge case but it will get you mostly there.</p>
+<div><pre><span>// capture all clicks and store x, y coords for later</span>
+<span>document</span><span>.</span><span>addEventListener</span><span>(</span><span>'click'</span><span>,</span> <span>function</span><span>(</span><span>event</span><span>)</span> <span>{</span>
+  <span>if</span><span>(</span><span>event</span><span>.</span><span>target</span> <span>===</span> <span>cover</span> <span>&amp;&amp;</span> <span>!</span><span>event</span><span>.</span><span>synthetic</span><span>)</span> <span>{</span>
+      <span>pos</span><span>.</span><span>x</span> <span>=</span> <span>event</span><span>.</span><span>clientX</span><span>;</span>
+      <span>pos</span><span>.</span><span>y</span> <span>=</span> <span>event</span><span>.</span><span>clientY</span><span>;</span>
+      <span>clicked</span> <span>=</span> <span>true</span><span>;</span>
+  <span>}</span>
+<span>},</span> <span>false</span><span>);</span>
+
+<span>function</span> <span>dispatchClick</span><span>(</span><span>coords</span><span>){</span>
+  <span>var</span> <span>event</span> <span>=</span> <span>document</span><span>.</span><span>createEvent</span><span>(</span><span>"MouseEvent"</span><span>),</span>
+      <span>elem</span> <span>=</span> <span>document</span><span>.</span><span>elementFromPoint</span><span>(</span><span>coords</span><span>.</span><span>x</span><span>,</span> <span>coords</span><span>.</span><span>y</span><span>);</span>
+
+  <span>event</span><span>.</span><span>initMouseEvent</span><span>(</span>
+      <span>"click"</span><span>,</span>
+      <span>true</span> <span>/* bubble */</span><span>,</span> <span>true</span> <span>/* cancelable */</span><span>,</span>
+      <span>window</span><span>,</span> <span>null</span><span>,</span>
+      <span>coords</span><span>.</span><span>x</span><span>,</span> <span>coords</span><span>.</span><span>y</span><span>,</span> <span>0</span><span>,</span> <span>0</span><span>,</span> <span>/* coordinates */</span>
+      <span>false</span><span>,</span> <span>false</span><span>,</span> <span>false</span><span>,</span> <span>false</span><span>,</span> <span>/* modifier keys */</span>
+      <span>0</span> <span>/*left*/</span><span>,</span> <span>null</span>
+  <span>);</span>
+  <span>event</span><span>.</span><span>synthetic</span> <span>=</span> <span>true</span><span>;</span>
+
+  <span>elem</span><span>.</span><span>dispatchEvent</span><span>(</span><span>event</span><span>);</span>
+<span>}</span>
+</pre></div>
+<p>By attaching a listener to the document we can capture all clicks that happen before the timeout fires by storing the cursor x, y coordinates when the timeout fires we can target the element via elementFromPoint and then trigger a synthetic event on that element.</p>
+<div><pre><span>// On timeout check to make sure the user actually clicked during scroll</span>
+<span>// Dispatch synthetic click event</span>
+<span>setTimeout</span><span>(</span><span>function</span><span>(){</span>
+  <span>//...</span>
+  <span>if</span><span>(</span><span>clicked</span><span>)</span> <span>{</span>
+    <span>dispatchClick</span><span>(</span><span>pos</span><span>);</span>
+    <span>clicked</span> <span>=</span> <span>false</span><span>;</span>
+  <span>}</span>
+<span>},</span><span>500</span><span>);</span>
+</pre></div>
+<p>The downside to this approach is this will only trigger listeners attached via JavaScript it won’t trigger an actual click so if I was to click on a form submit button it wouldn’t do anything. This won’t work on iframes either so things like social button embeds etc. Of course once the timeout has fired all clicks will worked as expected.</p>
+<h2>Alternate solution using a div that follows the mouse cursor</h2>
+<p>One suggestion in the <a href="http://www.thecssninja.com/javascript/pointer-events-60fps/comment-page-1#comment-7469" target="_blank">comments</a> was to use a small cover div that follows the mouse cursor as the user scrolls and use CSS transforms to move it on the viewport so it won’t cause any layouts. I found the performance degraded compared to the original <code>pointer-events</code> technique and it also oddly triggered layouts/paints when changing the translate property but not all the time. Perhaps my <a href="http://jsbin.com/IdIhacE/2/quiet" target="_blank">test case</a> is flawed? If you know how to fix it let me know.</p>
+<p>Check out the <a href="http://jsbin.com/IdIhacE/2/quiet" target="_blank">test case</a> for yourself. Note that this demo only alters the <code>webkitTransform</code> property so it won’t do anything in Firefox.</p>
+<h2>Using a cover div + pointer-events: none</h2>
+<p>We’ll dive into the following test case that uses a cover div and <code>pointer-events: none</code> and go through some optimisations to improve it further.</p>
+
+<p>One of the main things when working with lots of images is not resizing them through CSS or the img elements width/height attributes as the browser has to decode the image and resize it before painting it to the screen. This makes sure your scrolling performance isn’t hit hard by big repaints. Harder to do when catering for High DPI screens but definitely a solution that the <a href="http://picture.responsiveimages.org/" target="_blank">picture element</a> will solve in the future.</p>
+<h2>60fps-scroll library</h2>
+<p>I created a <a href="https://github.com/ryanseddon/60fps-scroll" target="_blank">little library</a> that wraps up this technique that you can drop into your site and see if it helps your scroll performance.</p>
+<h2>Pursuit of a false metric?</h2>
+<p>Some may have the feeling that this may be a case of the premature optimisation gremlins and they’re right. I wouldn’t get caught up on 60fps performance until you have a problem with your scrolling where it can really effect the end users experience within your site.</p>
+					
+										
+					<p>
+						Post filed under: <a href="http://www.thecssninja.com/category/css" title="View all posts in css" rel="category tag">css</a>, <a href="http://www.thecssninja.com/category/javascript" title="View all posts in javascript" rel="category tag">javascript</a>.
+					</p>
+					<p>
+						<a href="#respond">Skip to comment form</a>.
+					</p>
+					
+					
+					
+					
+<!-- You can start editing here. -->
+
+
+			<!-- If comments are open, but there are no comments. -->
+
+	 
+
+
+
+				</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
