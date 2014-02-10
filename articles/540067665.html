@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Don't use flexbox for overall page layout</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Don't use flexbox for overall page layout</h1>
+<div><time datetime="2014-02-05">
+          Posted 05 February 2014
+          
+            only 5 months after the previous post
+          
+        </time><p>When I was building this blog I tried to use <a href="http://dev.w3.org/csswg/css-flexbox/">flexbox</a> for the overall page layout because I wanted to look cool and modern in front of my peers. However, like all of my other attempts to look cool and modern, it didn't really work.</p><p>Why? Well, take my hand and follow me into the next paragraph…</p><h2 id="flexbox-vs-grid">Flexbox vs Grid</h2><p>Here's a basic three column design:</p><figure>
+  <image src="//s3.amazonaws.com/com.jakearchibald/posts/flexbox-vs-grid/site.179883e3a774.png" alt="Three column layout">
+  <figcaption>The Holy Grail, apparently</figcaption>
+</image></figure><p><a href="http://jsbin.com/iYEmaTUF/1">Here it is mocked up using flexbox</a> (works in all modern browsers), and <a href="http://jsbin.com/iYEmaTUF/2">here it is using grid layout</a> (works in IE10+). Both look the same, the difference is in how they load:</p><figure>
+
+<figcaption>Flexbox vs Grid</figcaption>
+</figure><p>Browsers can progressively render content as it's streamed from the server, this is great because it means users can start consuming content before it's all arrived. However, when combined with flexbox it causes misalignment and horizontal shifting.</p><p>It's difficult to spot too, you're unlikely to notice it while developing locally, or via a super-fast connection. In those cases the page loads too quickly to notice. <a href="http://jsbin.com/iYEmaTUF/3">Here's a demo that displays the columns on a delay</a>, similar to how they will appear on a slower connection.</p><h2 id="flexbox-content-dictates-layout">Flexbox: content dictates layout</h2><p>Here's a simplified version of the layout:</p><div><pre><span>.container</span> <span>{</span>
+  <span>display</span><span>:</span> <span>flex</span><span>;</span>
+  <span>flex</span><span>-</span><span>flow</span><span>:</span> <span>row</span><span>;</span>
+<span>}</span>
+
+<span>nav</span> <span>{</span>
+  <span>flex</span><span>:</span> <span>1</span><span>;</span>
+  <span>min-width</span><span>:</span> <span>118px</span><span>;</span>
+  <span>max-width</span><span>:</span> <span>160px</span><span>;</span>
+<span>}</span>
+
+<span>.main</span> <span>{</span>
+  <span>order</span><span>:</span> <span>1</span><span>;</span>
+  <span>flex</span><span>:</span> <span>1</span><span>;</span>
+  <span>min-width</span><span>:</span> <span>510px</span><span>;</span>
+<span>}</span>
+
+<span>aside</span> <span>{</span>
+  <span>flex</span><span>:</span> <span>1</span><span>;</span>
+  <span>order</span><span>:</span> <span>2</span><span>;</span>
+  <span>min-width</span><span>:</span> <span>150px</span><span>;</span>
+  <span>max-width</span><span>:</span> <span>210px</span><span>;</span>
+<span>}</span>
+</pre></div><p>The container declares itself as a flexbox, and child elements declare how they'd like to interact with one another within the flexbox.</p><p>As the page loads, the container starts to receive the first child, the main content. At this point it's the only child and it has <code>flex: 1</code>, so it gets all of the space. When the nav starts to arrive, the main content has to resize to make room for it, which causes that ugly re-layout.</p><h2 id="grid-container-dictates-layout-to-some-extent">Grid: container dictates layout (to some extent)</h2><p>Here's a simplified version of the same layout:</p><div><pre><span>.container</span> <span>{</span>
+  <span>display</span><span>:</span> <span>grid</span><span>;</span>
+  <span>grid</span><span>-</span><span>template</span><span>-</span><span>columns</span><span>:</span>
+    <span>(</span><span>nav</span><span>)</span>   <span>minmax</span><span>(</span><span>118px</span><span>,</span> <span>160px</span><span>)</span><span>,</span>
+    <span>(</span><span>main</span><span>)</span>  <span>minmax</span><span>(</span><span>612px</span><span>,</span> <span>1</span><span>fr</span><span>)</span><span>,</span>
+    <span>(</span><span>aside</span><span>)</span> <span>minmax</span><span>(</span><span>182px</span><span>,</span> <span>242px</span><span>);</span>
+<span>}</span>
+
+<span>nav</span> <span>{</span>
+  <span>grid</span><span>-</span><span>area</span><span>:</span> <span>nav</span><span>;</span>
+<span>}</span>
+
+<span>.main</span> <span>{</span>
+  <span>grid</span><span>-</span><span>area</span><span>:</span> <span>main</span><span>;</span>
+<span>}</span>
+
+<span>aside</span> <span>{</span>
+  <span>grid</span><span>-</span><span>area</span><span>:</span> <span>aside</span><span>;</span>
+<span>}</span>
+</pre></div><p><strong>Note:</strong> The code above is based on <a href="http://dev.w3.org/csswg/css-grid/">the latest spec</a> and isn't implemented in any browser, yet. You should bother your favourite browser vendor about this.</p><p>Here the layout is defined in the container, so the nav is rendered into the middle column as soon as it starts to arrive.</p><h2 id="but-grid-can-load-poorly-too">But grid can load poorly too...</h2><p>To load nicely, you need to restrict yourself to configurations that can be predetermined by the grid container.</p><p>Here are some examples that break that:</p><div><pre><span>.container</span> <span>{</span>
+  <span>display</span><span>:</span> <span>grid</span><span>;</span>
+  <span>grid</span><span>-</span><span>template</span><span>-</span><span>columns</span><span>:</span>
+    <span>/* Size defined by content, so will change with content */</span>
+    <span>(</span><span>foo</span><span>)</span>   <span>max</span><span>-</span><span>content</span><span>,</span>
+    <span>/* Same again */</span> 
+    <span>(</span><span>bar</span><span>)</span>   <span>min</span><span>-</span><span>content</span><span>,</span>
+    <span>/* Computes to minmax(min-content, max-content), so same again */</span>
+    <span>(</span><span>hello</span><span>)</span> <span>auto</span><span>;</span>
+<span>}</span>
+
+<span>aside</span> <span>{</span>
+  <span>/* This column isn't defined by the container, so one</span>
+<span>     is created dynamically. This will cause content to</span>
+<span>     shift as 'aside' appears in the container */</span>
+  <span>grid</span><span>-</span><span>column</span><span>:</span> <span>4</span><span>;</span>
+<span>}</span>
+</pre></div><h2 id="but-dont-write-off-flexbox">But don't write-off flexbox!</h2><p>Flexbox is great, it just isn't the best thing for overall page layouts.</p><p>Flexbox's strength is in its content-driven model. It doesn't need to know the content up-front. You can <a href="http://dev.w3.org/csswg/css-flexbox/#valuedef-flex-basis">distribute items based on their content</a>, <a href="http://dev.w3.org/csswg/css-flexbox/#flex-wrap-property">allow boxes to wrap</a> which is really handy for responsive design, you can even <a href="http://dev.w3.org/csswg/css-flexbox/#flex-shrink-property">control the distribution of negative space</a> separately to positive space.</p><p><a href="http://codepen.io/chriscoyier/pen/FAbpm">This nav bar by Chris Coyier</a> is a great example of something that makes more sense as a flexbox than grid.</p><p>Flexbox and grid play well together, and are a huge step forward from the float &amp; table hacks they replace. The sooner we can use them both in production, the better.</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
