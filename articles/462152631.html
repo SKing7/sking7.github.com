@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JavaScript has a Unicode problem · Mathias Bynens</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>JavaScript has a Unicode problem · Mathias Bynens</h1>
+<div>
+    <header>
+     
+     <p><time datetime="2013-10-20" itemprop="datePublished">Published 20th October 2013</time> · tagged with <a href="/notes#javascript">JavaScript</a>, <a href="/notes#unicode">Unicode</a></p>
+    </header>
+    <p>The way JavaScript handles Unicode is… surprising, to say the least. This write-up explains the pain points associated with Unicode in JavaScript, provides solutions for common problems, and explains how the upcoming ECMAScript 6 will improve the situation.</p>
+    <p><strong>Note:</strong> It sucks to have to say this, but this document is best viewed in a browser that is capable of rendering emoji, like Firefox, Safari, or Internet Explorer. <a href="https://code.google.com/p/chromium/issues/detail?id=62435">Blink (Chrome/Opera) on OS X doesn’t render these glyphs at all</a>, which makes some of the code examples on this page pretty hard to make sense of. You’ve been warned!</p>
+    <h2 id="unicode-basics">Unicode basics</h2>
+    <p>Before we take a closer look at JavaScript, let’s make sure we’re all on the same page when it comes to Unicode.</p>
+    <p>It’s easiest to think of Unicode as a database that maps any symbol you can think of to a number called its <strong>code point</strong>, and to a unique name. That way, it’s easy to refer to specific symbols without actually using the symbol itself. Examples:</p>
+    
+    <p>Code points are usually formatted as hexadecimal numbers, zero-padded up to at least four digits, with a U+ prefix.</p>
+    <p>The possible code point values range from U+0000 to U+10FFFF. That’s over 1.1 million possible symbols. To keep things organised, Unicode divides this range of code points into 17 planes that consist of about 65 thousand code points each.</p>
+    <p>The first plane is called the <strong>Basic Multilingual Plane or BMP</strong>, and it’s probably the most important one, as it contains all the most commonly used symbols. Most of the time you don’t need any code points outside of the BMP for text documents in English. Just like any other Unicode plane, it groups about 65 thousand symbols.</p>
+    <p>That leaves us about 1 million other code points that live outside the BMP. The planes these code points belong to are called <strong>supplementary planes</strong>, or <strong>astral planes</strong>.</p>
+    <p><strong>Astral code points</strong> are pretty easy to recognize: if you need more than 4 hexadecimal digits to represent the code point, it’s an astral code point.</p>
+    <p>Now that we have a basic understanding of Unicode, let’s see how it applies to JavaScript strings.</p>
+    <h2 id="escape-sequences">Escape sequences</h2>
+    <p>You may have seen <a href="http://mathiasbynens.be/notes/javascript-escapes">things like this</a> before:</p>
+    <pre><code>&gt;&gt; '\x41\x42\x43'<br />'ABC'<p>&gt;&gt; '\x61\x62\x63'<br />'abc'</p></code></pre>
+    <p>These are called <a href="http://mathiasbynens.be/notes/javascript-escapes#hexadecimal">hexadecimal escape sequences</a>. They consist of two hexadecimal digits that refer to the matching code point. For example, <code>\x41</code> represents <a href="http://codepoints.net/U+0041">U+0041 LATIN CAPITAL LETTER A</a>. These escape sequences can be used for code points in the range from U+0000 to U+00FF.</p>
+    <p>Also common is the following type of escape:</p>
+    <pre><code>&gt;&gt; '\u0041\u0042\u0043'<br />'ABC'<p>&gt;&gt; 'I \u2661 JavaScript!'<br />'I ♡ JavaScript!'</p></code></pre>
+    <p>These are called <a href="http://mathiasbynens.be/notes/javascript-escapes#unicode">Unicode escape sequences</a>. They consist of exactly 4 hexadecimal digits that represent a code point. For example, <code>\u2661</code> represents <a href="http://codepoints.net/U+2661">U+2661 WHITE HEART SUIT</a>. These escape sequences can be used for code points in the range from U+0000 to U+FFFF, i.e. the entire Basic Multilingual Plane.</p>
+    <p>But what about all the other planes — the astral planes? We need more than 4 hexadecimal digits to represent their code points… So how can we escape them?</p>
+    <p>In ECMAScript 6 this will be easy, since it introduces a new type of escape sequence: <a href="http://mathiasbynens.be/notes/javascript-escapes#unicode-code-point">Unicode code point escapes</a>. For example:</p>
+    <pre><code>&gt;&gt; '\u{41}\u{42}\u{43}'<br />'ABC'<p>&gt;&gt; '\u{1F4A9}'<br />'💩' // U+1F4A9 PILE OF POO</p></code></pre>
+    <p>Between the braces you can use up to six hexadecimal digits, which is enough to represent all Unicode code points. So, by using this type of escape sequence, you can easily escape any Unicode symbol based on its code point.</p>
+    <p>For backwards compatibility with ECMAScript 5 and older environments, the unfortunate solution is to use surrogate pairs:</p>
+    <pre><code>&gt;&gt; '\uD83D\uDCA9'<br />'💩' // U+1F4A9 PILE OF POO</code></pre>
+    <p>In that case, each escape represents the code point of a surrogate half. Two surrogate halves form a single astral symbol.</p>
+    <p>Note that the surrogate code points don’t look anything like the original code point. <a href="http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae">There are formulas</a> to calculate the surrogates based on a given astral code point, and the other way around — to calculate the original astral code point based on its surrogate pair.</p>
+    <p>Using surrogate pairs, all astral code points (i.e. from U+010000 to U+10FFFF) can be represented… But the whole concept of using a single escape to represent BMP symbols, and two escapes for astral symbols, is confusing, and has lots of annoying consequences.</p>
+    <h2 id="counting-symbols">Counting symbols in a JavaScript string</h2>
+    <p>Let’s say you want to count the number of symbols in a given string, for example. How would you go about it?</p>
+    <p>My first thought would probably be to simply use the <code>length</code> property.</p>
+    <pre><code>&gt;&gt; 'A'.length // U+0041 LATIN CAPITAL LETTER A<br />1<p>&gt;&gt; 'A' == '\u0041'<br />true</p><p>&gt;&gt; 'B'.length // U+0042 LATIN CAPITAL LETTER B<br />1</p><p>&gt;&gt; 'B' == '\u0042'<br />true</p></code></pre>
+    <p>In these examples, the <code>length</code> property of the string happens to reflect the number of characters. This makes sense: if we use escape sequences to represent the symbols, it’s obvious that we only need a single escape for each of these symbols. But this is not always the case! Here’s a slightly different example:</p>
+    <pre><code>&gt;&gt; '𝐀'.length // U+1D400 MATHEMATICAL BOLD CAPITAL A<br />2<p>&gt;&gt; '𝐀' == '\uD835\uDC00'<br />true</p><p>&gt;&gt; '𝐁'.length // U+1D401 MATHEMATICAL BOLD CAPITAL B<br />2</p><p>&gt;&gt; '𝐁' == '\uD835\uDC01'<br />true</p><p>&gt;&gt; '💩'.length // U+1F4A9 PILE OF POO<br />2</p><p>&gt;&gt; '💩' == '\uD83D\uDCA9'<br />true</p></code></pre>
+    <p>Internally, JavaScript represents astral symbols as <a href="http://mathiasbynens.be/notes/javascript-encoding#surrogate-pairs">surrogate pairs</a>, and <a href="http://mathiasbynens.be/notes/javascript-encoding" title="JavaScript’s internal character encoding: UCS-2 or UTF-16?">it exposes the separate surrogate halves as separate “characters”</a>. If you represent the symbols using nothing but ECMAScript 5-compatible escape sequences, you’ll see that two escapes are needed for each astral symbol. This is confusing, because humans generally think in terms of <em>Unicode symbols</em> or <em>graphemes</em> instead.</p>
+    <h3 id="accounting-for-astral-symbols">Accounting for astral symbols</h3>
+    <p>Getting back to the question: how to accurately count the number of symbols in a JavaScript string? The trick is to account for surrogate pairs properly, and only count each pair as a single symbol. You could use something like this:</p>
+    <pre><code>var regexAstralSymbols = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;<p>function countSymbols(string) {<br />return string<br />// replace every surrogate pair with a BMP symbol<br />.replace(regexAstralSymbols, '_')<br />// then get the length<br />.length;<br />}</p></code></pre>
+    <p>Or, if you use <a href="http://mths.be/punycode">Punycode.js</a> (which ships with <a href="http://nodejs.org/">Node.js</a>), make use of its utility methods to convert between JavaScript strings and Unicode code points. The <code>punycode.ucs2.decode</code> method takes a string and returns an array of Unicode code points; one item for each symbol.</p>
+    <pre><code>function countSymbols(string) {<br />return punycode.ucs2.decode(string).length;<br />}</code></pre>
+    <p>Using either implementation, we’re now able to count code points properly, which leads to more accurate results:</p>
+    <pre><code>&gt;&gt; countSymbols('A') // U+0041 LATIN CAPITAL LETTER A<br />1<p>&gt;&gt; countSymbols('𝐀') // U+1D400 MATHEMATICAL BOLD CAPITAL A<br />1</p><p>&gt;&gt; countSymbols('💩') // U+1F4A9 PILE OF POO<br />1</p></code></pre>
+    <h3 id="accounting-for-lookalikes">Accounting for lookalikes</h3>
+    <p>But if we’re being really pedantic, counting the number of symbols in a string is even more complicated. Consider this example:</p>
+    <pre><code>&gt;&gt; 'mañana' == 'mañana'<br />false</code></pre>
+    <p>JavaScript is telling us that these strings are different, but visually, there’s no way to tell! So what’s going on there?</p>
+    <p><a href="http://mothereff.in/js-escapes#1ma%C3%B1ana%20man%CC%83ana"><img src="/_img/js-escapes-manana.png" alt="" /></a></p>
+    <p>As <a href="http://mothereff.in/js-escapes#1ma%C3%B1ana%20man%CC%83ana">my JavaScript escapes tool</a> would tell you, the reason is the following:</p>
+    <pre><code>&gt;&gt; 'ma\xF1ana' == 'man\u0303ana'<br />false<p>&gt;&gt; 'ma\xF1ana'.length<br />6</p><p>&gt;&gt; 'man\u0303ana'.length<br />7</p></code></pre>
+    <p>The first string contains <a href="http://codepoints.net/U+00F1">U+00F1 LATIN SMALL LETTER N WITH TILDE</a>, while the second string uses two separate code points (<a href="http://codepoints.net/U+006E">U+006E LATIN SMALL LETTER N</a> and <a href="http://codepoints.net/U+0303">U+0303 COMBINING TILDE</a>) to create the same glyph. That explains why they’re not equal, and why they have a different <code>length</code>.</p>
+    <p>However, if we want to count the number of symbols in these strings the same way a human being would, we’d expect the answer <code>6</code> for both strings, since that’s the number of visually distinguishable glyphs in each string. How can we make this happen?</p>
+    <p>In ECMAScript 6, the solution is fairly simple:</p>
+    <pre><code>function countSymbolsPedantically(string) {<br />// Unicode Normalization, NFC form, to account for lookalikes:<br />var normalized = string.normalize('NFC');<br />// Account for astral symbols / surrogates, just like we did before:<br />return punycode.ucs2.decode(normalized).length;<br />}</code></pre>
+    <p>The <code>normalize</code> method on <code>String.prototype</code> performs <a href="http://unicode.org/reports/tr15/">Unicode normalization</a>, which accounts for these differences. If there is a single code point that represents the same glyph as another code point followed by a combining mark, it will normalize it to the single code point form.</p>
+    <pre><code>&gt;&gt; countSymbolsPedantically('mañana') // U+00F1<br />6<br />&gt;&gt; countSymbolsPedantically('mañana') // U+006E + U+0303<br />6</code></pre>
+    <p>For backwards compatibility with ECMAScript 5 and older environments, <a href="http://git.io/unorm">a <code>String.prototype.normalize</code> polyfill</a> can be used.</p>
+    <h3 id="accounting-for-other-combining-marks">Accounting for other combining marks</h3>
+    <p>This still isn’t perfect, though — code points with multiple combining marks applied to them always result in a single visual glyph, but may not have a normalized form, in which case normalization doesn’t help. For example:</p>
+    <pre><code>&gt;&gt; 'q\u0307\u0323'.normalize('NFC') // `q̣̇`<br />'q\u0307\u0323'<p>&gt;&gt; countSymbolsPedantically('q\u0307\u0323')<br />3 // not 1</p><p>&gt;&gt; countSymbolsPedantically('Z͑ͫ̓ͪ̂ͫ̽͏̴̙̤̞͉͚̯̞̠͍A̴̵̜̰͔ͫ͗͢L̠ͨͧͩ͘G̴̻͈͍͔̹̑͗̎̅͛́Ǫ̵̹̻̝̳͂̌̌͘!͖̬̰̙̗̿̋ͥͥ̂ͣ̐́́͜͞')<br />74 // not 6</p></code></pre>
+    <p>You could use <a href="https://github.com/mathiasbynens/esrever/blob/c32979673931a05b594d0a82ed821a59102faaba/esrever.js#L20">a regular expression</a> to remove any combining marks from the input string instead if a more accurate solution is needed.</p>
+    <pre><code>// Regex generated by this script: https://github.com/mathiasbynens/esrever/blob/master/scripts/export-data.js<br />var regexSymbolWithCombiningMarks = /([\0-\u02FF\u0370-\u1DBF\u1E00-\u20CF\u2100-\uD7FF\uDC00-\uFE1F\uFE30-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF])([\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]+)/g;<p>function countSymbolsIgnoringCombiningMarks(string) {<br />// Remove any combining marks, leaving only the symbols they belong to:<br />var stripped = string.replace(regexSymbolWithCombiningMarks, function($0, symbol, combiningMarks) {<br />return symbol;<br />});<br />// Account for astral symbols / surrogates, just like we did before:<br />return punycode.ucs2.decode(stripped).length;<br />}</p></code></pre>
+    <p>This function removes any combining marks, leaving only the symbols they belong to. Any unmatched combining marks (at the start of the string) are left intact. This solution works even in ECMAScript 3 environments, and it provides the most accurate results yet:</p>
+    <pre><code>&gt;&gt; countSymbolsIgnoringCombiningMarks('q\u0307\u0323')<br />1<br />&gt;&gt; countSymbolsIgnoringCombiningMarks('Z͑ͫ̓ͪ̂ͫ̽͏̴̙̤̞͉͚̯̞̠͍A̴̵̜̰͔ͫ͗͢L̠ͨͧͩ͘G̴̻͈͍͔̹̑͗̎̅͛́Ǫ̵̹̻̝̳͂̌̌͘!͖̬̰̙̗̿̋ͥͥ̂ͣ̐́́͜͞')<br />6</code></pre>
+    <h2 id="reversing-strings">Reversing strings in JavaScript</h2>
+    <p>Here’s an example of a similar problem: reversing a string in JavaScript. How hard can it be, right? A common, very simple, solution to this problem is the following:</p>
+    <pre><code>// naive solution<br />function reverse(string) {<br />return string.split('').reverse().join('');<br />}</code></pre>
+    <p>It seems to work fine in a lot of cases:</p>
+    <pre><code>&gt;&gt; reverse('abc')<br />'cba'<p>&gt;&gt; reverse('mañana') // U+00F1<br />'anañam'</p></code></pre>
+    <p>However, it completely messes up strings that contain combining marks or astral symbols.</p>
+    <pre><code>&gt;&gt; reverse('mañana') // U+006E + U+0303<br />'anãnam' // note: the `~` is now applied to the `a` instead of the `n`<p>&gt;&gt; reverse('💩') // U+1F4A9<br />'��' // `'\uDCA9\uD83D'`, the surrogate pair for `💩` in the wrong order</p></code></pre>
+    <p>Luckily, a brilliant computer scientist named Missy Elliot came up with a <a href="http://www.youtube.com/watch?v=UODX_pYpVxk&amp;t=33s">bulletproof algorithm</a> that accounts for these issues. It goes:</p>
+    <blockquote cite="http://www.youtube.com/watch?v=UODX_pYpVxk">
+     <p>I put my thang down, flip it, and reverse it. I put my thang down, flip it, and reverse it.</p>
+    </blockquote>
+    <p>And indeed: by swapping the position of any combining marks with the symbol they belong to, as well as reversing any surrogate pairs before further processing the string, <a href="http://mths.be/esrever">the issues are avoided successfully</a>. Thanks, Missy!</p>
+    <pre><code>// using Esrever (http://mths.be/esrever)<p>&gt;&gt; esrever.reverse('mañana') // U+006E + U+0303<br />'anañam'</p><p>&gt;&gt; esrever.reverse('💩') // U+1F4A9<br />'💩' // U+1F4A9</p></code></pre>
+    <h2 id="string-methods">Issues with Unicode in string methods</h2>
+    <p>This behavior affects other string methods, too.</p>
+    <h3 id="code-point-to-symbol">Turning a code point into a symbol</h3>
+    <p><code>String.fromCharCode</code> allows you to create a string based on a Unicode code point. But it only works correctly for code points in the BMP range (i.e. from U+0000 to U+FFFF). If you use it with an astral code point, you’ll get an unexpected result.</p>
+    <pre><code>&gt;&gt; String.fromCharCode(0x0041) // U+0041<br />'A' // U+0041<p>&gt;&gt; String.fromCharCode(0x1F4A9) // U+1F4A9<br />'' // U+F4A9, not U+1F4A9</p></code></pre>
+    <p>The only workaround is to <a href="http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae">calculate the code points for the surrogate halves yourself</a>, and pass them as separate arguments.</p>
+    <pre><code>&gt;&gt; String.fromCharCode(0xD83D, 0xDCA9)<br />'💩' // U+1F4A9</code></pre>
+    <p>If you don’t want to go through the trouble of calculating the surrogate halves, you could resort to <a href="http://mths.be/punycode">Punycode.js</a>’s utility methods once again:</p>
+    <pre><code>&gt;&gt; punycode.ucs2.encode([ 0x1F4A9 ])<br />'💩' // U+1F4A9</code></pre>
+    <p>Luckily, ECMAScript 6 introduces <code>String.fromCodePoint(codePoint)</code> which does handle astral symbols correctly. It can be used for any Unicode code point, i.e. from U+000000 to U+10FFFF.</p>
+    <pre><code>&gt;&gt; String.fromCodePoint(0x1F4A9)<br />'💩' // U+1F4A9</code></pre>
+    <p>For backwards compatibility with ECMAScript 5 and older environments, use <a href="http://mths.be/fromcodepoint">a <code>String.fromCodePoint()</code> polyfill</a>.</p>
+    <h3 id="symbol-from-string">Getting a symbol out of a string</h3>
+    <p>If you use <code>String.prototype.charAt(position)</code> to retrieve the first symbol in the string containing the pile of poo character, you’ll only get the first surrogate half instead of the whole symbol.</p>
+    <pre><code>&gt;&gt; '💩'.charAt(0) // U+1F4A9<br />'\uD83D' // U+D83D, i.e. the first surrogate half for U+1F4A9</code></pre>
+    <p>There’s a <a href="https://mail.mozilla.org/pipermail/es-discuss/2013-October/034240.html">proposal to introduce <code>String.prototype.at(position)</code> in ECMAScript 6</a>. It would be like <code>charAt</code> except it deals with full symbols instead of surrogate halves whenever possible.</p>
+    <pre><code>&gt;&gt; '💩'.at(0) // U+1F4A9<br />'💩' // U+1F4A9</code></pre>
+    <p>For backwards compatibility with ECMAScript 5 and older environments, <a href="http://mths.be/at">a <code>String.prototype.at()</code> polyfill/prollyfill is available</a>.</p>
+    <h3 id="code-point-from-string">Getting a code point out of a string</h3>
+    <p>Similarly, if you use <code>String.prototype.charCodeAt(position)</code> to retrieve the code point of the first symbol in the string, you’ll get the code point of the first surrogate half instead of the code point of the pile of poo character.</p>
+    <pre><code>&gt;&gt; '💩'.charCodeAt(0)<br />0xD83D</code></pre>
+    <p>Luckily, ECMAScript 6 introduces <code>String.prototype.codePointAt(position)</code>, which is like <code>charCodeAt</code> except it deals with full symbols instead of surrogate halves whenever possible.</p>
+    <pre><code>&gt;&gt; '💩'.codePointAt(0)<br />0x1F4A9</code></pre>
+    <p>For backwards compatibility with ECMAScript 5 and older environments, use <a href="http://mths.be/codepointat">a <code>String.prototype.codePointAt()</code> polyfill</a>.</p>
+    <h3 id="iterating-over-symbols">Iterating over all symbols in a string</h3>
+    <p>Let’s say you want to loop over every symbol in a string and do something with each separate symbol.</p>
+    <p>In ECMAScript 5 you’d have to write a lot of boilerplate code just to account for surrogate pairs:</p>
+    <pre><code>function getSymbols(string) {<br />var length = string.length;<br />var index = -1;<br />var output = [];<br />var character;<br />var charCode;<br />while (++index &lt; length) {<br />character = string.charAt(index);<br />charCode = character.charCodeAt(0);<br />if (charCode &gt;= 0xD800 &amp;&amp; charCode &lt;= 0xDBFF) {<br />// note: this doesn’t account for lone high surrogates<br />output.push(character + string.charAt(++index));<br />} else {<br />output.push(character);<br />}<br />}<br />return output;<br />}<p>var symbols = getSymbols('💩');<br />symbols.forEach(function(symbol) {<br />assert(symbol == '💩');<br />});</p></code></pre>
+    <p>In ECMAScript 6, you can simply use <code>for…of</code>. The string iterator deals with whole symbols instead of surrogate pairs.</p>
+    <pre><code>for (let symbol of '💩') {<br />assert(symbol == '💩');<br />}</code></pre>
+    <p>Unfortunately there’s no way to polyfill this, as <code>for…of</code> is a grammar-level construct.</p>
+    <h3 id="other-issues">Other issues</h3>
+    <p>This behavior affects pretty much all string methods, including those that weren’t explicitly mentioned here (such as <code>String.prototype.substring</code>, <code>String.prototype.slice</code>, etc.) so be careful when using them.</p>
+    <h2 id="regex">Issues with Unicode in regular expressions</h2>
+    <h3 id="matching-code-points">Matching code points and Unicode scalar values</h3>
+    <p>The dot operator (<code>.</code>) in regular expressions only matches a single “character”… But since JavaScript exposes surrogate halves as separate “characters”, it won’t ever match an astral symbol.</p>
+    <pre><code>&gt;&gt; /foo.bar/.test('foo💩bar')<br />false</code></pre>
+    <p>Let’s think about this for a second… What regular expression could we use to match any Unicode symbol? Any ideas? As demonstrated, <code>.</code> is not sufficient, because <a href="http://ecma-international.org/ecma-262/5.1/#sec-15.10.2.8">it doesn’t match line breaks</a> or whole astral symbols.</p>
+    <pre><code>&gt;&gt; /^.$/.test('💩')<br />false</code></pre>
+    <p>To match line breaks correctly, we could use <code>[\s\S]</code> instead, but that still won’t match whole astral symbols.</p>
+    <pre><code>&gt;&gt; /^[\s\S]$/.test('💩')<br />false</code></pre>
+    <p>As it turns out, the <strong>regular expression to match any Unicode code point</strong> is not very straight-forward at all:</p>
+    <pre><code>&gt;&gt; /^[\0-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF]$/.test('💩') // wtf<br />true</code></pre>
+    <p>Of course, you wouldn’t want to write these regular expressions by hand, let alone debug them. To generate the previous regex, I’ve used <a href="http://mths.be/regenerate"><em>Regenerate</em></a>, a library to easily create regular expressions based on a list of code points or symbols:</p>
+    <pre><code>&gt;&gt; regenerate.fromCodePointRange(0x0, 0x10FFFF)<br />'[\0-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF]'</code></pre>
+    <p>From left to right, this regex matches BMP symbols, or surrogate pairs (astral symbols), or lone surrogates.</p>
+    <p>While lone surrogates are technically allowed in JavaScript strings, they don’t map to any symbols by themselves, and should be avoided. The term <a href="http://www.unicode.org/glossary/#unicode_scalar_value"><em>Unicode scalar values</em></a> refers to all code points except for surrogate code points. Here’s a regular expression is created that matches any Unicode scalar value:</p>
+    <pre><code>&gt;&gt; regenerate()<br />.addRange(0x0, 0x10FFFF)     // all Unicode code points<br />.removeRange(0xD800, 0xDBFF) // minus high surrogates<br />.removeRange(0xDC00, 0xDFFF) // minus low surrogates<br />.toRegExp()<br />/[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/</code></pre>
+    <p><a href="http://mths.be/regenerate">Regenerate</a> is meant to be used as part of a build script, to create complex regular expressions while still keeping the script that generates them very readable and easily to maintain.</p>
+    <p>ECMAScript 6 <a href="http://norbertlindenberg.com/2012/05/ecmascript-supplementary-characters/#RegExp">will hopefully introduce</a> a <code>u</code> flag for regular expressions that causes the <code>.</code> operator to match whole code points instead of surrogate halves.</p>
+    <pre><code>&gt;&gt; /foo.bar/.test('foo💩bar')<br />false<p>&gt;&gt; /foo.bar/u.test('foo💩bar')<br />true</p></code></pre>
+    <p>When the <code>u</code> flag is set, <code>.</code> is equivalent to the following backwards-compatible regular expression pattern:</p>
+    <pre><code>&gt;&gt; regenerate()<br />.addRange(0x0, 0x10FFFF) // all Unicode code points<br />.remove(  // minus `LineTerminator`s (http://ecma-international.org/ecma-262/5.1/#sec-7.3):<br />0x000A, // Line Feed &lt;LF&gt;<br />0x000D, // Carriage Return &lt;CR&gt;<br />0x2028, // Line Separator &lt;LS&gt;<br />0x2029  // Paragraph Separator &lt;PS&gt;<br />)<br />.toString();<br />'[\0-\x09\x0B\x0C\x0E-\u2027\u202A-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF]'<p>&gt;&gt; /foo(?:[\0-\x09\x0B\x0C\x0E-\u2027\u202A-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF])bar/u.test('foo💩bar')<br />true</p></code></pre>
+    <h3 id="astral-ranges">Astral ranges in character classes</h3>
+    <p>Considering that <code>/[a-c]/</code> matches any symbol from <a href="http://codepoints.net/U+0061">U+0061 LATIN SMALL LETTER A</a> to <a href="http://codepoints.net/U+0063">U+0063 LATIN SMALL LETTER C</a>, it might seem like <code>/[💩-💫]/</code> would match any symbol from <a href="http://codepoints.net/U+1F4A9">U+1F4A9 PILE OF POO</a> to <a href="http://codepoints.net/U+1F4AB">U+1F4AB DIZZY SYMBOL</a>. This is however not the case:</p>
+    <pre><code>&gt;&gt; /[💩-💫]/<br />SyntaxError: Invalid regular expression: Range out of order in character class</code></pre>
+    <p>The reason this happens is because that regular expression is equivalent to:</p>
+    <pre><code>&gt;&gt; /[\uD83D\uDCA9-\uD83D\uDCAB]/<br />SyntaxError: Invalid regular expression: Range out of order in character class</code></pre>
+    <p>Instead of matching U+1F4A9, U+1F4AA, and U+1F4AB like we wanted to, instead the regex matches:</p>
+    <ul>
+     <li>U+D83D (a high surrogate), or…</li>
+     <li>the range from U+DCA9 to U+D83D (which is invalid, because the starting code point is greater than the code point marking the end of the range), or…</li>
+     <li>U+DCAB (a low surrogate).</li>
+    </ul>
+    <p>ECMAScript 6 allows you to opt in to the more sensical behavior by — once again — using the magical <code>/u</code> flag.</p>
+    <pre><code>&gt;&gt; /[\uD83D\uDCA9-\uD83D\uDCAB]/u.test('\uD83D\uDCA9') // match U+1F4A9<br />true<p>&gt;&gt; /[\u{1F4A9}-\u{1F4AB}]/u.test('\u{1F4A9}') // match U+1F4A9<br />true</p><p>&gt;&gt; /[💩-💫]/u.test('💩') // match U+1F4A9<br />true</p><p>&gt;&gt; /[\uD83D\uDCA9-\uD83D\uDCAB]/u.test('\uD83D\uDCAA') // match U+1F4AA<br />true</p><p>&gt;&gt; /[\u{1F4A9}-\u{1F4AB}]/u.test('\u{1F4AA}') // match U+1F4AA<br />true</p><p>&gt;&gt; /[💩-💫]/u.test('💪') // match U+1F4AA<br />true</p><p>&gt;&gt; /[\uD83D\uDCA9-\uD83D\uDCAB]/u.test('\uD83D\uDCAB') // match U+1F4AB<br />true</p><p>&gt;&gt; /[\u{1F4A9}-\u{1F4AB}]/u.test('\u{1F4AB}') // match U+1F4AB<br />true</p><p>&gt;&gt; /[💩-💫]/u.test('💫') // match U+1F4AB<br />true</p></code></pre>
+    <p>Sadly, this solution isn’t backwards compatible with ECMAScript 5 and older environments. If that is a concern, you should use <a href="http://mths.be/regenerate"><em>Regenerate</em></a> to generate ES5-compatible regular expressions that deal with astral ranges, or astral symbols in general:</p>
+    <pre><code>&gt;&gt; regenerate.fromSymbolRange('💩', '💫')<br />'\uD83D[\uDCA9-\uDCAB]'<p>&gt;&gt; /^\uD83D[\uDCA9-\uDCAB]$/.test('💩') // match U+1F4A9<br />true</p><p>&gt;&gt; /^\uD83D[\uDCA9-\uDCAB]$/.test('💪') // match U+1F4AA<br />true</p><p>&gt;&gt; /^\uD83D[\uDCA9-\uDCAB]$/.test('💫') // match U+1F4AB<br />true</p></code></pre>
+    <h2 id="bugs">Real-world bugs and how to avoid them</h2>
+    <p>This behavior leads to many issues. Twitter, for example, allows 140 characters per tweet, and their back-end doesn’t mind what kind of symbol it is — astral or not. But because the JavaScript counter on their website at some point simply read out the string’s <code>length</code> without accounting for surrogate pairs, it wasn’t possible to enter more than 70 astral symbols. (The bug has since been fixed.)</p>
+    <p>Many JavaScript libraries that deal with strings fail to account for astral symbols properly.</p>
+    <p>For example, when <em>Countable.js</em> was released, <a href="https://github.com/RadLikeWhoa/Countable/issues/9">it didn’t count astral symbols correctly</a>.</p>
+    <p><em>Underscore.string</em> has an implementation of <code>reverse</code> that <a href="https://github.com/epeli/underscore.string/issues/220">doesn’t handle combining marks or astral symbols</a>. (Use <a href="http://mths.be/esrever">Missy Elliot’s algorithm</a> instead.)</p>
+    <p>It also <a href="https://github.com/epeli/underscore.string/issues/218">incorrectly decodes HTML numeric entities for astral symbols</a>, such as <code>&amp;#x1F4A9;</code>. Lots of other HTML entity conversion <a href="https://github.com/pierreliefauche/htmlentities.js/issues/4">libraries</a> <a href="https://github.com/vokidas/html-pe/issues/1">have</a> <a href="https://github.com/substack/node-ent/pull/7">similar</a> <a href="https://github.com/fb55/node-entities/issues/11">problems</a>. (Until these bugs are fixed, consider using <a href="http://mths.be/he"><em>he</em></a> instead for all your HTML-encoding/decoding needs.)</p>
+    <p>These are all easy mistakes to make — after all, the way JavaScript handles Unicode is just plain annoying. This write-up already demonstrated how these bugs can be fixed; but how can we prevent them?</p>
+    <h2 id="poo-test">Introducing… The Pile of Poo Test™</h2>
+    <p>Whenever you’re working on a piece of JavaScript code that deals with strings or regular expressions in some way, <strong>just add a unit test that contains a pile of poo (<code>💩</code>) in a string</strong>, and see if anything breaks. It’s a quick, fun, and easy way to see if your code supports astral symbols. Once you’ve found a Unicode-related bug in your code, all you need to do is apply the techniques discussed in this post to fix it.</p>
+    <p>A good test string for Unicode support in general is the following: <code>Iñtërnâtiônàlizætiøn☃💩</code>. Its first 20 symbols are in the range from U+0000 to U+00FF, then there’s a symbol in the range from U+0100 to U+FFFF, and finally there’s an astral symbol (from the range of U+010000 to U+10FFFF).</p>
+    <p>TL;DR Go forth and submit pull requests with piles of poo in them. It’s the only way to <em>Unicode the Web Forward®</em>.</p>
+    <p><strong>Disclaimer:</strong> This post is based on the latest ES6 draft and the various strawmans and proposals to further improve Unicode support in JavaScript. Some of these new features may not make it to the final ES6 specification.</p>
+    <h2 id="slides">Slides</h2>
+    <p>This write-up summarizes the various presentations I’ve given on the subject of Unicode in JavaScript over the past few years. The slides I used for those talks are embedded below.</p>
+    
+    <p>Want me to give this presentation at your meetup/conference? <a href="/contact">Let’s talk.</a></p>
+    <h2 id="translations">Translations</h2>
+    
+    <footer id="about">
+     <img src="//gravatar.com/avatar/24e08a9ea84deb17ae121074d0f17125?s=105" alt="" width="105" height="105" srcset="//gravatar.com/avatar/24e08a9ea84deb17ae121074d0f17125?s=210 2x" />
+     <h2>About me</h2>
+     <p>My name’s Mathias Bynens, and I’m a freelance web developer from Belgium. I collaborate on open-source projects such as <a href="//jsperf.com/">jsPerf</a> and <a href="//html5boilerplate.com/">HTML5 Boilerplate</a>. If that sounds like fun to you, you should <a href="https://twitter.com/mathias" rel="me nofollow">follow me on Twitter</a> and <a href="https://github.com/mathiasbynens" rel="me nofollow">GitHub</a>.</p>
+    </footer>
+    
+    <section>
+     
+     <form method="post" action="/notes/javascript-unicode">
+      <fieldset>
+       <legend>Comment on “JavaScript has a Unicode problem”</legend>
+       <p>
+        <label for="comment-name">Name <em>*</em></label>
+        
+       </p>
+       <p>
+        <label for="comment-mail">Email <em>*</em></label>
+        
+       </p>
+       <p>
+        <label for="comment-site">Website</label>
+        
+       </p>
+       
+       <details>
+        <summary>Some Markdown is allowed; HTML isn’t. Keyboard shortcuts are available.</summary>
+        <div><p>It’s possible to add emphasis to text:</p><pre><mark>_Emphasize_</mark> some terms. Perhaps you’d rather use <mark>**strong emphasis**</mark> instead?</pre><p>Select some text and press <kbd>⌘</kbd> + <kbd>I</kbd> on Mac or <kbd>Ctrl</kbd> + <kbd>I</kbd> on Windows to make it italic. For bold text, use <kbd>⌘</kbd> + <kbd>B</kbd> or <kbd>Ctrl</kbd> + <kbd>B</kbd>.</p><p>To create links:</p><pre>Here’s an inline link to <mark>[Google](http://www.google.com/)</mark>.</pre><p>If the link itself is not descriptive enough to tell users where they’re going, you might want to create a link with a <code>title</code> attribute, which will show up on hover:</p><pre>Here’s a <mark>[poorly-named link](http://www.google.com/ "Google")</mark>.</pre><p>Use backticks (<code>`</code>) to create an inline <code>&lt;code&gt;</code> span:</p><pre>In HTML, the <mark>`p`</mark> element represents a paragraph.</pre><p>Select some inline text and press <kbd>⌘</kbd> + <kbd>K</kbd> on Mac or <kbd>Ctrl</kbd> + <kbd>K</kbd> on Windows to make it a <code>&lt;code&gt;</code> span.</p><p>Indent four spaces to create an escaped <code>&lt;pre&gt;&lt;code&gt;</code> block:</p><pre><code><mark>    </mark>printf("goodbye world!"); /* his suicide note<br /><mark>    </mark>                             was in C */</code></pre><p>Alternatively, you could use triple backtick syntax:</p><pre><code><mark>```</mark><br />printf("goodbye world!"); /* his suicide note<br />was in C */<br /><mark>```</mark></code></pre><p>Select a block of text (more than one line) and press <kbd>⌘</kbd> + <kbd>K</kbd> on Mac or <kbd>Ctrl</kbd> + <kbd>K</kbd> on Windows to make it a preformatted <code>&lt;code&gt;</code> block.</p><p>Quoting text can be done as follows:</p><pre><mark>&gt; </mark>Lorem iPad dolor sit amet, consectetur Apple adipisicing elit,<br /><mark>&gt; </mark>sed do eiusmod incididunt ut labore et dolore magna aliqua Shenzhen.<br /><mark>&gt; </mark>Ut enim ad minim veniam, quis nostrud no multi-tasking ullamco laboris<br /><mark>&gt; </mark>nisi ut aliquip iPad ex ea commodo consequat.</pre><p>Select a block of text and press <kbd>⌘</kbd> + <kbd>E</kbd> on Mac or <kbd>Ctrl</kbd> + <kbd>E</kbd> on Windows to make it a <code>&lt;blockquote&gt;</code>.</p></div>
+       </details>
+       <p>
+        <label for="comment-spam">Spammer? (Enter ‘no’) <em>*</em></label>
+        
+       </p>
+       
+      </fieldset>
+     </form>
+    </section>
+   </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
