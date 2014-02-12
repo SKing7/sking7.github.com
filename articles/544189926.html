@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>javascript - How does Facebook disable Developer Tools?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>javascript - How does Facebook disable Developer Tools?</h1>
+<div><p>I'm a security engineer at Facebook and this is my fault. We're
+testing this for some users to see if it can slow down some attacks where users are tricked into pasting (malicious) javascript into the browser console.</p><p>Just to be clear: trying to block hackers client-side is a <a href="http://stackoverflow.com/questions/7559409/disable-developer-tools">bad idea</a> in general;
+this is to protect against a <a href="https://www.facebook.com/photo.php?v=956977232793">specific social engineering attack</a>.</p><p>If you ended up in the test group and are annoyed by this, sorry. I tried to
+make <a href="https://www.facebook.com/selfxss">the opt-out page</a> as simple as
+possible while still being scary enough to stop at least <em>some</em> of the
+victims.</p><p>The actual code is pretty similar to @joeldixon66's link; ours is a
+little more complicated for no good reason.</p><p>Chrome wraps all console code in</p><pre><code>with ((console &amp;&amp; console._commandLineAPI) || {}) {
+  &lt;code goes here&gt;
+}
+</code></pre><p>... so the site redefines <code>console._commandLineAPI</code> to throw:</p><pre><code>Object.defineProperty(console, '_commandLineAPI',
+   { get : function() { throw 'Nooo!' } })
+</code></pre><p>This is <a href="http://escape.alf.nu/20">not quite enough (try it!)</a>, but that's the
+main trick.</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
