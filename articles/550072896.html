@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Tricks for GPU Composited CSS</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Tricks for GPU Composited CSS</h1>
+<div>
+							<p><a href="http://ariya.ofilabs.com/wp-content/uploads/2014/02/ops.png"><img src="http://ariya.ofilabs.com/wp-content/uploads/2014/02/ops.png" alt="ops" /></a><br />The use of <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">graphics processing unit</a> (GPU) in modern browsers, particularly for page rendering, means that there is no more excuse for laggy animation. In some cases, when the intended animation is not necessarily GPU friendly, some tricks need to be employed so that the graphics operations do not cause a potential performance problem.</p>
+<p>The fundamental principles of exploiting GPU for popular CSS features have been described in my previous blog post on <a href="http://ariya.ofilabs.com/2013/06/optimizing-css3-for-gpu-compositing.html" title="Optimizing CSS3 for GPU Compositing">Optimizing CSS3 for GPU Compositing</a>. The key here is the compositing process where the browser uploads portions of the page as GPU textures and subsequent animation frames involve only a small set of operations on those textures. The current modern browser rendering engines allow a few different operations to delegated to its GPU-compositor: <strong>opacity</strong>, <strong>transformation</strong>, and <strong>filter</strong>.</p>
+<p>Still, for a buttery smooth 60 fps interface, web developers need to ensure that certain rendering operations are GPU friendly. As mentioned in my previous <a href="http://ariya.ofilabs.com/2013/06/optimizing-css3-for-gpu-compositing.html" title="Optimizing CSS3 for GPU Compositing">blog post</a>, an easy way to verify that is by using Safari’s <em>Show Compositing Border</em> feature. The number on the top left corner for each rectangle represents more or less every content update operation which necessites a texture upload to the GPU. <strong>Efficient compositing</strong> is indicated by having that number unchanged during the course of the animation.</p>
+<p>What about animations that are not easily handled by the compositor? Let’s take a look at the following example (also check the live demo at <a href="http://codepen.io/ariya/full/xuwgy">codepen.io/ariya/full/xuwgy</a>):</p>
+
+<div><table><tr><td><pre><span>@keyframes box {</span>
+    <span>0%</span> <span>{</span> <span>background-color</span><span>:</span> <span>green</span><span>;</span> <span>}</span>
+    <span>100%</span> <span>{</span> <span>background-color</span><span>:</span> <span>blue</span><span>;</span> <span>}</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p><a href="http://ariya.ofilabs.com/wp-content/uploads/2013/06/uploads.png"><img src="http://ariya.ofilabs.com/wp-content/uploads/2013/06/uploads.png" alt="uploads" width="254" /></a><br />For clarity, the box is also moving horizontally back and forth. When it is on the left, the color is green and as it moves to the right, the color also changes to blue. Safari (with its compositing border indicator enabled) reveals that there is a continuous rendering of the box onto a GPU texture. With more boxes, while viewing it on a mobile device, the animation will cause frame-dropping or even an application crash.</p>
+<p>To overcome this issue, we need to find a trick where a continous texture update is avoided. In the simple color transition example above, we are lucky since we can opt to use CSS filter instead. However, if assume we can’t or won’t be using it, what would be a more generalized approach? Apparently, for such an animation with a short duration and thus the accuracy is not a big concern, we can always approximate it by <strong>superimposing two states</strong>, each represents the <em>initial</em> and the <em>final</em> state, and <strong>tween the opacity</strong> accordingly. To get the feeling of it, check out the demo at <a href="http://codepen.io/ariya/full/ofDIh">codepen.io/ariya/full/ofDIh</a>.</p>
+<p>In this arrangement, the user has the illusion that the box changes color. What actually happens is that the green box starts to disappear when the blue one slowly appears. Since changing the opacity is a very cheap operation for the GPU, the animation will be smooth. The following diagram shows the magic behind the scene. Viewed from a user facing north west, it is <em>as if</em> there is only one opaque box with a gradual color transition.</p>
+<p><img src="http://ariya.ofilabs.com/wp-content/uploads/2013/10/layers.png" alt="layers" width="550" /></p>
+<p>This technique can be applied to other properties as well. For example, take a look at this <strong>glowing effect</strong>: <a href="http://codepen.io/ariya/full/nFADe">codepen.io/ariya/full/nFADe</a>. While glowing can be achieved by varying the blur radius of the shadow, tweening between the glowing version and non-glowing version is our kind of cheat with this trick. Less accurate, more shortcut.</p>
+<p>As with any other types of workaround, the opacity tweening trick has some drawbacks. Most important is that it requires more memory since we trade it for a fast animation frame. Thus, be judious in employing the trick since you can’t blindly consume all the available GPU textures for user interface animations.</p>
+<p>Last but not least, if you prefer to watch a video on this subject, take a look my past presentation on <em>Fluid User Interface with Hardware Acceleration</em> (<a href="http://www.youtube.com/watch?v=gTHAn-nkQnI">28-min video</a>, <a href="https://speakerdeck.com/ariya/fluid-user-interface-with-hardware-acceleration">slide deck</a>).</p>
+							
+												
+						</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
