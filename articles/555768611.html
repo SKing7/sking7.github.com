@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSS Shake</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>CSS Shake</h1>
+<div><section>
+			
+			
+			<h4>Some CSS classes to <span>move your DOM!</span></h4>
+			<a></a>
+		</section><section>
+			
+			<h4>The basic collection</h4>
+			<ul>
+				<li>
+					<i>
+						Bs
+						<span></span>
+					</i>
+					<p>Basic Shake</p>
+				</li>
+				<li>
+					<i>
+						Ss
+						<span></span>
+					</i>
+					<p>Slow Shake</p>
+				</li>
+				<li>
+					<i>
+						Ls
+						<span></span>
+					</i>
+					<p>Little Shake</p>
+				</li>
+				<li>
+					<i>
+						Hs
+						<span></span>
+					</i>
+					<p>Hard Shake</p>
+				</li>
+				<li>
+					<i>
+						⇄
+						<span></span>
+					</i>
+					<p>Fixed Horizontal</p>
+				</li>
+				<li>
+					<i>
+						⇵
+						<span></span>
+					</i>
+					<p>Fixed Vertical</p>
+				</li>
+				<li>
+					<i>
+						↻
+						<span></span>
+					</i>
+					<p>Fixed Rotation</p>
+				</li>
+				<li>
+					<i>
+						Os
+						<span></span>
+					</i>
+					<p>Opacity Shake</p>
+				</li>
+				<li>
+					<i>
+						✌
+						<span></span>
+					</i>
+					<p>Crazy Shake</p>
+				</li>
+				<li>
+					<i>
+						ℇ
+						<span></span>
+					</i>
+					<p>Constant Shake</p>
+				</li>
+			</ul>
+			<a></a>
+		</section><section>
+			
+			<h4>Some things you could add...</h4>
+			<ul>
+				<li>
+					<i id="pr1">
+						❄
+						<span></span>
+					</i>
+					<p>Freezed after Shake</p>
+				</li>
+				<li>
+					<i id="pr2">
+						⾉
+						<span></span>
+					</i>
+					<p>Constant :hover stops</p>
+				</li>
+			</ul>
+			<p>
+				<select id="shake-type">
+				    <option value="" disabled="" selected="">Select a shake</option>
+				    <option value="shake-hard">Hard Shake</option>
+				    <option value="shake-slow">Slow Shake</option>
+				    <option value="shake-little">Little Shake</option>
+				    <option value="shake-horizontal">Horizopntal Shake</option>
+				    <option value="shake-vertical">Vertical Shake</option>
+				    <option value="shake-rotate">Rotate Shake</option>
+				    <option value="shake-opacity">Opacity Shake</option>
+				    <option value="shake-crazy">Crazy Shake</option>
+				</select>
+			</p>
+			<a></a>
+		</section><section>
+			
+			<h4>Realleasy, hover to test...</h4>
+			<div class=""><link type="text/css" href="css/csshake.css" /><pre><code>&lt;link type="text/css" href="csshake.css"&gt;</code></pre><pre><code>&lt;div class="shake"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-hard"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-slow"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-little"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-horizontal"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-vertical"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-rotate"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-opacity"&gt;&lt;/div&gt;</code></pre><pre><code>&lt;div class="shake shake-crazy"&gt;&lt;/div&gt;</code></pre></div>
+			<a></a>
+		</section><section>
+			
+			<h4>The Sass @mixins, and so on...</h4>
+			<pre>
+	<code>@include shake($x, $y, $rot, $name, $steps, $opacity); /* _mixins.scss */ 
+	/* 	$x &amp; $y: pixels to move on the X and Y axis,
+		$rot: deg to rotate
+		$name: the name assigned to those parameters
+		$steps: adjust the animation loop (i.e 10 makes an animation in steps of 10%)
+		$opacity: true/false to add opacity animation */
+	@include shake(40px, 40px, 20deg, 'shake-crazy', 10, true); /* an example */
+
+	@include animation($name, $dur, $iter, $tim, $del); /* _shake.scss */
+	/*  $name: animation-name,
+		$dur: animation-duration,
+		$iter: animation-iteration-count,
+		$tim: animation-timing-function,
+		$del: animation-delay */
+	@include animation(shake-slow, 5s); /* an example */
+</code></pre>
+			<p>Attention: you have to use the random() function to compile Sass files. <br />You could read how to implement it <a href="https://github.com/nex3/sass/pull/968">here</a> or <a href="http://blog.codepen.io/2013/09/17/adding-random-function-sass/">here</a> or <a href="http://hugogiraudel.com/2013/10/17/sass-random/">here</a> mucho more information.<br />Remember that there isn't prefixes on the main code. Hoping that one day we won't need it.</p>
+			<a href="css/csshake.min.css">Download</a>
+			<small>csshake.mis.css</small>
+			<a></a>
+		</section><section>
+			
+			<h4>The about, the idea, and the desire to hear you to improve the whole code...</h4>
+			<p>I had to do a shake-animation for a big project. I did it in vanilla CSS at the begining.<br />After finish it I discover <a href="http://jackrugile.com/jrumble/">this</a> cool jQuery plugin by <a href="https://twitter.com/jackrugile">@jackrugile</a><br />Then I started to think in made <span>this little CSS project</span>.</p>
+			<a href="css/csshake.min.css">Download</a>
+			<small>csshake.mis.css</small>
+			<a href="http://github.com/elrumordelaluz">Fork me on Github</a>
+			<footer>Made with ♥ by <a href="http://twitter.com/elrumordelaluz">@elrumordelaluz</a>, using <a href="http://sass-lang.com/">Sass</a>.<br />In this site I used <a href="http://leaverou.github.io/prefixfree/">prefixfree</a> and <a href="http://prismjs.com/">Prism.js</a> both by <a href="http://twitter.com/LeaVerou">Lea Verou</a> and <a href="https://github.com/peachananr/onepage-scroll">One page scroll</a> plugin by <a href="https://twitter.com/peachananr">@peachananr</a> </footer>
+		</section></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
