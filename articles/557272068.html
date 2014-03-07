@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Architecture for a Sass Project</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Architecture for a Sass Project</h1>
+<div>
+
+          <p>Remember when we used to do everything with nothing more than plain old CSS? All we had was a single CSS file, longer than a sleepless night. Yay! Thousands and thousands of lines — usually poorly written — of CSS where we were struggling to find the one value we had to change to fix some obscure and frustrating IE bug.</p>
+<p>Well those days are behind us, folks. Dealing with CSS has become more interesting and more complicated. Probably the latter because of the former. And now that we have CSS preprocessors, responsive web design, progressive enhancement, graceful degradation, and all the other things cool kids talk about, CSS has become more powerful than ever.</p>
+<blockquote>
+<p>“CSS has become more interesting and complicated.”<br />— Me.</p>
+</blockquote>
+<p>So because we have a lot to deal with, it is important that we stay organized. And we can probably all agree that it isn’t always easy to be. So I thought in this post I could help you to understand how you should <em>think</em> (rather than how you should do; I’ll leave that up to you).</p>
+<h2 id="drawing-your-architecture">Drawing Your Architecture</h2>
+<p>One of the main benefits of using a CSS preprocessor is having the ability to split your code into several files without impacting performance. Thanks to Sass’s <code>@import</code> directive you can have as many files as you want in your developement environment and this will compile to a single file in production.</p>
+<blockquote>
+<p>“Multiple files in dev, a single file in prod.”<br />— Bruce Lee</p>
+</blockquote>
+<p>Being organized starts with correctly splitting your CSS across several files and folders. As one of my teachers used to say <em>“everything has its right place, every place has its right thing”</em>. Well here is how I like to do it!</p>
+<h3 id="folders-are-cool-use-them">Folders are cool, use them</h3>
+<p>Folders are essential. At home, you don’t drop every sheet of paper into the same box. You probably have folders. One for the house/flat, one for the bank, one for bills, and so on.</p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2014/02/1393307247whatif-meme-folder.jpg" alt="What if I told you, you don't have to put all your Sass files in the same folder?" title="" /></p>
+<p>When planning your CSS architecture, it is the exact same thing: you don’t just drop every Sass file into the same folder, you categorize them.</p>
+<p>Here’s how we might organize our files:</p>
+<pre>
+sass/ 
+| 
+|– base/ 
+|   |– _reset.scss       # Reset/normalize 
+|   |– _typography.scss  # Typography rules 
+|   ...                  # Etc… 
+| 
+|– components/ 
+|   |– _buttons.scss     # Buttons 
+|   |– _carousel.scss    # Carousel 
+|   |– _cover.scss       # Cover 
+|   |– _dropdown.scss    # Dropdown 
+|   |– _navigation.scss  # Navigation 
+|   ...                  # Etc… 
+| 
+|– helpers/ 
+|   |– _variables.scss   # Sass Variables 
+|   |– _functions.scss   # Sass Functions 
+|   |– _mixins.scss      # Sass Mixins 
+|   |– _helpers.scss     # Class &amp; placeholders helpers 
+|   ...                  # Etc… 
+| 
+|– layout/ 
+|   |– _grid.scss        # Grid system 
+|   |– _header.scss      # Header 
+|   |– _footer.scss      # Footer 
+|   |– _sidebar.scss     # Sidebar 
+|   |– _forms.scss       # Forms 
+|   ...                  # Etc… 
+| 
+|– pages/ 
+|   |– _home.scss        # Home specific styles 
+|   |– _contact.scss     # Contact specific styles 
+|   ...                  # Etc… 
+| 
+|– themes/ 
+|   |– _theme.scss       # Default theme 
+|   |– _admin.scss       # Admin theme 
+|   ...                  # Etc… 
+| 
+|– vendors/ 
+|   |– _bootstrap.scss   # Bootstrap 
+|   |– _jquery-ui.scss   # jQuery UI 
+|   ...                  # Etc… 
+| 
+| 
+`– main.scss             # primary Sass file 
+</pre>
+<p>As you can see, there is only one Sass file at the root level: <code>main.scss</code>. All the other files are divided into appropriate folders and prefixed with an underscore (<code>_</code>) to tell Sass they are <a href="http://sass-lang.com/documentation/file.SASS_REFERENCE.html#partials">partial .scss files</a> that shouldn’t be compiled to <code>.css</code> files. Indeed, it is the <a href="https://gist.github.com/HugoGiraudel/8615243">base file</a>’s role to import and merge all of those.</p>
+<blockquote>
+<p>“One file to rule them all,<br />One file to find them,<br />One file to bring them all,<br />And in the Sass way merge them.”<br />— J.R.R. Tolkien</p>
+</blockquote>
+<p>Let’s now look at each of the folders in our architecture.</p>
+<h3 id="base">Base</h3>
+<p>The <code>base/</code> folder holds what we might call the boilerplate stuff for your project. In there, you might find the reset (or Normalize.css, or whatever), probably some stuff dealing with typography, and, depending on the project, maybe some other files.</p>
+<ul>
+<li><code>_reset.scss</code> or <code>_normalize.scss</code></li>
+<li><code>_typography.scss</code></li>
+</ul>
+<h3 id="helpers">Helpers</h3>
+<p>The <code>helpers/</code> folder (sometimes called <code>utils/</code>) gathers all Sass tools and helpers we’ll use across the project. Got a function? A mixin? Put it in there. This folder also contains a <code>_variables.scss</code> file (sometimes <code>_config.scss</code>) which holds all global variables for the project (for typography, color schemes, and so on).</p>
+<ul>
+<li><code>_variables.scss</code></li>
+<li><code>_mixins.scss</code></li>
+<li><code>_functions.scss</code></li>
+<li><code>_placeholders.scss</code> (frequently named <code>_helpers.scss</code>)</li>
+</ul>
+<h3 id="layout">Layout</h3>
+<p>The <code>layout/</code> directory (sometimes called <code>partials/</code>) usually contains a number of files, each of them setting some styles for the main sections of the layout (header, footer, and so on). It also contains the <code>_grid</code> file which is the grid system used to build the layout.</p>
+<ul>
+<li><code>_grid.scss</code></li>
+<li><code>_header.scss</code></li>
+<li><code>_footer.scss</code></li>
+<li><code>_sidebar.scss</code></li>
+<li><code>_forms.scss</code></li>
+</ul>
+<p>Having the navigation file (<code>_navigation.scss</code>) in this folder could make sense although I use to put it in <code>components/</code> (see next section). I think it would be better in the <code>/layout</code> folder but I’ll let you decide.</p>
+<h3 id="components">Components</h3>
+<p>For smaller components, there is the <code>components/</code> folder (frequently called <code>modules/</code>). While <code>layout/</code> is kind of <em>macro</em> (defining the global wireframe), <code>components/</code> is more <em>micro</em>. It can contain all kinds of specific modules like a slider, a loader, a widget, or anything along those lines. There are usually a lot of files in <code>components/</code> since your site <del>is</del> should be mostly composed of tiny modules.</p>
+<ul>
+<li><code>_media.scss</code></li>
+<li><code>_carousel.scss</code></li>
+<li><code>_thumbnails.scss</code></li>
+</ul>
+<h3 id="pages">Pages</h3>
+<p>If you have page-specific styles, I think it’s cool to put them in a <code>pages/</code> folder and in a file named after the page. For example, it’s not uncommon to have very specific styles for the home page, so you’d have a <code>_home.scss</code> file in <code>pages/</code> dealing with this.</p>
+
+<p>Depending on your deployment process, those files could be called on their own to avoid merging them with the others in the resulting stylesheet. It is really up to you. Where I work, we decided to make them not-partials in order to include them only on pages requiring them. For example, our home page has a very specific layout, compiling to about 200 lines of CSS. To prevent those rules from being loaded on every page, we include this file only on the home page.</p>
+<h3 id="themes">Themes</h3>
+<p>If you are working on a large site with multiple themes like I do, having a <code>themes/</code> folder can make sense. You can stuff all your theme/design related styles in there. This is definitely project-specific so be sure to include it only if you feel the need.</p>
+
+<h3 id="vendors">Vendors</h3>
+<p>And last but not least, you will probably have a <code>vendors/</code> folder containing all the CSS files from external libraries and frameworks – Bootstrap, jQueryUI, FancyCarouselSliderjQueryPowered, and so on. Putting those aside in the same folder is a good way to tell “Hey, this is not from me, not my code, not my responsibility”.</p>
+<p>Example:</p>
+<ul>
+<li><code>bootstrap.scss</code></li>
+<li><code>jquery-ui.scss</code></li>
+<li><code>select2.scss</code></li>
+</ul>
+<p>On a side note, where I work we also have a <code>vendors-extensions/</code> folder where we store files overriding some tiny bits from vendors. For example, we have a <code>_bootstrap.scss</code> file in there that we can use to change some components in Bootstrap. This is to avoid editing the vendor files themselves, which is generally not a good idea.</p>
+<hr />
+<p>That’s pretty much it. This architecture is likely to vary according to the project but I’m sure you get the concept. On nesting folders in folders, I wouldn’t always advise against it but I don’t prefer that. I’ve found that in most cases, a single level of architecture is more than enough to keep things clean and organized without adding too much complexity. But if you think your project deserves a deeper structure, feel free to do so.</p>
+<p><em>Pro tip: if you feel like your architecture isn’t obvious to anyone opening up the <code>scss</code> folder, you might consider adding a <code>README.md</code> file at the root level (side by side with <code>main.scss</code>) explaining everything.</em></p>
+<h3 id="files-are-cool-too">Files are cool too!</h3>
+<p>A question I get asked frequently is <em>“how many files is too many files?”</em> and to that I’d reply: There are never too many files. Splitting your work across several files aims at helping you organizing your code. If you feel like something deserves to be divided into many files, feel free to go nuts! As Chris Coyier says in his <a href="http://css-tricks.com/sass-style-guide/" rel="nofollow">Sass Style Guide</a>:</p>
+<blockquote>
+<p>“Break into as many small files as makes sense.”<br />— Chris Coyier</p>
+</blockquote>
+<p>Yet I’d advise against exploding a single component into several files unless you have very good reason to do so. Usually I tend to have one module per file — not more, not less — with a clean name like the name of the module it stands for. This way I can do a quick “go to” in Sublime text when I’m looking for something.</p>
+<h2 id="in-summary">In Summary</h2>
+<p>All the suggestions in this article are based on my personal experience working as the sole front-end developer in the web-based branch of Crédit Agricole, a huge banking group in France. Your own circumstances and experiences might warrant a different approach.</p>
+<p>If we could pick a Golden Rule for architecting a Sass project, it might be something as simple as: Pick something that makes sense. If you are working as a team on the front-end, make sure everyone feels comfortable with the chosen structure, else release documentation somewhere so that everybody can understand what’s going on.</p>
+<p>Do you have any thoughts or suggestions on Sass architecture? We’d love to hear your comments.</p>
+<blockquote>
+<p>“With great power comes great responsibility.”<br />—  Aquaman</p>
+</blockquote>
+
+            <div><div><figure>
+          <img alt="" src="http://1.gravatar.com/avatar/729edf889ced7863dedba95452272bca?s=96&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96&amp;r=G" height="96" width="96" />        </figure></div></div>
+  
+      </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
