@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The Diffen Blog • How a Progress bar for AJAX requests helped increase conversions by 38%</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The Diffen Blog • How a Progress bar for AJAX requests helped increase conversions by 38%</h1>
+<div><p>The NY Times published <a href="http://www.nytimes.com/2014/03/09/magazine/who-made-that-progress-bar.html?ref=technology" target="_blank">an interesting article</a>&nbsp;this week about how progress bars can make it easier for people to wait for computers to respond. This idea is <a href="http://uxmovement.com/buttons/how-to-make-progress-bars-feel-faster-to-users/" target="_blank">not</a> <a href="http://www.sitepoint.com/forums/showthread.php?857765-Make-progress-bars-feel-faster" target="_blank">new</a>; usability experts have long advocated their use. Developers and designers have even tried to have some <a href="http://mashable.com/2013/12/15/work-in-progress-bars/" target="_blank">fun with progress bars</a>.</p><p>When we launched the <em>Get from Wikipedia</em> feature on Diffen, we wanted to make the wait bearable for our users and hold their interest. Our first progress indicator was just a a <a href="http://www.diffen.com/difference/images/loading.gif" target="_blank"><em>loading</em> GIF</a>. Here’s how we replaced it with an actual progress bar and increased conversions by 38%.</p><p>First, for those who don’t know, <a href="http://www.diffen.com" title="Diffen" target="_blank">Diffen</a> is like Wikipedia for comparisons. If you compare two entities on Diffen and there is no information about&nbsp;either of them in our database, the system tries to get the information from Wikipedia infoboxes. Here’s a 20-second demo of how it works:</p><p>The page makes an AJAX request to get information about each entity. The back-end needs some time to respond because different variations and misspellings of the entity name may have to be tried before finding the right Wikipedia page for it. Also, the Wikipedia page must be parsed to tokenize the attribute/value pairs from the infobox. (We can do a separate blog post on how this is done if there is interest.)&nbsp;When both AJAX requests are completed successfully, the attributes are lined up side by side and shown to the user.</p><p><strong>How we implemented the progress bar</strong></p><p>First we benchmarked the time it took for a typical AJAX request for entity information and found that the time varies from 3-8 seconds. So we needed a progress bar that could last as long as 8-10 seconds. That’s a pretty long time, which means we needed lots of status messages.&nbsp;</p><p>The status messages in the progress bar are based on what the server is <em>likely</em> doing, not what the server is <em>actually</em> doing at that time (more on that later). The status messages we use are:</p><pre><code>
+var progressStatuses = [
+    "Searching Wikipedia",
+    "Scanning search results",
+    "Reading the right Wikipedia page",
+    "Scanning the information box",
+    "Preparing the info",
+    "Preparing the info",
+    "Receiving the info",
+    "Almost there"
+];
+</code></pre><p>The server doesn’t really send any progress report to the browser. The progress bar isn’t real; it is only meant to placate the user and tell her the system is working on her request.</p><p><strong>A word about timing</strong></p><p>The easy way to make progress is to increment to the next step at a set interval, say 1 second. But that is more likely to draw suspicion and give away our illusion of authenticity.</p><p>Another approach would be to progress through the initial 3 stages really fast to get the user hooked, and then gradually decelerate the pace of progress.</p><p>Instead we try and use <strong>intermittent variable rewards</strong>, known to be&nbsp;<a href="http://www.nirandfar.com/2012/03/want-to-hook-your-users-drive-them-crazy.html" target="_blank">more pleasurable</a> and <a href="http://www.theguardian.com/lifeandstyle/2011/apr/23/this-column-change-life-random-rewards" target="_blank">addictive</a>. The basic idea is that <a href="http://dilbert.com/blog/entry/random_reinforcement/" target="_blank">random reinforcement is more addictive</a> (because it is more pleasurable) than consistent, predictable reinforcement for the same activity. We spend a random amount of time - between 500 and 1500 milliseconds - at each stage.</p><pre><code>function makeProgress (reset){
+    var div = $("#progressIndicator"),width=0;
+    if(div.length==0)
+        return; //Operation complete. Progress indicator is gone.
+    if(reset)
+        div.width(0);
+    else
+        width = div.width();
+    if(width &lt; 300){
+        width += 45; //make the bar progress
+        div.width(width);
+        $("#progressStatus").html(progressStatuses[(width/45)-1]+'...');
+        var delay = Math.floor(Math.random() * (1500 - 500 + 1)) + 500; //A random number between 500 and 1500
+        setTimeout(makeProgress, delay, false);
+    }
+}<br /></code></pre><p>That’s pretty much all we need for the progress bar. The initialization code is somewhat like this:</p><pre><code>    
+function importFromWikipedia(){
+    setTimeout(makeProgress,100,true); //start the progress bar
+    $.getJSON("/call/to/backend/script/for/entity1",fnOnSuccess);
+    $.getJSON("/call/to/backend/script/for/entity2",fnOnSuccess);
+    function fnOnSuccess(data){ 
+        //Did we get information about both entities or only one? 
+        if(bothReceived){ 
+            showTheComparisonChart(); 
+            $('#progressIndicator').remove(); //helps us break out of the makeProgress() recursion
+        }
+        else {
+            //Mark one entity as complete and wait for the other one         } 
+    }); 
+} 
+</code></pre><p>First, we initialize the progress bar. Then we make the AJAX requests to the backend. When both requests are completed, we remove the progress indicator and show the comparison chart.</p><p>It is not necessary to loop through all 7 available progress status messages and “complete” the progress bar visually. If the user only sees the first 3 before the request completes, she is not going to care. In fact, if she notices it at all, she is likely to be delighted that the operation finished quicker than expected.&nbsp;</p><p>It’s not very pretty, but this progress bar is quite functional. When this progress bar replaced a <a href="http://www.diffen.com/difference/images/loading.gif" target="_blank">loading GIF</a>&nbsp;we saw conversion rate (as measured by the weekly number of new entities imported from Wikipedia and saved to our database) increase 38%.&nbsp;</p><p><em><a href="https://news.ycombinator.com/item?id=7370140" target="_blank">Discuss on Hacker News</a></em></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
