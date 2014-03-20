@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The Definitive Guide to Using Negative Margins</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The Definitive Guide to Using Negative Margins</h1>
+<div>
+                    
+                
+                
+                                    <p>Since the recommendation of CSS2 back in 1998, the use of tables has slowly faded into the background and into the history books. Because of this, CSS layouts have since then been synonymous with coding elegance.</p>
+<p>Out of all the CSS concepts designers have ever used, an award probably needs to be given to the use of <strong>Negative Margins</strong> as being the most <em>least</em> talked about method of positioning. It’s like an online taboo—everyone’s doing it, yet no one wants to talk about it.</p>
+<h3>1. Setting the record straight</h3>
+<p>We all use margins in our CSS, but when it comes to negative margins, our relationship somehow manages to take a turn for the worse. The use of negative margins in web design is so divided that while some of us absolutely love it, there are also those who simply think it’s the work of the devil.</p>
+<p>A negative margin looks like this:</p>
+<pre><code>#content {margin-left:-100px;}</code></pre>
+<p>Negative margins are usually applied in small doses but as you’ll see later on, it’s capable of so much more. A few things to note about negative margins are:</p>
+<ul>
+<li><strong>They are extremely valid CSS</strong><br />I’m not kidding on this one. W3C even says that, “<em>Negative values for margin properties are allowed…</em>” ‘Nuff said. Check out the <a href="http://www.w3.org/TR/CSS2/box.html#margin-properties">article</a> for more details.</li>
+<li><strong>Negative margins are not a hack</strong><br />This is especially true. It’s because of not understanding negative margins properly that it got its <em>hackish</em> image. It only becomes a hack if you use it to fix an error you made elsewhere.</li>
+<li><strong>It goes with the flow</strong><br />It does not break the flow of the page if applied to elements without floats. So if you use a negative margin to nudge an element upwards, all succeeding elements will be nudged as well.</li>
+<li><strong>It is highly compatible</strong><br />Negative margins are wholly supported across all modern browsers (and IE6 in most cases).</li>
+<li><strong>It reacts differently when floats are applied</strong><br />Negative margins are not your everyday CSS so they should be applied with care.</li>
+<li><strong>Dreamweaver doesn’t understand it</strong><br />Negative margins don’t show up in the Design View of DW. Why are you even checking your site in Design View anyway?</li>
+</ul>
+<h3>2. Working with negative margins</h3>
+<p>Negative margins are very powerful when used correctly. There are 2 types of scenarios where negative margins take center stage.</p>
+<h4>Negative Margins on Static Elements</h4>
+<p>        <img src="http://media.smashingmagazine.com/wp-content/uploads/images/css-negative-margins/margin-motion.gif" width="500" height="410" alt="Negative margins motion on static elements" /></p>
+<p>A static element is an element with <em>no</em> float applied. The image below illustrates how static elements react to negative margins.</p>
+<ul>
+<li>When a static element is given a negative margin on the <strong>top/left</strong>, it <em>pulls</em> the element in that specified direction. For example:
+<pre><code>/* Moves the element 10px upwards */
+
+#mydiv1 {margin-top:-10px;}</code></pre>
+</li>
+<li>But if you apply it to the <strong>bottom/right</strong>, it doesn’t move the element down/right as you might think. Instead, it <em>pulls</em> any succeeding element <em>into</em> the main element, overlapping it.
+<pre><code>/* 
+* All elements succeeding #mydiv1 move up by
+* 10px, while #mydiv1 doesn’t even move an inch.
+*/
+
+#mydiv1 {margin-bottom:-10px;}</code></pre>
+</li>
+<li>If no width is applied, adding Negative Margins to its left/right pulls the element in both directions increasing its width. It’s here that the margin acts like a padding.</li>
+</ul>
+<h4>Negative Margins on Floated Elements</h4>
+<p>Consider this as our actual markup:</p>
+<p>HTML</p>
+<pre name="code">
+&lt;div id="mydiv1"&gt;First&lt;/div&gt;
+&lt;div id="mydiv2"&gt;Second&lt;/div&gt;
+</pre>
+<ul>
+<li>If a negative margin is applied opposite a float, it creates a void leading to the overlapping of content. This is great for liquid layouts where one column has a width of 100% while the other has a definite width, like 100px.
+<pre><code>/* A negative margin is applied opposite the float */
+#mydiv1 {float:left; margin-right:-100px;}</code></pre>
+</li>
+<li>If both elements are floated left and <code>margin-right:-20px</code> is applied to <code>#mydiv1, #mydiv2</code> treats <code>#mydiv1</code> as if it were 20px smaller in width than it actually is (thus, overlapping it). What’s interesting is that the contents of <code>#mydiv1</code> don’t react at all and continue to retain its current width.</li>
+<li>If the negative margin is equal to the actual width, then it overlaps it entirely. This is because margins, padding, borders, and width add up to the total width of an element. So if a negative margin is equal to the rest of the dimensions then the element’s width effectively becomes <code>0px</code>.</li>
+</ul>
+<h3>3. Effective Techniques</h3>
+<p>Since we now know that applying a negative margin is valid CSS2 code, using it provides for some very interesting CSS techniques:</p>
+<h4>Making a single &lt;ul&gt; into a 3-column list</h4>
+<p>        <img src="http://media.smashingmagazine.com/wp-content/uploads/images/css-negative-margins/splitting-a-list.gif" width="500" height="321" alt="Splitting a list into 3 columns" /></p>
+<p>If you have a list of items which are just too long to display vertically, why not divide them into columns instead? Negative margins let you do this without having to add any floats or additional tags. It’s amazing how it easily lets you divide the list below into 3 separate columns, like so:</p>
+<p>HTML</p>
+<pre name="code">
+&lt;ul&gt;
+   &lt;li class="col1"&gt;Eggs&lt;/li&gt;
+   &lt;li class="col1"&gt;Ham&lt;li&gt;
+   &lt;li class="col2 top"&gt;Bread&lt;li&gt;
+   &lt;li class="col2"&gt;Butter&lt;li&gt;
+   &lt;li class="col3 top"&gt;Flour&lt;li&gt;
+   &lt;li class="col3"&gt;Cream&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p>CSS</p>
+<pre><code>ul {list-style:none;}
+li {line-height:1.3em;}
+.col2 {margin-left:100px;}
+.col3 {margin-left:200px;}
+.top {margin-top:-2.6em;} /* the clincher */</code></pre>
+<p>By adding <code>margin-top:-2.6em</code> (twice the line-height of <code>&lt;li&gt;</code>) to <code>.top</code>, all elements move up in <strong>perfect alignment.</strong> Using a negative margin is more appropriate than applying relative positioning since you only have to apply it to the first of the new columns instead of to each <code>&lt;li&gt;</code> tag. Cool, huh?</p>
+<h4>Overlap for added emphasis</h4>
+<p><img src="http://media.smashingmagazine.com/wp-content/uploads/images/css-negative-margins/phlashers.gif" width="500" height="298" alt="Phlashers.com" /></p>
+<p>Overlapping elements on purpose is also a good design metaphor. It adds emphasis to specific elements since the overlapping effect creates the illusion of depth. A good example would be the comments section of <a href="http://phlashers.com/blog/?p=180">Phlashers.com</a>, which uses an overlapping technique to draw attention to the number of comments a post has. Combine this with the <code>z-index</code> property and a little creativity and you’ve got it made.</p>
+<h4>Smashing 3D text effects</h4>
+<p><img src="http://media.smashingmagazine.com/wp-content/uploads/images/css-negative-margins/nike.jpg" width="500" height="298" alt="3D effects" /></p>
+<p>Here’s a neat trick. Create Safari-like text, which are slightly beveled by creating 2 versions of your text in 2 different colors. Then use negative margins to overlap one over the other with a discrepancy of around 1 or 2 pixels and you’ve got selectable, robot-friendly beveled text! No need for huge jpegs or gifs which devour bandwidth like fat pigs.</p>
+<h4>Simple 2-column Layouts</h4>
+<p>Negative margins are also a great way to create simple 2-column liquid layouts where the sidebar has a preset width and the content has a liquid width of <code>100%</code></p>
+<p>HTML</p>
+<pre name="code">
+&lt;div id="content"&gt; &lt;p&gt;Main content in here&lt;/p&gt; &lt;/div&gt;
+&lt;div id="sidebar"&gt; &lt;p&gt;I’m the Sidebar! &lt;/p&gt; &lt;/div&gt;
+</pre>
+<p>CSS</p>
+<pre><code>#content {width:100%; float:left; margin-right:-200px;}
+#sidebar {width:200px; float:left;}</code></pre>
+<p>And there you have a simple 2-column layout record time. It works flawlessly in IE6 too! Now, to prevent <code>#sidebar</code> from overlapping the text inside  <code>#content</code>, simply add</p>
+<pre><code>/* Prevent text from being overlapped */
+
+#content p {margin-right:210px;}
+
+/* It’s 200px + 10px, the 10px being an additional margin.*/</code></pre>
+<p>When used properly, negative margins can also provide what’s called a <strong>Flexible Document Structure</strong> which absolutely kicks tables in the face. Flexible Document Structure is an accessibility and SEO technique which allows you to arrange your markup in almost any order depending on your intentions. Tom Wright wrote an interesting <a href="http://www.severnsolutions.co.uk/twblog/archive/2004/07/01/cssnegativemarginsalgebra">article</a> which discusses possible applications of negative margins in multicolumn layouts.</p>
+<h4>Nudging elements into place</h4>
+<p>This is the most common (and simplest) usage for negative margins. If you’re inserting a 10th div in a sea of 9 other divs and somehow it just won’t align properly, use negative margins to nudge that 10th div into place instead of having to edit the other 9.</p>
+<h3>4. Bugfixes</h3>
+<h4>Text and Link problems</h4>
+<p>Using negative margins with floats sometimes pisses off older browsers. Some symptoms include:</p>
+<ul>
+<li>Making links unclickable</li>
+<li>Text becomes difficult to select</li>
+<li>Tabbing any links disappears when you lose focus</li>
+</ul>
+<p><strong>Solution:</strong> Just add <code>position:relative</code> and it works!</p>
+<h4>My picture got cut-off</h4>
+<p>If you have the bad luck of using IE6 in the office, sometimes content will suddenly be cut-off when overlapping and floats are concerned.</p>
+<p><strong>Solution:</strong> Again, just add <code>position:relative</code> to the floated element and everything goes back to normal.</p>
+<h3>5. Conclusion</h3>
+<p>Negative margins have a place in modern web design because of its ability to position elements without any additional markup. With more users switching to more updated browsers (IE8 included), the future looks very bright for sites which rely on this technique.</p>
+<p>If you have any unique experiences with negative margins, let me know by posting a comment.</p>
+<h3>6. Resources</h3>
+<p>More info on negative margins.</p>
+<ul>
+<li>Search This,  <a href="http://www.search-this.com/2007/08/01/the-positive-side-of-negative-margins/">The Positive Side of Negative Margins</a></li>
+<li>Severn Solutions, <a href="http://www.severnsolutions.co.uk/twblog/archive/2004/07/01/cssnegativemarginsalgebra">CSS Negative Margins Algebra</a></li>
+<li>Mindfly, <a href="http://www.mindfly.com/blog/post/2009/01/Get-Refreshed-Liquid-Layouts-With-Simpler-CSS-and-Without-A-Semantic-Mess.aspx">Get Refreshed: Liquid Layouts With Simpler CSS and Without A Semantic Mess</a></li>
+<li>A List Apart, <a href="http://www.alistapart.com/articles/negativemargins/">Creating Liquid Layouts with Negative Margins</a></li>
+<li>W3.org, <a href="http://www.w3.org/TR/1998/REC-CSS2-19980512/box.html#margin-properties">Margin Properties</a></li>
+<li> Branbell, <a href="http://www.brainbell.com/tutorials/HTML_and_CSS/Using_Negative_Margins.htm">Using Negative Margins</a></li>
+<li>devarticles, <a href="http://www.devarticles.com/c/a/Web-Style-Sheets/Swapping-Column-Positions-in-Web-Page-Layouts-with-Negative-Margins/ ">Swapping Column Positions in Web Page Layouts with Negative Margins</a></li>
+<li>Simplebits, <a href="http://www.simplebits.com/notebook/2005/05/23/negative.html ">Exceptionally Negative</a></li>
+<li>CommunityMX, <a href="http://www.communitymx.com/content/article.cfm?cid=B0029 ">CSS Negative Margins</a></li>
+<li>brunildo, <a href="http://www.brunildo.org/test/NegMOutH.html ">Horizontal Negative Margins</a></li>
+<li>Ben Nadel, <a href="http://www.bennadel.com/blog/1174-Negative-CSS-Margins-Are-Not-Cool.htm ">Negative CSS Margins Are Not Cool</a></li>
+<li>bluerobo, <a href="http://www.bluerobot.com/web/css/center2.html ">Centering: Negative Margin</a></li>
+</ul>
+                        	
+	                    
+    </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
