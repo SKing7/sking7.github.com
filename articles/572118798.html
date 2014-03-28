@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSS animations and transitions performance: looking inside the browser</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>CSS animations and transitions performance: looking inside the browser</h1>
+<div><p>You’ve probably used <a href="http://www.w3.org/TR/css3-animations/">CSS Animations</a> or <a href="http://www.w3.org/TR/css3-transitions/">CSS Transitions</a> in a project. (If not, check out CSS-Trick’s almanac entries on <a href="http://css-tricks.com/almanac/properties/a/animation/">animations</a> and <a href="http://css-tricks.com/almanac/properties/t/transition/">transitions</a>.)&nbsp;Some of your animations might have performed smoothly. Other might have appeared choppy. Do you wonder why?</p><p dir="ltr">In this article, we’ll explore how browsers handle CSS Animations and CSS Transitions, so you can develop intuition around whether an animation is likely to perform well —&nbsp;before writing any code!&nbsp;With this intuition, you’ll be able to make design decisions that play well with the browser and result in silky smooth user experiences.</p><h3>Browser Internals</h3><p dir="ltr">Let’s pop the hood of the browser, and look around. Once we understand how it works, we can drive it better.</p><p dir="ltr">Modern browsers typically have two important threads of execution. These threads work together to render a web page:</p><ul>
+<li>The main thread</li>
+<li>The compositor thread</li>
+</ul><p dir="ltr">Typically, the main thread is responsible for:</p><ul>
+<li>Running your JavaScript.</li>
+<li>Calculating your HTML elements’ CSS styles.</li>
+<li>Laying out your page.</li>
+<li>Painting your elements into one or more bitmaps.</li>
+<li>Handing these bitmaps over to the compositor thread.</li>
+</ul><p dir="ltr">Typically, the compositor thread is responsible for:</p><ul>
+<li>Drawing bitmaps to the screen via the GPU.</li>
+<li>Asking the main thread to update bitmaps for visible or soon-to-be-visible parts of the page.</li>
+<li>Figuring out which parts of the page are visible.</li>
+<li>Figuring out which parts are soon-to-be-visible when you’re scrolling.</li>
+<li>Moving parts of the page when you scroll.</li>
+</ul><p dir="ltr">The main thread can be busy for long periods of time running your JavaScript or painting a large element. While it’s busy, it’s not responsive to user input.</p><p dir="ltr">On the other hand, the compositor thread tries to stay extremely responsive to user input. The compositor tries to redraw the page 60 times per second when the page is changing, even if the page is incomplete.</p><p dir="ltr">For example, when the user scrolls a page, the compositor thread asks the main thread to update the bitmaps for newly visible parts of the page. However, if the main thread doesn’t respond quickly enough, the compositor doesn’t wait. The compositor draws the parts of the page it has so far and draws white elsewhere.</p><h3>The GPU</h3><p dir="ltr">I mentioned the compositor thread draws bitmaps to the screen using the GPU. Let’s quickly go over the GPU.</p><p dir="ltr">The GPU is a chip found in most phones, tablets, and computers today. It’s extremely specialized, meaning it’s really good at certain things, and it’s not that great at others.</p><p dir="ltr">GPUs are really fast at:</p><ol>
+<li>Drawing to the screen.</li>
+<li>Drawing the same bitmap over and over again.</li>
+<li>Drawing the same bitmap in a different position, rotation, or scale.</li>
+</ol><p dir="ltr">GPUs are relatively slow at:</p><ol>
+<li>Loading bitmaps into their memory.</li>
+</ol><h3>transition: height</h3><p dir="ltr">Now that we have a rough idea of the software and hardware running our page, let’s look at how the browser’s main thread and compositor thread work together to perform a CSS Transition.</p><p dir="ltr">Suppose we’re transitioning an element’s height from 100px to 200px, like so:</p><pre title="">
+
+div {
+    height: 100px;
+    transition: height 1s linear;
+}
+
+div:hover {
+    height: 200px;
+}
+
+</pre><p dir="ltr"><span>The main thread and the compositor thread will perform operations according to the timeline diagram below. Note that operations in orange boxes are potentially time-consuming. Operations in blue boxes are quick.</span></p><p dir="ltr"><a href="http://blogs.adobe.com/webplatform/files/2014/03/animate-height-2x.png"><img alt="animate-height-2x" src="http://blogs.adobe.com/webplatform/files/2014/03/animate-height-2x.png" width="479" height="740" /></a></p><p>As you can see, there are lots of orange boxes, meaning the browser has to work pretty hard! This means the transition might be choppy.</p><p dir="ltr">In every frame of the transition, the browser has to perform layout, painting, and uploading new bitmaps to the GPU. As we learned, loading bitmaps into GPU memory can be a relatively slow operation.</p><p dir="ltr">The reason the browser has to work so hard every frame is because the contents of the element keep changing. Changing an element’s height may cause its child elements to also change in size, so the browser has to perform layout. After layout, the main thread has to regenerate the bitmap for the element.</p><h3>transition: transform</h3><p dir="ltr">So, height can be somewhat expensive to transition. Is there something cheaper?</p><p dir="ltr">Suppose we’re scaling an element from half size to full size. Also suppose we’re using the <a href="http://css-tricks.com/almanac/properties/t/transform/">CSS transform property</a> to scale it and the CSS transition property to animate the scaling, like so:</p><pre title="">
+
+div {
+    transform: scale(0.5);
+    transition: transform 1s linear;
+}
+
+div:hover {
+    transform: scale(1.0);
+}
+
+</pre><p>Let’s look at the timeline diagram for this case:</p><p><a href="http://blogs.adobe.com/webplatform/files/2014/03/animate-transform-2x.png"><img alt="animate-transform-2x" src="http://blogs.adobe.com/webplatform/files/2014/03/animate-transform-2x.png" width="479" height="605" /></a></p><p>We see a lot less orange this time, meaning the animation will probably be smooth! So, how is animating an element’s transform different than animating its height?</p><p dir="ltr">By definition, the CSS transform property does not change the layout of an element or the elements around it. It affects the element as a whole- it scales the whole element or rotates the whole element or moves the whole element.</p><p dir="ltr">This is great news for the browser! The browser only has to generate the bitmap for the element and upload it to the GPU at the start of the animation. After that, the browser doesn’t have to do any more layout, painting, or bitmap uploading. Instead, the browser can leverage the GPU’s special ability to draw the same bitmap in a different position, rotation, or scale quickly.</p><h3>Design Decisions</h3><p dir="ltr">So, does this mean we shouldn’t animate an element’s height? No. Sometimes it’s exactly what your design warrants, and the animation could be fast enough. Maybe your element is isolated, and doesn’t cause other parts of the page to be laid out again. Maybe your element is simple to repaint, and the browser can do it quickly. Maybe your element is small, and the browser only has to upload a small bitmap to the GPU.</p><p dir="ltr">Of course, if you can animate a “cheaper” property like CSS transform instead of a more expensive property like CSS height, and there is no impact on your design vision, do that. For example, lets say your design involves a button that reveals a menu when tapped. Instead of animating the menu’s CSS top or height properties to reveal it, try animating the element’s CSS transform property for a similar or identical effect.</p><p dir="ltr">The CSS properties that are particularly fast to animate include:</p><p dir="ltr">This list is somewhat limited today, but as browsers advance, you’ll see more and more CSS properties becoming fast to animate. Also, don’t discount the current list. You might be surprised at just how many rich effects you can create by combining these properties. Get creative!</p><style><!--
+.concise-list li { margin-bottom: 0; }
+--></style></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
