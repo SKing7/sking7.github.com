@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SEO-Friendly Infinite Scroll</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>SEO-Friendly Infinite Scroll</h1>
+<div>
+
+            <p>As a developer, at some point you may have to decide between the old fashioned pagination and the trendy new infinite scroll, using the latest technologies, inspired by internet giants like Facebook and Pinterest. It depends on your requirements, but it also may come down to your (or your client’s) personal choice.</p>
+<p>Infinite can be an efficient way for users to browse content, but it <a href="http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/">has a lot of disadvantages</a> and can be <a href="http://www.nngroup.com/articles/infinite-scrolling/">the wrong choice</a> on certain types of websites.</p>
+<p>One of the primary problems with infinite scroll is the fact that it is, in its barest form, not SEO friendly. When you implement infinite scroll, new content is loaded via Ajax. Unless you <a href="https://developers.google.com/webmasters/ajax-crawling/">take specific measures</a>, this renders the content invisible to search engines. So how then do we make infinite scroll SEO friendly? Let’s discuss a few ways we can do this, including <a href="http://googlewebmastercentral.blogspot.in/2014/02/infinite-scroll-search-friendly.html">one discussed by Google</a> on the Webmaster Central blog.</p>
+<h2 id="include-a-sitemap">Include a Sitemap</h2>
+<p>If the content you’re loading via infinite scroll is separated into various distinct pages, or units, that have their own URLs, search crawlers like Googlebot may not be able to find that content unless it’s linked somewhere in an accessible spot on one of your already-indexed pages.</p>
+<p>A <a href="https://support.google.com/webmasters/answer/156184">sitemap</a> is one way you can ensure a search crawler can find every page, including the content loaded via infinite scroll functionality. A sitemap is a list of pages in a website, usually in XML format. If a part of your website is inaccessible to web crawlers, you can provide a sitemap to inform the crawler of the full list of pages. For more info about sitemaps and how to create one, you can refer to <a href="http://webdesign.tutsplus.com/articles/all-you-need-to-know-about-xml-sitemaps--webdesign-9838">this tutorial on Tuts+</a>.</p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2014/04/1396912946sitemap.png" alt="Google Webmaster Tools — Add a Sitemap" width="348" height="184" /></p>
+<p>If you have an account on Google Webmaster Tools, you can use the service to test and submit your sitemap to ensure that a crawler doesn’t miss your site due to errors in your sitemap or other factors.</p>
+
+<p>This is the method, as mentioned earlier, that Google discusses in a recent blog post. Interestingly, it involves providing the pagination alternative to infinite scroll within the same page! Let’s look into the details.</p>
+<h3 id="using-html5s-history-api">Using HTML5’s History API</h3>
+<p>When you load new content, Google recommends that you use <a href="http://www.impressivewebs.com/html5-history-api-syntax/">HTML5’s History API</a> to change the URL of the page to accommodate the page number when the user scrolls to initiate the loading of new new content. For instance, on loading page 3, the current URL would change to <a href="http://myexample.com/?page=3">http://myexample.com/?page=3</a>. Similarly, on scrolling up to view the previous content, the URL would change to <a href="http://myexample.com/?page=2">http://myexample.com/?page=2</a>.</p>
+
+<p>In addition to changing the URL as content is scrolled through, Google suggests that you provide your list of pages at the bottom, which are links to the same pages with page numbers in the URL (e.g. <a href="http://myexample.com/?page=3">http://myexample.com/?page=3</a>). Just like in traditional pagination, when someone clicks on a page, the page refreshes, and the contents of page 3 are shown. At this point, the infinite scroll functionality will still work, along with the HTML5 History API changes outlined above. So if the user scrolls up or down, new content is shown and the page number is changed on the URL.</p>
+<h3 id="the-benefits">The Benefits</h3>
+<p>So what does this mean for search crawlers? Well, when a crawler visits your site, the content of the first page is shown with page numbers at the bottom. Since the crawler cannot trigger infinite scroll, no new content is going to be loaded. However, because the pagination section is still included on the page, the crawler is able to access all the content. This also ensures that while searching, when someone searches for a particular item on page 3, they land directly on the content and not somewhere else.</p>
+<p>This method has the added bonus of making deep linking to infinite scroll content easy. So if I want to share a particular item on the 4th page with someone, I can simply copy the URL (which would be on page 4 at the time) and when someone goes to that URL, they would be able to see exactly what I want them to see.</p>
+<h2 id="john-muellers-demo">John Mueller’s Demo</h2>
+<p><a href="http://scrollsample.appspot.com/items">A live demo of the implementation of this idea</a> of infinite scroll with pagination is provided by Webmaster Trends Analyst John Mueller.</p>
+<p><a href="http://scrollsample.appspot.com/items"><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2014/04/1396912947infinite-scroll.png" alt="Infinite Scroll with Pagination Demo" width="687" height="413" /></a></p>
+<p>And as mentioned, you can read a full description of John’s demo <a href="http://googlewebmastercentral.blogspot.in/2014/02/infinite-scroll-search-friendly.html">on the Google Webmaster Central Blog</a>.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>On one of my recent articles discussing implementing infinite scroll with jQuery, <a href="http://www.sitepoint.com/implementing-infinite-scroll-jquery/#comment-1308994786">someone commented</a> that as more sites start using this technique, the better it will be for those that don’t. This may very well be true.</p>
+<p>Google’s own suggestions, along with what I’ve discussed here should provide more incentive for those who want to use the technique but not suffer from SEO limitations.</p>
+<p>If you’ve looked at Google’s suggestions or have had to deal with this on one of your own websites or applications, let us know in the comments.</p>
+
+        </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
