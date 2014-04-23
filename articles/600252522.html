@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A Review of the Brackets Editor</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>A Review of the Brackets Editor</h1>
+<div>
+
+            <p>This article is going to take a look at <a href="http://brackets.io/">Brackets</a>, an open-sourced editor originally developed by Adobe. It may not have had quite the same level of publicity and hype as Atom, GitHub’s new lightweight editor, but it’s a promising option for the front end developer.</p>
+<h2 id="target-audience">Target Audience</h2>
+<p>It’s worth pointing out that Brackets is primarily aimed at front end developers and web designers. Although it’s essentially a text editor and therefore suitable for coding pretty much anything, it’s optimized for HTML, CSS, and JS (as well as derivatives such as SASS, Less, CoffeeScript, and so on). Ruby, Python, PHP developers, and the like <em>might</em> be better served looking elsewhere, whether that be for a fully-fledged IDE or something more lightweight such as Sublime or, indeed, Atom.</p>
+<h2 id="what-makes-brackets-different">What Makes Brackets Different?</h2>
+<p>Brackets makes a big deal of the fact that it’s written using a combination of HTML, CSS, and JavaScript. While this may mean little for the casual user, those who wish to extend – or even hack it – have the opportunity to do so using technologies they’re probably already familiar with. The fact that it’s open-sourced also makes it stand out from the crowd. Sublime, for example, is a commercial product, while Atom is closed-source and won’t be free forever.</p>
+<h2 id="getting-brackets">Getting Brackets</h2>
+<p>Brackets can be downloaded <a href="http://brackets.io/">from the website</a>, and is available for Mac OSX, Windows, and Linux (32 or 64-bit). For the purposes of this review, I’m running the 37th “sprint”, on Mac OSX.</p>
+<h2 id="first-steps">First Steps</h2>
+<p>When you open Brackets for the first time, you’re thrown straight into an HTML-based tutorial file with accompanying CSS, which is a great way to start exploring.</p>
+<p><img alt="The Brackets editor" src="http://f.cl.ly/items/1N1o3i1O092o1p0B3Q0j/brackets-main.png" /></p>
+<p>The left-hand column lists the working files, and beneath that is a folder view. It’s like Sublime in that you can view a file with one click without actually opening it. A double-click opens the file for editing, adding it to the working files list.</p>
+<p>The right-hand column contains icons for opening Live Preview (which we’ll look at shortly) and for the Extension Manager. Many third-party extensions create their own icons and place them in this bar, so it can quickly become an invaluable launchpad.</p>
+<h2 id="a-quick-feature-tour">A Quick Feature Tour</h2>
+<p>Let’s look at some of the key features of Brackets.</p>
+<h3 id="live-preview">Live Preview</h3>
+<p>The Live Preview feature launches a new Chrome window showing the current page that not only doesn’t require a manual refresh when you change a file, but also as you type. It’s essentially Chrome’s Web Inspector, but with all the benefits of a self-contained editor. It’s a truly great feature, particularly if you have a splt-screen setup. It doesn’t just work with HTML files, either. If you make a change to a linked CSS file which impacts the current page, that too gets reflected immediately in the browser. If you’re editing a CSS file used by the currently visible page, highlighting rules causes the preview to highlight elements which are affected by them.</p>
+<h3 id="quick-edit">Quick Edit</h3>
+<p>The Quick Edit feature is context-specific. Let’s look at a few of its uses.</p>
+<h4 id="css">CSS</h4>
+<p>When you’re editing HTML, if you click a tag with a corresponding CSS declaration situated in a linked file and hit <code>Ctrl / Command + E</code>, an inline editor appears allowing you to quickly edit that rule. This is probably best illustrated with the following screenshot.</p>
+<p><img alt="Inline CSS editing" src="http://f.cl.ly/items/452f090w2U1g1Q353z1h/brackets-inline-css-editing.png" /></p>
+<h4 id="colours">Colours</h4>
+<p>Hovering over a color in a CSS declaration shows a small swatch of that color. Also, the same keyboard shortcut (<code>Ctrl / Command + E</code>) gives you a pretty sophisticated color selector / converter, as illustrated below.</p>
+<p><img alt="The Color selector" src="http://f.cl.ly/items/1j171U1a2m2m2B242D2k/brackets-colours.png" /></p>
+<h4 id="curves">Curves</h4>
+<p>While unlikely to be used nearly as often as the CSS rule or color editor, the bezier curve editor is a hugely impressive little feature. Again, it’s best illustrated with a screenshot:</p>
+<p><img alt="Editing beziers in Brackets" src="http://f.cl.ly/items/3M3t0L3I3a401W26190j/brackets-beziers.png" /></p>
+<h4 id="and-more">And More</h4>
+<p>It looks like third-party extensions will provide additional contexts for Quick Edit, like the regular expression editor described later in the article. It will be interesting to see what’s produced; there are clearly many possibilities for it.</p>
+<h3 id="jslint">JSLint</h3>
+<p>Enabled by default, built-in JSLint support will check your Javascript code upon saving, with its results displayed as a panel below the main editing window.</p>
+<p><img alt="JSLint in action" src="http://f.cl.ly/items/0j0H3B1K123C3O1z1J15/brackets-jslint.png" /></p>
+<p>Because Brackets runs the JSLint process when you save, rather than as you go, it can feel a little unresponsive; you can correct something and the report remains on-screen because you haven’t saved it. However, the performance impact of doing it any other way would probably create its own problems.</p>
+<h3 id="other-features">Other Features</h3>
+<p>As you’d expect from a code editor, Brackets implements code completion. And, it’s fast. Really fast. I’ve found a number of editors in the past to feel sluggish, which negatively impacts the experience, but not so here. That’s not to say it’s perfect. For example, when writing SASS it would be good if, once you start typing out a nested selector (i.e., with a period or a hash) that code completion would stop prompting you for a rule.</p>
+<p><img alt="Autocomplete isn't perfect" src="http://f.cl.ly/items/340i0X0G0K1V1O3D2b0b/brackets-autocomplete-issues.png" /></p>
+<h2 id="extending-brackets">Extending Brackets</h2>
+<p>The true power of Brackets, I feel, lies in its potential for extension. There are already a significant number of extensions available. I’m going to take a look at a few that stood out for me.<br />The process of installing an extension couldn’t be easier. Simply click the “brick” icon on the top right, then you can search for and install them from within the application.</p>
+<p><img alt="Installing extensions from within Brackets" src="http://f.cl.ly/items/1t0P1f3d2o0B332H3z3F/brackets-installing-extensions.png" /></p>
+<p>If you’re looking for features found in other code editors, there are extensions for <a href="https://github.com/thehogfather/brackets-code-folding">code-folding</a>, <a href="https://github.com/jrowny/brackets-snippets">snippets</a>, and <a href="https://github.com/enturn/brackets-quick-search">smart highlighting</a>, among others. <a href="https://github.com/adobe-research/theseus">Theseus</a> is a JavaScript debugger for Brackets, which works with both Chrome and Node.js. It probably warrants its own article, so I won’t cover it in detail here.</p>
+<p>If you work with Markdown, you might find the <a href="https://github.com/gruehle/MarkdownPreview">Markdown Preview</a> extension to be useful. When you open or create a Markdown file in Brackets, it splits the screen horizontally into two panels – one for editing, and one for a live preview. While this offers nothing a dedicated Markdown editor such as Mou doesn’t, one benefit is that you can edit a project’s Markdown files (GitHub READMEs, for example) without having to leave the editor. On the downside, it doesn’t do everything you’d expect, like have keypresses for bold or italics. A screenshot of this extension in action is shown below.</p>
+<p><img alt="The Markdown extension in action" src="http://f.cl.ly/items/0X2V030S38332t0g073X/brackets-markdown.png" /></p>
+<p>For Node.js developers, <a href="https://github.com/briancraig/brackets-nodejs">this extension</a> allows you to stop and start your applications and view their output from within the editor itself.</p>
+<p>The <a href="https://github.com/mikaeljorhult/brackets-autoprefixer">Autoprefixer</a> module parses CSS declarations and automatically adds vendor prefixes to the appropriate rules, using up-to-date browser information from <a href="http://caniuse.com/">Can I Use</a>.</p>
+<p>If you work with files for whom the extension doesn’t give away the language, such as <code>.inc</code> files, PHP files masquerading as <code>.module</code> files, or indeed those without extensions, then the <a href="https://github.com/p4bl1t0/brackets-languageswitcher">Language Switcher</a> module may help. This module is shown below. It also means you can take advantage of language-specific features such as syntax highlighting on a new file before you’ve saved it.</p>
+<p><img alt="The file language switcher provides a new drop-down menu to specify a file's language" src="http://f.cl.ly/items/1D1x1y2D3H2u280K091C/brackets-file-language.png" /></p>
+<p>If, like me, regular expressions can give you headaches then there’s even an <a href="https://github.com/peterflynn/brackets-regex-editor">inline regex editor</a>. This works in the same way as the other Quick Edit contexts such as colors and beziers, suggesting that this is an area where contributions will be particularly active.</p>
+<p>You can even <a href="https://github.com/artoale/brackets-terminal">run a terminal</a> from inside the editor.</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>Brackets feels like an extension of Chrome’s Developer tools. The Live Preview feature is incredibly useful, combining the advantages of coding in the browser with those of a dedicated editor. Its other killer feature for me is Quick Edit, although it feels like that’s some way off from its full potential. However, by tapping into users’ knowledge of web technologies, it seems likely that any gaps will quickly be filled by contributions.</p>
+<p>From a personal point of view, I can’t see myself switching to Brackets for the server side work I do using languages such as PHP. For more front end focused development I can see it becoming a useful part of my toolkit. If you’re a front end developer then I would urge you to take it for a spin, at least – and after all, it is free.</p>
+
+        </div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
