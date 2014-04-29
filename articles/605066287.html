@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>用 CSS3 和 JavaScript 制作径向动画菜单 - 博客</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>用 CSS3 和 JavaScript 制作径向动画菜单 - 博客</h1>
+<div><p style="display: inline;">
+					
+		本文由 </p><a href="http://blog.jobbole.com">伯乐在线</a><p style="display: inline;"> - </p><a href="http://blog.jobbole.com/author/heloowird/">heloowird</a><p style="display: inline;"> 翻译自 </p><a target="_blank" href="http://creative-punch.net/2014/02/making-animated-radial-menu-css3-javascript/">CREATIVE PUNCH</a><p style="display: inline;">。欢迎加入</p><a target="_blank" href="http://www.jobbole.com/groups/6/">技术翻译小组</a><p style="display: inline;">。转载请参见文章末尾处的要求。</p><p>今天，让我们来看看：如何使用CSS3和JavaScript轻松地实现一个简单的径向动画菜单。</p><p>看看下面的演示，点击按钮，弹出径向菜单。</p><p data-height="368" data-theme-id="0" data-slug-hash="lAHiu" data-default-tab="result">See the Pen <a href="http://codepen.io/CreativePunch/pen/lAHiu/">Animated radial / circular menu</a> by Creative Punch (<a href="http://codepen.io/CreativePunch">@CreativePunch</a>) on <a href="http://codepen.io">CodePen</a>.</p><p><br />上面的codepen示例呈现了代码，那么我们来介绍其中的一些细节。</p><h2>HTML</h2><p>我们看看HTML。我们使用HTML5的nav元素，包含一些链接元素和激活径向菜单的按钮。</p><pre>&lt;nav class="circular-menu"&gt;
+
+  &lt;div class="circle"&gt;
+    &lt;a href="" class="fa fa-home fa-2x"&gt;&lt;/a&gt;
+    &lt;a href="" class="fa fa-facebook fa-2x"&gt;&lt;/a&gt;
+    &lt;a href="" class="fa fa-twitter fa-2x"&gt;&lt;/a&gt;
+    &lt;a href="" class="fa fa-linkedin fa-2x"&gt;&lt;/a&gt;
+    &lt;a href="" class="fa fa-github fa-2x"&gt;&lt;/a&gt;
+    &lt;a href="" class="fa fa-rss fa-2x"&gt;&lt;/a&gt;
+    &lt;a href="" class="fa fa-pinterest fa-2x"&gt;&lt;/a&gt;
+    &lt;a href="" class="fa fa-asterisk fa-2x"&gt;&lt;/a&gt;
+  &lt;/div&gt;
+
+  &lt;a href="" class="menu-button fa fa-bars fa-2x"&gt;&lt;/a&gt;
+
+&lt;/nav&gt;</pre><p>我使用了<a href="http://fortawesome.github.io/Font-Awesome/" target="_blank">Font Awesome</a>图标，同时在a标签中添加了必要的类，以便为径向菜单中的菜单项附着漂亮的图标。</p><h2>CSS</h2><p>下面，我们看看部分CSS。首先，我们定义了径向菜单根容器（这里指带有circular-menu类的nav元素）的宽和高。我们也将position属性定义为relative，以便于相对定位所含的菜单项。</p><pre>.circular-menu {
+  width: 250px;
+  height: 250px;
+  margin: 50px auto 0;
+  position: relative;
+}</pre><p>默认情况下，菜单项是隐藏的。我们想作出漂亮的“淡入淡出+缩放”效果，所以初始化菜单项时，将透明度设为0，并把transform属性的scale值设为0。</p><pre>.circle {
+  width: 250px;
+  height: 250px;
+  opacity: 0;
+
+  -webkit-transform: scale(0);
+  -moz-transform: scale(0);
+  -transform: scale(0);
+
+  -webkit-transition: all 0.4s ease-out;
+  -moz-transition: all 0.4s ease-out;
+  transition: all 0.4s ease-out;
+}</pre><p>你可以看到：我们使用transition属性来定义动画。</p><p>为了让菜单项完成放大和淡入效果，我们希望在类之间进行切换。因此我们为径向菜单定义了一个open类。</p><pre>.open.circle {
+  opacity: 1;
+
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -transform: scale(1);
+}</pre><p>一旦open类和circle类出现在同一个元素中，那么这个元素将根据动画长度和transition属性的类型应用新的样式属性。</p><p>当然，嵌在circle类里面的a元素也需要样式。除了一些常规的大小样式，将position设置为absolute非常重要，这使得JavaScript能够绝对定位径向菜单中的菜单项。</p><pre>.circle a {
+  text-decoration: none;
+  color: white;
+  display: block;
+  height: 40px;
+  width: 40px;
+  line-height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+  position: absolute;
+  text-align: center;
+
+}
+
+.circle a:hover {
+  color: #eef;
+}</pre><p>同时我们需要定位、设计菜单的开关按钮。</p><pre>.menu-button {
+  position: absolute;
+  top: calc(50% - 30px);
+  left: calc(50% - 30px);
+  text-decoration: none;
+  text-align: center;
+  color: #444;
+  border-radius: 50%;
+  display: block;
+  height: 40px;
+  width: 40px;
+  line-height: 40px;
+  padding: 10px;
+  background: #dde;
+}
+
+.menu-button:hover {
+  background-color: #eef;
+}</pre><p>现在让我们移步至最后部分，这部分使我们的菜单变成真正的径向菜单。</p><h2>JavaScript</h2><p>首先，我们实现点击菜单开关按钮能够显示、隐藏菜单项的功能。</p><pre>document.querySelector('.menu-button').onclick = function(e) {
+   e.preventDefault(); document.querySelector('.circle').classList.toggle('open');
+}</pre><p>选取含menu-button类的元素来监听点击事件。一旦你点击它，它会选取含circle类元素，并向之添加open类。</p><p>现在，最后的任务是：确定菜单项的位置。</p><pre>var items = document.querySelectorAll('.circle a');
+
+for(var i = 0, l = items.length; i &lt; l; i++) {
+  items[i].style.left = (50 - 35*Math.cos(-0.5 * Math.PI - 2*(1/l)*i*Math.PI)).toFixed(4) + "%";
+  items[i].style.top = (50 + 35*Math.sin(-0.5 * Math.PI - 2*(1/l)*i*Math.PI)).toFixed(4) + "%";
+}</pre><p>第一行代码所做的就是选取嵌在circle类元素里的所有链接元素。之后可以遍历这些元素。</p><p>然后，利用基本的几何图形，正弦、余弦函数，迭代(ⅰ)来计算的CSS的 top和left属性。</p><p>用JavaScript来定位元素，这允许您在菜单使用任何数量的子元素a，接下来就交给JavaScript的数学魔法。</p><h2>搞定！</h2><p>我希望这篇文章能帮助你实现一个很酷的径向菜单。如果你做的东西真棒，尽情地在评论中分享吧！如果你真心喜欢这个教程，分享到您最喜爱的社交媒体吧！</p><!-- p><a target="_blank" rel="nofollow" href="http://www.hi-vps.com/?utm_source=jobbole.com"><img src="http://ww2.sinaimg.cn/large/63918611gw1e8xk7amtjlj20go04g3z7.jpg"></img></a></p --><p style="display: inline;">
+
+原文链接： </p><a target="_blank" ref="nofollow" href="http://creative-punch.net/2014/02/making-animated-radial-menu-css3-javascript/">CREATIVE PUNCH</a><p style="display: inline;">&nbsp;&nbsp;&nbsp;翻译： </p><a href="http://blog.jobbole.com"> 伯乐在线 </a><p style="display: inline;"> - </p><a href="http://blog.jobbole.com/author/heloowird/">heloowird</a><p style="display: inline;">译文链接： </p><a href="http://blog.jobbole.com/65551/">http://blog.jobbole.com/65551/</a><p style="display: inline;">[ </p><span><b>转载必须在正文中标注并保留原文链接、译文链接和译者等信息。</b></span><p style="display: inline;">]</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
