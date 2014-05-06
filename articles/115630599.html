@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Fr B - SVG Fonts usage</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Fr B - SVG Fonts usage</h1>
+<div>
+
+
+
+
+
+<p>The SVG font format <a href="//www.w3.org/TR/SVG11/fonts.html" title="Fonts - SVG 1.1" target="_blank">is defined in the SVG Specification</a> in order to provide one format for fonts of which SVG content developers can be sure that it will be supported by all <a href="//www.w3.org/TR/SVG11/conform.html#ConformingSVGViewers" title="Conformance Criteria - SVG 1.1" target="_blank">conforming SVG viewers</a>, regardless what operating system they are used on; and which can be embedded in an SVG document. When saving an image as SVG, using the vector drawing application of your choice, there might be an option to embed used fonts. This is the easiest way to use SVG fonts, but not always the best. Read on, if you’d like to learn more about how to use SVG fonts. But note that Mozilla Firefox, probably the most widely used SVG supporting webbrowser, does not yet support SVG fonts.</p>
+
+<h2>Where To Get SVG Fonts</h2>
+
+<p>Font files in other formats than SVG can be converted to SVG fonts by opening them in the font editing software <a href="//fontforge.sourceforge.net/" title="FontForge" target="_blank">FontForge</a> and then saving as SVG font. Fonts in the True Type format can also be converted with the <a href="//xmlgraphics.apache.org/batik/tools/font-converter.html" title="SVG Font Converter" target="_blank">Apache Batik SVG Font Converter</a>. Other tools for font conversion exist, and maybe the vector drawing application you use has an option to <em>embed</em> fonts, which means that a font, or part of it, would be converted to the SVG format and written into the same SVG document in which it is used.</p>
+
+<p>Apart from the technological task of converting fonts, there is the question of whether you’re allowed to do so. Most commercial fonts may not be used as web fonts, as this would constitute redistribution, which isn’t permitted by their licences. Even a lot of freely available fonts might be problematic legally. It’s not a widely used technology yet, so it often wasn’t even considered when a font’s license was written.</p>
+
+<p>A good resource for liberally licensed fonts is the <a href="//www.openfontlibrary.org/" title="Open Font Library Type Casting" target="_blank">Open Font Library</a>. All fonts hosted at the Open Font Library are distributed under licenses which definitely permit conversion to other formats and utilisation as web fonts, and more.</p>
+
+<h2>How to Use an External SVG Font</h2>
+
+<p>Once we’ve got a font in SVG format, we can use it in a graphic like this one:</p>
+
+
+
+<p>Remember that SVG fonts don’t work in Firefox. I recommend viewing this page in the <a href="//www.opera.com/" title="Opera browser: Home page" target="_blank">Opera</a> webbrowser. Even when you use Opera in a recent version, the text might get rendered in a system font before the SVG comic font <a href="../resource/font/TomsonTalks">Tomson Talks</a> is downloaded. If the rendering doesn’t update after the correct font is available, selecting the text with the mouse might help.</p>
+
+<p>Now let’s look at the source code for that image to understand, how it’s done:</p>
+
+<pre xml:space="preserve"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 300"&gt;
+&lt;defs &gt;
+<mark> &lt;font-face font-family="Tomson Talks"&gt;
+  &lt;font-face-src&gt;
+   &lt;font-face-uri xlink:href="../font/TomsonTalks.svg#TomsonTalks"&gt;
+    &lt;font-face-format string="svg"/&gt;
+   &lt;/font-face-uri&gt;
+  &lt;/font-face-src&gt;
+ &lt;/font-face&gt;</mark>
+&lt;/defs&gt;
+ &lt;image xlink:href="Imp.jpg" width="400" height="300"/&gt;
+ &lt;path fill="#fff" stroke="#000" stroke-width="3" stroke-miterlimit="50" d="M350 280a400 400 0 0 0 4 -150a100 60 0 1 0 -14 4a400 400 0 0 1 10 146z"/&gt;
+ &lt;text <mark>font-family="'Tomson Talks',sans-serif"</mark> font-size="25"&gt;
+  &lt;tspan x="302" y="60" text-anchor="middle"&gt;You cause&lt;/tspan&gt;
+  &lt;tspan x="302" y="85" text-anchor="middle"&gt;more trouble&lt;/tspan&gt;
+  &lt;tspan x="302" y="110" text-anchor="middle"&gt;than good.&lt;/tspan&gt;
+ &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+<p>There are two things to do, when you want to use an SVG font for text in an SVG image. The first thing is to include a reference to the font file, so an SVG viewer will know where to find it. In the code above this was done with the <nobr><code>font-face</code></nobr> element and its child elements. You can just copy that part, paste it into your graphics, and adapt some of the attributes. The <nobr><code>font-family</code></nobr> attribute should be changed to the name of the font family you would like to use, and the <nobr><code>xlink:href</code></nobr> attribute of the <nobr><code>font-face-uri</code></nobr> element is the reference to the font location. It is important to note that the URL does not just point to the font file. The last part, “<code>#TomsonTalks</code>”, references a specific node within the XML document located at <nobr><code>../font/TomsonTalks.svg</code></nobr> . And that is the <code>font</code> node in which the font is defined. When you <a href="/font/TomsonTalks.svg" target="_blank">open the Tomson Talks file</a> and view its source code you will find that there is a <code>font</code> element with an <code>id</code> attribute set to “TomsonTalks”. For any font you would like to use, you will have to find the id of the <code>font</code> element. This also makes it possible to store multiple fonts in one file. The <code>string</code> attribute of the <nobr><code>font-face-format</code></nobr> element must only be changed if you use a font in a different format, but SVG viewer software is not required to support any other font format than SVG fonts.</p>
+
+<p>There is no strict rule on where the <nobr><code>font-face</code></nobr> element should be, but it’s good practice to place it inside a <code>defs</code> element at the beginning of the file, right after the <code>title</code> element and the first <code>desc</code> element, and before all shape elements.</p>
+
+<p>Alternatively <a href="//www.w3.org/TR/css3-webfonts/" title="CSS3 module: Web Fonts" target="_blank">CSS Web Fonts</a> syntax can be used to reference a font location, but that currently seems to be even less well supported by browsers than the syntax used above.</p>
+
+<p>The second thing you need to do is to specify which font to use for which <code>text</code> elements. In our example this is done with the <nobr><code>font-family</code></nobr> attribute of the <code>text</code> element. Font family names which contain spaces must be put in additional quotation marks. Instead of just one font name, the attribute in the example holds a comma separated list. The second item is not a font name, but a generic font family. It tells the user agent to use a sans serif font if Tomson Talks is not available. Since we told the user agent where to find Tomson Talks, this should ideally not play any role. But the document can already be rendered, while the font file is still loading, and then of course there are SVG viewers in use which don’t support external SVG fonts. With a list of alternative fonts you can still have some control over the style in these cases.</p>
+
+<p>Font selection can also be done with CSS, and CSS properties take precedence over XML attributes, which means you can’t overwrite existing CSS style definitions by adding the <nobr><code>font-family</code></nobr> attribute. If you need to change the font family of text in an existing SVG document without using a vector graphics editor, just with a text editor, then you should use the search and replace functionality to replace all occurences of the font name.</p>
+
+<p>If you use a Font which you have only in SVG format then you probably won’t be able to select it in your vector drawing application. In this case it might be necessary to select a system font, and then replace the font name in a text editor.</p>
+
+<h2>How to Use an Embedded SVG Font</h2>
+
+<p>If you use a font only in one document then you might want to put the font definition directly into that document.</p>
+
+<p>To do this you need to copy the <code>font</code> element from the font file into your SVG image. Everything from <nobr><code>&lt;font </code>…</nobr> to <nobr><code>&lt;/font&gt;</code></nobr> must be in the image file. Normally there will already be a <nobr><code>font-face</code></nobr> element inside the <code>font</code> element, so you won’t have to add one. If there’s no <nobr><code>font-face</code></nobr> element, double-check to be sure there really is none, and if so, you must add one. The <nobr><code>font-face</code></nobr> element should be placed inside the <code>font</code> element, because then the <nobr><code>font-face-src</code></nobr> element may be omitted. Only the <nobr><code>font-family</code></nobr> attribute is needed, so you can use it to refer to the font.</p>
+
+<p>This will normally suffice to make the font available within the document, but there are exceptions. If the font makes use of <em>entities</em> defined in an <em>internal subset <acronym title="document type definition">DTD</acronym></em>, you’d also have to copy the internal subset into your graphics document. This is not something you will encounter in fonts converted from other file formats, but I have created a font, named “spaceagedigital”, which makes use of entity definitions. This technique is practical when parts of glyphs are used multiple times, as is the case with digital display fonts or with accents. But since this is not commonly used, and my own usage is mainly experimental, I won’t go into details here about what would need to be copied to where.</p>
+
+<p>Furthermore it needs to be considered that values of <code>id</code> attributes must be unique within a document, because of which copying together elements from multiple documents can be problematic. Browsers don’t necessarily report an error in case an <code>id</code> is used more than once, but it could cause problems with some software. The <code>font</code> elements needs to have an <code>id</code> so it can be referenced from other documents, but when the font is embedded, the <code>id</code> attribute will normally not be necessary and can be removed.</p>
+
+<p>To reduce the file size glyphs which aren’t used can be removed. Especially for a font which is used in only one image there might be a lot of potential for minimization. Doing this by hand would obviously be cumbersome, and when texts are changed the font would need to be updated. If you want to include only necessary glyphs you should export from a vector graphics editor which offers such a feature.</p>
+
+<p>There is no strict rule on where the <code>font</code> element should be, but it’s good practice to place it inside a <code>defs</code> element at the beginning of the file, right after the <code>title</code> element and the first <code>desc</code> element, and before all shape elements.</p>
+
+<p>Step two, font selection, works just the same as with external fonts.</p>
+
+</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
