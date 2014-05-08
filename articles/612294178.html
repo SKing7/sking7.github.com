@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>7 Things You Didn't Know You Could Do with CSS</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>7 Things You Didn't Know You Could Do with CSS</h1>
+<div>
+
+		<!-- article title, social widgets, article content -->
+	
+	
+			<a href="http://davidwalsh.name/css-filters"><img src="http://davidwalsh.name/demo/css-filters.png" alt="CSS Filters" /></a>
+<p>CSS and JavaScript, believe it or not, are starting to overlap as CSS adds more functionality. When I wrote <a href="http://davidwalsh.name/ways-css-javascript-interact">5 Ways that CSS and JavaScript Interact That You May Not Know About</a>, people were surprised at how CSS and JavaScript have come to overlap. &nbsp;Today I will highlight seven tasks you can accomplish with CSS -- no JavaScript or imagery required!</p>
+
+
+<p>Every good front-end developer feature-tests before using features which&nbsp;a browser may not have. &nbsp;Feature testing has always done with JavaScript, and many people use Modernizr,&nbsp;an impressive utility&nbsp;packed with loads of well-tested&nbsp;routines, to do that feature testing. &nbsp;A new API, however, has come along to let you do feature tests with CSS: &nbsp;<a href="http://davidwalsh.name/css-supports">@supports</a>. &nbsp;Here are a few samples of how <code>@supports</code> works:</p>
+
+<pre>
+/* basic usage */
+@supports(prop:value) {
+	/* more styles */
+}
+
+/* real usage */
+@supports (display: flex) {
+	div { display: flex; }
+}
+
+/* testing prefixes too */
+@supports (display: -webkit-flex) or
+          (display: -moz-flex) or
+          (display: flex) {
+
+    section {
+      display: -webkit-flex;
+      display: -moz-flex;
+    	display: flex;
+    	float: none;
+    }
+}
+</pre>
+
+<p>This new <code>@supports</code> feature, which also has a JavaScript counterpart, is well overdue and we can look forward to using it soon!</p>
+
+
+<p>Write&nbsp;a service&nbsp;to modify an image's color shades and you can sell it to Facebook for a billion dollars! &nbsp;Of course that's an over-simplification but writing image filters isn't&nbsp;exactly a science. &nbsp;I wrote a <a href="https://github.com/darkwing/fotofilter" rel="nofollow">tiny app</a> my first week at Mozilla (which won a contest, BTW...just sayin') which used some JS-based math to create image filters with canvas, but today we can <a href="http://davidwalsh.name/css-filters">create image filters with just CSS</a>!</p>
+
+<pre>
+/* simple filter */
+.myElement {
+	-webkit-filter: blur(2px);
+}
+
+/* advanced filter */
+.myElement {
+	-webkit-filter: blur(2px) grayscale (.5) opacity(0.8) hue-rotate(120deg);
+}
+</pre>
+
+<p>This type of filtering only masks an image's original view&nbsp;and doesn't save or export the image with said filter, but it's great for photo galleries or anywhere else you'd like to add flare to an image!</p>
+
+
+
+
+<p>The <a href="http://davidwalsh.name/pointer-events">CSS <code>pointer-events</code> property</a> provides a&nbsp;method to effectively disable an element, so much so that clicks on a link don't trigger a click event through JavaScript:</p>
+
+<pre>
+/* do nothing when clicked or activated */
+.disabled { pointer-events: none; }
+</pre>
+
+<pre>
+/* this will _not_ fire because of the pointer-events: none application */
+document.getElementById("disabled-element").addEventListener("click", function(e) {
+	alert("Clicked!");
+});
+</pre>
+
+<p>In the example above, the click event wont even fire due to the CSS <code>pointer-events</code> value. &nbsp;I find this of massive utility as you don't need to do className or attribute checks everywhere to see if something is disabled.</p>
+
+
+
+
+
+<p>CSS affords us the ability to create transitions and animations but oftentimes we need JavaScript libraries to give us a hand in modifying a few things and controlling the animation. &nbsp;One such popular animation is the <a href="http://davidwalsh.name/css-slide">slide up and&nbsp;slide down effect</a>, which most people don't know can be accomplished with only CSS!</p>
+
+<pre>
+/* slider in open state */
+.slider {
+	overflow-y: hidden;
+	max-height: 500px; /* approximate max height */
+
+	transition-property: all;
+	transition-duration: .5s;
+	transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+
+/* close it with the "closed" class */
+.slider.closed {
+	max-height: 0;
+}
+</pre>
+
+<p>A clever use of <code>max-height</code> allows the&nbsp;element to grow and shrink as needed.</p>
+
+
+
+
+
+<p>We'll always have a giggle at what&nbsp;the term "counter" means on the internet, but <a href="http://davidwalsh.name/css-counters">CSS counters</a> are another thing entirely. &nbsp;CSS counters allow developers to increment a counter and display it via <code>:before</code> or <code>:after</code> for a given element:</p>
+
+<pre>
+/* initialize the counter */
+ol.slides {
+	counter-reset: slideNum;
+}
+
+/* increment the counter */
+ol.slides &gt; li {
+	counter-increment: slideNum;
+}
+
+/* display the counter value */
+ol.slides li:after {
+	content: "[" counter(slideNum) "]";
+}
+</pre>
+
+<p>You often see CSS counters used in slideshows at conferences and even in lists like a table of contents.</p>
+
+
+
+
+
+<p>There are loads of&nbsp;CSS best practice documents out there, and they'll all start with how to name your CSS classes. &nbsp;What you'll never see is one of those documents telling you to use <a href="http://davidwalsh.name/unicode-css-classes">unicode symbols&nbsp;to name your classes</a>:</p>
+
+<pre>
+.ಠ_ಠ {
+	border: 1px solid #f00;
+	background: pink;
+}
+
+.❤ {
+	background: lightgreen;
+	border: 1px solid green;
+}
+</pre>
+
+<p>Please don't use these. &nbsp;Please. &nbsp;BUT YOU CAN!</p>
+
+
+
+
+
+
+<p><a href="http://davidwalsh.name/css-triangles">CSS&nbsp;triangles</a> are a neat trick but so are <a href="http://davidwalsh.name/css-circles">CSS&nbsp;circles</a>. &nbsp;By abusing CSS <code>border-radius</code>, you can create flawless circles!</p>
+
+<pre>
+.circle {
+	border-radius: 50%;
+	width: 200px;
+	height: 200px; 
+	/* width and height can be anything, as long as they're equal */
+}
+</pre>
+
+<a href="http://davidwalsh.name/css-circles"><img src="http://davidwalsh.name/demo/css-circles.png" alt="CSS Circle" /></a>
+<p>You can add gradients to your circles&nbsp;and&nbsp;you can even use CSS animations to spin them around! &nbsp;CSS has a more <a href="http://alistapart.com/article/css-shapes-101" rel="nofollow">uniform API for Shapes coming</a> but you can create circles with this hack now!</p><p>There you have it: &nbsp;seven things you can do with CSS that you may be surprised at. &nbsp;A few are quite useful, a few are more edge cases. &nbsp;Let me know if I've missed an awesome CSS task that you use frequently!</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
