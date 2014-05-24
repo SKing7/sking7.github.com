@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The Curious Case of JavaScript NaN</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The Curious Case of JavaScript NaN</h1>
+<div>
+							<p><a href="http://en.wikipedia.org/wiki/NaN">NaN</a>, not a number, is a special <del datetime="2014-05-22T06:00:13+00:00">type</del> value used to denote an unrepresentable value. With JavaScript, <code>NaN</code> can cause some confusion, starting from its <code>typeof</code> and all to the way the comparison is handled.</p>
+<p>Several operations can lead to <code>NaN</code> as the result. Here are some examples (follow along on JSBin: <a href="http://jsbin.com/yulef/1/edit?js,console">jsbin.com/yulef</a>):</p>
+
+<div><table><tr><td><pre><span>Math</span>.<span>sqrt</span><span>(</span><span>-</span><span>2</span><span>)</span>
+<span>Math</span>.<span>log</span><span>(</span><span>-</span><span>1</span><span>)</span>
+<span>0</span><span>/</span><span>0</span>
+parseFloat<span>(</span><span>'foo'</span><span>)</span></pre></td></tr></table></div>
+
+<p>The first trap for many JavaScript beginners is usually the unexpected result of calling <code>typeof</code>:</p>
+
+<div><table><tr><td><pre>console.<span>log</span><span>(</span><span>typeof</span> <span>NaN</span><span>)</span><span>;</span>   <span>// 'number'</span></pre></td></tr></table></div>
+
+<p>In a way, while NaN isn’t supposed to be a number, its type is number. Got it?</p>
+<p>Stay calm, as this will continue to lead to many confusing paths. Let’s compare two NaNs:</p>
+
+<div><table><tr><td><pre><span>var</span> x <span>=</span> <span>Math</span>.<span>sqrt</span><span>(</span><span>-</span><span>2</span><span>)</span><span>;</span>
+<span>var</span> y <span>=</span> <span>Math</span>.<span>log</span><span>(</span><span>-</span><span>1</span><span>)</span><span>;</span>
+console.<span>log</span><span>(</span>x <span>==</span> y<span>)</span><span>;</span>      <span>// false</span></pre></td></tr></table></div>
+
+<p>Maybe that’s because we’re supposed to use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_when_to_use_them">strict equal</a> (===) operator instead? Apparently not.</p>
+
+<div><table><tr><td><pre><span>var</span> x <span>=</span> <span>Math</span>.<span>sqrt</span><span>(</span><span>-</span><span>2</span><span>)</span><span>;</span>
+<span>var</span> y <span>=</span> <span>Math</span>.<span>log</span><span>(</span><span>-</span><span>1</span><span>)</span><span>;</span>
+console.<span>log</span><span>(</span>x <span>===</span> y<span>)</span><span>;</span>      <span>// false</span></pre></td></tr></table></div>
+
+<p>Arrgh! Could it be because they are NaNs from two different operations? What about…</p>
+
+<div><table><tr><td><pre><span>var</span> x <span>=</span> <span>Math</span>.<span>sqrt</span><span>(</span><span>-</span><span>2</span><span>)</span><span>;</span>
+<span>var</span> y <span>=</span> <span>Math</span>.<span>sqrt</span><span>(</span><span>-</span><span>2</span><span>)</span><span>;</span>
+console.<span>log</span><span>(</span>x <span>==</span> y<span>)</span><span>;</span>      <span>// false</span></pre></td></tr></table></div>
+
+<p>Even crazier:</p>
+
+<div><table><tr><td><pre><span>var</span> x <span>=</span> <span>Math</span>.<span>sqrt</span><span>(</span><span>-</span><span>2</span><span>)</span><span>;</span>
+console.<span>log</span><span>(</span>x <span>==</span> x<span>)</span><span>;</span>      <span>// false</span></pre></td></tr></table></div>
+
+<p>What about comparing two real NaNs?</p>
+
+<div><table><tr><td><pre>console.<span>log</span><span>(</span><span>NaN</span> <span>===</span> <span>NaN</span><span>)</span><span>;</span> <span>// false</span></pre></td></tr></table></div>
+
+<p>Because there are many ways to represent a NaN, it makes sense that one NaN will not be equal to another NaN. Still, this is the reason why I sometimes tweet:</p>
+
+
+<p>To solve this, originally I intended to submit this proposal for ECMAScript 7:</p>
+<a href="http://ariya.ofilabs.com/wp-content/uploads/2014/05/nan.png"><img src="http://ariya.ofilabs.com/wp-content/uploads/2014/05/nan.png" alt="nan" /></a>
+<p>But of course, <a href="http://www.2ality.com/2012/02/nan-infinity.html">solutions</a> (and workarounds) already exist today.</p>
+<p>Let’s get to know the global function <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN</a>:</p>
+
+<div><table><tr><td><pre>console.<span>log</span><span>(</span>isNaN<span>(</span><span>NaN</span><span>)</span><span>)</span><span>;</span>      <span>// true</span></pre></td></tr></table></div>
+
+<p>Alas, <code>isNan()</code> has its own well-known flaws:</p>
+
+<div><table><tr><td><pre>console.<span>log</span><span>(</span>isNaN<span>(</span><span>'hello'</span><span>)</span><span>)</span><span>;</span>  <span>// true</span>
+console.<span>log</span><span>(</span>isNaN<span>(</span><span>[</span><span>'x'</span><span>]</span><span>)</span><span>)</span><span>;</span>    <span>// true</span>
+console.<span>log</span><span>(</span>isNaN<span>(</span><span>{</span><span>}</span><span>)</span><span>)</span><span>;</span>       <span>// true</span></pre></td></tr></table></div>
+
+<p>This often leads to a number of different workarounds. One example is to exploit the non-reflective nature of NaN (see e.g. Kit Cambridge’s <a href="https://gist.github.com/kitcambridge/1086528">note</a>):</p>
+
+<div><table><tr><td><pre><span>var</span> My <span>=</span> <span>{</span>
+  isNaN<span>:</span> <span>function</span> <span>(</span>x<span>)</span> <span>{</span> <span>return</span> x <span>!==</span> x<span>;</span> <span>}</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>Another example is to check for the value’s type first (to prevent coercion):</p>
+
+<div><table><tr><td><pre>My.<span>isNaN</span> <span>=</span> <span>function</span><span>(</span>x<span>)</span> <span>{</span> <span>return</span> <span>typeof</span> x <span>===</span> <span>'number'</span> <span>&amp;&amp;</span> isNaN<span>(</span>x<span>)</span><span>}</span><span>;</span></pre></td></tr></table></div>
+
+<p>Fortunately, for the upcoming ECMAScript 6, there is <code>Number.isNaN()</code> which provides a true <code>NaN</code> detection (BTW, you can already use this function in the latest version of Chrome and Firefox). In the <a href="http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts">latest draft</a> from April 2014 (Rev 24), this is specified in Section 20.1.2.4:</p>
+<blockquote><p>When the Number.isNaN is called with one argument number, the following steps are taken:<br />1. If Type(number) is not Number, return false.<br />2. If number is NaN, return true.<br />3. Otherwise, return false.
+</p></blockquote>
+<p>In other words, it returns <code>true</code> only if the argument is <em>really</em> NaN:</p>
+
+<div><table><tr><td><pre>console.<span>log</span><span>(</span><span>Number</span>.<span>isNaN</span><span>(</span><span>NaN</span><span>)</span><span>)</span><span>;</span>            <span>// true</span>
+console.<span>log</span><span>(</span><span>Number</span>.<span>isNaN</span><span>(</span><span>Math</span>.<span>sqrt</span><span>(</span><span>-</span><span>2</span><span>)</span><span>)</span><span>)</span><span>;</span>  <span>// true</span>
+&nbsp;
+console.<span>log</span><span>(</span><span>Number</span>.<span>isNaN</span><span>(</span><span>'hello'</span><span>)</span><span>)</span><span>;</span>        <span>// false</span>
+console.<span>log</span><span>(</span><span>Number</span>.<span>isNaN</span><span>(</span><span>[</span><span>'x'</span><span>]</span><span>)</span><span>)</span><span>;</span>          <span>// false</span>
+console.<span>log</span><span>(</span><span>Number</span>.<span>isNaN</span><span>(</span><span>{</span><span>}</span><span>)</span><span>)</span><span>;</span>             <span>// false</span></pre></td></tr></table></div>
+
+<p>Next time you need to deal with NaN, be extremely careful!</p>
+							
+												
+						</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
