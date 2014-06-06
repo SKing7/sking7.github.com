@@ -19,7 +19,7 @@
       <div class="app-content">
         <div class="app-section">
             <!-- in your app-content -->
-            <input type="search" class="app-input"> <!-- will have search icon -->
+            <input type="search" class="app-input" placeholder="search"> <!-- will have search icon -->
         </div>
         <div class="app-button" data-target="page2">下一页</div>
       </div>
@@ -32,7 +32,6 @@
       </div>
       <div class="app-content">
         <div class="app-button left m-top" data-back>Back</div>
-        <div class="app-button right m-top">Forward</div>
         <ul class="app-list m-top">
             <li>Item 1</li>
             <li>Item 2</li>
@@ -54,16 +53,6 @@
             <li>Item 1</li>
             <li>Item 1</li>
             <li>Item 1</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
         </ul>
       </div>
       <div class="app-content">
@@ -89,7 +78,6 @@
         });
         App.controller('page3', function (page) {
             App.infiniteScroll($(page).find('.J-infinite-list'), function (next) {
-console.log(next);
                 // dynamically fetch data
                 var list = ['abc'];
                 // add html elements to list
