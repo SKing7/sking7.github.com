@@ -38,6 +38,35 @@
             <li>Item 2</li>
             <li>Item 3</li>
         </ul>
+        <div class="app-button m-top" data-target="page3">下一页</div>
+      </div>
+    </div>
+    <div class="app-page" data-page="page3">
+      <div class="app-topbar">
+        <div class="app-button left" data-back data-autotitle></div>
+        <div class="app-title">Page 3</div>
+        <ul class="app-list J-infinite-list">
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+            <li>Item 1</li>
+            <li>Item 1</li>
+            <li>Item 1</li>
+            <li>Item 1</li>
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+        </ul>
+      </div>
+      <div class="app-content">
       </div>
     </div>
     <div class="app-page dark-page" data-page="viewer">
@@ -57,6 +86,16 @@
         });
 
         App.controller('page2', function (page) {
+        });
+        App.controller('page3', function (page) {
+console.log($(page).find('.J-infinite-list'));
+            App.infiniteScroll($(page).find('.J-infinite-list'), function (next) {
+console.log(next);
+                // dynamically fetch data
+                var list = ['abc'];
+                // add html elements to list
+                next(list);
+            });
         });
         App.controller('viewer', function (page, data) {
           var photoViewer = new PhotoViewer(page, data.urls);
