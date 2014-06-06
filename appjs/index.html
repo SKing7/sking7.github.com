@@ -27,7 +27,13 @@
         <div class="app-title">Page 2</div>
       </div>
       <div class="app-content">
-        Page 2 is lonely
+        <div class="app-button left" data-back>Back</div>
+        <div class="app-button right">Forward</div>
+        <ul class="app-list">
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+        </ul>
       </div>
     </div>
 
@@ -45,7 +51,7 @@
       try {
         App.restore();
       } catch (err) {
-        App.load('home');
+        App.load('home', 'fade');
       }
     </script>
   </body>
