@@ -14,13 +14,14 @@
   <body>
     <div class="app-page" data-page="home">
       <div class="app-topbar">
-        <div class="app-title">Home page</div>
+        <div class="app-title">首页</div>
       </div>
       <div class="app-content">
         <div class="app-section">
             <!-- in your app-content -->
             <input type="search" class="app-input"> <!-- will have search icon -->
         </div>
+        <div class="app-button" data-target="page2">下一页</div>
       </div>
     </div>
 
@@ -61,12 +62,12 @@
           var photoViewer = new PhotoViewer(page, data.urls);
         });
         try {
-            App.restore();
+            //App.restore();
+            App.load('home', 'slide-left');
         } catch (err) {
-            App.load('home', 'fade');
         }
         App.dialog({
-          title        : '确定要进入？',
+          title        : '确定要查看图片viewer？',
           text         : 'welcome!模仿mobile对话框',
           okButton     : 'OK',
           cancelButton : 'Cancel'
