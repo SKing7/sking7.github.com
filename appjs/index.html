@@ -88,13 +88,11 @@
         App.controller('page2', function (page) {
         });
         App.controller('page3', function (page) {
-console.log($(page).find('.J-infinite-list'));
             App.infiniteScroll($(page).find('.J-infinite-list'), function (next) {
 console.log(next);
                 // dynamically fetch data
                 var list = ['abc'];
                 // add html elements to list
-                next(list);
             });
         });
         App.controller('viewer', function (page, data) {
