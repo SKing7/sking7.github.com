@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>So You Think You’ve Built a Good Infinite Scroll</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>So You Think You’ve Built a Good Infinite Scroll</h1>
+<div id="post-body-7774107182723773526" itemprop="articleBody"><figure>
+<img src="http://1.bp.blogspot.com/-5sR0l82QrC4/U4osZWVnj8I/AAAAAAAAFpI/zYNAAsoVhys/s1600/PewResearch_infScroll_small.gif" alt="Animated GIF showing mouse and keyboard scrolling efforts with infinite scroll on Pew Research site." />
+<figcaption>So you’re saying there’s a chance … that I’ll make it to the footer.</figcaption>
+</figure><p>
+Last week Derek Featherstone posted <cite><a href="http://simplyaccessible.com/article/infinite-scrolling/">Automatic infinite scrolling and accessibility</a></cite>, a quick rundown of why having your page just keep going without user input to do so can be such a hassle for users. Also, don’t do it.
+</p><p>
+In the comments <a href="http://simplyaccessible.com/article/infinite-scrolling/#comment-2609">someone trotted out</a> an example of <a href="http://www.pewresearch.org/category/publications/">his own automatic infinite scroll</a> that he felt was effective and was developed with the user in mind. <a href="http://simplyaccessible.com/article/infinite-scrolling/#comment-2621">I got a bit ranty</a> and suggested otherwise. That wasn’t as productive as it could be, partly because I was commenting on one example that other developers might feel doesn’t apply to their own efforts at similar implementations.
+</p><p>
+I think maybe this could all be made a bit easier by offering a quick checklist of what to test, expect, and review if you attempt your own version of an automatic infinite scroll. Here is my attempt at one, but please feel free to suggest others (or corrections) in the comments below.
+</p><h2>1. Can the user hit “back” and return to the exact same place?</h2><p>
+There’s nothing quite so infuriating as loading a few screenfuls of content, following a link, and then coming back only to find you have to reload those screenfuls of content all over again. Not only is it a waste of time, it’s a waste of bandwidth.
+</p><h2>2. Is there paging for when the JavaScript breaks?</h2><p>
+Everybody surfs without JavaScript while the page is loading, and that load time can be extended by network lag. In addition, broken third-party scripts can take down your own script. Can the user still get past page one if the JavaScript has fallen down?
+</p><h2>3. Does the page have a footer?</h2><p>
+Now you’re just being a tease. The user will never get there, so don’t lie by showing the footer and implying he or she can get there. You might as well just remove it. It’s at least honest.
+</p><h2>4. Can a keyboard user access all other content on the page?</h2><p>
+Unless the content that keeps updating is (or contains) the last focus-able element in the source order (the linearized version of your page), then a keyboard user (as well as screen reader users) will never be able to get to that content. Just like the footer you might as well remove it altogether.
+</p><h2>5. Can you share a URL to a specific place on the page?</h2><p>
+After you’ve gone a few screenfuls deep you may have found a few links of interest. Can you copy the address from the browser and email it (or even tweet it) and expect the recipient will come to exact state of the page (a few screenfuls in and with that content visible in the viewport)? Remember, an anchor is useless if it hasn’t loaded yet (or has been co-opted by your script).
+</p><h2>6. Can a user easily jump ahead a few “pages” to quickly get to content much further down the list?</h2><p>
+Consider a list of news. After a couple screenfuls you might glean that each screen loads a week (or a month or whatever time period). You want content from a few weeks ago (or a few time periods ago). In a traditional paged navigation you could jump ahead a few screens to more quickly get further down the timeline. If your approach doesn’t afford users this control, you’re wasting your users’ time and bandwidth.
+</p><h2>7. Does the memory footprint of the page dramatically increase after just a couple new “pages?”</h2><p>
+Keep your favorite memory monitoring tool open and load a few screenfuls. Then a few more. Then perhaps all. Take a look at how much memory this requires and then compare to available memory on other devices (such as smart phones). Remember that a mobile browser may reclaim memory by dumping other resources from working memory, potentially purging the rest of your site and its assets from the user’s cache, resulting in more bandwidth overhead and longer download times on subsequent pages.
+</p><h2>8. Is there a way to disable automatic infinite scrolling and lean on standard paging?</h2><p>
+Can the user easily disable the infinite scroll? Forget browser configuration acrobatics, instead look for a very visible single-click/tap option for the user to disable infinite scrolling and move on.
+</p><h2>9. Have you conducted any user tests?</h2><p>
+Before you roll this out, make sure some real users sit down in front of it. Nobody from your organization. Nobody who is an IT professional, developer, or whose paycheck depends on making you or your boss happy.
+</p><h2>10. Are you satisfying a use case that has come from research or user request?</h2><p>
+Did this feature request come from users, or the client? Or your boss? Or your desire to flex your scripting muscles? If you don’t have a compelling use case or feature request to add it, you may want to put your efforts toward features that truly have value, like <a href="http://blog.adrianroselli.com/search/label/print">print styles</a>.
+</p><h2>11. Do you have any analytics/tracking to measure success?</h2><p>
+If you do decide to launch your perfect automatic infinite scroll feature, don’t forget to put some tracking scripts in place to determine how many screens deep your users go, and how often they click. There are other things you can measure (like if the footer ever gets clicks on that page). After all, success isn’t measured by you launching, but by whether or not it works well.
+</p><!--
+<a href="http://3.bp.blogspot.com/-UmWflTLUyX8/U4osZbjQsUI/AAAAAAAAFpM/5HEKqKFQi_k/s1600/PewResearch_infScroll.gif" imageanchor="1" ><img border="0" src="http://3.bp.blogspot.com/-UmWflTLUyX8/U4osZbjQsUI/AAAAAAAAFpM/5HEKqKFQi_k/s1600/PewResearch_infScroll.gif" /></a><a href="http://1.bp.blogspot.com/-5sR0l82QrC4/U4osZWVnj8I/AAAAAAAAFpI/zYNAAsoVhys/s1600/PewResearch_infScroll_small.gif" imageanchor="1" ><img border="0" src="http://1.bp.blogspot.com/-5sR0l82QrC4/U4osZWVnj8I/AAAAAAAAFpI/zYNAAsoVhys/s1600/PewResearch_infScroll_small.gif" /></a>
+--></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

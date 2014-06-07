@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JSON Hijacking - You've Been Haacked</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>JSON Hijacking - You've Been Haacked</h1>
+<div itemprop="articleBody"><p>A while back I wrote about <a href="http://haacked.com/archive/2008/11/20/anatomy-of-a-subtle-json-vulnerability.aspx" title="Anatomy of a Subtle JSON Vulnerability">a subtle JSON
+vulnerability</a>
+which could result in the disclosure of sensitive information. That
+particular exploit involved overriding the JavaScript <code>Array</code>
+constructor to disclose the payload of a JSON array, something which
+most browsers do not support now.</p><p>However, there’s another related exploit that seems to affect many more
+browsers. It was brought to my attention recently by someone at
+Microsoft and <a href="http://hanselman.com/" title="Scott Hanselman's Blog">Scott
+Hanselman</a> and I
+demonstrated it at the Norwegian Developers Conference last week, though
+it has been <a href="http://hackademix.net/2009/01/13/you-dont-know-what-my-twitter-leaks/" title="You don't know what my twitter leaks">demonstrated against Twitter in the
+past</a>.</p><p><a href="http://www.sxc.hu/photo/676972" title="Car Theft by alicja_M on stock.xchng"><img src="http://haacked.com/images/haacked_com/WindowsLiveWriter/JSONHijacking_B386/hijack_3.jpg" alt="hijack" title="hijack" /></a></p><p>Before I go further, let me give you the punch line first in terms of
+what this vulnerability affects.</p><p>This vulnerability requires that you are exposing a JSON service which…</p><ul>
+<li>  …returns sensitive data.</li>
+<li>  …returns a JSON array.</li>
+<li>  …responds to GET requests.</li>
+<li>  …the browser making the request has JavaScript enabled (very likely
+the case)</li>
+<li>  …the browser making the request supports the <code>__defineSetter__</code>
+method.</li>
+</ul><p>Thus if you never send sensitive data in JSON format, or you only send
+JSON in response to a POST request, etc. then your site is probably not
+vulnerable to <em>this particular vulnerability</em> (though there could be
+others).</p><p>I’m terrible with Visio, but I thought I’d give it my best shot and try
+to diagram the attack the best I could. In this first screenshot, we see
+the unwitting victim logging into the vulnerable site, and the
+vulnerable site issues an authentication cookie, which the browser holds
+onto.</p><p><img src="http://haacked.com/images/haacked_com/WindowsLiveWriter/JSONHijacking_B386/Json-Hijack-1_3.png" alt="Json-Hijack-1" title="Json-Hijack-1" /></p><p>At some point, either in the past, or the near future, the bad guy spams
+the victim with an email promising a hilariously funny video of a
+hamster on a piano.</p><p><img src="http://haacked.com/images/haacked_com/WindowsLiveWriter/JSONHijacking_B386/Json-Hijack-2_3.png" alt="Json-Hijack-2" title="Json-Hijack-2" /></p><p>But the link actually points to the bad guy’s website. When the victim
+clicks on the link, the next two steps happen in quick succession.
+First, the victim’s browser makes a request for the bad guy’s website.</p><p><img src="http://haacked.com/images/haacked_com/WindowsLiveWriter/JSONHijacking_B386/Json-Hijack-3_6.png" alt="Json-Hijack-3" title="Json-Hijack-3" /></p><p>The website responds with some HTML containing some JavaScript along
+with a <code>script</code> tag. When the browser sees the script tag, it makes
+<em>another GET request</em> back to the vulnerable site to load the script,
+<em>sending the auth cookie along</em>.</p><p><img src="http://haacked.com/images/haacked_com/WindowsLiveWriter/JSONHijacking_B386/Json-Hijack-4_3.png" alt="Json-Hijack-4" title="Json-Hijack-4" /></p><p>The bad guy has tricked the victim’s <em>browser</em> to issue a request for
+the JSON containing sensitive information using the browser’s
+credentials (aka the auth cookie). This loads the JSON array as
+executable JavaScript and now the bad guy has access to this data.</p><p>To gain a deeper understanding, it may help to see actual code (which
+you can download and run) which demonstrates this attack.</p><p>Note that the following demonstration is not specific to ASP.NET or
+ASP.NET MVC in any way, I just happen to be using <a href="http://asp.net/mvc" title="ASP.NET MVC Website">ASP.NET
+MVC</a> to demonstrate it.
+Suppose the Vulnerable Website returns JSON with sensitive data via an
+action method like this.</p><div><pre><code data-lang="csharp"><span>[Authorize]</span>
+<span>public</span> <span>JsonResult</span> <span>AdminBalances</span><span>()</span> <span>{</span>
+  <span>var</span> <span>balances</span> <span>=</span> <span>new</span><span>[]</span> <span>{</span>
+    <span>new</span> <span>{</span><span>Id</span> <span>=</span> <span>1</span><span>,</span> <span>Balance</span><span>=</span><span>3.14</span><span>},</span> 
+    <span>new</span> <span>{</span><span>Id</span> <span>=</span> <span>2</span><span>,</span> <span>Balance</span><span>=</span><span>2.72</span><span>},</span>
+    <span>new</span> <span>{</span><span>Id</span> <span>=</span> <span>3</span><span>,</span> <span>Balance</span><span>=</span><span>1.62</span><span>}</span>
+  <span>};</span>
+  <span>return</span> <span>Json</span><span>(</span><span>balances</span><span>);</span>
+<span>}</span>
+</code></pre></div><p>Assuming this is a method of <code>HomeController</code>, you can access this
+action via a GET request for <code>/Home/AdminBalances</code> which returns the
+following JSON:</p><blockquote>
+<p><code>[{"Id":1,"Balance":3.14},{"Id":2,"Balance":2.72},{"Id":3,"Balance":1.62}]</code></p>
+</blockquote><p>Notice that I’m requiring authentication via the <code>AuthorizeAttribute</code> on
+this action method, so an anonymous GET request will not be able to view
+this sensitive data.</p><p>The fact that this is a JSON array is important. It turns out that a
+script that contains a JSON array is a valid JavaScript script and can
+thus be executed. A script that just contains a JSON object is not a
+valid JavaScript file. For example, if you had a JavaScript file that
+contained the following JSON:</p><blockquote>
+<p>{"Id":1, "Balance":3.14}</p>
+</blockquote><p>And you had a script tag that referenced that file:</p><blockquote>
+<p><code>&lt;script src="http://example.com/SomeJson"&gt;&lt;/script&gt;</code></p>
+</blockquote><p>You would get a JavaScript error in your HTML page. However, through an
+unfortunate coincidence, if you have a script tag that references a file
+only containing a JSON array, that would be considered valid JavaScript
+and the array gets executed.</p><p>Now let’s look at the HTML page that the bad guy hosts on his/her own
+server:</p><div><pre><code data-lang="csharp"><span>&lt;</span><span>html</span><span>&gt;</span> 
+<span>...</span>
+<span>&lt;</span><span>body</span><span>&gt;</span> 
+    <span>&lt;</span><span>script</span> <span>type</span><span>=</span><span>"text/javascript"</span><span>&gt;</span> 
+        <span>Object</span><span>.</span><span>prototype</span><span>.</span><span>__defineSetter__</span><span>(</span><span>'</span><span>Id</span><span>'</span><span>,</span> <span>function</span><span>(</span><span>obj</span><span>){</span><span>alert</span><span>(</span><span>obj</span><span>);});</span>
+    <span>&lt;/</span><span>script</span><span>&gt;</span> 
+    <span>&lt;</span><span>script</span> <span>src</span><span>=</span><span>"http://example.com/Home/AdminBalances"</span><span>&gt;&lt;/</span><span>script</span><span>&gt;</span> 
+<span>&lt;/</span><span>body</span><span>&gt;</span> 
+<span>&lt;/</span><span>html</span><span>&gt;</span>
+</code></pre></div><p>What’s happening here? Well the bad guy is changing the prototype for
+<code>Object</code> using the special <code>__defineSetter__</code> method which allows
+overriding what happens when a property setter is being called.</p><p>In this case, any time a property named <code>Id</code> is being set on any object,
+an anonymous function is called which displays the value of the property
+using the alert function. Note that the script could just as easily post
+the data back to the bad guy, thus disclosing sensitive data.</p><p>As mentioned before, the bad guy needs to get you to visit his malicious
+page shortly after logging into the vulnerable site while your session
+on that site is still valid. Typically a phishing attack via email
+containing a link to the evil site does the trick.</p><p>If by blind bad luck you’re still logged into the original site when you
+click through to the link, the browser will send your authentication
+cookie to the website when it loads the script referenced in the script
+tag. As far as the original site is concerned, you’re making a valid
+authenticated request for the JSON data and it responds with the data,
+which now gets executed in your browser. This may sound familiar as it
+is really a variant of a <a href="http://haacked.com/archive/2009/04/02/anatomy-of-csrf-attack.aspx" title="Anatomy of a CSRF attack">Cross Site Request Forgery (CSRF)
+attack</a>
+which I wrote about before.</p><p>If you want to see it for yourself, you can grab the <a href="https://github.com/Haacked/CodeHaacks" title="CodeHaacks on GitHub"><strong>CodeHaacks
+solution from
+GitHub</strong></a>
+and run the <em>JsonHijackDemo</em> project locally (right click on the project
+and select <em>Set as StartUp Project</em>. Just follow the instructions on the
+home page of the project to see the attack in action. It will tell you
+to visit
+<a href="http://demo.haacked.com/security/JsonAttack.html">http://demo.haacked.com/security/JsonAttack.html</a>.</p><p>Note that this attack does not work on IE 8 which will tell you that
+<code>__defineSetter__</code> is not a valid method. Last I checked, it <em>does</em> work
+on Chrome and Firefox.</p><p>The mitigation is simple. Either never send JSON arrays OR always
+require an HTTP POST to get that data (except in the case of
+non-sensitive data in which case you probably don’t care). For example,
+with ASP.NET MVC, you could use the <code>AcceptVerbsAttribute</code> to enforce
+this like so:</p><div><pre><code data-lang="csharp"><span>[Authorize]</span>
+<span>[AcceptVerbs(HttpVerbs.Post)]</span>
+<span>public</span> <span>JsonResult</span> <span>AdminBalances</span><span>()</span> <span>{</span>
+  <span>var</span> <span>balances</span> <span>=</span> <span>new</span><span>[]</span> <span>{</span>
+    <span>new</span> <span>{</span><span>Id</span> <span>=</span> <span>1</span><span>,</span> <span>Balance</span><span>=</span><span>3.14</span><span>},</span> 
+    <span>new</span> <span>{</span><span>Id</span> <span>=</span> <span>2</span><span>,</span> <span>Balance</span><span>=</span><span>2.72</span><span>},</span>
+    <span>new</span> <span>{</span><span>Id</span> <span>=</span> <span>3</span><span>,</span> <span>Balance</span><span>=</span><span>1.62</span><span>}</span>
+  <span>};</span>
+  <span>return</span> <span>Json</span><span>(</span><span>balances</span><span>);</span>
+<span>}</span>
+</code></pre></div><p>One issue with this approach is that many JavaScript libraries such as
+jQuery request JSON using a GET request by default, not POST. For
+example, <code>$.getJSON</code> issues a GET request by default. So when calling
+into this JSON service, you need to make sure you issue a POST request
+with your client library.</p><p>ASP.NET and WCF JSON service endpoints actually wrap their JSON in an
+object with the “d” property as I <a href="http://haacked.com/archive/2008/11/20/anatomy-of-a-subtle-json-vulnerability.aspx" title="Json Vulnerability">wrote about a while
+back</a>.
+While it might seem odd to have to go through this property to get
+access to your data, this awkwardness is eased by the fact that the
+generated client proxies for these services strip the “d” property so
+the end-user doesn’t need to know it was ever there.</p><p>With ASP.NET MVC (and other similar frameworks), a significant number of
+developers are not using client generated proxies (we don’t have them)
+but instead using jQuery and other such libraries to call into these
+methods, making the “d” fix kind of awkward.</p><h3>What About Checking The Header?</h3><p>Some of you might be wondering, “why not have the JSON service check for
+a special header such as the <code>X-Requested-With: XMLHttpRequest</code> or
+<code>Content-Type: application/json</code> before serving it up in response to a
+GET request?” I too thought this might be a great mitigation because
+most client libraries send one or the other of these headers, but a
+browser’s GET request in response to a script tag would not.</p><p>The problem with this (as a couple of co-workers pointed out to me) is
+that at some point in the past, the user may have made a legitimate GET
+request for that JSON in which case it may well be cached in the user’s
+browser or in some proxy server in between the victim’s browser and the
+vulnerable website. In that case, when the browser makes the GET request
+for the script, the request might get fulfilled from the browser cache
+or proxy cache. You could try setting <code>No-Cache</code> headers, but at that
+point you’re trusting that the browser and all proxy servers correctly
+implement caching and that the user can’t override that accidentally.</p><p>Of course, this particular caching issue isn’t a problem if you’re
+serving up your JSON using SSL.</p><h3>The real issue?</h3><p>There’s a post at the Mozilla Developer Center which states that object
+and array initializers <a href="https://developer.mozilla.org/web-tech/2009/04/29/object-and-array-initializers-should-not-invoke-setters-when-evaluated/" title="initializers should not invoke setters">should not invoke setters when
+evaluated</a>,
+which at this point, I tend to agree with, though a comment to that post
+argues that perhaps browsers really shouldn’t execute scripts regardless
+of their content type, which is also a valid complaint.</p><p>But at the end of the day, assigning blame doesn’t make your site more
+secure. These type of browser quirks will continue to crop up from time
+to time and we as web developers need to deal with them. Chrome
+2.0.172.31 and <a href="http://www.oldapps.com/firefox.php?old_firefox=59" title="Download FireFox 3.0.11">Firefox
+3.0.11</a>
+were both vulnerable to this. IE 8 was not because it doesn’t support
+this method. I didn’t try it in IE 7 or IE 6.</p><p>It seems to me that to be secure by default, the default behavior for
+accessing JSON should probably be POST and you should opt-in to GET,
+rather than the other way around as is done with the current client
+libraries. What do you think? And how do other platforms you’ve worked
+with handle this? I’d love to hear your thoughts.</p><p>In case you missed it, here are the repro steps again: grab the
+<a href="https://github.com/Haacked/CodeHaacks" title="CodeHaacks on GitHub"><strong>CodeHaacks solution from
+GitHub</strong></a>
+and run the <em>JsonHijackDemo</em> project locally (right click on the project
+and select <em>Set as StartUp Project</em>. Just follow the instructions on the
+home page of the project to see the attack in action. To see a
+successful attack, you’ll need to do this in a vulnerable browser such
+as <a href="http://www.oldapps.com/firefox.php?old_firefox=59" title="Download FireFox 3.0.11">Firefox
+3.0.11</a>.</p><p>I followed up this post with <a href="http://haacked.com/archive/2009/06/26/too-late-to-change-json.aspx" title="Too late to change JSON?">a proposal to fix
+JSON</a>
+to prevent this particular issue.</p><p>Tags: <a href="http://haacked.com/tags/aspnetmvc/default.aspx">aspnetmvc</a>,
+<a href="http://haacked.com/tags/json/default.aspx">json</a>,
+<a href="http://haacked.com/tags/javascript/default.aspx">javascript</a>,
+<a href="http://haacked.com/tags/security/default.aspx">security</a>,
+<a href="http://haacked.com/tags/browsers/default.aspx">browsers</a></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
