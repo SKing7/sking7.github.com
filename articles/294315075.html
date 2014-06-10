@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>javascript - Why does Google prepend while(1); to their JSON responses?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>javascript - Why does Google prepend while(1); to their JSON responses?</h1>
+<div><p>It prevents disclosure of the response through JSON hijacking.</p><p>In theory, Google's JSON responses are protected by the Same Origin Policy: pages from one domain cannot get any informations from pages on an other domain (unless explicitly allowed).</p><p>An attacker can request pages on other domains on your behalf, e.g. by using a <code>&lt;script src=...&gt;</code> or <code>&lt;img&gt;</code>tag, but it can't get any information about the result (headers, contents).</p><p>Thus, an attacker's page couldn't read your email from gmail.com while visiting it.</p><p>Except that when using a script tag to request JSON content, the JSON is executed as Javascript in an attacker's controlled environment. If the attacker can replace the Array or Object contructor or some other method used during object construction, anything in the JSON would pass through the attacker's code, and be disclosed.  </p><p>Note that this happens at the time the JSON is executed as Javascript, not at the time it's parsed.</p><p>There are multiple counter measures:</p><p>By placing a <code>while(1);</code> statement before the JSON data, Google makes sure that the JSON data is never executed as Javascript.</p><p>Only a legitimate page could actually get the whole content, strip the <code>while(1);</code>, and parse the remainder as JSON.</p><p>Similarly, adding invalid tokens before the JSON, like <code>&amp;&amp;&amp;START&amp;&amp;&amp;</code>, makes sure that it is never executed.</p><p>This is <a href="https://www.owasp.org/index.php/OWASP_AJAX_Security_Guidelines#Always_return_JSON_with_an_Object_on_the_outside" rel="nofollow"><strong><code>OWASP</code></strong> recommended way</a> to protect from JSON hijacking, and is the less intrusive one.</p><p>Similarly to the the previous counter-measures, it makes sure that the JSON is never executed as Javascript.</p><p>A valid JSON object, when not enclosed by anything, is not valid in Javascript:</p><pre><code>eval('{"foo":"bar"}')
+// SyntaxError: Unexpected token :
+</code></pre><p>This is however valid JSON:</p><pre><code>JSON.parse('{"foo":"bar"}')
+// Object {foo: "bar"}
+</code></pre><p>So, making sure you always return an Object at the top level of the response makes sure that the JSON is not valid Javascript, while still being valid JSON.</p><p>The OWASP way is less intrusive, as it needs no client library changes, and transfers valid JSON. It is unsure whether past or future browser bugs could defeat this, however.</p><p>Google's way requires client library in order for it to support automatic de-serialization, and can be considered to be safer with regard to browser bugs.</p><p>Both methods require server changes in order avoid developers from accidentally sending vulnerable JSON.</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
