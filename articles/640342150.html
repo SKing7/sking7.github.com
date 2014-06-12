@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Creating Scrolling Parallax Effects with CSS</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Creating Scrolling Parallax Effects with CSS</h1>
+<div><!-- secondary ad --><!-- content --><div><p><em>I generally dislike ESPN because&nbsp;they're the McDonalds of sports news but they recently did a <a href="http://espn.go.com/espn/feature/story/_/id/10984370/portrait-serial-winner-luis-suarez-soccer-most-beautiful-player">piece on Luis Suarez</a>&nbsp;that was eye-catching. &nbsp;The content itself was great but their use of parallax and imagery was outstanding. &nbsp;They've employed this technique in a few of their features now and I've been so impressed that I implored my readers to write about how it's done. &nbsp;The following is a post principally written by Stefan Judis with detail added by myself. &nbsp;Enjoy!</em></p></div>
+
+<h2 id="introduction">Introduction</h2>
+<p>For quite a long time now websites with the so called "parallax" effect have been really popular.
+In case you have not heard of this effect, it basically includes different layers of images that are moving in different directions or with different speed. This leads to a nice optical effect and keeps the attention of the visitor.</p>
+
+
+
+
+<p>In web design, the most common way to achieve this is by simply adding a jQuery plugin to a website. Doing this unfortunately has a few disadvantages. These plugins mostly attach an event handler to the <code>scroll</code> event of the <code>window</code> object. This leads to tons of events being handled via JavaScript (handling the <code>scroll</code> event can easily cause performance issues and should be considered carefully). To move the mentioned layers, background positions of images get calculated and set to the depending elements, which then additionally causes a lot of DOM manipulations.</p>
+
+<p>In short:  parallax done with JavaScript can decrease the scrolling performance of a website quite quickly.</p>
+
+<h2 id="background-position-fixed-to-the-rescue"><code>background-position: fixed</code> to the Rescue</h2>
+<p>What only a few people may know, is that this effect can be achieved via CSS, too.  Check out the example below:</p>
+
+<p data-height="268" data-theme-id="602" data-slug-hash="nrzHI" data-default-tab="result">See the Pen <a href="http://codepen.io/stefanjudis/pen/nrzHI/">Parallax with background-attachment : fixed</a> by Stefan Judis (<a href="http://codepen.io/stefanjudis">@stefanjudis</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+
+<p>To get this parallax effect, background images have to be placed on different elements. These elements additionally need to have defined <code>background-attachment: fixed</code>. By defining <code>background-attachment</code> the behavior and positioning of any background image can be changed.</p>
+
+<p>The initial value of the property is <code>scroll</code>, which basically means that the image position is fixed to its element. There is nothing fancy about that and we all know this behavior. The user scrolls on a website and elements are moving up and down and so do the background images.</p>
+
+<p>It gets interesting by setting the <code>background-attachment</code> to <code>fixed</code>. <code>fixed</code> defines that the background image position is not fixed to the depending element but rather fixed to the viewport. This means that the image will stay visually on the same position no matter how much scrolling will be done. This leads to the nice visual parallax effect.</p>
+
+<p>Let's have a quick check on the actual implementation:</p>
+
+<pre>&lt;!-- Four containers for setting the background images --&gt;
+&lt;div class="parallax"&gt;
+  &lt;div class="bg__foo"&gt;foo&lt;/div&gt;
+  &lt;div class="bg__bar"&gt;bar&lt;/div&gt;
+  &lt;div class="bg__baz"&gt;baz&lt;/div&gt;
+  &lt;div class="bg__bazz"&gt;bazz&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<pre>// setting base styles to image containers
+[class*="bg__"] {
+  height: 50vh;
+
+  text-indent: -9999px;
+
+  /* fix background */
+  background-attachment: fixed;
+
+  /* center it */
+  background-position: center center;
+
+  /* Scale it nicely to the element */
+  background-size: cover;
+
+  /* just make it look a bit better ;) */
+  &amp;:nth-child(2n) {
+    box-shadow: inset 0 0 1em #111;
+  }
+}
+
+.bg__foo {
+  background-image: url(
+    https://s3-us-west-2.amazonaws.com/s.cdpn.io/30354/parallax1.jpg
+  );
+}
+
+.bg__bar {
+  background-image: url(
+    https://s3-us-west-2.amazonaws.com/s.cdpn.io/30354/parallax2.jpg
+  );
+}
+
+.bg__baz {
+  background-image: url(
+    https://s3-us-west-2.amazonaws.com/s.cdpn.io/30354/parallax3.jpg
+  );
+}
+
+.bg__bazz {
+  height: 100vh;
+
+  background-image: url(
+    https://s3-us-west-2.amazonaws.com/s.cdpn.io/30354/parallax1.jpg
+  );
+}
+</pre>
+
+<p>A quick check regarding <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment#Browser_compatibility">browser support</a> on MDN shows almost global compatibility. It is already supported in IE9 and Android 2.1.</p>
+
+
+
+<h2 id="sum-up">Sum up</h2>
+<p>I personally prefer CSS solutions to JavaScript solutions and this is a perfect example for my preference. There is no logic and no additional DOM manipulation needed, which makes the whole solution pretty nice. But there is still one thing to remember when dealing with parallax effects.</p>
+
+<p><em>Even with this CSS solution there is a lot of stuff to do for the browser.</em> <code>background-attachment: fixed</code> will lead to much more painting that needs to be done by the browser, which can affect the scrolling performance and maybe drop your FPS (remember the 60FPS goal?). So keeping an eye on the FPS meter e.g. in Chrome when doing these kind of things is always a good idea. </p>
+<!-- guest blogger --><div id="gb-bio"><img src="http://davidwalsh.name/demo/stefan.jpeg" alt="Stefan Judis" /><h3>About Stefan Judis<p>Stefan is a frontend developer from Berlin. He maintains the projects grunt-phantomas and grunt-photobox. Improving performance, automating everything, visualizing datasets and drinking good coffee are the things he is doing most of the time.</p><p><a href="http://4waisenkinder.de"><i aria-hidden="true"></i>4waisenkinder.de</a><a href="//twitter.com/stefanjudis">stefanjudis</a></p></h3></div></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
