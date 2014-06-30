@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JavaScript最大堆栈的数量</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>JavaScript最大堆栈的数量</h1>
+<div id="content"><span> 你对JavaScript引擎能进行多少次递归调用好奇吗？</span><p><h3>多少次递归调用</h3><br />下面的函数可以让你找到答案： （灵感来自Ben Alman的 <a href="https://gist.github.com/cowboy/10262391" target="_blank" rel="nofollow">gist</a>）</p><p><pre>function computeMaxCallStackSize() {<br />try {<br />return 1 + computeMaxCallStackSize();<br />} catch (e) {<br />// Call stack overflow<br />return 1;<br />}<br />}</pre><br />三个结果：</p><p><ul><li>Node.js: 11034</li><li>Firefox: 50994</li><li>Chrome: 10402</li></ul><br />这些数字代表什么？Aleph先生指出，在V8中，递归调用的数量取决于两个量：堆栈的大小和堆栈帧（保存参数的局部变量）的大小。你可以通过在&nbsp; computeMaxCallStackSize() 添加局部变量进行验证 － 它会返回低位值。</p><p><h3>在ECMAScript 6中的尾部调用（Tail call）优化</h3>ES6 有<a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tail-position-calls" target="_blank" rel="nofollow">尾部调用优化 </a>：如果一个函数中的最后一步也是一个函数调用，它会被“跳”过，而不是通过子函数调用。这就意味着在ES6（严格模式）下，你只要稍微改一下<span>computeMaxCallStackSize函数，它就可以永远执行下去。<br /></span><pre>function computeMaxCallStackSize(size) {
+    size = size || 1;
+    return computeMaxCallStackSize(size + 1);
+}</pre><br /></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

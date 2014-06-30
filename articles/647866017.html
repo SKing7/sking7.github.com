@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+    
+      JavaScript's Primitive Wrapper Objects · Design Pepper
+    
+  </title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>
+    
+      JavaScript's Primitive Wrapper Objects · Design Pepper
+    
+  </h1>
+<div class="post"><span>
+  </span><span>
+  </span><span class="post-date">17 Jun 2014</span><span>
+  </span><p><em>Originally published in <a href="http://designpepper.com/a-drip-of-javascript">A Drip of JavaScript</a>.</em></p><span>
+
+</span><p>We've talked before about how in JavaScript most things behave like objects even when they aren't objects. For instance, consider how we can call methods on a string even though it is a primitive:</p><span>
+</span><div class="highlight"><pre><code class="javascript language-javascript" data-lang="javascript"><span class="c1">// Outputs: "FRED FLINTSTONE"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Fred Flintstone"</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">());</span>
+</code></pre></div><span>
+</span><p>How does that work, though? Initially you might think that strings are really objects in disguise and try assigning properties to them.</p><span>
+</span><div class="highlight"><pre><code class="javascript language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">fred</span> <span class="o">=</span> <span class="s2">"Fred Flintstone"</span><span class="p">;</span>
+<span class="nx">fred</span><span class="p">.</span><span class="nx">favoriteFood</span> <span class="o">=</span> <span class="s2">"Brontosaurus Steak"</span><span class="p">;</span>
+
+<span class="c1">// Outputs: undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fred</span><span class="p">.</span><span class="nx">favoriteFood</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>But that doesn't work. And even more strangely, it doesn't trigger an error. It turns out that in order to allow you to call methods on a primitive, JavaScript does a little bit of trickery which we'll get to shortly.</p><span>
+
+</span><p>Apart from <code>null</code> and <code>undefined</code>, each primitive type (string, number and boolean) has a corresponding object equivalent which you can create by invoking its constructor. For instance:</p><span>
+</span><div class="highlight"><pre><code class="javascript language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">barney</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">String</span><span class="p">(</span><span class="s2">"Barney Rubble"</span><span class="p">);</span>
+
+<span class="c1">// Outputs: "Barney Rubble"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">barney</span><span class="p">);</span>
+
+<span class="nx">barney</span><span class="p">.</span><span class="nx">favoriteFood</span> <span class="o">=</span> <span class="s2">"Pterodactyl Eggs"</span><span class="p">;</span>
+
+<span class="c1">// Outputs: "Pterodactyl Eggs"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">barney</span><span class="p">.</span><span class="nx">favoriteFood</span><span class="p">);</span>
+
+<span class="c1">// Outputs: "object"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">barney</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>As you can see, though, the string object can have properties assigned to it, and it reports itself to be of type "object."</p><span>
+
+</span><p>The trickery I mentioned before is that any time you attempt to access a property on a primitive, JavaScript will implicitly create a temporary wrapper object. We can verify this by doing the following:</p><span>
+</span><div class="highlight"><pre><code class="javascript language-javascript" data-lang="javascript"><span class="nb">String</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">reportType</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">typeof</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">fred</span> <span class="o">=</span> <span class="s2">"Fred Flintstone"</span><span class="p">;</span>
+
+<span class="c1">// Outputs: "string"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">fred</span><span class="p">);</span>
+
+<span class="c1">// Outputs: "object"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fred</span><span class="p">.</span><span class="nx">reportType</span><span class="p">());</span>
+</code></pre></div><span>
+</span><p>When we directly check the type of a string primitive we get <code>"string"</code> as expected, but when we check the type of <code>this</code> in a method executed on a string primitive we get <code>"object"</code>.</p><span>
+
+</span><p>The JavaScript engine doesn't keep this wrapper object around, though. As soon as the work of the method (or other property) is done, it is disposed of.</p><span>
+
+</span><p>This explains why trying to assign properties to a primitive doesn't work, but also doesn't throw an error. Assigning the property succeeds, but the property is set on a wrapper object which is immediately destroyed. So when you go to look up the property later, there is nothing there anymore.</p><span>
+
+</span><p>I hope this has helped you better learn the quirks of JavaScript primitives.</p><span>
+
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
