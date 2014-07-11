@@ -1,0 +1,845 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JavaScript Performance Best Practices</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>JavaScript Performance Best Practices</h1>
+<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr"><div class="rightColumn infoBox portal collapsible-nav"><span>
+</span><p>Article Metadata</p><span>
+</span><div class="body"><span>Article</span><p>Created: <span class="userlink" name="userLink">isalento</span>
+ (25 Nov 2009)</p><p>Last edited: <span class="userlink" name="userLink">wmseto</span>
+ (10 Aug 2012)</p></div><span>
+</span></div><span>
+</span><div class="rightColumnTop"><a href="http://developer.nokia.com/community/wiki/Template:FeaturedArticle" title="Featured Article"><img alt="Featured Article" src="http://developer.nokia.com/community/wiki/images/2/21/Featured-article.png?20110614004623" width="41" height="41" /></a><br /><span>10 Jan</span><br /><span>2010</span></div><span>
+</span><p>This article gives valuable guidance for building faster web applications. The article is a collection of guidelines from various sources.
+</p><span>
+</span><table id="toc" class="toc"><tr><td><p></p>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Case_study:_Tips_and_tricks_for_improving_JavaScript_performance"><span class="tocnumber">1</span> <span class="toctext">Case study: Tips and tricks for improving JavaScript performance</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Overview"><span class="tocnumber">2</span> <span class="toctext">Overview</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Core_JavaScript_pitfalls"><span class="tocnumber">3</span> <span class="toctext">Core JavaScript pitfalls</span></a>
+<ul>
+<li class="toclevel-2 tocsection-4"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_using_eval_or_the_Function_constructor"><span class="tocnumber">3.1</span> <span class="toctext">Avoid using eval or the Function constructor</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_using_with"><span class="tocnumber">3.2</span> <span class="toctext">Avoid using with</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Don.27t_use_try-catch-finally_inside_performance-critical_functions"><span class="tocnumber">3.3</span> <span class="toctext">Don't use try-catch-finally inside performance-critical functions</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_using_global_variables"><span class="tocnumber">3.4</span> <span class="toctext">Avoid using global variables</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_for-in_in_performance-critical_functions"><span class="tocnumber">3.5</span> <span class="toctext">Avoid for-in in performance-critical functions</span></a></li>
+<li class="toclevel-2 tocsection-9"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_strings_accumulator-style"><span class="tocnumber">3.6</span> <span class="toctext">Use strings accumulator-style</span></a></li>
+<li class="toclevel-2 tocsection-10"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Primitive_operations_can_be_faster_than_function_calls"><span class="tocnumber">3.7</span> <span class="toctext">Primitive operations can be faster than function calls</span></a></li>
+<li class="toclevel-2 tocsection-11"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Pass_functions.2C_not_strings.2C_to_setTimeout.28.29_and_setInterval.28.29"><span class="tocnumber">3.8</span> <span class="toctext">Pass functions, not strings, to setTimeout() and setInterval()</span></a></li>
+<li class="toclevel-2 tocsection-12"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_unnecessary_DOM_references_in_objects"><span class="tocnumber">3.9</span> <span class="toctext">Avoid unnecessary DOM references in objects</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Maximize_object_resolution_speed_and_minimize_scope_chain"><span class="tocnumber">3.10</span> <span class="toctext">Maximize object resolution speed and minimize scope chain</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Try_to_keep_script_comments_to_a_minimum.2F_Avoid_long_variable_names"><span class="tocnumber">3.11</span> <span class="toctext">Try to keep script comments to a minimum/ Avoid long variable names</span></a></li>
+<li class="toclevel-2 tocsection-15"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Store_local_references_to_out-of-scope_variables"><span class="tocnumber">3.12</span> <span class="toctext">Store local references to out-of-scope variables</span></a></li>
+<li class="toclevel-2 tocsection-16"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Caching_values_to_variables"><span class="tocnumber">3.13</span> <span class="toctext">Caching values to variables</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-17"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Tips_for_better_loading_performance"><span class="tocnumber">4</span> <span class="toctext">Tips for better loading performance</span></a>
+<ul>
+<li class="toclevel-2 tocsection-18"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Load_scripts_without_blocking_for_faster_startup_and_to_show_a_splash_screen"><span class="tocnumber">4.1</span> <span class="toctext">Load scripts without blocking for faster startup and to show a splash screen</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Add_an_Expires_or_a_Cache-Control_HTTP_header"><span class="tocnumber">4.2</span> <span class="toctext">Add an Expires or a Cache-Control HTTP header</span></a></li>
+<li class="toclevel-2 tocsection-20"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Gzip_JavaScript_and_CSS_resources"><span class="tocnumber">4.3</span> <span class="toctext">Gzip JavaScript and CSS resources</span></a></li>
+<li class="toclevel-2 tocsection-21"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_YUI_Compressor_or_JSMin_to_compress_the_code"><span class="tocnumber">4.4</span> <span class="toctext">Use YUI Compressor or JSMin to compress the code</span></a></li>
+<li class="toclevel-2 tocsection-22"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Minimize_the_number_and_size_of_resources"><span class="tocnumber">4.5</span> <span class="toctext">Minimize the number and size of resources</span></a></li>
+<li class="toclevel-2 tocsection-23"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Load_scripts_without_blocking_parallel_downloads"><span class="tocnumber">4.6</span> <span class="toctext">Load scripts without blocking parallel downloads</span></a></li>
+<li class="toclevel-2 tocsection-24"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Couple_asynchronous_scripts"><span class="tocnumber">4.7</span> <span class="toctext">Couple asynchronous scripts</span></a></li>
+<li class="toclevel-2 tocsection-25"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Move_inline_scripts_above_stylesheets"><span class="tocnumber">4.8</span> <span class="toctext">Move inline scripts above stylesheets</span></a></li>
+<li class="toclevel-2 tocsection-26"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_iframes_sparingly"><span class="tocnumber">4.9</span> <span class="toctext">Use iframes sparingly</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-27"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Document_Object_Model_.28DOM.29_obscurities"><span class="tocnumber">5</span> <span class="toctext">Document Object Model (DOM) obscurities</span></a>
+<ul>
+<li class="toclevel-2 tocsection-28"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Minimize_the_size_of_the_DOM"><span class="tocnumber">5.1</span> <span class="toctext">Minimize the size of the DOM</span></a></li>
+<li class="toclevel-2 tocsection-29"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_document_fragment_templates_for_re-usability"><span class="tocnumber">5.2</span> <span class="toctext">Use document fragment templates for re-usability</span></a></li>
+<li class="toclevel-2 tocsection-30"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Minimize_the_number_of_reflows_and_repaints"><span class="tocnumber">5.3</span> <span class="toctext">Minimize the number of reflows and repaints</span></a>
+<ul>
+<li class="toclevel-3 tocsection-31"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_createDocumentFragment.28.29"><span class="tocnumber">5.3.1</span> <span class="toctext">Use createDocumentFragment()</span></a></li>
+<li class="toclevel-3 tocsection-32"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_cloneNode.28.29"><span class="tocnumber">5.3.2</span> <span class="toctext">Use cloneNode()</span></a></li>
+<li class="toclevel-3 tocsection-33"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_HTML_templates_and_innerHTML"><span class="tocnumber">5.3.3</span> <span class="toctext">Use HTML templates and innerHTML</span></a></li>
+<li class="toclevel-3 tocsection-34"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Modify_an_invisible_element"><span class="tocnumber">5.3.4</span> <span class="toctext">Modify an invisible element</span></a></li>
+<li class="toclevel-3 tocsection-35"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Minimize_the_use_of_operations_determining_the_dimensions_or_location_of_elements"><span class="tocnumber">5.3.5</span> <span class="toctext">Minimize the use of operations determining the dimensions or location of elements</span></a></li>
+<li class="toclevel-3 tocsection-36"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Make_multiple_predefined_style_changes_at_once_using_className"><span class="tocnumber">5.3.6</span> <span class="toctext">Make multiple predefined style changes at once using className</span></a></li>
+<li class="toclevel-3 tocsection-37"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Make_multiple_dynamic_style_changes_at_once_using_setAttribute"><span class="tocnumber">5.3.7</span> <span class="toctext">Make multiple dynamic style changes at once using setAttribute</span></a></li>
+<li class="toclevel-3 tocsection-38"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#CSS_class_name_vs._style_property_changing"><span class="tocnumber">5.3.8</span> <span class="toctext">CSS class name vs. style property changing</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-39"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_traversing_large_number_of_nodes"><span class="tocnumber">5.4</span> <span class="toctext">Avoid traversing large number of nodes</span></a></li>
+<li class="toclevel-2 tocsection-40"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_modifications_while_traversing"><span class="tocnumber">5.5</span> <span class="toctext">Avoid modifications while traversing</span></a></li>
+<li class="toclevel-2 tocsection-41"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Cache_DOM_values_into_variables"><span class="tocnumber">5.6</span> <span class="toctext">Cache DOM values into variables</span></a></li>
+<li class="toclevel-2 tocsection-42"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Remove_references_to_documents_that_have_been_closed"><span class="tocnumber">5.7</span> <span class="toctext">Remove references to documents that have been closed</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-43"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Object-Oriented_JavaScript"><span class="tocnumber">6</span> <span class="toctext">Object-Oriented JavaScript</span></a>
+<ul>
+<li class="toclevel-2 tocsection-44"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Consider_alternative_inheritance_mechanisms"><span class="tocnumber">6.1</span> <span class="toctext">Consider alternative inheritance mechanisms</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-45"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Client-server_communication"><span class="tocnumber">7</span> <span class="toctext">Client-server communication</span></a>
+<ul>
+<li class="toclevel-2 tocsection-46"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Set_timeouts_to_XMLHttpRequests"><span class="tocnumber">7.1</span> <span class="toctext">Set timeouts to XMLHttpRequests</span></a></li>
+<li class="toclevel-2 tocsection-47"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Consider_using_a_custom_data_exchange_format_for_large_datasets.2C_as_an_alternative_to_XML_and_JSON"><span class="tocnumber">7.2</span> <span class="toctext">Consider using a custom data exchange format for large datasets, as an alternative to XML and JSON</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-48"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Animations"><span class="tocnumber">8</span> <span class="toctext">Animations</span></a>
+<ul>
+<li class="toclevel-2 tocsection-49"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_animations_modestly"><span class="tocnumber">8.1</span> <span class="toctext">Use animations modestly</span></a></li>
+<li class="toclevel-2 tocsection-50"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_scrollTo.28.29_to_animate_scrolling"><span class="tocnumber">8.2</span> <span class="toctext">Use scrollTo() to animate scrolling</span></a></li>
+<li class="toclevel-2 tocsection-51"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Absolutely_or_fixed_position_animated_elements"><span class="tocnumber">8.3</span> <span class="toctext">Absolutely or fixed position animated elements</span></a></li>
+<li class="toclevel-2 tocsection-52"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_one_timer_to_animate_multiple_elements_at_the_same_time"><span class="tocnumber">8.4</span> <span class="toctext">Use one timer to animate multiple elements at the same time</span></a></li>
+<li class="toclevel-2 tocsection-53"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Trade_animation_smoothness_for_speed"><span class="tocnumber">8.5</span> <span class="toctext">Trade animation smoothness for speed</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-54"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Events"><span class="tocnumber">9</span> <span class="toctext">Events</span></a>
+<ul>
+<li class="toclevel-2 tocsection-55"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Use_event_delegation"><span class="tocnumber">9.1</span> <span class="toctext">Use event delegation</span></a></li>
+<li class="toclevel-2 tocsection-56"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Throttle_event_handlers_which_fire_excessively"><span class="tocnumber">9.2</span> <span class="toctext">Throttle event handlers which fire excessively</span></a></li>
+<li class="toclevel-2 tocsection-57"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Escaping_the_JavaScript_call_stack_with_setTimeout"><span class="tocnumber">9.3</span> <span class="toctext">Escaping the JavaScript call stack with setTimeout</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-58"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Styling"><span class="tocnumber">10</span> <span class="toctext">Styling</span></a>
+<ul>
+<li class="toclevel-2 tocsection-59"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Optimize_CSS"><span class="tocnumber">10.1</span> <span class="toctext">Optimize CSS</span></a>
+<ul>
+<li class="toclevel-3 tocsection-60"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Change_CSS_classes_near_the_edges_of_the_DOM_tree"><span class="tocnumber">10.1.1</span> <span class="toctext">Change CSS classes near the edges of the DOM tree</span></a></li>
+<li class="toclevel-3 tocsection-61"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_tables_for_layout_or_use_table-layout:_fixed"><span class="tocnumber">10.1.2</span> <span class="toctext">Avoid tables for layout or use table-layout: fixed</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-62"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Optimize_images"><span class="tocnumber">10.2</span> <span class="toctext">Optimize images</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-63"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#S60_specifics"><span class="tocnumber">11</span> <span class="toctext">S60 specifics</span></a>
+<ul>
+<li class="toclevel-2 tocsection-64"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Styling_2"><span class="tocnumber">11.1</span> <span class="toctext">Styling</span></a>
+<ul>
+<li class="toclevel-3 tocsection-65"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Remove_borders_around_focusable_elements"><span class="tocnumber">11.1.1</span> <span class="toctext">Remove borders around focusable elements</span></a></li>
+<li class="toclevel-3 tocsection-66"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Fix_focus_problems_in_tabbed_navigation_mode"><span class="tocnumber">11.1.2</span> <span class="toctext">Fix focus problems in tabbed navigation mode</span></a></li>
+<li class="toclevel-3 tocsection-67"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Prevent_elements_losing_focus_in_tabbed_navigation_mode"><span class="tocnumber">11.1.3</span> <span class="toctext">Prevent elements losing focus in tabbed navigation mode</span></a></li>
+<li class="toclevel-3 tocsection-68"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Allow_animated_gif_images_to_animate_after_being_hidden"><span class="tocnumber">11.1.4</span> <span class="toctext">Allow animated gif images to animate after being hidden</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-69"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Home_Screen_Widgets"><span class="tocnumber">11.2</span> <span class="toctext">Home Screen Widgets</span></a></li>
+<li class="toclevel-2 tocsection-70"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Misc"><span class="tocnumber">11.3</span> <span class="toctext">Misc</span></a>
+<ul>
+<li class="toclevel-3 tocsection-71"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Avoid_background-repeat_if_the_background-image_is_small_relative_to_its_containing_element"><span class="tocnumber">11.3.1</span> <span class="toctext">Avoid background-repeat if the background-image is small relative to its containing element</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-72"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#jQuery-specifics"><span class="tocnumber">12</span> <span class="toctext">jQuery-specifics</span></a>
+<ul>
+<li class="toclevel-2 tocsection-73"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Minimize_the_use_of_slow_jQuery_methods"><span class="tocnumber">12.1</span> <span class="toctext">Minimize the use of slow jQuery methods</span></a></li>
+<li class="toclevel-2 tocsection-74"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Optimize_selectors"><span class="tocnumber">12.2</span> <span class="toctext">Optimize selectors</span></a></li>
+<li class="toclevel-2 tocsection-75"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Consider_alternatives_to_jQuery.each.28.29"><span class="tocnumber">12.3</span> <span class="toctext">Consider alternatives to jQuery.each()</span></a></li>
+<li class="toclevel-2 tocsection-76"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Consider_alternatives_to_.show.28.29.2C_.hide.28.29_and_.toggle.28.29"><span class="tocnumber">12.4</span> <span class="toctext">Consider alternatives to .show(), .hide() and .toggle()</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-77"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#References"><span class="tocnumber">13</span> <span class="toctext">References</span></a>
+<ul>
+<li class="toclevel-2 tocsection-78"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Generic_JavaScript"><span class="tocnumber">13.1</span> <span class="toctext">Generic JavaScript</span></a></li>
+<li class="toclevel-2 tocsection-79"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#HTML5-specific"><span class="tocnumber">13.2</span> <span class="toctext">HTML5-specific</span></a></li>
+<li class="toclevel-2 tocsection-80"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#jQuery-specific"><span class="tocnumber">13.3</span> <span class="toctext">jQuery-specific</span></a></li>
+<li class="toclevel-2 tocsection-81"><a href="http://developer.nokia.com/community/wiki/JavaScript_Performance_Best_Practices#Latest"><span class="tocnumber">13.4</span> <span class="toctext">Latest</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></table><span>
+</span><span>
+</span><p>Tips &amp; tricks in this article were collected from the developer experiences when creating an example application.
+</p><span>
+</span><h2> <span class="mw-headline" id="Overview">Overview</span></h2><span>
+</span><span>
+</span><p>First understand the big picture and the major component of the stack affecting the performance. It is of utmost importance to understand what can and cannot be optimized in JavaScript without touching the browser codebase. A good starting point for this study is to first take a look at the <a rel="nofollow" class="external text" href="http://ejohn.org/blog/javascript-performance-stack/">JavaScript Performance Stack</a> (depicted in the figure). 
+</p><p>Pick your battles. It is generally a good approach to first optimize those parts which give you the biggest improvements. 
+</p><p>There are many interrelated components that play an instrumental role in the real-life web application performance such as those responsible for layout, rendering, parsing HTML, marshaling, DOM, CSS formatting, JavaScript -- as you see, JavaScript is only one part of the performance equation. 
+</p><p>The most expensive operations tend to be reflowing the layout and repainting. 
+Although you as a JavaScript developer cannot optimize browser layout or painting algorithms you can still implicitly affect the performance of these expensive operations by trying to avoid triggering there expensive operations unnecessarily. 
+A real-life example of IE8 tells us that layout and rendering tasks takes most time on IE8 (see <a rel="nofollow" class="external text" href="http://yuiblog.com/blog/2008/12/23/video-crockford-performance/">webcast</a> at -20:00 mins) 
+</p><p>Below are some examples of common reasons for slow JavaScript performance that you as a JavaScript developer can easily fix and make your web application to perform better instantly:
+</p><p><b>DOM access</b>
+</p><p>Interaction with the DOM is usually slower than normal JavaScript code.  Interaction with the DOM is usually inevitable, but try to minimize it.  For instance, dynamically creating HTML with strings and setting the  <b>innerHTML</b> is usually faster than creating HTML with DOM methods.
+</p><p><b>eval</b>
+</p><p>Whenever possible, avoid the eval method because significant overhead is involved in script evaluation.
+</p><p><b>with</b>
+</p><p>Using with statements creates additional scope objects that slow variable access and create ambiguities.
+</p><p><br /><b>for-in loops</b>
+</p><p>Traverse arrays use the traditional <tt>{{{1}}}</tt>instead of for-in loops.  Unfortunately, most JavaScript environments have a slow implementation of for-in loops.
+</p><span>
+</span><h2> <span class="mw-headline" id="Core_JavaScript_pitfalls">Core JavaScript pitfalls</span></h2><span>
+</span><h3> <span class="mw-headline" id="Avoid_using_eval_or_the_Function_constructor">Avoid using eval or the Function constructor</span></h3><span>
+</span><ul><li>Using eval or Function constructor are expensive operations as each time they are called script engine must convert source code to executable code. 
+</li><li>Additionally, using eval the context of the string has to be interpreted at runtime.
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> addMethod<span class="br0">(</span>object<span class="sy0">,</span> property<span class="sy0">,</span> code<span class="br0">)</span> <span class="br0">{</span><br />object<span class="br0">[</span>property<span class="br0">]</span> <span class="sy0">=</span> <span class="kw2">new</span> <span class="kw2">Function</span><span class="br0">(</span>code<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br />addMethod<span class="br0">(</span>myObj<span class="sy0">,</span> <span class="st0">'methodName'</span><span class="sy0">,</span> <span class="st0">'this.localVar=foo'</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> addMethod<span class="br0">(</span>object<span class="sy0">,</span> property<span class="sy0">,</span> func<span class="br0">)</span> <span class="br0">{</span><br />object<span class="br0">[</span>property<span class="br0">]</span> <span class="sy0">=</span> func<span class="sy0">;</span><br /><span class="br0">}</span><br />addMethod<span class="br0">(</span>myObj<span class="sy0">,</span> <span class="st0">'methodName'</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span> <span class="st0">'this.localVar=foo'</span><span class="sy0">;</span> <span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Avoid_using_with">Avoid using with</span></h3><span>
+</span><p>Although seen as a convenience, with construct introduces an extra scope to search each time variable is referenced and the contents of that scope is not known at compile time. 
+</p><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw1">with</span> <span class="br0">(</span>test.<span class="me1">object</span><span class="br0">)</span> <span class="br0">{</span><br />foo <span class="sy0">=</span> <span class="st0">'Value of foo property of object'</span><span class="sy0">;</span><br />bar <span class="sy0">=</span> <span class="st0">'Value of bar property of object'</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> myObj <span class="sy0">=</span> test.<span class="me1">object</span><span class="sy0">;</span><br />myObj.<span class="me1">foo</span> <span class="sy0">=</span> <span class="st0">'Value of foo property of object'</span><span class="sy0">;</span><br />myObj.<span class="me1">bar</span> <span class="sy0">=</span> <span class="st0">'Value of bar property of object'</span><span class="sy0">;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Don.27t_use_try-catch-finally_inside_performance-critical_functions">Don't use try-catch-finally inside performance-critical functions</span></h3><span>
+</span><ul><li>The try-catch-finally construct creates a new variable in the current scope at runtime each time the catch clause is executed where the caught exception object is assigned to a variable. 
+</li><li>Exception handling should be done at as high level in the script where it does not occur frequently, for example outside a loop. 
+</li><li>Or if possible, avoid try-catch-finally completely 
+</li></ul><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">Slow<span class="sy0">:</span> <br /><span class="kw2">var</span> object <span class="sy0">=</span> <span class="br0">[</span><span class="st0">'foo'</span><span class="sy0">,</span> <span class="st0">'bar'</span><span class="br0">]</span><span class="sy0">,</span> i<span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span>i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> object.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">try</span> <span class="br0">{</span><br /><span class="co1">// do something that throws an exception</span><br /><span class="br0">}</span> <span class="kw1">catch</span> <span class="br0">(</span>e<span class="br0">)</span> <span class="br0">{</span><br /><span class="co1">// handle exception</span><br /><span class="br0">}</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> object <span class="sy0">=</span> <span class="br0">[</span><span class="st0">'foo'</span><span class="sy0">,</span> <span class="st0">'bar'</span><span class="br0">]</span><span class="sy0">,</span> i<span class="sy0">;</span><br /><span class="kw1">try</span> <span class="br0">{</span><br /><span class="kw1">for</span> <span class="br0">(</span>i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> object.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="co1">// do something</span><br /><span class="br0">}</span><br /><span class="br0">}</span> <span class="kw1">catch</span> <span class="br0">(</span>e<span class="br0">)</span> <span class="br0">{</span><br /><span class="co1">// handle exception</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Avoid_using_global_variables">Avoid using global variables</span></h3><span>
+</span><ul><li>If you reference global variables from within function or another scope, scripting engine has to look through the scope to find them. 
+</li><li>Variable in the global scope persist though the life time of the script, whereas in local scope they are destroyed when the local scope is lost. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> i<span class="sy0">,</span><br />str <span class="sy0">=</span> <span class="st0">''</span><span class="sy0">;</span><br /><span class="kw2">function</span> globalScope<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">for</span> <span class="br0">(</span>i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> <span class="nu0">100</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />str <span class="sy0">+=</span> i<span class="sy0">;</span> <span class="co1">// here we reference i and str in global scope which is slow</span><br /><span class="br0">}</span><br /><span class="br0">}</span><br />globalScope<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> localScope<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> i<span class="sy0">,</span><br />str <span class="sy0">=</span> <span class="st0">''</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span>i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> <span class="nu0">100</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />str <span class="sy0">+=</span> i<span class="sy0">;</span> <span class="co1">// i and str in local scope which is faster</span><br /><span class="br0">}</span><br /><span class="br0">}</span><br />localScope<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Avoid_for-in_in_performance-critical_functions">Avoid for-in in performance-critical functions</span></h3><span>
+</span><ul><li>The for-in loop requires the script engine to build a list of all the enumerable properties and check for duplicates prior the start. 
+</li><li>If your code inside for loop does not modify the array it iterates pre-compute the length of the array into a variable <b>len</b> inside for loop scope. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> sum <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="kw1">in</span> arr<span class="br0">)</span> <span class="br0">{</span><br />sum <span class="sy0">+=</span> arr<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p><br />Faster:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> sum <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> len <span class="sy0">=</span> arr.<span class="me1">length</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> len<span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />sum <span class="sy0">+=</span> arr<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Use_strings_accumulator-style">Use strings accumulator-style</span></h3><span>
+</span><ul><li>Using + operator a new string is created in memory and the concatenated value is assigned to it. Only after this the result is assigned to a variable. 
+</li><li>To avoid the intermediate variable for concatenation result, you can directly assign the result using += operator. 
+</li></ul><span>
+</span><p>Slow:
+</p><span>
+</span><span>
+</span><p>Faster: 
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Primitive_operations_can_be_faster_than_function_calls">Primitive operations can be faster than function calls </span></h3><span>
+</span><ul><li>Consider using alternative primitive operation over function calls in performance critical loops and functions. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> min <span class="sy0">=</span> Math.<span class="me1">min</span><span class="br0">(</span>a<span class="sy0">,</span> b<span class="br0">)</span><span class="sy0">;</span><br />arr.<span class="me1">push</span><span class="br0">(</span>val<span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> min <span class="sy0">=</span> a <span class="sy0">&lt;</span> b <span class="sy0">?</span> a <span class="sy0">:</span> b<span class="sy0">;</span><br />arr<span class="br0">[</span>arr.<span class="me1">length</span><span class="br0">]</span> <span class="sy0">=</span> val<span class="sy0">;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Pass_functions.2C_not_strings.2C_to_setTimeout.28.29_and_setInterval.28.29">Pass functions, not strings, to setTimeout() and setInterval() </span></h3><span>
+</span><ul><li>If you pass a string into setTimeout() or setInterval() the string will be evaluated the same way as with eval which is slow. 
+</li><li>Wrap your code into an anonymous function instead so that it can be interpreted and optimized during compilation. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">setInterval<span class="br0">(</span><span class="st0">'doSomethingPeriodically()'</span><span class="sy0">,</span> <span class="nu0">1000</span><span class="br0">)</span><span class="sy0">;</span><br />setTimeOut<span class="br0">(</span><span class="st0">'doSomethingAfterFiveSeconds()'</span><span class="sy0">,</span> <span class="nu0">5000</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">setInterval<span class="br0">(</span>doSomethingPeriodically<span class="sy0">,</span> <span class="nu0">1000</span><span class="br0">)</span><span class="sy0">;</span><br />setTimeOut<span class="br0">(</span>doSomethingAfterFiveSeconds<span class="sy0">,</span> <span class="nu0">5000</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Avoid_unnecessary_DOM_references_in_objects">Avoid unnecessary DOM references in objects</span></h3><span>
+</span><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> car <span class="sy0">=</span> <span class="kw2">new</span> Object<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br />car.<span class="me1">color</span> <span class="sy0">=</span> <span class="st0">"red"</span><span class="sy0">;</span><br />car.<span class="me1">type</span> <span class="sy0">=</span> <span class="st0">"sedan"</span></pre></div></div><span>
+</span><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> car <span class="sy0">=</span> <span class="br0">{</span><br />color <span class="sy0">:</span> <span class="st0">"red"</span><span class="sy0">;</span><br />type <span class="sy0">:</span> <span class="st0">"sedan"</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Maximize_object_resolution_speed_and_minimize_scope_chain">Maximize object resolution speed and minimize scope chain</span></h3><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> url <span class="sy0">=</span> window.<span class="me1">location</span>.<span class="me1">href</span><span class="sy0">;</span></pre></div></div><span>
+</span><span>
+</span><h3> </h3><span>
+</span><p>Keep script comments to a minimun or avoid them altogether, especially inside functions, loops and arrays. Comments unnecessarily slow down script execution and increase file size. For example,
+</p><span>
+</span><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> someFunction<span class="br0">(</span><span class="br0">)</span><br /><span class="br0">{</span><br /><span class="kw2">var</span> person_full_name<span class="sy0">=</span><span class="st0">"somename"</span><span class="sy0">;</span> <span class="coMULTI">/* stores the full name*/</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> someFunction<span class="br0">(</span><span class="br0">)</span><br /><span class="br0">{</span><br /><span class="kw2">var</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"somename"</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Store_local_references_to_out-of-scope_variables">Store local references to out-of-scope variables</span></h3><span>
+</span><ul><li>When a function is executed an execution context is created and an activation object containing all local variables is pushed to the front of the context's scope chain. 
+</li><li>Further in the chain, the slower the identifier resolution is, which means local variables are fastest. 
+</li><li>By storing local references to frequently used out-of-scope variables reading and writing to variables is significantly faster. This is visible especially with global variables and other deep searches for identifier resolution. 
+</li><li>Also in-scope variables (<tt>var myVar</tt>) are faster than object property access (<tt>this.myVar</tt>). 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> doSomething<span class="br0">(</span>text<span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> divs <span class="sy0">=</span> document.<span class="me1">getElementsByTagName</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">,</span><br />text <span class="sy0">=</span> <span class="br0">[</span><span class="st0">'foo'</span><span class="sy0">,</span> <span class="coMULTI">/* ... n ... */</span><span class="sy0">,</span> <span class="st0">'bar'</span><span class="br0">]</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> l <span class="sy0">=</span> divs.<span class="me1">length</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> l<span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />divs<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">innerHTML</span> <span class="sy0">=</span> text<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">;</span><br /><span class="br0">}</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> doSomethingFaster<span class="br0">(</span>text<span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> doc <span class="sy0">=</span> document<span class="sy0">,</span><br />divs <span class="sy0">=</span> doc.<span class="me1">getElementsByTagName</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">,</span><br />text <span class="sy0">=</span> <span class="br0">[</span><span class="st0">'foo'</span><span class="sy0">,</span> <span class="coMULTI">/* ... n ... */</span><span class="sy0">,</span> <span class="st0">'bar'</span><span class="br0">]</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> l <span class="sy0">=</span> divs.<span class="me1">length</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> l<span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />divs<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">innerHTML</span> <span class="sy0">=</span> text<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">;</span><br /><span class="br0">}</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>If you need to access an element (e.g. the head) inside a big loop using a localized DOM access ( get in the example) is faster. 
+</p><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> doSomethingElseFaster<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> get <span class="sy0">=</span> document.<span class="me1">getElementsByTagName</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> i <span class="sy0">&lt;</span> <span class="nu0">100000</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />get<span class="br0">(</span><span class="st0">'head'</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Caching_values_to_variables"> Caching values to variables </span></h3><span>
+</span><ul><li> Caching values to local variables where ever needed prevents interpreter from doing the repetative job.
+</li></ul><span>
+</span><ul><li> Couple of examples below should clarify the caching/storing values to variable in broader sense.
+</li></ul><span>
+</span><span>
+</span><ul><li> Example 1) Caching math functions in variables before executing calculations within a loop
+</li></ul><span>
+</span><p>Wrong Way:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> d<span class="sy0">=</span><span class="nu0">35</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span><span class="nu0">1000</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span> <br />y <span class="sy0">+=</span> Math.<span class="me1">sin</span><span class="br0">(</span>d<span class="br0">)</span><span class="sy0">*</span><span class="nu0">10</span><span class="sy0">;</span> <br /><span class="br0">}</span></pre></div></div><span>
+</span><p><br />Better Approach:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> d <span class="sy0">=</span> <span class="nu0">55</span><span class="sy0">;</span><br /><span class="kw2">var</span> math_sind <span class="sy0">=</span> Math.<span class="me1">sin</span><span class="br0">(</span>d<span class="br0">)</span><span class="sy0">*</span><span class="nu0">10</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span><span class="nu0">1000</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />y <span class="sy0">+=</span> math_sind<span class="sy0">;</span> <br /><span class="br0">}</span></pre></div></div><span>
+</span><span>
+</span><ul><li> Example 2) Caching/Storing array length when used in loops
+</li></ul><span>
+</span><p>Bad Approach: 
+</p><p>The length of the array arr is recalculated every time the loop iterates.
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> arr.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="co1">// do something</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Better Approach:
+</p><p>Better way is to to cache the length of the array:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> len <span class="sy0">=</span> arr.<span class="me1">length</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> len<span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="co1">// do something</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><ul><li> In General we should avoid sending the interpreter out to do unnecessary work once it has already done it once, eg: figuring out the scope chain or the function evaulation values of an expression used more than once.<b>storing/caching values to variable only makes sense if those values are used repetatively or more than once, otherwise we are creating overhead again for declaring a variable, assigning values and then just using only once, so keep in mind</b>
+</li></ul><span>
+</span><p>Sources:
+<a rel="nofollow" class="external text" href="http://www.nczonline.net/blog/2006/01/10/javascript-1-2-must-die/">Variable Performance</a>, <a rel="nofollow" class="external text" href="http://www.slideshare.net/nzakas/java-script-variable-performance-presentation">slides</a>
+<a rel="nofollow" class="external text" href="http://jsconf.us/2009/stefanov_video.html">High Performance Kick Ass Web Apps Video at JSCONF 2009</a>
+</p><span>
+</span><h2> <span class="mw-headline" id="Tips_for_better_loading_performance">Tips for better loading performance</span></h2><span>
+</span><h3> <span class="mw-headline" id="Load_scripts_without_blocking_for_faster_startup_and_to_show_a_splash_screen">Load scripts without blocking for faster startup and to show a splash screen</span></h3><span>
+</span><ul><li>When &lt;script&gt; tags are found in the HTML document the referenced script resources are downloaded and executed before the rendering engine can continue to download other resources which effectively blocks the rendering of the page below the tag. To avoid this blocking behaviour a script tag can be created via a mechanism known as a dynamic script tag injection. 
+</li><li>This mechanism allows the rendering engine to immediately render and display the initial view (aka the splash screen) defined in HTML while the JavaScript resources are still being loaded and executed which leads to better user experience.
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/div.html"><span class="kw2">div</span></a> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">"splash"</span><span class="sy0">/</span>&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/script.html"><span class="kw2">script</span></a> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">"my-script-file.js"</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"text/javascript"</span>&gt;&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/script.html"><span class="kw2">script</span></a>&gt;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="co1">// JavaScript</span><br /><span class="kw2">function</span> loadScript<span class="br0">(</span>src<span class="sy0">,</span> callback<span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> head <span class="sy0">=</span> document.<span class="me1">getElementsByTagName</span><span class="br0">(</span><span class="st0">'head'</span><span class="br0">)</span><span class="br0">[</span><span class="nu0">0</span><span class="br0">]</span><span class="sy0">,</span><br />script <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'script'</span><span class="br0">)</span><span class="sy0">;</span><br />done <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span><br />script.<span class="me1">setAttribute</span><span class="br0">(</span><span class="st0">'src'</span><span class="sy0">,</span> src<span class="br0">)</span><span class="sy0">;</span><br />script.<span class="me1">setAttribute</span><span class="br0">(</span><span class="st0">'type'</span><span class="sy0">,</span> <span class="st0">'text/javascript'</span><span class="br0">)</span><span class="sy0">;</span><br />script.<span class="me1">setAttribute</span><span class="br0">(</span><span class="st0">'charset'</span><span class="sy0">,</span> <span class="st0">'utf-8'</span><span class="br0">)</span><span class="sy0">;</span><br />script.<span class="kw3">onload</span> <span class="sy0">=</span> script.<span class="me1">onreadstatechange</span> <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span>done <span class="sy0">&amp;&amp;</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw1">this</span>.<span class="me1">readyState</span> <span class="sy0">||</span> <span class="kw1">this</span>.<span class="me1">readyState</span> <span class="sy0">==</span> <span class="st0">'loaded'</span> <span class="sy0">||</span> <span class="kw1">this</span>.<span class="me1">readyState</span> <span class="sy0">==</span> <span class="st0">'complete'</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span><br />done <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span><br />script.<span class="kw3">onload</span> <span class="sy0">=</span> script.<span class="me1">onreadystatechange</span> <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span><br /><span class="kw1">if</span> <span class="br0">(</span>callback<span class="br0">)</span> <span class="br0">{</span><br />callback<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br /><span class="br0">}</span><br /><span class="br0">}</span><br />head.<span class="me1">insertBefore</span><span class="br0">(</span>script<span class="sy0">,</span> head.<span class="me1">firstChild</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br /><span class="co1">// load the my-script-file.js and display an alert dialog once the script has been loaded</span><br />loadScript<span class="br0">(</span><span class="st0">'my-script-file.js'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span> <span class="kw3">alert</span><span class="br0">(</span><span class="st0">'my-script-file.js loaded.'</span><span class="br0">)</span><span class="sy0">;</span> <span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Sources: 
+</p><span>
+</span><span>
+</span><h3> </h3><span>
+</span><p>Using Apache the Expires HTTP header and the max-age directive of the Cache-Control HTTP header in server responses can be configures in .htaccess. The syntax is as follows: 
+</p><p><tt>ExpiresDefault "&lt;base&gt; [plus] {&lt;num&gt;  &lt;type&gt;}*"</tt>
+<tt>ExpiresByType type/encoding "&lt;base&gt; [plus] {&lt;num&gt; &lt;type&gt;}*"</tt>
+</p><p>Example: 
+<tt>ExpiresActive On </tt>
+<tt>ExpiresByType image/png "access plus 1 year"</tt>
+</p><p>Source: 
+<a rel="nofollow" class="external text" href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache mod_expires</a>
+</p><span>
+</span><h3> <span class="mw-headline" id="Gzip_JavaScript_and_CSS_resources">Gzip JavaScript and CSS resources </span></h3><span>
+</span><p>Below is a simple configuration to gzip not only JavaScript and CSS but also HTML, XML and JSON. To accomplish this, the following must be set in the Apache .htaccess: 
+</p><p><tt>AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/x-javascript application/json </tt>
+</p><p>Source: 
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Use_YUI_Compressor_or_JSMin_to_compress_the_code">Use YUI Compressor or JSMin to compress the code</span></h3><span>
+</span><ul><li>The Best: <a rel="nofollow" class="external text" href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a> provides the best overall performance when you consider it as: Total_Speed = Time_to_Download + Time_to_Evaluate. Depends on Rhino and is not applicable for real-time compression. 
+</li><li>Simple: <a rel="nofollow" class="external text" href="http://www.crockford.com/javascript/jsmin.html">JSMin</a> has implementations in nearly all the languages and is applicable for real-time compression. After gzipping the size comes very close to that of YUI Compressor. 
+</li><li>JSMin or YUI Compressor + gzipping is better performer than Dean Edwards' <a rel="nofollow" class="external text" href="http://dean.edwards.name/packer/">Packer</a> + gzipping. Although Packer provides the smallest (byte-size) code it will evaluate much slower as the scripts are unpacked on the client-side using one pass of a RegExp? this introduces an overhead especially significant on slow mobile devices. 
+</li></ul><span>
+</span><p>Sources 
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Minimize_the_number_and_size_of_resources">Minimize the number and size of resources </span></h3><span>
+</span><ul><li>Concatenate multiple scripts into one. However, consider that some mobile browsers have limits in how big resources they keep in cache. 
+</li><li>Always aim for the smallest code size prior to minification and re-factor to increase re-usable code, consider all resources: HTML, JavaScript, CSS, images, JSON loaded using XHR. 
+</li><li>Minimize the number of resources per host to enable more efficient parallel loading of resources 
+</li><li>Serve your content from different hosts to overcode HTTP/1.1 limitation of parallel loading of two resources per host.
+</li></ul><span>
+</span><h3> <span class="mw-headline" id="Load_scripts_without_blocking_parallel_downloads">Load scripts without blocking parallel downloads </span></h3><span>
+</span><ul><li>Multiple scripts can be loaded in parallel without blocking using techniques such as via normal script src, XHR eval, XHR injection, script in iframe, script DOM element, script defer and document.write script tag. 
+</li><li>Depending on your specific constraints (resources in the same/different domain, need to preserve script loading order, need to show browser loading indicator) you can do an informed decision by checking the decision tree in the following presentation (slide 26). 
+</li></ul><span>
+</span><p><a rel="nofollow" class="external text" href="http://www.stevesouders.com/blog/2009/03/16/sxsw-slides/">Even Faster Websites - Steve Souders at SXSW ‘09</a>
+</p><span>
+</span><h3> <span class="mw-headline" id="Couple_asynchronous_scripts">Couple asynchronous scripts </span></h3><span>
+</span><ul><li>If you have inline script which depend on the script you have multiple options: hardcoded callback, <tt>window.onload</tt>, timer, degrading script tags and script onload. 
+</li><li>See slide 35 onwards for details: 
+</li></ul><span>
+</span><p><a rel="nofollow" class="external text" href="http://www.stevesouders.com/blog/2009/03/16/sxsw-slides/">Even Faster Websites- Steve Souders at SXSW ‘09</a>
+</p><span>
+</span><h3> <span class="mw-headline" id="Move_inline_scripts_above_stylesheets">Move inline scripts above stylesheets </span></h3><span>
+</span><ul><li>Browsers download stylesheets in parallel with other resources that follow unless the stylesheet is followed by an inline script. 
+</li><li>Workaround is to either avoid inline scripts or move them above stylesheets or below other resources (e.g. images, scripts) and use &lt;link&gt;, not @import. 
+</li><li><a rel="nofollow" class="external text" href="http://stevesouders.com/cuzillion/?ex=10021">Live demo</a>
+</li></ul><span>
+</span><h3> <span class="mw-headline" id="Use_iframes_sparingly">Use iframes sparingly </span></h3><span>
+</span><ul><li>Parent's onload doesn't fire until iframe and all its components are downloaded. 
+</li><li>Workaround for Safari and Chrome is to set iframe src in JavaScript. 
+</li><li>Scripts and stylesheets also block iframe from loading. 
+<ul><li>In IE and FF stylesheets in the parent block the iframe or its resources 
+</li></ul>
+</li><li>iframe shares connection pool with parent, typically 2 connections per host.
+</li></ul><span>
+</span><span>
+</span><h2> <span class="mw-headline" id="Document_Object_Model_.28DOM.29_obscurities">Document Object Model (DOM) obscurities </span></h2><span>
+</span><p>Source: <a rel="nofollow" class="external text" href="http://dev.opera.com/articles/view/efficient-javascript/?page=3">Efficient JavaScript - DOM</a>
+</p><p>Slow DOM performance can be traced back into the following three main causes: 
+</p><span>
+</span><table border="1">
+<tr>
+<td>Extensive DOM manipulation
+</td>
+<td>Extensive use of DOM API is a well-known cause of slowness.
+</td></tr>
+<tr>
+<td>Script triggers too many reflows or repaints
+</td>
+<td>As a consequence of DOM manipulation, reflowing the layout and repainting are very expensive.
+</td></tr>
+<tr>
+<td>Slow approach to locating nodes in the DOM
+</td>
+<td>Locating a desired node(s) in the DOM is potential bottleneck if the DOM is sizable and/or complex.
+</td></tr></table><span>
+</span><h3> <span class="mw-headline" id="Minimize_the_size_of_the_DOM">Minimize the size of the DOM </span></h3><span>
+</span><ul><li>The size of DOM slows down all the operation related to it such as reflowing, traversal and DOM manipulation. 
+</li><li>The most effective way to make programs faster is to make n smaller means that the DOM should be as small as possible at all times. 
+</li><li>Minimize n, you can track the number of elements in a page by: 
+
+</li></ul><span>
+</span><h3> <span class="mw-headline" id="Use_document_fragment_templates_for_re-usability">Use document fragment templates for re-usability </span></h3><span>
+</span><ul><li>Dynamically inserting and updating elements into the DOM is expensive. An efficient way to tackle this is to use HTML templates which can be cloned and re-used for re-usable parts of the DOM such as dialogs and other UI widgets. 
+</li><li>In practice the approach is to modify, clone and append all nodes in JavaScript without touching the live DOM and append the completed document fragment to the DOM at once. One can do this with DOM API or alternatively construct a string representation of the HTML fragment to append based on a string template and push that into the DOM with a one innerHTML assignment. On both cases the rendering engine does not have to reflow and repaint the layout multiple times. Next we introduce some techniques to achieve this behavior.
+</li></ul><span>
+</span><h3> <span class="mw-headline" id="Minimize_the_number_of_reflows_and_repaints">Minimize the number of reflows and repaints </span></h3><span>
+</span><table border="1">
+<tr>
+<td>Repaint
+</td>
+<td>Repainting happens when something is made visible or hidden without altering the layout of the document. For example if an outline is added to an element, its background color is changed of its visibility is changed. Repainting is an expensive operation (<a rel="nofollow" class="external text" href="http://ejohn.org/blog/browser-paint-events/">paint events demo</a>).
+</td></tr>
+<tr>
+<td>Reflow
+</td>
+<td>Reflow happens whenever the DOM is manipulated in a way it affects the layout. For example, style is changed to affect the layout, className property is changed or browser window size is changed. Once an element needs to be reflown, its children will also be reflown and any elements appearing after the element in the DOM. Finally, everything is repainted. Reflows are even more expensive operations, than repainting. In many cases reflowing is comparable to layout out the entire page again (<a rel="nofollow" class="external text" href="http://www.youtube.com/watch?v=dndeRnzkJDU">reflow demo videos</a>).
+</td></tr></table><span>
+</span><ul><li>Operation that trigger reflows should be used sparsely. 
+</li><li>Reflowing a table element is more expensive that reflowing equivalent element with block display. 
+</li><li>Elements that are positioned absolutely or fixed do not affect the main document layout, so their reflowing is cheaper as they do not trigger main document reflowing. This is recommended approach for element that need to be animated. 
+</li><li>DOM modifications trigger reflow. This means that operations such as adding new elements, changing the value of text nodes or adding element attributes and their properties cause reflow. 
+</li><li>Good strategies to overcome this limitation are elaborated next.
+</li></ul><span>
+</span><ul><li>Further reading 
+
+</li><li>Tools 
+<ul><li><a rel="nofollow" class="external text" href="https://addons.mozilla.org/en-US/firefox/addon/xul-profiler-by-yoono/">XUL Profiler</a>
+</li><li>Mac OS X Quartz Debug (in developer tools part of every OS X) Autoflush drawing setting illustrates how the page is reflown in step-by-step detail. (<a rel="nofollow" class="external text" href="http://www.stubbornella.org/content/2009/03/27/reflows-repaints-css-performance-making-your-javascript-slow/">more</a>)
+</li></ul>
+</li></ul><span>
+</span><h4> <span class="mw-headline" id="Use_createDocumentFragment.28.29">Use createDocumentFragment() </span></h4><span>
+</span><ul><li>Make multiple changes in a DOMDocumentFragment and add the fragment into the DOM in a single operation. This triggers only one reflow. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> list <span class="sy0">=</span> <span class="br0">[</span><span class="st0">'foo'</span><span class="sy0">,</span> <span class="st0">'bar'</span><span class="sy0">,</span> <span class="st0">'baz'</span><span class="br0">]</span><span class="sy0">,</span><br />elem<span class="sy0">,</span><br />contents<span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> list.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />elem <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">;</span><br />content <span class="sy0">=</span> document.<span class="me1">createTextNode</span><span class="br0">(</span>list<span class="br0">[</span>i<span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">appendChild</span><span class="br0">(</span>content<span class="br0">)</span><span class="sy0">;</span><br />document.<span class="me1">body</span>.<span class="me1">appendChild</span><span class="br0">(</span>elem<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> fragment <span class="sy0">=</span> document.<span class="me1">createDocumentFragment</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">,</span><br />list <span class="sy0">=</span> <span class="br0">[</span><span class="st0">'foo'</span><span class="sy0">,</span> <span class="st0">'bar'</span><span class="sy0">,</span> <span class="st0">'baz'</span><span class="br0">]</span><span class="sy0">,</span><br />elem<span class="sy0">,</span><br />contents<span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> list.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />elem <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">;</span><br />content <span class="sy0">=</span> document.<span class="me1">createTextNode</span><span class="br0">(</span>list<span class="br0">[</span>i<span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span><br />fragment.<span class="me1">appendChild</span><span class="br0">(</span>content<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br />document.<span class="me1">body</span>.<span class="me1">appendChild</span><span class="br0">(</span>fragment<span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><h4> <span class="mw-headline" id="Use_cloneNode.28.29">Use cloneNode() </span></h4><span>
+</span><ul><li>If you're not working on elements that do not contain form elements or event handlers, you can clone the element to modify and swap it in place after all the changes have been done resulting in a one reflow only. 
+</li><li>A faster alternative to above slow approach is presented below. 
+</li></ul><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> orig <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'container'</span><span class="br0">)</span><span class="sy0">,</span><br />clone <span class="sy0">=</span> orig.<span class="me1">cloneNode</span><span class="br0">(</span><span class="kw2">true</span><span class="br0">)</span><span class="sy0">,</span><br />list <span class="sy0">=</span> <span class="br0">[</span><span class="st0">'foo'</span><span class="sy0">,</span> <span class="st0">'bar'</span><span class="sy0">,</span> <span class="st0">'baz'</span><span class="br0">]</span><span class="sy0">,</span><br />elem<span class="sy0">,</span><br />contents<span class="sy0">;</span><br />clone.<span class="me1">setAttribute</span><span class="br0">(</span><span class="st0">'width'</span><span class="sy0">,</span> <span class="st0">'50%'</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> list.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />elem <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">;</span><br />content <span class="sy0">=</span> document.<span class="me1">createTextNode</span><span class="br0">(</span>list<span class="br0">[</span>i<span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">appendChild</span><span class="br0">(</span>content<span class="br0">)</span><span class="sy0">;</span><br />clone.<span class="me1">appendChild</span><span class="br0">(</span>elem<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br />original.<span class="me1">parentNode</span>.<span class="me1">replaceChild</span><span class="br0">(</span>clone<span class="sy0">,</span> original<span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><h4> <span class="mw-headline" id="Use_HTML_templates_and_innerHTML">Use HTML templates and innerHTML </span></h4><span>
+</span><ul><li>One way to implement a templating system is to populate template content based on a light-weight JavaScript object acting as a date model. The data model may be persisted as JSON serialization into e.g. <a rel="nofollow" class="external text" href="http://www.developer.nokia.com/Resources/Library/Web/"><tt>setPreferenceForKey()</tt></a> store in S60 WRT, in a HTTP cookie or XHR'd to the server-side. 
+</li></ul><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="sy0">&lt;</span>nowiki<span class="sy0">&gt;</span><br /><span class="kw2">var</span> model <span class="sy0">=</span> <span class="br0">{</span> title<span class="sy0">:</span> <span class="st0">'My Test Page'</span><span class="sy0">;</span> <span class="br0">}</span><span class="sy0">,</span><br />template <span class="sy0">=</span> <span class="br0">[</span><span class="br0">]</span><span class="sy0">;</span><br />template.<span class="me1">push</span><span class="br0">(</span><span class="st0">'&lt;h1&gt;'</span> <span class="sy0">+</span> model.<span class="me1">title</span> <span class="sy0">+</span> <span class="st0">'&lt;h1&gt;'</span><span class="br0">)</span><span class="sy0">;</span><br />template.<span class="me1">push</span><span class="br0">(</span><span class="st0">'&lt;div&gt;Another Test Element&lt;div&gt;'</span><span class="br0">)</span><span class="sy0">;</span><br />document.<span class="me1">getElementById</span><span class="br0">(</span>containerId<span class="br0">)</span>.<span class="me1">innerHTML</span> <span class="sy0">=</span> template.<span class="me1">join</span><span class="br0">(</span><span class="st0">''</span><span class="br0">)</span><span class="sy0">;</span> <br /><span class="co1">// alternatively you can use concat() -- see string concatenation test results</span><br /><span class="sy0">&lt;/</span>nowiki<span class="sy0">&gt;</span></pre></div></div><span>
+</span><h4> <span class="mw-headline" id="Modify_an_invisible_element">Modify an invisible element </span></h4><span>
+</span><ul><li>If the display property of an element is set to none it will not be repainted. 
+</li><li>By setting display to none, do the modifications and then set it to block causes only two reflows 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> subElem <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">,</span><br />elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'animated'</span><span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">appendChild</span><span class="br0">(</span>subElem<span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">width</span> <span class="sy0">=</span> <span class="st0">'320px'</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> subElem <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">,</span><br />elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'animated'</span><span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">display</span> <span class="sy0">=</span> <span class="st0">'none'</span><span class="sy0">;</span><br />elem.<span class="me1">appendChild</span><span class="br0">(</span>subElem<span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">width</span> <span class="sy0">=</span> <span class="st0">'320px'</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">display</span> <span class="sy0">=</span> <span class="st0">'block'</span><span class="sy0">;</span></pre></div></div><span>
+</span><h4> <span class="mw-headline" id="Minimize_the_use_of_operations_determining_the_dimensions_or_location_of_elements">Minimize the use of operations determining the dimensions or location of elements </span></h4><span>
+</span><ul><li>Determining dimensions or location of elements via getComputedStyle, offsetWidth, scrollWidth and clientWidth properties will force reflow. 
+</li><li>If you take the measurements repeatedly, consider taking them only once. 
+</li><li>This issue is the main cause of slowness in WebKit according to <a rel="nofollow" class="external text" href="http://www.stubbornella.org/content/2009/03/27/reflows-repaints-css-performance-making-your-javascript-slow/#comment-13157">Dave Hyatt</a>
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'animated'</span><span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">fontSize</span> <span class="sy0">=</span> <span class="br0">(</span>elem.<span class="me1">offsetWidth</span> <span class="sy0">/</span> <span class="nu0">10</span><span class="br0">)</span> <span class="sy0">+</span> <span class="st0">'px'</span><span class="sy0">;</span><br />elem.<span class="me1">firstChild</span>.<span class="me1">style</span>.<span class="me1">marginleft</span> <span class="sy0">=</span> <span class="br0">(</span>elem.<span class="me1">offsetWidth</span> <span class="sy0">/</span> <span class="nu0">20</span><span class="br0">)</span> <span class="sy0">+</span> <span class="st0">'px'</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'animated'</span><span class="br0">)</span><span class="sy0">,</span><br />elemWidth <span class="sy0">=</span> elem.<span class="me1">offsetWidth</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">fontSize</span> <span class="sy0">=</span> <span class="br0">(</span>elemWidth <span class="sy0">/</span> <span class="nu0">10</span><span class="br0">)</span> <span class="sy0">+</span> <span class="st0">'px'</span><span class="sy0">;</span><br />elem.<span class="me1">firstChild</span>.<span class="me1">style</span>.<span class="me1">marginleft</span> <span class="sy0">=</span> <span class="br0">(</span>elemWidth <span class="sy0">/</span> <span class="nu0">20</span><span class="br0">)</span> <span class="sy0">+</span> <span class="st0">'px'</span><span class="sy0">;</span></pre></div></div><span>
+</span><h4> <span class="mw-headline" id="Make_multiple_predefined_style_changes_at_once_using_className">Make multiple predefined style changes at once using className </span></h4><span>
+</span><ul><li>As with DOM manipulation, several style changes can be done at the same time. 
+</li><li>Instead if you set the styles one by one, multiple reflows and repaints can be triggered. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'styled'</span><span class="br0">)</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">background</span> <span class="sy0">=</span> <span class="st0">'blue'</span><span class="sy0">;</span><br />elem.<span class="me1">style</span>.<span class="me1">color</span> <span class="sy0">=</span> <span class="st0">'white'</span><span class="sy0">;</span><br />Faster<span class="sy0">:</span> <br /><span class="sy0">&lt;</span>code html4strict<span class="sy0">&gt;</span><br /><span class="sy0">&lt;</span>style type<span class="sy0">=</span><span class="st0">"text/css"</span><span class="sy0">&gt;</span><br />div <span class="br0">{</span> background<span class="sy0">:</span> white<span class="sy0">;</span> color<span class="sy0">:</span> black<span class="sy0">;</span> <span class="br0">}</span><br />div.<span class="me1">active</span> <span class="br0">{</span> background<span class="sy0">:</span> blue<span class="sy0">;</span> color<span class="sy0">:</span> white<span class="sy0">;</span> <span class="br0">}</span><br /><span class="sy0">&lt;/</span>style<span class="sy0">&gt;</span><br />...</pre></div></div><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'styled'</span><span class="br0">)</span>.<span class="me1">className</span> <span class="sy0">=</span> <span class="st0">'active'</span><span class="sy0">;</span></pre></div></div><span>
+</span><h4> <span class="mw-headline" id="Make_multiple_dynamic_style_changes_at_once_using_setAttribute">Make multiple dynamic style changes at once using setAttribute </span></h4><span>
+</span><ul><li>For dynamic animation, using predefined styles does not work. In this case setAttribute object can be used (for IE, use style.cssText property) 
+</li></ul><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'styled'</span><span class="br0">)</span><span class="sy0">;</span><br />elemStyle <span class="sy0">=</span> <span class="st0">'background: blue; color: white;'</span><span class="sy0">;</span><br />elem.<span class="me1">setAttribute</span><span class="br0">(</span><span class="st0">'style'</span><span class="sy0">,</span> elemStyle<span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><span>
+</span><h4> <span class="mw-headline" id="CSS_class_name_vs._style_property_changing">CSS class name vs. style property changing </span></h4><span>
+</span><p>Changing the class name of an element is a nice way to use JavaScript to dynamically change elements. Performance varies from browser to browser, but generally it is faster to change an element's visual appearance directly via the Javascript style attribute, rather than to change a class name on that element. 
+</p><p>Slow: 
+<tt>div.active { border: 1px solid red; </tt>}
+</p><p>Faster (for a one element): 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> container <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'container'</span><span class="br0">)</span><span class="sy0">;</span><br />container.<span class="me1">style</span>.<span class="me1">border</span> <span class="sy0">=</span> <span class="st0">'1px solid red'</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>The above method appears to be more efficient when changing a specific number of items. Sometimes a single class name change is effective however. If you need to change all elements under a given container for example, it is more efficient to change the class name of a parent container which holds the affected elements and let CSS do what it does best. 
+</p><p>Faster (if multiple child elements of a container need to be changed): 
+<tt>// by changing the class name of the container, all of its child div elements will be updated</tt>
+<tt>#container.active div { border: 1px solid red; } </tt>
+</p><p>Depending on the specific case at hand you should use the method which gives you the best performance (without sacrificing too much of the separation of concerns benefits of externally defined CSS). 
+</p><p>Source:
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Avoid_traversing_large_number_of_nodes">Avoid traversing large number of nodes </span></h3><span>
+</span><ul><li>Always try to use inbuilt methods and collections of the DOM to narrow down the search to smallest number of nodes possible. 
+</li><li>Try to avoid manually recursively stepping through the DOM as much as possible. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elements <span class="sy0">=</span> document.<span class="me1">getElementsByTagName</span><span class="br0">(</span><span class="st0">'*'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// searches every element, slow</span><br /><span class="kw1">for</span> <span class="br0">(</span>i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> elements.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">if</span> <span class="br0">(</span>element<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">hasAttribute</span><span class="br0">(</span><span class="st0">'selected'</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// continues even through element was found</span><br />...<br /><span class="br0">}</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elements <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'parent'</span><span class="br0">)</span>.<span class="me1">childNodes</span><span class="sy0">;</span> <span class="co1">// we know the element is a child of parent</span><br /><span class="kw1">for</span> <span class="br0">(</span>i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> elements.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">if</span> <span class="br0">(</span>element<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">nodeType</span> <span class="sy0">==</span> <span class="nu0">1</span> <span class="sy0">&amp;&amp;</span> element<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">hasAttribute</span><span class="br0">(</span><span class="st0">'selected'</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// first test for valid node type</span><br />...<br /><span class="kw1">break</span><span class="sy0">;</span> <span class="co1">// break out of the loop if we found what we were looking for</span><br /><span class="br0">}</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Avoid_modifications_while_traversing">Avoid modifications while traversing</span></h3><span>
+</span><ul><li>childNodes and NodeList returned by getElementsByTagName() are live. This means that these collections may change without waiting for the execution to finish first. 
+</li><li>If new elements are added to the collections while they are traversed, an infinite loop may occur. 
+</li><li>If new elements are added even outside of collection itself, the collection must look for potential new entries. Due to this it cannot remember its last position or length which need to be recalculated. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elems <span class="sy0">=</span> document.<span class="me1">getElementsByTagName</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> elems.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />elems<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">appendChild</span><span class="br0">(</span>document.<span class="me1">createTextNode</span><span class="br0">(</span>i<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elems <span class="sy0">=</span> document.<span class="me1">getElementsByTagName</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">,</span><br />temp <span class="sy0">=</span> <span class="br0">[</span><span class="br0">]</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> elems.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />temp<span class="br0">[</span>i<span class="br0">]</span> <span class="sy0">=</span> elems<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">;</span> <span class="co1">// first a build static list of elements to modify</span><br /><span class="br0">}</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> temp.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />temp<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">appendChild</span><span class="br0">(</span>document.<span class="me1">createTextNode</span><span class="br0">(</span>i<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// perform modifications on static list instead of live NodeList</span><br /><span class="br0">}</span><br />temp <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Cache_DOM_values_into_variables">Cache DOM values into variables </span></h3><span>
+</span><ul><li>Cache frequently accessed DOM values into variables. 
+</li></ul><span>
+</span><p>Slow:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'elem'</span><span class="br0">)</span>.<span class="me1">propertyOne</span> <span class="sy0">=</span> <span class="st0">'value of first property'</span><span class="sy0">;</span><br />document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'elem'</span><span class="br0">)</span>.<span class="me1">propertyTwo</span> <span class="sy0">=</span> <span class="st0">'value of second property'</span><span class="sy0">;</span><br />document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'elem'</span><span class="br0">)</span>.<span class="me1">propertyThree</span> <span class="sy0">=</span> <span class="st0">'value of third property'</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elem <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'elem'</span><span class="br0">)</span>.<span class="me1">propertyOne</span> <span class="sy0">=</span> <span class="st0">'value of first property'</span><span class="sy0">;</span><br />elem.<span class="me1">propertyTwo</span> <span class="sy0">=</span> <span class="st0">'value of second property'</span><span class="sy0">;</span><br />elem.<span class="me1">propertyThree</span> <span class="sy0">=</span> <span class="st0">'value of third property'</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Remove_references_to_documents_that_have_been_closed">Remove references to documents that have been closed</span></h3><span>
+</span><ul><li>If a reference to frame, iframe or object is stored in a global variable or a property, clear it by setting it to null or deleting it. 
+</li><li>For example, a popup window that is closed and has a reference to global variable, will be kept in memory although the document itself is no longer loaded, if it is not deleted manually. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> frame <span class="sy0">=</span> parent.<span class="me1">frames</span><span class="br0">[</span><span class="st0">'frameId'</span><span class="br0">]</span>.<span class="me1">document</span><span class="sy0">,</span><br />container <span class="sy0">=</span> frame.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'contentId'</span><span class="br0">)</span><span class="sy0">,</span><br />content <span class="sy0">=</span> frame.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">;</span><br />content.<span class="me1">appendChild</span><span class="br0">(</span>frame.<span class="me1">createTextNode</span><span class="br0">(</span><span class="st0">'Some content'</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span><br />container.<span class="me1">appendChild</span><span class="br0">(</span>content<span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> frame <span class="sy0">=</span> parent.<span class="me1">frames</span><span class="br0">[</span><span class="st0">'frameId'</span><span class="br0">]</span>.<span class="me1">document</span><span class="sy0">,</span><br />container <span class="sy0">=</span> frame.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'contentId'</span><span class="br0">)</span><span class="sy0">,</span><br />content <span class="sy0">=</span> frame.<span class="me1">createElement</span><span class="br0">(</span><span class="st0">'div'</span><span class="br0">)</span><span class="sy0">;</span><br />content.<span class="me1">appendChild</span><span class="br0">(</span>frame.<span class="me1">createTextNode</span><span class="br0">(</span><span class="st0">'Some content'</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span><br />container.<span class="me1">appendChild</span><span class="br0">(</span>content<span class="br0">)</span><span class="sy0">;</span><br /><span class="co1">// nullify references to frame</span><br />frame <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span><br />container <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span><br />content <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></pre></div></div><span>
+</span><h2> <span class="mw-headline" id="Object-Oriented_JavaScript">Object-Oriented JavaScript </span></h2><span>
+</span><h3> <span class="mw-headline" id="Consider_alternative_inheritance_mechanisms">Consider alternative inheritance mechanisms </span></h3><span>
+</span><ul><li>There exists many ways to mimic Object Orientated style inheritance in JavaScript. However, not all the mechanism to emulate inheritance perform similarly. 
+</li><li>Especially if your code calls overridden methods frequently you should take a look at the <a rel="nofollow" class="external text" href="http://www.broofa.com/2009/02/javascript-inheritance-performance/">results of JavaScript Inheritance Performance</a> study.
+</li></ul><span>
+</span><h2> <span class="mw-headline" id="Client-server_communication">Client-server communication </span></h2><span>
+</span><h3> <span class="mw-headline" id="Set_timeouts_to_XMLHttpRequests">Set timeouts to XMLHttpRequests </span></h3><span>
+</span><ul><li>Browsers will timeout XHR requests after some time, but sometimes it is beneficial to abort the connection under script control. This can be done by adding timeouts to XHR calls using setTimeout(). 
+</li></ul><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> xhr <span class="sy0">=</span> <span class="kw2">new</span> XMLHttpRequest <span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br />xhr.<span class="kw3">open</span><span class="br0">(</span><span class="st0">'GET'</span><span class="sy0">,</span> url<span class="sy0">,</span> <span class="kw2">false</span><span class="br0">)</span><span class="sy0">;</span><br />xhr.<span class="me1">onreadystatechange</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">if</span> <span class="br0">(</span><span class="kw1">this</span>.<span class="me1">readyState</span> <span class="sy0">==</span> <span class="nu0">4</span><span class="br0">)</span> <span class="br0">{</span>                    <br />clearTimeout<span class="br0">(</span>timeout<span class="br0">)</span><span class="sy0">;</span><br /><span class="co1">// do something with response data</span><br /><span class="br0">}</span><br /><span class="br0">}</span><br /><span class="kw2">var</span> timeout <span class="sy0">=</span> setTimeout<span class="br0">(</span> <br /><span class="kw2">function</span> <span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />xhr.<span class="me1">abort</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="co1">// call error callback</span><br /><span class="br0">}</span><span class="sy0">,</span><br /><span class="nu0">60</span><span class="sy0">*</span><span class="nu0">1000</span> <span class="co1">// timeout after a minute</span><br /><span class="br0">)</span><span class="sy0">;</span><br />xhr.<span class="me1">send</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Consider_using_a_custom_data_exchange_format_for_large_datasets.2C_as_an_alternative_to_XML_and_JSON">Consider using a custom data exchange format for large datasets, as an alternative to XML and JSON</span></h3><span>
+</span><ul><li>Depending on the browser, its version and OS, the performance difference between XML or JSON parsing and traversing may be very significant. For example, on Nokia 5800 XpressMusic with a very large dataset JSON is approx. 5x faster. 
+</li><li>Using a custom string-based data format (think CSV) over XML and JSON is efficient in terms of transferred bytes and parse time with large datasets. 
+</li><li>Using JavaScript’s String and RegExp methods one can match the speed of JSON executed natively with as little overhead to the file size as possible. 
+</li></ul><span>
+</span><p>JSON: 
+<tt>{{{1}}}</tt>
+</p><p>Equivalent using custom data format and String and RegExp methods: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">that.<span class="me1">contacts</span> <span class="sy0">=</span> o.<span class="me1">responseText</span>.<span class="me1">split</span><span class="br0">(</span><span class="st0">"<span class="es0">\\</span>c"</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> n <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> len <span class="sy0">=</span> that.<span class="me1">contacts</span>.<span class="me1">length</span><span class="sy0">,</span> contactSplit<span class="sy0">;</span> n <span class="sy0">&lt;</span> len<span class="sy0">;</span> n<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span><br />contactSplit <span class="sy0">=</span> that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">split</span><span class="br0">(</span><span class="st0">"<span class="es0">\\</span>a"</span><span class="br0">)</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span> <span class="sy0">=</span> <span class="br0">{</span><span class="br0">}</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">n</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">0</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">e</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">1</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">u</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">2</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">r</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">3</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">s</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">4</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">f</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">5</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">a</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">6</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">d</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">7</span><span class="br0">]</span><span class="sy0">;</span><br />that.<span class="me1">contacts</span><span class="br0">[</span>n<span class="br0">]</span>.<span class="me1">y</span> <span class="sy0">=</span> contactSplit<span class="br0">[</span><span class="nu0">8</span><span class="br0">]</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Sources: 
+</p><span>
+</span><span>
+</span><h2> <span class="mw-headline" id="Animations">Animations </span></h2><span>
+</span><h3> <span class="mw-headline" id="Use_animations_modestly">Use animations modestly </span></h3><span>
+</span><ul><li>Animation without hardware support is slow. Try to avoid excessive use of animations which do not bring any real usability value. At least give users an opportunity to disable animations.
+</li></ul><span>
+</span><h3> <span class="mw-headline" id="Use_scrollTo.28.29_to_animate_scrolling">Use scrollTo() to animate scrolling </span></h3><span>
+</span><p>Using native scrolling via scrollTo() performs significantly better as it does not trigger reflow.
+</p><span>
+</span><h3> <span class="mw-headline" id="Absolutely_or_fixed_position_animated_elements">Absolutely or fixed position animated elements </span></h3><span>
+</span><ul><li>By default elements have style property position: static and animating such elements causes reflowing of the layout and is expensive. 
+</li><li>Elements to be animated should be set as position: absolute or position: fixed if reflowing is not mandatory for smoother animation and lesser CPU load. Such elements do not affect other elements layout, so they will only cause a repaint rather than a full reflow with a nice performance boost. 
+</li><li>CSS positioning schemes for position property:
+</li></ul><span>
+</span><table border="1">
+
+<tr>
+<th>Position value
+</th>
+<th>Description
+</th></tr>
+<tr>
+<td>static
+</td>
+<td>Default. An element with position: static always has the position the normal flow of the page gives it (a static element ignores any top, bottom, left, or right declarations)
+</td></tr>
+<tr>
+<td>relative
+</td>
+<td>An element with position: relative moves an element relative to its normal position, so left:20 adds 20 pixels to the element's left position
+</td></tr>
+<tr>
+<td>absolute
+</td>
+<td>An element with position: absolute is positioned at the specified coordinates relative to its containing block. The element's position is specified with the left, top, right, and bottom properties.
+</td></tr>
+<tr>
+<td>fixed
+</td>
+<td>An element with position: fixed is positioned at the specified coordinates relative to the browser window. The element's position is specified with the left, top, right, and bottom properties. The element remains at that position regardless of scrolling.
+</td></tr></table><span>
+</span><p>Source: 
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Use_one_timer_to_animate_multiple_elements_at_the_same_time">Use one timer to animate multiple elements at the same time </span></h3><span>
+</span><ul><li><tt>setTimeout()</tt> and <tt>setInterval()</tt> timers are two basic methods used to implement animation (i.e. trigger changes to element size, position and/or appearance over time).
+</li><li>If multiple elements are animated at the same time, the best frame rate is achieved by iterating across all animated elements inside a single loop. Using multiple timers makes animation less efficient and consistent, presumably due to timer invocation overhead. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">setInterval<span class="br0">(</span><span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />animateFirst<span class="br0">(</span>arg<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><span class="sy0">,</span> <span class="nu0">50</span><span class="br0">)</span><span class="sy0">;</span><br />setInterval<span class="br0">(</span><span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />animateSecond<span class="br0">(</span>arg<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><span class="sy0">,</span> <span class="nu0">50</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw2">function</span> animateFirst<span class="br0">(</span>arg<span class="br0">)</span> <span class="br0">{</span><span class="br0">}</span><span class="sy0">;</span><br /><span class="kw2">function</span> animateSecond<span class="br0">(</span>arg<span class="br0">)</span> <span class="br0">{</span><span class="br0">}</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">setInterval<span class="br0">(</span><span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />animateFirst<span class="br0">(</span>arg<span class="br0">)</span><span class="sy0">;</span><br />animateSecond<span class="br0">(</span>arg<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><span class="sy0">,</span> <span class="nu0">50</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw2">function</span> animateFirst<span class="br0">(</span>arg<span class="br0">)</span> <span class="br0">{</span><span class="br0">}</span><span class="sy0">;</span><br /><span class="kw2">function</span> animateSecond<span class="br0">(</span>arg<span class="br0">)</span> <span class="br0">{</span><span class="br0">}</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Sources, further reading: 
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Trade_animation_smoothness_for_speed">Trade animation smoothness for speed</span></h3><span>
+</span><p>To trade smoothness for speed means that while you may want to move an animation 1 pixel at a time, the animation and subsequent reflows may in that case use 100% of the CPU and the animation will seem jumpy as the browser is forced to drop frames to update the flow. Moving the animated element by e.g. 5 pixels at a time may seem slightly less smooth on faster machines, but won’t cause CPU thrashing that easily on mobile devices.
+</p><span>
+</span><h2> <span class="mw-headline" id="Events">Events </span></h2><span>
+</span><h3> <span class="mw-headline" id="Use_event_delegation">Use event delegation </span></h3><span>
+</span><ul><li>Assigning event handlers to individual objects can add up quickly and is expensive if you create a lots of new elements dynamically to which event handlers need to be bound.
+</li><li>This becomes especially interesting if you assign multiple event listeners (e.g. click and blur to a one element. In case of 100 elements that would mean 200 event handlers. 
+</li><li>Using DOM Level 2 event model all events propagate toward the document object which is highest up in the hierarchy. This means that one can bind event listeners to document which invokes a controller and passes the event object to it. The controller is responsible for inspecting the internals of the event and dispatching to appropriate logic. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">var</span> elems <span class="sy0">=</span> <span class="br0">[</span>first<span class="sy0">,</span> ...<span class="sy0">,</span> last<span class="br0">]</span><span class="sy0">;</span> <span class="co1">// an array which holds say 1000 references to element to which assign the event handlers to</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">,</span> l <span class="sy0">=</span> elems.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++;</span> i <span class="sy0">&lt;</span> l<span class="br0">)</span> <span class="br0">{</span><br />elems<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">onclick</span> <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><span class="br0">}</span><span class="sy0">;</span><br />elems<span class="br0">[</span>i<span class="br0">]</span>.<span class="kw3">onblur</span> <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><span class="br0">}</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="co1">//HTML</span><br /><span class="sy0">&lt;</span>button id<span class="sy0">=</span><span class="st0">"doSomething"</span><span class="sy0">&gt;</span>Click me to <span class="kw1">do</span> something<span class="sy0">&lt;/</span>button<span class="sy0">&gt;</span> <span class="co1">// you can add more of elements without the need to worry about binding event handlers</span><br /><span class="co1">// JS</span><br />document.<span class="me1">addEventListener</span><span class="br0">(</span><span class="st0">'click'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">(</span>event<span class="br0">)</span> <span class="br0">{</span> eventController<span class="br0">(</span>event<span class="br0">)</span><span class="sy0">;</span> <span class="br0">}</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">)</span><span class="sy0">;</span><br />document.<span class="me1">addEventListener</span><span class="br0">(</span><span class="st0">'blue'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">(</span>event<span class="br0">)</span> <span class="br0">{</span> eventController<span class="br0">(</span>event<span class="br0">)</span><span class="sy0">;</span> <span class="br0">}</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw2">function</span> eventController<span class="br0">(</span>event<span class="br0">)</span> <span class="br0">{</span><br /><span class="co1">// inspect the event object internals and do something wise</span><br /><span class="kw1">if</span> <span class="br0">(</span>event.<span class="me1">target</span>.<span class="me1">id</span> <span class="sy0">===</span> <span class="st0">'doSomething'</span><span class="br0">)</span> <span class="br0">{</span><br />doSomething<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>   <br /><span class="br0">}</span><br /><span class="br0">}</span><br /><span class="kw2">function</span> doSomething<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><span class="br0">}</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Throttle_event_handlers_which_fire_excessively">Throttle event handlers which fire excessively </span></h3><span>
+</span><ul><li>If a handler is called many times, the responsiveness of the UI degrade and tops the CPU. This is especially an issue if the event handler triggers reflow as is the case with resize. 
+</li><li>On S60 5.0 devices input element's blur handler is called each time the content of the input field changes, e.g. user types in a single letter. 
+</li><li>You may want your function to run once after the last event has fired to prevent excessive calls to potentially expensive functions. You must implement throttling mechanism to achieve that kind of a rate limited. 
+</li></ul><span>
+</span><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">window.<span class="kw3">onresize</span> <span class="sy0">=</span> resizeHandler<span class="sy0">;</span> <span class="co1">// fires excessively during resize</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> SomeObject<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> self <span class="sy0">=</span> <span class="kw1">this</span><span class="sy0">;</span><br /><span class="kw1">this</span>.<span class="me1">lastExecThrottle</span> <span class="sy0">=</span> <span class="nu0">500</span><span class="sy0">;</span> <span class="co1">// limit to one call every "n" msec</span><br /><span class="kw1">this</span>.<span class="me1">lastExec</span> <span class="sy0">=</span> <span class="kw2">new</span> Date<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw1">this</span>.<span class="me1">timer</span> <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span><br /><span class="kw1">this</span>.<span class="me1">resizeHandler</span> <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> d <span class="sy0">=</span> <span class="kw2">new</span> Date<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw1">if</span> <span class="br0">(</span>d<span class="sy0">-</span>self.<span class="me1">lastExec</span> <span class="sy0">&lt;</span> self.<span class="me1">lastExecThrottle</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="co1">// This function has been called "too soon," before the allowed "rate" of twice per second</span><br /><span class="co1">// Set (or reset) timer so the throttled handler execution happens "n" msec from now instead</span><br /><span class="kw1">if</span> <span class="br0">(</span>self.<span class="me1">timer</span><span class="br0">)</span> <span class="br0">{</span><br />window.<span class="me1">clearTimeout</span><span class="br0">(</span>self.<span class="me1">timer</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br />self.<span class="me1">timer</span> <span class="sy0">=</span> window.<span class="me1">setTimeout</span><span class="br0">(</span>self.<span class="me1">resizeHandler</span><span class="sy0">,</span> self.<span class="me1">lastExecThrottle</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="kw1">return</span> <span class="kw2">false</span><span class="sy0">;</span> <span class="co1">// exit</span><br /><span class="br0">}</span><br />self.<span class="me1">lastExec</span> <span class="sy0">=</span> d<span class="sy0">;</span> <span class="co1">// update "last exec" time</span><br /><span class="co1">// At this point, actual handler code can be called (update positions, resize elements etc.)</span><br /><span class="co1">// self.callResizeHandlerFunctions();</span><br /><span class="br0">}</span><br /><span class="br0">}</span><br /><span class="kw2">var</span> someObject <span class="sy0">=</span> <span class="kw2">new</span> SomeObject<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br />window.<span class="kw3">onresize</span> <span class="sy0">=</span> someObject.<span class="me1">resizeHandler</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Source: 
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Escaping_the_JavaScript_call_stack_with_setTimeout">Escaping the JavaScript call stack with <tt>setTimeout</tt></span></h3><span>
+</span><ul><li>Setting up handlers that run after an event has fired needs some trickery. Because the event doesn’t take effect until the event-handling call stack opens and closes completely, there’s no way to work in a post-event environment via conventional event handlers. 
+</li><li>When something is called using setTimeout with a delay of 0 the JavaScript engine notices it is busy (with a task which invoked <tt>setTimeout</tt>) and queues the <tt>setTimeout</tt> code for execution immediately after the current call stack closes. 
+</li><li>This technique can be used to prioritize certain functionality such as showing and hiding loading indicator prior to executing a computationally heavy operation such as modifying the DOM. 
+</li></ul><span>
+</span><p>In a typical scenario this will not turn the loading indicator visible:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"> showLoadingIndicator<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br />doSomethingExpensive<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Workaround is to use setTimeout as follows (please take extra care when using this anti-pattern as what it does is actually delays the execution in order to display the loading indicator in the UI):
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw2">function</span> switchViews<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />setTimeout<span class="br0">(</span><span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />showLoadingIndicator<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">)</span><span class="sy0">;</span><br />setTimeout<span class="br0">(</span><span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />doSomethingExpensive<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><span class="sy0">,</span> <span class="nu0">50</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>Source: 
+</p><span>
+</span><span>
+</span><span>
+</span><h2> <span class="mw-headline" id="Styling">Styling </span></h2><span>
+</span><h3> <span class="mw-headline" id="Optimize_CSS">Optimize CSS </span></h3><span>
+</span><ul><li>Create a component library 
+</li><li>Use consistent semantic styles 
+</li><li>Design modules to be transparent on the inside 
+</li><li>Be flexible 
+</li><li>Learn to love grids 
+</li><li>Minimize selectors 
+</li><li>Separate structure and skin 
+</li><li>Separate container and content 
+</li><li>Extend objects by applying multiple classes to an element 
+</li><li>Use reset and fonts from YUI 
+</li><li>Source: <a rel="nofollow" class="external text" href="http://www.slideshare.net/stubbornella/object-oriented-css">Object Oriented CSS</a>
+</li></ul><span>
+</span><h4> <span class="mw-headline" id="Change_CSS_classes_near_the_edges_of_the_DOM_tree">Change CSS classes near the edges of the DOM tree </span></h4><span>
+</span><p>To limit the scope of the reflow to as few nodes as possible you should avoid changing a class on wrapper (or body) element(s) which affects the display of many child nodes. Additionally, that may result in re-resolving style on the entire document and for a large DOM that could lock up the browser for a while. 
+</p><p>Source: 
+</p><span>
+</span><span>
+</span><h4> <span class="mw-headline" id="Avoid_tables_for_layout_or_use_table-layout:_fixed">Avoid tables for layout or use table-layout: fixed</span></h4><span>
+</span><p>Avoid tables for layout. As if you needed another reason to avoid them, tables often require multiple passes before the layout is completely established because they are one of the rare cases where elements can affect the display of other elements that came before them on the DOM. Imagine a cell at the end of the table with very wide content that causes the column to be completely resized. This is why tables are not rendered progressively in all browsers and yet another reason why they are a bad idea for layout. 
+</p><p>It is recommended to use a fixed layout ( table-layout: fixed) for data tables to allow a more efficient layout algorithm. This will allow the table to render row by row according to the CSS 2.1 specification. 
+</p><p>Source:
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Optimize_images">Optimize images </span></h3><span>
+</span><ul><li>Combine similar colors 
+</li><li>Avoid whitespace in sprites, use CSS instead 
+</li><li>Horizontal is better than vertical 
+</li><li>Limit the number of colors 
+</li><li>First optimize individual images, next sprites in it 
+</li><li>Reduce anti-aliased pixels via size and alignment 
+</li><li>Avoid diagonal gradients due to increased image size 
+</li><li>Avoid alpha transparency (IE does not support) 
+</li><li>Change gradient color every 2-3 pixels 
+</li></ul><span>
+</span><p>Source: 
+</p><span>
+</span><span>
+</span><span>
+</span><h2> <span class="mw-headline" id="S60_specifics">S60 specifics </span></h2><span>
+</span><h3> <span class="mw-headline" id="Styling_2">Styling </span></h3><span>
+</span><h4> <span class="mw-headline" id="Remove_borders_around_focusable_elements">Remove borders around focusable elements </span></h4><span>
+</span><p>In WRT 1.x you can remove default blue borders in tab navigation mode with the following CSS. 
+<tt>a:hover, a:focus { outline: none; </tt>}
+</p><span>
+</span><h4> </h4><span>
+</span><p>In tabbed navigation mode the focus may lost while switching views. A fix to this issue is to place a read-only <tt>&lt;input&gt;</tt> text element (can be absolutely positioned, zero-sized and transparent) under the element to be focused after switching the view and <tt>focus()</tt>:ing on it after the view changes. 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1">/* CSS */<br />#top {<br />position: absolute;<br />top: 0px;<br />width: 0px;<br />height: 0px;<br />border: 0px;<br />background: transparent;<br />}<br /><span class="sc-1">&lt;!-- HTML --&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/input.html"><span class="kw2">input</span></a> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">"top"</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"text"</span> <span class="kw3">readonly</span><span class="sy0">=</span><span class="st0">"readonly"</span><span class="sy0">/</span>&gt;</span></pre></div></div><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="co1">// JavaScript</span><br />widget.<span class="me1">setNavigationEnabled</span><span class="br0">(</span><span class="kw2">false</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// tabbed navigation mode</span><br /><span class="kw2">function</span> toggleViews<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br />hideFirstView<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br />showSecondView<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br />document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'top'</span><span class="br0">)</span>.<span class="kw3">focus</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><p>You may need to alter the positioning of the element by modifying the <tt>top</tt> property to position it underneath the first focusable element depending on your layout.
+</p><span>
+</span><h4> </h4><span>
+</span><p>There is no exhaustive fix to this bug but it seems to help if you set the styles via onblur and onfocus event handlers instead of using CSS pseudo selector&nbsp;:hover. 
+</p><p>So instead of <tt>:hover</tt> in CSS: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"text/css"</span>&gt;</span><br />#focusable:hover {<br />background-color: blue;<br />}<br /><span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a>&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/button.html"><span class="kw2">button</span></a> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">"focusable"</span>&gt;</span>Foobar<span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/button.html"><span class="kw2">button</span></a>&gt;</span></pre></div></div><span>
+</span><p>You utilize <tt>onfocus</tt> and <tt>onblur</tt> event handlers and set the styles using JavaScript: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'focusable'</span><span class="br0">)</span>.<span class="kw3">onfocus</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">this</span>.<span class="me1">style</span>.<span class="me1">backgroundColor</span> <span class="sy0">=</span> <span class="st0">'blue'</span><span class="sy0">;</span><br /><span class="br0">}</span><br />document.<span class="me1">getElementById</span><span class="br0">(</span><span class="st0">'focusable'</span><span class="br0">)</span>.<span class="kw3">onblur</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw1">this</span>.<span class="me1">style</span>.<span class="me1">backgroundColor</span> <span class="sy0">=</span> <span class="st0">'inherit'</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div><span>
+</span><span>
+</span><h4> <span class="mw-headline" id="Allow_animated_gif_images_to_animate_after_being_hidden">Allow animated gif images to animate after being hidden </span></h4><span>
+</span><p>S60 3.x and 5.0 devices do not animated gif images if they have been set as display: none at any point during their lifespan regardless of subsequent display value. A workaround to this bug is to avoid display: none and use position: absolute and alter left property to move the animated gif outside of the visible viewport to hide it ( left: -100%) and bring it back ( left: 0). 
+</p><p>Alternatively you can fold the animated gif into another element whose style you set in a similar fashion. 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1"><span class="sc-1">&lt;!-- animation hidden --&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/img.html"><span class="kw2">img</span></a> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">"position: absolute; left: -100%;"</span> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">"animated.gif"</span> <span class="sy0">/</span>&gt;</span></pre></div></div><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1"><span class="sc-1">&lt;!-- animation visible --&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/img.html"><span class="kw2">img</span></a> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">"position: absolute; left: 0;"</span> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">"animated.gif"</span> <span class="sy0">/</span>&gt;</span></pre></div></div><span>
+</span><h3> <span class="mw-headline" id="Home_Screen_Widgets">Home Screen Widgets </span></h3><span>
+</span><ul><li>Remove unneeded images in mini view 
+<ul><li>If images are used exclusively in full view, you can get rid of all of them (or selectively one by one) and save memory. 
+</li><li>Any other unneeded images (e.g. images specific to screen orientation, portrait or landscape) can be also removed using similar technique. 
+</li><li>To remove all images use: <div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="kw1">in</span> document.<span class="me1">images</span><span class="br0">)</span> <span class="br0">{</span><br />document.<span class="me1">images</span><span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">src</span> <span class="sy0">=</span> <span class="st0">"#"</span><span class="sy0">;</span><br /><span class="br0">}</span></pre></div></div>
+</li></ul>
+</li></ul><span>
+</span><ul><li>Remove unneeded nodes from the DOM when in mini view
+
+</li></ul><span>
+</span><ul><li>Check and remove unused JavaScript functions and &lt;embed&gt; tags when in mini view
+<ul><li>Removing unused JavaScript functions and &lt;embed&gt; tags will save memory.
+</li></ul>
+</li><li>Consider using background color in mini view instead of images
+</li><li>Respect onshow and onhide
+<ul><li>When you get an <tt>onhide</tt> event, call <tt>clearInterval()</tt> and <tt>clearTimeout()</tt> for any pending timers and abort any pending XHR calls to keep the CPU usage low.
+</li></ul>
+</li></ul><span>
+</span><span>
+</span><ul><li>Animations on Home Screen
+<ul><li>Avoid animations on home screen unless they are really needed for the sake of good user experience.
+</li></ul>
+</li></ul><span>
+</span><h3> <span class="mw-headline" id="Misc">Misc </span></h3><span>
+</span><h4> <span class="mw-headline" id="Avoid_background-repeat_if_the_background-image_is_small_relative_to_its_containing_element">Avoid background-repeat if the background-image is small relative to its containing element </span></h4><span>
+</span><p>Interaction such as scrolling is extremely slow if background-repeat property is set to repeat-x or repeat-y combined with a background-image of a size which needs to be repeated multiple times to fill in the element's background. A workaround is to avoid using repeating backgrounds i.e. use a big enough background-image with <tt>background-repeat: no-repeat</tt>.
+For example, a commonly used CSS design pattern -- which degrades the performance and should be avoided -- is to create a continuous vertical gradient background using a background image of width 1px which is repeated horizontally across the whole element width. 
+</p><p>This optimization pattern is a tradeoff between the initial load time and the subsequent interaction smoothness. In a typical scenario using a bigger background-image (longed load time) with <tt>background-repeat: no-repeat</tt> delivers a far superior overall UX over using a smaller repeating background. 
+</p><p>Slow: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"text/css"</span>&gt;</span><br />.container {<br />width: 500px;<br />height: 50px;<br />}<br />.repeat {<br />background-image: url(background1.png); /* background1.png width 1px, height 50px */<br />background-repeat: repeat-x;<br />}<br /><span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a>&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/div.html"><span class="kw2">div</span></a> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">"container repeat"</span>&gt;</span>Foobar<span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/div.html"><span class="kw2">div</span></a>&gt;</span></pre></div></div><span>
+</span><p>Faster: 
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"text/css"</span>&gt;</span><br />.container {<br />width: 500px;<br />height: 50px;<br />}<br />.norepeat {<br />background-image: url(background2.png); /* background2.png width 500px, height 50px */<br />background-repeat: no-repeat;<br />}<br /><span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a>&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/div.html"><span class="kw2">div</span></a> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">"container norepeat"</span>&gt;</span>Foobar<span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/div.html"><span class="kw2">div</span></a>&gt;</span></pre></div></div><span>
+</span><span>
+</span><h2> <span class="mw-headline" id="jQuery-specifics">jQuery-specifics </span></h2><span>
+</span><p>NB! These optimization patterns are aimed at jQuery 1.2.6. Recent versions and the Sizzle selector engine alleviate some of these bottlenecks. 
+</p><p>Sources 
+<a rel="nofollow" class="external text" href="http://ajaxian.com/archives/ajax-experience-talks-resig-slocum-and-heilmann">Advanced jQuery with John Resig </a>
+<a rel="nofollow" class="external text" href="http://ejohn.org/blog/function-call-profiling/">JavaScript Function Call Profiling </a>
+</p><span>
+</span><h3> <span class="mw-headline" id="Minimize_the_use_of_slow_jQuery_methods">Minimize the use of slow jQuery methods </span></h3><span>
+</span><p><tt>remove()</tt>, <tt>hmtl()</tt> and <tt>empty()</tt> have order of n2 time complexity, that is T(n) = O(n2). Minimizing the use of these methods is recommended in jQuery versions prior to 1.3.3. . 
+</p><span>
+</span><tt>append, prepend, before, after</tt><span> methods are expensive as well as taking a chunk of HTML and serializing it (</span><tt>$("<p>Hello World!</p>")</tt><span>). 
+</span><p>The process behind these manipulations methods is the following: cleaning the input string, converting the string into a DOM fragment and injecting it into the DOM.
+</p><span>
+</span><h3> <span class="mw-headline" id="Optimize_selectors">Optimize selectors </span></h3><span>
+</span><p>Pay attention to the selectors you use. E.g. if you want to hide paragraphs which are direct children of div elements there are multiple ways to do it. 
+</p><p>Using the selector below will try to find all div elements, loops thought all of them and find all p relative to the div, merge and figure out unique results. 
+Making sure that the returned set is unique is where the most time is spent, and is very slow especially with a large DOM tree. 
+</p><p>Slow: 
+</p><span>
+</span><span>
+</span><p>A one way to optimize the selector is to match direct children of div (this may require you to re-factor the DOM structure of your app and may not be feasible in every scenario). 
+This alternative flatter selector will try to find all div elements, loops thought all child elements and verifies if element is p. 
+</p><p>Faster: 
+</p><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Consider_alternatives_to_jQuery.each.28.29">Consider alternatives to jQuery.each() </span></h3><span>
+</span><p>Depending on the size of the array, looping through it using 
+<tt>{{{1}}}</tt> instead of <tt>jQuery.each(myArray)</tt> may be faster. 
+</p><span>
+</span><h3> <span class="mw-headline" id="Consider_alternatives_to_.show.28.29.2C_.hide.28.29_and_.toggle.28.29">Consider alternatives to .show(), .hide() and .toggle()</span></h3><span>
+</span><p>Toggling element visibility via <tt>.css({'display':'none'})</tt> and <tt>.css({'display':'block'});</tt> is faster than using convenience functions <tt>.show()</tt>, <tt>.hide()</tt> and <tt>toggle()</tt>, especially while working with large number of elements. Depending on the rendering engine used, <tt>.css()</tt> is also faster than using <tt>.addClass()</tt> and <tt>.removeClass()</tt>.
+</p><p><br />Slow:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">$<span class="br0">(</span><span class="st0">'#elementToHide'</span><span class="br0">)</span>.<span class="me1">hide</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br />$<span class="br0">(</span><span class="st0">'#elementToShow'</span><span class="br0">)</span>.<span class="me1">show</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Faster:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1">$<span class="br0">(</span><span class="st0">'#elementToHide'</span><span class="br0">)</span>.<span class="me1">css</span><span class="br0">(</span><span class="br0">{</span><span class="st0">'display'</span><span class="sy0">:</span><span class="st0">'none'</span><span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span><br />$<span class="br0">(</span><span class="st0">'#elementToShow'</span><span class="br0">)</span>.<span class="me1">css</span><span class="br0">(</span><span class="br0">{</span><span class="st0">'display'</span><span class="sy0">:</span><span class="st0">'block'</span><span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>For dealing with extremely large set of DOM elements, you may want to consider disabling stylesheets as follows:
+</p><span>
+</span><div dir="ltr" class="mw-geshi"><div class="html4strict source-html4strict"><pre class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">"special_hide"</span>&gt;</span>.special_hide { display: none; }<span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/style.html"><span class="kw2">style</span></a>&gt;</span><br /><span class="sc-1">&lt;!--  ...  --&gt;</span><br /><span class="sc2">&lt;<a href="http://december.com/html/4/element/div.html"><span class="kw2">div</span></a> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">"special_hide"</span>&gt;</span>Special hide DIV<span class="sc2">&lt;<span class="sy0">/</span><a href="http://december.com/html/4/element/div.html"><span class="kw2">div</span></a>&gt;</span></pre></div></div><span>
+</span><div dir="ltr" class="mw-geshi"><div class="javascript source-javascript"><pre class="de1"><span class="co1">// show all elements with a class of “special_hide”</span><br />$<span class="br0">(</span><span class="st0">'#special_hide'</span><span class="br0">)</span>.<span class="me1">attr</span><span class="br0">(</span><span class="st0">'disabled'</span><span class="sy0">,</span> <span class="st0">'true'</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="co1">// hide all elements with a class of “special_hide”</span><br />$<span class="br0">(</span><span class="st0">'#special_hide'</span><span class="br0">)</span>.<span class="me1">attr</span><span class="br0">(</span><span class="st0">'disabled'</span><span class="sy0">,</span> <span class="st0">'false'</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div><span>
+</span><p>Sources
+</p><span>
+</span><span>
+</span><h2> <span class="mw-headline" id="References"> References </span></h2><span>
+</span><h3> <span class="mw-headline" id="Generic_JavaScript"> Generic JavaScript </span></h3><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="HTML5-specific"> HTML5-specific </span></h3><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="jQuery-specific"> jQuery-specific </span></h3><span>
+</span><span>
+</span><h3> <span class="mw-headline" id="Latest"> Latest </span></h3><span>
+</span><span>
+</span><p><br />This article is originally authored by <a rel="nofollow" class="external text" href="http://twitter.com/anssik">Anssi Kostiainen</a> and licensed under a <a rel="nofollow" class="external text" href="http://creativecommons.org/licenses/by-nc-sa/2.5/">Creative Commons Attribution, Non Commercial - Share Alike 2.5 license</a>.
+</p><p>---
+</p><p>Copyright notice: Nokia may include links to sites on the Internet that are owned or operated by third parties. If you choose to use such links to such sites you agree to review and accept such site's rules of use before using such site. You access the third-party sites at your own risk. Nokia does not assume any responsibility for material created or published by such third-party sites. By providing a link to a third party site Nokia does not imply that Nokia endorses the site or the products or services referenced in such third party site.
+</p><span>
+</span><!-- 
+NewPP limit report
+Preprocessor node count: 1870/1000000
+Post‐expand include size: 5136/2097152 bytes
+Template argument size: 1370/2097152 bytes
+Expensive parser function count: 0/100
+--><span>
+
+</span><!-- Saved in parser cache with key wiki:pcache:idhash:17983-0!*!0!!en!2!* and timestamp 20140711030637 --><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

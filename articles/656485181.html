@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>自己搭建的google搜索镜像服务</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>自己搭建的google搜索镜像服务</h1>
+<div class="content"><span>
+      
+</span><p>基于我前几天发布的一个小工具<a href="http://examplecode.github.io/2014/06/25/minimal-http-proxy-c-language-implementation">mproxy</a>，做了一个免费的Google搜索镜像用来满足日常使用Google的需求，为了发挥VPS的更大效能,现分享出来供免费使用。</p><span>
+
+</span><p>注：目前此教程只针对Chrome浏览器，其他浏览器的使用者请忽略此文，或自行想办法(原理上都是一样的)免费的镜像不知能够提供多长时间，有兴趣的话可以按照<a href="http://examplecode.github.io/2014/06/25/minimal-http-proxy-c-language-implementation">mproxy</a>的使用教程自行部署服务</p><span>
+
+</span><p>应用原理主要是依赖浏览器的PAC(Proxy-Auto-Config)功能,在使用google的时候自动切换至mproxy提供的代理服务，如果想使用其他被墙的网站原理相同，只需要修改.pac文件就好了。设置简洁3步搞定，详情如下。</p><span>
+
+</span><h3 id="step1-mproxy">step1 下载并编译mproxy</h3><span>
+
+</span><pre><code>clone https://github.com/examplecode/mproxy
+cd mproxy
+gcc -o mproxy mproxy.c
+</code></pre><span>
+
+</span><h3 id="step2-proxy">step2 在命令行启动proxy</h3><span>
+
+</span><pre><code>./mproxy -l 8081 -h free.mmbox.me -E -d
+</code></pre><span>
+
+</span><h3 id="step-3-chrome-">step 3 以命令行的方式启动Chrome 浏览器</h3><span>
+
+</span><p>为了确保自动切换代理模式可以正常工作，请再测试之前先禁用(chrome-&gt;偏好设置-&gt;扩展程序)掉所有的代理管理插件，如proxySwitchSharp。 </p><span>
+
+</span><h4 id="mac-">Mac 版本</h4><span>
+
+</span><pre><code>cd /Applications/Google\ Chrome.app/Contents/MacOS
+./Google\ Chrome --proxy-pac-url=http://free.mmbox.me/mproxy.pac
+</code></pre><span>
+
+</span><h4 id="linux-">linux 版本</h4><span>
+
+</span><pre><code>cd /path/of/chrome
+./chrome --proxy-pac-url=http://free.mmbox.me/mproxy.pac
+</code></pre><span>
+
+</span><p>在完成以上步骤后就可以畅通无阻的使用Google了，enjoy it ! :) </p><span>
+
+
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

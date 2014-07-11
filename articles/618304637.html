@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+      Eight Terminal Utilities Every OS X Command Line User Should Know · mitchchn.me
+    </title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>
+      Eight Terminal Utilities Every OS X Command Line User Should Know · mitchchn.me
+    </h1>
+<div class="post-content" itemprop="articleBody"><span>
+    </span><p>The OS X Terminal opens up a world of powerful UNIX utilities and scripts. If you’re migrating from Linux, you’ll find many familiar commands work the way you expect. But power users often aren’t aware that OS X comes with a number of its own text-based utilities not found on any other operating system. Learning about these Mac-only programs can make you more productive on the command line and help you bridge the gap between UNIX and your Mac.</p><span>
+
+</span><!--more--><span>
+
+</span><p><strong>Update:</strong> Thanks to reader feedback, I’ve written about a few more commands in a follow-up post: <a href="http://www.mitchchn.me/2014/and-eight-hundred-more/">(And eight hundred more)</a>.</p><span>
+
+</span><h2 id="open">1. <strong>open</strong></h2><span>
+
+</span><p><code>open</code> opens files, directories and applications. Exciting, right? But it really does come in handy as a <strong>command-line double-click.</strong> For instance, typing:</p><span>
+
+</span><pre><code>$ open /Applications/Safari.app/
+</code></pre><span>
+
+</span><p>…will launch Safari as if you had double-clicked its icon in the Finder.<sup id="fnref:bundles"></sup></p><span>
+
+</span><p>If you point <code>open</code> at a file instead, it will try to load the file with its associated GUI application. <code>open screenshot.png</code> on an image will open that image in Preview. You can set the <code>-a</code> flag to choose the app yourself, or <code>-e</code> to open the file for editing in TextEdit.</p><span>
+
+</span><p>Running <code>open</code> on a directory will take you straight to that directory in a Finder window. This is especially useful for bringing up the current directory by typing <code>open .</code></p><span>
+
+</span><p>Remember that the integration between Finder and Terminal goes both ways – if you drag a file from Finder into a Terminal window, its full path gets pasted into the command line.</p><span>
+
+</span><h2 id="pbcopy-and-pbpaste">2. <strong>pbcopy</strong> and <strong>pbpaste</strong></h2><span>
+
+</span><p>These two commands let you copy and paste text from the command line. Of course, you could also just use your mouse—but the real power of <code>pbcopy</code> and <code>pbpaste</code> comes from the fact that they’re UNIX commands, and that means they benefit from piping, redirection, and the ability to be in scripts in conjunction with other commands. Typing:</p><span>
+
+</span><pre><code>$ ls ~ | pbcopy
+</code></pre><span>
+
+</span><p>…will copy a list of files in your home directory to the OS X clipboard. You can easily capture the contents of a file:</p><span>
+
+</span><pre><code>$ pbcopy &lt; blogpost.txt
+</code></pre><span>
+
+</span><p>..or do something crazier. This hacked-up script will grab the link of the latest Google doodle and copy it to your clipboard.</p><span>
+
+</span><pre><code>$ curl http://www.google.com/doodles#oodles/archive | grep -A5 'latest-doodle on' | grep 'img src' | sed s/.*'&lt;img src="\/\/'/''/ | sed s/'" alt=".*'/''/ | pbcopy
+</code></pre><span>
+
+</span><p>Using <code>pbcopy</code> with pipes is a great way to capture the output of a command without having to scroll up and carefully select it. This makes it easy to share diagnostic information. <code>pbcopy</code> and <code>pbpaste</code> can also be used to automate or speed up certain kinds of tasks. For instance, if you want to save email subject lines to a task list, you could copy the subjects from Mail.app and run:</p><span>
+
+</span><pre><code>$ pbpaste &gt;&gt; tasklist.txt
+</code></pre><span>
+
+</span><h2 id="mdfind">3. <strong>mdfind</strong></h2><span>
+
+</span><p>Many a Linux power user has tried to use <code>locate</code> to search for files on a Mac and then quickly discovered that it didn’t work. There’s always the venerable UNIX <code>find</code> command, but OS X comes with its own killer search tool: Spotlight. So why not tap into its power from the command line?</p><span>
+
+</span><p>That’s exactly what <code>mdfind</code> does. Anything Spotlight can find, <code>mdfind</code> can find too. That includes the ability to search inside files and metadata.</p><span>
+
+</span><p><code>mdfind</code> comes with a few conveniences that make it stand out from its big blue brother. For instance, the <code>-onlyin</code> flag can restrict the search to a single directory:</p><span>
+
+</span><pre><code>$ mdfind -onlyin ~/Documents essay
+</code></pre><span>
+
+</span><p>The <code>mdfind</code> database should stay up to date in the background, but you can also troubleshoot it (as well as Spotlight) using <code>mdutil</code>. If Spotlight isn’t working the way it should, <code>mdutil -E</code> will erase the index and rebuild it from scratch. You can also turn off indexing entirely with <code>mdutil -i off</code>.</p><span>
+
+</span><h2 id="screencapture">4. <strong>screencapture</strong></h2><span>
+
+</span><p><code>screencapture</code> lets you take many different kinds of screenshots. It’s similar to <strong>Grab.app</strong> and the keyboard shortcuts <kbd>cmd</kbd> + <kbd>shift</kbd> + <kbd>3</kbd> and <kbd>cmd</kbd> + <kbd>shift</kbd> + <kbd>4</kbd>, except it’s far more flexible. Here are just a few different ways you can use <code>screencapture</code>:</p><span>
+
+</span><p>Capture the contents of the screen, including the cursor, and attach the resulting image (named ‘image.png’) to a new Mail message:</p><span>
+
+</span><pre><code>$ screencapture -C -M image.png
+</code></pre><span>
+
+</span><p>Select a window using your mouse, then capture its contents without the window’s drop shadow and copy the image to the clipboard:</p><span>
+
+</span><pre><code>$ screencapture -c -W
+</code></pre><span>
+
+</span><p>Capture the screen after a delay of 10 seconds and then open the new image in Preview:</p><span>
+
+</span><pre><code>$ screencapture -T 10 -P image.png
+</code></pre><span>
+
+</span><p>Select a portion of the screen with your mouse, capture its contents, and save the image as a pdf:</p><span>
+
+</span><pre><code>$ screencapture -s -t pdf image.pdf
+</code></pre><span>
+
+</span><p>To see more options, type <code>screencapture --help</code> </p><span>
+
+</span><h2 id="launchctl">5. <strong>launchctl</strong></h2><span>
+
+</span><p><code>launchctl</code> lets you interact with the OS X init script system, <code>launchd</code>. With launch daemons and launch agents, you can control the services that start up when you boot your computer. You can even set up scripts to run periodically or at timed intervals in the background, similar to cron jobs on Linux.</p><span>
+
+</span><p>For example, if you’d like to have the Apache web server start automatically when you turn on your Mac, simply type:</p><span>
+
+</span><pre><code>$ sudo launchctl load -w /System/Library/LaunchDaemons/org.apache.httpd.plist
+</code></pre><span>
+
+</span><p>Running <code>launchctl list</code> will show you what launch scripts are currently loaded. <code>sudo launchctl unload [path/to/script]</code> will stop and unload running scripts, and adding the <code>-w</code> flag will remove those scripts permanently from your boot sequence. I like to run this one on all the auto-update “helpers” created by Adobe apps and Microsoft Office.</p><span>
+
+</span><p>Launchd scripts are stored in the folllowing locations:</p><span>
+
+</span><pre><code>~/Library/LaunchAgents    
+/Library/LaunchAgents          
+/Library/LaunchDaemons
+/System/Library/LaunchAgents
+/System/Library/LaunchDaemons
+</code></pre><span>
+
+</span><p>To see what goes into a launch agent or daemon, there’s a great blog post by <a href="http://paul.annesley.cc/2012/09/mac-os-x-launchd-is-cool/">Paul Annesley</a> that walks you through the file format. And if you’d like to learn how to write your own <code>launchd</code> scripts, Apple provides some helpful documentation on their <a href="https://developer.apple.com/library/mac/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html">Developer site</a>. There’s also the fantastic <a href="http://www.peterborgapps.com/lingon/">Lingon</a> app if you’d prefer to avoid the command line entirely.</p><span>
+
+</span><h2 id="say">6. <strong>say</strong></h2><span>
+
+</span><p>This is a fun one: <code>say</code> converts text to speech, using the same TTS engine OS X uses for <a href="http://www.apple.com/accessibility/osx/voiceover/">VoiceOver</a>. Without any options, <code>say</code> will simply speak whatever text you give it out loud.:<sup id="fnref:mac"></sup></p><span>
+
+</span><pre><code>$ say "Never trust a computer you can't lift."
+</code></pre><span>
+
+</span><p>You can also use <code>say</code> to speak the contents of a text file with the <code>-f</code> flag, and you can store the resulting audio clip with the <code>-o</code> flag:</p><span>
+
+</span><pre><code>$ say -f mynovel.txt -o myaudiobook.aiff
+</code></pre><span>
+
+</span><p>The <code>say</code> command can be useful in place of console logging or alert sounds in scripts. For instance, you can set up an Automator or <a href="http://www.noodlesoft.com/hazel.php">Hazel</a> script to do batch file processing and then announce the task’s completion with <code>say</code>.</p><span>
+
+</span><p>But the most enjoyable use for <code>say</code> is rather more sinister: if you have <code>ssh</code> access to a friend or coworker’s Mac, you can silently log into their machine and haunt them through the command line. Give ‘em a Siri-ous surprise.</p><span>
+
+</span><p>You can set the voice (and language!) used by <code>say</code> by changing the default setting in the <strong>Dictation &amp; Speech</strong> panel in System Preferences.</p><span>
+
+</span><h2 id="diskutil">7. <strong>diskutil</strong></h2><span>
+
+</span><p><code>diskutil</code> is a command line interface to the <strong>Disk Utility</strong> app that comes with OS X. It can do everything its graphical cousin can, but it also has some extra capabilities—such as filling a disk with zeroes or random data. Simply type <code>diskutil list</code> to see the path names of disks and removable media attached to your machine, and then point the command at the volume you want to operate on. Be careful: <code>diskutil</code> can permanently destroy data if it’s used incorrectly.</p><span>
+
+</span><h2 id="brew">8. <strong>brew</strong></h2><span>
+
+</span><p>Alright–this isn’t technically a native command. But no OS X power user should be without <a href="http://brew.sh/">Homebrew</a>. The website calls it “The missing package manager for OS X,” and that couldn’t be truer. If you’ve ever used <code>apt-get</code> in Linux, you will feel right at home in Homebrew.<sup id="fnref:compiling"></sup></p><span>
+
+</span><p><code>brew</code> gives you easy access to thousands of free utilities and libraries from the open source community. For instance, <code>brew install imagemagick</code> will set you up with <a href="http://www.imagemagick.org/">ImageMagick</a>, a powerful utility that makes it possible to do anything from whipping up animated gifs to converting images between dozens of different types. <code>brew install node</code> will introduce you to <a href="http://nodejs.org/">NodeJS</a>, the hot new tool for developing and running server-side JavaScript apps.</p><span>
+
+</span><p>You can have fun with Homebrew too: <code>brew install archey</code> will get you <strong>Archey</strong>, a cool little script for displaying your Mac’s specs next to a colourful Apple logo. The selection in Homebrew is huge—and because it’s so easy to create <a href="https://github.com/Homebrew/homebrew/wiki/Formula-Cookbook">formulas</a>, new packages are being added all the time.</p><span>
+
+</span><figure>
+    <img src="http://www.mitchchn.me/public/img/archey.png" />
+    <figcaption><span class="elegant">Archey—</span>My command line brings all the boys to the yard.</figcaption>
+</figure><span>
+
+</span><p>But the best part about Homebrew? It keeps all its files in a single directory: <code>/usr/local/</code>. That means you can install newer versions of system software, such as <code>python</code> and <code>mysql</code>, without interfering with the built-in equivalents. And if you ever want to get rid of your Homebrew installation, it’s easy to remove. </p><span>
+
+</span><p><em>Edit—May 15:</em> Someone suggested to me that that you should not blindly delete the contents of <code>/usr/local/</code>. That’s a fair precaution. To remove Homebrew safely, use the <a href="https://gist.github.com/mxcl/1173223">uninstall script</a>.</p><span>
+
+</span><p>For more fun with <strong>Terminal.app</strong>, here is an A-Z list of <a href="http://ss64.com/osx/">all available console commands in OS X 10.9 Mavericks</a>.</p><span>
+</span><span>
+
+  </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
