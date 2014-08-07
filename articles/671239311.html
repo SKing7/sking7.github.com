@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Slimmer and faster JavaScript strings in Firefox</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Slimmer and faster JavaScript strings in Firefox</h1>
+<div class="entry-content"><span>  
+        </span><p>Since Brendan Eich wrote the first SpiderMonkey version in 1995, there have been many, many changes to its internal string representation. New string types like inline strings (more on this below) and <a href="http://en.wikipedia.org/wiki/Rope_%28computer_science%29">ropes</a> were added to save memory and improve performance, but the character representation never changed: string characters were always stored as <span class="message"><span class="content">a <a href="http://www.2ality.com/2013/09/javascript-unicode.html">sequence of UTF-16 code units</a></span></span>. The past two months I’ve been <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=998392">working on</a> changing this. The JS engine can now store <a href="http://en.wikipedia.org/wiki/ISO/IEC_8859-1">Latin1</a> strings (strings that only use the first 256 Unicode <a href="http://en.wikipedia.org/wiki/Code_point">code points</a>) more efficiently: it will use 1 byte per character instead of 2 bytes. This is purely an internal optimization, JS code will behave exactly the same. In this post I will use the term <i>Latin1</i> for the new 8-bit representation and <i>TwoByte</i> for the 16-bit format.</p><span>
+</span><p>To measure how much memory this saves, I opened Gmail, waited 15 seconds then opened about:memory and looked at the zones/strings subtree under “Other measurements”:</p><span>
+</span><p><a href="https://blog.mozilla.org/javascript/files/2014/07/JS-String-Memory.png"><img class="alignnone size-full wp-image-729" src="https://blog.mozilla.org/javascript/files/2014/07/JS-String-Memory.png" alt="JS String Memory" width="1008" height="556" /></a></p><span>
+</span><p>For every JS string we allocate a small, fixed-size structure (JSString) on the gc-heap. Short strings can store their characters inline (see the <i>Inline strings</i> section below), longer strings contain a pointer to characters stored on the malloc-heap.</p><span>
+</span><p>Note that the malloc-heap size was more than halved and the total string memory was reduced by about 4 MB (40%). The difference between 32-bit and 64-bit is pretty small, JSString is 16 bytes on 32-bit and 24 bytes on 64-bit, but on 64-bit it can store more characters inline.</p><span>
+</span><p>The chart below shows how much of our string memory is used for Latin1 strings vs TwoByte strings on 64-bit:</p><span>
+</span><p><a href="https://blog.mozilla.org/javascript/files/2014/07/JS-String-Encoding.png"><img class="alignnone size-full wp-image-733" src="https://blog.mozilla.org/javascript/files/2014/07/JS-String-Encoding.png" alt="JS String Encoding" width="758" height="452" /></a></p><span>
+</span><p>Almost all strings are stored as Latin1. As we will see below, this is also the case for non-Western languages. The graph suggests some longer strings (that use malloc storage) are still stored as TwoByte. Some of these strings are really TwoByte and there’s not much we can do there, but a lot of them could be stored as Latin1. There are follow-up <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1038099">bugs</a> on file to use Latin1 strings in more cases.</p><span>
+</span><h3>Why not use UTF8?</h3><span>
+</span><p>At this point you may ask: wait, it’s 2014, why use Latin1 and not UTF8? It’s a good question and I did consider UTF8, but it has a number of disadvantages for us, most importantly:<b></b></p><span>
+</span><ul>
+<li>Gecko is huge and it uses TwoByte strings in most places. Converting all of Gecko to use UTF8 strings is a much bigger project and has its own risks. As described below, we currently inflate Latin1 strings to TwoByte Gecko strings and that was also a potential performance risk, but inflating Latin1 is much faster than inflating UTF8.</li>
+<li>Linear-time indexing: operations like charAt require character indexing to be fast. We discussed solving this by adding a special flag to indicate all characters in the string are ASCII, so that we can still use O(1) indexing in this case. This scheme will only work for ASCII strings, though, so it’s a potential performance risk. An alternative is to have such operations inflate the string from UTF8 to TwoByte, but that’s also not ideal.</li>
+<li>Converting SpiderMonkey’s own string algorithms to work on UTF8 would require a lot more work. This includes changing the irregexp regular expression engine we imported from V8 a few months ago (it already had code to handle Latin1 strings).</li>
+</ul><span>
+</span><p>So although UTF8 has advantages, with Latin1 I was able to get significant wins in a much shorter time, without the potential performance risks. Also, with all the refactoring I did we’re now in a much better place to add UTF8 in the future, if Gecko ever decides to switch.</p><span>
+</span><h3>Non-Western languages</h3><span>
+</span><p>So Latin1 strings save memory, but what about non-Western languages with non-Latin1 characters? It turns out that such websites still use a lot of Latin1 strings for property names, DOM strings and other identifiers. Also, Firefox and Firefox OS have a lot of internal JS code that’s exactly the same for each locale.</p><span>
+</span><p>To verify this, I opened the <a href="http://www.alexa.com/topsites/countries/CN">top 10</a> most popular Chinese websites, then looked at about:memory. 28% of all strings were TwoByte, this is definitely more than I saw on English language websites, but the majority of strings were still Latin1.</p><span>
+</span><h3>String changes</h3><span>
+</span><p>Each JSString used to have a single word that stored both the length (28 bits) and the flags (4 bits). We really needed these 4 flag bits to encode all our <a href="https://hg.mozilla.org/integration/mozilla-inbound/file/291b0b70cabb/js/src/vm/String.h#l90">string types</a>, but we also needed a new Latin1 flag, to indicate the characters are stored as Latin1 instead of TwoByte. I <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1008590">fixed</a> this by eliminating the character pointer for inline strings, so that we could store the string length and flags in two separate 32-bit fields. Having 32 flags available meant I could clean up the type encoding and make some type tests a lot faster. This change also allowed us to shrink JSString from 4 words to 3 words on 64-bit (JSString is still 4 words on 32-bit).</p><span>
+</span><p>After this, I had to convert all places where SpiderMonkey and Gecko work with string characters. In SpiderMonkey itself, I used C++ templates to make most functions work on both character types without code duplication. The deprecated HTML string extensions were <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1014114">rewritten</a> in self-hosted JS, so that they automatically worked with Latin1 strings.</p><span>
+</span><p>Some operations like <i>eval</i> currently inflate Latin1 to a temporary TwoByte buffer, because the parser still works on TwoByte strings and making it work on Latin1 would be a pretty big change. Fortunately, as far as I know this did not regress performance on any benchmarks or apps/games. The JSON parser, regex parser and almost all string functions can work on Latin1 strings without inflating.</p><span>
+</span><p>When I started working on this, Terrence mentioned that if we are going to refactor our string code, it’d be good to make all string code work with <i>unstable string characters</i> as well: <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=903519">once we start</a> allocating strings in the GGC nursery (or have <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=650161">compacting GC</a> for strings), we can no longer hold a pointer to string characters across a GC, because the GC can move the characters in memory, leaving us with a dangling pointer. I added new APIs and functions to safely access string characters and pave the way for more string improvements in the future.</p><span>
+</span><p>After converting all of SpiderMonkey’s string code, I had to make Gecko work with Latin1 JS strings and unstable string characters. Gecko has its own TwoByte string types and in many cases it used to avoid copying the JS characters by using a nsDependentString. This is not compatible with both Latin1 strings and nursery allocated strings, so I ended up copying (and inflating) JS strings when passing them to Gecko to solve both problems. For short strings we can use inline storage to avoid malloc or nsStringBuffer and overall this turned out to be fast enough: although it was about 10% slower on (pretty worst-case) getAttribute micro-benchmarks, none of our DOM benchmarks noticeably regressed as far as I know. For longer strings, the copy is potentially more expensive, but because I used a (refcounted) nsStringBuffer for those, it often avoids copying later on.</p><span>
+</span><h3>Inline strings</h3><span>
+</span><p>SpiderMonkey has two string types that can store their characters inline, instead of on the malloc heap: inline strings (size of a normal JSString) and fat inline strings (a few words bigger than a JSString). The table below shows the number of characters they can store inline (excluding the null terminator):</p><span>
+</span><table width="528">
+<tbody>
+<tr>
+<td></td>
+<td>32-bit Latin1</td>
+<td>32-bit TwoByte</td>
+<td>64-bit Latin1</td>
+<td>64-bit TwoByte</td>
+</tr>
+<tr>
+<td>Inline</td>
+<td>7</td>
+<td>3</td>
+<td>15</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Fat inline</td>
+<td>23</td>
+<td>11</td>
+<td>23</td>
+<td>11</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>So a Latin1 string of length 15 can be stored in an inline string on 64-bit and a fat inline string on 32-bit. Latin1 strings can store more characters inline so, as expected, there are a lot more inline strings now (measured after opening Gmail):</p><span>
+</span><p><a href="https://blog.mozilla.org/javascript/files/2014/07/JS-String-Types.png"><img class="alignnone size-full wp-image-742" src="https://blog.mozilla.org/javascript/files/2014/07/JS-String-Types.png" alt="JS String Types" width="994" height="562" /></a></p><span>
+</span><p>87% of strings can store their characters inline, this used to be 65%. Inline strings are nice for cache locality, save memory and improve performance (malloc and free are relatively slow). Especially on 64-bit, non-fat inline strings are now more common than fat inline strings, because most strings are very short.</p><span>
+</span><p>These numbers include <a href="http://en.wikipedia.org/wiki/String_interning"><i>atoms</i></a>, a string subtype the engine uses for property names, identifiers and some other strings. Minimized JS code is likely responsible for many short strings/atoms<strong>.</strong></p><span>
+</span><p>Note that SpiderMonkey has other string types (ropes, dependent strings, external strings, extensible strings), but more than 95% of all strings are inline, fat inline or malloc’ed so I decided to focus on those to avoid making the chart more complicated.</p><span>
+</span><h3>Performance</h3><span>
+</span><h3></h3><span>
+</span><p>The main goal was saving memory, but Latin1 strings also improved performance on several benchmarks. There was about a 36% win on Sunspider regexp-dna on x86 and x64 on <a href="http://arewefastyet.com/">AWFY</a> (the regular expression engine can generate more efficient code for Latin1 strings) and a 48% win on Android.</p><span>
+</span><p>There were also smaller wins on several other benchmarks, for instance the Kraken JSON tests improved by 11% on x86 and x64. On ARM this was closer to 20%.</p><span>
+</span><h3>Conclusion</h3><span>
+</span><p>Latin1 strings are in Firefox Nightly, will be in Aurora this week and should ship in Firefox 33. This work also paves the way for generational and compacting GC for strings, I’ll hopefully have time to work on that in the coming weeks. Last but not least, I want to thank Luke Wagner, Terrence Cole, Nicholas Nethercote, Boris Zbarsky, Brian Hackett, Jeff Walden and Bobby Holley for many excellent and fast reviews.</p><span>
+      </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

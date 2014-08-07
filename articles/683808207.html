@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>  Using mozjpeg to Create Efficient JPEGs ✩
+        Mozilla Hacks – the Web developer blog  </title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>  Using mozjpeg to Create Efficient JPEGs ✩
+        Mozilla Hacks – the Web developer blog  </h1>
+<article class="post" role="article">
+    <p>The mozjpeg project recently released <a href="https://github.com/mozilla/mozjpeg/releases/tag/v2.1" title="mozjpeg v2.1">version 2.1</a>. It aims to improve the efficiency of JPEG encoding over existing encoders while maintaining compatibility with the vast majority of existing decoders.</p>
+<p>I’d like to explain how you can use this software to reduce the size of your JPEGs. Specifically, I’m going to go over usage of mozjpeg’s <code>cjpeg</code> command line utility.</p>
+<h2>Building mozjpeg</h2>
+<p>There are no official mozjpeg binaries available, so you’ll have to build the project from source. Do this by <a href="https://github.com/mozilla/mozjpeg/releases" title="mozjpeg latest release">downloading the source code for the latest release</a> and following the instructions in the file <a href="https://github.com/mozilla/mozjpeg/blob/master/BUILDING.txt" title="BUILDING.txt file">BUILDING.txt</a>.</p>
+<p>Building on Linux and OS X is quite easy. Things are a little more complicated on Windows, but it’s still relatively easy. The mozjpeg project is considering providing binary releases in the future.</p>
+<p>When you build mozjpeg you’ll produce a command line tool called <code>cjpeg</code>. This is the encoding program that comes with mozjpeg. The decoder is called <code>djpeg</code>.</p>
+<h2>Input Image Formats</h2>
+<p>The <code>cjpeg</code> tool is capable of handling the following input file types: targa, bmp, ppm, and jpg.</p>
+<p>The ability to take JPEG files as input is a new feature in mozjpeg which doesn’t yet exists in the <code>cjpeg</code> tools provided by other projects. It was added to make re-compression workflows easier. Instead of converting JPEGs to BMP or something else and then re-encoding them, you can just pass the JPEG directly to the <code>cjpeg</code> encoder.</p>
+<p>If you want to create a JPEG from a file type not supported by <code>cjpeg</code>, take a look at the <a href="http://imagemagick.com/" title="ImageMagick">ImageMagick tools</a>. They include a command-line utility called <code>convert</code> that can convert back and forth from many types of images.</p>
+<h2>Basic Usage of the <code>cjpeg</code> Command Line Tool</h2>
+<p>Most people who use mozjpeg’s <code>cjpeg</code> use it in its simplest form:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="bash"><span>$ </span>cjpeg <span>-quality</span> <span>80</span> foo.bmp <span>&gt;</span> bar.jpg</pre></td></tr></table></div>
+
+<p>This will create a JPEG called “foo.jpg” from the “foo.bmp” input file at quality level 80. <code>cjpeg</code> directly emits the contents of the resulting JPEG file, so if you want to write it to disk, which you probably do, you’ll need to pipe the results to a file with ‘<code>&gt;</code>‘.</p>
+<h2>Selecting a Quality Level</h2>
+<p>Quality can range from 0 at the low end to 100 at the high end. Most people will want to pick quality a value somewhere between 60 and 90. You’ll want to use the lowest value that still produces and image at a quality you’re happy with, because lower values will produce images with smaller file sizes.</p>
+<p>The following image shows an original image as well as the same image encoded at five different quality levels with mozjpeg’s <code>cjpeg</code>. Click on it to enlarge.</p>
+<p><a href="https://hacks.mozilla.org/wp-content/uploads/2014/07/JPEG-Quality-Comparison.png"><img src="https://hacks.mozilla.org/wp-content/uploads/2014/07/JPEG-Quality-Comparison-250x431.png" alt="JPEG Quality Comparison" width="250" height="431" class="aligncenter size-medium wp-image-25961" /></a></p>
+<p>Here are the image files one-by-one:</p>
+
+<p><em>(Image courtesy of Soulmatesphotography, <a href="https://commons.wikimedia.org/wiki/File%3AClovisfest.jpg" title="Original Image at Wikimedia">via Wikimedia</a>, Creative Commons Attribution-Share Alike 3.0 Unported License)</em></p>
+<p>Do some experimenting here. Lots of people don’t, and they miss out on significant reductions in file size. Their thinking is often something along the lines of “80 seems like a good compromise, and I hear that’s what most people do, so I’ll do that.” If you can’t tell the difference between an image at quality 77 vs 80, and you’re using 80, you’re missing out on significant file size savings at no cost to you in terms of quality.</p>
+<h2>Progressive vs. Baseline JPEGs</h2>
+<p>The mozjpeg version of <code>cjpeg</code> produces progressive JPEGs by default because their file sizes tend to be about 4% smaller than baseline JPEGs. Progressive JPEGs can appear at full size but blurry at first, and then progress to full resolution as the image downloads. Baseline JPEGs simply load from top to bottom.</p>
+<p>Baseline:<br /><a href="https://hacks.mozilla.org/wp-content/uploads/2014/07/jpeg-baseline.png"><img src="https://hacks.mozilla.org/wp-content/uploads/2014/07/jpeg-baseline-500x257.png" alt="jpeg-baseline" width="500" height="257" class="alignnone size-large wp-image-25881" /></a></p>
+<p>Progressive:<br /><a href="https://hacks.mozilla.org/wp-content/uploads/2014/07/jpeg-progressive.png"><img src="https://hacks.mozilla.org/wp-content/uploads/2014/07/jpeg-progressive-500x257.png" alt="jpeg-progressive" width="500" height="257" class="alignnone size-large wp-image-25882" /></a><br /><em>(Image courtesy of Soulmatesphotography, <a href="https://commons.wikimedia.org/wiki/File%3AClovisfest.jpg" title="Original Image at Wikimedia">via Wikimedia</a>, Creative Commons Attribution-Share Alike 3.0 Unported License)</em></p>
+<p>If you want to produce a baseline JPEG, you can do so like this:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="bash"><span>$ </span>cjpeg <span>-baseline</span> <span>-quality</span> <span>80</span> foo.bmp <span>&gt;</span> bar.jpg</pre></td></tr></table></div>
+
+<h2>Targeting Metrics</h2>
+<p>A cool feature of mozjpeg’s <code>cjpeg</code> is that you can optimize for any of four specific quality metrics: PSNR, PSNR-HVS-M, SSIM, and MS-SSIM. These metrics are algorithms that calculate the quality of an image compared to the original. More scientifically, this is often referred to as a distortion rate.</p>
+<p>These algorithms differ in how they define quality, so optimizing for one metric can hurt performance on another. See the <a href="http://people.mozilla.org/~josh/lossy_compressed_image_study_july_2014/" title="July 2014 Lossy Compressed Image Study">July 2014 lossy compressed images study from Mozilla</a> for many example of what this looks like.</p>
+<p>mozjpeg tunes for PSNR-HVS-M by default, because tuning for this does pretty well on all metrics.</p>
+<p>If you or your organization have decided that you trust a particular metric more than the others, you can tell mozjpeg’s <code>cjpeg</code> tool about your preference and it will tune for that metric.</p>
+<h2>Conclusion</h2>
+<p>Hopefully at this point you know enough to confidently start making use of mozjpeg to optimize your JPEGs. If you run into any issues, please report them on <a href="https://github.com/mozilla/mozjpeg/issues?state=open" title="mozjpeg issue tracker">mozjpeg’s github issue tracker</a>.</p>    
+  </article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

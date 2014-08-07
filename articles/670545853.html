@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>为什么回车叫做回车？ - imjustice - 博客园</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>为什么回车叫做回车？ - imjustice - 博客园</h1>
+<div id="cnblogs_post_body"><p>你是否也和我一样曾经好奇过为什么回车叫做回车呢？回车回的是哪门子的车，哪来的车？你是否知道回车和换行的区别呢？</p><span>
+</span><h2>前传</h2><span>
+</span><p>在展开这个话题之前先说一个身边的故事。下面一段代码是同事写来处理一个简单的文件然后输出到另一个文件的代码，大家觉得有什么问题么？</p><span>
+</span><pre class="brush: csharp;">    string content;
+    using (StreamReader sr = new StreamReader("a.txt"))
+    {
+        content = sr.ReadToEnd();
+    }
+
+    string[] rows = content.Split('\n');
+    string result = string.Empty;
+
+    using (StreamWriter sw = new StreamWriter("b.txt"))
+    {
+        foreach (var row in rows)
+        {
+            //处理row
+            sw.WriteLine(row);
+        }
+    }
+    
+</pre><span>
+</span><p>最后发现b.txt在某一些编辑器中每一行中间都多了一个空行，但是代码里明明是每一行写一次的，怎么会出现空行呢？</p><span>
+</span><p>问题就处在<code>content.Split('\n');</code>这句话，因为在Windows下文件的行末包含两个字符<code>\r\n</code>，而不是仅仅是<code>\n</code>。用Notepad++打开一个文件看一下一目了然了：</p><span>
+</span><p><img src="https://farm6.staticflickr.com/5593/14697300685_e61952dd00.jpg" alt="Notepad++ 查看换行" /></p><span>
+</span><h2>回车和换行前世今生</h2><span>
+</span><p>回到最开始的那个问题，换行符尚可理解，但是回车符这名字好奇怪，而且换一个行为毛需要两个特殊字符呢？</p><span>
+</span><p>记得前几天看过一篇<a href="http://blog.segmentfault.com/devlevelup/1190000000584068" target="_blank">关于光速安振创投副总裁张矩(Google前员工)的采访</a>：</p><span>
+</span><blockquote>
+<p>Google认为计算机科学完全是由人基于理性的设计，和物理、化学等基础性学科不一样，它背后的原理是人可以理解的，也唯有理解了原理之后，才能学会创新。例如你需要了解TCP/IP为什么会设计成这样，而不是只知道它是什么。在Google看来，只要人的基础足够好，在他们的环境下就可以做好，而且环境变了，以前的经验未必有用。Google最早的几个员工里，也只有两个来自计算机专业。</p>
+</blockquote><span>
+</span><p>计算机里的一些设计往往是由特定的原因或者历史问题才存在的，那么这个奇怪的回车是为什么存在呢？</p><span>
+</span><h3>从打字机说起</h3><span>
+</span><p>人们在使用最开始的打字机的时候，当打到一行末尾需要换行的时候，需要做两个操作。第一个就是拉动carriage讲纸回到行首，然后再拉动换行杆将纸张向下移动一行。这个设计影响了之后电传打印机的设计，而电传打印机的设计间接的影响了最开始计算机系统中的一部分设计（因为最开始的计算机需要兼容电传打印机）。</p><span>
+</span><p><img src="https://farm4.staticflickr.com/3912/14674258946_bb7282db6e_z.jpg" alt="type writer" /></p><span>
+</span><p>打印机的那个装置叫做Carriage，于是回到行首的这个操作就叫做Carriage Return，翻译成中文就变成了回车，这里的车其实是打印机上的一个装置。后来的打字机则将这两个操作合并到了一个操作装置上去了。</p><span>
+</span><h3>ASCII码的设计</h3><span>
+</span><p>大家都知道<code>\r</code>和<code>\n</code>是包含在ASCII码中的，ASCII是由ISO和ASA(ASNI的前身)同时设计的，在ISO的标准草稿中支持<code>CR</code>+<code>LF</code>或<code>LF</code>作为新行标识，而ASA的标准草稿则支持<code>CR</code>+<code>LF</code>。</p><span>
+</span><p><code>CR</code>+<code>LF</code>之所以同时使用是为了兼容当时的电传打印机，和老式打印机一样电传打印机需要两个指令来完成一次换行。所以后来的很多系统中都沿用了这个<code>CR</code>+<code>LF</code>的惯例，将它们作为新行的标识。</p><span>
+</span><h3>混乱的现状</h3><span>
+</span><p>虽然很多系统沿用了这个惯例，但是还是有很多其他的系统使用了不同的换行方式。</p><span>
+</span><p>Windows：<code>CR</code> + <code>LF</code></p><span>
+</span><p>Unix及类Unix系统(Linux, OS X)：<code>LF</code> 老板本</p><span>
+</span><p>MacOS：<code>CR</code></p><span>
+</span><p>大部分的文本相关的因特网协议(Http, FTP, IRC, SMTP)都强制使用ASCII码 <code>CR</code>+<code>LF</code>做换行符。</p><span>
+</span><p>这就导致了一个问题，文件如果从一个系统直接拷贝到另一个系统就需要对其中的换行符进行转换才能够正确的使用。</p><span>
+</span><span>
+</span><p><strong>P.S.: 纯属YY, 我觉得把Carriage Return翻译成回头也许更加合理一些！ 😄</strong></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
