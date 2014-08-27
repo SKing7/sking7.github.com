@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Web Designer's Guide to PNG Image Format</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Web Designer's Guide to PNG Image Format</h1>
+<div id="content"><span>
+</span><span>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="sixrevisions" data-related="designinstruct:A web magazine for designers and digital artists.">Tweet</a>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><!-- close: meta paragraph --><span>
+</span><p><a href="http://sixrevisions.com/web_design/web-designers-guide-to-png-image-format/"><img src="http://images.sixrevisions.com/2010/11/17-01_web_designer_png_ld_img.jpg" width="550" height="200" alt="Web Designer's Guide to PNG Image Format" /></a></p><span>
+</span><p>Once upon a time, there was the mighty GIF image format, the most popular type of image compression for web graphics. Then, it was announced that software programs using GIF would require a license (this was because of the Unisys patent for the LZW compression method used in GIF). This change sped up the development for its successor: the PNG format. PNG, which stands for <a href="http://en.wikipedia.org/wiki/Portable_Network_Graphics" title="Portable Network Graphics - en.wikipedia.org">Portable Network Graphics</a>, gained popularity and, nowadays, it’s probably the most used image format when it comes to web design, alongside JPEG.</p><span>
+</span><p>In this guide, we will cover everything you, as a web designer, need to know about the PNG image format.</p><span>
+</span><span>
+</span><h3>Understanding Digital Image Formats</h3><span>
+</span><p>There are many digital image formats available for you to use, but only some of them are optimized for web use. For example, the TIFF image format is not designed for web use; it’s used for printing. Examples of image formats for the web are JPEG, PNG, GIF, and SVG.</p><span>
+</span><p>Why are certain image formats suitable for the web, while others aren’t? Because images on the web must be optimized and highly compressed so that they don’t get too huge.</p><span>
+</span><p>Some digital image formats, especially those designed for print (such as TIFF) are so unnecessarily high in resolution, metadata, and color-richness — which all become irrelevant when viewed in computer&nbsp; monitors — that they are too big in file size for web use.</p><span>
+</span><h4>Compression Methods</h4><span>
+</span><p>There are two general kinds of image compression methods: lossy and lossless.</p><span>
+</span><p><strong>Lossy compression</strong> is when the compression algorithm being used results in some loss in data. This means that you will not get the exact same image as the original if you try to decompress it. The data loss, in most instances, is done in such a way that you don’t lose too much quality; at least not enough that people will notice.</p><span>
+</span><p>On the other hand, <strong>lossless compression</strong> is the opposite of lossy. Lossless compression involves compression algorithms that when decompressed, will get you exactly the same image as the original. An example of lossless compression is when you are zipping up a document using the ZIP format. When you unzip your document, it will be the same as the original.</p><span>
+</span><p>PNG uses a lossless compression algorithm. On the other hand, JPEG uses a lossy compression algorithm. What this essentially means is that, by saving your original images using JPEG, you might witness some quality loss (the same goes for PNG in certain situations, as you’ll see later on).</p><span>
+</span><p><img src="http://images.sixrevisions.com/2010/11/17-02_lossy_lossless.jpg" width="550" height="447" alt="Compression Methods" /></p><span>
+</span><h3>Some Technical Stuff about PNG</h3><span>
+</span><p>Aside from using lossless compression, PNG is a bitmapped image format, which just means it’s a raster image format. If you skipped Design 101, <strong>raster images</strong>, unlike vector image formats such as <a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics" title="Scalable Vector Graphics - en.wikipedia.org">SVG</a>, cannot be rescaled without losing quality. However, raster images are better than vector images for complex images such as photographs.</p><span>
+</span><p>PNG was designed for quickly transferring images on the web and for displaying images in computer screens, so it only uses the RGB color model. The CMYK color model, which is typically for print purposes, is not available when saving images in PNG format. In short: the PNG image format is not optimal for graphics that will be printed. </p><span>
+</span><h4>PNG-8 and PNG-24</h4><span>
+</span><p>There are two PNG formats: PNG-8 and PNG-24. The numbers are shorthand for saying "8-bit PNG" or "24-bit PNG." Not to get  too much into technicalities — because as a web designer, you probably don’t care — 8-bit PNGs mean that the image is 8 bits per pixel, while 24-bit PNGs mean 24 bits per pixel.</p><span>
+</span><p>To sum up the difference in plain English: Let’s just say PNG-24 can handle a lot more color and is good for complex images with lots of color such as photographs (just like JPEG), while PNG-8 is more optimized for things with simple colors, such as logos and user interface elements like icons and buttons.</p><span>
+</span><p>Another difference is that PNG-24 natively supports alpha transparency, which is good for transparent backgrounds. This difference is  <em>not</em> 100% true because Adobe products’ <em>Save for Web</em> command allows <a href="http://www.red-team-design.com/png8-alpha-transparency-using-adobe-fireworks" title="PNG8 alpha transparency using Adobe Fireworks - red-team-design.com">PNG-8 with alpha transparency</a>.</p><span>
+</span><p><img src="http://images.sixrevisions.com/2010/11/17-03_png24_png8.jpg" width="472" height="247" alt="PNG-8 and PNG-24" /></p><span>
+</span><h3>The Short Story: When to Use PNGs</h3><span>
+</span><p>When you need to preserve transparency and large amounts of color, as well as achieve full or partial transparency, the PNG image format is the best.</p><span>
+</span><p>Since it’s a lossless format, images saved using the PNG format aren’t going to be small all the time, but because PNG stores a lot of additional data, you can easily <a href="http://sixrevisions.com/tools/8-excellent-tools-for-optimizing-your-images/">optimize images</a> for web usage to reduce file sizes.</p><span>
+</span><h3>PNG vs. GIF vs. JPEG</h3><span>
+</span><p>Let’s compare the advantages and disadvantages of using PNG versus the two other popular web image formats.</p><span>
+</span><h4>PNG vs. GIF</h4><span>
+</span><p>Short answer: Always use PNG over GIF unless you are making an animated GIF or when you want to use images with transparent backgrounds on older versions of IE (however, there’s a workaround for supporting PNG transparencies in IE6 and below, using <a href="http://www.twinhelix.com/css/iepngfix/">JavaScript PNG fix libraries</a>). I’m not alone on this, Jeff Atwood, founder of StackOverflow and the Coding Horror blog, <a href="http://www.codinghorror.com/blog/2007/03/getting-the-most-out-of-png.html">will agree</a>.</p><span>
+</span><p>PNG has some important advantages over GIF that web designers will care about, such as:</p><span>
+</span><span>
+</span><p>There are, of course, many other advantages, but those are the ones that matter to web designers.</p><span>
+</span><p>Here’s a visual comparison of PNG versus GIF. Note that for the sample image below, you would not use PNG-24  because it has simple colors and will also weigh more than GIF. However, the PNG over GIF notion still stands: If you save a photographic image (such as a photo of your mom and dad), PNG-24 will have a better result than GIF.</p><span>
+</span><span>
+</span><p><strong>Optimization Tip:</strong> There are a lot of tools you can use to <a href="http://sixrevisions.com/tools/8-excellent-tools-for-optimizing-your-images/">optimize your images</a>. Below, I used <a href="http://pmt.sourceforge.net/pngcrush/">pngcrush</a> for the PNG images and <a href="http://www.smushit.com/ysmush.it/">Smush.it</a> for the GIF image. No apparent loss in quality, and PNG-8 still wins over GIF.</p><span>
+</span><span>
+</span><h4>PNG vs. JPEG</h4><span>
+</span><p>JPEG will be tinier in file size versus PNGs when we’re talking about photographic images. This is because it uses a lossy compression algorithm specifically designed for photographic, rich-color images.</p><span>
+</span><p>So for web use, if you’re putting up a photographic image on a web page (such as a picture of your cat), always choose JPEG over PNG. Using PNG over JPEG in this situation will result in a bigger file size (often 5-10 times more than JPEG).</p><span>
+</span><p>Here is a PNG vs. JPEG (quality: 70) comparison using a photographic image. Note that we use PNG-24, not PNG-8, because it’s the proper format for photographic images.</p><span>
+</span><span>
+</span><p><strong>Further optimization with pngcrush and Smush.it:</strong></p><span>
+</span><span>
+</span><p><strong>Optimization tip:</strong> You (as the web designer) will criticize your  images more than your website users, so a good advice is to be a little more "brutal" when saving your web images. Find a good balance between file size versus quality. Lower your quality settings until it becomes unbearable.</p><span>
+</span><h4>When to Use Each Format</h4><span>
+</span><p>Here is a simplistic summary of the file format comparisons:</p><span>
+</span><ul>
+<li>Use <strong>PNG-8</strong> over <strong>GIF</strong> for images with <strong>simple colors</strong> (logos, icons, buttons)</li>
+<li>Use <strong>PNG-8</strong> over <strong>JPEG</strong> for images with <strong>simple colors</strong> (logos, icons, buttons)</li>
+<li>Use <strong>PNG-24</strong> over <strong>GIF</strong> for <strong>photographic images</strong></li>
+<li>Use <strong>PNG</strong> over <strong>JPEG</strong> when using <strong>alpha transparency</strong></li>
+<li>Use <strong>JPEG</strong> over <strong>PNG</strong> for <strong>photographic images</strong></li>
+<li>Use <strong>GIF</strong> for background <strong>transparency for older browsers</strong> (IE6 and below)</li>
+<li>Use <strong>GIF</strong> for <strong>animated GIFs</strong></li>
+</ul><span>
+</span><h3>PNG-8 Color Reduction Optimization</h3><span>
+</span><p>When choosing the PNG-8 image format, you may see a decrease in the number of colors in the image. This is why it is  good for simple artworks such as logos, icons, and UI elements such as buttons.</p><span>
+</span><p>Pick PNG-8 in instances where there is a limited color palette. This will help you achieve a smaller image file size without any visible difference, allowing you to build faster, leaner and more responsive web designs.</p><span>
+</span><p>An optimization trick you can perform is reducing the number of colors of your PNG image. This will drastically reduce its file size, and you can do it with little-to-no apparent loss in quality.</p><span>
+</span><p>Most software applications that can save PNG files will have the ability to allow you to manually enter the number of colors to include. For example, Photoshop’s <em>Save for the Web &amp; Devices</em> feature (which you can get to by going to File &gt; Save for Web &amp; Devices) gives you a dropdown menu for setting the number of colors for the PNG format. Reduce the number of colors until you see a visible difference in quality.</p><span>
+</span><p><img src="http://images.sixrevisions.com/2010/11/17-15_saveforweb_photoshop_colors.png" width="550" height="295" /></p><span>
+</span><p>Below, you can see the optimization of the RSS icon we used earlier through the reduction of the number of colors. Reducing the number of colors from 256 to 16 results in very little noticeable loss in quality and results in a file size that is 62% smaller — over half of the file size was shaved off!</p><span>
+</span><span>
+</span><h3>PNG-24 Posterization Optimization</h3><span>
+</span><p>This optimization technique helps you optimize the PNG-24 format and this is how it works: it reduces the amount of colors by combining similar colors.</p><span>
+</span><p>In Photoshop, here is how you can do this optimization trick: Open the image in Photoshop. Choose Image &gt; Adjustments &gt; Posterize and then decrease the levels until it results in visible quality loss. Then just use the Save for the Web &amp; Devices feature to save the image in PNG-24 format.</p><span>
+</span><span>
+</span><h3>Summary</h3><span>
+</span><p>For web designers, the importance of reducing images sizes is a way to increase the overall speed of a web page. Optimized, smaller images in a web design means:</p><span>
+</span><ul>
+<li>Faster web pages that load more quickly</li>
+<li>Less bandwidth consumption</li>
+<li>Less data required to transfer to site visitors, which means lower data activity</li>
+</ul><span>
+</span><p>You may be wondering if PNG is the best image format — this is an inevitable question. The answer is: <em>it depends</em>. As shown in this guide, there are many variables that will affect what image format you will choose. Certain situations will find PNG-8 favorable over PNG-24, while others will produce better results when using JPEG. </p><span>
+</span><p>PNG has certain advantages over GIF, such as lower file sizes and being an open format. However, PNG transparency in <a href="http://sixrevisions.com/web-development/definitive-guide-to-taming-the-ie6-beast/">IE6</a> isn’t supported so you might have to use GIFs (or a JavaScript library that emulates PNG alpha transparency in IE6, such as <a href="http://www.twinhelix.com/css/iepngfix/">IE PNG Fix</a>). The same can be said for when you’re dealing with animated images, which GIFs can do.</p><span>
+</span><p>Regarding PNG versus JPEG: the choice depends a lot on what type of image you’re optimizing. Specifically, PNG does extremely well with limited color schemes, solid colors and supporting transparency (which JPEG does not support). For complex, photographic images, JPEG is the way to go.</p><span>
+</span><p>The main thing to take away here is that you should use a combination of image formats. You shouldn’t strictly use PNG, or JPEG, or GIF. Furthermore, you  shouldn’t be afraid to optimize each image manually so that you can achieve better results and smaller file sizes. You should always use an image optimizer, which will squeeze out every last excess byte.</p><span>
+</span><p>There are two things that will help you pick the right format: experimenting and experience. The more you save images for the web, the quicker you will be in recognizing situations in which PNG, JPEG, or even GIF should be used.</p><span>
+</span><h3>References and Resources</h3><span>
+</span><span>
+</span><h3>Related Content</h3><span>
+</span><span>
+</span><h3>About the Author</h3><span>
+</span><p class="about-author"><img src="http://images.sixrevisions.com/authors/catalin_rosu_small.jpg" alt="" width="80" height="80" /><strong>Catalin Rosu</strong>, a.k.a. Red, is a web designer and developer with over 5 years experience in the industry. You can find articles or tutorials on CSS tips and tricks by visiting his blog at <a href="http://www.red-team-design.com/">red-team-design.com</a>. You can connect with him on Twitter as @<a href="http://www.twitter.com/catalinred">catalinred</a>.</p><span>
+</span><!-- BuySellAds Zone Code --><span>
+</span><span>
+</span><!-- End BuySellAds Zone Code --><span>
+
+</span><!-- close: comments --></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

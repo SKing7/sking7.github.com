@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>配置反向代理 - 小果果 - SegmentFault</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>配置反向代理 - 小果果 - SegmentFault</h1>
+<div class="post-content fmt"><span>
+                    
+</span><p><strong>传统代理</strong></p><span>
+
+</span><p>早期，我们通常需要通过代理服务器，来访问互联网上的 WEB 站点。代理服务器接入了互联网，而我们通过内部网络与代理服务器相连。</p><span>
+
+</span><p>现在，为了访问某些被禁的网站，我们也会通过特定的代理服务器，绕过某些限制，来访问目标站点。</p><span>
+
+</span><p><strong>NAT</strong></p><span>
+
+</span><p>不过现在网关通常使用 <code>NAT</code> - 网络地址转换。</p><span>
+
+</span><blockquote>
+  <p>将 <code>PC</code> 的内部 <code>IP</code> 地址和网关的外网 <code>IP</code> 地址进行相互转换，使得 <code>PC</code> 发出的请求可以顺利到达外部网络的 <code>WEB</code><br />服务器。</p>
+  
+  <p>同时，将返回的正确数据正确的传送给内部网络的PC。</p>
+</blockquote><span>
+
+</span><p>使用 <code>NAT</code>，<code>PC</code> 便不用直接暴露在互联网中，提高了安全性能。</p><span>
+
+</span><p><strong>反向代理</strong></p><span>
+
+</span><p><code>Reverse Proxy</code>，与传统代理相反，<code>WEB</code> 服务器隐藏在代理服务器之后。</p><span>
+
+</span><p>这里我们在一台服务器上，配置反向代理，采用 <code>APACHE</code> 和 <code>NGINX</code>。</p><span>
+
+</span><p><code>Nginx</code> 作为 <code>Apache</code> 的反向代理，将用户的请求转发到 <code>Apache</code> 监听的 <code>8081</code> 端口。</p><span>
+
+</span><p>[<code>APACHE</code>]</p><span>
+
+</span><pre><code>    Listen 8081
+</code></pre><span>
+
+</span><p>[<code>NGINX</code>]</p><span>
+
+</span><pre><code>    server_name  www.test.com;
+    listen       80;
+    location ~ \.php$ {
+        proxy_pass http://127.0.0.1:8081;
+    }
+</code></pre><span>
+
+</span><p>测试一下：</p><span>
+
+</span><pre><code>ab -n5 http://www.test.com/phpinfo.php
+</code></pre><span>
+
+</span><p>查看日志：</p><span>
+
+</span><p>[<code>Nginx</code>]</p><span>
+
+</span><pre><code>127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18 "-" "ApacheBench/2.3"
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18 "-" "ApacheBench/2.3"
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18 "-" "ApacheBench/2.3"
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18 "-" "ApacheBench/2.3"
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18 "-" "ApacheBench/2.3"
+</code></pre><span>
+
+</span><p>[<code>Apache</code>]</p><span>
+
+</span><pre><code>127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18
+127.0.0.1 - - [22/Aug/2014:11:42:17 +0800] "GET /phpinfo.php HTTP/1.0" 200 18
+</code></pre><span>
+
+</span><p><strong>结论</strong></p><span>
+
+</span><p>从上述日志看出，<code>Nginx</code> 对于 <code>php</code> 文件的请求，全部都转到 <code>Apache</code> 处理了。</p><span>
+                </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

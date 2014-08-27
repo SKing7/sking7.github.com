@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Favicons, Touch Icons, Tile Icons, etc. What All Do You Need?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Favicons, Touch Icons, Tile Icons, etc. What All Do You Need?</h1>
+<article class="module" id="post-179442">
+
+			
+
+			<p><em class="explanation">The following is a guest post by Philippe Bernard. Philippe has done research on what it takes to make a favicon (and all the related graphics and markup) such that you are covered with the best quality output everywhere. Spoiler alert: it's a lot of different graphics and markup. Also full disclosure: Philippe has built a tool to help with it he showcases in the article.</em></p>
+
+<p>Favicons were introduced in 1999 by Internet Explorer 5 (<a href="http://en.wikipedia.org/wiki/Favicon">ref</a>) and standardized by the W3C a few months later. They are a small graphic that represents the website. </p>
+<figure id="post-179453 media-179453" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/favicon-in-desktop-browsers.jpg" alt="" /></figure>
+<p>Since then, most desktop browsers have followed the trend and used favicons in some way. It's an easy job, isn't it? Just create a small picture to add to any web project to make it "final". Nothing fancy. Or is it?</p>
+<p>Let's do a quiz!</p>
+<h3>What is the primary favicon file?</h3>
+<p><strong>Answer: <code>favicon.ico</code>.</strong> And just to make sure: this is <em>not</em> a PNG renamed to <code>favicon.ico</code>. Although some browsers are easygoing enough to forgive this mistake, ICO is a different format, one that supports multiple versions of an image.</p>
+<h3>Question: What dimensions should <code>favicon.ico</code> be?</h3>
+<ul>
+<li><strong>A: 16x16</strong>. The standard.</li>
+<li><strong>B: 32x32</strong>. Wasn't favicon updated some time ago?</li>
+<li><strong>C: 64x64</strong>. You know, with all these new high pixel density screens.</li>
+<li><strong>D: None of the above</strong>.</li>
+</ul>
+<p><strong>Answer: D.</strong></p>
+<p><code>favicon.ico</code> is a format originally conceived by Microsoft and the other vendors have gone along with it. <a href="http://msdn.microsoft.com/en-us/library/ie/gg491740(v=vs.85).aspx">Microsoft recommends</a> 16x16, 32x32 <em>and</em> 48x48. Yes, a single ICO file can contain multiple graphics.</p>
+<p>Desktop browsers often use the favicon in a tab, and on standard resolution displays, the 16x16 version is fine:</p>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/windows_chrome_16x16_32x32_48x48_tab.png" /><br /><figcaption>16x16 favicon.ico in Chrome's tab. So far so good.</figcaption><br /></figure>
+<p>But a 16x16 icon is too small for other places: the task bar and the desktop.</p>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/windows_chrome_16x16_taskbar.png" /><br /><figcaption>16x16 favicon.ico added to task bar.</figcaption><br /></figure>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/windows_chrome_16x16_desktop.png" /><br /><figcaption>16x16 favicon.ico added to desktop. Not good.</figcaption><br /></figure>
+<p>As soon as the icon contains several pictures, the results are much better.</p>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/windows_chrome_16x16_32x32_48x48_taskbar.png" /><br /><figcaption>16x16, 32x32 and 48x48 favicon.ico added to task bar. As good as a native app.</figcaption><br /></figure>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/windows_chrome_16x16_32x32_48x48_desktop.png" /><br /><figcaption>16x16, 32x32 and 48x48 favicon.ico added to desktop. Perfect.</figcaption><br /></figure>
+<h3>Question: What is the purpose of <code>favicon.png</code>?</h3>
+<p>When digging the topic, we often encounter another file, <code>favicon.png</code>. People have questions about it <a href="http://stackoverflow.com/questions/6121725/favicon-ico-or-png-correct-tags">all the time</a>. What is it exactly?</p>
+<ul>
+<li><strong>A: An icon for browsers which do not support <code>favicon.ico</code>.</strong> Such as Firefox, maybe?</li>
+<li><strong>B: A high resolution icon</strong>. You know, with all these new high pixel density displays.</li>
+<li><strong>C: An old relic from the past.</strong> Now there are modern icons such as the Apple Touch icon.</li>
+<li><strong>D: Answer D.</strong> It's complicated.</li>
+</ul>
+<p><strong>Answer: D.</strong> Since the adoption of HTML5, <code>favicon.ico</code> isn't very useful. The <code>sizes</code> attribute was introduced to specify several different versions of the same icon, and those can be PNG files:</p>
+<pre rel="HTML"><code class="language-markup">&lt;link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16"&gt;
+&lt;link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32"&gt;
+&lt;link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96"&gt;</code></pre>
+<p>So what should we declare?</p>
+<p>Let's face an unsatisfying truth. Altough all desktop browsers support <code>favicon.ico</code>, this file is mostly deprecated. Yes, you can still rely on this file and it will work as expected. But seriously, it's an old deprecated format. It is not used anywhere else in web technology. PNG is much more consistent.</p>
+<p><code>favicon.ico</code> is for old versions of IE. For the other browsers and most recent versions of IE, we use PNG icons. Then, which <code>sizes</code> do we declare? We'll cover that soon.</p>
+<h3>Question: What format do we need to support mobile platforms?</h3>
+<p>According to <a href="http://www.smartinsights.com/mobile-marketing/mobile-marketing-analytics/mobile-marketing-statistics/">SmartInsights</a>, more than 26% of the Web traffic is generated by smartphones and tablets. It's the future. What do you need to support this world?</p>
+<ul>
+<li><strong>A: <code>favicon.ico</code>.</strong> It worked 15 years ago it'll work today.</li>
+<li><strong>B: PNG icons.</strong> You said you would talk about it.
+</li><li><strong>C: Apple Touch icon</strong>. Duh.</li>
+<li><strong>D: The right answer is never listed anyway.</strong></li>
+</ul>
+<p><strong>Answer: D. You need PNG icons. <em>And</em> Apple Touch icons. <em>And</em> Windows 8 tile graphics. <em>And</em> a file named <code>browserconfig.xml</code>.</strong></p>
+<p>Mobile platforms are much more heterogeneous than the classic desktop browsers. Screen sizes and resolutions vary hugely and there is no predominant OS like Windows was when the Internet started to spread. Consequence: do not expect to design a mobile favicon with a single, universal graphic and single, universal declaration in the HTML code.</p>
+<h3>Question: Which sizes should the PNG icons be?</h3>
+<ul>
+<li><strong>A: 96x96 for Google TV</strong></li>
+<li><strong>B: 196x196 for Android Chrome</strong></li>
+<li><strong>C: 228x228 for Coast by Opera</strong></li>
+<li><strong>D: All of the above</strong></li>
+</ul>
+<p><strong>Answer: D, and more</strong>. Like the 160x160 picture for older versions of Opera Speed Dial (long gone), or the 128x128 icon for Chrome Web Store, here it really depends on the platforms you want to support.</p>
+<h3>Question: What is the size of the Apple Touch icon?</h3>
+<p>The Apple Touch icon is used by iOS devices for bookmarks and web sites "added to home screen". If the answer that comes to mind is 57x57, congratulations. This is correct. Well, it was, 7 years ago, when the first iPhone was released.</p>
+<p><strong>Answer: Up to 152x152.</strong></p>
+<p>Three releases occurred since the birth of the first iPhone:</p>
+<ul>
+<li>The iPad. Its screen is much larger than the iPhone.</li>
+<li>The Retina screen. It doubles the pixel density of the original screen.</li>
+<li>iOS 7. Its flat style makes the appearance of iPhone/iPad slightly different.</li>
+</ul>
+<p>Combines them and you get 2 x 2 x 2 = 8 combinations:</p>
+<table>
+<tr>
+<th>Device</th>
+<th>Screen</th>
+<th>iOS version</th>
+<th>Icon size</th>
+</tr><tr>
+</tr><tr>
+<td rowspan="4">iPhone</td>
+<td rowspan="2">Classic</td>
+<td>6 and prior</td>
+<td>57x57</td>
+</tr>
+<tr>
+<td>7</td>
+<td>60x60</td>
+</tr>
+<tr>
+<td rowspan="2">Retina</td>
+<td>6 and prior</td>
+<td>114x114</td>
+</tr>
+<tr>
+<td>7</td>
+<td>120x120</td>
+</tr>
+<tr>
+<td rowspan="4">iPad</td>
+<td rowspan="2">Classic</td>
+<td>6 and prior</td>
+<td>72x72</td>
+</tr>
+<tr>
+<td>7</td>
+<td>76x76</td>
+</tr>
+<tr>
+<td rowspan="2">Retina</td>
+<td>6 and prior</td>
+<td>144x144</td>
+</tr>
+<tr>
+<td>7</td>
+<td>152x152</td>
+</tr>
+</table>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/Retina_iPad_57x57.png" /><br /><figcaption>An old 57x57 Apple Touch icon on a shiny Retina iPad. Blurry.</figcaption><br /></figure>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/Retina_iPad_152x152.png" /><br /><figcaption>A high resolution 152x152 Apple Touch icon on a shiny Retina iPad. Neat.</figcaption><br /></figure>
+<p>If you didn't have the right answer, don't blame yourself though. Out of the 5,000 top web sites which exhibit an <code>apple-touch-icon.png</code>, <a href="http://realfavicongenerator.net/blog/apple-touch-icon-the-good-the-bad-the-ugly/">as little as 4% get it right.</a></p>
+<p>Some might argue that 8 graphics are not really necessary. But at least, your master Apple Touch icon should be 152x152. A Retina iPad running iOS 7 will find what it needs and lesser devices can scale down such picture as needed.</p>
+<h3>Question: Is it necessary to declare the Apple Touch icons in the HTML?</h3>
+<ul>
+<li><strong>A: I dunno.</strong> Come on, you have to answer something!</li>
+<li><strong>B: Yes.</strong> How could iOS find them otherwise?</li>
+<li><strong>C: No.</strong> Apple <a href="https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html">defines conventions</a> so that iOS devices can find them anyway.</li>
+<li><strong>D: No but...</strong></li>
+</ul>
+<p><strong>Answer: D... but since some other platforms also use the Apple Touch icon, it is safer to declare it anyway.</strong></p>
+<pre rel="HTML"><code class="language-markup">&lt;link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png"&gt;</code></pre>
+<p>As strange at it sounds, iOS devices are not the only ones to look for the Apple Touch icon. Since these icons are popular and more common than high resolution PNG icons, some browsers, such as Android Chrome, are using them. Therefore, declaring them is safer, in case a visitor with a compatible device or browser is able to process one of them.</p>
+<h3>Question: What does it take to define a tile for Windows 8 tablets?</h3>
+<ul>
+<li><strong>A: Windows 8 tablet? What is this?</strong></li>
+<li><strong>B: <code>favicon.ico</code></strong>. Steve Balmer legacy.</li>
+<li><strong>C: Two <code>msapplication-TileColor</code> and <code>msapplication-TileImage</code> meta tags.</strong></li>
+<li><strong>D: <code>browserconfig.xml</code></strong>.
+</li></ul>
+<p><strong>Answer: C for Windows 8.0 and IE 10, D for Windows 8.1 and IE 11. Answer A is somehow also correct.</strong></p>
+<p>Windows 8.0 declaration typically looks like:</p>
+<pre rel="HTML"><code class="language-markup">&lt;meta name="msapplication-TileColor" content="#2b5797"&gt;
+&lt;meta name="msapplication-TileImage" content="/mstile-144x144.png"&gt;</code></pre>
+<p>Windows 8.1 and IE 11 rely on several tile pictures declared in <code>browserconfig.xml</code>. For example:</p>
+<pre rel="XML"><code class="language-markup">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;browserconfig&gt;
+  &lt;msapplication&gt;
+    &lt;tile&gt;
+      &lt;square70x70logo src="/mstile-70x70.png"/&gt;
+      &lt;square150x150logo src="/mstile-150x150.png"/&gt;
+      &lt;square310x310logo src="/mstile-310x310.png"/&gt;
+      &lt;wide310x150logo src="/mstile-310x150.png"/&gt;
+      &lt;TileColor&gt;#2b5797&lt;/TileColor&gt;
+    &lt;/tile&gt;
+  &lt;/msapplication&gt;
+&lt;/browserconfig&gt;</code></pre>
+<p>New Metro UI comes with a new set of guidelines, like the "white silhouettes" used by most of the builtin apps.</p>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/w8.png" /><br /><figcaption>Web site tile in Windows 8 desktop</figcaption><br /></figure>
+<h3>Question: What is the size of the <code>square150x150logo</code> tile picture?</h3>
+<ul>
+<li><strong>A: 150x150.</strong> Can't you read?</li>
+<li><strong>B: Something else.</strong>
+</li></ul>
+<p><strong>Answer: B, 270x270.</strong> <a href="http://msdn.microsoft.com/en-us/library/ie/dn455106(v=vs.85).aspx">Microsoft recommends larger sizes</a> to support high density screen.</p>
+<hr />
+<p>Congratulations, you completed the quiz! How did you do?</p>
+<p>The point of these questions was to point out how tricky this topic truly is, despite its apparent simplicity. The time when favicon was a single <code>favicon.ico</code> file is long gone. But old habits persist and lead to absurd situations. We can spend days on a super neat responsive design, yet dropping only a 57x57 Apple Touch icon, just suitable for old devices barely used nowadays.</p>
+<hr />
+<h3>A favicon generator for the mobile era</h3>
+<p>In 2014, creating a multi-platform favicon is complex and hard to get done right. Sure, you can get a decent result with <code>favicon.ico</code>, a 32x32 PNG icon and a 152x152 <code>apple-touch-icon.png</code> in the root of your web site. But it can take more than a dozen of picture to get the job done. Unless we work on a huge project with according budget, we usually do not have so much time to spend on this small task.</p>
+<p>As the author of RealFaviconGenerator, let me give you a wise advice: use <a href="http://realfavicongenerator.net/">RealFaviconGenerator</a>. Unlike the regular favicon generators around, it fills two needs.</p>
+<p><strong>Different platforms involve different UIs.</strong> While it is certainly not an online version of Photoshop, RealFaviconGenerator offers a few settings to design decent icons for various platforms. Like an opaque background for iOS (Apple prevents transparent icons) or a white silhouette for Windows 8.</p>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/rfg_editor.png" /><br /><figcaption>RealFaviconGenerator editor</figcaption><br /></figure>
+<p><strong>Generate all the pictures and HTML code</strong> you need to cover major platforms: PC/Mac, iOS, Android, Windows 8, etc. <a href="http://realfavicongenerator.net/favicon_compatibility">The generated pictures and code were extensively tested</a> to make sure that the service keeps its promise.</p>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/rfg_result.png" /><br /><figcaption>Ready-to-use pictures and HTML code</figcaption><br /></figure>
+<p>For example, by submitting a high resolution icon, I was able to generate this set of icons in a few clicks.</p>
+<figure>
+  <img src="http://cdn.css-tricks.com/wp-content/uploads/2014/08/rfg.png" /><br /><figcaption>The kind of favicon set RealFaviconGenerator can generate in a few seconds.</figcaption><br /></figure>
+<p>Now it's as easy as it was 10 years ago: make a graphic and 5 minutes later you have your up-to-date favicon at work.</p>
+
+			
+			<h5 class="share-on-title">Share On</h5>
+
+			<a class="share-on-link share-on-twitter" href="https://twitter.com/intent/tweet?text=Favicons,%20Touch%20Icons,%20Tile%20Icons,%20etc.%20What%20All%20Do%20You%20Need?&amp;url=http://css-tricks.com/favicon-quiz/&amp;via=real_css_tricks">Twitter</a>
+
+			<a class="share-on-link share-on-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://css-tricks.com/favicon-quiz/">Facebook</a>
+			
+			<a class="share-on-link share-on-googleplus" href="https://plus.google.com/share?url=http://css-tricks.com/favicon-quiz/">Google+</a>
+
+		</article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

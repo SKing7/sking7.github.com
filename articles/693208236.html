@@ -1,0 +1,269 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Styleguide Driven Development</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Styleguide Driven Development</h1>
+<div class="entry-content"><p>Styleguide Driven Development (SDD) is a practice that encourages the separation of UX, Design &amp; Frontend from Backend concerns. This is achieved by developing the UI separately in a styleguide.</p><span>
+
+</span><p>By separating the UI and backend tasks so they don’t rely on each other, it allows teams to iterate fast on prototypes and designs without having to make changes to the backend. With careful planning they should plug-and-play together nicely.</p><span>
+
+</span><p>SDD isn’t just limited for big teams working on large applications, but the core concepts of developing UI elements separately in a styleguide (living or static) can still benefit a sole developer working on a single page app.</p><span>
+
+</span><!--more--><span>
+
+
+
+
+</span><h2 id="sdd-in-the-real-world">SDD in the real world</h2><span>
+
+
+</span><p>We have recently embraced SDD in the Envato Market ‘Purchase’ team and have spent the last 6 months building a new shopping cart using this approach with great success.</p><span>
+
+</span><p>SDD evolved slowly out of our team’s growth and the need to visualise complex features and their scenarios at a glance. By introducing such a wide-reaching and sophisticated feature into an already complex application it spurred a change in our development and agile practices.</p><span>
+
+</span><p>As a frontend developer working on a cross-functional team with 4 backend developers, a UX designer and a product manager, it is easy to become a bottleneck. The UI has many moving parts and strong dependencies on each team member.</p><span>
+
+</span><h2 id="living-styleguides">Living Styleguides</h2><span>
+
+
+</span><p><img src="http://webuild.envato.com/images/posts/styleguide-driven-development/living-styleguide.png" alt="Styleguide Driven Development" /></p><span>
+
+</span><p>Styleguides and pattern libraries do a great job of visualising an application’s framework and static UI library, however when developing data rich applications the ‘views’ (aka partials) are mostly dynamic and require data to bring them alive. In order to render these dynamic views in the styleguide we need to use sample data to trigger the scenarios we want to test.</p><span>
+
+</span><p>By using real views, we can be confident that the styleguide truly reflects our application. This confidence allowed us to change our approach and develop our views directly in the styleguide as the first step in assembling a new page or adding a feature.</p><span>
+
+</span><p>Using sample data means that we can iterate quickly on prototypes and designs before requiring the backend to be complete or even exist. Developing the views early helps to expose any gaps in the designs or wireframes. It also helps us figure out what sort of logic we need from the backend. Having it all separated like this offers us the freedom to complete the backend and frontend work asynchronously.</p><span>
+
+</span><p>Living styleguides are the key to SDD and they also provide a fantastic base for regression testing so that we can avoid breaking our UI when working on new features.</p><span>
+
+</span><h2 id="scenario-visualisation">Scenario Visualisation</h2><span>
+
+
+</span><p>User interfaces are often developed for best case scenarios, however they can unknowingly break in a handful of cases when a possible scenario hasn’t been considered or is ‘out of sight, out of mind’. Simple things like the length of the data or how it responds to mobile breakpoints can turn an otherwise well designed UI into an amateurish mess.</p><span>
+
+</span><p>Having a styleguide that documents all the possible scenarios for a view is a tremendously powerful asset. It directly benefits each team member’s role as well as other members of the business. Historically, testing a view across all of its various states was very manual process and occasionally required database manipulation.</p><span>
+
+</span><p>By documenting all scenarios in a central location the styleguide essentially becomes a frontend spec and helps identify edge-cases, gaps in the UX and breakages.</p><span>
+
+</span><p><em>Below is an early prototype of the <code>user-nav</code> view and its possible scenarios</em>.</p><span>
+
+</span><p><img src="http://webuild.envato.com/images/posts/styleguide-driven-development/user-nav-scenarios.png" alt="User navigation scenarios" /></p><span>
+
+</span><h2 id="bringing-the-views-alive">Bringing the views alive</h2><span>
+
+
+</span><p>Developing views that can handle sample data required us to change our development practices. Historically our views pulled data directly from our database backed models, which meant that they were not very reusable outside of their primary context.</p><span>
+
+</span><p>In order to decouple the views from the models, we create a layer of objects responsible for asking our data models for information and converting it into whatever form will make our views happy. In Ruby on Rails there are several ways to do this; the way that we currently use is for each view to have a presenter object sitting behind it.</p><span>
+
+</span><p>Essentially this makes our views ‘dumb’ as they only care about the values that they require. Removing the bulk of their logic and their direct relationship with our data models makes them reusable in other contexts, similar to the way that javascript templates work.</p><span>
+
+</span><p><em>The following is a simplified example of the ‘user-nav’ view and presenters.</em></p><span>
+
+</span><p><img src="http://webuild.envato.com/images/posts/styleguide-driven-development/user-nav.png" alt="User navigation example" /></p><span>
+
+</span><figure class="code"><figcaption><span>Styleguide Presenter</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">UserNavPresenter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">signed_in_cart_with_a_few_items</span>
+</span><span class="line">    <span class="no">OpenStruct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class="line">      <span class="ss">:user_signed_in?</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:shopping_cart_enabled?</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:username</span> <span class="o">=&gt;</span> <span class="s2">"michael-jordan"</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:balance</span> <span class="o">=&gt;</span> <span class="s2">"$314.15"</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:shopping_cart_count</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:shopping_cart_empty?</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:sign_in_url</span> <span class="o">=&gt;</span> <span class="s2">"#"</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:sign_out_url</span> <span class="o">=&gt;</span> <span class="s2">"#"</span><span class="p">,</span>
+</span><span class="line">      <span class="ss">:sign_up_url</span> <span class="o">=&gt;</span> <span class="s2">"#"</span>
+</span><span class="line">    <span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">signed_out_cart_with_a_few_items</span>
+</span><span class="line">    <span class="c1"># etc</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure><span>
+
+
+
+
+</span><figure class="code"><figcaption><span>Application Presenter</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">UserNavPresenter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">user_signed_in?</span>
+</span><span class="line">    <span class="vi">@signed_in_user</span><span class="o">.</span><span class="n">present?</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">shopping_cart_enabled?</span>
+</span><span class="line">    <span class="n">feature_on?</span><span class="p">(</span><span class="ss">:shopping_cart</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">username</span>
+</span><span class="line">    <span class="vi">@user</span><span class="o">.</span><span class="n">username</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">balance</span>
+</span><span class="line">    <span class="vi">@user</span><span class="o">.</span><span class="n">balance</span><span class="o">.</span><span class="n">format</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">shopping_cart_count</span>
+</span><span class="line">    <span class="vi">@cart</span><span class="o">.</span><span class="n">entries_count</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">shopping_cart_empty?</span>
+</span><span class="line">    <span class="vi">@cart</span><span class="o">.</span><span class="n">entries_count</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">sign_in_url</span>
+</span><span class="line">    <span class="n">routes</span><span class="o">.</span><span class="n">sign_in_path</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">sign_out_url</span>
+</span><span class="line">    <span class="n">routes</span><span class="o">.</span><span class="n">sign_out_path</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">sign_up_url</span>
+</span><span class="line">    <span class="n">routes</span><span class="o">.</span><span class="n">sign_up_path</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure><span>
+
+
+
+
+</span><figure class="code"><figcaption><span>Our View (user_nav.html.erb)</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class="erb"><span class="line"><span class="x">&lt;div&gt;</span>
+</span><span class="line"><span class="x">  &lt;div&gt;</span>
+</span><span class="line"><span class="x">    </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">presenter</span><span class="o">.</span><span class="n">user_signed_in?</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">      &lt;span&gt;</span><span class="cp">&lt;%=</span> <span class="n">presenter</span><span class="o">.</span><span class="n">username</span> <span class="cp">%&gt;</span><span class="x">&lt;/span&gt;</span>
+</span><span class="line"><span class="x">      &lt;span&gt;</span><span class="cp">&lt;%=</span> <span class="n">presenter</span><span class="o">.</span><span class="n">balance</span> <span class="cp">%&gt;</span><span class="x">&lt;/span&gt;</span>
+</span><span class="line"><span class="x">    </span><span class="cp">&lt;%</span> <span class="k">else</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">      &lt;a href="</span><span class="cp">&lt;%=</span> <span class="n">presenter</span><span class="o">.</span><span class="n">sign_up_url</span> <span class="cp">%&gt;</span><span class="x">"&gt;Create an Envato Account&lt;/a&gt;</span>
+</span><span class="line"><span class="x">    </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">  &lt;/div&gt;</span>
+</span><span class="line"><span class="x">  </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">presenter</span><span class="o">.</span><span class="n">shopping_cart_enabled?</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">    &lt;div&gt;</span>
+</span><span class="line"><span class="x">      &lt;div class="cart-summary</span><span class="cp">&lt;%=</span> <span class="s2">"--empty"</span> <span class="k">if</span> <span class="n">presenter</span><span class="o">.</span><span class="n">shopping_cart_empty?</span> <span class="cp">%&gt;</span><span class="x">"&gt;</span>
+</span><span class="line"><span class="x">        &lt;span&gt;</span><span class="cp">&lt;%=</span> <span class="n">presenter</span><span class="o">.</span><span class="n">shopping_cart_count</span> <span class="cp">%&gt;</span><span class="x">&lt;/span&gt;</span>
+</span><span class="line"><span class="x">      &lt;/div&gt;</span>
+</span><span class="line"><span class="x">    &lt;/div&gt;</span>
+</span><span class="line"><span class="x">  </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">  &lt;div&gt;</span>
+</span><span class="line"><span class="x">    </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">presenter</span><span class="o">.</span><span class="n">user_signed_in?</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">      &lt;a href="</span><span class="cp">&lt;%=</span> <span class="n">presenter</span><span class="o">.</span><span class="n">sign_out_url</span> <span class="cp">%&gt;</span><span class="x">"&gt;Sign Out&lt;/a&gt;</span>
+</span><span class="line"><span class="x">    </span><span class="cp">&lt;%</span> <span class="k">else</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">      &lt;a href="</span><span class="cp">&lt;%=</span> <span class="n">presenter</span><span class="o">.</span><span class="n">sign_in_url</span> <span class="cp">%&gt;</span><span class="x">"&gt;Sign In&lt;/a&gt;</span>
+</span><span class="line"><span class="x">    </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span><span class="line"><span class="x">  &lt;/div&gt;</span>
+</span><span class="line"><span class="x">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure><span>
+
+
+</span><p>This approach does mean we do need to manage two presenters for each view which we add to the  styleguide, however we are currently investigating different methods to decouple our views from the models and are trialling <a href="https://github.com/apotonick/cells">Cells</a> to reduce the need for duplication.</p><span>
+
+</span><h2 id="agile-practices">Change in agile practices</h2><span>
+
+
+</span><p>As we experimented with SDD our agile practices evolved to compliment our new approach.</p><span>
+
+</span><p>Historically we included both frontend and backend tasks in one self contained and estimated user-story, but this often meant that we were creating blockers and bottlenecks for ourselves on day one as often a frontend task couldn’t start until the backend was completed or vice versa.</p><span>
+
+</span><p>Using SDD we can now split our larger user-stories into smaller more focussed stories with smaller estimates and less dependencies. The benefit of this is that they can be tackled in any order even over the course of several sprints as the resources become available.</p><span>
+
+</span><p>With good communication the UI and backend will seamlessly come together.</p><span>
+
+</span><p>An added benefit of this approach we have found is that our Git branches and Pull Requests are much smaller as they don’t combine as much frontend and backend code and as a result makes them easier to get reviewed.</p><span>
+
+</span><h2 id="conclusion">Conclusion</h2><span>
+
+
+</span><p>By developing directly in the styleguide we immediately have to start thinking about the user experience and how we want our view to interface with the backend.</p><span>
+
+</span><p>While this approach requires changing some development and agile practices, the process directly benefits and compliments the UX, design, frontend and backend stages of development.</p><span>
+
+</span><p>The added benefit of this approach is that we are documenting our application and all its views, thus bringing light to otherwise hidden or broken scenarios. Any edge cases or gaps in the UI are identified early and the frontend and backend devs can be confident they are developing towards a consistent interface.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

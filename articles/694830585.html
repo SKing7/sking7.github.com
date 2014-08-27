@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>High Performance Map Interactions using HTML5 Canvas</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>High Performance Map Interactions using HTML5 Canvas</h1>
+<div class="entry-content"><p><img src="http://cl.ly/image/1G003b1g3508/compare.png" alt="Before and after" /></p><span>
+
+</span><p>Last week, you may have noticed that we released a facelift for our interactive maps. Our Deal Score markers have finally been brought up to 2014 design standards to match the <a href="http://chairnerd.seatgeek.com/event-pages-through-the-ages/">Omnibox</a>. However, what may not be as apparent is that our maps are now between <strong>10 and 100 times faster</strong>, depending on the device.</p><span>
+
+</span><h3 id="background">Background</h3><span>
+
+</span><p><a href="http://chairnerd.seatgeek.com/spatial-data-structures-for-better-map-interactions/">This blog post</a> from March gives a good overview of how our maps used to work. Our maps consisted of three different layers: an image tile layer, an SVG layer, and a Leaflet marker layer.</p><span>
+
+</span><p><img src="http://cl.ly/image/413p0B0h1Z2x/Screen%20Shot%202014-03-26%20at%203.19.09%20PM.png" alt="Old style" /></p><span>
+
+</span><p>This is how our map used to look. The actual stadium is an image tile, the blue section outline is an SVG layer, and the green dot is a Leaflet marker, an HTML element containing an image. There are a couple drawbacks to this approach…</p><span>
+
+</span><h4 id="performance">Performance</h4><span>
+</span><p>While Leaflet markers work well for maps with a small number of markers, we were pushing the limits how many markers could be drawn on the map. At a row-level zoom, we can have thousands of markers on the screen at a given time. Since each marker is an individual DOM element, the browser must move around thousands of DOM elements at the same time when panning and zooming. This meant slow performance on even the fastest of computers and even worse performance on mobile.</p><span>
+
+</span><h4 id="code-complexity">Code Complexity</h4><span>
+</span><p>With the addition of section and row shape interactions, our code became incredibly complex. We were listening to mouse events coming from the tile layer, the SVG layer, and the marker layer. This resulted in a mess of code trying to handle every corner case, e.g. we receive a <code>mouseout</code> event from a marker and a <code>mouseover</code> event from the SVG layer.</p><span>
+
+</span><h3 id="marker-clustering">Marker Clustering</h3><span>
+
+</span><p>A common way to handle large numbers of markers is to use clustering, such as the <a href="https://github.com/Leaflet/Leaflet.markercluster">Leaflet markercluster plugin</a>.</p><span>
+
+</span><p><img src="http://cl.ly/image/3F240q1i2y1a/Screen%20Shot%202014-08-19%20at%2010.51.20%20AM.png" alt="Marker Cluster" /></p><span>
+
+</span><p>This is an effective way to reduce the number of DOM elements on screen. Unfortunately, clustering like this does not work for our use case. In our maps, the markers need to be specific to either a row or a section. Marker clusters, which are based only on marker positions, could result in some unintuitive ticket groupings, e.g. a VIP box and the front row of an upper level section. Therefore, we needed to come up with a solution that would maintain the section and row level detail views, while achieving the same performance as marker clusters.</p><span>
+
+</span><h3 id="html5-canvas">HTML5 Canvas</h3><span>
+</span><p>A few months ago, we made the decision to drop support of Internet Explorer 8. In addition to making every engineer here very happy, this also opened up the possibility of using canvas for our map markers, something we have been looking forward to for a long time.</p><span>
+
+</span><p>The <a href="http://en.wikipedia.org/wiki/Canvas_element">HTML5 canvas element</a> is basically a low-level drawing region. It supports basic drawing operations, but does not have the concept of a scene graph or event handling for anything drawn to it. Most importantly for us, modern browsers are <em>incredibly</em> fast at drawing to canvas elements, often using hardware acceleration.</p><span>
+
+</span><h3 id="canvas-tiles">Canvas Tiles</h3><span>
+
+</span><p>Our plan was to move from using SVG section outlines and Leaflet markers to using tiled canvas elements. This means that instead of forcing the browser to move thousands of DOM elements when panning and zooming the map, we can draw the markers to the canvas tiles once per zoom level and move the canvas tiles themselves around. Browsers are much better at moving 16 elements around on the screen than 2,000.</p><span>
+
+</span><p>Here is what the canvas tiles look like (with debugging on) at our lowest zoom level:</p><span>
+
+</span><p><img src="http://cl.ly/image/1A3n1S2Y2531/Screen%20Shot%202014-08-18%20at%206.53.50%20PM.png" alt="Canvas Debugging" /></p><span>
+
+</span><p>And at our highest zoom level:</p><span>
+
+</span><p><img src="http://cl.ly/image/3U3t0x3N0J1N/Screen%20Shot%202014-08-18%20at%207.04.41%20PM.png" alt="Canvas Debugging Zoomed" /></p><span>
+
+</span><p>This is by no means a new idea. <a href="http://leafletjs.com/reference.html#tilelayer-canvas">Leaflet itself</a> supports basic canvas tiling and some <a href="http://aparshin.github.io/leaflet-fractal/">cool things</a> have been done with it. However, using canvas tiles for our purposes presents some very interesting challenges.</p><span>
+
+</span><h4 id="hit-testing">Hit Testing</h4><span>
+
+</span><p>By consolidating the SVG and marker layers into a single canvas tile layer, we were able to greatly consolidate our mouse interaction code. The bounding boxes of the section and row shapes as well as the markers were put into our favorite spatial data structure, the <a href="http://en.wikipedia.org/wiki/R-tree">R-Tree</a>, for fast lookup. As markers sometimes extend past the edge of the shape they are in, we first check for marker intersect and then fall back to shape intersect.</p><span>
+
+</span><h4 id="drawing">Drawing</h4><span>
+
+</span><p>In order to maintain a high frame rate, we need to make the drawing step as fast as possible. Every time Leaflet requests a tile to be drawn, we calculate the bounding box it covers on the map. Then, we look up what markers fall within that bounding box plus a small buffer, to avoid markers right next to the edge of a tile being clipped. We then iterate through the markers and draw them to the tile. We perform a similar process for drawing hovered and selected shape outlines.</p><span>
+
+</span><h4 id="tile-redrawing">Tile Redrawing</h4><span>
+
+</span><p>There are a couple of events that cause tiles to need to be drawn or redrawn. On zoom, a new set of canvas tiles are requested and drawn at the correct scale. When a shape is hovered or selected, we also must redraw the tile or tiles that contain it. In order to minimize the number of tiles redrawn, we keep track of a redraw bounding box. Between each redraw, we update the redraw bounding box to contain the shapes that need to be drawn or cleared. Then, when the redraw function gets called, we draw only the tiles that contain the redraw bounding box. Now, we could clear and redraw only parts of each tile, but it turned out we got the performance we were looking for without introducing the extra code complexity of sub-tile redrawing.</p><span>
+
+</span><p>Here you can see how the canvas tiles are redrawn. Each redraw colors the updated tiles the same color.</p><span>
+
+</span><p><img src="http://cl.ly/image/0f2Z1I0W3g1j/redraw.gif" alt="Canvas Redraw" /></p><span>
+
+</span><p>And on mobile.</p><span>
+
+</span><p><img src="http://cl.ly/image/012V2p1U0L1P/selective_mobile_cropped.gif" alt="Canvas Redraw Mobile" /></p><span>
+
+</span><h4 id="buffered-marker-drawing">Buffered Marker Drawing</h4><span>
+
+</span><p>All was going great until we decided the markers needed a slight drop shadow to help visually separate them from the underlying map. Drawing drop shadows in canvas is <a href="http://jsperf.com/shadowblur-performance">notoriously slow</a>. However, drawing images or other canvas elements to a canvas element is quite fast. Therefore, while we are waiting for our tickets to load, we create small canvas elements for every  marker color (and at two different sizes, since we enlarge the marker on hover). Then, when we need to draw the markers in the canvas tiles, we can pull from these buffered marker canvases. This way, we only incur the cost of shadow blur once and use the comparatively fast <code>drawImage</code> when performance counts.</p><span>
+
+</span><h3 id="results">Results</h3><span>
+
+</span><h4 id="flexibility">Flexibility</h4><span>
+
+</span><p>As the markers are now procedurally drawn, we can now change their styling whenever we want to. Even the legend is a canvas element that correctly spaces the markers if we change their sizes.</p><span>
+
+</span><p><img src="http://cl.ly/image/0y1A0Z0u3i22/Screen%20Shot%202014-08-18%20at%209.28.45%20PM.png" alt="Legend canvas" /></p><span>
+
+</span><h4 id="code-complexity-1">Code Complexity</h4><span>
+
+</span><p>By switching to canvas markers we were able to greatly reduce the complexity of our event handling code. Probably the best thing to ever see in a GitHub pull request, an overall code decrease.</p><span>
+
+</span><p><img src="http://cl.ly/image/2R2G2u1x2Q2t/Screen%20Shot%202014-08-18%20at%209.32.43%20PM.png" alt="GitHub Diff" /></p><span>
+
+</span><h4 id="performance-1">Performance</h4><span>
+
+</span><p>The Chrome timeline pretty much sums up the staggering performance increase.</p><span>
+
+</span><p>Old map.</p><span>
+
+</span><p><img src="http://cl.ly/image/0i0S05403N2y/Screen%20Shot%202014-08-18%20at%209.06.31%20PM.png" alt="Old Performance" /></p><span>
+
+</span><p>New map.</p><span>
+
+</span><p><img src="http://cl.ly/image/0r3x3q3r3W2C/Screen%20Shot%202014-08-18%20at%209.06.39%20PM.png" alt="New Performance" /></p><span>
+
+</span><p>As you can see, the main performance gain comes from greatly reducing the browser rendering time (purple). Across all devices, the maps now stay comfortably over 60fps, inertial panning works smoothly, and our mobile site is considerably more usable.</p><span>
+
+</span><p>If this type of stuff gets you excited, we are always looking for engineers. <a href="https://seatgeek.com/jobs/">Come join us!</a></p><span>
+
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
