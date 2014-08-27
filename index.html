@@ -305,12 +305,23 @@
       _gaq.push(['_setDomainName', 'liuzhe.co']);
         _gaq.push(['_trackPageview']);
 
-          (function() {
-              var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                        })();
+      (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+              ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                    })();
 
-                        </script>
+    </script>
+<script type="text/javascript">
+  (function() {
+  var s = document.createElement("script");
+    s.type = "text/javascript";
+    s.async = true;
+    s.src = '//api.usersnap.com/load/'+
+            '84a00292-e238-47d1-be8d-690f88025215.js';
+    var x = document.getElementsByTagName('script')[0];
+    x.parentNode.insertBefore(s, x);
+  })();
+</script>
   </body>
 </html>
