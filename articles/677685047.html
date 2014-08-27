@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>LukeW | Breaking Development: Offline First is the new Mobile First</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>LukeW | Breaking Development: Offline First is the new Mobile First</h1>
+<article class="entry writingsentry">
+<p class="feature">In his presentation at Breaking Development in Nashville TN, John Allsopp talked about making use of offline technologies to improve experiences on the Web. Here's my notes from his talk <a href="http://bdconf.com/events/nashville-2014/">Offline First is the new Mobile First</a>.</p>
+
+<ul>
+<li>We have to stop building apps with a desktop mindset where we have permanent, fast, connectivity.</li>
+<li>Most people think of offline experiences only in the client but servers go down as well. Offline techniques can help lighten the load on servers as well.</li>
+<li>Offline technologies don't just give us sites that work offline, they improve performance, and security by minimizing the need for cookies, http, and file uploads. It also opens up new possibilities for better user experiences.</li>
+</ul>
+
+<h2>Web Storage</h2>
+<ul>
+<li>Web Storage: give you more sophisticated ways to keep data around in the browser. Session storage is data that only persists for a session. A session lasts in a tab or window, while it is open.</li>
+<li>We can keep sensitive information around during a transaction like checkout.</li>
+<li>Localstorage and Sessionstorage work mostly the same way. They store a set of key value pairs as strings. Use setItem to store data. Once you store that data, it is available until the window or tab is closed.</li>
+<li>To retrieve data use getItem this provides you the name and values you stored before. There's no need to set databases or tables. It's designed to be dead simple to use.</li>
+<li>To save between sessions, you can use localStorage. Because items here persist forever, you might want to delete these items yourself.</li> 
+<li>You can message between windows using localStorage as there is an event fired when it is updated.</li>
+<li>This event is only sent if a key value changes, not if we send the same value. Only the other open windows have the event fire.</li>
+<li>LocalStorage can only hold 5MB per domain. If you exceed this, an error will be fired.</li>
+<li>Web Storage functionality is synchronous. All Javascript stops running while the storage function is performed. In most cases, this is not really an issue.</li>
+<li>Web Storage stores all data as strings. Parse things using JSON on the way in and out of local storage.</li>
+<li>Web Storage has a pretty restricted approach to domains. sub-domains, https, etc. are separate.</li>
+</ul>
+
+<h2>App Cache</h2>
+<ul>
+<li>Browsers cache HTML, CSS, and Javascript files, images, etc. to speed up subsequent loading of pages.</li>
+<li>App Cache allows you to control all of this caching behavior. This lets you make sites &amp; apps that work offline.</li>
+<li>Offline access allows you to create a CDN on people's devices. This creates dramatic improvements in performance.</li>
+<li>App Cache is painful to use but quite useful. It works as described but there's a lot of logic to understand. Once you understand it's quirks, you can use it anywhere.</li>
+<li>Create a manifest file, link to it from HTML documents, then be aware of all the gotchas.</li>
+<li>Your manifest file specifies all the elements you want to cache, the ones you never want to cache, and a set of fallbacks.</li>
+<li>In the CACHE section list all the resources you want to cache forever. You can use relative or absolute URLs. Everyone must be listed individually. You are not restricted to only the domain where the cache is stored.</li>
+<li>In the NETWORK section list all the files that are changing all the time. You can use a partial match to specify a group of resources. The * character turns of caching for all resources unless specified in the App Cache.</li>
+<li>In the fallback section, list the resources to be used for non-cached resources when offline. These entries have two parts: the resources to replace and how to replace them.</li>
+<li>Once a resource is cached, the browser will continue to use the cached assets. You must update the manifest file. To do this easily, add a date/time stamp as a comment on the top. This will create a new cache file. The user must reload the page twice to get the new app cache to load.</li>
+<li>Resources must be explicitly cached. Any images in stylesheets needs to be explicitly specified in the manifest.</li>
+<li>If you are using https domains, you have to cahce resources from the same domain.</li>
+<li>Any document with a manifest file attribute in the HTML element will be cached, even if it is listed in the NETWORK section of the manifest.</li>
+<li>Do not develop with App Cache enabled, use the wrong MIME-type during development.</li>
+<li>And the list of gotchas continues...</li>
+<li>We have other technologies like navigator.online, the File API, offline events, IndexDB, and more like Service Workers are coming soon.</li>
+<li>The tools for building offline experiences on the Web are here &amp; work now. Offline is a reality today -design with it in mind.
+</li></ul></article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

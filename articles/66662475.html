@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>PNG 8, 24, 32…what?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>PNG 8, 24, 32…what?</h1>
+<div class="entry"><span>
+
+</span><p>I keep having the conversation with colleagues about PNG’s and the bit formats available, why Photoshop and Fireworks seem to offer different options, and which format is the best to use. Although I know some of the answers and reasons, I wanted to make sure to clarify and explain as much as possible, so I did a little further research and tests.</p><span>
+</span><p><strong>First off, what is a PNG?</strong></p><span>
+</span><p><strong>wikipedia’s definition:</strong><br />A PNG is a bitmapped image format and video codec that employs lossless data compression. PNG was created to improve upon and replace GIF (Graphics Interchange Format) as an image-file format not requiring a patent license.</p><span>
+</span><p>Now that we have a general definition of a PNG, let’s try to understand the various types. (8, 24, 32, FW)</p><span>
+</span><p>Here is a PNG-Type matrix I created to help clarify and demonstrate the visual differences.<br />The subject is a light blue to dark blue gradient rounded rectangle.<br />I used an annoying red for the background and/or matte color for some of the tests.</p><span>
+</span><p><a href="http://www.patrickhansen.com/wp-content/uploads/2011/02/PNG_test1.jpg"><img src="http://www.patrickhansen.com/wp-content/uploads/2011/02/PNG_test1-218x300.jpg" alt="PNG type test matrix" title="PNG_test matrix" width="218" height="300" class="alignnone size-medium wp-image-1378" /></a></p><span>
+</span><p>“<a href="http://www.patrickhansen.com/demos/png/PNG_type_matrix.zip" alt="PNG Type Matrix">Download the full-size PNG Type Matrix Here</a></p><span>
+</span><p>Now, what type of PNG’s are there?<br /><strong>1) PNG- 8</strong><br />The 8 stands for 8 bit. It can handle up to 256 colors, similar to GIF, and uses a lossless compression method. You will receive a low file size similar to GIF, approximately 10-30% smaller than other bitmap formats like JPG. </p><span>
+</span><p>It will also support background index &amp; alpha transparency and matte.</p><span>
+</span><p>PNG-8 is good for small graphics, line-art, logos, but may not be suitable for complex graphics with gradients or photos. You can see in my matrix, that all of the PNG-8′s have banding across the gradient. You can see the banding on the PNG-8 images in the matrix.</p><span>
+</span><p>With PNG-8 index transparency, you can see that you will get jagged aliased rounded edges, but if you choose a matte color, then the matte color becomes jagged and will blend in with your true background that you will apply this graphic to and it will appear smooth.</p><span>
+</span><p><strong>2) PNG-24</strong><br />PNG 24 is similar to 8, but has support for 16 million colors and will preserve color variations such as gradients better and help prevent “banding.” It does use the same lossless compression as PNG-8, but you will obtain a larger file size due to the amount of information that will be retained vs. PNG-8.</p><span>
+</span><p>PNG-24 is great for basic graphics, line-art, logos, etc., but you will have an unnecessary larger file size then needed. If you have more complex graphics or photos which require more detail retention, PNG-24 is a great choice.</p><span>
+</span><p>PNG-24 provides support for background index transparency and matte.</p><span>
+</span><p>Since PNG-24 supports index transparency, you usually apply a matte color of the color of the background you will apply this graphic on top of. This will provide the illusion of a smooth transparency along the curves or anti-aliased parts of your graphic.</p><span>
+</span><p>In 24-B and 24-B2, you can see around the corners on the none matte images that they are aliased and jagged. Also, you will notice the black, these were exported on a transparent background, but I did not select a matte color, so it defaulted to black.</p><span>
+</span><p>This also means that if yo have a graphic like an overlay with a percentage opacity of 50%, it will become fully opaque, since index can only handle a single level of transparency. You will have to use Alpha Transparency to achieve this.</p><span>
+</span><p>The issue using PNG-24 with index transparency, is if you are planning on using your graphic like a rounded rectangle on top of a gradient or multi-colored backgrounds, you can’t really apply a single matte color to accomplish the effect appropriately in all cases. (backgrounds with a subtle gradient could be accomplished with minimal conflict if you pick the median color of your gradient).</p><span>
+</span><p>That’s when you have to use Alpha Transparency, which will entail, turn your PNG-24 into a PNG-32. Or you could say it is a PNG-24 with Alpha Transparency based on traditional definitions.</p><span>
+</span><p><strong>3) PNG-32</strong><br />Whoa – there’s a PNG-32?<br />If you use Photoshop and Illustrator primarily, you’re probably only familiar with PNG-8 an PNG-24. However, Fireworks provides an option for a PNG-32.<br />Why?<br />Well, Photoshop and Illustrator produce PNG-32′s if you choose full alpha transparency option on a PNG-24. It just doesn’t really inform the user that it is creating a PNG-32. Why? I don’t know.</p><span>
+</span><p>PNG-32 is the highest quality most of the time, but that also means high file sizes. Use this format only when necessary for those complex graphics that have gradients, varying colors, rounded edges and transparency.</p><span>
+</span><p>PNG-32 will support full Alpha Transparency. You can technically make a PNG-32 with no transparency visually, but it would be somewhat overkill, because it still contains alpha meta data and you can achieve practically the same quality with a PNG-24.</p><span>
+</span><p><strong>Alpha transparency vs. Index Transparency? </strong><br />Well, index transparency provides a single index color and level to be transparent. It’s either on or off.<br />Alpha Transparency provides multiple levels of transparency which in turn, provides a much smoother blend along curves or anti-aliased edges. This also means you can have varying percentages of transparency for your graphic/image, like a graphic that may be used as an overlay and it has 50% opacity on the whole image.</p><span>
+</span><p>You can see in the matrix, that 8-C2 and 32-C2 show the graphic as intended, with a 50% opacity. But most other formats, such as index, reverted it to 100% opacity.</p><span>
+</span><p><strong>4) Fireworks layered PNG</strong><br />Yes, there is technically one more format. Adobe Fireworks, formally Macromedia, uses PNG as it’s file format, but it is a “layered” PNG which means that it could potentially be large in file size, because it retains all of the raw, layered information of the Fireworks file.</p><span>
+</span><p>This is NOT what you would want to use for your production web graphics. So, if you have an unusually large PNG, that might be the reason why.</p><span>
+</span><p>Please correct me if I am incorrect about any of this</p><span>
+</span><p><strong>note:</strong><br />IE5 and IE6 do not support alpha transparency (PNG-8 alpha, PNG-32 alpha), it may convert it to single index, or it may not display at all. There are some <a href="http://www.dillerdesign.com/experiment/DD_belatedPNG/">PNG fix libraries</a> to help handle this for those browsers.</p><span>
+</span><p><strong>Additional Resources</strong><br />If you want to further optimize your web graphics, then try http://www.smushit.com/ysmush.it/</p><span>
+</span><p>This tool will help you compress your PNG’s even further, and provide feedback of any images that could be compressed and what your file size savings are after the additional compression.</p><span>
+</span><p><strong>references:</strong><br />I did use some references that other have posted to help provide these defintions – thanks.<br /><a href="http://www.deepbluesky.com/blog/-/the-difference-between-png24-and-png32_49/">deepbluesky.com</a><br /><a href="http://bkwld.com/blog/2007/11/alpha-transparency-vs-index-transparency-for-8-bit-pngs/">bkwld.com</a><br /><a href="http://iit.bloomu.edu/vthc/ImageReady/basics/formats.htm">iit.bloomu.edu</a><br /><a href="http://en.wikipedia.org/wiki/Portable_Network_Graphics">en.wikipedia.org</a></p><span>
+
+</span><span>
+
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

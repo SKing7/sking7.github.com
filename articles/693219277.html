@@ -1,0 +1,1507 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSS Guidelines (2.0.16) – High-level advice and guidelines for writing sane, manageable, scalable CSS</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>CSS Guidelines (2.0.16) – High-level advice and guidelines for writing sane, manageable, scalable CSS</h1>
+<div class="wrapper"><span>
+
+    </span><span>
+</span><h2 class="alpha  site-title">High-level advice and guidelines for writing sane, manageable, scalable CSS</h2><span>
+
+</span><h2 id="about-the-author">About the Author</h2><span>
+
+</span><p><cite>CSS Guidelines</cite> is a document by me, <a href="http://csswizardry.com/work/">Harry
+Roberts</a>. I am a Consultant Front-end Architect
+from the UK, and I help companies all over the world write and manage better
+quality UIs for their products and teams. I am available for hire.</p><span>
+
+</span><p class="text-center">
+<a href="https://twitter.com/csswizardry" class="btn  btn--secondary"><span class="hide-palm">Follow me on </span>Twitter</a>
+or <a href="http://csswizardry.com/work/" class="btn">Hire<span class="hide-palm"> Me</span></a>
+</p><span>
+
+</span><hr /><span>
+
+</span><h2 id="support-the-guidelines">Support the Guidelines</h2><span>
+
+</span><p><cite>CSS Guidelines</cite> is provided through a pay-what-you-like model—from
+$0 upward. If <cite>CSS Guidelines</cite> is useful to you or your team, please
+consider <a href="https://gumroad.com/l/JAgjq">supporting it</a>.</p><span>
+
+</span><p class="text-center">
+<a href="https://gumroad.com/l/JAgjq" class="btn">Support the Guidelines</a>
+</p><span>
+
+</span><p>Get updates about changes, additions, and new and upcoming sections by following
+<a href="https://twitter.com/cssguidelines">@cssguidelines</a> on Twitter.</p><span>
+
+</span><hr /><span>
+
+</span><h2 id="contents">Contents</h2><span>
+
+</span><ul>
+  <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#introduction">Introduction</a>
+    <ul>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#the-importance-of-a-styleguide">The Importance of a Styleguide</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#disclaimers">Disclaimers</a></li>
+    </ul>
+  </li>
+  <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#syntax-and-formatting">Syntax and Formatting</a>
+    <ul>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#multiple-files">Multiple Files</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#table-of-contents">Table of Contents</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#characters-wide">80 Characters Wide</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#titling">Titling</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#anatomy-of-a-ruleset">Anatomy of a Ruleset</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#multi-line-css">Multi-line CSS</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#indenting">Indenting</a>
+        
+      </li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#meaningful-whitespace">Meaningful Whitespace</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#html">HTML</a></li>
+    </ul>
+  </li>
+  <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#commenting">Commenting</a>
+    <ul>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#high-level">High-level</a>
+        <ul>
+          <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#objectextension-pointers">Object–Extension Pointers</a></li>
+        </ul>
+      </li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#low-level">Low-level</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#preprocessor-comments">Preprocessor Comments</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#removing-comments">Removing Comments</a></li>
+    </ul>
+  </li>
+  <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#naming-conventions">Naming Conventions</a>
+    <ul>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#hyphen-delimited">Hyphen Delimited</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#bem-like-naming">BEM-like Naming</a>
+        <ul>
+          <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#starting-context">Starting Context</a></li>
+          <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#more-layers">More Layers</a></li>
+          <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#modifying-elements">Modifying Elements</a></li>
+        </ul>
+      </li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#naming-conventions-in-html">Naming Conventions in HTML</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#javascript-hooks">JavaScript Hooks</a>
+        
+      </li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#taking-it-further">Taking It Further</a></li>
+    </ul>
+  </li>
+  <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#css-selectors">CSS Selectors</a>
+    <ul>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#selector-intent">Selector Intent</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#reusability">Reusability</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#location-independence">Location Independence</a></li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#portability">Portability</a>
+        <ul>
+          <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#quasi-qualified-selectors">Quasi-Qualified Selectors</a></li>
+        </ul>
+      </li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#naming">Naming</a>
+        
+      </li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#selector-performance">Selector Performance</a>
+        
+      </li>
+      <li><a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#general-rules">General Rules</a></li>
+    </ul>
+  </li>
+</ul><span>
+
+</span><h3 id="up-next">Up Next</h3><span>
+
+</span><ul>
+  <li>Specificity</li>
+  <li>Architecture</li>
+  <li>Preprocessors</li>
+  <li>Layout</li>
+  <li>Performance</li>
+  <li>Code Smells</li>
+  <li>Legacy, Hacks, and Technical Debt</li>
+</ul><span>
+
+</span><hr /><span>
+
+</span><h2 id="introduction">Introduction</h2><span>
+
+</span><p>CSS is not a pretty language. While it is simple to learn and get started with,
+it soon becomes problematic at any reasonable scale. There isn’t much we can do
+to change how CSS works, but we can make changes to the way we author and
+structure it.</p><span>
+
+</span><p>In working on large, long-running projects, with dozens of developers of
+differing specialities and abilities, it is important that we all work in a
+unified way in order to—among other things—</p><span>
+
+</span><ul>
+  <li>keep stylesheets maintainable;</li>
+  <li>keep code transparent, sane, and readable;</li>
+  <li>keep stylesheets scalable.</li>
+</ul><span>
+
+</span><p>There are a variety of techniques we must employ in order to satisfy these
+goals, and <cite>CSS Guidelines</cite> is a document of recommendations and
+approaches that will help us to do so.</p><span>
+
+</span><h3 id="the-importance-of-a-styleguide">The Importance of a Styleguide</h3><span>
+
+</span><p>A coding styleguide (note, not a visual styleguide) is a valuable tool for teams
+who</p><span>
+
+</span><ul>
+  <li>build and maintain products for a reasonable length of time;</li>
+  <li>have developers of differing abilities and specialisms;</li>
+  <li>have a number of different developers working on a product at any given time;</li>
+  <li>on-board new staff regularly;</li>
+  <li>have a number of codebases that developers dip in and out of.</li>
+</ul><span>
+
+</span><p>Whilst styleguides are typically more suited to product teams—large codebases on
+long-lived and evolving projects, with multiple developers contributing over
+prolonged periods of time—all developers should strive for a degree of
+standardisation in their code.</p><span>
+
+</span><p>A good styleguide, when well followed, will</p><span>
+
+</span><ul>
+  <li>set the standard for code quality across a codebase;</li>
+  <li>promote consistency across codebases;</li>
+  <li>give developers a feeling of familiarity across codebases;</li>
+  <li>increase productivity.</li>
+</ul><span>
+
+</span><p>Styleguides should be learned, understood, and implemented at all times on a
+project which is governed by one, and any deviation must be fully justified.</p><span>
+
+</span><h3 id="disclaimers">Disclaimers</h3><span>
+
+</span><p><cite>CSS Guidelines</cite> is <em>a</em> styleguide; it is not <em>the</em> styleguide. It
+contains methodologies, techniques, and tips that I would firmly recommend to my
+clients and teams, but your own tastes and circumstances may well be different.
+Your mileage may vary.</p><span>
+
+</span><p>These guidelines are opinionated, but they have been repeatedly tried, tested,
+stressed, refined, broken, reworked, and revisited over a number of years on
+projects of all sizes.</p><span>
+
+</span><hr /><span>
+
+</span><h2 id="syntax-and-formatting">Syntax and Formatting</h2><span>
+
+</span><p>One of the simplest forms of a styleguide is a set of rules regarding syntax and
+formatting. Having a standard way of writing (<em>literally</em> writing) CSS means
+that code will always look and feel familiar to all members of the team.</p><span>
+
+</span><p>Further, code that looks clean <em>feels</em> clean. It is a much nicer environment to
+work in, and prompts other team members to maintain the standard of cleanliness
+that they found. Ugly code sets a bad precedent.</p><span>
+
+</span><p>At a very high-level, we want</p><span>
+
+</span><ul>
+  <li>Four (4) space indents. No tabs;</li>
+  <li>80 character wide columns;</li>
+  <li>Multi-line CSS;</li>
+  <li>Meaningful use of whitespace.</li>
+</ul><span>
+
+</span><p><span class="highlight" id="did-you-see-this-bit">But, as with anything, the
+specifics are somewhat irrelevant—consistency is key.</span></p><span>
+
+</span><h3 id="multiple-files">Multiple Files</h3><span>
+
+</span><p>With the meteoric rise of preprocessors of late, more often is the case that
+developers are splitting CSS across multiple files.</p><span>
+
+</span><p>Even if not using a preprocessor, it is a good idea to split discrete chunks of
+code into their own files, which are concatenated during a build step.</p><span>
+
+</span><p>If, for whatever reason, you are not working across multiple files, the next
+sections might require some bending to fit your setup.</p><span>
+
+</span><h3 id="table-of-contents">Table of Contents</h3><span>
+
+</span><p>A table of contents is a fairly substantial maintenance overhead, but the
+benefits it brings far outweigh any costs. It takes a diligent developer to keep
+a table of contents up to date, but it is well worth sticking with. An
+up-to-date table of contents provides a team with a single, canonical catalogue
+of what is in a CSS project, what it does, and in what order.  </p><span>
+
+</span><p>A simple table of contents will—in order, naturally—simply provide the name of
+the section and a brief summary of what it is and does, for example:</p><span>
+
+</span><pre><code>/**
+ * CONTENTS
+ *
+ * SETTINGS
+ * Global...............Globally-available variables and config.
+ *
+ * TOOLS
+ * Mixins...............Useful mixins.
+ *
+ * GENERIC
+ * Normalize.css........A level playing field.
+ * Box-sizing...........Better default `box-sizing`.
+ *
+ * BASE
+ * Headings.............H1–H6 styles.
+ *
+ * OBJECTS
+ * Wrappers.............Wrapping and constraining elements.
+ *
+ * COMPONENTS
+ * Page-head............The main page header.
+ * Page-foot............The main page footer.
+ * Buttons..............Button elements.
+ *
+ * TRUMPS
+ * Text.................Text helpers.
+ */
+</code></pre><span>
+
+</span><p>Each item maps to a section and/or include.</p><span>
+
+</span><p>Naturally, this section would be substantially larger on the majority of
+projects, but hopefully we can see how this section—in the master
+stylesheet—provides developers with a project-wide view of what is being used
+where, and why.</p><span>
+
+</span><h3 id="characters-wide">80 Characters Wide</h3><span>
+
+</span><p>Where possible, limit CSS files’ width to 80 characters. Reasons for this
+include</p><span>
+
+</span><ul>
+  <li>the ability to have multiple files open side by side;</li>
+  <li>viewing CSS on sites like GitHub, or in terminal windows;</li>
+  <li>providing a comfortable line length for comments.</li>
+</ul><span>
+
+</span><pre><code>/**
+ * I am a long-form comment. I describe, in detail, the CSS that follows. I am
+ * such a long comment that I easily break the 80 character limit, so I am
+ * broken across several lines.
+ */</code></pre><span>
+
+</span><p>There will be unavoidable exceptions to this rule—such as URLs, or gradient
+syntax—which shouldn’t be worried about.</p><span>
+
+</span><h3 id="titling">Titling</h3><span>
+
+</span><p>Begin every new major section of a CSS project with a title:</p><span>
+
+</span><pre><code>/*------------------------------------*\
+    #SECTION-TITLE
+\*------------------------------------*/
+
+.selector {}
+</code></pre><span>
+
+</span><p>The title of the section is prefixed with a hash (<code>#</code>) symbol to allow us to
+perform more targeted searches (e.g. <code>grep</code>, etc.): instead of searching for
+just <kbd>SECTION-TITLE</kbd>—which may yield many results—a more scoped search
+of <kbd>#SECTION-TITLE</kbd> should return only the section in question.</p><span>
+
+</span><p>Leave a carriage return between this title and the next line of code (be that a
+comment, some Sass, or some CSS).</p><span>
+
+</span><p>If you are working on a project where each section is its own file, this title
+should appear at the top of each one. If you are working on a project with
+multiple sections per file, each title should be preceded by five (5) carriage
+returns. This extra whitespace coupled with a title makes new sections much
+easier to spot when scrolling through large files:</p><span>
+
+</span><pre><code>/*------------------------------------*\
+    #A-SECTION
+\*------------------------------------*/
+
+.selector {}
+
+
+
+
+
+/*------------------------------------*\
+    #ANOTHER-SECTION
+\*------------------------------------*/
+
+/**
+ * Comment
+ */
+
+.another-selector {}
+</code></pre><span>
+
+</span><span>
+
+</span><h3 id="anatomy-of-a-ruleset">Anatomy of a Ruleset</h3><span>
+
+</span><p>Before we discuss how we write out our rulesets, let’s first familiarise
+ourselves with the relevant terminology:</p><span>
+
+</span><pre><code>[selector] {
+    [property]: [value];
+    [&lt;--declaration---&gt;]
+}
+</code></pre><span>
+
+</span><p>For example:</p><span>
+
+</span><pre><code>.foo, .foo--bar,
+.baz {
+    display: block;
+    background-color: green;
+    color: red;
+}
+</code></pre><span>
+
+</span><p>Here you can see we have</p><span>
+
+</span><ul>
+  <li>related selectors on the same line; unrelated selectors on new lines;</li>
+  <li>a space before our opening brace (<code>{</code>);</li>
+  <li>properties and values on the same line;</li>
+  <li>a space after our property–value delimiting colon (<code>:</code>);</li>
+  <li>each declaration on its own new line;</li>
+  <li>the opening brace (<code>{</code>) on the same line as our last selector;</li>
+  <li>our first declaration on a new line after our opening brace (<code>{</code>);</li>
+  <li>our closing brace (<code>}</code>) on its own new line;</li>
+  <li>each declaration indented by four (4) spaces;</li>
+  <li>a trailing semi-colon (<code>;</code>) on our last declaration.</li>
+</ul><span>
+
+</span><p>This format seems to be the largely universal standard (except for variations in
+number of spaces, with a lot of developers preferring two (2)).</p><span>
+
+</span><p>As such, the following would be incorrect:</p><span>
+
+</span><pre><code>.foo, .foo--bar, .baz
+{
+	display:block;
+	background-color:green;
+	color:red }
+</code></pre><span>
+
+</span><p>Problems here include</p><span>
+
+</span><ul>
+  <li>tabs instead of spaces;</li>
+  <li>unrelated selectors on the same line;</li>
+  <li>the opening brace (<code>{</code>) on its own line;</li>
+  <li>the closing brace (<code>}</code>) does not sit on its own line;</li>
+  <li>the trailing (and, admittedly, optional) semi-colon (<code>;</code>) is missing;</li>
+  <li>no spaces after colons (<code>:</code>).</li>
+</ul><span>
+
+</span><h3 id="multi-line-css">Multi-line CSS</h3><span>
+
+</span><p>CSS should be written across multiple lines, except in very specific
+circumstances. There are a number of benefits to this:</p><span>
+
+</span><ul>
+  <li>A reduced chance of merge conflicts, because each piece of functionality
+exists on its own line.</li>
+  <li>More ‘truthful’ and reliable <code>diff</code>s, because one line only ever carries one
+change.</li>
+</ul><span>
+
+</span><p>Exceptions to this rule should be fairly apparent, such as similar rulesets that
+only carry one declaration each, for example:</p><span>
+
+</span><pre><code>.icon {
+    display: inline-block;
+    width:  16px;
+    height: 16px;
+    background-image: url(/img/sprite.svg);
+}
+
+.icon--home     { background-position:   0     0  ; }
+.icon--person   { background-position: -16px   0  ; }
+.icon--files    { background-position:   0   -16px; }
+.icon--settings { background-position: -16px -16px; }
+</code></pre><span>
+
+</span><p>These types of ruleset benefit from being single-lined because</p><span>
+
+</span><ul>
+  <li>they still conform to the one-reason-to-change-per-line rule;</li>
+  <li>they share enough similarities that they don’t need to be read as thoroughly
+as other rulesets—there is more benefit in being able to scan their selectors,
+which are of more interest to us in these cases.</li>
+</ul><span>
+
+</span><h3 id="indenting">Indenting</h3><span>
+
+</span><p>As well as intending individual declarations, indent entire related rulesets to
+signal their relation to one another, for example:</p><span>
+
+</span><pre><code>.foo {}
+
+    .foo__bar {}
+
+        .foo__baz {}
+</code></pre><span>
+
+</span><p>By doing this, a developer can see at a glance that <code>.foo__baz {}</code> lives inside
+<code>.foo__bar {}</code> lives inside <code>.foo {}</code>.</p><span>
+
+</span><p>This quasi-replication of the DOM tells developers a lot about where classes are
+expected to be used without them having to refer to a snippet of HTML.</p><span>
+
+</span><h4 id="indenting-sass">Indenting Sass</h4><span>
+
+</span><p>Sass provides nesting functionality. That is to say, by writing this:</p><span>
+
+</span><pre><code>.foo {
+    color: red;
+
+    .bar {
+        color: blue;
+    }
+
+}
+</code></pre><span>
+
+</span><p>…we will be left with this compiled CSS:</p><span>
+
+</span><pre><code>.foo { color: red; }
+.foo .bar { color: blue; }
+</code></pre><span>
+
+</span><p>When indenting Sass, we stick to the same four (4) spaces, and we also leave a
+blank line before and after the nested ruleset.</p><span>
+
+</span><p><strong>N.B.</strong> Nesting in Sass should be avoided wherever possible. See the
+Specificity section for more details.</p><span>
+
+</span><h4 id="alignment">Alignment</h4><span>
+
+</span><p>Attempt to align common and related identical strings in declarations, for
+example:</p><span>
+
+</span><pre><code>.foo {
+    -webkit-border-radius: 3px;
+       -moz-border-radius: 3px;
+            border-radius: 3px;
+}
+
+.bar {
+    position: absolute;
+    top:    0;
+    right:  0;
+    bottom: 0;
+    left:   0;
+    margin-right: -10px;
+    margin-left:  -10px;
+    padding-right: 10px;
+    padding-left:  10px;
+}
+</code></pre><span>
+
+</span><p>This makes life a little easier for developers whose text editors support column
+editing, allowing them to change several identical and aligned lines in one go.</p><span>
+
+</span><h3 id="meaningful-whitespace">Meaningful Whitespace</h3><span>
+
+</span><p>As well as indentation, we can provide a lot of information through liberal and
+judicious use of whitespace between rulesets. We use:</p><span>
+
+</span><ul>
+  <li>One (1) empty line between closely related rulesets.</li>
+  <li>Two (2) empty lines between loosely related rulesets.</li>
+  <li>Five (5) empty lines between entirely new sections.</li>
+</ul><span>
+
+</span><p>For example:</p><span>
+
+</span><pre><code>/*------------------------------------*\
+    #FOO
+\*------------------------------------*/
+
+.foo {}
+
+    .foo__bar {}
+
+
+.foo--baz {}
+
+
+
+
+
+/*------------------------------------*\
+    #BAR
+\*------------------------------------*/
+
+.bar {}
+
+    .bar__baz {}
+
+    .bar__foo {}
+</code></pre><span>
+
+</span><p>There should never be a scenario in which two rulesets do not have an empty line
+between them. This would be incorrect:</p><span>
+
+</span><pre><code>.foo {}
+    .foo__bar {}
+.foo--baz {}
+</code></pre><span>
+
+</span><h3 id="html">HTML</h3><span>
+
+</span><p>Given HTML and CSS’ inherently interconnected nature, it would be remiss of me
+to not cover some syntax and formatting guidelines for markup.</p><span>
+
+</span><p>Always quote attributes, even if they would work without. This reduces the
+chance of accidents, and is a more familiar format to the majority of
+developers. For all this would work (and is valid):</p><span>
+
+</span><pre><code>&lt;div class=box&gt;
+</code></pre><span>
+
+</span><p>…this format is preferred:</p><span>
+
+</span><pre><code>&lt;div class="box"&gt;
+</code></pre><span>
+
+</span><p>The quotes are not required here, but err on the safe side and include them.</p><span>
+
+</span><p>When writing multiple values in a class attribute, separate them with two
+spaces, thus:</p><span>
+
+</span><pre><code>&lt;div class="foo  bar"&gt;
+</code></pre><span>
+
+</span><p>When multiple classes are related to each other, consider grouping them in
+square brackets (<code>[</code> and <code>]</code>), like so:</p><span>
+
+</span><pre><code>&lt;div class="[ box  box--highlight ]  [ bio  bio--long ]"&gt;
+</code></pre><span>
+
+</span><p>This is not a firm recommendation, and is something I am still trialling myself,
+but it does carry a number of benefits. Read more in <a href="http://csswizardry.com/2014/05/grouping-related-classes-in-your-markup/"><cite>Grouping related
+classes in your
+markup</cite></a>.</p><span>
+
+</span><p>As with our rulesets, it is possible to use meaningful whitespace in your HTML.
+You can denote thematic breaks in content with five (5) empty lines, for
+example:</p><span>
+
+</span><pre><code>&lt;header class="page-head"&gt;
+    ...
+&lt;/header&gt;
+
+
+
+
+
+&lt;main class="page-content"&gt;
+    ...
+&lt;/main&gt;
+
+
+
+
+
+&lt;footer class="page-foot"&gt;
+    ...
+&lt;/footer&gt;
+</code></pre><span>
+
+</span><span>
+
+</span><p>Separate independent but loosely related snippets of markup with a single empty
+line, for example:</p><span>
+
+</span><pre><code>&lt;ul class="primary-nav"&gt;
+
+    &lt;li class="primary-nav__item"&gt;
+        &lt;a href="/" class="primary-nav__link"&gt;Home&lt;/a&gt;
+    &lt;/li&gt;
+
+    &lt;li class="primary-nav__item  primary-nav__trigger"&gt;
+        &lt;a href="/about" class="primary-nav__link"&gt;About&lt;/a&gt;
+
+        &lt;ul class="primary-nav__sub-nav"&gt;
+            &lt;li&gt;&lt;a href="/about/products"&gt;Products&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="/about/company"&gt;Company&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+
+    &lt;/li&gt;
+
+    &lt;li class="primary-nav__item"&gt;
+        &lt;a href="/contact" class="primary-nav__link"&gt;Contact&lt;/a&gt;
+    &lt;/li&gt;
+
+&lt;/ul&gt;
+</code></pre><span>
+
+</span><p>This allows developers to spot separate parts of the DOM at a glance, and also
+allows certain text editors—like Vim, for example—to manipulate
+empty-line-delimited blocks of markup.</p><span>
+
+</span><h3 id="further-reading">Further Reading</h3><span>
+
+</span><span>
+
+</span><hr /><span>
+
+</span><span>
+
+</span><p>The cognitive overhead of working with CSS is huge. With so much to be aware of,
+and so many project-specific nuances to remember, the worst situation most
+developers find themselves in is being the-person-who-didn’t-write-this-code.
+Remembering your own classes, rules, objects, and helpers is manageable <em>to an
+extent</em>, but anyone inheriting CSS barely stands a chance.</p><span>
+
+</span><p><strong>CSS needs more comments.</strong></p><span>
+
+</span><p>As CSS is something of a declarative language that doesn’t really leave much of
+a paper-trail, it is often hard to discern—from looking at the CSS alone—</p><span>
+
+</span><ul>
+  <li>whether some CSS relies on other code elsewhere;</li>
+  <li>what effect changing some code will have elsewhere;</li>
+  <li>where else some CSS might be used;</li>
+  <li>what styles something might inherit (intentionally or otherwise);</li>
+  <li>what styles something might pass on (intentionally or otherwise);</li>
+  <li>where the author intended a piece of CSS to be used.</li>
+</ul><span>
+
+</span><p>This doesn’t even take into account some of CSS’ many quirks—such as various
+sates of <code>overflow</code> triggering block formatting context, or certain transform
+properties triggering hardware acceleration—that make it even more baffling to
+developers inheriting projects.</p><span>
+
+</span><p>As a result of CSS not telling its own story very well, it is a language that
+really does benefit from being heavily commented.</p><span>
+
+</span><p>As a rule, you should comment anything that isn’t immediately obvious from the
+code alone. That is to say, there is no need to tell someone that <code>color: red;</code>
+will make something red, but if you’re using <code>overflow: hidden;</code> to clear
+floats—as opposed to clipping an element’s overflow—this is probably something
+worth documenting.</p><span>
+
+</span><h3 id="high-level">High-level</h3><span>
+
+</span><p>For large comments that document entire sections or components, we use a
+DocBlock-esque multi-line comment which adheres to our 80 column width.</p><span>
+
+</span><p>Here is a real-life example from the CSS which styles the page header on <a href="http://csswizardry.com/">CSS
+Wizardry</a>:</p><span>
+
+</span><pre><code>/**
+ * The site’s main page-head can have two different states:
+ *
+ * 1) Regular page-head with no backgrounds or extra treatments; it just
+ *    contains the logo and nav.
+ * 2) A masthead that has a fluid-height (becoming fixed after a certain point)
+ *    which has a large background image, and some supporting text.
+ *
+ * The regular page-head is incredibly simple, but the masthead version has some
+ * slightly intermingled dependency with the wrapper that lives inside it.
+ */
+</code></pre><span>
+
+</span><p>This level of detail should be the norm for all non-trivial code—descriptions of
+states, permutations, conditions, and treatments.</p><span>
+
+</span><h4 id="objectextension-pointers">Object–Extension Pointers</h4><span>
+
+</span><p>When working across multiple partials, or in an OOCSS manner, you will often
+find that rulesets that can work in conjunction with each other are not always
+in the same file or location. For example, you may have a generic button
+object—which provides purely structural styles—which is to be extended in a
+component-level partial which will add cosmetics. We document this relationship
+across files with simple <i>object–extension pointers</i>. In the object file:</p><span>
+
+</span><pre><code>/**
+ * Extend `.btn {}` in _components.buttons.scss.
+ */
+
+.btn {}
+</code></pre><span>
+
+</span><p>And in your theme file:</p><span>
+
+</span><pre><code>/**
+ * These rules extend `.btn {}` in _objects.buttons.scss.
+ */
+
+.btn--positive {}
+
+.btn--negative {}
+</code></pre><span>
+
+</span><p>This simple, low effort commenting can make a lot of difference to developers
+who are unaware of relationships across projects, or who are wanting to know
+how, why, and where other styles might be being inherited from.</p><span>
+
+</span><h3 id="low-level">Low-level</h3><span>
+
+</span><p>Oftentimes we want to comment on specific declarations (i.e. lines) in a
+ruleset. To do this we use a kind of reverse footnote. Here is a more complex
+comment detailing the larger site headers mentioned above:</p><span>
+
+</span><pre><code>/**
+ * Large site headers act more like mastheads. They have a faux-fluid-height
+ * which is controlled by the wrapping element inside it.
+ *
+ * 1. Mastheads will typically have dark backgrounds, so we need to make sure
+ *    the contrast is okay. This value is subject to change as the background
+ *    image changes.
+ * 2. We need to delegate a lot of the masthead’s layout to its wrapper element
+ *    rather than the masthead itself: it is to this wrapper that most things
+ *    are positioned.
+ * 3. The wrapper needs positioning context for us to lay our nav and masthead
+ *    text in.
+ * 4. Faux-fluid-height technique: simply create the illusion of fluid height by
+ *    creating space via a percentage padding, and then position everything over
+ *    the top of that. This percentage gives us a 16:9 ratio.
+ * 5. When the viewport is at 758px wide, our 16:9 ratio means that the masthead
+ *    is currently rendered at 480px high. Let’s…
+ * 6. …seamlessly snip off the fluid feature at this height, and…
+ * 7. …fix the height at 480px. This means that we should see no jumps in height
+ *    as the masthead moves from fluid to fixed. This actual value takes into
+ *    account the padding and the top border on the header itself.
+ */
+
+.page-head--masthead {
+    margin-bottom: 0;
+    background: url(/img/css/masthead.jpg) center center #2e2620;
+    @include vendor(background-size, cover);
+    color: $color-masthead; /* [1] */
+    border-top-color: $color-masthead;
+    border-bottom-width: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) inset;
+
+    @include media-query(lap-and-up) {
+        background-image: url(/img/css/masthead-medium.jpg);
+    }
+
+    @include media-query(desk) {
+        background-image: url(/img/css/masthead-large.jpg);
+    }
+
+    &gt; .wrapper { /* [2] */
+        position: relative; /* [3] */
+        padding-top: 56.25%; /* [4] */
+
+        @media screen and (min-width: 758px) { /* [5] */
+            padding-top: 0; /* [6] */
+            height: $header-max-height - double($spacing-unit) - $header-border-width; /* [7] */
+        }
+
+    }
+
+}
+</code></pre><span>
+
+</span><p>These types of comment allow us to keep all of our documentation in one place
+whilst referring to the parts of the ruleset to which they belong.</p><span>
+
+</span><span>
+
+</span><p>With most—if not all—preprocessors, we have the option to write comments that
+will not get compiled out into our resulting CSS file. As a rule, use these
+comments to document code that would not get written out to that CSS file
+either. If you are documenting code which will get compiled, use comments that
+will compile also. For example, this is correct:</p><span>
+
+</span><pre><code>// Dimensions of the @2x image sprite:
+$sprite-width:  920px;
+$sprite-height: 212px;
+
+/**
+ * 1. Default icon size is 16px.
+ * 2. Squash down the retina sprite to display at the correct size.
+ */
+.sprite {
+    width:  16px; /* [1] */
+    height: 16px; /* [1] */
+    background-image: url(/img/sprites/main.png);
+    background-size: ($sprite-width / 2 ) ($sprite-height / 2); /* [2] */
+}
+</code></pre><span>
+
+</span><p>We have documented variables—code which will not get compiled into our CSS
+file—with preprocessor comments, whereas our CSS—code which will get compiled
+into our CSS file—is documented using CSS comments. This means that we have only
+the correct and relevant information available to us when debugging our compiled
+stylesheets.</p><span>
+
+</span><span>
+
+</span><p>It should go without saying that no comments should make their way into
+production environments—all CSS should be minified, resulting in loss of
+comments, before being deployed.</p><span>
+
+</span><hr /><span>
+
+</span><h2 id="naming-conventions">Naming Conventions</h2><span>
+
+</span><p>Naming conventions in CSS are hugely useful in making your code more
+strict, more transparent, and more informative.</p><span>
+
+</span><p>A good naming convention will tell you and your team</p><span>
+
+</span><ul>
+  <li>what type of thing a class does;</li>
+  <li>where a class can be used;</li>
+  <li>what (else) a class might be related to.</li>
+</ul><span>
+
+</span><p>The naming convention I follow is very simple: hyphen (<code>-</code>) delimited strings,
+with BEM-like naming for more complex pieces of code.</p><span>
+
+</span><p>It’s worth noting that a naming convention is not normally useful CSS-side of
+development; they really come into their own when viewed in HTML.</p><span>
+
+</span><h3 id="hyphen-delimited">Hyphen Delimited</h3><span>
+
+</span><p>All strings in classes are delimited with a hyphen (<code>-</code>), like so:</p><span>
+
+</span><pre><code>.page-head {}
+
+.sub-content {}
+</code></pre><span>
+
+</span><p>Camel case and underscores are not used for regular classes; the following are
+incorrect:</p><span>
+
+</span><pre><code>.pageHead {}
+
+.sub_content {}
+</code></pre><span>
+
+</span><span>
+
+</span><h3 id="bem-like-naming">BEM-like Naming</h3><span>
+
+</span><p>For larger, more interrelated pieces of UI that require a number of classes, we
+use a BEM-like naming convention.</p><span>
+
+</span><p><cite>BEM</cite>, meaning <i>Block</i>, <i>Element</i>, <i>Modifier</i>, is a
+front-end methodology coined by developers working at Yandex. Whilst BEM is a
+complete methodology, here we are only concerned with its naming convention.
+Further, the naming convention here only is BEM-<em>like</em>; the principles are
+exactly the same, but the actual syntax differs slightly.</p><span>
+
+</span><p>BEM splits components’ classes into three groups:</p><span>
+
+</span><ul>
+  <li>Block: The sole root of the component.</li>
+  <li>Element: A component part of the Block.</li>
+  <li>Modifier: A variant or extension of the Block.</li>
+</ul><span>
+
+</span><p>To take an analogy (note, not an example):</p><span>
+
+</span><pre><code>.person {}
+.person__head {}
+.person--tall {}
+</code></pre><span>
+
+</span><p>Elements are delimited with two (2) underscores (<code>__</code>), and Modifiers are
+delimited by two (2) hyphens (<code>--</code>).</p><span>
+
+</span><p>Here we can see that <code>.person {}</code> is the Block; it is the sole root of a
+discrete entity. <code>.person__head {}</code> is an Element; it is a smaller part of the
+<code>.person {}</code> Block. Finally, <code>.person--tall {}</code> is a Modifier; it is a specific
+variant of the <code>.person {}</code> Block.</p><span>
+
+</span><h4 id="starting-context">Starting Context</h4><span>
+
+</span><p>Your Block context starts at the most logical, self-contained, discrete
+location. To continue with our person-based analogy, we’d not have a class like
+<code>.room__person {}</code>, as the room is another, much higher context. We’d probably
+have separate Blocks, like so:</p><span>
+
+</span><pre><code>.room {}
+
+    .room__door {}
+
+.room--kitchen {}
+
+
+.person {}
+
+    .person__head {}
+</code></pre><span>
+
+</span><p>If we did want to denote a <code>.person {}</code> inside a <code>.room {}</code>, it is more correct
+to use a selector like <code>.room .person {}</code> which bridges two Blocks than it is to
+increase the scope of existing Blocks and Elements.</p><span>
+
+</span><p>A more realistic example of properly scoped blocks might look something like
+this, where each chunk of code represents its own Block:</p><span>
+
+</span><pre><code>.page {}
+
+
+.content {}
+
+
+.sub-content {}
+
+
+.footer {}
+
+    .footer__copyright {}
+</code></pre><span>
+
+</span><p>Incorrect notation for this would be:</p><span>
+
+</span><pre><code>.page {}
+
+    .page__content {}
+
+    .page__sub-content {}
+
+    .page__footer {}
+
+        .page__copyright {}
+</code></pre><span>
+
+</span><p>It is important to know when BEM scope starts and stops. As a rule, BEM applies
+to self-contained, discrete parts of the UI.</p><span>
+
+</span><h4 id="more-layers">More Layers</h4><span>
+
+</span><p>If we were to add another Element—called, let’s say, <code>.person__eye {}</code>—to this
+<code>.person {}</code> component, we would not need to step through every layer of the
+DOM. That is to say, the correct notation would be <code>.person__eye {}</code>, and not
+<code>.person__head__eye {}</code>. Your classes do not reflect the full paper-trail of the
+DOM.</p><span>
+
+</span><h4 id="modifying-elements">Modifying Elements</h4><span>
+
+</span><p>You can have variants of Elements, and these can be denoted in a number of ways
+depending on how and why they are being modified. Carrying on with our person
+example, a blue eye might look like this:</p><span>
+
+</span><pre><code>.person__eye--blue {}
+</code></pre><span>
+
+</span><p>Here we can see we’re directly modifying the eye Element.</p><span>
+
+</span><p>Things can get more complex, however. Please excuse the crude analogy, and let’s
+imagine we have a face Element that is handsome. The person themselves isn’t
+that handsome, so we modify the face Element directly—a handsome face on a
+regular person:</p><span>
+
+</span><pre><code>.person__face--handsome {}
+</code></pre><span>
+
+</span><p>But what if that person <em>is</em> handsome, and we want to style their face because
+of that fact? A regular face on a handsome person:</p><span>
+
+</span><pre><code>.person--handsome .person__face {}
+</code></pre><span>
+
+</span><p>Here is one of a few occasions where we’d use a descendant selector to modify
+an Element based on a Modifier on the Block.</p><span>
+
+</span><p>If using Sass, we would likely write this like so:</p><span>
+
+</span><pre><code>.person {}
+
+    .person__face {
+
+        .person--handsome &amp; {}
+
+    }
+
+.person--handsome {}
+</code></pre><span>
+
+</span><p>Note that we do not nest a new instance of <code>.person__face {}</code> inside of
+<code>.person--handsome {}</code>; instead, we make use of Sass’ parent selectors to
+prepend <code>.person--handsome</code> onto the existing <code>.person__face {}</code> selector. This
+means that all of our <code>.person__face {}</code>-related rules exist in once place, and
+aren’t spread throughout the file. This is general good practice when dealing
+with nested code: keep all of your context (e.g. all <code>.person__face {}</code> code)
+encapsulated in one location.</p><span>
+
+</span><h3 id="naming-conventions-in-html">Naming Conventions in HTML</h3><span>
+
+</span><p>As I previously hinted at, naming conventions aren’t necessarily all that useful
+in your CSS. Where naming conventions’ power really lies is in your markup. Take
+the following, non-naming-conventioned HTML:</p><span>
+
+</span><pre><code>&lt;div class="box  profile  pro-user"&gt;
+
+    &lt;img class="avatar  image" /&gt;
+
+    &lt;p class="bio"&gt;...&lt;/p&gt;
+
+&lt;/div&gt;
+</code></pre><span>
+
+</span><p>How are the classes <code>box</code> and <code>profile</code> related to each other? How are the
+classes <code>profile</code> and <code>avatar</code> related to each other? Are they related at all?
+Should you be using <code>pro-user</code> alongside <code>bio</code>? Will the classes <code>image</code> and
+<code>profile</code> live in the same part of the CSS? Can you use <code>avatar</code> anywhere else?</p><span>
+
+</span><p>From that markup alone, it is very hard to answer any of those questions. Using
+a naming convention, however, changes all that:</p><span>
+
+</span><pre><code>&lt;div class="box  profile  profile--is-pro-user"&gt;
+
+    &lt;img class="avatar  profile__image" /&gt;
+
+    &lt;p class="profile__bio"&gt;...&lt;/p&gt;
+
+&lt;/div&gt;
+</code></pre><span>
+
+</span><p>Now we can clearly see which classes are and are not related to each other, and
+how; we know what classes we can’t use outside of the scope of this component;
+and we know which classes we may be free to reuse elsewhere.</p><span>
+
+</span><h3 id="javascript-hooks">JavaScript Hooks</h3><span>
+
+</span><p>As a rule, it is unwise to bind your CSS and your JS onto the same class in your
+HTML. This is because doing so means you can’t have (or remove) one without
+(removing) the other. It is much cleaner, much more transparent, and much more
+maintainable to bind your JS onto specific classes.</p><span>
+
+</span><p>I have known occasions before when trying to refactor some CSS has unwittingly
+removed JS functionality because the two were tied to each other—it was
+impossible to have one without the other.</p><span>
+
+</span><p>Typically, these are classes that are prepended with <code>js-</code>, for example:</p><span>
+
+</span><pre><code>&lt;input type="submit" class="btn  js-btn" value="Follow" /&gt;
+</code></pre><span>
+
+</span><p>This means that we can have an element elsewhere which can carry with style of
+<code>.btn {}</code>, but without the behaviour of <code>.js-btn</code>.</p><span>
+
+</span><h4 id="data--attributes"><code>data-*</code> Attributes</h4><span>
+
+</span><p>A common practice is to use <code>data-*</code> attributes as JS hooks, but this is
+incorrect. <code>data-*</code> attributes, as per the spec, are used <q><strong>to store custom
+data</strong> private to the page or application</q> (emphasis mine). <code>data-*</code>
+attributes are designed to store data, not be bound to.</p><span>
+
+</span><h3 id="taking-it-further">Taking It Further</h3><span>
+
+</span><p>As previously mentioned, these are very simple naming conventions, and ones that
+don’t do much more than denote three distinct groups of class.</p><span>
+
+</span><p>I would encourage you to read up on and further look in to your naming
+convention in order to provide more functionality—I know it’s something I’m keen
+to research and investigate further.</p><span>
+
+</span><h3 id="further-reading-1">Further Reading</h3><span>
+
+</span><span>
+
+</span><hr /><span>
+
+</span><h2 id="css-selectors">CSS Selectors</h2><span>
+
+</span><p>Perhaps somewhat surprisingly, one of the most fundamental, critical aspects of
+writing maintainable and scalable CSS is selectors. Their specificity, their
+portability, and their reusability all have a direct impact on the mileage we
+will get out of our CSS, and the headaches it might bring us.</p><span>
+
+</span><h3 id="selector-intent">Selector Intent</h3><span>
+
+</span><p>It is important when writing CSS that we scope our selectors correctly, and that
+we’re selecting the right things for the right reasons. <i>Selector Intent</i>
+is the process of deciding and defining what you want to style and how you
+will go about selecting it. For example, if you are wanting to style your
+website’s main navigation menu, a selector like this would be incredibly unwise:</p><span>
+
+</span><pre><code>header ul {}
+</code></pre><span>
+
+</span><p>This selector’s intent is to style any <code>ul</code> inside any <code>header</code> element, whereas
+<em>our</em> intent was to style the site’s main navigation. This is poor Selector
+Intent: you can have any number of <code>header</code> elements on a page, and they in turn
+can house any number of <code>ul</code>s, so a selector like this runs the risk of applying
+very specific styling to a very wide number of elements. This will result in
+having to write more CSS to undo the greedy nature of such a selector.</p><span>
+
+</span><p>A better approach would be a selector like:</p><span>
+
+</span><pre><code>.site-nav {}
+</code></pre><span>
+
+</span><p>An unambiguous, explicit selector with good Selector Intent. We are explicitly
+selecting the right thing for exactly the right reason.</p><span>
+
+</span><p>Poor Selector Intent is one of the biggest reasons for headaches on CSS
+projects. Writing rules that are far too greedy—and that apply very specific
+treatments via very far reaching selectors—causes unexpected side effects and
+leads to very tangled stylesheets, with selectors overstepping their intentions
+and impacting and interfering with otherwise unrelated rulesets.</p><span>
+
+</span><p>CSS cannot be encapsulated, it is inherently leaky, but we can mitigate some of
+these effects by not writing such globally-operating selectors: <strong>your selectors
+should be as explicit and well reasoned as your reason for wanting to select
+something.</strong></p><span>
+
+</span><h3 id="reusability">Reusability</h3><span>
+
+</span><p>With a move toward a more component-based approach to constructing UIs, the idea
+of reusability is paramount. We want the option to be able to move, recycle,
+duplicate, and syndicate components across our projects.</p><span>
+
+</span><p>To this end, we make heavy use of classes. IDs, as well as being hugely
+over-specific, cannot be used more than once on any given page, whereas classes
+can be reused an infinite amount of times. Everything you choose, from the type
+of selector to its name, should lend itself toward being reused.</p><span>
+
+</span><h3 id="location-independence">Location Independence</h3><span>
+
+</span><p>Given the ever-changing nature of most UI projects, and the move to more
+component-based architectures, it is in our interests not to style things based
+on where they are, but on <em>what</em> they are. That is to say, our components’
+styling should not be reliant upon where we place them—they should remain
+entirely location independent.</p><span>
+
+</span><p>Let’s take an example of a call-to-action button that we have chosen to style
+via the following selector:</p><span>
+
+</span><pre><code>.promo a {}
+</code></pre><span>
+
+</span><p>Not only does this have poor Selector Intent—it will greedily style any and
+every link inside of a <code>.promo</code> to look like a button—it is also pretty wasteful
+as a result of being so locationally dependent: we can’t reuse that button with
+its correct styling outside of <code>.promo</code> because it is explicitly tied to that
+location. A far better selector would have been:</p><span>
+
+</span><pre><code>.btn {}
+</code></pre><span>
+
+</span><p>This single class can be reused anywhere outside of <code>.promo</code> and will always
+carry its correct styling. As a result of a better selector, this piece of UI is
+more portable, more recyclable, doesn’t have any dependencies, and has much
+better Selector Intent. <strong>A component shouldn’t have to live in a certain place
+to look a certain way.</strong></p><span>
+
+</span><span>
+
+</span><h3 id="portability">Portability</h3><span>
+
+</span><p>Reducing, or, ideally, removing, location dependence means that we can move
+components around our markup more freely, but how about improving our ability to
+move classes around components? On a much lower level, there are changes we
+can make to our selectors that make the selectors themselves—as opposed to the
+components they create—more portable. Take the following example:</p><span>
+
+</span><pre><code>input.btn {}
+</code></pre><span>
+
+</span><p>This is a <i>qualified</i> selector; the leading <code>input</code> ties this ruleset to
+only being able to work on <code>input</code> elements. By omitting this qualification, we
+allow ourselves to reuse the <code>.btn</code> class on any element we choose, like an <code>a</code>,
+for example, or a <code>button</code>.</p><span>
+
+</span><p>Qualified selectors do not lend themselves well to being reused, and every
+selector we write should be authored with reuse in mind.</p><span>
+
+</span><p>Of course, there are times when you may want to legitimately qualify a
+selector—you might need to apply some very specific styling to a particular
+element when it carries a certain class, for example:</p><span>
+
+</span><pre><code>/**
+ * Embolden and colour any element with a class of `.error`.
+ */
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+/**
+ * If the element is a `div`, also give it some box-like styling.
+ */
+div.error {
+    padding: 10px;
+    border: 1px solid;
+}
+</code></pre><span>
+
+</span><p>This is one example where a qualified selector might be justifiable, but I would
+still recommend an approach more like:</p><span>
+
+</span><pre><code>/**
+ * Text-level errors.
+ */
+.error-text {
+    color: red;
+    font-weight: bold;
+}
+
+/**
+ * Elements that contain errors.
+ */
+.error-box {
+    padding: 10px;
+    border: 1px solid;
+}
+</code></pre><span>
+
+</span><p>This means that we can apply <code>.error-box</code> to any element, and not just a
+<code>div</code>—it is more reusable than a qualified selector.</p><span>
+
+</span><h4 id="quasi-qualified-selectors">Quasi-Qualified Selectors</h4><span>
+
+</span><p>One thing that qualified selectors can be useful for is signalling where a class
+might be expected or intended to be used, for example:</p><span>
+
+</span><pre><code>ul.nav {}
+</code></pre><span>
+
+</span><p>Here we can see that the <code>.nav</code> class is meant to be used on a <code>ul</code> element, and
+not on a <code>nav</code>. By using <i>quasi-qualified selectors</i> we can still provide
+that information without actually qualifying the selector:</p><span>
+
+</span><pre><code>/*ul*/.nav {}
+</code></pre><span>
+
+</span><p>By commenting out the leading element, we can still leave it to be read, but
+avoid qualifying and increasing the specificity of the selector.</p><span>
+
+</span><h3 id="naming">Naming</h3><span>
+
+</span><p>As Phil Karlton once said, <q>There are only two hard things in Computer
+Science: cache invalidation and naming things.</q></p><span>
+
+</span><p>I won’t comment on the former claim here, but the latter has plagued me for
+years.  My advice with regard to naming things in CSS is to pick a name that is
+sensible, but somewhat ambiguous: aim for high reusability. For example, instead
+of a class like <code>.site-nav</code>, choose something like <code>.primary-nav</code>; rather than
+<code>.footer-links</code>, favour a class like <code>.sub-links</code>.</p><span>
+
+</span><p>The differences in these names is that the first of each two examples is tied to
+a very specific use case: they can only be used as the site’s navigation or the
+footer’s links respectively. By using slightly more ambiguous names, we can
+increase our ability to reuse these components in different circumstances.</p><span>
+
+</span><p>To quote Nicolas Gallagher:</p><span>
+
+</span><blockquote>
+  <p>Tying your class name semantics tightly to the nature of the content has already
+reduced the ability of your architecture to scale or be easily put to use by
+other developers.</p>
+</blockquote><span>
+
+</span><p>That is to say, we should use sensible names—classes like <code>.border</code> or <code>.red</code>
+are never advisable—but we should avoid using classes which describe the exact
+nature of the content and/or its use cases. <strong>Using a class name to describe
+content is redundant because content describes itself.</strong></p><span>
+
+</span><p>The debate surrounding semantics has raged for years, but it is important that
+we adopt a more pragmatic, sensible approach to naming things in order to work
+more efficiently and effectively. Instead of focussing on ‘semantics’, look more
+closely at sensibility and longevity—choose names based on ease of maintenance,
+not for their perceived meaning.</p><span>
+
+</span><p>Name things for people; they’re the only things that actually <em>read</em> your
+classes (everything else merely matches them). Once again, it is better to
+strive for reusable, recyclable classes rather than writing for specific use
+cases. Let’s take an example:</p><span>
+
+</span><pre><code>/**
+ * Runs the risk of becoming out of date; not very maintainable.
+ */
+.blue {
+    color: blue;
+}
+
+/**
+ * Depends on location in order to be rendered properly.
+ */
+.header span {
+    color: blue;
+}
+
+/**
+ * Too specific; limits our ability to reuse.
+ */
+.header-color {
+    color: blue;
+}
+
+/**
+ * Nicely abstracted, very portable, doesn’t risk becoming out of date.
+ */
+.highlight-color {
+    color: blue;
+}
+</code></pre><span>
+
+</span><p>It is important to strike a balance between names that do not literally describe
+the style that the class brings, but also ones that do not explicitly describe
+specific use cases. Instead of <code>.home-page-panel</code>, choose <code>.masthead</code>; instead
+of <code>.site-nav</code>, favour <code>.primary-nav</code>; instead of <code>.btn-login</code>, opt for
+<code>.btn-primary</code>.</p><span>
+
+</span><h4 id="naming-ui-components">Naming UI Components</h4><span>
+
+</span><p>Naming components with agnosticism and reusability in mind really helps
+developers construct and modify UIs much more quickly, and with far less waste.
+However, it can sometimes be beneficial to provide more specific or meaningful
+naming alongside the more ambiguous class, particularly when several agnostic
+classes come together to form a more complex and specific component that might
+benefit from having a more meaningful name. In this scenario, we augment the
+classes with a  <code>data-ui-component</code> attribute which houses a more specific name,
+for example:</p><span>
+
+</span><pre><code>&lt;ul class="tabbed-nav" data-ui-component="Main Nav"&gt;
+</code></pre><span>
+
+</span><p>Here we have the benefits of a highly reusable class name which does not
+describe—and, therefore, tie itself to—a specific use case, and added meaning
+via our <code>data-ui-component</code> attribute. The <code>data-ui-component</code>’s value can take
+any format you wish, like title case:</p><span>
+
+</span><pre><code>&lt;ul class="tabbed-nav" data-ui-component="Main Nav"&gt;
+</code></pre><span>
+
+</span><p>Or class-like:</p><span>
+
+</span><pre><code>&lt;ul class="tabbed-nav" data-ui-component="main-nav"&gt;
+</code></pre><span>
+
+</span><p>Or namespaced:</p><span>
+
+</span><pre><code>&lt;ul class="tabbed-nav" data-ui-component="nav-main"&gt;
+</code></pre><span>
+
+</span><p>The implementation is largely personal preference, but the concept still
+remains: <strong>Add any useful or specific meaning via a mechanism that will not
+inhibit your and your team’s ability to recycle and reuse CSS.</strong></p><span>
+
+</span><h3 id="selector-performance">Selector Performance</h3><span>
+
+</span><p>A topic which is—with the quality of today’s browsers—more interesting than it
+is important, is selector performance. That is to say, how quickly a browser can
+match the selectors your write in CSS up with the nodes it finds in the DOM.</p><span>
+
+</span><p>Generally speaking, the longer a selector is (i.e. the more component parts) the
+slower it is, for example:</p><span>
+
+</span><pre><code>body.home div.header ul {}
+</code></pre><span>
+
+</span><p>…is a far less efficient selector than:</p><span>
+
+</span><pre><code>.primary-nav {}
+</code></pre><span>
+
+</span><p>This is because browsers read CSS selectors <strong>right-to-left</strong>. A browser will
+read the first selector as</p><span>
+
+</span><ul>
+  <li>find all <code>ul</code> elements in the DOM;</li>
+  <li>now check if they live anywhere inside an element with a class of <code>.header</code>;</li>
+  <li>next check that <code>.header</code> class exists on a <code>div</code> element;</li>
+  <li>now check that that all lives anywhere inside any elements with a class of
+<code>.home</code>;</li>
+  <li>finally, check that <code>.home</code> exists on a <code>body</code> element.</li>
+</ul><span>
+
+</span><p>The second, in contrast, is simply a case of the browser reading</p><span>
+
+</span><ul>
+  <li>find all the elements with a class of <code>.primary-nav</code>.</li>
+</ul><span>
+
+</span><p>To further compound the problem, we are using descendant selectors (e.g. <code>.foo
+.bar {}</code>). The upshot of this is that a browser is required to start with the
+rightmost part of the selector (i.e. <code>.bar</code>) and keep looking up the DOM
+indefinitely until it finds the next part (i.e. <code>.foo</code>). This could mean
+stepping up the DOM dozens of times until a match is found.</p><span>
+
+</span><p>This is just one reason why <strong>nesting with preprocessors is often a false
+economy</strong>; as well as making selectors unnecessarily more specific, and creating
+location dependency, it also creates more work for the browser.</p><span>
+
+</span><p>By using a child selector (e.g. <code>.foo &gt; .bar {}</code>) we can make the process much
+more efficient, because this only requires the browser to look one level higher
+in the DOM, and it will stop regardless of whether or not it found a match.</p><span>
+
+</span><h4 id="the-key-selector">The Key Selector</h4><span>
+
+</span><p>Because browsers read selectors right-to-left, the rightmost selector is often
+critical in defining a selector’s performance: this is called the <i>key
+selector</i>.</p><span>
+
+</span><p>The following selector might appear to be highly performant at first glance. It
+uses an ID which is nice and fast, and there can only ever be one on a page, so
+surely this will be a nice and speedy lookup—just find that one ID and then
+style everything inside of it:</p><span>
+
+</span><pre><code>#foo * {}
+</code></pre><span>
+
+</span><p>The problem with this selector is that the key selector (<code>*</code>) is very, <em>very</em>
+far reaching. What this selector actually does is finds <em>every single</em> node in
+the DOM (even <code>&lt;title&gt;</code>, <code>&lt;link&gt;</code>, and <code>&lt;head&gt;</code> elements; <em>everything</em>) and then
+looks to see if it lives anywhere at any level within <code>#foo</code>. This is a very,
+<em>very</em> expensive selector, and should most likely be avoided or rewritten.</p><span>
+
+</span><p>Thankfully, by writing selectors with good <a href="http://cssguidelin.es/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-124&amp;utm_medium=email#selector-intent">Selector Intent</a>,
+we are probably avoiding inefficient selectors by default; we are very unlikely
+to have greedy key selectors if we’re targeting the right things for the right
+reason.</p><span>
+
+</span><p>That said, however, CSS selector performance should be fairly low on your list
+of things to optimise; browsers are fast, and are only ever getting faster, and
+it is only on notable edge cases that inefficient selectors would be likely to
+pose a problem.</p><span>
+
+</span><p>As well as their own specific issues, nesting, qualifying, and poor Selector
+Intent all contribute to less efficient selectors.</p><span>
+
+</span><h3 id="general-rules">General Rules</h3><span>
+
+</span><p>Your selectors are fundamental to writing good CSS. To very briefly sum up the
+above sections:</p><span>
+
+</span><ul>
+  <li><strong>Select what you want explicitly</strong>, rather than relying on circumstance or
+coincidence. Good Selector Intent will rein in the reach and leak of your
+styles.</li>
+  <li><strong>Write selectors for reusability</strong>, so that you can work more efficiently and
+reduce waste and repetition.</li>
+  <li><strong>Do not nest selectors unnecessarily</strong>, because this will increase
+specificity and affect where else you can use your styles.</li>
+  <li><strong>Do not qualify selectors unnecessarily</strong>, as this will impact the number of
+different elements you can apply styles to.</li>
+  <li><strong>Keep selectors as short as possible</strong>, in order to keep specificity down and
+performance up.</li>
+</ul><span>
+
+</span><p>Focussing on these points will keep your selectors a lot more sane and easy to
+work with on changing and long-running projects.</p><span>
+
+</span><h3 id="further-reading-2">Further Reading</h3><span>
+
+</span><span>
+
+</span><hr /><span>
+
+
+
+    </span><span>
+
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

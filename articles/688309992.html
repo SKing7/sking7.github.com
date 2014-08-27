@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>httpd vs Nginx vs HAProxy</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>httpd vs Nginx vs HAProxy</h1>
+<div class="entry-content"><span>
+		</span><p>The three most popular tools for proxying HTTP(S) traffic are <a href="http://httpd.apache.org/">httpd</a>, <a href="http://nginx.org/">Nginx</a>, and <a href="http://www.haproxy.org/">HAProxy</a>. As more and more DevOps flock to “the cloud” for running their infrastructure, configuring elastic HTTP(S) proxies are becoming more and more important. (It should be noted that if you use a PaaS, then you won’t have a need for an HTTP(S) proxy as the service provider will route traffic for you… probably using one of these tools.) Which proxy you pick can make your job of ensuring an highly available environment easier.</p><span>
+</span><blockquote><p><b>What is an HTTP(S) proxy?</b> HTTP(S) proxies are servers that act on the behalf of the HTTP server(s) that handles requests.<br /><b>Why use an HTTP(S) proxy?</b> They are usually used to load balance traffic, protect a possibly not-so-hardened web server, and A/B test new site releases.</p></blockquote><span>
+</span><h3>http</h3><span>
+</span><p>httpd is by far the oldest in the bunch. It is arguably the first real web server; released in April 1996! As far as web servers go, it is extremely feature complete and is often found behind one of the other tools. As far as a proxy server, it is very much an after-thought. The original design simply wasn’t focused on being a proxy server.</p><span>
+</span><h3>Nginx</h3><span>
+</span><p>They claim to be the #1 web server for the top busiest websites in the world, and they do have an impressive list of “clients”: Netflix, box, hulu, etc. If you’re looking for a project that is equal parts web server and proxy, then Nginx is probably the best choice. With the first public release of Nginx being in October of 2004, it is coming up on almost a decade of serving web traffic.</p><span>
+</span><h3>HAProxy</h3><span>
+</span><p>Besides its 1990-era web site, HAProxy is anything but basic. It is the most complete proxy of the bunch in terms of load balancing capabilities. A number of popular sites rely upon HAProxy to ensure their site is always up: DISQUS, GitHub, Imgur, Instagram, etc. Tests with HAProxy have shown it can easily <a href="http://www.haproxy.org/10g.html">saturate a 10-Gig NIC</a>. HAProxy was first released in November of 2000.</p><span>
+</span><h3>The Comparison</h3><span>
+</span><p>This is by no means a complete list of features for each project. See their respective sites for more information.</p><span>
+</span><table>
+<thead>
+<tr>
+<th></th>
+<th>httpd</th>
+<th>Nginx</th>
+<th>HAProxy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full Web Server</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>“Concurrency”</td>
+<td>Pre-thread pool</td>
+<td>Async</td>
+<td>Async</td>
+</tr>
+<tr>
+<td>Load Balancer</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>SSL Offloading</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Plugins</td>
+<td>Dynamic Loading</td>
+<td>Statically Compiled</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Admin Console</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>SPDY Support</td>
+<td>via Plugin</td>
+<td>via Plugin</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Runs on Windows</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>TCP Proxy</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table><span>
+</span><h3>Conclusion</h3><span>
+</span><p>While httpd is a GREAT web server, it simply falls short as a proxy. Both Nginx and HAProxy are full-featured proxies and it really comes down to specific features you might be looking for. If caching is important to you, then Nginx might be a better choice. If advanced routing and load balancing is important to you, then HAProxy might be a better choice. Regardless, you can hardly “go wrong” with either of these projects. What’s more is that they seem to be in a bit of a feature war; when one project gets a feature, the other follows fairly quickly. So if you’re using one and it doesn’t have the feature you want, just wait a few months… or contribute yourself!</p><span>
+			</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
