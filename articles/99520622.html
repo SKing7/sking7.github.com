@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>pierrespring.com</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>pierrespring.com</h1>
+<div class="entry"><span>
+				</span><p>Initially I meant to write an article entitled “Dirty looping in JavaScript”. The tagline of this soon to be written article was the following:</p><span>
+
+</span><blockquote>
+  <p>Due to <a href="http://en.wikipedia.org/wiki/Scope_%28programming%29#Lexical_scoping">Lexical Scoping</a> and the way variables are declared and assigned values in JavaScript we have to be a bit careful when using loops.</p>
+</blockquote><span>
+
+</span><p>As I was writing about loops in JavaScript I noticed that the problem was rather with <strong>Function Scope</strong> than with <em>Lexical Scoping</em>. And not being sure what the exact difference between <em>Function Scope</em> and <em>Lexical Scoping</em> was, I dropped my initial article in order to ask (and hopefully answer) the following questions:</p><span>
+
+</span><p>What is <em>Lexical Scoping</em>? And how does it relate to <em>Function Scope</em>?</p><span>
+
+</span><p>To me, <em>Scoping</em> is the ruleset used to lookup variable values. Especially the ones that are not declared within the current <em>Scope</em>. Only when you exactly know how <em>Scoping</em> works in your language, can you be sure about the value a variable has at any given place in your code. It is very important to understand how this is implemented in your language of choice.</p><span>
+
+</span><p>Wikipedia defines <em>Scope</em> as follows:</p><span>
+
+</span><blockquote>
+  <p>Typically, scope is used to define the extent of information hiding—that is, the visibility or accessibility of variables from different parts of the program.</p>
+</blockquote><span>
+
+</span><p>In JavaScript we have <em>Function Scope</em> and <em>Lexical Scoping</em>.</p><span>
+
+</span><p><strong>Function Scope</strong> means that any variable which is defined within a function is visible within that <em>entire function</em>. This is quite different form <em>Block Scope</em>, in which a variable scope is limited by the <em>block</em> a variable is declared in. A block is usually what you find between <code class="codecolorer php default"><span class="php"><span class="br0">{</span>curly braces<span class="br0">}</span></span></code> or loop variables. <em>Block Scope</em> is used in most of the programming languages that are currently popular. Think of a <code class="codecolorer javascript default"><span class="javascript"><span class="kw1">for</span><span class="br0">(</span><span class="sy0">;;</span><span class="br0">)</span><span class="br0">{</span><span class="br0">}</span></span></code> loop:</p><span>
+
+</span><div class="codecolorer-container javascript default"><p><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span><br /><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span><span class="nu0">10</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span><span class="br0">{</span><span class="br0">}</span><br /><span class="kw3">alert</span><span class="br0">(</span>i<span class="br0">)</span><span class="sy0">;</span><br /><span class="co1">// block scope &nbsp; &nbsp;-&gt; 1</span><br /><span class="co1">// function scope -&gt; 10</span></p></div><span>
+
+</span><p>Pretty simple, right. Now we know what <em>Function Scope</em> is. But what is <em>Lexical Scoping</em>?</p><span>
+
+</span><p><strong>Lexical Scoping</strong> defines how variable names are resolved in nested functions. Other names of <em>Lexical Scoping</em> are <em>Static Scoping</em> or <em>Closure</em>. It means that the scope of an <em>inner function</em> contains the scope of a <em>parent function</em>. Let’s have a look at the following example:</p><span>
+
+</span><div class="codecolorer-container javascript default"><div class="javascript codecolorer"><span class="kw2">var</span><span> text </span><span class="sy0">=</span><span> </span><span class="st0">'Look at me'</span><span class="sy0">;</span><p><span class="kw2">var</span> parent_function <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span></p><p>&nbsp; <span class="kw2">var</span> inner_function <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span><br /><span class="kw2">var</span> scream <span class="sy0">=</span> <span class="st0">'!!!'</span><span class="sy0">;</span><br /><span class="kw3">alert</span><span class="br0">(</span>text <span class="sy0">+</span> <span class="st0">', '</span> <span class="sy0">+</span> reason <span class="sy0">+</span> scream<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br /><span class="kw2">var</span> reason <span class="sy0">=</span> <span class="st0">"I'm an attention whore"</span><span class="sy0">;</span><br /><span class="kw2">var</span> scream <span class="sy0">=</span> <span class="st0">'!'</span><span class="sy0">;</span><br /><span class="kw3">alert</span><span class="br0">(</span>text <span class="sy0">+</span> scream<span class="br0">)</span><span class="sy0">;</span><br />inner_function<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><span class="sy0">;</span></p><p>parent_function<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><br /><span class="co1">// alerts the two following strings, in this order:</span><br /><span class="co1">// "Look at me!"</span><br /><span class="co1">// "Look at me, I'm an attention whore!!!"</span></p></div></div><span>
+
+</span><p>Look at what happens when the <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code> is called. It needs to alert all three of the following variables: <code class="codecolorer javascript default"><span class="javascript">text</span></code>, <code class="codecolorer javascript default"><span class="javascript">reason</span></code> and <code class="codecolorer javascript default"><span class="javascript">scream</span></code>.</p><span>
+
+</span><p>The first variable that needs to be looked up is <code class="codecolorer javascript default"><span class="javascript">text</span></code>. This variable is neither declared in the scope of the <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code> nor in the scope of <code class="codecolorer javascript default"><span class="javascript">parent_function</span></code>. So it takes the globally declared <code class="codecolorer javascript default"><span class="javascript">text</span></code>.</p><span>
+
+</span><p>The second variable the <code class="codecolorer javascript default"><span class="javascript"><span class="kw3">alert</span><span class="br0">(</span><span class="br0">)</span></span></code> in the <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code> needs is <code class="codecolorer javascript default"><span class="javascript">reason</span></code>. This variable is not declared within the <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code>. Hence it is looked for in the enclosing <code class="codecolorer javascript default"><span class="javascript">parent_function</span></code> scope where it finds the truth about my nature. <code class="codecolorer javascript default"><span class="javascript"><span class="st0">"I'm an attention whore"</span></span></code>.</p><span>
+
+</span><p>The 3rd variable <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code> needs to <code class="codecolorer javascript default"><span class="javascript"><span class="kw3">alert</span><span class="br0">(</span><span class="br0">)</span></span></code> is <code class="codecolorer javascript default"><span class="javascript">scream</span></code>. It is declared within <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code> and <code class="codecolorer javascript default"><span class="javascript">parent_function</span></code>. The <code class="codecolorer javascript default"><span class="javascript"><span class="kw3">alert</span></span></code> is called in the scope of <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code>, hence it is resolved to <code class="codecolorer javascript default"><span class="javascript"><span class="st0">'!!!'</span></span></code>.</p><span>
+
+</span><p>That’s almost all you have to know about <em>Lexical Scoping</em>. <strong>The scope of an inner function contains the scope of a parent function.</strong></p><span>
+
+</span><p>If you bare with me for a little more, you will know it all. There is a little more to it, and that little more is what makes <em>Lexical Scoping</em> so powerful: <em>inner functions</em> contain the scope of <em>parent functions</em> <strong>even if the parent function has returned.</strong></p><span>
+
+</span><p>Let’s look at the following example:</p><span>
+
+</span><div class="codecolorer-container javascript default"><div class="javascript codecolorer"><span class="kw2">var</span><span> adder </span><span class="sy0">=</span><span> </span><span class="kw2">function</span><span> </span><span class="br0">(</span><span>total</span><span class="br0">)</span><span> </span><span class="br0">{</span><p>&nbsp; <span class="co1">// the following function is returned </span><br /><span class="co1">// and assigned to adder</span><br /><span class="kw2">var</span> inner_function <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">(</span>summand<span class="br0">)</span> <span class="br0">{</span><br />total <span class="sy0">+=</span> summand<span class="sy0">;</span><br /><span class="kw3">alert</span><span class="br0">(</span>total<span class="br0">)</span><span class="sy0">;</span><br /><span class="br0">}</span><br /><span class="kw1">return</span> inner_function<span class="sy0">;</span><br /><span class="br0">}</span><span class="br0">(</span><span class="nu0">0</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// &lt;- we call the annonymous function </span><br /><span class="co1">// &nbsp; &nbsp;and assign the returned function to adder</span></p><p>adder<span class="br0">(</span><span class="nu0">2</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// -&gt; 2</span><br />adder<span class="br0">(</span><span class="nu0">3</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// -&gt; 5</span></p></div></div><span>
+
+</span><p>This is possible, because in JavaScript <em>functions are first class objects</em>. That means that you can pass functions as arguments or they can be returned from a function. They can also be assigned to a variable or stored in an object. Anyway, the <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code> that is returned is assigned to the variable <code class="codecolorer javascript default"><span class="javascript">adder</span></code>. And when you call <code class="codecolorer javascript default"><span class="javascript">adder</span></code>, that is the <code class="codecolorer javascript default"><span class="javascript">inner_function</span></code>, it has access to <code class="codecolorer javascript default"><span class="javascript">total</span></code> due to <em>Lexical Scoping</em>, even though the function that had the <code class="codecolorer javascript default"><span class="javascript">total</span></code>. <code class="codecolorer javascript default"><span class="javascript">total</span></code> itself was declared in the scope of a function that has returned a long time ago.</p><span>
+
+</span><p>Get it? How sexy is that? Simple yet beautiful!</p><span>
+
+</span><p>And that’s it. You know everything there is to know about <em>Lexical Scoping</em>: <strong>inner functions contain the scope of parent functions even if the parent function has returned.</strong></p><span>
+
+								</span><p>Tags: <a href="http://pierrespring.com/tag/closure/" rel="tag">closure</a>, <a href="http://pierrespring.com/tag/javascript/" rel="tag">javascript</a>, <a href="http://pierrespring.com/tag/lexical-scoping/" rel="tag">lexical scoping</a></p><span>
+				</span><span>
+
+			</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

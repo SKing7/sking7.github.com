@@ -1,0 +1,548 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>All You Need To Know About Vertical-Align</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>All You Need To Know About Vertical-Align</h1>
+<div class="text white-bg start-background-fade js-article-content"><span>
+        </span><p>Often I need to vertically align elements side by side.</p><span>
+
+</span><p>CSS offers some possibilities. Sometimes I solve it with <code>float</code>, sometimes with <code>position: absolute</code>, sometimes even dirty by manually adding margins or paddings.</p><span>
+
+</span><p>I don’t really like these solutions. Floats only align at their tops and need to be cleared manually. Absolute positioning takes the elements out of the flow so they do no longer affect their surroundings. And working with fixed margins and paddings immediately breaks things on the tiniest change.</p><span>
+
+</span><p>But there is another player here: <strong><code>vertical-align</code></strong>. I think it deserves more credit. Ok, technically, using <code>vertical-align</code> for layout is a hack, since it wasn’t invented for this reason. It’s there to align text and elements next to text. Nonetheless, you can also use <code>vertical-align</code> in different contexts to align elements very flexible and fine-grained. The sizes of elements need not to be known. Elements stay in the flow so other elements can react to changed dimensions of those. This makes it a valuable option.</p><span>
+
+</span><h2 id="peculiarities-of-vertical-align">Peculiarities Of Vertical-Align</h2><span>
+</span><p>But, <code>vertical-align</code> can be a real scumbag sometimes. Working with it can be a little frustrating. There seem to be some mysterious rules at work. For example, it might happen, that the element you changed <code>vertical-align</code> for doesn’t change its alignment at all, but other elements in the line do! I’m still getting dragged into the dark corners of <code>vertical-align</code> from time to time, tearing my hair.</p><span>
+
+</span><p>Unfortunately, most resources on the matter are somewhat shallow. Especially, if we want to use <code>vertical-align</code> for layout. They concentrate on the misconception of trying to vertical align everything inside an element. They give basic introductions into the property and explain how elements are aligned in very simple situations. They do not explain the tricky parts.</p><span>
+
+</span><p>So, I set myself the target to <strong>clarify the behavior of vertical-align once and for all</strong>. I ended up working through the W3C’s <a href="http://www.w3.org/TR/CSS2/visudet.html#line-height">CSS</a> <a href="http://www.w3.org/TR/CSS2/visuren.html#inline-formatting">specifications</a> and playing with some examples. The result is this article.</p><span>
+
+</span><p>So, let’s tackle the rules of the game.</p><span>
+
+</span><h2 id="requirements-to-use-vertical-align">Requirements To Use Vertical-Align</h2><span>
+</span><p><code>vertical-align</code> is used to align <a href="http://www.w3.org/TR/CSS2/visuren.html#inline-level">inline-level elements</a>. These are elements, whose <code>display</code> property evaluates to</p><span>
+
+</span><ul>
+  <li>inline,</li>
+  <li>inline-block or</li>
+  <li>inline-table (not considered in this article).</li>
+</ul><span>
+
+</span><p><strong>Inline elements</strong> are basicly text.</p><span>
+
+</span><p><strong>Inline-block elements</strong> are what their name suggests: block elements living inline. They can have a width and height (possibly defined by its own content) as well as padding, a border and margin.</p><span>
+
+</span><p>Inline-level elements are laid out next to each other in lines. Once there are more elements that fit into the current line, a new line is created beneath it. All these lines have a so-called <strong>line box</strong>, which encloses all the content of its line. Differently sized content means line boxes of different height. In the following illustration the top and bottom of line boxes are indicated by red lines.</p><span>
+
+</span><figure>
+    <span class="red dotted line top"> </span><!--
+ --><span class="red dotted line bottom"> </span><!--
+ --><span class="center">A tall
+    <span class="tall box bg-grey baseline"> </span>
+    in a line of text.</span><br /><span class="red dotted line bottom"> </span><!--
+ --><span class="center">A short
+    <span class="shorter box bg-grey baseline"> </span>
+    in a line of text.</span><br /><span class="red dotted line bottom"> </span><!--
+ --><span class="center">
+        <span class="middle">This</span>
+        <span class="tall box bg-grey text-top"> </span>
+        <span class="top">can</span>
+        <span class="tall box bg-grey text-bottom"> </span>
+        <span class="bottom">happen.</span>
+    </span>
+</figure><span>
+
+</span><p>The line boxes trace out the field we are playing on. Inside these line boxes the property <code>vertical-align</code> is responsible for aligning the individual elements. <strong>So, in respect to what are elements aligned?</strong></p><span>
+
+</span><h2 id="about-baselines-and-outer-edges">About Baselines and Outer Edges</h2><span>
+</span><p>The most important reference point to align vertically is the baseline of the involved elements. In some cases the top and bottom edge of the element’s enclosing box becomes important, too. Let’s have a look where the baseline and outer edges live for each involved type of element:</p><span>
+
+</span><h3 id="inline-element">Inline Element</h3><span>
+</span><figure class="columns no-break thirds">
+    <p><!--
+     --><span class="green dotted line text-top"> </span><!--
+     --><span class="green dotted line text-bottom"> </span><!--
+     --><span class="red dotted line top"> </span><!--
+     --><span class="red dotted line bottom"> </span><!--
+     --><span class="blue dotted line baseline"> </span><!--
+     --><span class="center">aAÄ qQ</span>
+    </p><!--
+
+ --><p><!--
+     --><span class="green dotted line text-top"> </span><!--
+     --><span class="green dotted line text-bottom"> </span><!--
+     --><span class="red dotted line top"> </span><!--
+     --><span class="red dotted line bottom"> </span><!--
+     --><span class="blue dotted line baseline"> </span><!--
+     --><span class="center">aAÄ qQ</span>
+    </p><!--
+
+ --><p><!--
+     --><span class="inline-overlay"><!--
+         --><span class="red dotted line top"> </span><!--
+         --><span class="red dotted line bottom"> </span>
+        </span><!--
+     --><span class="green dotted line text-top"> </span><!--
+     --><span class="green dotted line text-bottom"> </span><!--
+     --><span class="blue dotted line baseline"> </span><!--
+     --><span class="center">aAÄ qQ</span>
+    </p>
+</figure><span>
+
+</span><p>Here you see three lines of text next to each other. The top and bottom edge of the line height is indicated by red lines, the height of the font by green lines and the baseline by a blue line. On the left, the text has a line height set to the <em>same height</em> as the font-size. The green and red line collapsed to one line on each side. In the middle, the line height is <em>twice as large</em> as the font-size. On the right, the line height is <em>half as large</em> as the font-size.</p><span>
+
+</span><p><strong>The inline element’s outer edges</strong> align themselves with the top and bottom edge of the line height. It <em>does not</em> matter, if the line height is smaller than the height of the font. So, the outer edges are the red lines in the figure above.</p><span>
+
+</span><p><strong>The inline element’s baseline</strong> is the line, the characters are <em>sitting</em> on. This is the blue line in the figure. Roughly speaking, the baseline is <em>somewhere below the middle of the font’s height</em>. Have look at the W3C Specs for a <a href="http://www.w3.org/TR/CSS2/visudet.html#leading">detailed definition</a>.</p><span>
+
+</span><h3 id="inline-block-element">Inline-Block Element</h3><span>
+</span><figure class="columns no-break thirds">
+    <p><!--
+     --><span class="red dotted line top"> </span><!--
+     --><span class="red dotted line bottom"> </span><!--
+     --><span class="blue dotted line baseline"> </span><!--
+     --><span class="inline-block show-box-model"><!--
+         --><span class="show-box-model-content">c</span>
+        </span>
+    </p><!--
+
+ --><p><!--
+     --><span class="red dotted line top"> </span><!--
+     --><span class="blue dotted line baseline"> </span><!--
+     --><span class="inline-block show-box-model"><!--
+         --><span class="show-box-model-content">c</span>
+        </span>
+    </p><!--
+
+ -->
+</figure><span>
+
+</span><style type="text/css">
+    figure .inline-block {
+        display: inline-block;
+        margin: .5em;
+        padding: .5em;
+        width: 1.5em;
+        height: 1.5em;
+        border-width: .5em;
+        border-style: solid;
+        text-align: center;
+    }
+</style><span>
+
+</span><p>From left to right you see: an inline-block element with <a href="http://www.w3.org/TR/CSS21/visuren.html#positioning-scheme">in-flow</a> content (a “c”), an inline-block element with in-flow content and <code>overflow: hidden</code> and an inline-block element with <em>no</em> in-flow content (but the content area has a height). The boundaries of the margin is indicated by red lines, the border is yellow, the padding green and the content area blue. The baseline of each inline-block element is shown as a blue line.</p><span>
+
+</span><p><strong>The Inline-block element’s outer edges</strong> are the top and bottom edge of its <a href="http://www.w3.org/TR/CSS2/box.html#x17">margin-box</a>. These are the red lines in the figure.</p><span>
+
+</span><p><strong>The Inline-block element’s baseline</strong> depends on whether the element has in-flow content:</p><span>
+
+</span><ul>
+  <li>In case of in-flow content the baseline of the inline-block element is the baseline of the last content element in normal flow (example on the left). For this last element its baseline is found according to its own rules.</li>
+  <li>In case of in-flow content but an <code>overflow</code> property evaluating to something other than <code>visible</code>, the baseline is the bottom edge of the margin-box (example in the middle). So, it is the same as the inline-block element’s bottom edge.</li>
+  <li>In case of <em>no</em> in-flow content the baseline is, again, the bottom edge of the margin-box (example on the right).</li>
+</ul><span>
+
+</span><h3 id="line-box">Line Box</h3><span>
+</span><figure>
+    <span class="large font">
+        <span class="green dotted line text-top"> </span><!--
+     --><span class="green dotted line text-bottom"> </span><!--
+     --><span class="red dotted line top"> </span><!--
+     --><span class="red dotted line bottom"> </span><!--
+     --><span class="blue dotted line baseline"> </span><!--
+     --><span class="font color-grey inline-overlay">x</span><!--
+     --><span class="center">
+            <span class="middle bg-grey">This</span>
+            <span class="tall box bg-grey text-top"> </span>
+            <span class="top bg-grey">can</span>
+            <span class="tall box bg-grey text-bottom"> </span>
+            <span class="bottom bg-grey">happen.</span>
+        </span>
+    </span>
+</figure><span>
+
+</span><p>You’ve already seen this setting above. This time I drew in the top and bottom of the line box’s text box (green, more on this below) and the baseline (blue), too. I also highlighted the area of the text elements by giving them a grey background.</p><span>
+
+</span><p>The line box has a <strong>top edge</strong> aligned to the top edge of the top-most element of this line and a <strong>bottom edge</strong> aligned to the bottom edge of the bottom-most element of the line. This is the box indicated by the red lines in the figure above.</p><span>
+
+</span><p><strong>The line box’s baseline</strong> is variable:</p><span>
+
+</span><blockquote class="short">
+    <p>CSS 2.1 does not define the position of the line box's baseline.</p>
+    <footer>— the <a href="http://www.w3.org/TR/CSS2/visudet.html#line-height">W3C Specs</a></footer>
+</blockquote><span>
+
+</span><p>This is probably the most confusing part, when working with vertical-align. It means, the baseline is placed where ever it needs to be to fulfil all other conditions like vertical-align and minimizing the line box’s height. It is a free parameter in the equation.</p><span>
+
+</span><p>Since the line box’s baseline is invisible, it may not immediately be obvious where it is. But, you can make it visible very easily. Just add a character at the beginning of the line in questions, like I added an “x” in the figure. If this character is not aligned in any way, it will sit on the baseline by default.</p><span>
+
+</span><p>Around its baseline the line box has what we might call its <strong>text box</strong>. The text box simply is an inline element inside the line box without any alignment. Its top and bottom edges are defined by the line height. This box is indicated by the green lines in the figure above. Since this text box is tied to the baseline, it moves when the baseline moves. (Side note: this text box is called <a href="http://www.w3.org/TR/CSS2/visudet.html#strut">strut</a> in the W3C Specs)</p><span>
+
+</span><p>Phew, this was the hard part. <strong>Now, we know everything to put things into perspective</strong>. Let’s quickly sum up the most important facts:</p><span>
+
+</span><ul>
+  <li>There is an area called <em>line box</em>. This is the area in which vertical alignment takes place. It has a <em>baseline</em>, a <em>text box</em> and a <em>top</em> and <em>bottom edge</em>.</li>
+  <li>There are <em>inline-level elements</em>. These are the objects that are aligned. They have a <em>baseline</em> and and a <em>top</em> and <em>bottom edge</em>.</li>
+</ul><span>
+
+</span><h2 id="the-values-of-vertical-align">The Values Of Vertical-Align</h2><span>
+</span><p>By using <code>vertical-align</code> the reference points mentioned in the last sentence in the list above are set into a certain relationship.</p><span>
+
+</span><h3 id="aligning-the-elements-baseline-relative-to-the-line-boxs-baseline">Aligning the Element’s Baseline Relative To the Line Box’s Baseline</h3><span>
+</span><figure>
+    <span class="large font">
+        <span class="blue dotted line baseline"> </span><!--
+     --><span class="font color-grey">x</span><!--
+     --><span class="center">
+            <span class="baseline">baseline</span>
+            <span class="sub"><span class="blue dotted line baseline"> </span>sub</span>
+            <span class="super"><span class="blue dotted line baseline"> </span>super</span>
+            <span class="baseline"><span class="blue dotted line baseline"> </span>-50%</span>
+            <span class="baseline"><span class="blue dotted line baseline"> </span>+10px</span>
+        </span>
+    </span>
+</figure><span>
+
+</span><ul>
+  <li><strong>baseline</strong>: The element’s baseline sits exactly on top of the line box’s baseline.</li>
+  <li><strong>sub</strong>: The element’s baseline is shifted below the line box’s baseline.</li>
+  <li><strong>super</strong>: The element’s baseline is shifted above the line box’s baseline.</li>
+  <li><strong>&lt;percentage&gt;</strong>: The element’s baseline is shifted with respect to the line box’s baseline by a percentage relative to the line-height.</li>
+  <li><strong>&lt;length&gt;</strong>: The element’s baseline is shifted with respect to the line box’s baseline by an absolute length.</li>
+</ul><span>
+
+</span><h3 id="aligning-the-elements-outer-edges-relative-to-the-line-boxs-baseline">Aligning the Element’s Outer Edges Relative To the Line Box’s Baseline</h3><span>
+</span><figure>
+    <span class="large font">
+        <span class="orange dotted line middle"> </span><!--
+     --><span class="font color-grey baseline"><span class="blue dotted line baseline"> </span>x</span><!--
+     --><span class="center">
+            <span class="middle"><!--
+             --><span class="red dotted line top"> </span><!--
+             --><span class="red dotted line bottom"> </span><!--
+             -->middle
+            </span>
+        </span>
+    </span>
+</figure><span>
+
+</span><ul>
+  <li><strong>middle</strong>: The midpoint between the element’s top and bottom edge is aligned to the line box’s baseline plus half of the x-height.</li>
+</ul><span>
+
+</span><h3 id="aligning-the-elements-outer-edges-relative-to-the-line-boxs-text-box">Aligning the Element’s Outer Edges Relative To the Line Box’s Text Box</h3><span>
+</span><figure>
+    <span class="large font tall-line-height">
+        <span class="green dotted line text-top"> </span><!--
+     --><span class="green dotted line text-bottom"> </span><!--
+     --><span class="font tall-line-height baseline color-grey"><!--
+        --><span class="red dotted line top"> </span><!--
+        --><span class="red dotted line bottom"> </span><!--
+        -->x
+        </span><!--
+     --><span class="center">
+            <span class="font text-top"><!--
+             --><span class="red dotted line top"> </span><!--
+             --><span class="red dotted line bottom"> </span><!--
+             -->text-top
+            </span>
+            <span class="font text-bottom"><!--
+             --><span class="red dotted line top"> </span><!--
+             --><span class="red dotted line bottom"> </span><!--
+             -->text-bottom
+            </span>
+        </span>
+    </span>
+</figure><span>
+
+</span><p>One could also list these two cases under aligning relative to the line box’s baseline, since the position of the text box is determined by the baseline.</p><span>
+
+</span><ul>
+  <li><strong>text-top</strong>: The element’s top edge is aligned to the line box’s text box top edge.</li>
+  <li><strong>text-bottom</strong>: The element’s bottom edge is aligned to the line box’s text box bottom edge.</li>
+</ul><span>
+
+</span><h3 id="aligning-the-elements-outer-edges-relative-to-the-line-boxs-outer-edges">Aligning the Element’s Outer Edges Relative To the Line Box’s Outer Edges</h3><span>
+</span><figure>
+    <span class="large font tall-line-height">
+        <span class="red dotted line top"> </span><!--
+     --><span class="red dotted line bottom"> </span><!--
+     --><span class="font baseline color-grey"><!--
+        --><span class="green dotted line text-top"> </span><!--
+        --><span class="green dotted line text-bottom"> </span><!--
+        -->x
+        </span><!--
+     --><span class="center">
+            <span class="font top"><!--
+             --><span class="red dotted line top"> </span><!--
+             --><span class="red dotted line bottom"> </span><!--
+             -->top
+            </span>
+            <span class="font bottom"><!--
+             --><span class="red dotted line top"> </span><!--
+             --><span class="red dotted line bottom"> </span><!--
+             -->bottom
+            </span>
+        </span>
+    </span>
+</figure><span>
+
+</span><ul>
+  <li><strong>top</strong>: The element’s top edge is aligned to the line box’s top edge.</li>
+  <li><strong>bottom</strong>: The element’s bottom edge is aligned to the line box’s bottom edge.</li>
+</ul><span>
+
+</span><p>The <a href="http://www.w3.org/TR/CSS2/visudet.html#propdef-vertical-align">formal definition</a> is found in, of course, the W3C Specs.</p><span>
+
+</span><h2 id="why-vertical-align-behaves-the-way-it-behaves">Why Vertical-Align Behaves The Way It Behaves</h2><span>
+</span><p>We can now take a closer look at vertical alignment in certain situations. Especially, we will deal with situations where things might have gone wrong.</p><span>
+
+</span><h3 id="centering-an-icon">Centering an Icon</h3><span>
+</span><p>One question bugging me was the following: I have an icon I want to center next to a line of text. Just giving the icon a <code>vertical-align: middle</code> didn’t seem to center it in a satisfying way. Have a look at this example:</p><span>
+
+</span><figure class="columns no-break">
+    <p>
+        <span class="small box bg-grey middle"> </span> Centered?
+    </p><!--
+ --><p>
+        <span class="small box bg-grey middle"> </span> <span class="middle">Centered!</span>
+    </p>
+</figure><span>
+
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- left mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"icon middle"</span><span class="nt">&gt;&lt;/span&gt;</span>
+Centered?
+
+<span class="c">&lt;!-- right mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"icon middle"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"middle"</span><span class="nt">&gt;</span>Centered!<span class="nt">&lt;/span&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+  <span class="nc">.icon</span>   <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+            <span class="c">/* size, color, etc. */</span> <span class="p">}</span>
+
+  <span class="nc">.middle</span> <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">middle</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span></code></pre></div><span>
+
+</span><p>Here is the example again, but I drew in some auxiliary lines you already know from above:</p><span>
+
+</span><figure class="columns no-break">
+    <p>
+        <span class="orange dotted line middle"> </span><!--
+     --><span class="font color-grey inline-overlay baseline"><!--
+         --><span class="blue dotted line baseline"> </span><!--
+         -->x
+        </span><!--
+     --><span class="center">
+            <span class="small box bg-grey middle"> </span>
+            <span class="baseline"><!--
+             --><span class="red dotted line top"> </span><!--
+             --><span class="red dotted line bottom"> </span><!--
+             -->Centered?
+            </span>
+        </span>
+    </p><!--
+ --><p>
+        <span class="orange dotted line middle"> </span><!--
+     --><span class="font color-grey inline-overlay baseline"><!--
+         --><span class="blue dotted line baseline"> </span><!--
+         -->x
+        </span><!--
+     --><span class="center">
+            <span class="small box bg-grey middle"> </span>
+            <span class="middle"><!--
+             --><span class="red dotted line top"> </span><!--
+             --><span class="red dotted line bottom"> </span><!--
+             -->Centered!
+            </span>
+        </span>
+    </p>
+</figure><span>
+
+</span><p>This sheds some light on our matter. Because the text on the left isn’t aligned at all, it sits on the baseline. The thing is, by aligning the box with <code>vertical-align: middle</code> we are aligning it to the middle of the lower case letters without ascenders (half of the x-height). So, characters with ascenders stand out at the top.</p><span>
+
+</span><p>On the right, we take the whole area of the font and align its midpoint vertically, too. The text’s baseline shifts slightly below the line box’s baseline to achieve this. The Result is a nicely centered text next to an icon.</p><span>
+
+</span><h3 id="movement-of-the-line-boxs-baseline">Movement Of the Line Box’s Baseline</h3><span>
+</span><p>This is a common pitfall when working with <code>vertical-align</code>: The position of the line box’s baseline is affected by all elements in that line. Let’s assume, an element is aligned in such a way, that the baseline of the line box has to move. Since most vertical alignment (except top and bottom) is done relative to this baseline, this results in an adjusted position of all other elements in that line, too.</p><span>
+
+</span><p>Some Examples:</p><span>
+
+</span><ul>
+  <li>
+    <p>If there is a tall element in the line spanning across the complete height, <code>vertical-align</code> has no effect on it. There is no space above its top and below its bottom, that would let it move. To fulfil its alignment relative to the line box’s baseline, the line box’s baseline has to move. The short box has a <code>vertical-align: baseline</code>. On the left, the tall box is aligned <code>text-bottom</code>. On the right, it is aligned <code>text-top</code>. You can see the baseline jumping up taking the short box with it.</p>
+
+    <figure class="columns no-break"><!--
+   --><!--
+   -->
+  </figure>
+
+    <div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- left mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-bottom"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"short-box"</span><span class="nt">&gt;&lt;/span&gt;</span>
+
+<span class="c">&lt;!-- right mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-top"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"short-box"</span><span class="nt">&gt;&lt;/span&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+  <span class="nc">.tall-box</span><span class="o">,</span>
+  <span class="nc">.short-box</span>   <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+                <span class="c">/* size, color, etc. */</span> <span class="p">}</span>
+
+  <span class="nc">.text-bottom</span> <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">text-bottom</span><span class="p">;</span> <span class="p">}</span>
+  <span class="nc">.text-top</span>    <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">text-top</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span></code></pre></div>
+
+    <p>The same behaviour shows up when aligning a tall element with other values for <code>vertical-align</code>.</p>
+  </li>
+  <li>
+    <p>Even setting <code>vertical-align</code> to <code>bottom</code> (left) and <code>top</code> (right) moves the baseline. This is strange, since the baseline shouldn’t be involved at all.</p>
+
+    <figure class="columns no-break">
+      <!--
+   -->
+  </figure>
+
+    <div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- left mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box bottom"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"short-box"</span><span class="nt">&gt;&lt;/span&gt;</span>
+
+<span class="c">&lt;!-- right mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box top"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"short-box"</span><span class="nt">&gt;&lt;/span&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+  <span class="nc">.tall-box</span><span class="o">,</span>
+  <span class="nc">.short-box</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+               <span class="c">/* size, color, etc. */</span> <span class="p">}</span>
+
+  <span class="nc">.bottom</span>    <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">bottom</span><span class="p">;</span> <span class="p">}</span>
+  <span class="nc">.top</span>       <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">top</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span></code></pre></div>
+  </li>
+  <li>
+    <p>Placing two larger elements in a line and vertically aligning them moves the baseline where it fulfils both alignments. Then the height of the line box is adjusted (left). Adding a third element, that does not go beyond the line box’s edges because of its alignment, affects neither the line box’s height nor the baseline’s position (middle). If it <em>does</em> go beyond the line box’s edges, the line box’s height and baseline are adjusted, again. In this case, our first two boxes are pushed down (right).</p>
+
+    <figure class="columns no-break thirds">
+      <!--
+   --><!--
+   -->
+  </figure>
+
+    <div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- left mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-bottom"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-top"</span><span class="nt">&gt;&lt;/span&gt;</span>
+
+<span class="c">&lt;!-- mark-up in the middle --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-bottom"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-top"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box middle"</span><span class="nt">&gt;&lt;/span&gt;</span>
+
+<span class="c">&lt;!-- right mark-up --&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-bottom"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-top"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tall-box text-100up"</span><span class="nt">&gt;&lt;/span&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+  <span class="nc">.tall-box</span>    <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+                 <span class="c">/* size, color, etc. */</span> <span class="p">}</span>
+                   
+  <span class="nc">.middle</span>      <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">middle</span><span class="p">;</span> <span class="p">}</span>
+  <span class="nc">.text-top</span>    <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">text-top</span><span class="p">;</span> <span class="p">}</span>
+  <span class="nc">.text-bottom</span> <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">text-bottom</span><span class="p">;</span> <span class="p">}</span>
+  <span class="nc">.text-100up</span>  <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="m">100%</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span></code></pre></div>
+  </li>
+</ul><span>
+
+</span><h3 id="there-might-be-a-little-gap-below-inline-level-elements">There Might Be a Little Gap Below Inline-Level Elements</h3><span>
+</span><p>Have a look at this setting. It’s common if you try to vertical-align <code>li</code> elements of a list.</p><span>
+
+</span><figure class="columns no-break">
+    <!--
+ -->
+</figure><span>
+
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;ul&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;&lt;/li&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;&lt;/li&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+  <span class="nc">.box</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+         <span class="c">/* size, color, etc. */</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span></code></pre></div><span>
+
+</span><p>As you can see, the list items sit on the baseline. Below the baseline is some space to shelter the descenders of a text. This is causing the gap. The Solution? Just move the baseline out of the way, for example by aligning the list items with <code>vertical-align: middle</code>:</p><span>
+
+</span><figure class="columns no-break">
+    <!--
+ -->
+</figure><span>
+
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;ul&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"box middle"</span><span class="nt">&gt;&lt;/li&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"box middle"</span><span class="nt">&gt;&lt;/li&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"box middle"</span><span class="nt">&gt;&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+  <span class="nc">.box</span>    <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+            <span class="c">/* size, color, etc. */</span> <span class="p">}</span>
+            
+  <span class="nc">.middle</span> <span class="p">{</span> <span class="k">vertical-align</span><span class="o">:</span> <span class="k">middle</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span></code></pre></div><span>
+
+</span><h3 id="a-gap-between-inline-level-elements-is-breaking-the-layout">A Gap Between Inline-Level Elements Is Breaking the Layout</h3><span>
+</span><p><em>This is mainly a problem of inline-level elements themselves. But since they are a requirement of vertical-align, it is good to know about this.</em></p><span>
+
+</span><p>You can see this gap in the former example between the list items. The gap comes from the white-space between inline-elements present in your mark-up. All white-space between inline-elements is collapsed into one space. This space gets in the way, if we want to place two inline elements next to each other and giving them <code>width: 50%</code>, for example. There is not enough space for two 50%-elements and a space. So the line breaks into two lines destroying the layout (left). To remove the gap, we need to remove the white-space, for example with html comments (right).</p><span>
+
+</span><figure class="columns no-break">
+    <div class="top border-grey"><span>
+        </span><p>
+            50% wide
+        </p><span>
+        </span><p>
+            50% wide... and in next line
+        </p><span>
+    </span></div><!--
+ -->
+</figure><span>
+
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- left mark-up --&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"half"</span><span class="nt">&gt;</span>50% wide<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"half"</span><span class="nt">&gt;</span>50% wide... and in next line<span class="nt">&lt;/div&gt;</span>
+
+<span class="c">&lt;!-- right mark-up --&gt;</span>
+   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"half"</span><span class="nt">&gt;</span>50% wide<span class="nt">&lt;/div&gt;</span><span class="c">&lt;!--</span>
+<span class="c">--&gt;</span><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"half"</span><span class="nt">&gt;</span>50% wide<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+  <span class="nc">.half</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+          <span class="k">width</span><span class="o">:</span> <span class="m">50%</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span></code></pre></div><span>
+
+</span><h2 id="vertical-align-demystified">Vertical-Align Demystified</h2><span>
+</span><p>Yea, that’s it. It is not very complicated once you know the rules. If <code>vertical-align</code> does not behave, just ask these questions:</p><span>
+
+</span><ul>
+  <li>Where is the baseline and top and bottom edge of the line box?</li>
+  <li>Where is the baseline and top and bottom edge of the inline-level elements?</li>
+</ul><span>
+
+</span><p>This will corner the solution to the problem.</p><span>
+
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

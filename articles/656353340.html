@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Nginx反向代理Google</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Nginx反向代理Google</h1>
+<article id="post-399" class="post-399 post type-post status-publish format-standard hentry category-linux tag-google tag-nginx single-view">
+
+
+
+<!-- Widgets: Before Post -->
+
+<!-- Date & Author -->
+
+
+<div class="entry-content cf"><span>
+
+	</span><!-- Widgets: Before Post Content --><span>
+	
+	</span><p>最近google被墙，工作效率严重下降，baidu不出来东东，刚刚看到<span class="wp_keywordlink"><a href="http://blog.linuxeye.com/tag/CentOS" title="Linux" target="_blank">CentOS</a></span>.bz的《<span class="wp_keywordlink"><a href="http://blog.linuxeye.com/tag/Nginx" title="Nginx" target="_blank">Nginx</a></span>反向代理谷歌》于是自己也搭建了一个，速度杠杠的。有国外vps的朋友可以试试，声明：有风险，IP或者域名有被墙的可能。</p><span>
+</span><p>基于《<a target="_blank" href="http://blog.linuxeye.com/31.html">lnmp一键安装包</a>》，将 –with-http_sub_module、ngx_cache_purge-2.1编译到nginx中，如下：</p><span>
+</span><pre class="prettyprint lang-bsh">cd ~/lnmp/src
+wget http://labs.frickle.com/files/ngx_cache_purge-2.1.tar.gz
+tar xzf ngx_cache_purge-2.1.tar.gz
+cd nginx-1.6.1
+make clean
+./configure --prefix=/usr/local/nginx --user=www --group=www --add-module=../ngx_cache_purge-2.1 \
+--with-http_sub_module --with-http_stub_status_module --with-http_ssl_module --with-http_flv_module \
+--with-http_gzip_static_module --with-ld-opt=-ljemalloc
+make
+mv /usr/local/nginx/sbin/nginx{,$(date +%m%d)}
+cp objs/nginx /usr/local/nginx/sbin
+service nginx resatrt
+mkdir -p /var/nginx/cache/one
+chown -R www.www /var/nginx</pre><span>
+</span><p>
+自己签发免费ssl证书，为nginx生成自签名ssl证书(访问时需添加信任。也可以使用第三方签名后的证书，如免费的startssl)</p><span>
+</span><pre class="prettyprint lang-bsh">cd /usr/local/nginx/conf
+openssl genrsa -out server.key 1024
+openssl req -new -key server.key -out server.csr
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt</pre><span>
+</span><p>
+nginx.conf 配置文件如下(<span><strong><span>注意: </span></strong>74.xx.xx.xx替换成域名或者IP</span>)：</p><span>
+</span><pre class="prettyprint lang-bsh">        proxy_cache_path /var/nginx/cache/one  levels=1:2   keys_zone=one:10m max_size=10g;
+        proxy_cache_key "$host$request_uri";
+
+        upstream google {
+                server 74.125.239.112:80 max_fails=3;
+                server 74.125.239.113:80 max_fails=3;
+                server 74.125.239.114:80 max_fails=3;
+                server 74.125.239.115:80 max_fails=3;
+                server 74.125.239.116:80 max_fails=3;
+        }
+
+        server {
+                listen 80;
+                server_name 74.xx.xx.xx;
+                rewrite ^(.*) https://74.xx.xx.xx$1 permanent;
+        }
+
+        server {
+        listen 443;
+        server_name 74.xx.xx.xx
+        ssl on;
+        ssl_certificate /usr/local/nginx/conf/server.crt;
+        ssl_certificate_key /usr/local/nginx/conf/server.key;
+        location / {
+                proxy_cache one;
+                proxy_cache_valid  200 302 1h;
+                proxy_cache_valid  404 1m;
+                proxy_redirect https://www.google.com/ /;
+                proxy_cookie_domain google.com 74.xx.xx.xx;
+                proxy_pass http://google;
+                proxy_set_header Host "www.google.com";
+                proxy_set_header Accept-Encoding "";
+                proxy_set_header User-Agent $http_user_agent;
+                proxy_set_header Accept-Language "zh-CN";
+                proxy_set_header Cookie "PREF=ID=047808f19f6de346:U=0f62f33dd8549d11:FF=2:LD=zh-CN:NW=1:TM=1325338577:LM=1332142444:GM=1:SG=2:S=rE0SyJh2w1IQ-Maw";
+                sub_filter www.google.com 74.xx.xx.xx ;
+                sub_filter_once off;
+                }
+        }</pre><span>
+</span><p>注解：<br />1、监听了80和443端口，可以在<span class="wp_keywordlink"><a href="http://www.linuxeye.com/" title="Linux" target="_blank">Linux</a></span>自己生成证书。<br />2、定义了个upstream google，放了5个谷歌的ip（通过nslookup www.google.com命令获取（yum -y install bind-utils）），如果不这样做，就等着被谷歌的验证码搞崩溃吧。<br />3、也设置了反向代理缓存，某些资源不用重复去请求谷歌获取，加快搜索速度<br />4、proxy_redirect https://www.google.com/ /; 这行的作用是把谷歌服务器返回的302响应头里的域名替换成我们的，不然浏览器还是会直接请求www.google.com，那样反向代理就失效了。<br />5、proxy_cookie_domain google.com 74.xx.xx.xx; 把cookie的作用域替换成我们的域名<br />6、proxy_pass http://google; 反向代理到upstream google<br />7、proxy_set_header Accept-Encoding “”; 防止谷歌返回压缩的内容，因为压缩的内容我们无法作域名替换<br />8、proxy_set_header Accept-Language “zh-CN”;设置语言为中文<br />9、proxy_set_header Cookie “PREF=ID=047808f19f6de346:U=0f62f33dd8549d11:FF=2:LD=zh-CN:NW=1:TM=1325338577:LM=1332142444:GM=1:SG=2:S=rE0SyJh2w1IQ-Maw”; 这行很关键，传固定的cookie给谷歌，是为了禁止即时搜索，因为开启即时搜索无法替换内容。还有设置为新窗口打开网站，这个符合我们打开链接的习惯<br />10、sub_filter www.google.com 74.xx.xx.xx当然是把谷歌的域名替换成我们的了，注意需要安装nginx的sub_filter模块(编译加上–with-http_sub_module参数)</p><span>
+</span><p>参考：https://www.centos.bz/2014/06/nginx-proxy-google/</p><span>
+</span><p>
+	<strong>Mon Jun 16 19:19:03 CST 2014</strong>
+</p><span>
+
+	</span><!-- Widgets: After Post Content --><span>
+	
+	
+</span></div>
+
+
+
+
+	
+
+</article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Asynchronous Ad Loading With Iframes</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Asynchronous Ad Loading With Iframes</h1>
+<article class="post-1865 post type-post status-publish format-standard hentry category-general-web category-javascript category-publishing-2 category-web-performance tag-ad-server tag-ads tag-async tag-iframes clearfix" id="post-1865">
+		  
+		  <time datetime="2012-11-29" pubdate="">November 29, 2012 | By Rob Flaherty</time>
+			
+			
+			<p>I’ve written a few posts about working with ad servers (see <a href="http://www.ravelrumba.com/blog/cleaning-up-ad-server-scripts/">here</a> and <a href="http://www.ravelrumba.com/blog/responsive-ads-real-world-ad-server-implementation/">here</a>) and in both, the discussion in the comments sections steered into questions about ad performance. There are numerous performance issues related to ad loading but the main issue is the blocking effect caused by third-party network requests implemented with <code>document.write()</code>. Here’s a demo showing a <a href="http://www.ravelrumba.com/code/demos/blocking-ads/demo1.html" target="_blank">request with a 3-second delay blocking the page content</a>.</p>
+<p>One way around this is to sandbox ads within iframes to allow them to load independently of the page content. <a href="http://www.ravelrumba.com/code/demos/blocking-ads/demo3.html" target="_blank">Here’s another demo</a> showing the same 3-second lagging ad request but this time the ad is load within an iframe, allowing the content to display unblocked.</p>
+
+<p>Loading ads in iframes is nothing new, and in some cases it’s easy to do; but if you’re working with many ads per page or uncooperative ad servers, it can be more of a challenge. For instance, when there are multiple ads on a page it’s common for the ad server to have to coordinate which ads display at the same time. There may be a requirement that Advertiser A’s campaigns do not display at the same time as Advertiser B’s. Or there may be companion units that have to display at the same time. This inter-ad-unit awareness is often achieved by batching the ad requests into a single call to the ad server. But, depending on your ad server, this technique may not be compatible with iframe ad loading.</p>
+<p>In this post I’ll show an example of how you can hack one ad server (24/7 Open AdStream) to make its single-request implementation work with iframes.</p>
+<h5>MJX</h5>
+<p>OAS has several different implementation methods (NX, RX, JX, SX, MJX), each with pros and cons. The one I’ve used the most is MJX, which allows for the greatest control over how campaigns can be coordinated with one another (companion serving, competitive serving, etc) by batching the individual ad requests into a single ad server request. This is how it works.</p>
+<p>In the HEAD section of your page you build up a request to OAS that tells the ad server which ad positions you want, what “page” (“Page Tag” in OAS terms) the campaigns should correspond to, and possibly some other stuff like key/value pairs to achieve additional targeting layers. OAS then returns a script&nbsp;with a function that writes out each ad unit. It looks something like this:</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript"><span>function</span> OAS_RICH<span>(</span>position<span>)</span> <span>{</span>
+  <span>if</span> <span>(</span>position <span>==</span> <span>'Top'</span><span>)</span> <span>{</span>
+    document.<span>write</span><span>(</span>...<span>)</span><span>;</span>
+  <span>}</span>
+&nbsp;
+  <span>if</span> <span>(</span>position <span>==</span> <span>'Right'</span><span>)</span> <span>{</span>
+    document.<span>write</span><span>(</span>...<span>)</span><span>;</span>
+  <span>}</span>
+<span>}</span></pre></td></tr></table></div>
+
+<p>This function is then invoked with the corresponding position name from the various ad placements on the page (e.g., <code>&lt;script&gt;OAS_RICH('Top')&lt;/script&gt;</code>).</p>
+<p><a href="http://www.ravelrumba.com/code/demos/iframe-ads/noiframes.html" target="_blank">Here’s an example showing a mock MJX implementation</a> that includes 2 ads, each consisting of JS that uses document.write to write an image to the page. The first script is returned with a 2-second delay, the second script with a 3-second delay. You can see how both paragraphs of text are blocked while we wait for the scripts to return from the server.</p>
+<p>Notice that <strong>everything</strong> is blocked, including the request for the second ad, which means the delays are compounded, which means it takes 5+ seconds for both the DomContentLoaded and window.onload events to fire.</p>
+<h5>Iframes</h5>
+<p>So at this point we have a global function, <code>OAS_RICH()</code>, that’s responsible for writing each ad unit. To load the ads within iframes we need to create documents for each ad position and then call the <code>OAS_RICH()</code> function from within the child documents.</p>
+<p>This is fairly easy but it’s not quite as easy as just calling <code>parent.OAS_RICH('Top')</code> from the iframed window. Why not? Because of JavaScript’s static/lexical scoping. The document object defined in the OAS_RICH function refers to the <strong>parent window document</strong>, not the child window document invoking the function. So calling the function from within the iframe overwrites the parent document. That’s not what we want.</p>
+<p>I don’t know of a solution to this that isn’t a hack. But maybe someone with more experience working with iframes can offer a better idea.</p>
+<p>The easiest solution, I think, is to convert the OAS_RICH function to a string and then reevaluate the function in the context of the iframe.</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript"><span>var</span> ad <span>=</span> parent.<span>OAS_RICH</span>.<span>toString</span><span>(</span><span>)</span><span>;</span>
+eval<span>(</span>ad<span>)</span><span>;</span>
+&nbsp;
+OAS_RICH<span>(</span><span>'Top'</span><span>)</span><span>;</span></pre></td></tr></table></div>
+
+<p>This is a little funky because aside from the <code>eval</code> usage this reevaluation has to be done for each ad unit on the page.</p>
+<p>Another option: In the parent document convert the function to a string, regex replace each “document” with “this.document”, and then <code>eval</code> the string to redefine the function. Then you can call the function using <code>apply()</code> within the child document and pass it the child document context. The advantage here is that the funky function-&gt;string-&gt;function action only happens once. The disadvantage is that you’re introducing a regex and manipulating the contents of the function.</p>
+<p><a href="http://www.ravelrumba.com/code/demos/iframe-ads/iframes.html" target="_blank">Here’s an example</a> showing how the content isn’t blocked when the iframe implementation is used. The ads load independently, the DomContentLoaded event fires right away, and the window.onload event occurs after 3 seconds instead of 5.</p>
+<p>(As a side note, I should point out that serving expanding ad units with iframes can require extra steps to allow the creative to “break out” of the iframe.)</p>
+<h5>Get to know your 3rd party code</h5>
+<p>This is kind of hacky but it’s also not very complicated, so I think it could be a useable solution (disclaimer: I haven’t used this in Production).</p>
+<p>However the point of the post wasn’t to deliver ready-to-paste code, but to crack open some third-party JavaScript to understand how it works and how we might bend/extend it to meet our needs. Of course you have to be very careful doing this—don’t just run around tearing up vendor code. But there’s a lot you can learn by reaching in, getting your hands greasy, and making 3rd-party code your own.</p>
+			
+						
+								Both comments and pings are currently closed.
+
+							
+			
+		</article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

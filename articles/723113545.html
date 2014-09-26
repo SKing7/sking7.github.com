@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>服务端的模块加载器</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>服务端的模块加载器</h1>
+<div class="intro-content"><span>
+			</span><h2 id="part1">功能介绍</h2><span>
+			</span><p>styleCombine 是一个<a href="http://trock.lofter.com/post/117023_1208040" target="_blank">服务器端的模块加载器</a>，它能够帮助我们实现以下功能：</p><br /><span>
+			</span><ul> 
+			 <li><p>将 HTML 页面上的多个 js/css 请求自动地合并成一个请求，发送给 <a href="http://tengine.taobao.org/index_cn.html" target="_blank">combo 服务器。</a>    <span class="goodpoints">---  促进应用模块化架构</span></p></li> 
+			 <li><p>对于入口的 AMD/CMD 模块，能够自动解析出模块的深层依赖关系，并将所依赖文件及页面上的其它 js 文件合并为一个请求发送。 <span class="goodpoints">---  自动提取、无需配置</span></p></li>  
+			 <li><p>对 HTML 页面中每个 js/css 链接都会根据文件内容自动地添加版本号后缀，js/css 内容更新将触发版本号的实时更新，使得浏览器端缓存或 CDN 缓存能够强制失效。   <span class="goodpoints">--- 降低 CDN 部署成本 </span></p></li> 
+			</ul><span>
+			
+			</span><p>与浏览器端的模块加载器（requireJS、seaJS ）不同，以上所有的工作都发生在服务器端，是对 html 源码的直接改变，能够做到浏览器端加载器所不能完成的功能，并取得更好的加载性能，故称之为服务器端的模块加载器。</p><span>
+			
+			
+			</span><h2 id="part2">应用示例</h2><span>
+			</span><p>在开发状态我们在页面上引入一个 AMD 模块的入口 js 文件：</p><span>
+			</span><img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_original.jpg" /><span>
+			
+			</span><p>经过 styleCombine 的动态处理后，该 AMD 模块的所有依赖模块（依赖层级不限）都将被解析出来，页面的源码被修改成如下状态并返回给浏览器：</p><span>
+			</span><img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_new.jpg" /><span>
+			
+			</span><p>如果该页面上有多个入口 JS，那么所有解析出的依赖模块URL在合并、去重后，会被自动拼接为一个 combo 请求。对开发者而言，除了需要在 script 标签中加 amd 属性的工作外，JS 代码中无需做特殊配置或特殊标记，整个过程自动化完成。</p><span>
+			</span><br /><span>
+			</span><p>阿里巴巴中文站已全站部署该系统，故可在线访问 <a href="http://quan.1688.com/" target="_blank">http://quan.1688.com/</a> 查看页面的实际使用效果，同时也可访问 <a href="http://quan.1688.com/?_debugMode_=1" target="_blank"> http://quan.1688.com/?_debugMode_=1</a> 查看页面在开发状态的原始代码。</p><span>
+			
+			
+			</span><h2 id="part3">系统构成</h2><span>
+			</span><p>styleCombine 主要由三大部分组成：</p><span> 
+			</span><span>
+			</span><p>系统的正常运作需要以上三大模块的配合使用，请分参照每个模块自己的配置文档进行安装。</p><span>
+			
+
+			</span><h2 id="part3.5">部署指南</h2><span>
+			
+			</span><h3>Nginx/Tengine 版本部署:</h3><span>
+			</span><br /><span>
+			</span><p>1、获取<a href="http://loftyjs.com/fdevlib/output/stylecombine/nginx-release-20140812.zip">最新版本</a>的 ngx_http_stylecombine_filter_module.so 及 ngx_proc_styleupdator_module.so 文件</p><span>
+			</span><p>2、拷贝 ngx_http_stylecombine_filter_module.so ngx_proc_styleupdator_module.so 到 Tengnie 安装目录如（/opt/taobao/tengine/modules）中</p><span>
+			</span><p>3、配置 Tengine 服务器 nginx.conf 文件，增加如下代码：</p><span>
+
+	</span><pre class="prettyprint linenums"> 
+
+	    dso {
+	        load ngx_http_stylecombine_filter_module.so;
+	        load ngx_proc_styleupdator_module.so;
+	    }
+
+	    SC_Enabled on;
+	    SC_AppName offerweb; （替换成应用在 Aone 中的名字）
+	    SC_OldDomains http://style.c.aliimg.com;
+	    SC_NewDomains http://astyle.alicdn.com;
+	    SC_FilterCntType  text/html;
+	    SC_AsyncVariableNames asyncResource;
+	    SC_MaxUrlLen    1024;
+
+	    processes {
+	        process styleupdator {
+	           style_updator_url http://style-center.alibaba-inc.com:8080/output/styleVersion.tar.gz?appName=yourAppNameInAone;  
+	           style_updator_path  /home/admin/output/run/stylecombine/;
+	           style_updator_internal 120;
+	           style_updator_amd on;
+	           style_updator_debug off;
+	        }
+	    }
+	</pre><span>
+
+			</span><p>4、部署完成！</p><span>
+
+			</span><p><b>注意</b>：阿里巴巴内网用户，styleCombine 已被打包为 Tengine 的默认安装模块，故先检查 /opt/taobao/tengine/modules 下是否已经有相应的 
+			so 模块，如果没有，则运行：yum install tengine-alibaba-modules -b test -y 即可按照最新版本的 styleCombine 模块到 module 
+			目录下。 请不要使用手动安装拷贝的方式进行！</p><span>
+
+
+			</span><p><h3>Apache 版本部署:</h3>
+
+			</p><p>1、获取<a href="http://loftyjs.com/fdevlib/output/stylecombine/apache-released-20140402.zip">最新版本</a>的 mod_styleCombine.so 及 StyleVersionUpdator 文件。</p><span>
+
+			</span><p>2、将 mod_styleCombine.so 放置在应用的 ${xxx_deployhome}/conf/modules文件夹中，StyleVersionUpdator 放在应用的 ${xxx_deployhome}/bin/ 文件夹中。</p><span>
+
+			</span><p>3、配置 Apache 服务器的 httd.conf 文件，增加如下代码：</p><span>
+
+	</span><pre class="prettyprint linenums"> 
+	  	#set($appName = "应用的名称")
+	  	LoadModule styleCombine_module   ${xxx_deployhome}/conf/modules/mod_styleCombine.so
+		&lt;IfModule mod_styleCombine.c&gt;
+		    SC_Enabled       On
+		    SC_AppName       $!appName
+		    SC_OldDomains    http://style.c.aliimg.com;
+		    SC_NewDomains    http://astyle.alicdn.com;
+		    SC_FilterCntType text/html;text/htm;
+		    SC_MaxUrlLen     1024
+		    LogFormat        nolog
+		    CustomLog "| ${xxx_deployhome}/bin/StyleVersionUpdator http://style-center.alibaba-inc.com:8080/output/styleVersion.tar.gz?appName=$!appName ${xxx_output}/ 120" nolog
+		&lt;/IfModule&gt;
+	</pre><span>
+			</span><p>4、部署完成！</p><span>
+
+
+			</span><h2 id="part4">开始使用</h2><span>
+			</span><p>在以上三大模块被正确安装后，应用中即可轻松使用 styleCombine 提供的功能。对开发者而言，只需关注以下几个属性的应用：</p><span>
+			</span><br /><span>
+			</span><ul>
+				<li>
+					<p><b>data-sc-pos 属性：</b> 取值有footer|head，具有相同 data-sc-pos 属性的 script 或 link 标签将按照在页面上出现的顺序被合并到页面指定位置，例如：</p>
+					
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_pos_original.jpg" />
+			
+					<p>实际输出页面的源码为：</p>
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_pos_new.jpg" />
+						
+				</li>
+				<br /><li>
+					<p><b> data-sc-amd 属性：</b> 是amd入口文件的标识，置 data-sc-amd="true"，将会解析出该模块依赖的所有子模块js,合并成一个请求，此属性可以</p><p>配合 data-sc-pos 使用。例如：</p>
+					
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_amd_original.jpg" />
+			
+					<p>实际输出页面的源码为：</p>
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_amd_new.jpg" />
+						
+				</li>
+				<br /><li>
+					<p><b>data-sc-async 属性：</b> 主要用于解决 scrip t标签阻塞页面渲染的问题。合并 URL 后不创建 script 标签，而是以全局变量的形式插入到页面中，</p><p>前端应用自己负责对该URL的异步加载。例如：</p>
+					
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_aync_original.jpg" />
+			
+					<p>实际输出页面的源码为：</p>
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_aync_new.jpg" />
+						
+				</li>
+				<br /><li>
+					<p><b>data-sc-group 属性：</b> 用于对 script 或 link 标签的分组，可自定义取值，需要配合 data-sc-pos 或 data-sc-async 属性一起使用。例如：</p>
+					
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_group_original.jpg" />
+			
+					<p>实际输出页面的源码为：</p>
+					<img src="http://loftyjs.com/fdevlib/static/img/lofty/sc_group_new.jpg" />
+						
+				</li>
+			</ul><span>
+			
+			
+			</span><h2 id="part5">系统原理</h2><span>
+			</span><img src="http://loftyjs.com/fdevlib/static/img/lofty/styleCombine.png" /><span>
+			
+		</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

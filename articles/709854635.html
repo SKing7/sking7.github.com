@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The 5 Functionalities Every API Must Have</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The 5 Functionalities Every API Must Have</h1>
+<article id="post-16532" class="post-16532 post type-post status-publish format-standard hentry category-engineering tag-api tag-engineers tag-javascript tag-node-js">
+										
+						
+											
+							
+										<div class="post-body"><span>
+																						</span><p>When building a Web API, certain features are commonly needed for a baseline implementation. Sometimes these may be specific features built into the framework or they may need to be manually coded. In this post, I’ve compiled the various Node.js libraries, along with the key features, needed for API development. Regardless of API framework or language, the five functionalities outlined below are commonly an assumed part of the end product of the API service.</p><span>
+</span><h3><strong>1. Error handling</strong></h3><span>
+</span><p><img class="alignright wp-image-16533 size-full" src="http://blog-assets.newrelic.com/wp-content/uploads/hapijs.jpg" alt="hapijs" width="200" height="200" />When developing APIs for the Web, the standard approach is to return any errors with a respective HTTP code. These aren’t always codified via a framework, but some frameworks such as <a href="https://github.com/hapijs/hapi" target="_blank">hapi.js</a> do have additional handling of errors. Hapi.js has a library it can utilize called <a href="https://github.com/hapijs/boom" target="_blank">boom</a>, maintained by Adam Bretz (<a href="https://github.com/arb" target="_blank">@arb</a>).</p><span>
+</span><h3><strong>2. Error logging</strong></h3><span>
+</span><p>Once error handling is in place, errors often need to be logged so they can be reviewed. There are many ways to log errors, from catching them and executing a <code>console.log(“error message here”)</code>; to having them written to a log file.</p><span>
+</span><p>Libraries for error logging include <a href="https://github.com/nomiddlename/log4js-node" target="_blank">log4js</a>, <a href="https://github.com/trentm/node-bunyan" target="_blank">bunyan</a>, and <a href="https://github.com/flatiron/winston" target="_blank">winston</a>. In some situations logging can be handled by a service such as New Relic to manage incoming error logging messages and view them in the <a href="https://docs.newrelic.com/docs/apm/applications-menu/events/errors-dashboard" target="_blank">New Relic Errors Dashboard</a>.</p><span>
+</span><h3><strong>3. Validation</strong></h3><span>
+</span><p>Another common need is to validate the data that is coming into the API services being built. A library that I have used lately for object validation is <a href="https://github.com/hapijs/joi" target="_blank">joi</a>. Joi is a validation framework that is part of the hapi.js collection of libraries. It provides a way to validate object schema such as the JSON objects that might be sent to an API. Some libraries exist that validate individual data types like <a href="https://github.com/parris/iz" target="_blank">iz</a> or <a href="https://github.com/chriso/validator.js" target="_blank">validator.js</a>, or <a href="http://validatejs.org/" target="_blank">validate</a>, which covers many functional validations.</p><span>
+</span><h3><strong>4. Authentication and authorization</strong></h3><span>
+</span><p>Authentication and authorization happen in a number of different ways these days. It can become a complex process just to decide exactly what is needed. There is standard username and password authentication, identity-based passed token authentication, oauth, openid, http token-based, API key, and many others. There are as many libraries as there are methods of securing API services.</p><span>
+</span><p>One very well-known library is <a href="http://passportjs.org/" target="_blank">passport.js</a>. The library works as middleware in express.js, hapi.js, or other frameworks. Passport.js provides an easy way to get a service up and running with a number of authentication strategies, or simply a single one.</p><span>
+</span><h3><strong>5. Testing</strong></h3><span>
+</span><p>Last but not least, one of my favorite functions: testing. In choosing your testing library, you’ll notice they vary greatly in styles, practices, patterns, and focus. But there are a few specific libraries that help out with API end points. One that helps out specifically with testing APIs is <a href="https://github.com/visionmedia/supertest" target="_blank">SuperTest</a>. This library is great for setting up integration level tests, but for unit tests it is often a bit much. To create tests for mocking up and testing APIs, check out <a href="https://github.com/pgte/nock" target="_blank">Nock</a>. Most of these libraries are best used with the <a href="http://visionmedia.github.io/mocha/" target="_blank">Mocha library</a>.</p><span>
+</span><h3><strong>Punch List:</strong></h3><span>
+</span><p><img class="alignnone size-full wp-image-16534" src="http://blog-assets.newrelic.com/wp-content/uploads/Punch-list.jpg" alt="Punch list" width="655" height="298" /></p><span>
+																					</span></div>
+										
+										<div class="author-box"><span>
+	</span><span>	</span><p><img src="http://www.gravatar.com/avatar.php?gravatar_id=b077605f4799abe20de52b6ded458e99&amp;size=40" height="64" width="64" alt="adronhall@gmail.com'" />Adron Hall is a jovial, proactive, test &amp; code, code &amp; test, get things done well, software architect, engineer, code monkey, coder, and distributed systems advocate. As a coder, Hall plies a polygot language path including C#, Java, JavaScript, and Erlang lately -- as well as Pascal, Basic, Visual Basic, C++, C, COBOL, RPG, CL, and others in the past. He founded Deconstructed.io with Aaron Gray, Node PDX with Troy Howard, and more startups are in the works. You can read his blog at Composite Code (http://compositecode.com).</p><span>
+</span></div>									
+				
+									<!---->
+									
+									<!--
+<div class="col-md-12 footer-signup">
+	<div class="row">
+		<div class="col-sm-12 col-lg-10 col-lg-offset-2 clearfix">
+			<article>
+			-->
+				
+									
+						
+				<!--
+			</article>
+		</div>
+	</div>
+</div>
+-->									
+																	</article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

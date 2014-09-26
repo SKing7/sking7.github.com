@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JS Drip #69: Holy Bat-Signal, Batman! Implementing the Observer Pattern in JavaScript</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>JS Drip #69: Holy Bat-Signal, Batman! Implementing the Observer Pattern in JavaScript</h1>
+<div><span>
+  </span><span>
+  </span><p>When trying to write clean JavaScript, there is a common problem that you can run into. You may have managed to separate your program's concerns into separate objects, yet still need object A to know if something happens to object B. Let's take a look at an example.</p><span>
+</span><div class="highlight"><pre><span class="kd">var</span> <span class="nx">jimGordon</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">arrest</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">criminal</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Jim Gordon arrests "</span> <span class="o">+</span> <span class="nx">criminal</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">respondToCrimeBy</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">criminal</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">criminal</span><span class="p">.</span><span class="nx">superVillain</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">arrest</span><span class="p">(</span><span class="nx">criminal</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Jim Gordon can't stop "</span> <span class="o">+</span> <span class="nx">criminal</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">batman</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">defeatSupervillain</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">villain</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Batman handily defeats "</span> <span class="o">+</span> <span class="nx">villain</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">})();</span>
+
+<span class="kd">var</span> <span class="nx">joeShmoe</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s2">"Joe Shmoe"</span><span class="p">,</span>
+    <span class="nx">supervillain</span><span class="o">:</span> <span class="kc">false</span>
+<span class="p">};</span>
+
+<span class="nx">jimGordon</span><span class="p">.</span><span class="nx">respondToCrimeBy</span><span class="p">(</span><span class="nx">joeShmoe</span><span class="p">);</span>
+<span class="c1">// =&gt; "Jim Gordon arrests Joe Shmoe"</span>
+
+<span class="kd">var</span> <span class="nx">mrFreeze</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s2">"Mr. Freeze"</span><span class="p">,</span>
+    <span class="nx">superVillain</span><span class="o">:</span> <span class="kc">true</span>
+<span class="p">};</span>
+
+<span class="nx">jimGordon</span><span class="p">.</span><span class="nx">respondToCrimeBy</span><span class="p">(</span><span class="nx">mrFreeze</span><span class="p">);</span>
+<span class="c1">// =&gt; "Jim Gordon can't stop Mr. Freeze"</span>
+</pre></div><span>
+</span><p>In this example, Jim Gordon is responsible for responding to crimes, and he can handle arresting your typical petty crooks, but he can't handle supervillains on his own. That responsibility belongs to Batman. But Batman doesn't respond to ordinary crimes directly. Gordon needs some way to notify Batman when he has a supervillain issue.</p><span>
+
+</span><p>The problem is that while Batman knows how to get hold of Gordon, Gordon doesn't know how to get hold of Batman. That's where the <a href="http://en.wikipedia.org/wiki/Observer_pattern">observer pattern</a> comes in.</p><span>
+</span><div class="highlight"><pre><span class="kd">var</span> <span class="nx">jimGordon</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">arrest</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">criminal</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Jim Gordon arrests "</span> <span class="o">+</span> <span class="nx">criminal</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">respondToCrimeBy</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">criminal</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">criminal</span><span class="p">.</span><span class="nx">superVillain</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">arrest</span><span class="p">(</span><span class="nx">criminal</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">notifyObservers</span><span class="p">(</span><span class="nx">criminal</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">observers</span><span class="o">:</span> <span class="p">[</span> <span class="p">],</span>
+    <span class="nx">registerObserver</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">observerFn</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">observers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">observerFn</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">notifyObservers</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">observers</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">observerFn</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">observerFn</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">batman</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">defeatSupervillain</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">villain</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Batman handily defeats "</span> <span class="o">+</span> <span class="nx">villain</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="nx">batSignal</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">villain</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">batman</span><span class="p">.</span><span class="nx">defeatSupervillain</span><span class="p">(</span><span class="nx">villain</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="nx">jimGordon</span><span class="p">.</span><span class="nx">registerObserver</span><span class="p">(</span><span class="nx">batman</span><span class="p">.</span><span class="nx">batSignal</span><span class="p">);</span>
+<span class="p">})();</span>
+
+<span class="kd">var</span> <span class="nx">mrFreeze</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s2">"Mr. Freeze"</span><span class="p">,</span>
+    <span class="nx">superVillain</span><span class="o">:</span> <span class="kc">true</span>
+<span class="p">};</span>
+
+<span class="nx">jimGordon</span><span class="p">.</span><span class="nx">respondToCrimeBy</span><span class="p">(</span><span class="nx">mrFreeze</span><span class="p">);</span>
+<span class="c1">// =&gt; "Batman handily defeats Mr. Freeze"</span>
+</pre></div><span>
+</span><p>Let's walk through how this works. By adding the <code>observers</code>, <code>registerObserver</code>, and <code>notifyObserver</code> properties to Gordon, we've made him "observable," which means that if someone like Batman wants to know about what's happening in Gotham, they just need to give Gordon a way to let them know about it. That's what <code>registerObserver</code> does. It takes a function that someone gives to <code>jimGordon</code> and keeps it around in the <code>observers</code> array. When something of interest happens, Gordon can <code>notifyObservers</code> and pass along the information that he has.</p><span>
+
+</span><p>That way, even though <code>jimGordon</code> doesn't have direct access to <code>batman</code>, Gordon can use the <code>batSignal</code> method to let Batman know what is going on.</p><span>
+
+</span><p>One of the important aspects of the observer pattern is that we can register multiple observers.</p><span>
+</span><div class="highlight"><pre><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">robin</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">defeatSupervillain</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">villain</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Robin helps defeat "</span> <span class="o">+</span> <span class="nx">villain</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="nx">radio</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">villain</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">robin</span><span class="p">.</span><span class="nx">defeatSupervillain</span><span class="p">(</span><span class="nx">villain</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="nx">jimGordon</span><span class="p">.</span><span class="nx">registerObserver</span><span class="p">(</span><span class="nx">robin</span><span class="p">.</span><span class="nx">radio</span><span class="p">);</span>
+<span class="p">})();</span>
+
+<span class="kd">var</span> <span class="nx">penguin</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s2">"Penguin"</span><span class="p">,</span>
+    <span class="nx">superVillain</span><span class="o">:</span> <span class="kc">true</span>
+<span class="p">};</span>
+
+<span class="nx">jimGordon</span><span class="p">.</span><span class="nx">respondToCrimeBy</span><span class="p">(</span><span class="nx">penguin</span><span class="p">);</span>
+<span class="c1">// =&gt; "Batman handily defeats Penguin"</span>
+<span class="c1">// =&gt; "Robin helps defeat Penguin"</span>
+</pre></div><span>
+</span><p>Of course, there are other ways of implementing the observer pattern as well. In particular, the property names don't have to be the exact ones I chose here: <code>observers</code>, <code>registerObserver</code> and <code>notifyObserver</code>. The important thing is the overall pattern allowing you to register and notify observers.</p><span>
+
+</span><p>Now you have one more tool to keep your object design clean and well-factored.</p><span>
+
+</span><p>Thanks for reading!</p><span>
+
+</span><p>Josh Clanton</p><span>
+
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

