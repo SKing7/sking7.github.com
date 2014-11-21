@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Embedding Base64 Image Data into a Webpage</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Embedding Base64 Image Data into a Webpage</h1>
+<div class="content"><span>
+	
+	
+	</span><!-- google_ad_section_start --><p>This is part two of a tutorial for taking a screenshot of a Flash movie and putting it into a webpage using Javascript.  As you might expect, Internet Explorer and Firefox have different ways of going about embedding the image data in HTML.  Details after the click-through.</p><p>This is the second part of a tutorial for dynamically embedding a screenshot of a Flash movie into a webpage.  In the previous section, we <a href="http://danielmclaren.com/2008/03/use-javascript-to-take-a-screenshot-of-a-flash-movie">got image data out of Flash and into a Javascript variable</a>.  Now, we'll find out how to display that data using an <span class="geshifilter"><code class="html4strict geshifilter-html4strict"><span><a href="http://december.com/html/4/element/img.html"><span>&lt;img&gt;</span></a></span></code></span> tag.  If you want, you can  skip ahead to <a 2008="" 03="">copying the image to the clipboard</a>.</p><span>
+
+</span><p>And, no, this doesn't involve creating a table with 1 x 1 px cells in hundreds of rows and columns.  (-;</p><span>
+
+</span><p>Here's that demo from last time so you can see where we're going with this.</p><span>
+
+
+</span><!-- use different getImageSrc function for IE
+	 - which can't parse base64-encoded images
+	 --><span>
+
+</span><!--[if gte IE 5]>
+	<script type="text/javascript">
+		function getImageSrc(base64Src)
+		{ return "/sites/danielmclaren.com/files/public/2008/swf_screenshot/decode_base64.php?" + base64Src; }
+	</script>
+<![endif]--><span>
+
+
+</span><div><span>
+</span><span>
+</span><div><span>
+	</span><img id="imageContainer" src="" width="50" height="50" /><span>
+</span></div><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span></div><span>
+
+</span><span>
+
+</span><p>Alright, so <a href="http://danielmclaren.com/2008/03/use-javascript-to-take-a-screenshot-of-a-flash-movie">where we left off</a>, we got the base64-encoded PNG data into a Javascript variable like so:</p><span>
+
+</span><div class="geshifilter"><pre class="geshifilter-javascript"><span>var</span> screenshotBase64 = flashElem.<span>getScreenshot</span><span>(</span><span>)</span>;</pre></div><span>
+
+</span><h2>Embedding the base64-encoded image in HTML</h2><span>
+
+</span><p>Now we've left the relatively sheltered environment provided by the Flash Player and we have to deal with some browser compatibility problems.  Firefox provides an easy way to embed images dynamically in a webpage.  You can use the <span class="geshifilter"><code class="text geshifilter-text">data:</code></span> URI scheme to put base64 (or other data) right into the <span class="geshifilter"><code class="html4strict geshifilter-html4strict">src</code></span> attribute of an <span class="geshifilter"><code class="html4strict geshifilter-html4strict">image</code></span> tag.</p><span>
+
+</span><div class="geshifilter"><pre class="geshifilter-html4strict"><span><a href="http://december.com/html/4/element/img.html"><span>&lt;img</span></a> <span>src</span>=<span>"data:image/png;base64,iVBORw0KGgoAAAANS..."</span> /<span>&gt;</span></span></pre></div><span>
+
+</span><h2>Base64 Images in Internet Explorer</h2><span>
+
+</span><p>IE is a little different.  If you want to embed images right in the web page for Internet Explorer, you would use <acronym title="MIME HTML">MHTML</acronym>, which attaches the additional images as distinct and separate parts in the request.  You can see an example of <a href="http://www.hedgerwow.com/360/dhtml/base64-image/demp.php" class="external" rel="external">embedding images into a webpage using MHTML</a> at Hedger Wang's website.  It's easiest to figure out what's going on by looking at <a href="http://www.hedgerwow.com/360/dhtml/base64-image/code.txt" class="external" rel="external">the PHP source code</a>.</p><span>
+
+</span><p>Since we're loading images dynamically this doesn't work for us so instead, what we'll do is write a short PHP script which accepts the encoded data and spits out the image.  This gives us a URL where the image can be accessed directly, so it's like referring to any other image on the server.  This is less than ideal, since it <em>does</em> involve a trip back to the server, but it works.</p><span>
+
+</span><p>Here's the script which I got from Dean Edwards' post on <a href="http://dean.edwards.name/weblog/2005/06/base64-ie" class="external" rel="external">displaying Base64-encoded images in IE</a>.</p><span>
+
+</span><div class="geshifilter"><pre class="geshifilter-php"><span>&lt;?php</span>
+<span>/**
+ * an example URL for viewing a base64-encoded image:
+ * http://example.com/decode.php?image/png;base64,iVBORw0KGgoAAAANS...
+ */</span>
+<span>$data</span> = <a href="http://www.php.net/split"><span>split</span></a><span>(</span><span>";"</span>, <span>$_SERVER</span><span>[</span><span>"QUERY_STRING"</span><span>]</span><span>)</span>;
+<span>$type</span> = <span>$data</span><span>[</span><span>0</span><span>]</span>;
+<span>$data</span> = <a href="http://www.php.net/split"><span>split</span></a><span>(</span><span>","</span>, <span>$data</span><span>[</span><span>1</span><span>]</span><span>)</span>;
+<a href="http://www.php.net/header"><span>header</span></a><span>(</span><span>"Content-type: "</span>.<span>$type</span><span>)</span>;
+<a href="http://www.php.net/echo"><span>echo</span></a> <a href="http://www.php.net/base64_decode"><span>base64_decode</span></a><span>(</span><span>$data</span><span>[</span><span>1</span><span>]</span><span>)</span>;
+<span>?&gt;</span></pre></div><span>
+
+</span><p>So now, using this script, we can display the encoded image in Internet Explorer as well, using the following markup.</p><span>
+
+</span><div class="geshifilter"><pre class="geshifilter-html4strict"><span><a href="http://december.com/html/4/element/img.html"><span>&lt;img</span></a> <span>src</span>=<span>"http://example.com/decode.php?image/png;base64,iVBORw..."</span> /<span>&gt;</span></span></pre></div><span>
+
+</span><h2>The actual markup which embeds the image</h2><span>
+
+</span><p>To distinguish between Internet Explorer and, well, everyone else, I used conditional comments in the <span class="geshifilter"><code class="html4strict geshifilter-html4strict"><span><a href="http://december.com/html/4/element/head.html"><span>&lt;head&gt;</span></a></span></code></span> like so:</p><span>
+
+</span><div class="geshifilter"><pre class="geshifilter-html4strict"><span><a href="http://december.com/html/4/element/script.html"><span>&lt;script</span></a> <span>type</span>=<span>"text/javascript"</span><span>&gt;</span></span>
+	function getImageSrc(base64Src)
+	{ return base64Src; }
+<span><span>&lt;/script&gt;</span></span>
+<span><span>&lt;!--[if gte IE 5]&gt;</span>
+</span>
+	<span><a href="http://december.com/html/4/element/script.html"><span>&lt;script</span></a> <span>type</span>=<span>"text/javascript"</span><span>&gt;</span></span>
+		function getImageSrc(base64Src)
+		{ return "/decode_base64.php?" + base64Src.slice(5); }
+	<span><span>&lt;/script&gt;</span></span>
+<span><span>&lt;</span>!<span>[</span>endif<span>]</span>--<span>&gt;</span></span></pre></div><span>
+		
+</span><p>Now, I can easily set the <span class="geshifilter"><code class="html4strict geshifilter-html4strict">src</code></span> attribute of the <span class="geshifilter"><code class="html4strict geshifilter-html4strict"><span><a href="http://december.com/html/4/element/img.html"><span>&lt;img&gt;</span></a></span></code></span> element.</p><span>
+
+</span><div class="geshifilter"><pre class="geshifilter-html4strict">// imageElem is the <span><a href="http://december.com/html/4/element/img.html"><span>&lt;img&gt;</span></a></span> tag that will display the screenshot
+imageElem.src = getImageSrc("data:image/png;base64," + screenshotBase64);</pre></div><span>
+
+</span><p>And that's all it takes!</p><span>
+
+</span><p>Note that the encoding used here is <span class="geshifilter"><code class="text geshifilter-text">image/png</code></span> but you can use other formats as well.</p><span>
+
+</span><h2>Embedding large images directly in HTML</h2><span>
+
+</span><p>There is a pretty significant problem with the way we worked around the Internet Explorer issue.  If you're just embedding little icons then you don't have to worry, but when dealing with larger images, the base64 string can get too long.  URLs have a limited length and it doesn't take a very large image to hit that boundary.  In my brief tests a 100x100 pixel PNG was okay, but a 200x200 one was not.  Note that this problem will only occur in IE since Firefox doesn't go back to the server at all.</p><span>
+
+</span><p>To work around this problem I did something a little different.  Instead of sending the base64 data to Javascript, I sent it directly to the server-side script in a POST request.  The script saves the data to a temporary file and returns an ID for that file to Flash.  Flash then calls it's <span class="geshifilter"><code class="actionscript2 geshifilter-actionscript2">ExternalInterface</code></span> method, passing the file ID on to Javascript.  Now, instead of setting the <span class="geshifilter"><code class="javascript geshifilter-javascript">Image.<span>src</span></code></span> attribute to the decode_base64.php script above, you use a different script which takes the file ID as a parameter, sends the appropriate Content-Type header, retrieves the file and prints it to output, and finally, deletes the temporary file.</p><span>
+
+</span><p>In the third and last part of this little tutorial, we're going to <a 2008="" 03="">copying the screenshot to the clipboard</a>.</p><!-- google_ad_section_end --><noscript></noscript></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

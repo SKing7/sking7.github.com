@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Dealing with localStorage errors</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Dealing with localStorage errors</h1>
+<article>
+    
+      
+    
+      
+      <p>published 2013-08-30</p>
+
+      
+
+<p>Web storage is pretty straightforward, but several otherwise helpful tutorials I went through brushed over error handling:</p>
+
+
+<blockquote>“QUOTA_EXCEEDED_ERR” is the exception that will get thrown if you exceed your storage quota of 5 megabytes.</blockquote>
+
+
+<blockquote>Due to browser specific quotas you would want to check for exceptions so you would change line 1 above to the following.
+  <pre><code>try {
+  localStorage.setItem("name", "Hello World!"); //saves to the database, "key", "value"
+} catch (e) {
+  if (e == QUOTA_EXCEEDED_ERR) {
+    alert('Quota exceeded!'); //data wasn't successfully saved due to quota exceed so throw an error
+  }
+}
+</code></pre>
+</blockquote>
+
+<p>Is <code>QUOTA_EXCEEDED_ERR</code> some kind of global constant?</p>
+
+<p>Chrome Developer tools says: <code>ReferenceError: QUOTA_EXCEEDED_ERR is not defined</code>.</p>
+
+<p><a href="https://www.google.com/search?q=QUOTA_EXCEEDED_ERR">Google</a> suggests it might actually be <code>DOMException.QUOTA_EXCEEDED_ERR</code>, and Chrome agrees - <code>DOMException.QUOTA_EXCEEDED_ERR</code> is <code>22</code>.</p>
+
+<p>Is there a certain attribute of the exception that we should be matching to error code <code>22</code>?</p>
+
+<p>
+  Let’s take a look. To generate the <code>QUOTA_EXCEEDED_ERR</code> exception we’ll attempt to store a 12MB string, which should exceed the quota. Open your developer tools console and enter:
+  <pre><code>var exception;
+var repeat = function(str, x) { return new Array(x+1).join(str); };
+var too_big = repeat("x", 12*1024*1024/2); // each JS character is 2 bytes
+localStorage.clear();
+try {
+  localStorage.setItem("test", too_big);
+} catch (e) {
+  exception = e;
+}
+</code></pre>
+</p>
+
+<p>Then inspect <code>exception</code>.</p>
+
+<p>Trying that in a few browsers, we observe:</p>
+
+<h4>Chrome</h4>
+<img class="outlined" src="http://chrisberkhout.com/images/localstorage-errors/exception-chrome.png" alt="Exception in Chrome" />
+
+<h4>Firefox</h4>
+<img class="outlined" src="http://chrisberkhout.com/images/localstorage-errors/exception-firefox.png" alt="Exception in Firefox" />
+
+<h4>Safari</h4>
+<img class="outlined" src="http://chrisberkhout.com/images/localstorage-errors/exception-safari.png" alt="Exception in Safari" />
+
+<p>There is no single attribute that we can depend on across browsers to detect that the error is in fact a <code>QUOTA_EXCEEDED_ERR</code>.</p>
+  
+<p>We could check <code>exception instanceof DOMException</code>, but to test such code we would need to be able to produce a mock <code>DOMException</code> instance. A SitePoint <a href="http://reference.sitepoint.com/javascript/DOMException">reference</a> notes:
+<blockquote>In practise, what we find is that most browsers implement DOM exceptions as part of their native mechanism...</blockquote>
+It’s not possible to <a href="http://stackoverflow.com/questions/5136727/manually-artificially-throwing-a-domexception-with-javascript">produce them cleanly</a> from normal JavaScript.</p>
+
+
+
+<p>Although <code>localStorage</code> quota errors are known by names such as <code>QuotaExceededError</code> and <code>QUOTA_EXCEEDED_ERR</code>, the only way to write testable, non-browser specific code is to accept any exception thrown during a storage attempt as a quota error. To differentiate between quota and support/security errors, be sure to <a href="http://diveintohtml5.info/detect.html#storage">detect the availability</a> of <code>localStorage</code> separately.</p>
+
+
+
+    </article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

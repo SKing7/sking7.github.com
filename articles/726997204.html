@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JS Drip #70: Even Stricter Equality with Object.is</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>JS Drip #70: Even Stricter Equality with Object.is</h1>
+<div><span>
+
+</span><p>One of the most common recommendations in JavaScript style guides is to <a href="https://github.com/airbnb/javascript#conditional-expressions--equality">always</a> (or <a href="http://contribute.jquery.org/style-guide/js/#equality">almost always</a>) make comparisons using the <code>===</code> strict equality operator, because it avoids a lot of ambiguities in the ordinary <code>==</code> equality operator. However, <code>===</code> does have two oddities of its own.</p><span>
+
+</span><p>First, the special value <code>NaN</code> is <strong>not</strong> strictly equal to itself.</p><span>
+
+</span><div class="highlight"><span>
+</span><pre>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">===</span> <span class="kc">NaN</span><span class="p">);</span>
+<span class="c1">// =&gt; false</span>
+</pre><span>
+</span></div><span>
+
+</span><p>Second, the values <code>0</code> (positive 0) and <code>-0</code> <strong>are</strong> strictly equal, even though they are distinct values in JavaScript. (The reasons for why they are distinct values is a bit complicated, but Dr. Axel Rauschmayer has a <a href="http://www.2ality.com/2012/03/signedzero.html">great article on the topic</a>.)</p><span>
+
+</span><div class="highlight"><span>
+</span><pre>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="o">-</span><span class="mi">0</span><span class="p">);</span>
+<span class="c1">// =&gt; true</span>
+</pre><span>
+</span></div><span>
+
+</span><p>Of course, there are ways to work around these ambiguities. As I've <a href="http://designpepper.com/blog/drips/the-problem-with-testing-for-nan-in-javascript.html">mentioned before</a>, we can detect <code>NaN</code> by using the fact that it is the only value which is not equal to itself.</p><span>
+
+</span><div class="highlight"><span>
+</span><pre>
+<span class="kd">function</span> <span class="nx">isNaNValue</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">val</span> <span class="o">!==</span> <span class="nx">val</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isNaNValue</span><span class="p">(</span><span class="kc">NaN</span><span class="p">));</span>
+<span class="c1">// =&gt; true</span>
+</pre><span>
+</span></div><span>
+
+</span><p>And we can detect <code>0</code> versus <code>-0</code> by using the fact that JavaScript also distinguishes between <code>Infinity</code> and <code>-Infinity</code>.</p><span>
+
+</span><div class="highlight"><span>
+</span><pre>
+<span class="kd">function</span> <span class="nx">isNegativeZero</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">val</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">thisInfinity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nx">val</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="nx">thisInfinity</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">isNegativeZero</span><span class="p">(</span><span class="o">-</span><span class="mi">0</span><span class="p">);</span>
+<span class="c1">// =&gt; true</span>
+</pre><span>
+</span></div><span>
+
+</span><p>However, even though we can detect these things, it would be nice if there was something built into the language that would do it for us. That's where <code>Object.is</code> comes in.</p><span>
+
+</span><p>ECMAScript 6 adds the new <code>is</code> method to the global <code>Object</code> object. The entire reason for <code>Object.is</code> to exist is resolving these ambiguities.</p><span>
+
+</span><p>For <code>Object.is</code>, <code>NaN</code> equals itself:</p><span>
+
+</span><div class="highlight"><span>
+</span><pre>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">is</span><span class="p">(</span><span class="kc">NaN</span><span class="p">,</span> <span class="kc">NaN</span><span class="p">));</span>
+<span class="c1">// =&gt; true</span>
+</pre><span>
+</span></div><span>
+
+</span><p><code>Object.is</code> also treats <code>0</code> and <code>-0</code> as distinct values:</p><span>
+
+</span><div class="highlight"><span>
+</span><pre>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">is</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">));</span>
+<span class="c1">// =&gt; false</span>
+</pre><span>
+</span></div><span>
+
+</span><p>So, when ES6 finally comes around will you be better off using <code>Object.is</code> instead of <code>===</code> to compare values? Probably not. While <code>Object.is</code> resolves some ambiguities in <code>===</code>, encountering those ambiguities is relatively rare. You should keep <code>Object.is</code> in your JavaScript toolbox, but it's not an everyday tool for most people.</p><span>
+
+</span><p>Because it is an ES6 method, <code>Object.is</code> isn't available everywhere yet. But it is available in FireFox and Chrome for the past few versions. And if you'd like use to it in older browsers, you can polyfill it using Paul Miller's <a href="https://github.com/paulmillr/es6-shim">es6-shim</a>.</p><span>
+
+</span><p>Thanks for reading!</p><span>
+
+</span><p>Josh Clanton</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

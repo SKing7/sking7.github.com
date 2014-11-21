@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JavaScript’s internal character encoding: UCS-2 or UTF-16? · Mathias Bynens</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>JavaScript’s internal character encoding: UCS-2 or UTF-16? · Mathias Bynens</h1>
+<div itemprop="articleBody"><span>
+     </span><p>Does JavaScript use UCS-2 or UTF-16 encoding? Since I couldn’t find a definitive answer to this question anywhere, I decided to look into it. The answer depends on what you’re referring to: the JavaScript engine, or JavaScript at the language level.</p><span>
+     </span><p>Let’s start with the basics…</p><span>
+     </span><h2 id="bmp">The notorious BMP</h2><span>
+     </span><p>Unicode identifies characters by an unambiguous name and an integer number called its <em>code point</em>. For example, the <code>©</code> character is named “copyright sign” and has U+00A9 — <code>0xA9</code> can be written as <code>169</code> in decimal — as its code point.</p><span>
+     </span><p>The Unicode code space is divided into seventeen planes of 2^16  (65,536) code points each. Some of these code points have not yet been assigned character values, some are reserved for private use, and some are permanently reserved as non-characters. The code points in each plane have the hexadecimal values <code>xy0000</code> to <code>xyFFFF</code>, where <code>xy</code> is a hex value from <code>00</code> to <code>10</code>, signifying which plane the values belong to.</p><span>
+     </span><p>The first plane (<code>xy</code> is <code>00</code>) is called the <em>Basic Multilingual Plane</em> or <em>BMP</em>. It contains the code points from U+0000 to U+FFFF, which are the most frequently used characters.</p><span>
+     </span><p>The other sixteen planes are called <em>supplementary planes</em> or <em>astral planes</em>. I won’t discuss them here; just remember that there are <em>BMP characters</em> and <em>non-BMP characters</em>, the latter of which are also known as <em>supplementary characters</em> or <em>astral characters</em>.</p><span>
+     </span><h2 id="differences">Differences between UCS-2 and UTF-16</h2><span>
+     </span><p>Both UCS-2 and UTF-16 are character encodings for Unicode.</p><span>
+     </span><p><strong>UCS-2</strong> (2-byte Universal Character Set) produces a <strong>fixed-length</strong> format by simply using the code point as the <strong>16-bit code unit</strong>. This produces exactly the same result as UTF-16 for the majority of all code points in the range from <code>0</code> to <code>0xFFFF</code> (i.e. the BMP).</p><span>
+     </span><p><a href="http://tools.ietf.org/html/rfc2781"><strong>UTF-16</strong></a> (16-bit Unicode Transformation Format) is an extension of UCS-2 that allows representing code points outside the BMP. It produces a <strong>variable-length</strong> result of either <strong>one or two 16-bit code units per code point</strong>. This way, it can encode code points in the range from <code>0</code> to <code>0x10FFFF</code>.</p><span>
+     </span><p>For example, in both UCS-2 and UTF-16, the BMP character <em>U+00A9 copyright sign</em> (<code>©</code>) is encoded as <code>0x00A9</code>.</p><span>
+     </span><h3 id="surrogate-pairs">Surrogate pairs</h3><span>
+     </span><p>Characters outside the BMP, e.g. <em>U+1D306 tetragram for centre</em> (<code>𝌆</code>), can only be encoded in UTF-16 using two 16-bit code units: <code>0xD834 0xDF06</code>. This is called a <em>surrogate pair</em>. Note that a surrogate pair only represents a single character.</p><span>
+     </span><p>The first code unit of a surrogate pair is always in the range from <code>0xD800</code> to <code>0xDBFF</code>, and is called a <em>high surrogate</em> or a <em>lead surrogate</em>.</p><span>
+     </span><p>The second code unit of a surrogate pair is always in the range from <code>0xDC00</code> to <code>0xDFFF</code>, and is called a <em>low surrogate</em> or a <em>trail surrogate</em>.</p><span>
+     </span><p>UCS-2 lacks the concept of surrogate pairs, and therefore interprets <code>0xD834 0xDF06</code> (the previous UTF-16 encoding) as two separate characters.</p><span>
+     </span><h3 id="surrogate-formulae">Converting between code points and surrogate pairs</h3><span>
+     </span><p><a href="http://unicode.org/versions/Unicode3.0.0/ch03.pdf">Section 3.7 of The Unicode Standard 3.0</a> defines the algorithms for converting to and from surrogate pairs.</p><span>
+     </span><p>A code point <code>C</code> greater than <code>0xFFFF</code> corresponds to a surrogate pair <code>&lt;H, L&gt;</code> as per the following formula:</p><span>
+     </span><pre><code>H = Math.floor((C - 0x10000) / 0x400) + 0xD800<br />L = (C - 0x10000) % 0x400 + 0xDC00</code></pre><span>
+     </span><p>The reverse mapping, i.e. from a surrogate pair <code>&lt;H, L&gt;</code> to a Unicode code point <code>C</code>, is given by:</p><span>
+     </span><pre><code>C = (H - 0xD800) * 0x400 + L - 0xDC00 + 0x10000</code></pre><span>
+     </span><h2>Ok, so what about JavaScript?</h2><span>
+     </span><p>ECMAScript, the standardized version of JavaScript, <a href="http://es5.github.io/x2.html#x2">defines</a> how characters should be interpreted:</p><span>
+     </span><blockquote cite="http://es5.github.io/x2.html#x2">
+      <p>A conforming implementation of this International standard shall interpret characters in conformance with the Unicode Standard, Version 3.0 or later and ISO/IEC 10646-1 with either UCS-2 or UTF-16 as the adopted encoding form, implementation level 3. If the adopted ISO/IEC 10646-1 subset is not otherwise specified, it is presumed to be the BMP subset, collection 300. If the adopted encoding form is not otherwise specified, it is presumed to be the UTF-16 encoding form.</p>
+     </blockquote><span>
+     </span><p>In other words, JavaScript engines are allowed to use either UCS-2 or UTF-16.</p><span>
+     </span><p>However, <a href="http://es5.github.io/x15.1.html#x15.1.3" title="“The character is transformed into its UTF-8 encoding, with surrogate pairs first converted from UTF-16 to the corresponding code point value.”">specific parts</a> of the specification require some UTF-16 knowledge, regardless of the engine’s internal encoding.</p><span>
+     </span><p>Of course, internal engine specifics don’t really matter to the average JavaScript developer. What’s far more interesting is <a href="http://es5.github.io/x6.html#x6">what JavaScript considers  to be “characters”</a>, and how it exposes those:</p><span>
+     </span><blockquote cite="http://es5.github.io/x6.html#x6">
+      <p>Throughout the rest of this document, the phrase <em>code unit</em> and the word <em>character</em> will be used to refer to a 16-bit unsigned value used to represent a single 16-bit unit of text.<br />The phrase <em>Unicode character</em> will be used to refer to the abstract linguistic or typographical unit represented by a single Unicode scalar value (which may be longer than 16 bits and thus may be represented by more than one code unit).<br />The phrase <em>code point</em> refers to such a Unicode scalar value.<br /><em>Unicode character</em> only refers to entities represented by single Unicode scalar values: the components of a combining character sequence are still individual “Unicode characters”, even though a user might think of the whole sequence as a single character.</p>
+     </blockquote><span>
+     </span><p>JavaScript treats code units as individual characters, while humans generally think in terms of Unicode characters. This has some unfortunate consequences for Unicode characters outside the BMP. Since surrogate pairs consist of two code units, <code>'𝌆'.length == 2</code>, even though there’s only <a href="http://codepoints.net/U+1D306" title="U+1D306 TETRAGRAM FOR CENTRE">one Unicode character</a> there. The individual surrogate halves are being exposed as if they were characters: <code>'𝌆' == '\uD834\uDF06'</code>.</p><span>
+     </span><p>Remind you of something? It should, ’cause this is almost exactly how UCS-2 works. (The only difference is that technically, UCS-2 doesn’t allow surrogate characters, while JavaScript strings do.)</p><span>
+     </span><p>You could argue that it resembles UTF-16, except unmatched surrogate halves are allowed, surrogates in the wrong order are allowed, and surrogate halves are exposed as separate characters. I think you’ll agree that it’s easier to think of this behavior as “UCS-2 with surrogates”.</p><span>
+     </span><p>This UCS-2-like behavior affects the entire language — for example, <a href="https://mathiasbynens.be/notes/javascript-unicode#astral-ranges">regular expressions for ranges of supplementary characters</a> are much harder to write than in languages that do support UTF-16.</p><span>
+     </span><p>Surrogate pairs are only recombined into a single Unicode character when they’re displayed by the browser (during layout). This happens outside of the JavaScript engine. To demonstrate this, you could write out the high surrogate and the low surrogate in separate <code>document.write()</code> calls: <code>document.write('\uD834'); document.write('\uDF06');</code>. This ends up getting rendered as <code>𝌆</code> — one glyph.</p><span>
+     </span><h2 id="conclusion">Conclusion</h2><span>
+     </span><p>JavaScript engines are free to use UCS-2 or UTF-16 internally. Most engines that I know of use UTF-16, but whatever choice they made, it’s just an implementation detail that won’t affect the language’s characteristics.</p><span>
+     </span><p>The ECMAScript/JavaScript language itself, however, exposes characters according to UCS-2, not UTF-16.</p><span>
+     </span><p>If you ever need to <a href="https://mathiasbynens.be/notes/javascript-escapes">escape a Unicode character</a>, breaking it up into surrogate halves when necessary, feel free to use my <a href="https://mothereff.in/js-escapes#1%F0%9D%8C%86">JavaScript escaper</a> tool.</p><span>
+     </span><p>If you want to <a href="https://mothereff.in/byte-counter#%F0%9D%8C%86">count the number of Unicode characters</a> in a JavaScript string, or create a string based on a non-BMP Unicode code point, you could use <a href="https://mths.be/punycode">Punycode.js</a>’s utility functions to convert between UCS-2 strings and UTF-16 code points:</p><span>
+     </span><pre><code class="language-javascript">// `String.length` replacement that only counts full Unicode characters<br />punycode.ucs2.decode('𝌆').length; // 1<br />// `String.fromCharCode` replacement that doesn’t make you enter the surrogate halves separately<br />punycode.ucs2.encode([0x1D306]); // '𝌆'<br />punycode.ucs2.encode([119558]); // '𝌆'</code></pre><span>
+     </span><p>ECMAScript 6 will support a new kind of escape sequence in strings, namely <a href="https://mathiasbynens.be/notes/javascript-escapes#unicode-code-point">Unicode code point escapes</a> e.g. <code>\u{1D306}</code>. Additionally, it will define <code>String.fromCodePoint</code> and <code>String#codePointAt</code>, both of which accept code points rather than code units.</p><span>
+     </span><p>Thanks to <a href="http://jonaswesterlund.se/">Jonas ‘nlogax’ Westerlund</a>, <a href="http://www.doxdesk.com/">Andrew ‘bobince’ Clover</a>, and <a href="http://www.xanthir.com/">Tab Atkins Jr.</a> for inspiring me to look into this, and for helping me out with their explanations.</p><span>
+     </span><p class="note"><strong>Note:</strong> If you liked reading about JavaScript’s internal character encoding, check out <a href="https://mathiasbynens.be/notes/javascript-unicode"><em>JavaScript has a Unicode problem</em></a>, which explains the practical problems caused by this behavior in more detail, and offers solutions.</p><span>
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

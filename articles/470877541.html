@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Wireshark基本介绍和学习TCP三次握手</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Wireshark基本介绍和学习TCP三次握手</h1>
+<div id="cnblogs_post_body"><p>之前写过一篇博客：<a href="http://www.cnblogs.com/TankXiao/archive/2012/02/06/2337728.html" target="_blank">用 Fiddler&nbsp;来调试HTTP，HTTPS</a>。 这篇文章介绍另一个好用的抓包工具wireshark，&nbsp;用来获取网络数据封包，包括http,TCP,UDP，等网络协议包。</p><span>
+</span><p>记得大学的时候就学习过TCP的三次握手协议，那时候只是知道，虽然在书上看过很多TCP和UDP的资料，但是从来没有真正见过这些数据包， 老是感觉在云上飘一样，学得不踏实。有了wireshark就能截获这些网络数据包，可以清晰的看到数据包中的每一个字段。更能加深我们对网络协议的理解。<br /><span>对我而言， wireshark 是学习网络协议最好的工具。</span></p><span>
+</span><span>
+</span><p>阅读目录</p><span>
+</span><ol>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#introduction">wireshark介绍</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#cannotdo">wireshark不能做的</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#wiresharkfiddler">wireshark VS Fiddler</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#othertool">同类的其他工具</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#who">什么人会用到wireshark</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#start">wireshark 开始抓包</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#mainui">wireshark 窗口介绍</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#filter">wireshark 显示过滤</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#savefilter">保存过滤</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#filterRegular">过滤表达式</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#PacketList">封包列表(Packet List Pane)</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#packetDetails">封包详细信息 (Packet Details Pane)</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#osi">wireshark与对应的OSI七层模型</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#tcpdetails">TCP包的具体内容</a></li>
+<li><a href="http://www.cnblogs.com/tankxiao/archive/2012/10/10/2711777.html#threehand">实例分析TCP三次握手过程</a></li>
+
+
+
+
+</ol><span>
+</span><span>
+</span><span>
+</span><p>wireshark的官方下载网站： <a href="http://www.wireshark.org/">http://www.wireshark.org/</a></p><span>
+</span><p>wireshark是非常流行的网络封包分析软件，功能十分强大。可以截取各种网络封包，显示网络封包的详细信息。</p><span>
+</span><p>wireshark是开源软件，可以放心使用。 可以运行在Windows和Mac OS上。</p><span>
+</span><span>
+</span><p><span>使用wireshark的人必须了解网络协议，否则就看不懂wireshark了。</span></p><span>
+</span><span>
+</span><p>为了安全考虑，wireshark只能查看封包，而不能修改封包的内容，或者发送封包。</p><span>
+</span><span>
+</span><span>
+</span><p>Fiddler是在windows上运行的程序，专门用来捕获HTTP，HTTPS的。</p><span>
+</span><p>wireshark能获取HTTP，也能获取HTTPS，但是不能解密HTTPS，所以wireshark看不懂HTTPS中的内容</p><span>
+</span><span>
+</span><p><span>总结，如果是处理HTTP,HTTPS 还是用Fiddler,&nbsp; 其他协议比如TCP,UDP 就用wireshark</span></p><span>
+</span><span>
+</span><p>微软的network monitor</p><span>
+</span><p>sniffer&nbsp;</p><span>
+</span><span>
+</span><span>
+</span><p>1. 网络管理员会使用wireshark来检查网络问题</p><span>
+</span><p>2. 软件测试工程师使用wireshark抓包，来分析自己测试的软件</p><span>
+</span><p>3. 从事socket编程的工程师会用wireshark来调试</p><span>
+</span><p>4. 听说，华为，中兴的大部分工程师都会用到wireshark。</p><span>
+</span><span>
+</span><p><span>总之跟网络相关的东西，都可能会用到wireshark.</span></p><span>
+</span><span>
+</span><p>开始界面</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100608483858.png" alt="" /></p><span>
+</span><p>wireshark是捕获机器上的某一块网卡的网络包，当你的机器上有多块网卡的时候，你需要选择一个网卡。</p><span>
+</span><p>点击Caputre-&gt;Interfaces.. 出现下面对话框，选择正确的网卡。然后点击"Start"按钮, 开始抓包</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100608494283.png" alt="" /></p><span>
+</span><span>
+</span><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100609122040.png" alt="" /></p><span>
+</span><span>
+</span><p>WireShark 主要分为这几个界面</p><span>
+</span><p>1. Display Filter(显示过滤器)，&nbsp; 用于过滤</p><span>
+</span><p>2. Packet List Pane(封包列表)， 显示捕获到的封包， 有源地址和目标地址，端口号。 颜色不同，代表</p><span>
+</span><p>3. Packet Details Pane(封包详细信息), 显示封包中的字段</p><span>
+</span><p>4. Dissector Pane(16进制数据)</p><span>
+</span><p>5. Miscellanous(地址栏，杂项)</p><span>
+</span><span>
+</span><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100617113979.png" alt="" /></p><span>
+</span><p>使用过滤是非常重要的， 初学者使用wireshark时，将会得到大量的冗余信息，在几千甚至几万条记录中，以至于很难找到自己需要的部分。搞得晕头转向。</p><span>
+</span><p>过滤器会帮助我们在大量的数据中迅速找到我们需要的信息。</p><span>
+</span><p>过滤器有两种，</p><span>
+</span><p>一种是显示过滤器，就是主界面上那个，用来在捕获的记录中找到所需要的记录</p><span>
+</span><p>一种是捕获过滤器，用来过滤捕获的封包，以免捕获太多的记录。 在Capture -&gt; Capture Filters 中设置</p><span>
+</span><span>
+</span><span>
+</span><p>在Filter栏上，填好Filter的表达式后，点击Save按钮， 取个名字。比如"Filter 102",</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100617144741.png" alt="" /></p><span>
+</span><p>Filter栏上就多了个"Filter 102" 的按钮。</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100617155580.png" alt="" /> </p><span>
+</span><span>
+</span><p>表达式规则</p><span>
+</span><p>&nbsp;1. 协议过滤</p><span>
+</span><p>比如TCP，只显示TCP协议。</p><span>
+</span><p>2. IP 过滤</p><span>
+</span><p>比如 ip.src ==192.168.1.102 显示源地址为192.168.1.102， </p><span>
+</span><p>ip.dst==192.168.1.102, 目标地址为192.168.1.102</p><span>
+</span><p>3. 端口过滤</p><span>
+</span><p>tcp.port ==80,&nbsp; 端口为80的</p><span>
+</span><p>tcp.srcport == 80,&nbsp; 只显示TCP协议的愿端口为80的。</p><span>
+</span><p>4. Http模式过滤</p><span>
+</span><p>http.request.method=="GET",&nbsp;&nbsp; 只显示HTTP GET方法的。</p><span>
+</span><p>5. 逻辑运算符为 AND/ OR</p><span>
+</span><p>常用的过滤表达式</p><span>
+</span><table border="0" align="left">
+<tbody>
+<tr>
+<td>过滤表达式</td>
+<td>用途</td>
+
+
+
+
+</tr>
+<tr>
+<td>http</td>
+<td>只查看HTTP协议的记录</td>
+
+
+
+
+</tr>
+<tr>
+<td>ip.src ==192.168.1.102 or ip.dst==192.168.1.102</td>
+<td>&nbsp;源地址或者目标地址是192.168.1.102</td>
+
+
+
+
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+
+</tr>
+
+
+
+
+</tbody>
+
+
+
+
+</table><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><p>封包列表的面板中显示，编号，时间戳，源地址，目标地址，协议，长度，以及封包信息。 你可以看到不同的协议用了不同的颜色显示。</p><span>
+</span><p>你也可以修改这些显示颜色的规则，&nbsp; View -&gt;Coloring Rules.</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100622181376.png" alt="" /></p><span>
+</span><span>
+</span><span>
+</span><p>这个面板是我们最重要的，用来查看协议中的每一个字段。</p><span>
+</span><p>各行信息分别为</p><span>
+</span><p>Frame:&nbsp;&nbsp; <span><span>物理层的数据帧概况</span></span></p><span>
+</span><p>Ethernet <span>II: <span><span>数据链路层以太网帧头部信息</span></span></span></p><span>
+</span><p><span>Internet Protocol Version 4: <span><span>互联网层IP包头部信息</span></span><br /></span></p><span>
+</span><p><span>Transmission Control Protocol:&nbsp; <span><span>传输层T的数据段头部信息，此处是TCP</span></span><br /></span></p><span>
+</span><p><span>Hypertext Transfer Protocol:&nbsp; <span>应用层的信息，此处是HTTP协议</span><br /></span></p><span>
+</span><span>
+</span><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100709030740.png" alt="" /></p><span>
+</span><span>
+</span><p>&nbsp;从下图可以看到wireshark捕获到的TCP包中的每个字段。</p><span>
+</span><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100717254656.png" alt="" /></p><span>
+</span><span>
+</span><span>
+</span><p>看到这， 基本上对wireshak有了初步了解， 现在我们看一个TCP三次握手的实例</p><span>
+</span><span>
+</span><p>&nbsp;三次握手过程为</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100722541987.png" alt="" /></p><span>
+</span><span>
+</span><p>这图我都看过很多遍了， 这次我们用wireshark实际分析下三次握手的过程。</p><span>
+</span><p>打开wireshark, 打开浏览器输入 <a>http://www.cnblogs.com/tankxiao</a></p><span>
+</span><p>在wireshark中输入http过滤， 然后选中GET /tankxiao HTTP/1.1的那条记录，右键然后点击"Follow TCP Stream", </p><span>
+</span><p>这样做的目的是为了得到与浏览器打开网站相关的数据包，将得到如下图</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100723095165.png" alt="" /></p><span>
+</span><p>图中可以看到wireshark截获到了三次握手的三个数据包。第四个包才是HTTP的， 这说明HTTP的确是使用TCP建立连接的。 </p><span>
+</span><span>
+</span><p>第一次握手数据包</p><span>
+</span><p>客户端发送一个TCP，标志位为SYN，序列号为0， 代表客户端请求建立连接。 如下图</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100723171949.png" alt="" /></p><span>
+</span><p>第二次握手的数据包</p><span>
+</span><p>服务器发回确认包, 标志位为 SYN,ACK. 将确认序号(Acknowledgement Number)设置为客户的I S N加1以.即0+1=1, 如下图</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100723221390.png" alt="" /></p><span>
+</span><p>第三次握手的数据包</p><span>
+</span><p>客户端再次发送确认包(ACK) SYN标志位为0,ACK标志位为1.并且把服务器发来ACK的序号字段+1,放在确定字段中发送给对方.并且在数据段放写ISN的+1, 如下图:</p><span>
+</span><p><img src="http://pic002.cnblogs.com/images/2012/263119/2012100723244189.png" alt="" /></p><span>
+</span><p>&nbsp;就这样通过了TCP三次握手，建立了连接</p><span>
+</span><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A proxy for first paint and why I love Velocity</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>A proxy for first paint and why I love Velocity</h1>
+<div class="post-content"><span>
+  </span><p>I love web performance conferences because I learn so much from interacting with other practitioners in my field. Velocity and WebPerfdays are the big conference + unconference pair in our field and so much happens there.</p><span>
+
+</span><p>At WebPerfDays London last year, while adding support for SPDY to boomerang, I learnt about Chrome’s alternate performance timing object… one that was different from Navigation Timing.</p><span>
+
+</span><p>That’s when I noticed that Chrome also reports when the the first paint happens. <!-- More --></p><span>
+
+</span><h2 id="first_paint">First Paint</h2><span>
+
+</span><p>In Chrome, first paint is reported via the object returned from <code>window.chrome.loadTimes()</code>. If you’re a performance geek like me, you’ve probably just opened up your WebDev console and inspected this object, and you’ve probably seen that it looks something like this:</p><span>
+</span><div class="highlight"><pre><code class="javascript"><span class="p">{</span>
+	<span class="nx">commitLoadTime</span><span class="o">:</span> <span class="mf">1384152185.366253</span>
+	<span class="nx">connectionInfo</span><span class="o">:</span> <span class="s2">"http/1"</span>
+	<span class="nx">finishDocumentLoadTime</span><span class="o">:</span> <span class="mf">1384152185.810402</span>
+	<span class="nx">finishLoadTime</span><span class="o">:</span> <span class="mf">1384152185.906618</span>
+	<span class="nx">firstPaintAfterLoadTime</span><span class="o">:</span> <span class="mf">1384152185.974076</span>
+	<span class="nx">firstPaintTime</span><span class="o">:</span> <span class="mf">1384152185.817258</span>
+	<span class="nx">navigationType</span><span class="o">:</span> <span class="s2">"Other"</span>
+	<span class="nx">npnNegotiatedProtocol</span><span class="o">:</span> <span class="s2">"unknown"</span>
+	<span class="nx">requestTime</span><span class="o">:</span> <span class="mf">1384152185.094807</span>
+	<span class="nx">startLoadTime</span><span class="o">:</span> <span class="mf">1384152185.220614</span>
+	<span class="nx">wasAlternateProtocolAvailable</span><span class="o">:</span> <span class="kc">false</span>
+	<span class="nx">wasFetchedViaSpdy</span><span class="o">:</span> <span class="kc">false</span>
+	<span class="nx">wasNpnNegotiated</span><span class="o">:</span> <span class="kc">false</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p><code>firstPaintTime</code> is what I cared about at the time. Note that it’s reported in seconds since the epoch with microsecond resolution, so everything before the decimal point is seconds and everything after it is microseconds. This is different from other JavaScript timestamps which are in milliseconds, possibly with microsecond resolution if using the <a href="http://www.w3.org/TR/hr-time/#sec-DOMHighResTimeStamp">High Resolution Timer</a>.</p><span>
+
+</span><h2 id="ie_too">IE too</h2><span>
+
+</span><p>Chrome is not the only browser that reports first paint. IE also reports it as part of <code>window.performance.msFirstPaint</code>, although in IE’s case it’s reported in milliseconds.</p><span>
+
+</span><h2 id="other_modern_browsers">Other modern browsers</h2><span>
+
+</span><p>And this brings us to the topic of this post and why I love Velocity.</p><span>
+
+</span><p>At Velocity New York earlier this year, I was chatting with Seth Walker from Etsy. Etsy was our first customer but more importantly keep contributing ideas that make boomerang better. This was one such idea.</p><span>
+
+</span><p>Seth’s new engineer, <a href="http://www.etsy.com/people/danielespeset">Daniel Espeset</a> worked on a proxy for detecting first paint. We compared the numbers to what Chrome’s <code>firstPaintTime</code> reported, and they were within 2-3 milliseconds of each other, so the proxy was pretty good on Chrome at least.</p><span>
+
+</span><p>Daniel’s trick was to attach a handler to <code>requestAnimationFrame</code>, and measure when it first fired. The logic was that <code>requestAnimationFrame</code> fires when the browser is ready to draw something to screen, and the first time that happens is when the browser can first draw stuff to screen, ie, on first paint.</p><span>
+
+</span><p>The brilliance is in its simplicity.</p><span>
+
+</span><p>I won’t post code here. I’ll let Daniel do that, or wait for his pull request to boomerang.</p><span>
+
+</span><h2 id="older_browsers">Older browsers</h2><span>
+
+</span><p>And this is where it gets even better. While chatting with <a href="http://stevesouders.com/">Steve</a> a little later in the conference, he mentioned another one of our customers who had a different proxy for first paint.</p><span>
+
+</span><p><a href="http://www.flipkart.com/">Flipkart.com</a> is an online marketplace in India, much like what Amazon is in the US. They’d been using boomerang to measure load time long before lognormal was founded, and moved over to our platform soon after.</p><span>
+
+</span><p>Flipkart’s idea was to measure when the last CSS file had finished loading. Since CSS blocks rendering, this was a pretty good lower limit of when rendering could start. It may not tell you that rendering has in fact started, but it’s pretty certain that nothing has rendered before this time.</p><span>
+
+</span><h2 id="the_full_list">The full list</h2><span>
+
+</span><p>So for the full list of first paint measures, I’d go through in this order:</p><span>
+
+</span><ol>
+<li>Attach a handler to <code>requestAnimationFrame</code> and remove it when it fires.</li>
+
+<li>Attach a handler to the <code>onload</code> event of all my CSS files (probably do this inline) (Edit: Andy Davies suggests all blocking resources in the HEAD instead of just CSS)</li>
+
+<li>Check for <code>window.chrome.loadTimes().firstPaintTime</code> or <code>window.performance.msFirstPaint</code></li>
+
+<li>Use the earliest time from 1. and 3. or use the time from 2. if neither 1. or 3. are available.</li>
+</ol><span>
+
+</span><p>See the <a href="https://github.com/lognormal/boomerang/blob/master/plugins/navtiming.js">Navigation Timing Plugin</a> for what we have right now.</p><span>
+
+</span><p>Do you have a better hack in place? Let us know in the comments.</p><span>
+
+</span><h2 id="acknowledgements">Acknowledgements</h2><span>
+
+</span><p>I’d like to thank Daniel Espeset for his technique, Seth Walker for showing it to me and Steve Souders for letting me know about the CSS hack.</p><span>
+
+</span><p>I’d also like to thank all of our customers. You’re all performance geeks just like we are, and a lot of the awesome sauce in our products come from ideas that you share with us. The above is just one example.</p><span>
+
+</span><h2 id="update_20131125">Update 2013-11-25</h2><span>
+
+</span><p>We’ve been doing a lot of testing on these techniques, and at the moment it looks like the <code>requestAnimationFrame</code> hack only works correctly on Chrome. All other browsers fire the first <code>RAF</code> within 40ms of the page starting up, even before <code>HEAD</code> has completed loading, and then repeatedly every 13-23ms.</p><span>
+
+</span><p>This is likely a bug in all browsers since painting cannot start until HEAD has loaded. From the <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.requestAnimationFrame">MDN</a> docs:</p><span>
+
+</span><blockquote>
+<p>The window.requestAnimationFrame() method tells the browser that you wish to perform an animation and requests that the browser call a specified function to update an animation <strong>before the next repaint</strong>.</p>
+</blockquote><span>
+
+</span><p>I have no idea why this happens. Unfortunately, since Chrome already reports first paint time, this technique won’t be very useful until browsers fix their bug.</p><span>
+
+</span><p>Strangely, Opera, which uses Chrome’s engine, also has the bug. On the other hand, since Opera uses Chrome’s engine, it also exposes <code>window.chrome.loadTimes()</code></p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

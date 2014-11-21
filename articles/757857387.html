@@ -1,0 +1,313 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Using Helper Classes to DRY and Scale CSS</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Using Helper Classes to DRY and Scale CSS</h1>
+<section class="article_body">
+
+            <p>You are starting a new web project and looking for a new CSS methodology that will help you scale your code. A growing set of techniques for writing modular CSS are available, including <a href="https://smacss.com/">SMACSS</a>, <a href="http://bem.info/">BEM</a>, and a number of other similar methodologies, all based on Object-oriented CSS (OCSS). As you can see, there are lots of techniques to write and organize CSS.</p>
+<p>Besides all these methodologies, there is something that can help us write <abbr title="Don't Repeat Yourself">DRY</abbr>, less repetitive code: Helper classes (also called utility classes).</p>
+<p>This concept was discussed some time ago <a href="http://www.smashingmagazine.com/2013/10/21/challenging-css-best-practices-atomic-approach/">in Thierry Koblentz’s article on Smashing Magazine</a>, but I thought I would explain the method in my own words here.</p>
+<h2 id="what-are-helper-classes">What Are Helper Classes?</h2>
+<p>Helper classes can help remove repetition by creating a set of abstract classes that can be used over and over on HTML elements. Each helper class is responsible for doing one job and doing it well. Doing this will make your code more reusable and scalable for many features that will be added in the future. So whenever you want to create a new component, you’ll just need to combine some classes together to build it.</p>
+<blockquote class="twitter-tweet" lang="en"><p>“Treat code like Lego. Break code into the smallest little blocks possible.” — <a href="https://twitter.com/csswizardry">@csswizardry</a> (via <a href="https://twitter.com/stubbornella">@stubbornella</a>) <a href="https://twitter.com/hashtag/btconf?src=hash">#btconf</a></p>
+<p>— Smashing Magazine (@smashingmag) <a href="https://twitter.com/smashingmag/status/339024926197559296">May 27, 2013</a></p></blockquote>
+<p>Let’s see a simple example of what utility classes look like and how we can use them. Look at the following snippet of code:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.left        { float: left; }
+.right       { float: right; }
+
+.text-left   { text-align: left; }
+.text-right  { text-align: right; }
+.text-center { text-align: center; }
+</pre>
+<p>Here we’ve created a set of CSS rules that we can use later when building new components. For example if you want to align some content to the left you can use the <code>text-left</code> class. Likewise, you can use the <code>left</code> or <code>right</code> classes to float elements in the needed direction.</p>
+<p>Let’s see another example of a box that needs to be on the left with its inner content centered.</p>
+<p>We usually do something like this:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="box"&gt;
+&lt;/div&gt;
+</pre>
+<p>With this CSS:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.box {
+    float: left;
+    text-align: center;
+}
+</pre>
+<p>Instead, we can achieve the same thing using reusable and single-responsibility helper classes:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="left text-center"&gt;
+&lt;/div&gt;
+</pre>
+<p>Notice how I removed the <code>box</code> class and instead added our predefined classes <code>left</code> and <code>text-center</code>.</p>
+<p>If you want to change the float and align directions, instead of doing this on the non-reusable <code>.box</code> class, you can use other helper classes:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="right text-right"&gt;
+&lt;/div&gt;
+</pre>
+<p>The grid system is a good example of helper classes in use. Here is <a href="http://foundation.zurb.com/docs/components/grid.html">an example from Foundation’s grid</a>:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="row"&gt;
+    &lt;div class="small-2 large-4 columns"&gt;&lt;/div&gt;
+    &lt;div class="small-4 large-4 columns"&gt;&lt;/div&gt;
+    &lt;div class="small-6 large-4 columns"&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p>Foundation provides numerous classes that can be used and combined together to create a grid system with different widths for different screen sizes. This flexibility helps developers create new customized layouts faster, without editing any CSS for the grid itself. For example:</p>
+<ul>
+<li><code>.small-2</code> and <code>.large-4</code> classes will set the width of an element based on the screen size.</li>
+<li>The <code>.row</code> class sets the width of the container that holds the columns.</li>
+<li>The <code>.columns</code> class sets the padding and floats.</li>
+</ul>
+<p>Now that you understand what helper classes are, let’s take a look at some reusable classes we can add to our projects, presented below in different categories. Note also that the example will use some Sass variables, but naturally these are not necessary.</p>
+<h2 id="margins-and-padding">Margins and Padding</h2>
+<p>Margins and padding are probably the most used properties in our CSS. Adding some abstract classes that can handle this will DRY our code.</p>
+<p>We start by defining a variable (using Sass) for the base space unit for our design. Let’s start with <code>1em</code> and on top of that we can create classes for different space sizes.</p>
+<pre class="brush: sass; title: ; notranslate" title="">
+$base-space-unit: 1em;
+
+// Top margin
+.margin-top-none    { margin-top: 0; }
+.margin-top-quarter { margin-top: $base-space-unit / 4; }
+.margin-top-half    { margin-top: $base-space-unit / 2; }
+.margin-top-one     { margin-top: $base-space-unit; }
+.margin-top-two     { margin-top: $base-space-unit * 2; }
+
+// Top padding
+.padding-top-none    { padding-top: 0; }
+.padding-top-quarter { padding-top: $base-space-unit / 4; }
+.padding-top-half    { padding-top: $base-space-unit / 2; }
+.padding-top-one     { padding-top: $base-space-unit; }
+.padding-top-two     { padding-top: $base-space-unit * 2; }
+</pre>
+<p>We can alternatively choose short class names, as in the example code below from <a href="http://www.basscss.com/docs/utility/#white-space">Basscss</a></p>
+<pre class="brush: css; title: ; notranslate" title="">
+.m0  { margin:        0 }
+.mt0 { margin-top:    0 }
+.mr0 { margin-right:  0 }
+.mb0 { margin-bottom: 0 }
+.ml0 { margin-left:   0 }
+</pre>
+<p>Choose what works for you and your team. The long names will obviously make your HTML elements larger, but they are more readable in contrast to the short names, so you may need to look at your CSS to figure out how things work.</p>
+<h2 id="width-and-height">Width and Height</h2>
+<p>Imagine you want to set a section to be full height in different places on your website. The traditional way we did this was something like this:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="contact-section"&gt;
+    &lt;!-- Content here... --&gt;
+&lt;/div&gt;
+</pre>
+<p>And our CSS:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.contact-section { height: 100%; }
+</pre>
+<p>For other sections we would repeat the code:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="services-section"&gt;
+    &lt;!-- Content here... --&gt;
+&lt;/div&gt;
+</pre>
+<p>And the CSS:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.services-section { height: 100%; }
+</pre>
+<p>But we can reduce all of this with one class called <code>full-height</code>:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="full-height"&gt;
+    &lt;!-- Content here... --&gt;
+&lt;/div&gt;
+</pre>
+<p>Below are some similar examples, including the <code>full-height</code> class used above:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.fit         { max-width: 100%; }
+.half-width  { width: 50% }
+.full-width  { width: 100%; }
+.full-height { height: 100%; }
+</pre>
+<h2 id="position-and-z-index">Position and Z-index</h2>
+<p>Position-related properties can be combined with other properties like <code>z-index</code> to create a complex layout. We can create a set of classes to set the exact position of any element in relation to the viewport or an ancestor element (right, left, top left, etc):</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.fixed    { position: fixed; }
+.relative { position: relative; }
+.absolute { position: absolute; }
+.static   { position: static; }
+
+.zindex-1 { z-index: 1; }
+.zindex-2 { z-index: 2; }
+.zindex-3 { z-index: 3; }
+
+.pin-top-right {
+    top: 0;
+    right: 0;
+}
+
+.pin-bottom-right {
+    bottom: 0;
+    right: 0;
+}
+</pre>
+<p>The “pin” helper classes are inspired by <a href="https://www.mapbox.com/base/latest/base.css">Mapbox’s CSS</a>.</p>
+<p>Let’s extend the full-height example to contain an element positioned at the bottom right.</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="full-height relative"&gt;
+    &lt;div class="absolute pin-bottom-right padding-one"&gt;
+        Text to bottom right
+    &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p><a href="http://jsbin.com/matito/1/">Demo</a></p>
+<p>By combining more than one class, we can get the required result in less code. If you want to position the inner element at the top right, you can use the <code>pin-top-right</code> instead of <code>pin-bottom-right</code>. You might have noticed in the above code I also added another helper class: The <code>padding-one</code> class ensures the element isn’t flush against the edge of the container or viewport.</p>
+<h2 id="floated-elements">Floated Elements</h2>
+<p>Floating elements left or right can be done using <code>left</code> or <code>right</code> classes. The well-known <a href="http://www.sitepoint.com/clearing-floats-overview-different-clearfix-methods/">clearfix class</a> can be used on the parent element to clear floats, shown below using <a href="http://sass-lang.com/documentation/file.SASS_REFERENCE.html#parent-selector">Sass’s parent selector</a>:</p>
+<pre class="brush: sass; title: ; notranslate" title="">
+.left  { float: left; }
+.right { float: right; }
+
+.clearfix {
+    &amp;:before,
+    &amp;:after {
+        content: "";
+        display: table;
+    }
+
+    &amp;:after { clear: both; }
+}
+</pre>
+<p><a href="http://jsbin.com/cenuvo/1/">Demo</a></p>
+<h2 id="aligning-elements">Aligning Elements</h2>
+<p>We can make text and other content align to any direction, using align-based helper classes:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.text-left    { text-align: left; }
+.text-right   { text-align: right; }
+.text-center  { text-align: center; }
+.text-just    { text-align: justify; }
+
+.align-top    { vertical-align: top; }
+.align-bottom { vertical-align: bottom; }
+.align-middle { vertical-align: middle; }
+</pre>
+<h2 id="visibility-classes">Visibility Classes</h2>
+<p>Visibility classes control the visibility of elements, depending on the screen size, device orientation, touch screen, or other factors. These can come in handy in responsive designs.</p>
+<p>We could have the following classes inside of our media queries:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.hide-on-small { display: none; }
+.show-in-large { display: block; }
+</pre>
+<p>And in our HTML:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="hide-on-small show-in-large"&gt;
+    &lt;!-- content here... --&gt;
+&lt;/div&gt;
+</pre>
+<p>The above element will be hidden on small screens but will be visible on larger screens.</p>
+<p>We can also use these classes to control elements on touch devices:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.touch .show-for-touch { display: none; }
+.touch .hide-for-touch { display: inherit; }
+</pre>
+<p>In the example above, the <code>.touch</code> class would come from the classes added to the <code>&lt;html&gt;</code> element by <a href="http://modernizr.com/">Modernizr</a>.</p>
+<p>A good example of visibility classes are <a href="http://foundation.zurb.com/docs/components/visibility.html">the ones in Foundation</a> and <a href="http://getbootstrap.com/css/#responsive-utilities">Bootstrap’s responsive-utilities</a>.</p>
+<h2 id="typography">Typography</h2>
+<p>In typography you can create classes for things like font weight and text manipulation, like ellipsis text.</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.bold     { font-weight: bold; }
+.regular  { font-weight: normal; }
+.italic   { font-style: italic; }
+
+.ell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.break-word { word-wrap: break-word; }
+.no-wrap    { white-space: nowrap; }
+</pre>
+<h2 id="colors">Colors</h2>
+<p>Every application has different guides and brand rules which we can define in classes that essentially ‘skin’ our interface. This would include text color, backgrounds, and more.</p>
+<p>Lets see how this can be translated to code. First let’s define our variables with Sass:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+$white     :   #fff;
+$gray      :   #2c3e50;
+$dark-gray :   #95a5a6;
+$dark      :   #2c3e50;
+
+$notice    :   #3498db;
+$success   :   #1abc9c;
+$alert     :   #e74c3c;
+</pre>
+<p>Then we define our helper classes, based on the variables:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+// Colors
+.white            { color: $white; }
+.gray             { color: $gray; }
+.dark-gray        { color: $dark-gray; }
+
+.notice           { color: $notice; }
+.success          { color: $success; }
+.alert            { color: $alert; }
+
+// Backgrounds
+.white-bg         { background-color: $white; }
+.gray-bg          { background-color: $gray; }
+.dark-gray-bg     { background-color: $darkgray; }
+
+.notice-bg        { background-color: $notice; }
+.success-bg       { background-color: $success; }
+.alert-bg         { background-color: $alert; }
+</pre>
+<p>Two good examples of using color and background helper classes are found in the <a href="https://www.mapbox.com/base/styling/color/">Mapbox</a> and the <a href="https://github.com/google/web-starter-kit/blob/master/app/styles/components/_helper.scss#L20">Google Web Starter Kit</a> projects.</p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2014/11/1415119829helperclasses-01.png" alt="Mapbox colors styleguide" width="704" height="296" class="aligncenter size-full wp-image-93945" /></p>
+<p>Another use case is the <a href="http://jsbin.com/tigeqo/1/">notification component</a>. Let’s see how we can style this with background helper classes.</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;div class="white p1 mb1 notice-bg"&gt;Info&lt;/div&gt;
+&lt;div class="white p1 mb1 success-bg"&gt;Success&lt;/div&gt;
+&lt;div class="white p1 mb1 alert-bg"&gt;Alert&lt;/div&gt;
+</pre>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2014/11/1415119827helperclasses-02.png" alt="Alerts" width="632" height="163" class="aligncenter size-full wp-image-93944" /></p>
+<h2 id="lists">Lists</h2>
+<p>How many times have you wanted to get rid of the bullets and padding from the <code>ul</code> element? A class called <code>list-bare</code>, <a href="https://github.com/inuitcss/objects.list-bare">as used in inuitcss</a>, can do that for you.</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.list-bare {
+    padding: 0;
+    list-style: none;
+}
+</pre>
+<h2 id="borders">Borders</h2>
+<p>Helper classes can be used to add borders to an element, whether for all sides or one side. So your CSS/Sass might look like this:</p>
+<pre class="brush: sass; title: ; notranslate" title="">
+$border-color: #f2f2f2;
+
+.border-all    { border:        1px solid $border-color; }
+.border-top    { border-top:    1px solid $border-color; }
+.border-bottom { border-bottom: 1px solid $border-color; }
+.border-right  { border-right:  1px solid $border-color; }
+.border-left   { border-left:   1px solid $border-color; }
+</pre>
+<h2 id="display-values">Display Values</h2>
+<p>The following helper classes give us the ability to use the different values for CSS’s <code>display</code> property:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+.inline       { display: inline; }
+.block        { display: block; }
+.inline-block { display: inline-block; }
+.hide         { display: none; }
+.flex         { display: flex; }
+</pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>Following this principle of abstraction might be a much different approach from what you are accustomed to when authoring CSS. But based on my experience, <a href="http://www.smashingmagazine.com/2013/10/21/challenging-css-best-practices-atomic-approach/">and that of others</a> I can say this is a very good approach to consider on your next project.</p>
+<p>You can check out all the helper classes from this post in a new library I created called <a href="https://github.com/ahmadajmi/css-helpers">css-helpers</a>.</p>
+
+<p>You can learn from and explore the structure of the following projects:</p>
+
+<h2 id="further-reading">Further Reading</h2>
+
+
+        </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

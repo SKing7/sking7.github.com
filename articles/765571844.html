@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>18F — Why we use HTTPS for every .gov we make</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>18F — Why we use HTTPS for every .gov we make</h1>
+<section class="blog-posting" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
+      
+      <time datetime="2014-11-13T00:00:00+00:00" itemprop="datePublished">November 13, 2014 </time>
+      <p>
+        Tagged /
+        <span class="blog-tags" itemprop="keywords">
+          
+            <a href="https://18f.gsa.gov/tags/security">security</a>
+            /
+          
+            <a href="https://18f.gsa.gov/tags/https">https</a>
+            /
+          
+            <a href="https://18f.gsa.gov/tags/policy">policy</a>
+            /
+          
+        </span>
+      </p>
+      <p class="authors">
+  by <span class="author eric">Eric Mill</span>
+</p>
+
+<p>The <code>.gov</code> in government websites carries a lot of weight. Citizens expect government websites to be secure, trustworthy, and reliable. Citizens expect anything they read on a <code>.gov</code> website to be official, and they expect any information they submit to that website — especially if they're submitting personal information — to be sent safely and only to the government.</p>
+
+<p>On today's Internet, in today's web browsers, <strong>HTTPS</strong> (<code>https://</code>) offers the strongest guarantee of reliable information and secure transmission.</p>
+
+<!-- more -->
+
+<p>That's why 18F's policy is to <strong>use HTTPS for every .gov website we make</strong>.  18F is an in-house government technology team that builds things for the rest of the US federal government, and we're committed to deploying HTTPS across all of our released websites.</p>
+
+<p><img src="https://18f.gsa.gov/assets/blog/https-everywhere/18f-https-desktop.png" alt="HTTPS URL on desktop" /></p>
+
+<p>Deciding to use HTTPS everywhere was not difficult. Strong encryption benefits our visitors and our government partners by providing:</p>
+
+<ul>
+<li><strong>A secure connection.</strong> HTTPS guarantees that visitors are connecting to the official website, and not getting a page that's been tampered with — or replaced entirely — by someone else. This protects users from being hijacked or having their information stolen, and protects our government partners from being impersonated or used as a vehicle for attack.</li>
+<li><strong>A private connection.</strong> Internet traffic is easily intercepted and easily correlated — there is no such thing as insensitive browsing data. By using HTTPS, a visitor's browsing activity is kept private. Web pages, URLs, cookies, and HTTP headers are all encrypted.</li>
+<li><strong>A fast connection.</strong> Encryption allows us to use modern protocols like <a href="https://developers.google.com/speed/spdy/">SPDY</a>, an extension to HTTPS that <a href="https://thethemefoundry.com/blog/why-we-dont-use-a-cdn-spdy-ssl/">greatly speeds up website loading</a>. SPDY is widely supported by modern browsers, and used today by <a href="http://www.wired.com/2013/03/facebook-spdy/">Twitter, Google, and Facebook</a>. SPDY requires encryption, and is the basis for the upcoming <a href="https://http2.github.io/">HTTP/2</a>, which will require encryption to support visitors on modern browsers.</li>
+</ul>
+
+<p>Finally, using HTTPS lets us adhere to <strong>search engine best practices</strong>, as <a href="http://googlewebmastercentral.blogspot.com/2014/08/https-as-ranking-signal.html">Google's search algorithms now prefer encrypted websites</a>.</p>
+
+<p>These properties are useful for all of our applications, all of the time — not just when passwords or personal information are involved. By simply deploying HTTPS all of the time, we don't have to engineer a boundary around "sensitive" parts of the application, or judge where those lines should be drawn.</p>
+
+<p>Our friends across the pond in the Government Digital Service have come to the same conclusion, and <a href="https://www.gov.uk/service-manual/domain-names/https.html">require HTTPS</a> in their <a href="https://www.gov.uk/service-manual">digital standards for the UK government</a>.</p>
+
+<p>As we build web APIs that we want the public to rely on, secure connections are becoming even more vital. 18F's <a href="https://18f.gsa.gov/2014/07/15/hot-off-the-press-18fs-api-standards/">API standards</a> recognize this by <a href="https://github.com/18F/api-standards#always-use-https">requiring the use of encryption</a>.</p>
+
+<h2 id="https-has-never-been-faster">HTTPS has never been faster</h2>
+
+<p>The most common concern people raise about HTTPS is performance. Encryption requires computation, and can make some kinds of caching more difficult. Fortunately, in the last several years, there has been tremendous investment in HTTPS by the private sector.</p>
+
+<p>Google has been engineering and publishing major speed improvements to OpenSSL's <a href="https://www.imperialviolet.org/2010/06/25/overclocking-ssl.html">encryption</a> and <a href="https://www.imperialviolet.org/2011/11/22/forwardsecret.html">privacy</a> for years, and their work on SPDY allows websites to achieve <a href="https://thethemefoundry.com/blog/why-we-dont-use-a-cdn-spdy-ssl/">serious performance improvements</a>. As major technology firms like <a href="http://lists.w3.org/Archives/Public/ietf-http-wg/2012JulSep/0251.html">Facebook</a> and <a href="https://blog.twitter.com/2013/forward-secrecy-at-twitter">Twitter</a> invest in universal encryption, their engineering and best practices have improved the ecosystem for everyone.</p>
+
+<p>In 2014, the biggest performance priority for HTTPS is to just <a href="https://istlsfastyet.com/">get it deployed more widely</a> so that these optimizations can continue.</p>
+
+<h2 id="integrating-https-into-our-workflow">Integrating HTTPS into our workflow</h2>
+
+<p>A more serious concern with HTTPS is operational: managing certificates, working out the right configuration, and generally not screwing it up. The financial cost of <em>purchasing</em> certificates is small — the maintenance cost of installing, configuring, and rotating them is not. This is arguably the biggest issue with deploying HTTPS today, and contributes to the web's <a href="https://konklone.com/post/why-google-is-hurrying-the-web-to-kill-sha-1#changing-certificates-shouldn%27t-be-this-hard">overall slow and inflexible security response</a>.</p>
+
+<p>Like everything else, managing the mechanics of HTTPS becomes far easier when you commit to it and operationalize it.</p>
+
+<p>We've still got a lot to do on this front, but we're starting out by:</p>
+
+<ul>
+<li>Openly documenting our <a href="https://github.com/18F/tls-standards">standard HTTPS practices</a>. This forces us to be more thoughtful and rigorous, and we hope it will yield valuable public feedback.</li>
+<li>Baking a <a href="https://github.com/18F/tls-standards/blob/008ad71ff13b368895351342142eea4fba671a50/configuration/nginx/ssl.rules">strong nginx configuration</a> into the baseline that 18F uses to create each of our production servers, so that our individual developers don't have to become HTTPS experts.</li>
+<li>Keeping up with the web security community as it makes advances in <a href="https://blog.cloudflare.com/ecdsa-the-digital-signature-algorithm-of-a-better-internet/">encryption</a>, <a href="http://threatpost.com/tls-1-3-working-group-has-consensus-to-deprectate-rsa-key-transport">protocols</a>, and <a href="https://sslmate.com/">certificate management</a> that can make our lives easier and our applications more secure.</li>
+</ul>
+
+<p>As we grow, we'll be writing about the tools we use — and <a href="https://18f.gsa.gov/2014/07/29/18f-an-open-source-team/">open sourcing</a> the tools we make — along the way.</p>
+
+<h2 id="moving-forward">Moving forward</h2>
+
+<p>The web's future is encrypted connections, for all the right reasons. The more people and institutions that push encryption forward, the simpler and faster it will become for everyone. 18F is joining that process.</p>
+
+<p>You'll soon hear more about our technical practices, and what we're doing to move the ball forward on web security inside the federal government.</p>
+
+    </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

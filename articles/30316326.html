@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>DOMContentLoaded and stylesheets · molily</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>DOMContentLoaded and stylesheets · molily</h1>
+<div lang="en"><span>
+
+</span><h2 id="dcl-introduction">Introduction to DOMContentLoaded</h2><span>
+
+</span><p>The DOMContentLoaded event is one of the main pillars of modern, unobtrusive JavaScript usage. This event fires after the HTML code has been fully retrieved from the server, the complete DOM tree has been created and scripts have access to all elements via the DOM API. Usually, this point in time is called “DOM ready”. In contrast to the <code>load</code> event, assets like images, iframes and plugins do not defer the DOMContentLoaded event. Thus, the DOMContentLoaded is ideal for authors attaching their JavaScript behavior to the page as early as possible.</p><span>
+
+</span><p>Nearly all JavaScript frameworks allow authors to start-up their scripts “on DOM ready”. It’s a common JavaScript programming pattern to put all your code in a private function scope and load this function “on DOM ready”. The code in such a start-up function queries the DOM, usually with the aid of selector engines. It gets information from the DOM, binds event listeners to elements, modifies the DOM etc. As I pointed out, this pattern is essential for unobtrusive DOM Scripting.</p><span>
+
+</span><p>How to make use of DOMContentLoaded in some popular frameworks:</p><span>
+
+</span><dl>
+
+<dt>jQuery:</dt>
+<dd><code>jQuery(document).ready(function ($) { ... });</code> or just <code>jQuery(function ($) { ... });</code></dd>
+
+<dt>Prototype:</dt>
+<dd><code>document.observe('dom:loaded', function () { ... });</code></dd>
+
+<dt>Mootools:</dt>
+<dd><code>window.addEvent('domready', function () { ... });</code></dd>
+
+</dl><span>
+
+</span><p>Microsoft Internet Explorer doesn’t support DOMContentLoaded up to and including version 8, so these frameworks make use of the <a href="http://javascript.nwbox.com/IEContentLoaded/">doScroll() workaround from Diego Perini</a>.</p><span>
+
+
+
+</span><h2 id="dcl-stylsheets">DOMContentLoaded and external stylesheets</h2><span>
+
+</span><p>To describe the exact behavior of the DOMContentLoaded event in my JavaScript tutorials, I’ve conducted several tests. The main question is: Does the loading of external stylesheets defer the DOMContentLoaded event? This issue isn’t new, it has already been investigated several years ago.</p><span>
+
+</span><p>For the most scripts, it makes sense to execute start-up scripts <strong>after</strong> all stylesheets have been loaded because these scripts rely on the fact that CSS rules have already been applied to the DOM. For the initialization of some scripts, it’s crucial to get the dimensions or the position of an element, for example.</p><span>
+
+</span><p>The <a href="https://developer.mozilla.org/en/docs/Gecko-Specific_DOM_Events#DOMContentLoaded">initial definition of Mozilla</a> says that DOMContentLoaded fires after the document has been parsed and the scripts therein have been executed. But in practise, DOMContentLoaded <em>sometimes</em> take stylesheets into account depending on how scripts are placed in the document and which type they are.</p><span>
+
+
+</span><h2 id="delaying-dcl">Delaying DOMContentLoaded in Gecko and Webkit with an external script</h2><span>
+
+</span><p>DOMContentLoaded doesn’t wait for stylesheets to load <em>provided that</em> no scripts are placed after the stylesheet reference, <code><link rel="stylesheet" /></code>. This is valid for all browsers supporting DOMContentLoaded.</p><span>
+
+</span><p><a href="http://molily.de/assets/domcontentloaded/t1-link-no-script.html">Testcase #1: no scripts after stylesheet</a></p><span>
+
+</span><p>There are several exceptions in which Gecko and Webkit <em>do</em> wait for the stylesheet to load before DOMContentLoaded fires. The most common case is <code><link rel="stylesheet" /></code> being followed by an external script, <code></code>. The script can be placed anywhere in the document as long as it’s after the <code><link /></code> element.</p><span>
+
+</span><p>A minimal testcase looks like this:</p><span>
+
+</span><pre>
+
+<head>
+<link rel="stylesheet" href="stylesheet.css" />
+
+</head>
+<body>
+<p>The element</p>
+</body>
+</pre><span>
+
+</span><p>stylesheet.css:</p><span>
+
+</span><pre>#element { color: red; }</pre><span>
+
+</span><p>script.js:</p><span>
+
+</span><pre>
+document.addEventListener('DOMContentLoaded', function () {
+	// should read #FF0000 or rgb(255, 0, 0)
+	alert(getComputedStyle(document.getElementById('element'), null).color);
+}, false);
+</pre><span>
+
+</span><p><a href="http://molily.de/assets/domcontentloaded/t2-link-external-script.html">Testcase #2: external script after stylesheet</a></p><span>
+
+</span><p>To demonstrate the browser differences, I’m forcing the HTTP server to serve the stylesheet with a delay of three seconds so the document parsing can finish before the stylesheet is received.</p><span>
+
+</span><p>The code above works as expected in Firefox, Safari and Chrome, but fails in Opera.</p><span>
+
+</span><p>Placing external scripts after the stylesheets has become a common practice. The <a href="http://api.jquery.com/ready/">jQuery documentation recommends</a> this very element order if you want to access a fully styled document in your DOM ready handler. Even if the stylesheet takes, say, 10 seconds to load and the document is received and parsed after one second, DOMContentLoaded doesn’t fire before the stylesheet has arrived.</p><span>
+
+</span><p>This involves pros and cons for DOM Scripting. You can count on the stylesheets being applied, but your scripts have to wait quite a time until they can traverse the DOM tree and register event handlers to elements.</p><span>
+
+
+
+</span><h2 id="html-parsing">Background: HTML parsing</h2><span>
+
+</span><p>These observations are based on browser quirks on a more fundamental level, the HTML parsing and script execution algorithm.</p><span>
+
+
+</span><h3 id="external-scripts">Stylesheets block execution of external scripts in Gecko, Webkit and IE</h3><span>
+
+</span><p>In these browsers, <strong>the loading of stylesheets blocks the execution of external scripts</strong>. Testcase #2 contains the following markup in the document’s head:</p><span>
+
+</span><pre>
+<link rel="stylesheet" href="stylesheet.css" />
+
+</pre><span>
+
+</span><p>Current Gecko and Webkit versions as well as Internet Explorer 8 download the stylesheet and the script in parallel with multiple HTTP connections. <strong>But they don’t execute the script until the stylesheet has been fetched.</strong> And they don’t start to render the page in the mean time. You can verify this observation using Firebug’s Network tab, the Resources tab from Safari’s Web Inspector and, most accurately, the Timeline tab in Chrome’s Developer Tools:</p><span>
+
+</span><p><img src="http://molily.de/assets/domcontentloaded/chrome-timeline-my.png" alt="" /></p><span>
+
+</span><p>Since DOMContentLoaded is fired after all scripts have been executed, the consequence is that DOMContentLoaded will always be fired <em>after</em> the stylesheet has been downloaded and processed.</p><span>
+
+</span><p>The same applies to Internet Explorer 8, except for the DOMContentLoaded part, of course.</p><span>
+
+</span><h3>Stylesheets do not block execution of external scripts in Opera</h3><span>
+
+</span><p>However, this trick to postpone DOMContentLoaded <strong>does not work for Opera</strong>. Opera executes the script as soon as it’s fetched and goes on with parsing immediately. This leads to incremental rendering, which is good for perceived performance, but also to a <a href="http://en.wikipedia.org/wiki/Flash_of_unstyled_content">flash of unstyled content (FOUC)</a>, which is rather undesirable.</p><span>
+
+</span><p>To normalize Opera’s deviation, jQuery 1.2.1 to 1.2.6 performed an additional check after the DOMContentLoaded event. In these jQuery versions, it was guaranteed that all stylesheets were loaded before the DOM ready handlers were called. <a href="http://github.com/jquery/jquery/commit/4c1e12e889f2a70bfa3603fed9d1cabe67d294e0">jQuery 1.3 dropped this workaround</a>. (Prototype and Mootools do not fix and didn't ever try to fix this issue, as far as I know.)</p><span>
+
+
+
+</span><h3 id="internal-scripts">Stylesheets block execution of internal scripts in Gecko and IE</h3><span>
+
+</span><p>Inline scripts also cause different browser behavior.</p><span>
+
+</span><pre>
+<link rel="stylesheet" href="stylesheet.css" />
+
+</pre><span>
+
+</span><p><a href="http://molily.de/assets/domcontentloaded/t3-link-script.html">Testcase #3: inline scripts after stylesheet</a></p><span>
+
+</span><p>In Internet Explorer and Gecko, <strong>a stylesheet also blocks the execution of subsequent inline scripts</strong>. Consequently, DOMContentLoaded is delayed.</p><span>
+
+</span><p>In Webkit and Opera, the inline script is executed immediately. Hence, DOMContentLoaded will fire as soon as the HTML is parsed regardless of the stylesheet.</p><span>
+
+
+
+</span><h2 id="summary">Summary</h2><span>
+
+</span><table>
+<caption>DOMContentLoaded and stylesheets overview</caption>
+<thead>
+<tr>
+<th>Browser Engine vs. Behavior</th>
+<th>
+	Stylesheets delay DOMContentLoaded if there are only scripts before the stylesheet link<br /><a href="http://molily.de/assets/domcontentloaded/t1-link-no-script.html">Testcase #1</a>
+</th>
+<th>
+	Stylesheets block the execution of subsequent <strong>external</strong> scripts and thereby delay DOMContentLoaded<br /><a href="http://molily.de/assets/domcontentloaded/t2-link-external-script.html">Testcase #2</a>
+</th>
+<th>
+	Stylesheets block the execution of subsequent <strong>inline</strong> scripts execution and thereby delay DOMContentLoaded<br /><a href="http://molily.de/assets/domcontentloaded/t3-link-script.html">Testcase #3</a>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Presto (Opera)</th>
+	<td>☐ No</td>
+	<td>☐ No</td>
+	<td>☐ No</td>
+</tr>
+<tr>
+	<th>Webkit (Safari, Chrome)</th>
+	<td>☐ No</td>
+	<td>☒ Yes</td>
+	<td>☐ No</td>
+</tr>
+<tr>
+	<th>Gecko (Firefox)</th>
+	<td>☐ No</td>
+	<td>☒ Yes</td>
+	<td>☒ Yes</td>
+</tr>
+<tr>
+	<th>Trident (Internet Explorer)</th>
+	<td>n/a</td>
+	<td>☒ Yes</td>
+	<td>☒ Yes</td>
+</tr>
+</tbody>
+</table><span>
+
+
+</span><h2 id="html5">HTML5 to the rescue? Yes! (updated on February 14)</h2><span>
+
+</span><p>Once, DOMContentLoaded was a Mozilla invention for internal use by Firefox addons. It didn’t take long for the evolving Unobtrusive JavaScript community to figure out how useful this event is for general Web sites. That’s why Opera and Apple adopted this event. But their HTML parsing implementations differ, as my tests revealed, and so therefore DOMContentLoaded has a different meaning.</p><span>
+
+</span><p>Fortunately, the most important webstandard to-be, HTML5, <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#the-end">is going to codify DOMContentLoaded</a> and the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html">exact HTML parsing process</a>.
+
+</p><p>According to HTML5, DOMContentLoaded is a plain DOM ready event without taking stylesheets into account. <strong>However</strong>, the HTML5 parsing algorithm require browsers to defer the execution of scripts until all previous stylesheets are loaded. Let’s get back to the example from testcase #2:</p><span>
+
+</span><pre>
+<link rel="stylesheet" href="stylesheet.css" />
+
+</pre><span>
+
+</span><p>When the HTML5 parser encounters the <code></code> tags, the whole parsing process is halted. First, the browser fetches the script resource, given it’s an external script. Second, the browser waits for the preceding stylesheet to load. Third, the JavaScript engine runs the downloaded script code. Finally, the parser continues to parse the HTML document.</p><span>
+
+</span><p>Given that at least some scripts are positioned after the stylesheets in the HTML source code, it is guaranteed that all stylesheets have been loaded at the moment of “DOM ready”. That’s because <code>DOMContentLoaded</code> fires after the whole document has been parsed.</p><span>
+
+</span><p>It turns out that Gecko and Internet Explorer already conform to HTML5 in this regard. But we don’t know yet when Webkit and Opera will switch to HTML5 parsing and if a HTML5 doctype <code></code> will be necessary to activate the HTML5 parser.</p><span>
+
+</span><p>As said above, this parsing rule has a <strong>huge performance impact</strong>. If we put all stylesheets and scripts in the document’s <code>head</code>, the parsers waits for them to download until it continues to parse the <code>body</code>. To achieve a better perceived performance and incremental page rendering across browsers, the <a href="http://developer.yahoo.com/performance/rules.html">basic rule</a> is “put stylesheets at the top, but scripts at the bottom” (see <a href="http://stevesouders.com/hpws/rules.php">High Performance Web Sites by Steve Souders</a>).</p><span>
+
+
+
+</span><h2 id="appendix">Appendix</h2><span>
+
+</span><p>This is the detailed HTML5 parsing process regarding <strong>external scripts</strong> (without <code>defer</code> or <code>async</code> attributes):</p><span>
+
+</span><ol class="kompakt">
+<li>When <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-inhead">in head</a> or <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-inbody">in body</a>, the tokenizer emits a <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#scriptTag">a <code></code> end tag is encountered</a>.</li>
+<li>Case <q>An end tag whose tag name is "script"</q></li>
+<li><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#running-a-script">Run the script</a><ol>
+	<li>Step 7. Fetch the script if it’s external</li>
+	<li>Step 8. <q>Then, the first of the following options that describes the situation must be followed:</q></li>
+	<li>Case <q>If the element has a src attribute, and the element has been flagged as "parser-inserted", and the element does not have an async attribute:</q></li>
+	<li>The element is the pending parsing-blocking script</li>
+	<li>Set the "ready to be parser-executed" when fetched</li>
+	</ol></li>
+<li>Back to <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-incdata">tree construction</a>
+</li><li><q>At this stage, if there is a pending parsing-blocking script, then:</q></li>
+<li>Case <q>Otherwise:</q>
+</li><li>Step 3. <q>Wait until there is <strong>no style sheet blocking scripts</strong> and the script's "ready to be parser-executed" flag is set.</q></li>
+<li><p>Step 7. <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#executing-a-script-block">Execute the script.</a></p>
+<ol>
+	<li>Step 2. <strong>Pause until either any applicable style sheets have been fetched and applied</strong>, or the user agent has timed out and decided to not wait for those style sheets.</li>
+	<li>Step 3. Execute the JavaScript code synchronously</li>
+	</ol>
+</li>
+</ol><span>
+
+</span><p>For <strong>internal scripts</strong>, it’s eventually the same because script execution always includes the step <q>Pause until either any applicable style sheets have been fetched and applied, or the user agent has timed out and decided to not wait for those style sheets.</q>
+
+</p><p>Thanks to Mozilla Developer <a href="http://weblogs.mozillazine.org/bz/">Boris Zbarsky</a> who helped me to understand to HTML5 parsing algorithm on the <a href="http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2010-February/thread.html#25068">WHATWG mailing list</a>.</p><span>
+
+</span><p><strong>Update, 2010-02-15</strong>: Few hours after I had posted this description, <a href="http://html5.org/tools/web-apps-tracker?from=4740&amp;to=4741">the HTML5 specification was changed</a>. The crucial section <q>Pause until either any applicable style sheets have been fetched and applied</q> was removed. But as far as I can see, this revision does not change the parsing behavior with regard to normal internal and external scripts. I’m going to update the parsing process description soon.</p><span>
+
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

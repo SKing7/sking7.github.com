@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Google Async Analytics using LocalStorage</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Google Async Analytics using LocalStorage</h1>
+<section class="post-content">
+<blockquote>
+<p>Update: this project now has its own GitHub repo: <a href="https://github.com/davidmurdoch/ga-localstorage">https://github.com/davidmurdoch/ga-localstorage</a>
+<br /></p>
+</blockquote>
+<h2 id="abbrtitletoolongdidntreadtldrabbr"><abbr title="Too Long; Didn't Read">TL;DR:</abbr> </h2>
+<p><a href="https://davidmurdoch.com/google-async-analytics-using-localstorage-test/">Click here</a> to make the web faster. Oh, and <a href="https://twitter.com/intent/tweet?original_referer=https%3A%2F%2Fdavidmurdoch.com%2F2014%2F09%2F22%2Fgoogle-async-analytics-using-localstorage%2F&amp;source=tweetbutton&amp;text=Google+Async+Analytics+using+LocalStorage&amp;url=https%3A%2F%2Fdavidmurdoch.com%2F2014%2F09%2F22%2Fgoogle-async-analytics-using-localstorage%2F&amp;via=pxcoach" target="_blank">share on Twitter</a>, too!</p>
+<h2 id="abbrtitletoolongreadanywaytlraabbr"><abbr title="Too Long; Read Anyway">TL;RA</abbr>: </h2>
+<p>In 2010 <a href="http://stackoverflow.com/questions/4502128/convert-google-analytics-cookies-to-local-session-storage/19207035" title="Convert Google Analytics cookies to Local/Session Storage">I postulated on Stack Overflow</a> that it may be possible to use Google Analytics without the baggage its cookies bring.</p>
+<p>The problem is that when you add Google Analytics to your website you also add up to 250 bytes of HTTP Cookies to every single HTTP <em>request</em> on your page's domain. You may also be sending some of these cookies in requests to subdomains, as well (about 30 bytes worth).</p>
+<p>As of September 1 2014 HTTP Archive reported that the average number of requests per page is 98. If we assume the worst case, that all requests are on the same domain, that amounts to nearly 25,000 (98 × 250 = 24500) uncompressed bytes sent on <em>every</em> page load, for absolutely no reason. (When using HTTP 2.0/SPDY <a href="http://www.stevesouders.com/blog/2013/09/05/domain-sharding-revisited/" title="Domain Sharding recvisited">domain sharding</a> is usually considered a performance anti-pattern, so this worst-case scenario may become common). To make matters worse, most users' upload speeds are abysmally slow, especially over 3G.</p>
+<p>After nearly 3 years of that Stack Overflow question being unanswered <a href="https://stackoverflow.com/users/173109/elmer">Elmer</a> came along and provided a working proof-of-concept. Being the HTML5 Boilerplate advocate that I am, I immediately opened <a href="https://github.com/h5bp/html5-boilerplate/issues/1444">an issue</a> on GitHub and started down a path to tweak the Google Analytics snippet to accomplish two goals:</p>
+<ol>
+<li>be smaller (in relation to the original snippet + its cookies) </li>
+<li>be cookieless (in browsers that support it)</li>
+</ol>
+<p>Now that this issue is the oldest open issue on the project, I think it is time I do my part and wrap it up. Hopefully all that is left for us to do is test the implementation. If you want to help, <a href="https://davidmurdoch.com/google-async-analytics-using-localstorage-test/">go here</a> (//davidmurdoch.com/google-async-analytics-using-localstorage-test/) and get your friends, colleagues, partners, and family to visit as well. If you have the time, please open it in different browsers and devices.</p>
+<p>As <a href="http://www.smokeybear.com/">Smokey the Bear</a> once famously quipped: </p>
+<blockquote>
+<p>Only You Can Prevent Unnecessary Bytes in Request Headers</p>
+</blockquote>
+<p>(or something like that).</p>
+<hr />
+<p>If you'd like to be added to the list of users who can read and analyze the captured tracking data, send your email address to <noscript>my first name + @ + my domain name.</noscript>.</p>
+<p><a href="https://twitter.com/intent/tweet?original_referer=https%3A%2F%2Fdavidmurdoch.com%2F2014%2F09%2F22%2Fgoogle-async-analytics-using-localstorage%2F&amp;source=tweetbutton&amp;text=Google+Async+Analytics+using+LocalStorage&amp;url=https%3A%2F%2Fdavidmurdoch.com%2F2014%2F09%2F22%2Fgoogle-async-analytics-using-localstorage%2F&amp;via=pxcoach" target="_blank">Share on Twitter</a></p>
+</section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

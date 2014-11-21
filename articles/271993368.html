@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p>As Steve pointed out in an <a href="http://calendar.perfplanet.com/2012/moving-beyond-window-onload/">earlier post</a>, window.onload is not the best metric for measuring website speed. It is a convenient metric, and a familiar one, but it fails to capture the dynamic nature of most modern pages. Instead,  we want to think about the user perceived performance of the page: how quickly can the user begin interacting with the page?</p><span>
+</span><p>The definition of “interacting” will vary depending on your page. For some, this may be as simple as getting the text visible on the page, such that the user can begin consuming the information they requested (e.g. this page). For others, this may require wiring up dozens of JavaScript components to build up a JavaScript UI (e.g. Gmail). However, in both cases, there is one prerequisite: the user must be able to see the page, which is to say, the browser needs to render <em>something</em> to the screen.</p><span>
+</span><p>So, with that in mind, what does it actually take to do a first content render in a modern browser?</p><span>
+</span><h2>DOM + CSSOM = Render Tree</h2><span>
+</span><p>The exact timing and behavior of the rendering pipeline will, of course, vary based on the parsing, layout and compositing pipelines of the browser. However, implementation differences aside, to get anything visible on the screen, all browsers must construct something resembling a “render tree”.</p><span>
+</span><p><img src="http://www.igvita.com/posts/12/doc-render.png" alt="document render steps" /></p><span>
+</span><p>The parsing of the HTML document is what constructs the DOM. In parallel, there is an oft forgotten cousin, the CSSOM, which is constructed from the specified stylesheet rules and resources. The two are then combined to create the “render tree”, at which point the browser has enough information to perform a layout and paint something to the screen. So far, so good.</p><span>
+</span><p>However, the diagram above shows an optimistic case: both the CSSOM and the DOM trees are shown as being constructed in parallel. This is where we must, unfortunately, introduce our favorite friend and foe
+
+</p><p>  – JavaScript.</p><span>
+</span><ul>
+<li>Synchronous JavaScript can issue a doc.write at any point; hence the DOM tree construction is blocked anytime a synchronous script is encountered</li>
+<li>JavaScript can query for a computed style of any object, which means it can also block on CSS</li>
+</ul><span>
+</span><p><img src="http://www.igvita.com/posts/12/doc-render-js.png" alt="document render steps, with JavaScript" /></p><span>
+</span><p>Instead of nice, parallel construction of the DOM and CSSOM objects shown in the earlier diagram, the two are now potentially intertwined: DOM construction can’t proceed until JavaScript is executed, and JavaScript can’t proceed until CSSOM is available. Yikes.</p><span>
+</span><p>Depending on how this dependency graph is resolved on your pages, which is governed by how, and how many resources you include in that first “critical path” of the page load, the time to first render will vary accordingly. Can we get some metrics, or insights into this process? Turns out, yes we can!</p><span>
+</span><h2>Document Interactive &amp; DOMContentLoaded</h2><span>
+</span><p>The HTML5 spec defines a <a href="http://www.w3.org/TR/html5/syntax.html#the-end">well documented sequence of steps</a> which the user agent must follow while constructing the page. Specifically, the end sequence captures two states, which can help answer our earlier question:</p><span>
+</span><ul>
+<li>The document is marked as “interactive” when the user agent stops parsing the document. Meaning, the DOM tree is ready.</li>
+<li>The user agent fires the DOMContentLoaded (DCL) event once any scripts marked with “defer have been executed, and there are no stylesheets that are blocking scripts. Meaning, the CSSOM is ready.</li>
+</ul><span>
+</span><p>If no synchronous JavaScript is thrown into the mix, then the DOM and CSSOM construction can proceed in parallel. Things get more interesting once we introduce JavaScript into the picture.</p><span>
+</span><p>If you add a script and tag it with “defer”, then you unblock the construction of the DOM: the document interactive state does not have to wait for execution of JavaScript. However, note that this same script will be executed <b>before</b> DCL is fired. Further, recall that JavaScript may query CSSOM, which means that the DCL event may be held until the CSSOM is ready, at which point the script will be executed. In short: we’ve unblocked the “document interactive” state, but we’re still potentially blocking DCL.</p><span>
+</span><p>If you add a script and tag it with “async”, then you inherit similar behavior as above, but with one distinction: DCL does not have to wait for execution of async scripts!</p><span>
+</span><p>The first important takeaway here is that by default, JavaScript will block DOM construction, which may block on CSSOM. Sync scripts are bad, but you already knew that. Marking scripts with “defer” and “async” makes an implicit promise to the document parser that you will not use doc.write, which in turn allows it to unblock DOM construction.</p><span>
+</span><p>Second takeaways is: if at any point we must wait for JavaScript execution, then we will have to first wait for the CSSOM construction to finish. In other words, there is a hard dependency edge between JavaScript and CSS… Stylesheets at the top, scripts at the bottom? Now you know why.</p><span>
+</span><p>Ok! This is all great in theory, but is this practical knowledge to help us optimize pages? Neither metric is a direct indicator of when the page will be painted, but monitoring either or both is a step in the right direction towards our ultimate goal of improving perceived performance.</p><span>
+</span><h2>Tracking the critical path of your page</h2><span>
+</span><p>If nothing else, <a href="https://developer.mozilla.org/en-US/docs/DOM/document.readyState">monitoring</a> “document interactive” will give you a good indicator of whether you are blocking DOM construction due to synchronous scripts. Sometimes, there is no way around this behavior, but this should be a known fact and a tradeoff, not an implicit “that’s how it works”.</p><span>
+</span><p>The DCL event is also a critical milestone. Many popular libraries, such as JQuery, will begin executing their code once it fires. In other words, this is likely the first point at which your client code can begin interacting with the page, as well as provide meaningful feedback to the user. If you do your job right, then through the magic of progressive enhancement, you can get the skeleton of the page up, such that the user can begin interacting with the page while the browser continues to load the remaining assets. The IE team has an excellent example illustrating the <a href="http://ie.microsoft.com/testdrive/HTML5/DOMContentLoaded/Default.html">difference between DCL and the window.onload</a> events.</p><span>
+</span><h2>When does your DOMContentLoaded fire?</h2><span>
+</span><p>What you can measure, you can optimize. Even better, Navigation Timing spec already captures all the events we need: domInteractive, domContentLoadedEvent{Start,End}, and loadEvent{Start,End}. If you are already tracking the onload event already, then you might want to add the two events we’ve have covered here as well!</p><span>
+</span><p>On that note, if you are using Google Analytics, then Christmas came early this year. The team recently added a new “<b>DOM Timings</b>” section. Guess which values it tracks? Yep.
+</p><p><img src="http://www.igvita.com/posts/12/ga-dcl.png" alt="Google Analytics DOM timing report" /></p><span>
+</span><p>Login into your GA account and head to “Content &gt; <a href="http://support.google.com/analytics/bin/answer.py?hl=en&amp;answer=1205784">Site Speed</a>“. Once there, head to the “Performance” tab to see the timing histograms for all of your pages, or drill into the stats for a particular page. From there, you can track your document interactive, DCL, and onload events.</p><span>
+</span><p>Just for fun, here is a side by side comparison of the DCL vs. onload histograms for my site:</p><span>
+</span><p><img src="http://www.igvita.com/posts/12/igvita-dcl-onload.png" alt="DCL vs. onload histogram" /></p><span>
+</span><p>The median time to DCL is under 1s, whereas the median for onload is ~1.5s. The relatively high DCL timing immediately tells me that there is likely a script that is blocking the construction of the DOM – something I should revisit. Having said that, the fact that there is a ~0.5s delta between DCL and onload tells me that I’m not forcing users to wait for all the assets to download before they can see <i>some of the content</i>.</p><span>
+</span><p>When do your document interactive and DCL events fire?</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

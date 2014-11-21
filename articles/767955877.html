@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flexbox Nav Bar with Fixed, Variable, and Take-Up-The-Rest Elements</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Flexbox Nav Bar with Fixed, Variable, and Take-Up-The-Rest Elements</h1>
+<article class="module" id="post-188502">
+
+			
+
+			<p>Izak Filmalter wrote to me:</p>
+<blockquote><p>On the site I am working on there is a navigation bar with a few elements in it: a search input, the user's full name, and some icons. The icons are of fixed with, the user's name varies, and the search bar should take up the rest of the usable space.</p>
+<p>No matter what I try, I can not get the search bar to use all the available space and no more when the user name length is dynamic.
+</p></blockquote>
+<p>I already sent Izak a response, but I'll share that solution here. <strong>Flexbox!</strong> I'm sure it comes as no surprise that flexbox is a wonderful layout tool. I have <a href="http://css-tricks.com/snippets/css/a-guide-to-flexbox/">a guide to flexbox</a> here that makes for a pretty good reference. </p>
+<p>The good news here is that this is a pretty easy thing to do with flexbox layout. We'll get more detailed, but these few lines of code basically get it done:</p>
+<pre rel="CSS"><code class="language-css">.bar {
+  display: flex;
+}
+.search {
+  flex: 1;
+} </code></pre>
+<h3>Step by Step</h3>
+<p>Let's assume markup like this. No surprises here really. I just wrapped the search input in a <code>&lt;div&gt;</code> mostly because I'm weirded out by an input becoming a flex item, but you'd probably want a wrapping element (like a <code>&lt;form&gt;</code>) anyway, because you'd probably have a <code>&lt;label&gt;</code> and whatnot. </p>
+<pre rel="HTML"><code class="language-markup">&lt;div class="bar"&gt;
+  &lt;div class="icon icon-1"&gt;&lt;/div&gt;
+  &lt;div class="icon icon-2"&gt;&lt;/div&gt;
+  &lt;div class="icon icon-3"&gt;&lt;/div&gt;
+  &lt;div class="username"&gt;
+    Emily Blunt
+  &lt;/div&gt;
+  &lt;div class="search"&gt;
+    &lt;input type="search" placeholder="search..." /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<figure id="post-188519 media-188519" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/starting-point.png" alt="" /><figcaption>Without any CSS</figcaption></figure>
+<p>To get them aligned horizontally and centered:</p>
+<pre rel="CSS"><code class="language-css">.bar {
+  display: flex;
+  align-items: center;
+}</code></pre>
+<figure id="post-188520 media-188520" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/aligned.png" alt="" /></figure>
+<p>Let's make sure the bar is as wide as the browser window. We can set 100% width easily enough. But whenever I do that, I'm reminded we should be <a href="http://css-tricks.com/international-box-sizing-awareness-day/">rocking box-sizing: border-box;</a> - otherwise any padding or border on that container and it would be wider than 100% and that's the worst.</p>
+<pre rel="CSS"><code class="language-css">*, *:before, *:after {
+  box-sizing: inherit;
+}
+html {
+  box-sizing: border-box;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #eee;
+  padding: 20px;
+}</code></pre>
+<figure id="post-188521 media-188521" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/all-wide.png" alt="" /></figure>
+<p>For the final trick:</p>
+<pre rel="CSS"><code class="language-css">.search {
+  /* take up the rest of the remaining space */
+  flex: 1;
+}
+.search input {
+  width: 100%;
+}</code></pre>
+<figure id="post-188522 media-188522" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/final-1.png" alt="" /></figure>
+<p>It'll work like this:</p>
+<figure id="post-188524 media-188524" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/remaining-space.png" alt="" /></figure>
+<p>Now that we're in flexbox-land, we can even flop the order of things around all we want and get the same good spacing action. The order property is 0 by default, so any positive value will put that flex item at the end or negative value at the beginning. And then in order, just like <code>z-index</code>.</p>
+<pre rel="CSS"><code class="language-css">.bar-2 .username {
+  order: 2;
+}
+.bar-2 .icon-3 {
+  order: 3;
+}
+
+.bar-3 .search {
+  order: -1;
+}
+.bar-3 .username {
+  order: 1;
+}</code></pre>
+<figure id="post-188526 media-188526" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/ordering-changes.png" alt="" /></figure>
+<h3>Bonus RWD!</h3>
+<p>Flexbox is super friendly toward responsive design, because we can swap around ordering and sizing, and even wrapping, really easily. Let's make our demo wrap, and make the search and username full-width:</p>
+<pre rel="CSS"><code class="language-css">@media (max-width: 650px) {
+  .bar {
+    flex-wrap: wrap;
+  }
+  .icon {
+    order: 0 !important;
+  }
+  .username {
+    order: 1 !important;
+    width: 100%;
+    margin: 15px;
+  }
+  .search {
+    order: 2 !important;
+    width: 100%;
+  }
+}</code></pre>
+<figure id="post-188531 media-188531" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/rwd-flexbox.gif" alt="" /></figure>
+<h3>Demo</h3>
+<p>Here we go:</p>
+<p data-height="346" data-theme-id="1" data-slug-hash="YPzyYa" data-default-tab="result" data-user="chriscoyier" class="codepen">See the Pen <a href="http://codepen.io/chriscoyier/pen/YPzyYa/">Flexbox reordering</a> by Chris Coyier (<a href="http://codepen.io/chriscoyier">@chriscoyier</a>) on <a href="http://codepen.io/">CodePen</a>.</p>
+<h3>Browser Support</h3>
+<p>You can't mention flexbox these days without some rabble-rabble browser support. As always, you can consult <a href="http://caniuse.com/#feat=flexbox">Can I Use</a>. IE 9 is the big limiter left. If you need to support that, you'll have to find another way. Otherwise, between <a href="http://css-tricks.com/old-flexbox-and-new-flexbox/">old / new / tweener</a> syntaxes, you'll <a href="http://css-tricks.com/using-flexbox/">be fine</a>. We aren't using anything weird here.</p>
+<p>The trick is just to <a href="http://css-tricks.com/autoprefixer/">use Autoprefixer</a> which handles flexbox wonderfully. When using that, the flexbox properties/values in this demo become:</p>
+<pre rel="CSS"><code class="language-css">.bar {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.search {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.bar-2 .username {
+  -webkit-order: 2;
+  -ms-flex-order: 2;
+  order: 2;
+}</code></pre>
+<h3>But I need a better fallback!</h3>
+<p>One possibility is to use <a href="http://modernizr.com/">Modernizr</a> to detect flexbox support. It'll put a class name on the html element, like:</p>
+<pre rel="HTML"><code class="language-markup">&lt;html class="no-flexbox"&gt;</code></pre>
+<p>You can use that to use a different layout technique:</p>
+<pre rel="CSS"><code class="language-css">.no-flexbox .bar {
+  display: table;
+  border-spacing: 15px;
+  padding: 0;
+}
+.no-flexbox .bar &gt; * {
+  display: table-cell;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.no-flexbox .username {
+  width: 1px;
+}</code></pre>
+<p>Works pretty good:</p>
+<figure id="post-188534 media-188534" class="align-none"><img src="http://cdn.css-tricks.com/wp-content/uploads/2014/11/ie9-flexbox.jpg" alt="" /></figure>
+<p>It's not the only possible way. You could mess with inline-block or float and measuring things with JavaScript. Or you could use an actual table. The web, yo, there is always a way.</p>
+
+			
+			<h5 class="share-on-title">Share On</h5>
+
+			<a class="share-on-link share-on-twitter" href="https://twitter.com/intent/tweet?text=Flexbox%20Nav%20Bar%20with%20Fixed,%20Variable,%20and%20Take-Up-The-Rest%20Elements&amp;url=http://css-tricks.com/flexbox-nav-bar-fixed-variable-take-rest-elements/&amp;via=real_css_tricks">Twitter</a>
+
+			<a class="share-on-link share-on-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://css-tricks.com/flexbox-nav-bar-fixed-variable-take-rest-elements/">Facebook</a>
+			
+			<a class="share-on-link share-on-googleplus" href="https://plus.google.com/share?url=http://css-tricks.com/flexbox-nav-bar-fixed-variable-take-rest-elements/">Google+</a>
+
+			
+		</article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Preventing 'layout thrashing'</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Preventing 'layout thrashing'</h1>
+<div class="post_content"><p>Layout Thrashing occurs when JavaScript violently writes, then reads, from the DOM, multiple times causing document reflows.</p><span>
+
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Read</span>
+<span class="kd">var</span> <span class="nx">h1</span> <span class="o">=</span> <span class="nx">element1</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+
+<span class="c1">// Write (invalidates layout)</span>
+<span class="nx">element1</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+
+<span class="c1">// Read (triggers layout)</span>
+<span class="kd">var</span> <span class="nx">h2</span> <span class="o">=</span> <span class="nx">element2</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+
+<span class="c1">// Write (invalidates layout)</span>
+<span class="nx">element2</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h2</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+
+<span class="c1">// Read (triggers layout)</span>
+<span class="kd">var</span> <span class="nx">h3</span> <span class="o">=</span> <span class="nx">element3</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+
+<span class="c1">// Write (invalidates layout)</span>
+<span class="nx">element3</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h3</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span></code></pre></div><span>
+
+</span><p>When the DOM is written to, layout is 'invalidated', and at some point needs to be reflowed. The browser is lazy and wants to wait until the end of current operation (or frame) to perform this reflow.</p><span>
+
+</span><p>Although, if we ask for a geometric value back from the DOM before the current operation (or frame) is complete, we <strong>force the browser to perform layout early</strong>, this is known as <strong>'forced synchonous layout'</strong>, and it kills performance!</p><span>
+
+</span><p>The side effects of layout thrashing on modern desktop browsers is not always obvious; but has <strong>severe consequences on low powered mobile devices</strong>.</p><span>
+
+</span><h3>Quick fix?</h3><span>
+
+</span><p>In an ideal world we would simply re-order the execution so that we can batch the DOM read and DOM writes together. This means the document only needs to be reflowed once.</p><span>
+
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Read</span>
+<span class="kd">var</span> <span class="nx">h1</span> <span class="o">=</span> <span class="nx">element1</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">h2</span> <span class="o">=</span> <span class="nx">element2</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">h3</span> <span class="o">=</span> <span class="nx">element3</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+
+<span class="c1">// Write (invalidates layout)</span>
+<span class="nx">element1</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+<span class="nx">element2</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h2</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+<span class="nx">element3</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h3</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+
+<span class="c1">// Document reflows at end of frame</span></code></pre></div><span>
+
+</span><h3>What about in the real world?</h3><span>
+
+</span><p>In reality this isn't so simple. Large applications have code scattered all over the place, all of which has that dangerous DOM at its finger tips. We can't easily (and definitely shouldn't) mash up all our pretty, decoupled code, just so we have control over execution order. What can we do to batch our reads and writes together for optimal performance?</p><span>
+
+</span><h3>Enter requestAnimationFrame</h3><span>
+
+</span><p><code>window.requestAnimationFrame</code> schedules a function to be executed at the next frame, similar to <code>setTimeout(fn, 0)</code>. This is super useful because we can use it to schedule all our DOM writes to run together in the next frame, leaving all DOM reads to run in the current synchronous turn.</p><span>
+
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Read</span>
+<span class="kd">var</span> <span class="nx">h1</span> <span class="o">=</span> <span class="nx">element1</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+
+<span class="c1">// Write</span>
+<span class="nx">requestAnimationFrame</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">element1</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="c1">// Read</span>
+<span class="kd">var</span> <span class="nx">h2</span> <span class="o">=</span> <span class="nx">element2</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+
+<span class="c1">// Write</span>
+<span class="nx">requestAnimationFrame</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">element2</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h2</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+<span class="p">});</span></code></pre></div><span>
+
+</span><p>This means we can keep our nicely encapsulated code where it is, and with a small code tweak, batch our pricey DOM access together! Win!</p><span>
+
+</span><h3>Working example</h3><span>
+
+</span><p>I created a <a href="http://jsbin.com/ebicuJu/2/edit?js,output">working example</a> to prove the concept. In the first screen shot you can see the aggressive layout thrashing in the Chrome Timeline.</p><span>
+
+</span><span>
+
+</span><p>Following our <code>requestAnimationFrame</code> alterations only one layout event took place, and as a result the operation was <strong>~96% faster!</strong></p><span>
+
+</span><h3>Can this scale?</h3><span>
+
+</span><p>In a simple example using raw <code>requestAnimationFrame</code> does allow us to postpone DOM writes to greatly improve performance, but this technique just doesn't scale.</p><span>
+
+</span><p>In our app we may need to read from the DOM <em>after</em> we have done our write, and then we are in layout thrashing territory again, just in a different frame.</p><span>
+
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Read</span>
+<span class="kd">var</span> <span class="nx">h1</span> <span class="o">=</span> <span class="nx">element1</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+
+<span class="c1">// Write</span>
+<span class="nx">requestAnimationFrame</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">element1</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+
+  <span class="c1">// We may want to read the new</span>
+  <span class="c1">// height after it has been set</span>
+  <span class="kd">var</span> <span class="nx">height</span> <span class="o">=</span> <span class="nx">element1</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+<span class="p">});</span></code></pre></div><span>
+
+</span><p>We could push the read into another <code>requestAnimationFrame</code> but then we cannot guarantee another part of the app has not just pushed a write job into the same frame. Essentially it's all going to get a bit chaotic, and once again you no longer have control over when DOM read/writes are happening.</p><span>
+
+</span><h3>Introducing 'FastDom'</h3><span>
+
+</span><p><a href="http://github.com/wilsonpage/fastdom">FastDom</a> is a small library I wrote to provide a common interface for batching DOM read/write work. It massively speeds up DOM work using similar <code>requestAnimationFrame</code> techniques described above.</p><span>
+
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">fastdom</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">h1</span> <span class="o">=</span> <span class="nx">element1</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+  <span class="nx">fastdom</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">element1</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="nx">fastdom</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">h2</span> <span class="o">=</span> <span class="nx">element2</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">;</span>
+  <span class="nx">fastdom</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">element2</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">h1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">});</span></code></pre></div><span>
+
+</span><p><a href="http://github.com/wilsonpage/fastdom">FastDom</a> harmonises DOM interactions by taking read and write jobs and batching them (reads then writes) on the next frame. This means you can build app components in isolation without worrying how they will affect (or be affected) by other components in the app.</p><span>
+
+</span><h3>Implications of using FastDom</h3><span>
+
+</span><p>By using <a href="http://github.com/wilsonpage/fastdom">FastDom</a> you are making <strong>all DOM tasks asynchronous</strong>, that means you can't always make assumptions as to what state the DOM will be in. Work that was previously sync, may not have completed now it is async.</p><span>
+
+</span><p>To work around this I like to use an <a href="http://github.com/wilsonpage/event">event system</a> to be more explicit about when work has finished, and responding only when I know DOM work I'm dependent on is complete.</p><span>
+
+</span><p>Also we are <strong>increasing the amount of code</strong> we have to write to effectively get the same amount of work done. Personally I think this is a small price to pay for a dramatic increase in performance.</p><span>
+
+</span><h3>FastDom examples</h3><span>
+
+</span><span>
+
+</span><h3>Improving FastDom</h3><span>
+
+</span><p>Web apps are lacking a clear way of solving the problem of layout thrashing. As an app grows it gets harder to coordinate all the different parts to ensure a fast end product. If <a href="http://github.com/wilsonpage/fastdom">FastDom</a> can help provide a simple interface for developers to solve this problem, it can only mean good things.</p><span>
+
+</span><p><em>Have a look at the <a href="http://github.com/wilsonpage/fastdom">FastDom project</a>  and feel free to contribute by submitting pull requests or filing issues.</em></p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

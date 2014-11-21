@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Compressing the Web</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Compressing the Web</h1>
+<div class="post-content user-defined-markup"><p><em>Be succinct.</em></p><span>
+</span><p>Virtually any network-based application can be made faster by optimizing the number of bytes transferred across the network. Taking advantage of <a href="http://blogs.msdn.com/b/ie/archive/2010/07/14/caching-improvements-in-internet-explorer-9.aspx">caching</a> is a great way to minimize transfer sizes, but just as important is to reduce the size of the resources you transfer.</p><span>
+</span><p>Data compression is used throughout the protocols and formats used by browsers, and today’s post is a summary of where you can find compression in use and how you can optimize it to improve the performance of your sites and services.</p><span>
+</span><h2>Compression Categories</h2><span>
+</span><p>Conceptually, compression is simple: recognize patterns in data and reduce repetition to minimize the size of the data. There are two major categories of compression: <strong>lossy </strong>and <strong>lossless</strong>.</p><span>
+</span><p>When information is compressed with lossy compression, reversing the process (decompression) doesn’t result in the original data, but instead a surrogate which resembles the original either closely or loosely depending on the <em>quality </em>of the compression. In browsers, the primary uses of lossy compression are in the JPEG image file format, the MP3 audio file format, and the MPEG video file format. These formats utilize understanding of human perception to drop details that are unlikely to be noticed by the viewer/listener, resulting in often-huge savings in data size. While important, this post won’t discuss lossy compression any further.</p><span>
+</span><p>In contrast, decompressing data that was losslessly compressed results in an <em>exact</em> copy of the original data—every byte is identical. Lossless compression is used throughout the web platform, in both the HTTP layer and internally within many web file formats including PNG, PDF, SWF, WOFF, and many more. The remainder of this post explores the use and optimization of lossless compression.</p><span>
+</span><h3>HTTP Headers</h3><span>
+</span><p>HTTP requests advertise the decompression algorithms the client supports using the<strong> <span>Accept-Encoding</span></strong> request header.</p><span>
+</span><p>Servers indicate which compression algorithm was used for a given response using the <strong>Content-Encoding </strong>response header. Unfortunately, even the updated HTTP/1.1 specification <a href="http://tools.ietf.org/html/rfc7230#section-4">implies</a> that servers can use compression-related tokens in the <span>Transfer-Encoding</span><strong> </strong>response header, but indicating compression using<strong> the Transfer-Encoding header</strong>&nbsp;<strong>does not work </strong>in any major browser (all support only the <span>chunked</span> token).</p><span>
+</span><p>If the server utilizes compression, it should generally include a <span>Vary: Accept-Encoding</span> response header to help ensure that a cache does not <a href="http://blogs.msdn.com/b/ieinternals/archive/2009/06/17/vary-header-prevents-caching-in-ie.aspx">mistakenly serve a compressed response</a> to a client that cannot understand it.</p><span>
+</span><h2>Algorithms</h2><span>
+</span><p>The most popular compression algorithm in use on the web is the DEFLATE algorithm, specified in <a href="https://www.ietf.org/rfc/rfc1951.txt">RFC 1951</a>. DEFLATE combines the <a href="http://en.wikipedia.org/wiki/LZ77_and_LZ78">LZ77</a> algorithm with Huffman encoding; it is straightforward to implement and effectively compresses a wide variety of data types. You can read a straightforward explanation of the algorithm <a href="http://www.zlib.net/feldspar.html">here</a>, and watch a fun video showing how repeated byte sequences are referenced <a href="https://www.youtube.com/watch?v=SWBkneyTyPU">here</a>.</p><span>
+</span><p>In browsers, the most obvious use of the DEFLATE algorithm is for <a href="http://tools.ietf.org/html/rfc7230#section-4.2">HTTP/1.1</a> Content-Encoding. DEFLATE is the algorithm underlying two of the three encodings defined in the HTTP specification (“<span>Content-Encoding: gzip</span>” and “<span>Content-Encoding: deflate</span>”).</p><span>
+</span><h3>DEFLATE vs. GZIP for Content-Encoding?</h3><span>
+</span><p>Given that virtually all clients allow both “<span>Content-Encoding: gzip</span>” and “<span>Content-Encoding: deflate</span>”, which should you use?</p><span>
+</span><p>You’ll find conflicting opinions on the topic, many of which are written without the understanding that both encodings are based on exactly the same algorithm, and the encodings differ only in the header and trailer bytes that wrap the compressed data.</p><span>
+</span><p>The <a href="http://tools.ietf.org/html/rfc1952">GZIP encoding</a> of a resource starts with two magic bytes <span>0x1F 0x8B</span>, a byte representing the compression method (<span>0x08</span>, indicating DEFLATE), seven additional bytes of metadata, several optional fields (rarely used), and then the DEFLATE-compressed bytes. After the compressed data, a 32bit <a href="http://en.wikipedia.org/wiki/Cyclic_redundancy_check">CRC-32</a> and 32bit original datasize field complete the format.</p><span>
+</span><p>Despite its name, the DEFLATE encoding of a resource is <em>specified</em> to be the <a href="http://tools.ietf.org/html/rfc1950">ZLIB data format</a>. This format consists of two header bytes; the first contains the compression method and window-size information (the low bits of the byte are <span>0x08</span>, indicating DEFLATE). The second header byte is a flag byte which indicates the compression strategy (minimize size vs. maximize speed) and serves as a checksum of the header bytes. The DEFLATE-compressed bytes follow. After the compressed data, a 32-bit <a href="http://en.wikipedia.org/wiki/Adler-32">ADLER32</a> checksum field completes the format.</p><span>
+</span><p>So, all other things being equal,<strong> </strong>a <span>C-E:GZIP</span>-encoded resource will be exactly 11 bytes bigger than a <span>C-E:DEFLATE</span>-encoded resource, due to the seven additional header bytes and four additional trailer bytes. In practice, however, your compression program may generate wildly different results.</p><span>
+</span><p>Now, note that I said the encoding is <em>specified to be the ZLIB data format</em>. Here’s what you’ll see in Internet Explorer if you try to load a page which has the ZLIB-wrapper around the DEFLATE data:</p><span>
+</span><p><a href="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-00-47-13-metablogapi/3036.image_5F00_45185D80.png"><img title="image" src="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-00-47-13-metablogapi/3652.image_5F00_thumb_5F00_023C1906.png" alt="image" width="739" height="391" border="0" /></a></p><span>
+</span><p>The problem is that <a href="https://connect.microsoft.com/IE/feedback/details/1007412/interop-wininet-does-not-support-content-encoding-deflate-properly">Internet Explorer expects a bare DEFLATE stream</a> without the ZLIB wrapper bytes. So, does that mean you can’t use <span>Content-Encoding: deflate</span>? Not really, no. In addition to supporting the proper ZLIB-wrapped data, Chrome, Firefox, Safari, and Opera all support bare DEFLATE.</p><span>
+</span><p>Some folks recommend you <a href="http://zoompf.com/blog/2012/02/lose-the-wait-http-compression">avoid C-E:Deflate</a> and just stick with C-E:GZIP. It’s hard to argue with that approach.</p><span>
+</span><h3>Optimizing DEFLATE</h3><span>
+</span><p>No matter which DEFLATE-based Content-Encoding you choose, the quality of the implementation underlying DEFLATE implementation is key to reducing the size of the data stream. Many developers mistakenly assume that “DEFLATE is DEFLATE”, and any compressor that implements the algorithm will get the same result. This is a mistake.</p><span>
+</span><p>Instead, think of DEFLATE’ing as solving a maze. <a href="http://commons.wikimedia.org/wiki/File:MAZE.png">A really really complicated maze</a>. You might run around as fast as you can and eventually stumble upon an exit, but that’s very different than finding the optimal path. If you instead spent much longer, frequently retracing your steps to find out whether there’s a shortcut you missed, you may find a much shorter path. DEFLATE works much the same way—you can expend more resources (CPU time and memory) in the compression process finding the optimal compression choices. The best part is that expending resources to optimize DEFLATE compression doesn’t typically increase <em>decompression </em>time—uncompressing DEFLATEd content is a comparatively straightforward process.</p><span>
+</span><p>For static resources that will be reused often (think of jQuery.js and other frameworks) you should be delighted to trade a one-time compression cost for a millions-of-times transfer size savings. Fortunately, folks at Google have done the hard work of making a great DEFLATE implementation, called <a href="http://code.google.com/p/zopfli/">Zopfli</a>&nbsp;(pronounced "zopflee"); you can read more about it and its real-world savings over <a href="http://blogs.telerik.com/fiddler/posts/14-07-02/maximize-compression-with-zopfli">here</a>. Unfortunately, far too few teams have integrated Zopfli into their workflow; even Google hasn’t gotten around to using it for most of their resources… yet.</p><span>
+</span><p>If Microsoft were to use Zopfli when building the browser-based versions of Office, they’d see significant savings; three of their largest files shrink by just over 4% each:</p><span>
+</span><table border="1" cellspacing="0" cellpadding="2">
+<tbody>
+<tr>
+<td valign="top" width="94"><strong>File</strong></td>
+<td valign="top" width="96">Original Size</td>
+<td valign="top" width="76">Served (gzip) Size</td>
+<td valign="top" width="76">Zopfli Size</td>
+<td valign="top" width="55">Savings</td>
+</tr>
+<tr>
+<td valign="top" width="94">WordViewer.js</td>
+<td valign="top" width="96">661,771</td>
+<td valign="top" width="76">171,189</td>
+<td valign="top" width="76">164,272</td>
+<td valign="top" width="55">4%</td>
+</tr>
+<tr>
+<td valign="top" width="94">Ewa.js</td>
+<td valign="top" width="96">729,547</td>
+<td valign="top" width="76">202,400</td>
+<td valign="top" width="76">193,822</td>
+<td valign="top" width="55">4.2%</td>
+</tr>
+<tr>
+<td valign="top" width="94">WordEditor.js</td>
+<td valign="top" width="96">1,876,196</td>
+<td valign="top" width="78">482,125</td>
+<td valign="top" width="80">462,147</td>
+<td valign="top" width="68">4.1%</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>Of course, you won’t always be able to use Zopfli to compress your resources—the compression tradeoff isn’t appropriate for dynamically-generated responses which will only be served once. But you can use it for more than just your HTML, CSS, and JS. Read on for more details.</p><span>
+</span><h3>Exotic Encodings</h3><span>
+</span><p>One of the <a href="http://code.google.com/p/zopfli/issues/detail?id=6&amp;can=1">first criticisms of Zopfli</a> was “<em>it seems like an awful lot of effort for a small improvement. Perhaps it’s time to add a better compression method</em>.” And this criticism is valid to a certain extent.</p><span>
+</span><h4>bzip2</h4><span>
+</span><p>For instance, the first versions of Google Chrome added support for <a href="http://en.wikipedia.org/wiki/Bzip2">bzip2</a> as a HTTP Content-Encoding, because (quoting a Google engineer) “well, we had the code laying around." Bzip2 yields much better compression than even Zopfli-optimized DEFLATE:</p><span>
+</span><table border="1" cellspacing="0" cellpadding="2">
+<tbody>
+<tr>
+<td valign="top" width="128"><strong>File</strong></td>
+<td valign="top" width="85">Zopfli Size</td>
+<td valign="top" width="61">BZIP2 Size</td>
+<td valign="top" width="77">Savings</td>
+</tr>
+<tr>
+<td valign="top" width="128">WordViewer.js</td>
+<td valign="top" width="85">164,272</td>
+<td valign="top" width="61">139,393</td>
+<td valign="top" width="77">15.1%</td>
+</tr>
+<tr>
+<td valign="top" width="128">Ewa.js</td>
+<td valign="top" width="85">193,822</td>
+<td valign="top" width="61">163,204</td>
+<td valign="top" width="77">15.8%</td>
+</tr>
+<tr>
+<td valign="top" width="128">WordEditor.js</td>
+<td valign="top" width="90">462,147</td>
+<td valign="top" width="74">396,897</td>
+<td valign="top" width="89">14.1%</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>And bzip2 doesn’t even offer the highest compression ratios: lzma2 showed even better results when we looked at it back in the IE9 timeframe.</p><span>
+</span><p>The challenge with more advanced compression schemes is that there are <strong>billions of clients </strong>that support DEFLATE-based schemes, and as we’ve seen previously, most implementations haven’t yet optimized their use of DEFLATE. Making matters worse are <strong>intermediaries</strong>: Google reportedly encountered network proxies and security applications that would corrupt bzip2-encoded traffic.</p><span>
+</span><h4>Xpress</h4><span>
+</span><p>Some Microsoft products (Exchange, Software Update Services, etc) use <span>Content-Encoding: xpress</span>, a scheme based on LZ77 (like DEFLATE), optimized for compression speed. <a href="http://msdn.microsoft.com/en-us/library/hh554002.aspx">Xpress encoding</a> is not used by Internet Explorer, WinINET, WinHTTP, or System.NET, the dominant HTTP implementations on Windows. When run on Windows 8 or later, Fiddler can decompress Xpress-encoded content using the native libraries.</p><span>
+</span><h4>SCDH</h4><span>
+</span><p>Back in 2008, Google <a href="http://lists.w3.org/Archives/Public/ietf-http-wg/2008JulSep/att-0441/Shared_Dictionary_Compression_over_HTTP.pdf">proposed</a> the SCDH (Shared Dictionary Compression over HTTP) Content-Encoding, and support has subsequently been added to Chrome and Android. Despite offering large potential savings, this lossless compression scheme is not broadly used and is comparatively complex to implement. It also has <a href="https://sites.google.com/a/chromium.org/dev/Home/chromium-security/client-identification-mechanisms#TOC-SDCH-dictionaries">privacy implications</a>.</p><span>
+</span><h4>Compress</h4><span>
+</span><p>The only non-DEFLATE-based HTTP-specification defined encoding (“<span>Content-Encoding: compress</span>”) is based on the <a href="http://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Welch">LZW compression algorithm</a>. Compress is not broadly supported (it doesn’t work in any major browser) and a quick test suggests that it’s not even as effective as a basic DEFLATE encoder.</p><span>
+</span><h2>What Gets Compressed</h2><span>
+</span><p>In general, HTTP Content-Encoding based compression applies to only the <strong>response body</strong>. This means that <strong>HTTP</strong> <strong>headers</strong> are not compressed, a significant shortcoming in the compression scheme. For instance, I recently observed Facebook delivering a 49 byte GIF file with 1050 bytes of HTTP headers, an overhead of over 2000% for a single file. Similarly, Content-Encoding is rarely applied to <strong>request</strong> bodies.</p><span>
+</span><h3>TLS Compression</h3><span>
+</span><p>When negotiating a HTTPS connection, the client may indicate support for automatic compression of all data on the connection, which has the benefit of applying to both headers and bodies of both the request and the response. TLS-based compression was not broadly implemented (Microsoft products have never supported it) and in 2012 it was disabled entirely by major products to address an exploit called <a href="http://en.wikipedia.org/wiki/CRIME">CRIME</a> (Compression Ratio Info-leak Made Easy).</p><span>
+</span><h3>HTTP/2 Compression</h3><span>
+</span><p>The <a href="https://tools.ietf.org/html/draft-ietf-httpbis-http2-14">HTTP/2 draft 14</a> enables header compression using an algorithm called <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-compression-09">HPACK</a>, designed to combat the CRIME exploit against the <a href="http://www.chromium.org/spdy/spdy-whitepaperhttp://www.chromium.org/spdy/spdy-whitepaper">SPDY</a> protocol (which used DEFLATE to compress header fields). Draft 12 of the specification removed per-frame GZIP compression for data; you’ll still use <span>Content-Encoding</span>.</p><span>
+</span><h3>Compressing WebSocket Data</h3><span>
+</span><p>Check out <a href="https://www.igvita.com/2013/11/27/configuring-and-optimizing-websocket-compression/">https://www.igvita.com/2013/11/27/configuring-and-optimizing-websocket-compression/</a> for discussion of a mechanism to use DEFLATE to compress data sent over WebSockets.</p><span>
+</span><h3>Compressing Request Bodies</h3><span>
+</span><p>In theory, HTTP allows clients to compress request bodies using the same <span>Content-Encoding</span> mechanism used for HTTP responses. In practice, however, this feature is not used by browsers and is only rarely used by other types of HTTP clients.</p><span>
+</span><p>One problem is that a client does not know, a priori, whether a server accepts compressed requests. In contrast, a server knows whether a client accepts compressed responses by examining the <span>Accept-Encoding</span> request header. Many servers do not accept compressed requests, although some have no objection (e.g. onedrive.live.com allows them). One consequence of this is that HTML forms do not (yet?) expose any way for authors to specify that compression of the request body should be undertaken.</p><span>
+</span><p>Modern web applications can workaround the shortcomings in browser APIs with script:</p><span>
+</span><ol>
+<li>Use HTML5 File API to load a file for upload into JavaScript</li>
+<li>Compress it using a script-based compression engine (of many, <a href="https://github.com/nodeca/pako">Pako</a> and <a href="https://github.com/cscott/compressjs">compressjs</a> look nice)</li>
+<li>Upload the compressed array to the server.</li>
+</ol><span>
+</span><p>You can use Fiddler to see whether your server accepts request bodies with <span>Content-Encoding</span>; click Rules &gt; Customize Rules. Scroll to <strong>OnBeforeRequest </strong>and add the following code inside the function:&nbsp;&nbsp;&nbsp;</p><span>
+</span><p><span>&nbsp; if (oSession.HTTPMethodIs("POST")) <br />{ <br />oSession["ui-backcolor"] = "yellow"; <br />oSession.utilGZIPRequest();&nbsp;&nbsp; <br />}</span></p><span>
+</span><p>If the server accepts the upload, you should see a normal HTTP/200 response (although you may wish to ensure that the server properly recognized the compression and didn’t just treat it like binary garbage). If the server doesn’t accept compressed uploads, you will likely see a HTTP/400 or HTTP/500 error code.</p><span>
+</span><h4>Compression Bombs</h4><span>
+</span><p>One reason that servers might be reluctant to support compressed uploads is the fear of “<a href="http://en.wikipedia.org/wiki/Zip_bomb">Compression bombs</a>”. The DEFLATE algorithm allows a peak compression ratio approaching <a href="http://security.stackexchange.com/questions/51071/zlib-deflate-decompression-bomb">1032 to 1</a>, so a one megabyte upload can explode to 1 gigabyte. Such attacks are generally possible against client applications like browsers, but tend to be much more potent against servers, where a single CPU is required to serve thousands of users simultaneously.</p><span>
+</span><p>Protecting against maliciously crafted compression streams requires additional diligence on the part of implementers.</p><span>
+</span><h2><strong>Best Practice: Minify, then Compress</strong></h2><span>
+</span><p>Because DEFLATE yields such great reductions in size, you might be thinking “<em>I don’t need to minify my assets. I can just serve them compressed</em>.”</p><span>
+</span><p>From a networking point of view, you’re mostly correct: the bytes-on-wire for DEFLATE will likely be nearly the same as DEFLATE alone. However, there are other concerns:</p><span>
+</span><p><strong>Memory</strong>: The browser must decompress your stylesheets, script, and HTML to strings, so a 50kb script file, compressed to 5kb, still uses 50kb of memory after it has been decompressed. If you can minify the script to 40kb before compressing, you can save at least 10kb of memory on the client (and likely more). This is particularly important on memory-constrained mobile devices.</p><span>
+</span><p><strong>Disk Cache: </strong>Some browsers store compressed responses in the cache in compressed form (and Firefox will even proactively compress uncompressed responses). However, Internet Explorer removes all Content-Encoding when writing to the cache file, meaning that your 50kb script file will occupy 50kb of the client’s cache. Smaller files will reload faster and are less enticing candidates for eviction when cache space is reclaimed.</p><span>
+</span><h2>File Formats</h2><span>
+</span><p>As mentioned previously, many file formats internally use DEFLATE compression; a great example is the <a href="http://www.w3.org/TR/PNG/">PNG image format</a>. Unfortunately, many generators of those formats opt for minimum compression time, failing to achieve maximum compression.</p><span>
+</span><p>The next release of Fiddler will include <strong>PNG Distill</strong>, a simple tool that removes unnecessary metadata chunks and recompresses image data streams using Zopfli. Zopfli-based recompression often shaves 10% or more from the size of PNG files.</p><span>
+</span><p><a href="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-00-47-13-metablogapi/3005.image_5F00_763A28D1.png"><img title="image" src="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-00-47-13-metablogapi/7242.image_5F00_thumb_5F00_05DCC494.png" alt="image" width="644" height="235" border="0" /></a></p><span>
+</span><p>The “Minify-then-compress” Best Practice applies to image file types as well. While large fields of empty pixels compress really well, the browser must decompress those fields back into memory.</p><span>
+</span><p>Beyond PNG, the WOFF font format also uses DEFLATE. Google recently shrank their WOFF font library <a href="https://plus.google.com/+IlyaGrigorik/posts/1sxencNkbNS">by an average of 6%</a> by reencoding their internal DEFLATE streams using Zopfli. Not content to stop there, Google has also introduced the WOFF2 format, which utilizes an innovative&nbsp;new&nbsp;algorithm known as <a href="http://tools.ietf.org/html/draft-alakuijala-brotli-01">Brotli</a>, yielding <a href="http://www.w3.org/TR/WOFF20ER/#lzma-size">size reductions around 20%</a> (Currently usable in Chrome, Opera, and Firefox dev builds; see <a href="http://caniuse.com/#search=woff2">CanIUse.com</a>).</p><span>
+</span><h2>Compression-Related Trivia</h2><span>
+</span><p><em>Here are a few points of compression-related arcana that have come up over the years…</em></p><span>
+</span><p>1. The HTTP decompression implementation used by Internet Explorer 6 and earlier was inside URLMon; the WinINET HTTP stack did not itself support decompression. As a consequence, there was a “dance” whereby WinINET would download the compressed version and ask URLMon to decompress the response in place, replacing the original compressed body. This “dance” was buggy in many corner cases, and led to problems where content could not be decompressed, or Vary headers were ignored, or similar.</p><span>
+</span><p>In Internet Explorer 7, decompression was moved from URLMon down into WinINET, eliminating the “dance” and slaying many bugs.</p><span>
+</span><p>2. Unfortunately, the fact that decompression happens so low in the stack causes its own minor problems, like the <a href="https://connect.microsoft.com/IE/Feedback/Details/812445">F12 Developer Tools not being aware of the use of Content-Encoding</a>.</p><span>
+</span><p>3. Some Apache servers will mistakenly serve <span>.tar.gz</span> files with a <span>Content-Encoding: gzip</span> header, leading the browser to eagerly decompress the downloaded file into a raw tar file with now-misleading filename extension. Firefox works around this issue by ignoring the <span>Content-Encoding</span> header if the response Content-Type is <span>application/x-gzip</span>. Internet Explorer 11 recently and briefly had a <a href="https://connect.microsoft.com/IE/Feedback/Details/950689">regression in its handling</a> of related scenarios.</p><span>
+</span><p>4. Despite the fact that the GZIP footer includes a CRC32 and OriginalSize field to enable detection of corruption, <a href="https://code.google.com/p/chromium/issues/detail?id=161127#c17">no browser complains</a> if these fields are incorrect or missing entirely&nbsp;(which makes some sense, insofar as the original requester has already read the entire response before these fields are available). But you should set these correctly, or various tools and&nbsp;middleware might reject your content.</p><span>
+</span><p>5. Even worse, a small number of servers apparently fail to <a href="http://daniel.haxx.se/blog/2014/10/26/stricter-http-1-1-framing-good-bye/">update the HTTP Content-Length header</a> when compressing the body.</p><span>
+</span><p>-Eric <br />MVP, Internet Explorer</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

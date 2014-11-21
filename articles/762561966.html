@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>9 basic principles of responsive web design</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>9 basic principles of responsive web design</h1>
+<div class="postcontent_typesome" itemprop="articleBody"><span>
+                </span><p>Responsive web design is a great solution to our multi-screen problem, but getting into it from the print perspective is difficult. No fixed page size, no millimetres or inches, no physical constraints to fight against. Designing in pixels for Desktop and Mobile only is also the past, as more and more gadgets can open up a website. Therefore, let's clarify some basic principles of responsive web design here to embrace the fluid web, instead of fighting it. To keep it simple we'll focus on layouts (yes, responsive goes way deeper than that and if you want to learn more <a href="http://bradfrost.com/blog/post/the-principles-of-adaptive-design/">this is a good start</a>).</p><span>
+
+</span><h3 id="responsivevsadaptivewebdesign">Responsive vs Adaptive web design</h3><span>
+
+</span><p>It might seem the same but it isn't. Both approaches complement each other, so there is no right or wrong way to do it. Let the content decide. <br /><img src="http://blog.froont.com/content/images/2014/11/01_Responsive-vs-Adaptive.gif" alt="" /></p><span>
+
+</span><h3 id="theflow">The flow</h3><span>
+
+</span><p>As screen sizes become smaller, content starts to take up more vertical space and anything below will be pushed down, it's called the flow. That might be tricky to grasp if you are used to design with pixels and points, but makes total sense when you get used to it. <br /><img src="http://blog.froont.com/content/images/2014/11/04_Flow-vs-Static-2.gif" alt="What is responsive and adaptive web design" /></p><span>
+
+</span><h3 id="relativeunits">Relative units</h3><span>
+
+</span><p>The canvas can be a desktop, mobile screen or anything in between. Pixel density can also vary, so we need units that are flexible and work everywhere. That's where relative units like percents come in handy. So making something 50% wide means it will always take half of the screen (or viewport, which is the size of the opened browser window). <br /><img src="http://blog.froont.com/content/images/2014/11/02_Relative-Units-vs-Static-Units-1.gif" alt="Relative units in CSS" /></p><span>
+
+</span><h3 id="breakpoints">Breakpoints</h3><span>
+
+</span><p>Breakpoints allow the layout to change at predefined points, i.e. having 3 columns on a desktop, but only 1 column on a mobile device. Most CSS properties can be changed from one breakpoint to another. Usually where you put one depends on the content. If a sentence breaks, you might need to add a breakpoint. But use them with caution – it can get messy quickly when it's difficult to understand what is influencing what. <br /><img src="http://blog.froont.com/content/images/2014/11/03_With-Breakpoints-vs-Without-Breakpoints-1.gif" alt="Breakpoints in the responsive web design" /></p><span>
+
+</span><h3 id="maxandminvalues">Max and Min values</h3><span>
+
+</span><p>Sometimes it's great that content takes up the whole width of a screen, like on a mobile device, but having the same content stretching to the whole width of your TV screen often makes less sense. This is why Min/Max values help. For example having width of 100% and Max width of 1000px would mean that content will fill the screen, but don't go over 1000px. <br /><img src="http://blog.froont.com/content/images/2014/11/07_Max-width-vx-No-max-width-1.gif" alt="Min and max widths in CSS" /></p><span>
+
+</span><h3 id="nestedobjects">Nested objects</h3><span>
+
+</span><p>Remember the relative position? Having a lot of elements depending on each other would be difficult to control, therefore wrapping elements in a container keeps it way more understandable, clean and tidy. This is where static units like pixels can help. They are useful for content that you don't want to scale, like logos and buttons. <br /><img src="http://blog.froont.com/content/images/2014/11/05_Nested-vs-Not-Nested-1.gif" alt="Nested objects" /></p><span>
+
+</span><h3 id="mobileordesktopfirst">Mobile or Desktop first</h3><span>
+
+</span><p>Technically there isn't much of a difference if a project is started from a smaller screen to a bigger (mobile first) or vice versa (desktop first). Yet it adds extra limitations and helps you make decisions if you start with mobile first. Often people start from both ends at once, so really, go and see what works better for you. <br /><img src="http://blog.froont.com/content/images/2014/11/08_Desktop-first-vs-Mobile-first-3.gif" alt="Mobile or desktop first" /></p><span>
+
+</span><h3 id="webfontsvssystemfonts">Webfonts vs System fonts</h3><span>
+
+</span><p>Wanna have a cool looking Futura or Didot on your website? Use webfonts! Although they will look stunning, remember that each will be downloaded and the more you'll have, the longer it will take to load the page. System fonts on the other hand are lightning fast, except when the user doesn't have it locally, it will fall back to a default font. <br /><img src="http://blog.froont.com/content/images/2014/11/06_System-fonts-vs-Webfonts-1.gif" alt="Webfonts vs System fonts" /></p><span>
+
+</span><h3 id="bitmapimagesvsvectors">Bitmap images vs Vectors</h3><span>
+
+</span><p>Does your icon have lot of details and some fancy effects applied? If yes, use a bitmap. If not, consider using a vector image. For bitmaps use a jpg, png or a gif, for vectors the best choice would be a SVG or an icon font. Each has some benefits and some drawbacks. However keep in mind the size -- no pictures should go online without optimization. Vectors on the other hand often are tiny, but some older browsers won't support it. Also, if it has lots of curves, it might be heavier than a bitmap, so choose wisely. <br /><img src="http://blog.froont.com/content/images/2014/11/09_Vectors-vs-Images-1.gif" alt="Bitmap images vs vectors" /></p><span>
+
+</span><p>Feel that we left out something important? Let us know in the comments!</p><span>
+            </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

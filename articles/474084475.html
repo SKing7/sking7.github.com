@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The Subtle Magic Behind Why the Bootstrap 3 Grid Works</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The Subtle Magic Behind Why the Bootstrap 3 Grid Works</h1>
+<div class="entry-content"><span>
+			</span><p>Things like CSS grids should remain behind the curtain. No one really needs to know how it works, or why. Until you have a broken design or something complex and you can’t figure out why your spacing, margins, paddings etc are all messed up. It can be a real pain, especially when you are generating content dynamically in some sort of interface that changes and shifts.</p><span>
+</span><p>I’ve seen a number of people confused or irritated at how the bootstrap grid works. I’ve explained it a bunch of times, and it always makes sense afterwards. So I’d like to quickly and visually explain <strong>why</strong> the Bootstrap grid works, not necessarily how. Let’s check out this one weird trick about how Bootstrap does its magic.</p><span>
+</span><h2>Container</h2><span>
+</span><p>The container has 2 purposes:</p><span>
+</span><ol>
+<li>To provide the width constraints on responsive widths. When the responsive sizes change, it’s the container that changes. Rows and columns are all percentage based so they don’t need to change.</li>
+<li>To provide padding so the content doesn’t touch the edge of the browser. This is 15px on each side as seen in pink in the image. This is explained more later.</li>
+</ol><span>
+</span><p>You never need another container inside of a container. Never. You’ll see why.</p><span>
+</span><h2><img class="alignnone size-full wp-image-44034" src="http://www.helloerik.com/wp-content/uploads/image-1.png" alt="image-1" width="1170" height="600" /><br />Row</h2><span>
+</span><p>The row provides the columns a place to live, ideally having columns that add up to 12. It also acts as a wrapper since all the columns float left, additional rows don’t have overlaps when floats get weird.</p><span>
+</span><p>Rows also have a unique aspect of having 15px of negative margin on each side, as seen in blue in the image below. The div that makes up the row would normally be constrained inside of the containers padding, touching the edges of the pink area but not beyond. The 15px negative margins push the row out over top of the containers 15px padding, essentially negating it. Why? Because of how the columns work as we’ll see next.</p><span>
+</span><p>Never use a row outside a container, it won’t work.</p><span>
+</span><p><img class="alignnone size-full wp-image-44033" src="http://www.helloerik.com/wp-content/uploads/image-2.png" alt="image-2" width="1170" height="600" /></p><span>
+</span><h2>Column</h2><span>
+</span><p>The columns now have 15px padding, seen in yellow. This padding means that the columns actually touch the edge of the row, which itself touches the edge of the container since the row has the negative margin, and the container has the positive padding. But, the padding on the column pushes anything inside the column in to where it needs to be, and also provides the 30px gutter between columns.</p><span>
+</span><p>Never use a column outside of a row, it won’t work.</p><span>
+</span><p><img class="alignnone size-full wp-image-44032" src="http://www.helloerik.com/wp-content/uploads/image-3.png" alt="image-3" width="1170" height="600" /></p><span>
+</span><h2>Content Within a Column</h2><span>
+</span><p>The column padding is what gives your content the space it needs to not touch the edge of the browser, or the content in the other columns next to it. This is where the whole container/row/column scheme finally culminates.</p><span>
+</span><p><img class="alignnone size-full wp-image-44031" src="http://www.helloerik.com/wp-content/uploads/image-4.png" alt="image-4" width="1170" height="600" /></p><span>
+</span><h2>Nesting</h2><span>
+</span><p>When you have a container, row, and column set up, you can make new grids inside of a column. You add rows right inside the outer columns, you do not need to use them in containers:</p><span>
+</span><p><img class="alignnone size-full wp-image-44030" src="http://www.helloerik.com/wp-content/uploads/image-5.png" alt="image-5" width="1170" height="600" /></p><span>
+</span><p>The trick here is that the column acts the same way as a container, it has 15px of padding that allows the row’s negative 15px of margin to overlay it… which in turn lets columns inside of this new row touch the edges, but push the content in with its own 15px padding, which also creates the gutter, as seen below.</p><span>
+</span><p><img class="alignnone size-full wp-image-44029" src="http://www.helloerik.com/wp-content/uploads/image-6.png" alt="image-6" width="1170" height="600" /></p><span>
+</span><h2>Offsets</h2><span>
+</span><p>Offsets are pretty simple, they just add a left margin to the side of a column to push it over. Where it gets weird is that the margin pushes off from the -15px margin on the row when on the far left, and when in the middle of a row it pushes off from the right side of the preceding column. It splits and separates the gutters. Other than that, they behave as columns would regarding how they float, push things around, etc.</p><span>
+</span><p>Nothing really to it.</p><span>
+</span><p><img class="alignnone size-full wp-image-44028" src="http://www.helloerik.com/wp-content/uploads/image-7.png" alt="image-7" width="1170" height="600" /></p><span>
+</span><h2>Push and Pull</h2><span>
+</span><p>Let me start by saying why you push/pull: to flip layouts based on responsive sizes. Especially good for reordering how columns are laid out from a mobile design, to the desktop design, as it allows you to break the HTML top -&gt; left drawing of divs.</p><span>
+</span><p>These are more confusing as they actually add positioning to the columns, not margin. A push adds left positioning, and a pull adds right positioning. Since they are floated and also contained in a relatively positioned container, the row, they move to the distance you set, ie col-sm-push-4, with the positioning.</p><span>
+</span><p><img class="alignnone size-full wp-image-44027" src="http://www.helloerik.com/wp-content/uploads/image-8.png" alt="image-8" width="1170" height="600" /></p><span>
+</span><p>This is a problem because it can make columns just overlap and not behave like normal or like an offset. So if you push one to the right, it’s going to be on top of the one on the right, and vice versa. So almost always, when you use push/pull, you docomplementary&nbsp;inverses, if you push a column to the right, you’ll almost always be pulling a column to the left a complementary&nbsp;distance.</p><span>
+</span><p><img class="alignnone size-full wp-image-44026" src="http://www.helloerik.com/wp-content/uploads/image-9.png" alt="image-9" width="1170" height="600" /></p><span>
+</span><span>
+</span><h2>The Reasoning Behind It</h2><span>
+</span><p><strong>Container:</strong> The container works this way so that the edges of the container can have that virtual 15px padding around the content, but not require the body tag to have a 15px padding. This was a change in the RC1 of Bootstrap 3. Otherwise, the entire body would have a 15px padding, which would make non-bootstrap divs and such not touch the edges, which is bad for full width divs with colored backgrounds.</p><span>
+</span><p><strong>Rows:</strong> Rows have negative margin equal to the containers padding so that they also touch the edge of the container, the negative margin overlapping the padding. this lets the row not be pushed in by the container’s padding. Why? Well…</p><span>
+</span><p><strong>Columns:</strong> Columns have the 15px padding again so that they finally truly keep your content 15px away from the edge of the container/browser/viewport, and also provide the 15px + 15px gutter between columns. It is like this so that there doesn’t have to be a special first/last column that doesn’t have padding on the left/right, like in grids of old (960, blueprint, etc). Now, there is a consistent 15px space between the edges of the columns at all times, no matter what.</p><span>
+</span><p><strong>Nested Rows:</strong> Nested rows work just as above, only now they overlap the padding of the column they are inside, just like the container. Essentially, the column is acting as the container, which is why you never need a container inside of anything.</p><span>
+</span><p><strong>Nested Columns:</strong> Nothing is different here now, works the same as before.</p><span>
+</span><p><strong>Offsets:</strong> These essentially split gutter widths to increase the space between columns by however many column units you want. Very, very simple.</p><span>
+</span><p><strong>Push/Pull:&nbsp;</strong>These make use of positioning to trick HTML into flipping elements from left to right when going from mobile to desktop sizes. Or, for when you have a special use-case where offsets don’t work.</p><span>
+</span><h2>Common Problems</h2><span>
+</span><p>There are a few common problems that come up. Most of these are easily visible once you know what to look for in your HTML.</p><span>
+</span><p><strong>Lack of a Container:&nbsp;</strong>The first is the lack of a container. Not having a container means that there is no padding for the row’s negative margins to overlap, meaning now the row pushes outside of its parent element. This is the most common reason for odd column alignment or weird horizontal scrolling when you’re close to the edge of the browser, or have a container with a hidden overflow.<img class="alignnone size-full wp-image-44053" src="http://www.helloerik.com/wp-content/uploads/image-10.png" alt="image-10" width="1170" height="600" /></p><span>
+</span><p><strong>Lack of Rows:&nbsp;</strong>The next similar problem is not having a row. This goes in the opposite direction as now you have double padding on your edges, meaning now instead of the 15px between the edge of your browser/viewport, you’ll have 30px. And, your columns won’t float right and you’ll have weird float overlaps since there’s not the row there to “clear” the stacked columns.</p><span>
+</span><p>Also, when you’re trying to nest grids, which is fine, a lack of a row will also double up the padding, so as you see below there is now 45px of padding on the left! Rows would fix this so that the nested grid was only 15px away from the edge of the browser/body as the first row overlaps the container padding, the first column touches the edge of the row, the inner row overlaps the outer columns padding, and the inner inner column touches the edge of that inner row! This is a LOT easier to see in practice, and you can see it in the nesting image up at the start of the article.</p><span>
+</span><p><img class="alignnone size-full wp-image-44052" src="http://www.helloerik.com/wp-content/uploads/image-11.png" alt="image-11" width="1170" height="600" /></p><span>
+</span><p><strong>Containers Inside of Anything Else:&nbsp;</strong>A container inside of anything else acts like a column by adding new padding, but also adds all the responsive widths and snap points that are unique to a container. By using a container anywhere inside another container, you’re going to have problems. It is never appropriate and will just cause all sorts of havok.</p><span>
+</span><p><img class="alignnone size-full wp-image-44051" src="http://www.helloerik.com/wp-content/uploads/image-12.png" alt="image-12" width="1170" height="600" /></p><span>
+</span><p><strong>Offset/Push/Pull:</strong>&nbsp;When using offsets and push/pulls, most of these still apply. Offsets are pretty simple as they just make columns bigger. Push/Pull is different is that if you make it too big, you can just push columns outside of their containers. Pretty easy to notice, just use common sense.</p><span>
+</span><p><img class="alignnone size-full wp-image-44054" src="http://www.helloerik.com/wp-content/uploads/image-13.png" alt="image-13" width="1170" height="600" /></p><span>
+</span><p>Those are some of the most common, basic grid problems. If you’re having trouble with a design with lots of nesting, or if your varying responsive layouts aren’t working how you want, go through and see if you have any of these problems first. If you fix these, often you’ll solve most of your issue that isn’t related to your custom layouts.</p><span>
+</span><h2>That’s It</h2><span>
+</span><p>This is why the Bootstrap 3 grid works. It’s really clever and provides an awesome solution most of us don’t realize is taking place. After many, many years of using grid frameworks, this is the most elegant solution I’ve used so far. Even though you might look at this and think it looks convoluted, it’s really using the limitations and abilities of CSS to give us a dead-simple way to make a grid that makes sense in practice, if not entirely under scrutiny.</p><span>
+</span><p>Be sure to check out the other Bootstrap 3 articles: <a href="http://www.helloerik.com/bootstrap-3-grid-introduction">The Bootstrap 3 Grid Introduction</a> and <a href="http://www.helloerik.com/bootstrap-3-less-workflow-tutorial">Bootstrap 3 Less Tutorial Workflow</a></p><span>
+					</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

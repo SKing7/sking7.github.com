@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSS-Only Solution For UI Tracking</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>CSS-Only Solution For UI Tracking</h1>
+<article class="post-208694 post type-post status-publish format-standard has-post-thumbnail hentry category-coding tag-analytics tag-css tag-data-visualization tag-techniques tag-tools" vocab="http://schema.org/" typeof="TechArticle">
+                    
+                
+                
+                                    <p>The web is growing up. We are building applications that work entirely in the browser. They are responsive; they have tons of features and work under many devices. We enjoy providing high-quality code that is well structured and tested.</p>
+<p>But what matters in the end is the impact for clients. Are they getting more products sold or are there more visitors for their campaign sites? The final results usually show if our project is successful. And we rely on statistics as a measuring tool. We all use instruments like <a href="http://www.google.com/analytics/">Google Analytics</a><sup class="po" id="note-1"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#1">1</a></sup>. It is a powerful way to collect data. In this article, we will see a CSS-only approach for tracking UI interactions using Google Analytics.</p>
+<h3><a name="user-content-the-problem" class="anchor" href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#the-problem"><span class="octicon octicon-link"></span></a><sup class="po" id="note-2"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#2">2</a></sup>The Problem</h3>
+<p>We developed an application that had to work on various devices. We were not able to test on most of them and decided that we had to make everything simple. So simple that there wasn’t a chance to produce buggy code. The design was clean, minimalistic, and there wasn’t any complex business logic.</p>
+<p>It was a website displaying information about one of the client’s products. One of our tasks was to track user visits and interactions. For most cases, we used Google Analytics. All we had to do was to place code like the example below at the bottom of the pages:</p>
+<pre><code class="language-css">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '......', '......');
+ga('send', 'pageview');
+</code></pre>
+<p>This snippet was enough for tracking page views, traffic, sessions, etc. Moreover, we placed JavaScript where the user interacts with the page. For example, clicking on a link, filling an input field, or checking option boxes.</p>
+<pre><code class="language-css">ga('send', 'event', 'ui-interaction', 'click', 'link clicked', 1);
+</code></pre>
+<p>The guys from Google handled these events nicely, and we were able to see them in our account. However, at some point the client reported that there were devices that have bad or no JavaScript support. They represented roughly 2% of all the devices that visited the site. We started searching for a solution that did not involve JavaScript. We were ready to admit that we could not collect statistics under these circumstances.</p>
+<p>It was not that bad, but the client shared another issue. Our little application was going to be part of a private network. The computers there had JavaScript turned off for security reasons. Also, this private network was important for the client. So, he insisted that we still get stats in those cases. We had to provide a proper solution, but the problem was that we had only CSS and HTML available as tools.</p>
+<h3><a name="user-content-the-solution" class="anchor" href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#the-solution"><span class="octicon octicon-link"></span></a><sup class="po" id="note-3"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#3">3</a></sup>The Solution</h3>
+<p>While searching for a solution, I was monitoring the <em>Network</em> tab in Chrome’s developer tools when I noticed the following:</p>
+<figure><a href="http://media.mediatemple.netdna-cdn.com/wp-content/uploads/2014/10/1-google-analytics-large-preview-opt.png"><img src="http://media.mediatemple.netdna-cdn.com/wp-content/uploads/2014/10/1-google-analytics-preview-opt.png" alt="Tracking UI with CSS" title="Tracking UI with CSS" width="500" height="52" /></a><sup class="po" id="note-4"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#4">4</a></sup><figcaption>(<a href="http://media.mediatemple.netdna-cdn.com/wp-content/uploads/2014/10/1-google-analytics-large-preview-opt.png">View large version</a><sup class="po" id="note-5"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#5">5</a></sup>)</figcaption></figure>
+<p>In the beginning, I thought that there was nothing unusual. Google Analytics’s code made few HTTP requests for its tracking processes. However, the fourth column shows the <code>Content-type</code> header of the response. It is an image. Not JSON or HTML, but an image. Then I started reading the documentation and landed on this <a href="https://developers.google.com/analytics/resources/concepts/gaConceptsTrackingOverview">Tracking Code Overview</a><sup class="po" id="note-6"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#6">6</a></sup>. The most interesting part was:</p>
+<blockquote>
+<p>When all this information is collected, it is sent to the Analytics servers in the form of a long list of parameters attached to a single-pixel GIF image request.</p>
+</blockquote>
+<p>So, Google indeed made the HTTP request but not the trivial Ajax call. It simply appends all the parameters to an image’s URL. After that it performs a request for a GIF file. There is even a name for such requests: <a href="http://www.phpied.com/beacon-performance/">beacon</a><sup class="po" id="note-7"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#7">7</a></sup>. I wondered why GA uses this approach. Then I realized that there are some benefits:</p>
+<ul>
+<li>It is simple. We initialize a new <code>Image</code> object and apply a value to its <code>src</code> attribute:
+<pre><code class="language-css">new Image().src = '/stats.gif?' + parameters</code></pre>
+</li>
+<li>It works everywhere. There is no need to add workarounds for different browsers as we do for Ajax requests.</li>
+<li>Tiny response. As <a href="http://www.phpied.com/beacon-performance/">Stoyan Stefanov said</a><sup class="po" id="note-8"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#8">8</a></sup>, the 1×1px GIF image could be only 42 bytes.</li>
+</ul>
+<p>I made few clicks and sent events to Google Analytics. Knowing the request parameters, I was able to construct my own image URLs. The only thing to do in the end was to load an image on the page. And yes, this was possible with pure CSS.</p>
+<pre><code class="language-css">background-image: url('http://www.google-analytics.com/collect?v=1&amp;_v=j23&amp;a=...');
+</code></pre>
+<p>Setting the <code>background-image</code> CSS property forces the browser to load an image. Finally, we successfully used this technique to track user actions.</p>
+<h3>
+<a name="user-content-the-tracking" class="anchor" href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#the-tracking"><span class="octicon octicon-link"></span></a><sup class="po" id="note-9"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#9">9</a></sup>Tracking User Actions</h3>
+<p>There are several ways to change styles based on user input. The first thing we thought about was the <code>:active</code> pseudo class. This class matches when an element is activated by the user. It is the time between the moment the user presses the mouse button and releases it. In our case, this was perfect for tracking clicks:</p>
+<pre><code class="language-css">input[type="button"]:active {
+    background-image: url('http://www.google-analytics.com/collect?v=1&amp;_v=j23&amp;a=...');
+}
+</code></pre>
+<p>Another useful pseudo class is <code>:focus</code>. We recorded how many times users started typing in the contact form. It was interesting to find out that in about 10% of cases users did not actually submit the form.</p>
+<pre><code class="language-css">input[name="message"]:focus {
+    background-image: url('http://www.google-analytics.com/collect?v=1&amp;_v=j23&amp;a=...');
+}
+</code></pre>
+<p>On one page, we had a step-by-step questionnaire. At the end, the user was asked to agree with some terms and conditions. Some of the visitors did not complete that last step. In the first version of the site, we were not able to determine what these users had selected in the questionnaire because the results would have been sent after completion. However, because all the steps were just radio buttons, we used the <code>:checked</code> pseudo class and successfully tracked the selections:</p>
+<pre><code class="language-css">input[value="female"]:checked {
+    background-image: url('http://www.google-analytics.com/collect?v=1&amp;_v=j23&amp;a=...');
+}
+</code></pre>
+<p>One of the most important statistics we had to deliver was about the diversity of screen resolutions. Thanks to media queries this was possible:</p>
+<pre><code class="language-css">@media all and (max-width: 640px) {
+    body {
+        background-image: url('http://www.google-analytics.com/collect?v=1&amp;_v=j23&amp;a=...');
+    }
+}
+</code></pre>
+<p>In fact, there are <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Media_queries">quite a few logical operators</a><sup class="po" id="note-10"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#10">10</a></sup> that we can use. We can track screens with a specific aspect ratio; devices in landscape orientation; or those with a resolution of 300dpi.</p>
+<h3>
+<a name="user-content-drawbacks" class="anchor" href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#drawbacks"><span class="octicon octicon-link"></span></a><sup class="po" id="note-11"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#11">11</a></sup>Drawbacks</h3>
+<p>The problem with this kind of CSS UI tracking is that we get only the first occurrence of the event. For example, take the <code>:active</code> pseudo class example. The request for the background image is fired only once. If we need to capture every click then, we have to change the URL, which is not possible without JavaScript.</p>
+<p>We used the <code>background-image</code> property to make the HTTP requests. However, sometimes we might need to set a real image as a background because of the application’s design. In such cases we could use the <code>content</code> property. It is usually used for adding text or icons but the property also accepts an image. For example:</p>
+<pre><code class="language-css">input[value="female"]:checked {
+    content: url('http://www.google-analytics.com/collect?v=1&amp;_v=j23&amp;a=...');
+}
+</code></pre>
+<p>Because we are requesting an image, we should make sure that the browser is not caching the file. The statistics server should process the request each time. We could achieve this by providing the correct headers. Check out the image below. It shows the response headers sent by Google:</p>
+<figure><a href="http://media.mediatemple.netdna-cdn.com/wp-content/uploads/2014/10/2-google-analytics-large-preview-opt.png"><img src="http://media.mediatemple.netdna-cdn.com/wp-content/uploads/2014/10/2-google-analytics-preview-opt.png" alt="Tracking UI with CSS" title="Tracking UI with CSS" width="500" height="239" /></a><sup class="po" id="note-12"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#12">12</a></sup><figcaption>(<a href="http://media.mediatemple.netdna-cdn.com/wp-content/uploads/2014/10/2-google-analytics-large-preview-opt.png">View large version</a><sup class="po" id="note-13"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#13">13</a></sup>)</figcaption></figure>
+<p>Sending the following headers guarantees that the browser will not cache the image:</p>
+<pre><code class="language-css">Cache-Control: no-cache, no-store, must-revalidate
+Pragma: no-cache
+Expires: 0
+</code></pre>
+<p>In some cases, we may decide to write our own statistics server. This is an important note that we must consider during development. Here is a simple Node.js-based implementation. We used that for testing purposes:</p>
+<pre><code class="language-css">var fs = require('fs'),
+    http = require('http'),
+    url = require('url'),
+    img = fs.readFileSync(__dirname + '/stat.png'),
+    stats = {};
+
+var collectStats = function(type) {
+    console.log('collectStats type=' + type);
+    if(!stats[type]) stats[type] = 0;
+    stats[type]++;
+}
+
+http.createServer(function(req, res){
+    var request = url.parse(req.url, true);
+    var action = request.pathname;
+    if (action == '/stat.png') {
+        collectStats(request.query.type);
+        res.writeHead(200, {'Content-Type': 'image/gif', 'Cache-Control': 'no-cache' });
+        res.end(img, 'binary');
+    } else { 
+        res.writeHead(200, {'Content-Type': 'text/html' });
+        res.end('Stats server:&lt;pre&gt;' + JSON.stringify(stats) + '&lt;/pre&gt;\n');
+    }
+}).listen(8000, '127.0.0.1');
+console.log('Server is running at http://127.0.0.1:8000');
+</code></pre>
+<p>If we save the code to a file called <i>server.js</i> and execute <code>node server.js</code> we will get a server listening on port 8000. There are two possible URLs for querying:</p>
+<pre><code class="language-css">* http://127.0.0.1:8000/ - shows the collected statistics
+* http://127.0.0.1:8000/stat.png?type=something - collecting statistics. 
+</code></pre>
+<p>By requesting the PNG in the second URL, we are incrementing values. The following piece of code shows the HTML and CSS that we have to place in the browser:</p>
+<pre><code class="language-css">&lt;input type="button" value="click me"/&gt;
+
+input[type="button"]:active {
+    background-image: url('http://127.0.0.1:8000/stat.png?type=form-submitted');
+}
+</code></pre>
+<p>Finally, as a last drawback we have to mention that some antivirus software or browser settings may remove 1×1px beacons. So we have to be careful when choosing this technique and make sure that we provide workarounds.</p>
+<h3>
+<a name="user-content-summary" class="anchor" href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#summary"><span class="octicon octicon-link"></span></a><sup class="po" id="note-14"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#14">14</a></sup>Summary</h3>
+<p>CSS is usually considered a language for applying styles to webpages. However, in this article we saw that it is more than that. It is also a handy tool for collecting statistics.</p>
+<p><em>(ds, il, og)</em></p>
+<h4 class="po">Footnotes</h4><ol class="po"><li id="#1"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-1">1 http://www.google.com/analytics/</a></li><li id="#2"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-2">2 #the-problem</a></li><li id="#3"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-3">3 #the-solution</a></li><li id="#4"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-4">4 http://www.smashingmagazine.com/wp-content/uploads/2014/10/1-google-analytics-large-preview-opt.png</a></li><li id="#5"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-5">5 http://www.smashingmagazine.com/wp-content/uploads/2014/10/1-google-analytics-large-preview-opt.png</a></li><li id="#6"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-6">6 https://developers.google.com/analytics/resources/concepts/gaConceptsTrackingOverview</a></li><li id="#7"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-7">7 http://www.phpied.com/beacon-performance/</a></li><li id="#8"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-8">8 http://www.phpied.com/beacon-performance/</a></li><li id="#9"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-9">9 #the-tracking</a></li><li id="#10"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-10">10 https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Media_queries</a></li><li id="#11"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-11">11 #drawbacks</a></li><li id="#12"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-12">12 http://www.smashingmagazine.com/wp-content/uploads/2014/10/2-google-analytics-large-preview-opt.png</a></li><li id="#13"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-13">13 http://www.smashingmagazine.com/wp-content/uploads/2014/10/2-google-analytics-large-preview-opt.png</a></li><li id="#14"><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#note-14">14 #summary</a></li></ol>           	                            
+	                    
+        <p><a href="http://www.smashingmagazine.com/2014/10/16/css-only-solution-for-ui-tracking/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-133&amp;utm_medium=email#top" class="top single" title="Jump to the top of the page">↑ Back to top</a><a class="sot single" href="https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Fwww.smashingmagazine.com%2F2014%2F10%2F16%2Fcss-only-solution-for-ui-tracking%2F&amp;source=tweetbutton&amp;text=CSS-Only%20Solution%20For%20UI%20Tracking&amp;url=http%3A%2F%2Fwww.smashingmagazine.com%2F2014%2F10%2F16%2Fcss-only-solution-for-ui-tracking%2F&amp;via=smashingmag" title="Share on Twitter!">Share on Twitter</a></p>
+    </article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

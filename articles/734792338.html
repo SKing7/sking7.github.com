@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>do u webview?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>do u webview?</h1>
+<div id="post-4179" class="post-4179 post type-post status-publish format-standard hentry category-browsers category-javascript category-mobile category-performance category-web-development tag-hybrid tag-webview"><span>
+        	            	</span><span>
+            
+			</span><!-- .entry-meta --><span>
+
+			</span><p>A “webview” is a browser bundled inside of a mobile application producing what is called a <em>hybrid app</em>. Using a webview allows mobile apps to be built using Web technologies (HTML, JavaScript, CSS, etc.) but still package it as a native app and put it in the app store. In addition to allowing devs to work with familiar technologies, other <a title="Hybrid sweet spot: Native navigation, web content" href="https://signalvnoise.com/posts/3743-hybrid-sweet-spot-native-navigation-web-content">advantages of building a hybrid app</a> include greater code reuse across the app and the website, and easier support for multiple mobile platforms.</p><span>
+</span><h3>We all have webview traffic</h3><span>
+</span><p>Deciding whether to build a hybrid app versus a native app, or to have an app at all, is a lengthy debate and not the point of this post. Even if you don’t have a hybrid app, a significant amount of your mobile traffic comes from webviews. That’s because many sources of traffic are hybrid apps. Two examples on iOS are the Facebook app and Google Chrome. “Whoa, whoa, whoa” you say, Facebook’s retreat from its hybrid app is well known. That’s true. The Facebook timeline, for example, is no longer rendered using a webview:</p><span>
+</span><p><a href="http://stevesouders.com/images/facebook-guggenheim-timeline.png"><img class="aligncenter" alt="Facebook timeline" src="http://stevesouders.com/images/facebook-guggenheim-timeline.png" width="320" /></a></p><span>
+</span><p>However, the Facebook timeline contains links, such as the link to <a href="http://www.guggenheim.org/">http://www.guggenheim.org/</a> in the timeline above. When users click on links in the timeline, the Facebook app opens those in a webview:</p><span>
+</span><p><a href="http://stevesouders.com/images/facebook-guggenheim-webview.png"><img class="aligncenter" alt="Facebook webview" src="http://stevesouders.com/images/facebook-guggenheim-webview.png" width="320" /></a></p><span>
+</span><p>Similarly, Chrome for iOS is implemented using a webview. Across all iOS traffic, 6% comes from Facebook’s webview and 5% comes from Google Chrome according to <a title="Mobile Overview Report by ScientiaMobile" href="http://wurfl.io/MOVR/">ScientiaMobile</a>. And there are other examples: Twitter’s iOS app uses a webview to render clicked links, etc.</p><span>
+</span><p>I encourage you to scan your server logs to gauge how much of your mobile traffic comes from webviews. There’s not much documentation on webview User-Agent strings. For iOS, the User-Agent is typically a base string with information appended by the app. Here’s the User-Agent string for Facebook’s webview:</p><span>
+</span><p><code>Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D201 [FBAN/FBIOS;FBAV/12.1.0.24.20; FBBV/3214247; FBDV/iPhone6,1;FBMD/iPhone; FBSN/iPhone OS;FBSV/7.1.1; FBSS/2; FBCR/AT&amp;T;FBID/phone;FBLC/en_US;FBOP/5]</code></p><span>
+</span><p>Here’s the User-Agent string from Chrome for iOS:</p><span>
+</span><p><code>Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) CriOS/37.0.2062.60 Mobile/11D257 Safari/9537.53</code></p><span>
+</span><p>That’s a lot of detail. The bottom line is: <em>we’re all getting more webview traffic than we expect</em>. Therefore, it’s important that we understand how webviews perform and take that into consideration when building our mobile websites.</p><span>
+</span><h3>Webview performance</h3><span>
+</span><p>Since a webview is just a bundled browser, we might think that webviews and their mobile browser counterpart have similar performance profiles. It turns out that this is <em>not</em> the case. This was discovered as an unintentional side effect from the article&nbsp;<a href="http://www.guypo.com/mobile/iphone-vs-android-45000-tests-prove-whose-browser-is-faster/">iPhone vs. Android – 45,000 Tests Prove Who is Faster</a>. This article from 2011, in the days of iOS 4.3, noted that the iPhone browser was 52% slower than Android’s. The results were so dramatic it triggered the following <a href="http://www.cnet.com/news/android-beats-iphone-on-browser-speed-or-not/">response from Apple</a>:</p><span>
+</span><blockquote><p>[Blaze's] testing is flawed. They didn’t actually test the Safari browser on the iPhone. Instead they only tested their own proprietary app, which uses an embedded Web viewer that doesn’t actually take advantage of Safari’s Web performance optimizations.</p></blockquote><span>
+</span><p>Apple’s response is accurate. The study conducted by Blaze (now part of Akamai) was conducted using a webview, so it was not a true comparison of the mobile browser from each platform. But the more important revelation is that webviews were hobbled resulting in worse performance than mobile Safari. Specifically, the webview on iOS 4.3 did not have Nitro’s JIT compiler for JavaScript, application cache, nor asynchronous script loading.</p><span>
+</span><p>This means it’s not enough to track the performance of mobile browsers alone; we also need to track the performance of webviews. This is especially true in light of the fact that more than 10% of iOS traffic comes from webviews. Luckily, the state of webviews is better than it was in 2011. Even better, the most recent webviews have significantly more features when it comes to performance.&nbsp;The following table compares the most recent iOS and Android webviews along a set of important performance features.</p><span>
+</span><table class="basictable">
+<tbody>
+<tr>
+<th></th>
+<th>iOS 7<br />UIWebView</th>
+<th>iOS 8<br />WKWebView</th>
+<th>Android 4.3<br />Webkit<br />Webview</th>
+<th>Android 4.4<br />Chromium<br />Webview</th>
+</tr>
+<tr>
+<td class="txt">Nitro/V8</td>
+<td></td>
+<td><span>✔</span></td>
+<td></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">html5test.com</td>
+<td>410</td>
+<td>440</td>
+<td>278</td>
+<td>434</td>
+</tr>
+<tr>
+<td class="txt">localStorage</td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">app cache</td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">indexedDB</td>
+<td></td>
+<td><span>✔</span></td>
+<td></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">SPDY</td>
+<td></td>
+<td><span>✔</span></td>
+<td></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">WebP</td>
+<td></td>
+<td></td>
+<td></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">srcset</td>
+<td></td>
+<td><span>✔</span></td>
+<td></td>
+<td>?</td>
+</tr>
+<tr>
+<td class="txt">WebGL</td>
+<td></td>
+<td><span>✔</span></td>
+<td></td>
+<td>?</td>
+</tr>
+<tr>
+<td class="txt">requestAnimation- Frame</td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+<td></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">Nav Timing</td>
+<td></td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+<td><span>✔</span></td>
+</tr>
+<tr>
+<td class="txt">Resource Timing</td>
+<td></td>
+<td></td>
+<td></td>
+<td><span>✔</span></td>
+</tr>
+</tbody>
+</table><span>
+</span><p>As shown in this table, the newest webviews have dramatically better performance. The most important improvement is JIT compilation for JavaScript. While localStorage and app cache now have support across all webviews, the newer webviews add support for indexedDB. Support for SPDY in the newer webviews is important to help mitigate the impact of slow mobile networks. WebP, image srcset, and WebGL address the bloat of mobile images, but support for these features is mixed. (I wasn’t able to confirm the status of srcset and WebGL in Android 4.4′s webview. Please add comments and I’ll update the table.) The requestAnimationFrame API gives smoother animations. Finally, adoption of the Nav Timing and Resource Timing APIs gives website owners the ability to track performance for websites served inside webviews.</p><span>
+</span><h3>Not out of the woods yet</h3><span>
+</span><p>While the newest webviews have a better performance profile, we’re still on the hook for supporting older webviews. Hybrid apps will continue to use the older webviews until they’re rebuilt and updated. The Android webview is pinned at Chromium 30 and requires an OS upgrade to get feature updates. Similar to the issues with legacy browsers, traffic from legacy webviews will continue for at least a year. Given the significant amount of traffic from webviews and the dramatic differences in webview performance, it’s important that developers measure performance on old and new webviews, and apply mobile performance best practices to make their website as fast as possible even on old webviews.</p><span>
+</span><p>(Many thanks to <a href="https://twitter.com/firt">Maximiliano Firtman</a>, <a href="http://twitter.com/tkadlec">Tim Kadlec</a>, <a href="https://twitter.com/brianleroux">Brian LeRoux</a>, and <a href="https://twitter.com/guypod">Guy Podjarny</a> for providing information for this post.)</p><span>
+            
+            			
+		</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

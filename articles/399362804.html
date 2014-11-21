@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Evaluating the Performance of SPDY-enabled Web Servers</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Evaluating the Performance of SPDY-enabled Web Servers</h1>
+<div class="entry"><span>
+				
+				</span><p>As you may already know, <strong>SPDY</strong> (pronounced “SPeeDY”) is a new networking protocol introduced by Google and designed to reduce the web latency associated with HTTP. With SPDY, web pages load up to 64 percent faster than HTTP alone, according to Google. It accomplishes this by adding a session layer between HTTP and SSL that supports concurrent, interleaved streams over a single TCP connection.&nbsp;The initial draft of HTTP/2.0, the future of the web, is based on SPDY, which is a welcome step forward considering that HTTP/1.0 was released in 1996. SPDY holds great potential for mobile devices, for which latency is more of an issue and the market is catching on.&nbsp;As evidence of this, Microsoft recently announced the next version of Internet Explorer will support the new protocol.</p><span>
+</span><p>Today, SPDY can be deployed on Apache by installing a single module (<a href="http://code.google.com/p/mod-spdy/" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://code.google.com']);" target="_blank">mod-spdy, the Apache SPDY module</a>). No changes to website content are required. SPDY is now enabled by default on many of the latest modern browsers, including Chrome, Firefox, Opera, and Android Browser. (You can check your own browser’s support by visiting isspdyenabled.com).</p><span>
+</span><p>So, simply by deploying the SPDY module on your Apache server, you can provide a large percentage of your users with better response times! More importantly, the response times of a website are correlated with the site’s conversion rate and bounce rate—so SPDY can have a significant positive impact on your business!</p><span>
+</span><p>With all the advantages of SPDY, you may be wondering if there is a price to pay on the server side.&nbsp;Moving from HTTP to SPDY adds encryption and compression overhead, which clearly requires more resources.&nbsp;It does, however, use fewer TCP connections.&nbsp;It wasn’t immediately clear to me if all these changes in aggregate would cause noticeable drawbacks on the server.</p><span>
+</span><p>To get to the bottom of this question, I thought it would be interesting to get some real-world performance metrics on SPDY, in particular its effect on the server side.&nbsp;To obtain this information, I used the new SPDY support in NeoLoad to run load tests of SPDY and compare its performance against HTTP and HTTPS.</p><span>
+</span><h3>Test Configuration Details</h3><span>
+</span><p>My approach was to test a server with a fairly typical configuration—not one that is finely tuned for a specific purpose.&nbsp;This setup provides a basis for comparing HTTP, HTTPS, and SPDY. It’s important to note here that changes to the application or the server configuration will produce different results—perhaps vastly different.</p><span>
+</span><p>Test setup:</p><span>
+</span><ul>
+<li>Server:
+<ul>
+<li>OS: Linux CentOS 6.3</li>
+<li>Hardware:
+<ul>
+<li>Intel Core i3 CPU 540 @ 3.07GHz</li>
+<li>4GB RAM</li>
+</ul>
+</li>
+<li>Apache
+<ul>
+<li>Version 2.2.15</li>
+<li>worker MPM: &lt;IfModuleworker.c&gt;<br />StartServers 5<br />MaxClients 600<br />MinSpareThreads 50<br />MaxSpareThreads 150<br />ThreadsPerChild 50<br />MaxRequestsPerChild 0<br />&lt;/IfModule&gt;</li>
+<li>SPDY module (mod-spdy-beta-0.9.3.3-386.x86_64). Default SPDY optimization flags were used (uncommented suggested values):
+<ul>
+<li>SpdyMaxThreadsPerProcess 30</li>
+<li>SpdyMaxStreamsPerConnection 100</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Application:
+<ul>
+<li>1 web page: 1 HTML 9.5kB + 50 PNG icons (32×32).</li>
+<li>The web page and all resources were served by the same server.</li>
+</ul>
+</li>
+<li>Load testing tool: NeoLoad 4.1.2</li>
+<li>Tests:
+<ul>
+<li>Ramp-up from 1 to 1000 users for 20 minutes.</li>
+<li>Scenario: 1 page call, wait for 5s, restart.</li>
+<li>Chrome browser simulated, with 6 parallel connections to the server.</li>
+<li>Emulated latency: 40ms in download, 45ms in upload.</li>
+<li>Test HTTP, HTTPS, and SPDY under the same conditions.</li>
+<li>Aggregation period of 30s for graphs. This smoothes variations to simplify comparison between several tests.</li>
+</ul>
+</li>
+</ul><span>
+</span><h3>Results and Analysis</h3><span>
+</span><p>First I wanted to examine the hit rate (hits per second), average response time (duration), and number of errors as the number of concurrent users increased.</p><span>
+</span><p>Here are the results for the HTTP test:</p><span>
+</span><p><img class=" wp-image-978 aligncenter" alt="spdy-http" src="http://www.neotys.com/blog/wp-content/uploads/2013/07/spdy-http.png" width="590" height="278" /></p><span>
+</span><p>The plot illustrates the following:</p><span>
+</span><ul>
+<li>At 3 minutes, the maximum number of page per second is reached.&nbsp; This maximum rate (16 pages/s or 827 request/s) is reached at 120 virtual users (VU), and the rate decreases as more concurrent users are added.</li>
+<li>At the same time (the 3-minute mark), response time starts to increase significantly.</li>
+<li>The first errors (which investigation revealed to be timeouts) appear at 405 users.</li>
+</ul><span>
+</span><p>The table below compares these metrics for HTTP, HTTPS, and SPDY:</p><span>
+</span><table border="1" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td valign="top" width="209"></td>
+<td valign="top" width="142">HTTP</td>
+<td valign="top" width="142">HTTPS</td>
+<td valign="top" width="132">SPDY</td>
+</tr>
+<tr>
+<td valign="top" width="209">Maximum pages/s</td>
+<td valign="top" width="142">16.3 pages/safter 3 minutes at 120 users</td>
+<td valign="top" width="142">15.9 pages/safter 3 minutes at 120 users</td>
+<td valign="top" width="132">98 pages/safter 14 minutes at 777 users</td>
+</tr>
+<tr>
+<td valign="top" width="209">Page response time at 100 users</td>
+<td valign="top" width="142">1.1s</td>
+<td valign="top" width="142">1.3s</td>
+<td valign="top" width="132">1.1s</td>
+</tr>
+<tr>
+<td valign="top" width="209">Page response time at 120 users</td>
+<td valign="top" width="142">1.4 s</td>
+<td valign="top" width="142">1.5s</td>
+<td valign="top" width="132">1.1s</td>
+</tr>
+<tr>
+<td valign="top" width="209">Page response time at 200 users</td>
+<td valign="top" width="142">7.1s</td>
+<td valign="top" width="142">7.8s</td>
+<td valign="top" width="132">1.1s</td>
+</tr>
+<tr>
+<td valign="top" width="209">Page response time at 777 users</td>
+<td valign="top" width="142">70.2s</td>
+<td valign="top" width="142">72s</td>
+<td valign="top" width="132">2.7s</td>
+</tr>
+<tr>
+<td valign="top" width="209">First error</td>
+<td valign="top" width="142">405 Users</td>
+<td valign="top" width="142">225 Users</td>
+<td valign="top" width="132">884 Users</td>
+</tr>
+<tr>
+<td valign="top" width="209">Service-level agreement violation (&lt; 3s page load time)</td>
+<td valign="top" width="142">133 Users</td>
+<td valign="top" width="142">133 Users</td>
+<td valign="top" width="132">794 Users</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>Based on a service-level agreement (SLA) of less than 3s for page load time, my test server handled <span>almost six times as many users</span> with SPDY than HTTP!</p><span>
+</span><h3>More Users With Fewer Workers</h3><span>
+</span><p>To handle incoming requests in parallel, Apache web servers use worker threads to process each request. Because each thread consumes resources and memory, Apache lets the system administrator limit thread use, which has an effect on how incoming requests are handled.</p><span>
+</span><p>My HTTP and HTTPS results are typical of a scenario known as <i>thread starvation</i>.</p><span>
+</span><p>This is confirmed by the following graph, which shows busy workers in orange, page rate in green, and user load in blue:</p><span>
+</span><p><img class="aligncenter  wp-image-980" alt="spdy-worker" src="http://www.neotys.com/blog/wp-content/uploads/2013/07/spdy-worker.png" width="590" height="196" /></p><span>
+</span><p>The number of busy Apache workers (threads) hits its maximum at the same time the page rate reaches its maximum.</p><span>
+</span><p>In contrast to HTTP/S, SPDY uses a single connection for all requests. The principal benefit of this is the decreased latency seen by the client, resulting in reduced response times for users. There is another great benefit on the server side: SPDY clients consume one worker instead of six. As a result, it takes much longer (that is, many more users) for all workers to become busy:</p><span>
+</span><p><img class="aligncenter  wp-image-982" alt="spdy-http-workers" src="http://www.neotys.com/blog/wp-content/uploads/2013/07/spdy-http-workers.png" width="590" height="196" /></p><span>
+</span><p>SPDY enables the server to handle <span>more users with the same number of workers</span>.</p><span>
+</span><h3>Server CPU and Memory Consumption</h3><span>
+</span><p>So far, I showed how SPDY affects Apache worker usage with my test configuration.&nbsp;Next, I wanted to see how CPU usage and memory were affected by SPDY.</p><span>
+</span><p>Here is a plot showing system idle time (low when the CPU is used intensively) for HTTP/HTTPS/SPDY:</p><span>
+</span><p><img class="aligncenter  wp-image-984" alt="spdy-linux-cpu-idle" src="http://www.neotys.com/blog/wp-content/uploads/2013/07/spdy-linux-cpu-idle.png" width="590" height="230" /></p><span>
+</span><p>No surprise here. As most HTTP/HTTPS requests are waiting to be served after the thread limit is reached, they don’t consume much CPU. For the SPDY tests, Apache is below the worker limit for much longer, resulting in a higher page rate and consequently more CPU used. The curve plateau is reached when all workers are busy (around 11 minutes).</p><span>
+</span><p>To better understand the behavior before the worker limit is reached, I focused on the numbers at 2 minutes, 88 virtual users, and 12.5 pages/s. The CPU idle time measurements are an average of six values taken over 30 seconds:</p><span>
+</span><table border="1" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td valign="top" width="78">CPU</td>
+<td valign="top" width="78">HTTP</td>
+<td valign="top" width="78">HTTPS</td>
+<td valign="top" width="78">SPDY</td>
+</tr>
+<tr>
+<td valign="top" width="78">CPU Idle time at 2 minutes</td>
+<td valign="top" width="78">93.33%</td>
+<td valign="top" width="78">91.5%</td>
+<td valign="top" width="78">92%</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>The values are comparable. SPDY consumes slightly less CPU than HTTPS and slightly more than HTTP for this load.</p><span>
+</span><p>On the memory side, here’s the global overview:</p><span>
+</span><p><img class="aligncenter  wp-image-986" alt="spdy-memory" src="http://www.neotys.com/blog/wp-content/uploads/2013/07/spdy-memory.png" width="590" height="207" /></p><span>
+</span><p>Again, it’s interesting to examine the memory used before the worker limit is reached. The numbers are an average of six measurements over 30 seconds.</p><span>
+</span><table border="1" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td valign="top" width="78">System Memory</td>
+<td valign="top" width="78">01:00</td>
+<td valign="top" width="78">02:00</td>
+<td valign="top" width="78">Difference = Consumed Memory</td>
+</tr>
+<tr>
+<td valign="top" width="78">HTTP</td>
+<td valign="top" width="78">3,357 MB</td>
+<td valign="top" width="78">3,416 MB</td>
+<td valign="top" width="78">59 MB</td>
+</tr>
+<tr>
+<td valign="top" width="78">HTTPS</td>
+<td valign="top" width="78">3,500 MB</td>
+<td valign="top" width="78">3,579 MB</td>
+<td valign="top" width="78">79 MB</td>
+</tr>
+<tr>
+<td valign="top" width="78">SPDY</td>
+<td valign="top" width="78">3,607 MB</td>
+<td valign="top" width="78">3,631 MB</td>
+<td valign="top" width="78">24 MB</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>The server consumed less memory when handling SPDY requests than when handling HTTP and HTTPS.</p><span>
+</span><p>During this <strong>test, SPDY</strong> consumed just 41% of the memory consumed by HTTP, and just 30% of the memory consumed by HTTPS.</p><span>
+</span><h3>Conclusion</h3><span>
+</span><p>It’s no surprise that <strong>SPDY improves response times</strong> on the client side. That’s what it was designed to do. It turns out that SPDY also has advantages on the server side:</p><span>
+</span><ul>
+<li>Compared to HTTPS, SPDY requests consume less resources (CPU and memory) on the server.</li>
+<li>Compared to HTTP, SPDY requests consume less memory but a bit more CPU. This may be good, bad, or irrelevant depending on which resource (if either) is currently limiting your server.</li>
+<li>Compared to HTTP/S, SPDY requires fewer Apache worker threads, which increases server capacity. As a result, the server may attract more SPDY traffic.</li>
+</ul><span>
+</span><p>From these results, it is clear that Apache tuning performed for HTTP/S may not be appropriate after SPDY is enabled on the server.&nbsp;It’s important to take the time to re-evaluate server sizing and retune the server before you start handling SPDY requests from your users.</p><span>
+</span><p>As I mentioned earlier, the test results I’ve shared here are specific to my server configuration and the web page I used for the tests. It’s important to understand <strong>how <i>your server</i> will perform under a realistic user load</strong> <i>before</i> you make SPDY available to the users on your site. I encourage you to test your own server and website using a <strong>load testing</strong> tool such as <a href="http://go.neotys.com/NeoLoad-Trial-Download.html" target="_blank">NeoLoad</a> to see how SPDY will affect your users’ response times and your <strong>server’s performance</strong>.</p><span>
+
+				</span><span>			  </span><span>
+			</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
