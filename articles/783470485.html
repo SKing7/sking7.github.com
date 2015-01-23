@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Paul O’Shannessy</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Paul O’Shannessy</h1>
+<div class="post-content"><span>
+          
+
+
+</span><p>I’ve reviewed some bits of code over the past couple months that stored functions in an array and then at some point in the future needed to call all of them. This is a very simple thing to do, but something about the code always bothered me.</p><span>
+
+</span><p>Assuming:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">callbacks</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="p">},</span>
+  <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="p">}</span>
+<span class="p">];</span>
+</code></pre></div><span>
+</span><p>You end up iterating over the array and calling each function explicitly:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">callbacks</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">callback</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre></div><span>
+</span><p>Part of the beauty of <code class="prettyprint">forEach</code> is that you can pass it a function without it having to be defined each time. So we could define a function that does what our anonymous function does for us.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">call</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">fn</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="nx">callbacks</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">call</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>This works but it feels silly. JS already has <code class="prettyprint">Function.prototype.call</code> so why should we have to write our own. Let’s figure out if we can make <code class="prettyprint">Function.prototype.call</code> work for us…</p><span>
+
+</span><h2>Function.prototype.call</h2><span>
+
+</span><p>The very first thing to know about is some internal implementation details. Like most objects in JS, functions use prototypes, and so within the prototype <code class="prettyprint">this</code> refers to a particular instance. So a simplified implementation of <code class="prettyprint">call</code> would look something like this:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">call</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">thisArg</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
+  <span class="nx">CALL_FN_WITH_SCOPE</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">thisArg</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">,</span> <span class="p">...);</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>That’s going to be down in native code and will of course vary by engine, but the important thing to remember is that <code class="prettyprint">this</code> is the function that gets called. There are a few more details in <a href="http://es5.github.io/#x15.3.4.4">the spec</a>.</p><span>
+
+</span><p>The second thing to know is that you can call functions on prototypes, so long as you use them correctly. So let’s try just calling one function.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">callbacks</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</code></pre></div><span>
+</span><p>That’s not going to work. Effectively you’re just calling a function that then calls <code class="prettyprint">this</code>. We might be able to write some weird code that ends up doing what we want but let’s not. What you actually want to do is call <code class="prettyprint">Function.prototype.call</code> with a specific <code class="prettyprint">this</code> so it knows what function to actually run. Confused?</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">call</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">callbacks</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</code></pre></div><span>
+</span><p>This works, but it’s also equivalent to just saying <code class="prettyprint">callbacks[0].call()</code> so it’s pretty bad form to do. But the point here is that we can now call a function by passing it as an argument instead of needing a proper handle to that function.</p><span>
+
+</span><h2>Array.prototype.forEach</h2><span>
+
+</span><p>The way <code class="prettyprint">forEach</code> works is also important to know. Go read <a href="http://es5.github.io/#x15.4.4.18">the spec</a>, or even just the <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/forEach">MDN page</a>.</p><span>
+
+</span><p>The key take away: the 2nd argument will be used as the <code class="prettyprint">this</code> that is accessible in the function argument. If you followed along with that chunk of the spec, you may have seen <code class="prettyprint">[[Call]]</code> — this is effectively saying that your JS is transformed into this:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">myFunction</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">thisArg</span><span class="p">,</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">array</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>(I say “effectively” because that’s not <em>exactly</em> how it happens but if you read the spec, the result is the same, with the same possible errors.)</p><span>
+
+</span><h2>Putting it Together…</h2><span>
+
+</span><p>We know we want to call <code class="prettyprint">Function.prototype.call</code> and we know what function we want to be run. So the next thing to try is:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">callbacks</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">call</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>But that doesn’t work. It’s actually going to throw an error. Remember, <code class="prettyprint">this</code> is what gets called and we’ve actually passed <code class="prettyprint">undefined</code> as this, not an item from our array. It really looks something like this:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">call</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="kc">undefined</span><span class="p">,</span> <span class="nx">callbacks</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</code></pre></div><span>
+</span><p>We’re almost there. We actually want to pass <code class="prettyprint">Function.prototype.call</code> as <code class="prettyprint">this</code> so it gets called — effectively <code class="prettyprint">Function.prototype.call.call</code>. And that in turn is passed our callback. Basically, we’re creating a little JavaScript <a href="http://en.wikipedia.org/wiki/Matryoshka_doll">Matryoshka doll</a>. It’s a little crazy but it works.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">callbacks</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">call</span><span class="p">,</span> <span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">call</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>At the end of the day though, this isn’t straightforward code. And in fact, <a href="http://jsperf.com/call-vs-prototype-call">it’s quite slow</a>. So I can’t recommend ever writing this code, though it made for an interesting thought experiment.</p><span>
+
+
+
+
+</span><span>
+
+
+        </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

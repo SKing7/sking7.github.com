@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p>We all know the expression “content is king.” But if we want to be more specific, we really need to clarify that, on the web, images are king. (As a writer, it pains me to say it, but it’s the truth.)</p><span>
+</span><p>As internet users, we crave images — the bigger, the better. But as developers, content creators, and site owners, images cause us no end of performance-related angst. According to the latest HTTP Archive data, <a href="http://www.webperformancetoday.com/2014/12/02/page-bloat-update-average-top-1000-web-page-1795-kb-size/" target="_blank"><strong>the average page weighs in at 1795 KB</strong></a>, with 56% of that weight (1000 KB) comprised of images. This makes images arguably the most fertile ground for improving web performance. And this is why, at Radware, we focus so much of our R&amp;D energy on image optimization.</p><span>
+</span><p>In this post, let’s talk about why images are so immensely valuable, and what we can do to make them as efficient as they are important.</p><span>
+</span><h2>Bigger, better, more. We’re hard-wired to crave images.</h2><span>
+</span><p>Adding images to a page, or making existing images larger, is a proven way to increase conversion rates (the percentage of site visitors who convert to active customers):</p><span>
+</span><span>
+</span><p>For obvious reasons, images aren’t going to go away. But we need to mindful of this…</p><span>
+</span><h2>We’re also extremely sensitive to how images render.</h2><span>
+</span><p>Earlier this year, Radware did some fascinating (if I say so myself) <a href="http://www.webperformancetoday.com/2014/09/17/progressive-image-rendering-good-evil/" target="_blank"><strong>neuroscientific research into how people respond to various image rendering formats</strong></a> in ecommerce transactions. While the focus of our study involved facial action coding and implicit response testing, we also surveyed our 742 test participants to find out what they think about images on the web. Here’s what they told us…</p><span>
+</span><h3>When do you start to interact with a web page?</h3><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/PerfCalendar2014-interact.png" alt="PerfCalendar2014-interact" width="650" height="339" class="alignnone size-full wp-image-1728" /></p><span>
+</span><h3>Have you ever felt frustrated by images taking too long to load?</h3><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/PerfCalendar2014-frustration.png" alt="PerfCalendar2014-frustration" width="650" height="344" class="alignnone size-full wp-image-1729" /></p><span>
+</span><p>Some of our other survey findings:</p><span>
+</span><ul>
+<li><strong>Around one third of respondents claim that they notice how images load.</strong> Only 1 out of 10 think that people don’t notice.</li>
+<li><strong>Around half claim the way images load affects people’s experience of the page</strong>, with a further 4 out of 10 claiming people are affected if the images are slow.</li>
+<li><strong>Women are more likely than men to wait for a web page’s images to load</strong> before interacting with the page.</li>
+</ul><span>
+</span><p>The takeaway from this survey is that most people are very sensitive to image rendering. Because of this, we need to do whatever we can to make images as fast as possible for the majority of web users who will delay interacting with a page until images have rendered.</p><span>
+</span><h2>8 things you should be doing (if you’re not already doing them) to improve image performance</h2><span>
+</span><p>You may already be aware of most or all of these practices. But if you are, then you’re in the minority. In surveys performed by Radware and other organizations, most sites fail to fully take advantage of all these techniques.</p><span>
+</span><h3>1. Image compression</h3><span>
+</span><p>Image compression is a performance technique that minimizes the size (in bytes) of a graphics file without degrading the quality of the image to an unacceptable level. Despite the benefits, we’ve found that <a title="State of the Union: Ecommerce Page Speed &amp; Web Performance [Fall 2014]" href="http://www.radware.com/fall-sotu2014/" target="_blank"><strong>43% of the top 100 retail pages failed to implement image compression</strong></a>.</p><span>
+</span><p>Reducing an image’s file size has two benefits:</p><span>
+</span><ul>
+<li>Reducing the amount of time required for images to be sent over the internet or downloaded.</li>
+<li>Increasing the number of images that can be stored in the browser cache, thereby improving page render time on repeat visits to the same page.</li>
+</ul><span>
+</span><h3>2. Reformat images</h3><span>
+</span><p>Inappropriate image formatting is an extremely common performance issue, especially in organizations where you have a lot of content creators with varying degrees of performance know-how dumping images into a CMS. An image that is saved to the wrong format can be several times larger than it would be if saved to the optimal format. Images with unnecessarily high resolution waste bandwidth, processing time, and cache space.</p><span>
+</span><p>As a general rule of thumb, these are the optimal formats for common image types:</p><span>
+</span><ul>
+<li>Photos – JPEG, PNG-24</li>
+<li>Low complexity (few colors) – GIF, PNG-8</li>
+<li>Low complexity with transparency – GIF, PNG-8</li>
+<li>High complexity with transparency – PNG-24</li>
+<li>Line art – SVG</li>
+</ul><span>
+</span><p>Yes, this is probably all old hat to you. I guarantee that it is not old hat to many people in your organization.</p><span>
+</span><h3>3. Let’s talk WebP</h3><span>
+</span><p>This touches on both compression and format. WebP (which you can read more about on the <strong><a href="https://developers.google.com/speed/webp/?csw=1" target="_blank">Google Dev blog</a></strong>) is a new-ish image format that offers lossy and lossless compression for web images. At Radware, we’ve been experimenting with a format — which we’ve dubbed PerfectImage — that takes a lossy compressed WebP image and degrades it until its Structural Similarity (SSIM) Index is 0.985 compared to the original.</p><span>
+</span><h3>4. Spriting</h3><span>
+</span><p>Spriting is a CSS technique for consolidating images. Sprites are simply multiple images combined into a rectilinear grid in one large image. The page fetches the large image all at once as a single CSS background image and then uses CSS background positioning to display the individual component images as needed on the page. This reduces multiple requests to only one, significantly improving performance.</p><span>
+</span><h3>5. Ensure feature images are optimized to load early and quickly</h3><span>
+</span><p>This principle seems like a no-brainer, but it’s amazing how many times I analyze pages that load primary content last. Site owners should be aware of the usability consequence of delaying the rendering of feature content: according to this <a href="http://www.nngroup.com/articles/website-response-times/"><strong>Nielsen Norman Group eyetracking study</strong></a>, a user who experiences instantaneous page rendering spends 20% of their viewing time within the feature area of a page, whereas a user who endures an eight-second download delay spends only 1% of their total viewing time looking at the featured space on a page.</p><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/PerfCalendar_eyetracking.png" alt="PerfCalendar_eyetracking" width="650" height="278" class="alignnone size-full wp-image-1730" /></p><span>
+</span><h3>6. Defer non-essential images (an obvious corollary to #5)</h3><span>
+</span><p>Help your visitors see the page faster by delaying the loading and rendering of any images that are below the initially visible area (sometimes called “below the fold”). Deferring non-essential content won’t change your bottom-line load time, but it can dramatically improve your perceived load time.</p><span>
+</span><h3>7. Auto-preloading (AKA predictive browser caching)</h3><span>
+</span><p>Not to be confused with browser preloading, auto-preloading is a powerful performance technique in which all user paths through a website are observed and recorded. Based on this massive amount of aggregated data, the auto-preloading engine can predict where a user is likely to go based on the page they are currently on and the previous pages in their path. The engine loads the resources (i.e. images) for those “next” pages in the user’s browser cache, enabling the page to render up to 70% faster.</p><span>
+</span><p>(Note that this is necessarily a data-intensive, highly dynamic technique that can only be performed by an automated solution. <a href="http://blog.radware.com/applicationdelivery/applicationaccelerationoptimization/2014/02/the-case-for-auto-preloading/" target="_blank"><strong>Learn more about auto-preloading.</strong></a>)</p><span>
+</span><h3>8. Make the perceived value worth the wait</h3><span>
+</span><p>I can handle waiting for a slow image that is either entertaining or offers important information. But waiting extra seconds just to see a stock image render makes me feel like chump for wasting my time. Images should always, always, always offer value to the user. If they don’t, they’re performance dead wood and should be pruned.</p><span>
+</span><h2>Takeaway</h2><span>
+</span><p>Tackling images is one of the easiest ways I can think of to pluck the low-hanging performance fruit. As I said earlier in this post, most or all of these techniques may be very familiar to you. But if your organization has a large number of content creators who are responsible for generating and uploading images to your CMS, I can guarantee that they will not be familiar with them. In the new year, consider making it your mission to spread the gospel of image optimization throughout your organization.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

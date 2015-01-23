@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Latency: The New Web Performance Bottleneck</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Latency: The New Web Performance Bottleneck</h1>
+<div id="post" class="content" itemscope="" itemtype="http://schema.org/Article"><span>
+  </span><span>
+  </span><p class="byline">By <a href="https://www.igvita.com/" rel="author" itemprop="author">Ilya Grigorik</a> on <b itemprop="datePublished" datetime="2012-07-19">July 19, 2012</b></p><span>
+
+  </span><p><img src="https://www.igvita.com/posts/12/chrome-fast.png" class="left" />If we want a faster browsing experience then reducing the round trip time (RTT) should be near the top of our list. Or, as Mike Belshe put it: <em><a href="https://docs.google.com/a/chromium.org/viewer?a=v&amp;pid=sites&amp;srcid=Y2hyb21pdW0ub3JnfGRldnxneDoxMzcyOWI1N2I4YzI3NzE2">more bandwidth doesn't matter (much)</a></em>.</p><span>
+
+</span><p>Now, let's be clear, higher bandwidth is never a bad thing, especially for use cases that require bulk transfer of data: video streaming, large downloads, and so on. However, <strong>when it comes to your web browsing experience, it turns out that latency, not bandwidth, is likely the constraining factor today</strong>. As a consumer, did you consider this when you picked your ISP? Likely not, I'm yet to see any provider mention, yet alone advertise latency.</p><span>
+
+</span><h2>Bandwidth vs. Latency</h2><span>
+
+</span><p>Akamai's <a href="http://www.akamai.com/stateoftheinternet/">State of the Internet</a> stats show that as of 2011 an average US consumer is accessing the web on a 5Mbps+ pipe. In fact, with the fast growth of broadband worldwide, many other countries are hovering around the same number, or quickly catching up. As it happens, 5mbps is an important threshold.</p><span>
+
+</span><p><img src="https://www.igvita.com/posts/12/bandwidth-vs-latency.png" class="center" /></p><span>
+
+</span><p>The two graphs above show the results of varying bandwidth and latency on the page load time (PLT). Upgrading your connection from 1Mbps to 2Mbps halves the PLT, but quickly thereafter we are into diminishing returns. <strong>In fact, upgrading from 5Mbps to 10Mbps results in a mere 5% improvement in page loading times!</strong> In other words, an average consumer in the US would not benefit <em>much</em> from upgrading their connection when it comes to browsing the web.</p><span>
+
+</span><p>However, the latency graph tells an entirely different story. <strong>For every 20ms improvement in latency, we have a linear improvement in page loading times</strong>. There are many good reasons for this: an average page is composed of many small resources, which require many connections, and TCP performance of each is closely tied to RTT.</p><span>
+
+</span><h2>Developing an Intuition for Latency</h2><span>
+
+</span><p>So what is <em>20ms</em> of latency? Most of us have a pretty good mental model for bandwidth as we are used to thinking in megabytes and file sizes. For latency, distance travelled by light is our best proxy:</p><span>
+
+</span><div id="map"><span>
+  </span><span>
+  </span><div id="controls"><span>
+    </span><p>
+      <span>
+        Fiber RTT:
+        <select onchange="onInput(msToFiberMeters(this.options[this.selectedIndex].value))">
+          <option>choose</option>
+          <option value="10">10ms</option>
+          <option value="20">20ms</option>
+          <option value="50">50ms</option>
+          <option value="100">100ms</option>
+        </select>
+      </span>
+      <span id="slider"></span>
+    </p><span>
+
+    </span><p>
+      Radius: <span id="km"></span>km / <span id="mi"></span>mi, RTT in vacuum: <span id="vacuum"></span>ms, RTT in fiber: <span id="fiber"></span>ms.
+    </p><span>
+  </span></div><span>
+</span></div><span>
+
+
+</span><p>Latency is constrained by the speed of light. Hence, 20ms RTT is equivalent to ~3000km, or a 1860 mile radius for light traveling in vacuum. We can't do any better without changing the laws of physics. Our data packets travel through fiber, which slows us down by a <a href="http://en.wikipedia.org/wiki/Optical_fiber#Index_of_refraction">factor of ~1.52</a>, which translates to 2027 km, or a 1260 mile radius. <strong>What is remarkable is that we are already within a small constant factor of the theoretical limit</strong>.</p><span>
+
+</span><p>The above map models a simple, but an unrealistic scenario: you are at the center of the circle, what is the maximum one-way distance that the packet can travel for an <code>X ms</code> RTT? Unrealistic because the "Fiber RTT" assumes we have a direct fiber link between the center and the edge, but this nonetheless gives us a good tool to sharpen our intuition. For example, sending a packet from San Francisco to NYC carries a minimum 40ms RTT.</p><span>
+
+</span><p>Grab the center of the circle, move it around, and you'll notice something very important: <strong>the <a href="http://en.wikipedia.org/wiki/Mercator_projection">Mercator projection</a> we are all so used to seeing on our maps introduces a lot of distortion</strong>. The same 20ms at the equator covers a <em>much</em> larger "surface area" when moved either North or South.</p><span>
+
+</span><h2>Improving Bandwidth &amp; Latency</h2><span>
+
+</span><p>Bandwidth demand is growing fast, but the good news is that we still have plenty of capacity within current fiber (<a href="http://www.telegeography.com/page_attachments/products/website/telecom-resources/telegeography-presentations/0002/7639/PTC_2012_Workshop.pdf#page=28">~20% of lit capacity used</a>), and even more importantly, the capacity can be improved by upgrades to existing submarine cables: capacity of trans-Pacific links tripled between 2007 and 2011, <a href="http://blog.telegeography.com/post/18007464371">most of it through upgrades</a>.</p><span>
+
+</span><p>Latency on the other hand affords no such "easy" wins. Yes, the equipment can be improved to shave off a few milliseconds, but <strong>if you want significant improvements, then the answer is simple: you need new, shorter cables to reduce the propagation delay</strong>. As you may have guessed, this is an <a href="http://www.popsci.com/technology/article/2011-04/new-transatlantic-cable-will-speed-information-exchange-price">expensive proposition</a>:</p><span>
+
+</span><blockquote>
+Huawei is working with another company, Hibernia Atlantic, to lay the first transatlantic fiber-optic submarine cable in a decade, a $400-million-plus project that will save traders five milliseconds. To do this, Hibernia is laying nearly 3,000 miles of cable across the Grand Banks off Canada and the North Atlantic, a shorter route that most companies have avoided because it traverses relatively shallow waters.
+</blockquote><span>
+
+
+</span><p><img src="https://www.igvita.com/posts/12/hibernia-express.png" class="center" /></p><span>
+
+</span><p><strong>That's $80M+ per millisecond saved; latency is expensive - literally, and figuratively.</strong> Even more impressive, the theoretical limit between New York and London is 37.2ms, which means that this new cable (60ms RTT) only adds 38% of overhead for switching and amplification.</p><span>
+
+</span><h2>"Last Mile" latency &amp; your ISP</h2><span>
+
+</span><p>40ms between NYC and London is great in theory, but in practice our ping times are <em>much higher</em>. When Mike Belshe published his study in 2010, average worldwide RTT to Google was ~100ms, and ~60-70ms within the US. <strong>In 2012, the average worldwide RTT to Google is still ~100ms, and ~50-60ms within the US.</strong> That's a positive trend within the US, but there is still a lot of room for improvement.</p><span>
+
+</span><p>Turns out, the "last mile" connection between your house and your ISP is often a significant bottleneck. According to FCC's recent <a href="http://www.fcc.gov/measuring-broadband-america">Measuring Broadband America</a> report, during peak hours:</p><span>
+
+</span><blockquote>
+Fiber-to-the-home services provided 17 milliseconds (ms) round-trip latency on average, while cable-based services averaged 28 ms, and DSL-based services averaged 44 ms.
+</blockquote><span>
+
+
+</span><p><strong>That's 17-44ms of latency just to the closest measuring node within your ISP, before your packet hits any internet backbone</strong>. You can run a simple traceroute to test your own ISP, my first hop (&lt;60 miles) to Comcast fluctuates in the 15-45ms range <em>(ouch)</em>:</p><span>
+
+</span><div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$&gt;</span> traceroute google.com
+traceroute to google.com <span class="o">(</span>74.125.224.102<span class="o">)</span>, <span class="m">64</span> hops max, <span class="m">52</span> byte packets
+ <span class="m">1</span>  10.1.10.1 <span class="o">(</span>10.1.10.1<span class="o">)</span>  2.322 ms  1.084 ms  1.002 ms <span class="c"># local router</span>
+ <span class="m">2</span>  96.157.100.1 <span class="o">(</span>96.157.100.1<span class="o">)</span>  38.253 ms  16.489 ms  24.702 ms <span class="c"># comcast</span>
+ ...</code></pre></div><span>
+
+
+</span><h2>Mobile Web Latency: 100-1000ms</h2><span>
+
+</span><p><img src="https://www.igvita.com/posts/12/mobile-web.png" class="left" />The mobile web is a whole different game, and not one for the better. If you are lucky, your radio is on, and depending on your network, quality of signal, and time of day, then just traversing your way to the internet backbone can take anywhere from 50 to 200ms+. From there, add backbone time and multiply by two: we are looking at 100-1000ms RTT range on mobile. Here's some fine print from the Virgin Mobile (owned by Sprint) <a href="http://www.virginmobileusa.com/networkmanagement">networking FAQ</a>:</p><span>
+
+</span><blockquote>
+Users of the Sprint 4G network can expect to experience average speeds of 3Mbps to 6Mbps download and up to 1.5Mbps upload with an average latency of 150ms. On the Sprint 3G network, users can expect to experience average speeds of 600Kbps - 1.4Mbps download and 350Kbps - 500Kbps upload with an average latency of 400ms.
+</blockquote><span>
+
+
+</span><p>To add insult to injury, if your phone has been idle and the radio is off, then you have to add another 1000-2000ms to negotiate the radio link. <a href="https://play.google.com/store/apps/details?id=com.overlook.android.fing">Testing</a> my own Galaxy Nexus, which is running on Sprint, shows average first hop at 95ms. <strong>If latency is important on wired connections, then it is a critical bottleneck for the mobile web.</strong></p><span>
+
+</span><h2>"High Speed" Internet</h2><span>
+
+</span><p>If you are tasked with optimizing your site or service, then make sure to investigate latency. Google Analytics Site Speed reports <a href="http://www.igvita.com/2012/04/04/measuring-site-speed-with-navigation-timing/">can sample and report</a> on real, user experienced latency of your visitors. Corollary: as a consumer, check the latency numbers in addition to the size of the pipe.</p><span>
+
+</span><p>Finally, if we can't make the bits travel faster, then the only way to improve the situation is to move the bits closer: place your servers closers to your users, leverage CDN's, reuse connections where possible (<a href="http://www.igvita.com/2011/10/20/faster-web-vs-tcp-slow-start/">TCP slow start</a>), and of course, no bit is faster than no bit - send fewer bits. We need more focus, tools and discussions about the impact of latency, especially on high latency links such as the mobile web. <strong>"High speed" connectivity is not all about bandwidth, unlike what many of our ISPs would like to promote.</strong></p><span>
+
+
+  </span><div class="author-callout"><span>
+    </span><img src="https://www.igvita.com/images/igrigorik-small.png" alt="Ilya Grigorik" height="35px" width="35px" /><strong>Ilya Grigorik</strong><span> is a web performance engineer and developer advocate at Google, where his focus is on making the web fast and driving adoption of performance best practices — follow on </span><a href="https://twitter.com/igrigorik">Twitter</a><span>, </span><a href="https://plus.google.com/+IlyaGrigorik">Google+</a><span>.
+  </span></div><span>
+  </span><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

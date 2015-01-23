@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Writing Good CSS</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Writing Good CSS</h1>
+<section class="post" data-ui-component="Main content">
+                <p>I’m always trying to learn new things. However, more importantly, I also try to learn ways to <em>improve</em> the way I already do things. Both at my full-time gig and for client side-projects, the thing I’ve always wanted to improve was my CSS. I’ve always felt I’m pretty good when it comes to CSS, but I’ve always found it messy to read, and often hard to maintain. What I’ve been trying to do, is find out what makes good, readable, maintainable CSS. I think I’ve come up with (and found) some ways to make this all possible.</p>
+
+<h2 id="the-problems">The Problems</h2>
+<p>There are several things that bother me in CSS. The most common annoyances I have are:</p>
+
+<ul>
+  <li>repeating common code</li>
+  <li>browser prefixes</li>
+  <li>lack of comments</li>
+  <li>over qualified selectors</li>
+  <li>poor class names</li>
+</ul>
+
+<p>When is comes to my own projects, I take full responsibility for my code. I rarely comment my CSS, and really often treat it as an afterthought. That’s just wrong. For a long time I figured that my class names are “semantic” and it’s just me doing things, so there’s no need to explain the code, or little “hacks”, or anything. Coming back to code on a long-standing project quickly proves this theory to be <em>very</em> wrong.</p>
+
+<p>When it comes to code at work, I can’t take all the blame. In fact, part of the issue is the number of people who have had there hands in there. Currently our team has 7 of us who at some point have written CSS for our sites, with another 6-8 that have come and gone over the years. Each member of the team has varying levels of knowledge and ability regarding CSS. As well, as is often the case with long-standing projects, some of the code is <strong>old</strong>. A lot of it is pre-CSS3, or pre-whatever-trend-was-cool-5-years-ago. In both cases there were often different ways of doing things at the time it was written, and in some cases, a natural lack of knowledge. I’ve also learned that some programmers will insist that their code is “self-documenting”. If you’re unfamiliar with that term, it translates to “my code has no comments”.</p>
+
+<h2 id="solutions">Solutions</h2>
+<p class="text-center">
+<img src="http://markrabey.com/content/images/blog/2014/Sep/css-guidelines.png" alt="CSS Guidelines" class="post__img" /> 
+</p>
+
+<p>While nothing is perfect, I believe there are things we can do to improve our code. I recently came across <a href="http://cssguidelin.es/" target="_blank">CSS Guidelines</a> by <a href="https://twitter.com/csswizardry" target="_blank">Harry Roberts</a>. I’m still working on reading it all in detail, but so far it holds true to the promise of “High-level advice and guidelines for writing sane, manageable, scalable CSS”.</p>
+
+
+<p>While <a href="http://cssguidelin.es/" target="_blank">CSS Guidelines</a> gives specifics on comment styles, I personally just try to put <strong><em>something</em></strong> in to tell future me what I was thinking. I start every component with a comment representing the title, them <em>details</em> on the intent of the component. When using a preprocessor I style specific comments to either be included with the CSS, or skipped by the preprocessor. I’m still working on this part, and trying to get into the habit of putting <em>something</em>, <strong><em>anything</em></strong>.</p>
+
+<h3 id="object-orientation">Object-orientation</h3>
+<p>Object-orientation is a programming paradigm that breaks big things into small things. From Wikipedia:</p>
+
+<blockquote>
+  <p>Object-oriented programming (OOP) is a programming paradigm that represents the concept of ‘objects’ […] which are usually instances of classes, [and] are used to interact with one another to design applications and computer programs.</p>
+</blockquote>
+
+<p>When it comes to CSS, we call this object-oriented CSS, or <em>OOCSS</em>. The basic concept breaks apart the <em>structure</em> of the element, from the <em>skin</em> of the element. This means we can easily reuse any recurring design patterns, without necessarily reusing the specific implementation details at the same time. OOCSS focuses heavily on the reuse of code, which makes us faster, and can keep the size of our codebase down.</p>
+
+<p>I think of structural aspects like skeletons; common frames that give constructs known as <em>object</em>. These objects are simple design patterns that are free from any cosmetics. We abstract the structure from a set of components in order to have a generic object.</p>
+
+<p>We then optionally add the “skin” layer to our structure so we can give the abstractions a specific look and feel. For example (taken from <a href="http://cssguidelin.es/" target="_blank">CSS Guidelines</a>):</p>
+
+<pre><code>/**
+ * A simple, design-free button object. Extend this object with a `.btn--*` skin
+ * class.
+ */
+.btn {
+    display: inline-block;
+    padding: 1em 2em;
+    vertical-align: middle;
+}
+
+/**
+ * Positive buttons’ skin. Extends `.btn`.
+ */
+.btn--positive {
+    background-color: green;
+    color: white;
+}
+
+/**
+ * Negative buttons’ skin. Extends `.btn`.
+ */
+.btn--negative {
+    background-color: red;
+    color: white;
+}
+</code></pre>
+
+<p>Here we see how the <code>.btn</code> class simply provides structure to an element, but has nothing concerning cosmetics. We can <em>extend</em> <code>.btn</code> with a second class, like <code>.btn--positve</code> to give that element more specific styling:</p>
+
+<pre><code>&lt;button class="btn  btn--positive"&gt;OK&lt;/button&gt;
+</code></pre>
+
+<p>I much prefer to use multiple classes in my HTML, over using something like <code>@extend</code> in a preprocessor. This gives me more visibility in my HTML allowing me to quickly see what classes are applied to my element. It also means that my classes are not tightly bound to other styles in my CSS. It sort of helps OOCSS following the concepts of <em>encapsulation</em>.</p>
+
+<h3 id="bem">BEM</h3>
+<p><em>BEM</em> (<em>Block, Element, Modifier</em>), is a front-end methodology developed at Yandex. BEM is actually a very complete methodology, and I honestly haven’t dug into all the details, but what I’m concerned with is simply the naming convention. I’m using BEM-<em>like</em> naming conventions. The concept is the same, but the exact syntax may differ slightly.</p>
+
+<p>BEM places classes into three groups:
+- Block: the root or base of a component
+- Element: a component inside of a Block
+- Modifier: a variation or extension of the Block</p>
+
+<p>A very basic analogy (<strong>not</strong> an example):</p>
+
+<pre><code>.dog {}
+.dog__tail {}
+.dog--small {}
+</code></pre>
+
+<p>Elements are delimited with two underscores (__), and modifiers are delimited with two hyphens (–).</p>
+
+<p>In the above analogy, we see that <code>.dog</code> is the Block, the root of element. Then, <code>.dog__tail</code> is an Element, it is a smaller part of a <code>.dog</code> Block. Lastly, <code>.dog--small</code> is Modifier, a specific variation of the <code>.dog</code> Block. You can also apply Modifiers to Elements. for example, we could have <code>.dog__tail--short</code> to again, specify a variation on the <code>dog__tail</code> Element.</p>
+
+<p>In some cases I may want multiple words for Blocks, Elements or Modifiers. In any case, these are separated with a single hyphen (-), and classes are always written in <em>lowercase</em>.</p>
+
+<h3 id="preprocessors">Preprocessors</h3>
+<p>I’ve been spending time working CSS Preprocessors into my work flow, and so far, it’s been incredibly valuable. CSS Preprocessors take code that is written in a preprocessed language and convert them to good old CSS. They are <em>not</em> CSS, which means they are not bound be the same rules and limitations of CSS. While CSS is great, it doesn’t always allow us to easily do the things we’d like to do.</p>
+
+<p>For example, one thing that would be really nice in CSS is <em>variables</em>. Maybe you want something to have the left margin of one element the same as the width of another, and suddenly someone decides that those numbers need to change. Since they’re the same number, and your layout might rely on that number, you have to change it more than one place. But with a <em>varibale</em> you could change it in just <em>one</em> place and have it reflect in the whole layout. Of course, there is a lot more to offered in preprocessors than variables, but that’s a start!</p>
+
+<p>You obviously don’t <em>have</em> to use a preprocessor, but I think you’ll find most people who do, won’t go back. I know I won’t. The gain in flexibility, and increased readability are something I just can’t give up. Simply being able to use <em>variables</em> and <em><a href="http://markrabey.com/blog/2014/04/14/css-transitions/">mixins</a></em> is enough to keep me hooked.</p>
+
+<p>There are several preprocessors available, but the only 2 I’ve really looked at and used at all are <em><a href="http://lesscss.org/">LESS</a></em> and <em><a href="http://sass-lang.com/">SASS</a></em>. Please take a look, and consider adding one of these to work flow, you won’t look back. In an upcoming post, I’ll go into more detail on the 2, and what I like or dislike with each one.</p>
+
+<hr />
+
+<p>My real point here, is that CSS <em>can</em> be better. Everything <em>can</em> be better. Someone told me recently in a comment on a post on Reddit that “CSS doesn’t have semantics”. I wholeheartedly disagree. CSS 100%, without a doubt <em>can</em> be semantic. Using OOCSS and BEM does, in fact, give your CSS very semantic meaning. This doesn’t mean it’s <em>easy</em> right off the bat, but it’s well worth exploring. Combine that with CSS Preprocessors, and you have the potential for very readable, maintainable, and scalable CSS. I’d also like to note that this not only makes you CSS (preprocessed or not) more readable, but also makes your HTML more readable, by applying <em>semantic</em> class names to elements.</p>
+
+<hr />
+
+<h2 id="tldr">TL;DR</h2>
+<p>Ok, maybe that was a lot - to summarize, write better CSS by doing this:</p>
+
+<ul>
+  <li>Object Oriented CSS
+– each class does one thing
+– it does it well, it does it right</li>
+  <li>Block, Element, Modifier (BEM) style class names
+    <ul>
+      <li>Block: <code>.grid</code></li>
+      <li>Element: <code>.grid__item</code> (2 underscores)</li>
+      <li>Modifier: <code>.grid--wide</code> (2 hyphens)</li>
+    </ul>
+  </li>
+  <li>Preprocessors are awesome, check them out
+    
+  </li>
+</ul>
+
+<p>Eventually, I will write more detailed posts about each of these areas. In the meantime, really, take a look at <a href="http://cssguidelin.es/" target="_blank">CSS Guidelines</a>.</p>
+
+            </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

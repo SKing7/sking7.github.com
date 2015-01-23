@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Planning for Performance · An A List Apart Article</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Planning for Performance · An A List Apart Article</h1>
+<div class="main-content"><span>
+			
+				
+				
+				
+				
+				
+				
+				</span><figure class="quote">
+<blockquote>I want you to ask yourself when you make things, when you prototype interactions, am I thinking about my own clock, or the user’s?</blockquote>
+<figcaption>Paul Ford, <a href="http://bkaprt.com/rrd/3-01/">“10 Timeframes”</a></figcaption>
+</figure><span>
+
+</span><h2>We’re not doing a good job</h2><span>
+
+</span><p>Page-load times in the ten-second range are still common on modern mobile networks, and that’s a fraction of how long it takes in countries with older, more limited networks. Why so slow? It’s mostly our fault: our sites are too heavy, and they’re often assembled and delivered in ways that don’t take advantage of how browsers work. According to <a href="http://bkaprt.com/rrd/3-02/">HTTP Archive</a>, the average website weighs 1.7 megabytes. (It’s probably heftier now, so you may want to look it up.) To make matters worse, most of the sites surveyed on HTTP Archive aren’t even responsive, but focus on one specific use case: the classic desktop computer with a large screen. </p><span>
+
+</span><p><b>Article Continues Below</b></p><span>
+				
+				</span><aside class="content-minutiae">
+				
+					<!--
+					
+					-->
+								
+				</aside><span>
+				
+										</span><p>That’s awful news for responsive (and, ahem, <em>responsible</em>) designers who aim to support many types of devices with a single codebase, rather than focusing on one type. Truth be told, much of the flak responsive design has taken relates to the ballooning file sizes of responsive sites in the wild, like Oakley’s admittedly gorgeous <a href="http://bkaprt.com/rrd/3-03/">Airbrake MX site</a>, which originally launched with a whopping 80-megabyte file size (though it was later heavily optimized to be much more responsible), or the media-rich Disney homepage, which serves a 5-megabyte responsive site to any device. </p><span>
+
+</span><p>Why are some responsive sites so big? Attempting to support every browser and device with a single codebase certainly can have an additive effect on file size—if we don’t take measures to prevent it. Responsive design’s very nature involves delivering code that’s ready to respond to conditions that may or may not occur, and delivering code only when and where it’s needed poses some tricky obstacles given our current tool set.</p><span>
+
+</span><h3>Fear not!</h3><span>
+
+</span><p>Responsible responsive designs are achievable even for the most complex and content-heavy sites, but they don’t happen on their own. Delivering fast responsive sites requires a deliberate focus on our delivery systems, because how we serve and apply our assets has an enormous impact on perceived and actual page-loading performance. In fact, how we <em>deliver</em> code matters more than how much our code weighs. </p><span>
+
+</span><p>Delivering responsibly is hard, so this chapter will take a deep, practical dive into optimizing responsive assets for eventual delivery over the network. First, though, we’ll tour the anatomy of the loading and enhancement process to see how client-side code is requested, loaded, and rendered, and where performance and usability bottlenecks tend to happen.</p><span>
+
+</span><p>Ready? Let’s take a quick look at the page-loading process.</p><span>
+
+</span><h2>A walk down the critical path</h2><span>
+
+</span><p>Understanding how browsers request and load page assets goes a long way in helping us to make responsible decisions about how we deliver code and speed up load times for our users. If you were to record the events that take place from the moment a page is requested to the moment that page is usable, you would have what’s known in the web performance community as the <em>critical path</em>. It’s our job as web developers to shorten that path as much as we can.</p><span>
+
+</span><h3>A simplified anatomy of a request</h3><span>
+
+</span><p>To kick off our tour de HTTP, let’s start with the foundation of everything that happens on the web: the exchange of data between a browser and a web server. Between the time when our user hits go and their site begins to load, an initial request pings back and forth from their browser to a local <em>Domain Name Service</em> (which translates the URL into an IP address used to find the host), or DNS, to the host server (fig 3.1).</p><span>
+
+</span><figure><img src="http://alistapart.com/d/409/3.1.jpg" alt="Diagram showing how data moves between browsers and servers." />
+<figcaption>Fig 3.1: The foundation of a web connection.</figcaption>
+</figure><span>
+
+</span><p>That’s the basic rundown for devices accessing the web over Wi-Fi (or an old-fashioned Ethernet cable). A device connected to a mobile network takes an extra step: the browser first sends the request to a local cell tower, which forwards the request to the DNS to start the browser-server loop. Even on a popular connection speed like 3G, that radio connection takes ages in computer terms. As a result, establishing a mobile connection to a remote server can lag behind Wi-Fi by two whole seconds or more (fig 3.2).</p><span>
+
+</span><figure><img src="http://alistapart.com/d/409/3.2.jpg" alt="Diagram showing how data moves on a mobile network." />
+<figcaption>Fig 3.2: Mobile? First to the cell tower! Which takes <a href="http://bkaprt.com/rrd/3-04/">two seconds on average over 3G</a>.</figcaption>
+</figure><span>
+
+</span><p>Two seconds may not seem like a long time, but consider that users can spot—and are bothered by—performance delays as short as 300 milliseconds. That crucial two-second delay means the mobile web is inherently slower than its Wi-Fi counterpart.</p><span>
+
+</span><p>Thankfully, modern LTE and 4G connections alleviate this pain dramatically, and they’re slowly growing in popularity throughout the world. We can’t rely on a connection to be fast, though, so it’s best to assume it won’t be. In either case, once a connection to the server is established, the requests for files can flow without tower connection delays. </p><span>
+
+</span><h2>Requests, requests, requests!</h2><span>
+
+</span><p>Say our browser requests an HTML file. As the browser receives chunks of that HTML file’s text from the server, it parses them procedurally, looking for references to external assets that must also be requested, and converts the HTML into a tree structure of HTML elements known as a <em>Document Object Model</em>, or DOM. Once that DOM structure is built, JavaScript methods can traverse and manipulate the elements in the document programmatically and CSS can visually style the elements however we like.</p><span>
+
+</span><p>The complexities of HTML parsing (and its variations across browsers) could fill a book. Lest it be ours, I will be brief: the important thing is getting a grasp on the fundamental order of operations when a browser parses and renders HTML.</p><ul>
+<li>CSS, for example, works best when all styles relevant to the initial page layout are loaded and parsed <em>before</em> an HTML document is rendered visually on a screen.</li>
+<li>In contrast, JavaScript behavior is often able to be applied to page elements <em>after</em> they’re loaded and rendered.</li>
+</ul><span>
+</span><p>But both JavaScript and CSS present bumps on the critical path, blocking our page from showing while they load and execute. Let’s dig into this order of operations a bit.</p><span>
+
+</span><h3>Rendering and blocking</h3><span>
+
+</span><p>The quickest-to-load HTML document is one without extra external files, but it’s also not one you’ll commonly find. A typical HTML document references a slew of outside assets like CSS, JavaScript, fonts, and images. </p><span>
+
+</span><p>You can often spot CSS and JavaScript in the HTML document’s <code>head</code> as <code>link</code> and <code>script</code> elements, respectively. By default, browsers wait to render a page’s content until these assets finish loading and parsing, a behavior known as <em>blocking</em> (fig 3.3). By contrast, images are a non-blocking asset, as the browser won’t wait for an image to load before rendering a page.</p><span>
+
+</span><figure><img src="http://alistapart.com/d/409/3.3.jpg" alt="Diagram showing CSS and JavaScript blocking." />
+<figcaption>Fig 3.3: Blocking CSS and JavaScript requests during page load.</figcaption>
+</figure><span>
+
+</span><p>Despite its name, blocking rendering for CSS does help the user interface load consistently. If you load a page before its CSS is available, you’ll see an unstyled default page; when the CSS finishes loading and the browser applies it, the page content will reflow into the newly styled layout. This two-step process is called a <em>flash of unstyled content</em>, or FOUC, and it can be extremely jarring to users. So blocking page rendering until the CSS is ready is certainly desirable as long as the CSS loads in a short period of time—which isn’t always an easy goal to meet.</p><span>
+
+
+				
+				
+				
+				
+				
+				</span><p>Blocking’s value with regard to JavaScript almost always undermines the user experience and is more a response to a lingering JavaScript method called <code>document.write</code>, used to inject HTML directly into the page at whatever location the browser happens to be parsing. It’s usually considered bad practice to use <code>document.write</code> now that better, more decoupled methods are available in JS, but <code>document.write</code> is still in use, particularly by scripts that embed advertisements. The biggest problem with <code>document.write</code> is that if it runs after a page finishes loading, it overwrites the entire document with the content it outputs. More like <code>document.wrong</code>, am I right? (I’m so sorry.) Unfortunately, a browser has no way of knowing whether a script it’s requesting contains a call to <code>document.write</code>, so the browser tends to play it safe and assume that it does. While blocking prevents a potential screen wipe, it also forces users to wait for scripts before they can access the page, even if the scripts wouldn’t have caused problems. Avoiding use of <code>document.write</code> is one important step we can take to address this issue in JavaScript. </p><span>
+
+</span><p>In the next chapter, we’ll cover ways to load scripts that avoid this default blocking behavior and improve perceived performance as a result.</p><span>
+				
+				
+				
+								
+			</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

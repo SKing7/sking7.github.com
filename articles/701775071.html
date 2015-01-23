@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>12 HTML5 tricks for mobile</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>12 HTML5 tricks for mobile</h1>
+<div class="copy"><span>
+      </span><p>The mobile web is a strange world: dozens of browsers, versions, screen sizes, undocumented features, bugs and new problems. That is why, in some situations, we need to break some limits to accomplish our objectives. If you learn at least three new tricks while reading this article, my goal will be accomplished. To test these tricks on your mobile device just <a href="http://mobilexweb.com/tests/netmag/" target="_blank">open this test suite</a>.</p><span>
+</span><h3 class="crosshead">01. Creating a fullscreen experience</h3><span>
+</span><p>On <a href="http://www.creativebloq.com/tag/Android">Android</a> Browser – the default browser on Android up to 4.3, and different to Chrome – the only solution is to have a document with a height at least equal to the device's height, and to use the following snippet to hide the URL bar.</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p>window.addEventListener("load", function() { window. scrollTo(0, 0); });</p></li>
+</ol></div></div><span>
+</span><p>Google Maps uses this trick to emulate a fullscreen experience on this browser. When used carefully, you can also reduce the possibility of a URL bar reappearance by preventing the browser from managing the touch scroll:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p>document.addEventListener("touchmove", function(e) { e.preventDefault() });</p></li>
+</ol></div></div><span>
+</span><p>In Google Chrome, Firefox OS, Firefox for Android, BlackBerry OS 10 and Amazon Silk (the browser developed for Kindle Fire) we can use the standard <a href="http://w3.org/TR/fullscreen" target="_blank">Fullscreen API</a> from the W3C.</p><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/02.jpg" />
+	<figcaption>iPhone on ios, Android Browser and Chrome on Android using a fullscreen mode with different implementations. on IE11 for Windows Phone, the user needs to approve fullscreen view</figcaption>
+</figure><span>
+</span><p>As you should already know, some browsers still work with prefixes, so for this we need a multivendor code:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p>var body = document.documentElement;</p></li>
+<li class="li1"><p>if (body.requestFullscreen) {</p></li>
+<li class="li1"><p>&nbsp; body.requestFullscreen();</p></li>
+<li class="li1"><p>} else if (body.webkitrequestFullscreen) {</p></li>
+<li class="li1"><p>&nbsp; body.webkitrequestFullscreen();</p></li>
+<li class="li1"><p>} else if (body.mozrequestFullscreen) {</p></li>
+<li class="li1"><p>&nbsp; body.mozrequestFullscreen();</p></li>
+<li class="li1"><p>} else if (body.msrequestFullscreen) {</p></li>
+<li class="li1"><p>&nbsp; body.msrequestFullscreen();</p></li>
+<li class="li1"><p>}</p></li>
+</ol></div></div><span>
+</span><p>The only important restriction to remember when requesting fullscreen mode is that we should do it only after a user's interaction – for example, activated by a touch operation.</p><span>
+</span><p>Apple offers a solution for <a href="http://www.creativebloq.com/tag/iPhone">iPhone</a> since iOS 7.1, using a special attribute of the viewport meta tag requesting a minimal UI from Safari on portrait and no UI at all on landscape. This mode is not available on <a href="http://www.creativebloq.com/tag/iPad">iPad</a>.</p><span>
+</span><p>To enable the minimal UI mode, just use:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"viewport"</span> <span class="kw3">content</span><span class="sy0">=</span><span class="st0">"width=devicewidth, minimal-ui"</span>&gt;</span></div></li>
+</ol></div></div><span>
+</span><p>When this mode is enabled, you need to <a href="http://www.mobilexweb.com/blog/ios-7-1-safari-minimal-ui-bugs" target="_blank">take some special care</a> around touchable areas near the edges.</p><span>
+</span><p>To detect if the minimal UI mode is enabled:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p>@media (device-height: 568px) and (height: 529px),</p></li>
+<li class="li1"><p>(device-height: 480px) and (height: 441px) {</p></li>
+<li class="li1"><p>/* minimal-ui is active */</p></li>
+<li class="li1"><p>}</p></li>
+</ol></div></div><span>
+</span><h3 class="crosshead">02. Creating a web app on the home screen</h3><span>
+</span><p>On iOS – for both iPhones and iPads – and Chrome on Android we can have a fullscreen experience after the user has installed an icon on the home screen. The web app will run outside of the browser, even from a multitasking point of view. To enable this we need to add some meta tags:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p><span class="sc-1">&lt;!-- for ios 7 style, multi-resolution icon of 152x152 --&gt;</span></p></li>
+<li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"apple-mobile-web-app-capable"</span> <span class="kw3">content</span><span class="sy0">=</span><span class="st0">"yes"</span>&gt;</span></div></li>
+<li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"apple-mobile-web-app-status-barstyle"</span> <span class="kw3">content</span><span class="sy0">=</span><span class="st0">"black-translucent"</span>&gt;</span></div></li>
+<li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/link.html"><span class="kw2">link</span></a> <span class="kw3">rel</span><span class="sy0">=</span><span class="st0">"apple-touch-icon"</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">"icon-152.png"</span>&gt;</span></div></li>
+<li class="li1"><p><span class="sc-1">&lt;!-- for Chrome on Android, multi-resolution icon of 196x196 --&gt;</span></p></li>
+<li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"mobile-web-app-capable"</span> <span class="kw3">content</span><span class="sy0">=</span><span class="st0">"yes"</span>&gt;</span></div></li>
+<li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/link.html"><span class="kw2">link</span></a> <span class="kw3">rel</span><span class="sy0">=</span><span class="st0">"shortcut icon"</span> sizes<span class="sy0">=</span><span class="st0">"196x196"</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">"icon-196.png"</span>&gt;</span></div></li>
+</ol></div></div><span>
+</span><p>On Firefox OS and Firefox for Android we can also create home screen web apps by creating a JSON manifest and using a JavaScript API. See the <a href="https://developer.mozilla.org/en-US/Apps/Build/installable_apps" target="_blank">official documentation</a> for examples.</p><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/01.jpg" />
+	<figcaption>When you define a home screen web app beside a chrome-less app, your app will have an entry in the task bar of the os, apart from the browser</figcaption>
+</figure><span>
+</span><h3 class="crosshead">03. High resolution Canvas</h3><span>
+</span><p>The Canvas API is a bitmap-based drawing interface that works as an image loaded from a file. Therefore, if you create a canvas with <strong>width=200</strong> it will create a 200 real pixel image. On the document it will be drawn at a 200 CSS-pixel width, independent of the resolution.</p><span>
+</span><span>
+</span><p>That means that on an iPhone 5S, the 200 pixel image will be resized to 400 device pixels, and on a Nexus 5 device it will be resized to 600 device pixels – in both cases losing some of the resolution of your image. If you want to create a highresolution image, let's say double of the original, medium-resolution device, it's possible to use the following trick:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p><span class="sc2">&lt;canvas <span class="kw3">width</span><span class="sy0">=</span><span class="st0">"400"</span> <span class="kw3">height</span><span class="sy0">=</span><span class="st0">"400"</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">"width: 200px; height: 200px"</span>&gt;&lt;<span class="sy0">/</span>canvas&gt;</span></p></li>
+<li class="li1"></li>
+<li class="li1"><p>document.queryselector("canvas").getContext("2d").scale(2, 2);</p></li>
+<li class="li1"></li>
+</ol></div></div><span>
+</span><p>Be aware that increasing the size of your canvas will also increase the memory used and the CPU required to create the drawings, so we should do it only when we are sure that we are dealing with a high-resolution device.</p><span>
+</span><h3 class="crosshead">04. Truly numeric text field</h3><span>
+</span><p>I'm pretty sure you already know all the new HTML5 types for the input element, such as <strong>type=email</strong> , that trigger different virtual keyboards on touch devices. While on Android and Windows Phone you will get a fully numeric keypad when using <strong>type=number</strong>, you might not realise that on iOS you don't get exactly that.</p><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/03.jpg" />
+	<figcaption>If you want to get a fully numeric keypad on ios, you have to add a pattern value on the input element. By default, the number type will allow the user to type letters</figcaption>
+</figure><span>
+</span><p>If you add a <strong>pattern="[0-9]*"</strong> attribute then you will get a truly numeric keypad in iOS as in other operating systems:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/input.html"><span class="kw2">input</span></a> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"number"</span> pattern<span class="sy0">=</span><span class="st0">"[0-9]*"</span>&gt;</span></div></li>
+</ol></div></div><span>
+</span><p>You can also use this trick with <strong>type="password"</strong> to get a numeric keypad for a PIN text field.</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/input.html"><span class="kw2">input</span></a> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"password"</span> pattern<span class="sy0">=</span><span class="st0">"[0-9]*"</span>&gt;</span></div></li>
+</ol></div></div><span>
+</span><h3 class="crosshead">05. Responsive web design and Windows 8</h3><span>
+</span><p>If you are working with responsive websites, you might think that defining a mobile viewport meta tag and different breakpoints with CSS media queries is enough. However, there is one particular situation that needs a little more work: Windows 8.x with Internet Explorer that works in fullscreen mode (previously known as Metro mode).</p><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/04.jpg" />
+	<figcaption>On IE for Windows 8.x mode you can share the screen with other apps – in which case by default your website will be zoomed out, even if you have responsive breakpoints on CSS</figcaption>
+</figure><span>
+</span><p>In Windows 8 and 8.1 a website opened in this browser can share the screen with other fullscreen mode apps, including the classic desktop. In that case, and when the available width is less than 1024 pixels, IE will apply a mobile behaviour that zooms out the website and does not apply your responsive code.</p><span>
+</span><p>To solve this issue, we can use the CSS Viewport declaration on a media query, such as:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p>@media only screen and (max-width: 400px) {</p></li>
+<li class="li1"><p>&nbsp; @-ms-viewport { width: 320px; }</p></li>
+<li class="li1"><p>}</p></li>
+</ol></div></div><span>
+</span><h3 class="crosshead">06. Where is my date and time picker?</h3><span>
+</span><p>You were told that by using <strong>&lt;input type=datetime&gt;</strong> you get a date and time picker on most browsers. And it was true on mobile devices until iOS 7 and Chrome 26 for Android. Since those versions, that kind of form control renders as just the default text fields.</p><span>
+</span><p>However, you may not be aware that the date and time picker is still available on those browsers using <strong>type=datetime-local</strong>, as this change was not properly announced or documented by the browser's vendors.</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/input.html"><span class="kw2">input</span></a> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">"datetime-local"</span>&gt;</span></div></li>
+</ol></div></div><span>
+</span><h3 class="crosshead">07. Rich editor</h3><span>
+</span><p>On HTML5 there is a new Boolean attribute for HTML elements: ContentEditable. We can use this attribute on any HTML element, including a <strong>&lt;div&gt;</strong>, a <strong>&lt;table&gt;</strong> or a <strong>&lt;ul&gt;</strong>.</p><span>
+</span><p>When the user taps on those elements, the virtual keyboard will appear and the user will be able to edit it, even if it includes rich HTML – such as adding new list's items using the Enter Virtual key. To save updates, you should check on the <strong>innerHTML</strong> attribute of the element.</p><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/05.jpg" />
+	<figcaption>With ContentEditable we can create a rich editor for iOs, Android, Windows Phone and other devices using the virtual keyboard on any HTML element</figcaption>
+</figure><span>
+</span><p>On iOS the user will be able to apply bold, italics and underline on a selection's contextual menu.</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"></li>
+<li class="li1"><div class="de1"><span>&nbsp; </span><span class="sc2">&lt;<a href="http://december.com/html/4/element/li.html"><span class="kw2">li</span></a>&gt;</span><span>static item in the hTML</span></div></li>
+<li class="li1"></li>
+</ol></div></div><span>
+</span><h3 class="crosshead">08. Safari's tint</h3><span>
+</span><p>Since iOS 7, Safari for iPhone and iPod touch includes a tint colour that goes behind a semi-transparent Safari UI. When your page loads, Safari looks at the background colour of your website to define that tint. There is no way to define that tint programmatically or through a meta tag, but I have a trick to enable you to chose a different colour for the tint and your background.</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><p>body {</p></li>
+<li class="li1"><p>&nbsp; /* for safari's tint */</p></li>
+<li class="li1"><p>&nbsp; background-color: blue;</p></li>
+<li class="li1"><p>&nbsp; /* for the document's body background color */</p></li>
+<li class="li1"><p>&nbsp; background-image: linear-gradient(to bottom, red 0%, red 100%);</p></li>
+<li class="li1"><p>}</p></li>
+</ol></div></div><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/06.jpg" />
+	<figcaption>If your body's background is red, the safari UI on iPhone will tint the toolbars with the same colour. Tip 08 outlines a trick to change the colour (right)</figcaption>
+</figure><span>
+</span><h3 class="crosshead">09. Home screen icon name</h3><span>
+</span><p>When you add a website to the home screen on iOS, Chrome on Android or pin a website to a tile on Windows Phone, your HTML's <strong>&lt;title&gt;</strong> content will be used for the icon's name. Because of SEO techniques, we know that our title is not exactly friendly for the home screen on our mobiles.</p><span>
+</span><p>An undocumented meta tag on Safari on iOS exists that helps us a lot with defining the name of an icon:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"apple-mobile-web-app-title"</span> <span class="kw3">content</span><span class="sy0">=</span><span class="st0">"Myname"</span>&gt;</span></div></li>
+</ol></div></div><span>
+</span><p>On Windows Phone and Windows 8.x tablets we can define the tile's title using:</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"application-name"</span> <span class="kw3">content</span><span class="sy0">=</span><span class="st0">"Myname"</span>&gt;</span></div></li>
+</ol></div></div><span>
+</span><p>Unfortunately, there is no way to define the icon's name on Chrome on Android programmatically.</p><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/07.jpg" />
+	<figcaption>On Windows 8+ and Windows Phone 8.1+ the user can pin a website to the start screen. We can customise how it looks and update its contents through meta tags</figcaption>
+</figure><span>
+</span><h3 class="crosshead">10. Live tiles for Windows Phone</h3><span>
+</span><p>The user can pin websites from IE to the Windows 8.x start screen, and this feature has been added to the lastest Windows Phones. You can convert that tile on the home screen to a Live Tile, updating info and keeping the icon alive even when your website is not open anymore.</p><span>
+</span><p>To do this we need to define some meta tags. Let's see first what else we need to define the tile icon:</p><span>
+</span><pre class="geshifilter-text" language="text">
+&lt;meta name="msapplication-TileImage" content="tile-background.png"&gt;
+&lt;meta name="msapplication-TileColor" content="#FF0000"&gt;
+</pre><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/08.jpg" />
+	<figcaption>You can build the meta tags for your Live Tile using Build My Pinned site online tool. If you have an RSS feed it will import it and give you the code to copy and paste</figcaption>
+</figure><span>
+</span><p>For the liveness of the tile, we can define a Badge Polling URI (compatible since IE10) and/ or a Notification Polling URI (compatible since IE11). The first one can update the icon and unread elements on the tile and the latter can bring news and information that will be rendered on the Live Tile's animation. In both cases, we can also define the frequency of the polling operation.</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"msapplication-badge"</span></span></div></li>
+<li class="li1"><p><span class="sc2"> &nbsp;<span class="kw3">content</span><span class="sy0">=</span><span class="st0">"frequency=60;polling-uri=http://host/ badge.xml"</span>&gt;</span></p></li>
+<li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">"msapplication-notification"</span></span></div></li>
+<li class="li1"><p><span class="sc2"> &nbsp;<span class="kw3">content</span><span class="sy0">=</span><span class="st0">"frequency=30;polling-uri=http://host/ live.xml"</span>&gt;</span></p></li>
+</ol></div></div><span>
+</span><p>There is a nice <a href="http://www.buildmypinnedsite.com/en" target="_blank">Live Tile creator</a> available on the Windows site, and a <a href="http://wordpress.org/plugins/custom-windows-pinned-tiles/" target="_blank">WordPress plugin</a> available that will do the work for you.</p><span>
+</span><h3 class="crosshead">11. Zombie tab for iOS</h3><span>
+</span><p>Browsers on mobile devices may look like their cousins on desktop but their behaviour is far from the same. Consider Safari for iPad: it has tabs. However, if you open three tabs with Facebook, Twitter and Gmail, you will only receive updates from the active tab. Every inactive tab is frozen. That means no JavaScript execution, and no way to receive updates as we are used to on desktop.</p><span>
+</span><p>With this trick, we can take an inactive tab or window and make it come to life. Why? Well, we can receive updates from the server, and if there is something really important we can change the tab's title to alert the user (only for iPad), or we can just use an alert dialog to interrupt the user while they are on a different tab or window.</p><span>
+</span><figure class="captioned-image"><img alt="" src="http://media.creativebloq.futurecdn.net/sites/creativebloq.com/files/images/2014/08/net256featmobile/10.jpg" />
+	<figcaption>Some mobile browsers such as safari on the iPad look like desktop browsers, but only the active tab is alive. The Zombie Tab hack tackles this issue</figcaption>
+</figure><span>
+</span><p>The hack requires the usage of the classic <strong>refresh </strong>meta tag that triggers a page's reload operation. When the page is frozen, Safari will still honour that meta tag and will revive that window. But we also need to pause the reload operation while we are in the active window. To do this we shift the <strong>refresh </strong>meta tag every x seconds (a code that won't fire when frozen).</p><span>
+</span><div class="geshifilter"><div class="html4strict geshifilter-html4strict"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<a href="http://december.com/html/4/element/meta.html"><span class="kw2">meta</span></a> <span class="kw3">http-equiv</span><span class="sy0">=</span><span class="st0">"refresh"</span> <span class="kw3">content</span><span class="sy0">=</span><span class="st0">"2"</span>&gt;</span></div></li>
+<li class="li1"></li>
+<li class="li1"><p>var mr = document.queryselector("meta"); setInterval(function() { mr.content=mr.content; }, 1000);</p></li>
+<li class="li1"></li>
+</ol></div></div><span>
+</span><p>Be careful only to use this when you really need it. I won't be held responsible for websites in the background annoying you while you are peacefully reading an article.</p><span>
+</span><h3 class="crosshead">12. Handle with care</h3><span>
+</span><p>In this article, I gave you examples, hacks and undocumented features that we can use today on mobile devices. You should be aware that you are working on the edge of the known world, and the hacks that work for you now might not work properly on future browsers.</p><span>
+</span><p>You should always remember that performance and multi-platform are key features of your web app or web content. Even when hacks are a necessary evil today, you need to ensure that your content is still compatible if the trick doesn't work.</p><span>
+</span><p><strong>Words</strong>: <a href="https://twitter.com/firt" target="_blank">Maximiliano Firtman</a> <strong>Illustration</strong>: <a href="https://twitter.com/bfearnley" target="_blank">Ben Fearnley</a></p><span>
+</span><p><em>This article originally appeared in net magazine issue 256.</em></p><span>
+          </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

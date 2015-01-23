@@ -1,0 +1,440 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Optimizing Page Load Time</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Optimizing Page Load Time</h1>
+<div id="content"><span>
+</span><span>
+
+
+</span><p>It is widely accepted that fast-loading pages improve the user
+experience.  In recent years, many sites have started using <a href="http://en.wikipedia.org/wiki/Ajax_(programming)">AJAX</a> techniques
+to reduce latency.  Rather than round-trip through the server retrieving a
+completely new page with every click, often the browser can either alter the
+layout of the page instantly or fetch a small amount of HTML, XML, or
+javascript from the server and alter the existing page.  In either case,
+this significantly decreases the amount of time between a user click and the
+browser finishing rendering the new content.</p><span>
+
+</span><p>However, for many sites that reference dozens of external objects,
+the majority of the page load time is spent in separate HTTP requests for 
+images, javascript, and stylesheets.  AJAX probably could help, but
+speeding up or eliminating these separate HTTP requests might help more, yet
+there isn't a common body of knowledge about how to do so.</p><span>
+
+</span><p>While working on optimizing page load times for a high-profile AJAX
+application, I had a chance to investigate how much I could reduce latency
+due to external objects. Specifically, I looked into how the HTTP client
+implementation in common browsers and characteristics of common Internet
+connections affect page load time for pages with many small objects.</p><span>
+
+</span><p>I found a few things to be interesting:</p><span>
+
+</span><ul>
+
+<li><p>IE, Firefox, and Safari ship with <a href="http://www.mozilla.org/projects/netlib/http/pipelining-faq.html">HTTP
+pipelining</a> disabled by default; Opera is the only browser I know of that
+enables it.  No pipelining means each request has to be answered and its
+connection freed up before the next request can be sent.  This incurs
+average extra latency of the round-trip (ping) time to the user divided by
+the number of connections allowed.  Or if your server has HTTP keepalives
+disabled, doing another TCP three-way handshake adds another round trip,
+doubling this latency.</p>
+
+</li><li><p>By default, IE allows only two outstanding connections per hostname
+when talking to HTTP/1.1 servers or eight-ish outstanding connections total. 
+Firefox has similar limits.  Using up to four hostnames instead of one will
+give you more connections.  (IP addresses don't matter; the hostnames can
+all point to the same IP.)</p>
+
+</li><li><p>Most DSL or cable Internet connections have asymmetric bandwidth, at
+rates like 1.5Mbit down/128Kbit up, 6Mbit down/512Kbit up, etc.  Ratios of
+download to upload bandwidth are commonly in the 5:1 to 20:1 range.  This
+means that for your users, a request takes the same amount of time to send
+as it takes to receive an object of 5 to 20 times the request size. 
+Requests are commonly around 500 bytes, so this should significantly impact
+objects that are smaller than maybe 2.5k to 10k.  This means that serving
+small objects might mean the page load is bottlenecked on the users'
+<i>upload</i> bandwidth, as strange as that may sound.</p>
+
+</li></ul><span>
+
+</span><p>Using these, I came up with a model to guesstimate the effective
+bandwidth of users of various flavors of network connections when loading
+various object sizes.  It assumes that each HTTP request is 500 bytes and
+that the HTTP reply includes 500 bytes of headers in addition to the object
+requested.  It is simplistic and only covers connection limits and
+asymmetric bandwidth, and doesn't account for the TCP handshake of the first
+request of a persistent (keepalive) connection, which is amortized when
+requesting many objects from the same connection.  <i>Note that this is
+best-case effective bandwidth and doesn't include other limitations like TCP
+slow-start, packet loss, etc.</i>  The results are interesting enough to
+suggest avenues of exploration but are no substitute for actually measuring 
+the difference with real browsers.</p><span>
+
+</span><p>To show the effect of keepalives and multiple hostnames, I simulated a
+user on net offering 1.5Mbit down/384Kbit up who is 100ms away with 0%
+packet loss.  This roughly corresponds to medium-speed ADSL on the other
+side of the U.S. from your servers.  Shown here is the effective bandwidth
+while loading a page with many objects of a given size, with
+effective bandwidth defined as total object bytes received divided by the
+time to receive them:</p><span>
+
+</span><img class="shrink" src="http://www.die.net/musings/page_load_time/ebps_1500k_100ms.png" width="640" height="480" alt="[1.5megabit 100ms graph]" /><span>
+
+</span><p>Interesting things to note:</p><span>
+</span><ul>
+
+<li><p>For objects of relatively small size (the left-hand portion of the
+graph), you can see from the empty space above the plotted line how little of
+the user's downstream bandwidth is being used, even though the browser is
+requesting objects as fast as it can.  This user has to be requesting
+objects larger than 100k before he's mostly filling his available downstream
+bandwidth.</p>
+
+</li><li><p>For objects under roughly 8k in size, you can double his effective
+bandwidth by turning keepalives on and spreading the requests over four
+hostnames.  <strong>This is a huge win.</strong></p>
+
+</li><li><p>If the user were to enable pipelining in his browser (such as setting
+Firefox's network.http.pipelining in about:config), the number of
+hostnames we use wouldn't matter, and he'd make even more effective use of
+his available bandwidth.  But we can't control that server-side.
+
+</p></li></ul><span>
+
+</span><p>Perhaps more clearly, the following is a graph of how much faster pages
+could load for an assortment of common access speeds and latencies with
+many external objects spread over four hostnames and keepalives
+enabled.  Baseline (0%) is one hostname and keepalives disabled.</p><span>
+
+</span><img class="shrink" src="http://www.die.net/musings/page_load_time/ebps_speedup.png" width="640" height="480" alt="[Speedup of 4 hostnames and keepalives on]" /><span>
+
+</span><p>Interesting things from that graph:</p><span>
+
+</span><ul>
+
+<li><p>If you load many objects smaller than 10k, both local users and ones
+on the other side of the world could see substantial improvement from
+enabling keepalives and spreading requests over 4 hostnames.</p>
+
+</li><li><p>There is a much greater improvement for users further away.</p>
+
+</li><li><p>This will matter more as access speeds increase.  The user on
+100meg ethernet only 20ms away from the server saw the biggest improvement.</p>  
+
+</li></ul><span>
+
+
+</span><p>One more thing I examined was the effect of request size on effective
+bandwidth.  The above graphs assumed 500 byte requests and 500 bytes of
+reply headers in addition to the object contents.  How does changing that
+affect performance of our 1.5Mbit down/384Kbit up and 100ms away user,
+assuming we're already using four hostnames and keepalives?</p><span>
+
+</span><img class="shrink" src="http://www.die.net/musings/page_load_time/ebps_request_size.png" width="640" height="480" alt="[Effective bandwidth at various request sizes]" /><span>
+
+</span><p>This shows that at small object sizes, we're bottlenecked on the upstream
+bandwidth.  The browser sending larger requests (such as ones laden with
+lots of cookies) seems to slow the requests down by 40% worst-case for this
+user.</p><span>
+
+</span><p>As I've said, these graphs are based on a simulation and don't account
+for a number of real-world factors.  But I've unscientifically verified the
+results with real browsers on real net and believe them to be a useful
+gauge.  I'd like to find the time and resources to reproduce these
+using real data collected from real browsers over a range of object sizes,
+access speeds, and latencies.</p><span>
+
+</span><h2>Measuring the effective bandwidth of your users</h2><span>
+
+</span><p>You can measure the effective bandwidth of your users on your site
+relatively easily, and if the effective bandwidth of users viewing
+your pages is substantially below their available downstream bandwidth, it
+might be worth attempting to improve this.</p><span>
+
+</span><p>Before giving the browser any
+external object references (&lt;img src="..."&gt;, &lt;link rel="stylesheet"
+href="..."&gt;, &lt;script src="..."&gt;, etc), record the current time. 
+After the page load is done, subtract the time you began, and include that
+time in the URL of an image you reference off of your server.</p><span>
+
+</span><p>Sample javascript implementing this:</p><span>
+
+</span><pre class="code">
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;...&lt;/title&gt;
+&lt;script type="text/javascript"&gt;
+&lt;!--
+var began_loading = (new Date()).getTime();
+
+function done_loading() {
+ (new Image()).src = '/timer.gif?u=' + self.location + '&amp;t=' + 
+  (((new Date()).getTime() - began_loading) / 1000);
+}
+// --&gt;
+&lt;/script&gt;
+&lt;!--
+Reference any external javascript or stylesheets after the above block.
+// --&gt;
+&lt;/head&gt;
+&lt;body onload="done_loading()"&gt;
+&lt;!--
+Put your normal page content here.
+// --&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><span>
+
+This will produce web log entries of the form:
+
+</span><pre>
+10.1.2.3 - - [28/Oct/2006:13:47:45 -0700] "GET /timer.gif?u=http://example.com/page.html&amp;t=0.971 HTTP/1.1" 200 49 ...
+</pre><span>
+
+</span><p>in this case, showing that for this user, loading the rest of
+http://example.com/page.html took 0.971 seconds.  And if you know that the
+combined size of everything referenced from that page is 57842 bytes, 
+57842 bytes * 8 bits per byte / 0.971 seconds = 476556 bits per second 
+effective bandwidth for that page load.  If this user should be getting 
+1.5Mbit downstream bandwidth, there is substantial room for improvement.</p><span>
+
+</span><h2>Tips to reduce your page load time</h2><span>
+
+</span><p>After you gather some page-load times and effective bandwidth for real
+users all over the world, you can experiment with changes that will improve
+those times.  Measure the difference and keep any that offer a substantial
+improvement.</p><span>
+
+</span><p>Try some of the following:</p><span>
+
+</span><ul>
+
+<li><p>Turn on <a href="http://httpd.apache.org/docs/2.0/mod/core.html#keepalive">HTTP
+keepalives</a> for external objects.  Otherwise you add an
+extra round-trip to do another <a href="http://en.wikipedia.org/wiki/Transmission_Control_Protocol#Connection_establishment">TCP three-way
+handshake</a> and <a href="http://en.wikipedia.org/wiki/Slow-start">slow-start</a> for every HTTP request.  If you are worried about hitting
+global server connection limits, set the keepalive timeout to something
+short, like 5-10 seconds.  Also look into serving your static content from
+a different webserver than your dynamic content.  Having thousands of
+connections open to a stripped down static file webserver can happen in like
+10 megs of RAM total, whereas your main webserver might easily eat 10 megs
+of RAM per connection.
+
+<li><p>Load fewer external objects.  Due to request overhead, one bigger
+file just loads faster than two smaller ones half its size.  Figure out how
+to globally reference the same one or two javascript files and one or two
+external stylesheets instead of many; if you have more, try preprocessing
+them when you publish them.  If your UI uses dozens of tiny GIFs all over
+the place, consider switching to a much cleaner <a href="http://www.w3.org/Style/CSS/learning">CSS</a>-based <a href="http://www.csszengarden.com/">design</a> which probably won't need so
+many images. Or load all of your common UI images in one request using a
+technique called "<a href="http://www.informit.com/articles/article.asp?p=447210&amp;rl=1">CSS
+sprites</a>".
+
+<li><p>If your users regularly load a dozen or more uncached or uncacheable
+objects per page, consider evenly spreading those objects over four
+hostnames.  This usually means your users can have 4x as many outstanding
+connections to you.  Without HTTP pipelining, this results in their average
+request latency dropping to about 1/4 of what it was before.</p>
+
+<p>When you generate a page, evenly spreading your images over four
+hostnames is most easily done with a hash function, like MD5.  Rather than
+having all &lt;img&gt; tags load objects from http://static.example.com/,
+create four hostnames (e.g. static0.example.com, static1.example.com,
+static2.example.com, static3.example.com) and use two bits from an MD5 of
+the image path to choose which of the four hosts you reference in the
+&lt;img&gt; tag.  Make sure all pages consistently reference the same
+hostname for the same image URL, or you'll end up defeating caching.</p>
+
+<p>Beware that each additional hostname adds the overhead of an extra DNS
+lookup and an extra TCP three-way handshake.  If your users have pipelining
+enabled or a given page loads fewer than around a dozen objects, they will
+see no benefit from the increased concurrency and the site may actually 
+load more slowly.  The benefits only become apparent on pages with larger
+numbers of objects.  Be sure to measure the difference seen by your users if 
+you implement this.</p>
+
+</li><li><p>Possibly the best thing you can do to speed up pages for repeat
+visitors is to allow static images, stylesheets, and javascript to be
+unconditionally cached by the browser.  This won't help the first page load
+for a new user, but can substantially speed up subsequent ones.
+
+</p><p>Set an <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21">Expires
+header</a> on everything you can, with a date days or even months into the
+future.  This tells the browser it is okay to not revalidate on every
+request, which can add latency of at least one round-trip per object per
+page load for no reason.</p>
+
+<p>Instead of relying on the browser to revalidate its cache, if you change
+an object, change its URL.  One simple way to do this for static objects if
+you have staged pushes is to have the push process create a new directory
+named by the build number, and teach your site to always reference objects
+out of the current build's base URL.  (Instead of &lt;img
+src="http://example.com/logo.gif"&gt; you'd use
+&lt;img src="http://example.com/build/1234/logo.gif"&gt;.  When you do another
+build next week, all references change to &lt;img
+src="http://example.com/build/1235/logo.gif"&gt;.)  This also nicely solves
+problems with browsers sometimes caching things longer than they should --
+since the URL changed, they think it is a completely different object.</p>
+
+<p>If you conditionally gzip HTML, javascript, or CSS, you probably want to
+add a "<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9">Cache-Control</a>:
+private" if you set an Expires header.  This will prevent problems with
+caching by proxies that won't understand that your gzipped content can't be
+served to everyone. (The Vary header was designed to do this more elegantly,
+but you can't use it because of IE brokenness.)</p>
+
+<p>For anything where you always serve the exact same content when given the
+same URL (e.g. static images), add "Cache-Control: public" to give proxies
+explicit permission to cache the result and serve it to different users.  If
+a caching proxy local to the user has the content, it is likely to have much
+less latency than you; why not let it serve your static objects if it
+has them?</p>
+
+<p>Avoid the use of query params in image URLs, etc.  At least the <a href="http://www.squid-cache.org/">Squid cache</a> refuses to cache any URL
+containing a question mark by default. I've heard rumors that other things
+won't cache those URLs at all, but I don't have more information.
+
+<li><p>On pages where your users are often sent the exact same content over and
+over, such as your home page or RSS feeds, implementing conditional GETs can
+substantially improve response time and save server load and bandwidth in
+cases where the page hasn't changed.</p>
+
+<p>When serving a static files (including HTML) off of disk, most webservers
+will generate <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.3.1">Last-Modified</a>
+and/or <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.3.2">ETag</a>
+reply headers for you and make use of the corresponding <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25">If-Modified-Since</a>
+and/or <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26">If-None-Match</a>
+mechanisms on requests.  But as soon as you add server-side includes,
+dynamic templating, or have code generating your content as it is served,
+you are usually on your own to implement these.</p>
+
+<p>The idea is pretty simple: When you generate a page, you give the
+browser a little extra information about exactly what was on the page you
+sent.  When the browser asks for the same page again, it gives you this
+information back.  If it matches what you were going to send, you know that
+the browser already has a copy and send a much smaller 304 (Not Modified)
+reply instead of the contents of the page again. And if you are clever about
+what information you include in an ETag, you can usually skip the most
+expensive database queries that would've gone into generating the page.</p>
+
+</li><li><p>Minimize HTTP request size.  Often cookies are set domain-wide, which
+means they are also unnecessarily sent by the browser with every image request
+from within that domain.  What might've been a 400 byte request for an image
+could easily turn into 1000 bytes or more once you add the cookie headers. 
+If you have a lot of uncached or uncacheable objects per page and big,
+domain-wide cookies, consider using a separate domain to host static
+content, and be sure to never set any cookies in it.</p>
+
+</li><li><p>Minimize HTTP response size by enabling gzip compression for HTML and
+XML for browsers that support it.  For example, the 17k document you are
+reading takes 90ms of the full downstream bandwidth of a user on 1.5Mbit
+DSL.  Or it will take 37ms when compressed to 6.8k.  That's 53ms off of the
+full page load time for a simple change.  If your HTML is bigger and more
+redundant, you'll see an even greater improvement.</p>
+
+<p>If you are brave, you could also try to figure out which set of browsers
+will handle compressed Javascript properly.  (Hint: IE4 through IE6 asks for
+its javascript compressed, then breaks badly if you send it that way.) Or
+look into Javascript obfuscators that strip out whitespace, comments, etc
+and usually get it down to 1/3 to 1/2 its original size.</p>
+
+</li><li><p>Consider locating your small objects (or a mirror or cache of them)
+closer to your users in terms of network latency.  For larger sites with a
+global reach, either use a commercial <a href="http://en.wikipedia.org/wiki/Content_Delivery_Network">Content Delivery
+Network</a>, or add a
+colo within 50ms of 80% of your users and use one of the many <a href="http://en.wikipedia.org/wiki/Global_Server_Load_Balancing">available
+methods</a> for routing user requests to your colo nearest them.</p>
+
+</li><li><p>Regularly use your site from a realistic net connection.  Convincing
+the web developers on my project to use a "slow proxy" that simulates bad
+DSL in New Zealand (768Kbit down, 128Kbit up, 250ms RTT, 1%
+packet loss) rather than the gig ethernet a few milliseconds from the
+servers in the U.S. was a huge win.  We found and fixed a number of
+usability and functional problems very quickly.</p>
+
+<p>To implement the slow proxy, I used the <a href="http://linux-net.osdl.org/index.php/Netem">netem</a> and <a href="http://www.die.net/doc/linux/man/man8/tc-htb.8.html">HTB</a> kernel
+modules available in the Linux 2.6 kernel, both of which are set up with the
+<a href="http://www.die.net/doc/linux/man/man8/tc.8.html">tc</a> command
+line tool.  These offer the most accurate simulation I could find, but are
+definitely not for the faint of heart.  I've not used them, but supposedly
+<a href="https://addons.mozilla.org/firefox/966/">Tamper Data</a> for
+Firefox, <a href="http://www.fiddlertool.com/">Fiddler</a> for Windows, and
+<a href="http://www.xk72.com/charles/">Charles</a> for OSX can all
+rate-limit and are probably easier to set up, but they may not simulate
+latency properly.</p>
+
+</li><li><p>Use <a href="http://www.getfirebug.com/">Firebug</a> for Firefox from
+a realistic net connection to see a graphical timeline of what it is doing
+during a page load.  This shows where Firefox has to wait for one HTTP
+request to complete before starting the next one and how page load time
+increases with each object loaded. <a href="http://developer.yahoo.com/yslow/">YSlow</a> extends Firebug to offer
+tips on how to improve your site's performance.</p>
+
+<p>The Safari team <a href="http://webkit.org/blog/?p=75">offers a tip</a> on a hidden feature in
+their browser that offers some timing data too.</p>
+
+<p>Or if you are familiar with the HTTP protocol and TCP/IP at the packet
+level, you can watch what is going on using <a href="http://www.die.net/doc/linux/man/man8/tcpdump.8.html">tcpdump</a>, <a href="http://ngrep.sourceforge.net/">ngrep</a>, or <a href="http://www.ethereal.com/">ethereal</a>.  These tools are indispensable
+for all sorts of network debugging.</p>
+
+
+</li><li><p>Try benchmarking common pages on your site from a local network with <a href="http://httpd.apache.org/docs/trunk/programs/ab.html">ab</a>, which
+comes with the <a href="http://httpd.apache.org/">Apache webserver</a>.  If
+your server is taking longer than 5 or 10 milliseconds to generate a page,
+you should make sure you have a good understanding of where it is spending
+its time.</p>
+
+<p>If your latencies are high and your webserver process (or CGI if you are
+using that) is eating a lot of CPU during this test, it is often a result of
+using a scripting language that needs to recompile your scripts with every
+request.  Software like <a href="http://eaccelerator.net/">eAccelerator</a>
+for PHP, <a href="http://perl.apache.org/">mod_perl</a> for perl, <a href="http://www.modpython.org/">mod_python</a> for python, etc can cache
+your scripts in a compiled state, dramatically speeding up your site. 
+Beyond that, look at finding a profiler for your language that can tell you
+where you are spending your CPU.  If you improve that, your pages will load
+faster and you'll be able to handle more traffic with fewer machines.</p>
+
+<p>If your site relies on doing a lot of database work or some other
+time-consuming task to generate the page, consider adding server-side
+caching of the slow operation.  Most people start with writing a cache to
+local memory or local disk, but that starts to fall down if you expand to
+more than a few web server machines.  Look into using <a href="http://www.danga.com/memcached/">memcached</a>, which essentially
+creates an extremely fast shared cache that's the combined size of the spare
+RAM you give it off of all of your machines.  It has clients available in
+most common languages.</p>
+
+</li><li><p><i>(Optional)</i> Petition browser vendors to turn on HTTP pipelining
+by default on new browsers.  Doing so will remove some of the need for these
+tricks and make much of the web feel much faster for the average user. 
+(Firefox has this disabled supposedly because some proxies, some load
+balancers, and some versions of IIS choke on pipelined requests.  But Opera
+has found sufficient workarounds to enable pipelining by default.  Why can't
+other browsers do similarly?)</p>
+
+</li></p></li></p></li></p></li></ul><span>
+
+</span><p>The above list covers improving the speed of communication between
+browser and server and can be applied generally to many sites, regardless of
+what web server software they use or what language the code behind your
+site is written in.  There is, unfortunately, a lot that isn't covered.</p><span>
+
+</span><p>While the tips above are intended to improve your page load times, a side
+benefit of many of them is a reduction in server bandwidth and CPU needed
+for the average page view.  Reducing your costs while improving your user
+experience seems it should be worth spending some time on.</p><span>
+
+</span><p align="center">
+-- <a href="http://www.aaronhopkins.com/">Aaron Hopkins</a></p><span>
+
+</span><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Optimizing Webfont Selection and Synthesis</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Optimizing Webfont Selection and Synthesis</h1>
+<div id="post" class="content" itemscope="" itemtype="http://schema.org/Article"><span>
+  </span><span>
+  </span><p class="byline">By <a href="https://www.igvita.com/" rel="author" itemprop="author">Ilya Grigorik</a> on <b itemprop="datePublished" datetime="2014-09-16">September 16, 2014</b></p><span>
+
+  </span><p><img src="https://www.igvita.com/posts/14/font-dropcap.png" class="left" /> A "webfont" is a set of resources, not just a single download. A single resource that includes all stylistic variants, which we may not need, plus all the characters, which may go unused, would simply be too large — tens of megabytes for a font with good unicode and stylistic coverage!</p><span>
+
+</span><p>As a result, the CSS @font-face rule allows us define a font family that is composed of many individual resources: regular font weight plus multiple <strong>bold</strong> and <em>oblique</em> variants, each of which can be responsible for a <a href="http://www.w3.org/TR/css3-fonts/#composite-fonts">particular unicode range</a>. In turn, each of these variants is backed by a separate font resource, which enables us to split and minimize the number of bytes required to get the critical text pixels on the screen.</p><span>
+
+</span><div class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@font-face</span> <span class="p">{</span>
+  <span class="nt">font-family</span><span class="o">:</span> <span class="s1">'Awesome Font'</span><span class="o">;</span>
+  <span class="nt">font-style</span><span class="o">:</span> <span class="nt">normal</span><span class="o">;</span>
+  <span class="nt">font-weight</span><span class="o">:</span> <span class="nt">400</span><span class="o">;</span> <span class="c">/* regular */</span>
+  <span class="nt">src</span><span class="o">:</span> <span class="nt">url</span><span class="o">(</span><span class="s1">'/fonts/awesome-normal.woff2'</span><span class="o">)</span> <span class="nt">format</span><span class="o">(</span><span class="s1">'woff2'</span><span class="o">);</span>
+  <span class="nt">unicode-range</span><span class="o">:</span> <span class="nt">U</span><span class="o">+</span><span class="nt">0370-03FF</span><span class="o">;</span> <span class="c">/* greek */</span>
+<span class="p">}</span>
+
+<span class="k">@font-face</span> <span class="p">{</span>
+  <span class="nt">font-family</span><span class="o">:</span> <span class="s1">'Awesome Font'</span><span class="o">;</span>
+  <span class="nt">font-style</span><span class="o">:</span> <span class="nt">bold</span><span class="o">;</span>
+  <span class="nt">font-weight</span><span class="o">:</span> <span class="nt">700</span><span class="o">;</span> <span class="c">/* bold */</span>
+  <span class="nt">src</span><span class="o">:</span> <span class="nt">url</span><span class="o">(</span><span class="s1">'/fonts/awesome-bold.woff2'</span><span class="o">)</span> <span class="nt">format</span><span class="o">(</span><span class="s1">'woff2'</span><span class="o">);</span>
+  <span class="nt">unicode-range</span><span class="o">:</span> <span class="nt">U</span><span class="o">+</span><span class="nt">0370-03FF</span><span class="o">;</span> <span class="c">/* greek */</span>
+<span class="p">}</span>
+
+<span class="nt">body</span> <span class="p">{</span> <span class="k">font-family</span><span class="o">:</span> <span class="s1">'Awesome Font'</span> <span class="p">}</span>
+<span class="nc">.title</span> <span class="p">{</span> <span class="k">font-weight</span><span class="o">:</span> <span class="m">600</span> <span class="p">}</span>
+<span class="nc">.subtitle</span> <span class="p">{</span> <span class="k">font-style</span><span class="o">:</span> <span class="k">italic</span> <span class="p">}</span></code></pre></div><span>
+
+
+</span><p>The above example declares the "Awesome Font" family that is composed of two resources that cover the same set of Greek characters (U+0370-03FF) but offer two different "weights": normal (400), and <strong>bold</strong> (700). However, what happens if one of our CSS rules specifies a different font weight, or sets the <code>font-style</code> property to <code>italic</code>?</p><span>
+
+</span><h2>Font selection algorithm</h2><span>
+
+</span><blockquote cite="http://www.w3.org/TR/css3-fonts/">When a weight is specified for which no face exists, a face with a nearby weight is used. In general, bold weights map to faces with heavier weights and light weights map to faces with lighter weights (see the font matching section below for a precise definition).</blockquote><span>
+
+
+</span><p>The <a href="https://www.igvita.com/2014/09/16/optimizing-webfont-selection-and-synthesis/font-face">@font-face rule</a> is specifically designed to provide the browser with a flexible selection mechanism: <strong>if an exact stylistic font match is not available the browser will substitute the closest match, and if none is available, it will synthesize its own font variant.</strong> For the curious, the <a href="http://www.w3.org/TR/css3-fonts/#font-matching-algorithm">font matching</a> algorithm gets into the gritty details. For example, the selection rules for <code>font-weight</code> are:</p><span>
+
+</span><ul>
+<li>If the desired weight is less than 400, weights below the desired weight are checked in descending order followed by weights above the desired weight in ascending order until a match is found.</li>
+<li>If the desired weight is greater than 500, weights above the desired weight are checked in ascending order followed by weights below the desired weight in descending order until a match is found.</li>
+<li>If the desired weight is 400, 500 is checked first and then the rule for desired weights less than 400 is used.</li>
+<li>If the desired weight is 500, 400 is checked first and then the rule for desired weights less than 400 is used.</li>
+</ul><span>
+
+
+</span><p>As a result, our <code>.title</code> selector in above example would end up rendering text with the 700 variant in place of the requested 600 weight. However, what about the <code>.subtitle</code>, which needs an <em>oblique font?</em></p><span>
+
+</span><h2>Font synthesis</h2><span>
+
+</span><p><strong>If no suitable match is found, the browser will attempt to synthesize the necessary font variant.</strong> The details of how to generate the bold and oblique variants are not specified, hence the results will vary from browser to browser, and will also be highly dependent on the font. As a hands-on example, consider what happens with <a href="https://www.google.com/fonts/specimen/Open+Sans">Open Sans</a>:</p><span>
+
+</span><p><img src="https://www.igvita.com/posts/14/open-sans-comparison.png" class="center" /></p><span>
+
+</span><p>Google fonts provides ten different variants, each at ~15KB for the latin character set, or ~150KB in total. Alternatively, the rightmost column provides a preview of the synthesized variants generated from the same (400 weight) variant. As you can tell, there is a noticeable difference, plus a number of additional limitations. The browser:</p><span>
+
+</span><ul>
+<li>Can't make a bold font lighter.</li>
+<li>Can't make an oblique font "straight".</li>
+<li>Has limited ability to synthesize bold(er) fonts.</li>
+<li>Has limited ability to synthesize oblique fonts and may produce wrong shapes - e.g. inspect the lowercase "f"  in the synthesized vs. actual columns.</li>
+</ul><span>
+
+
+</span><p>Typography geeks will provide a much longer list of why the synthesized version is inferior, but it's not just the looks:</p><span>
+
+</span><blockquote>Authors should also be aware that synthesized approaches may not be suitable for scripts like Cyrillic, where italic forms are very different in shape. It is always better to use an actual italic font rather than rely on a synthetic version.</blockquote><span>
+
+
+</span><p>The browser is simply applying some geometric transformations to the letter shapes and hoping for the best. Often, the results are pretty good, but we do need to be careful about how and where font synthesis is used. On that note, it is worth highlighting that the CSS specification does provide the <a href="http://www.w3.org/TR/css3-fonts/#font-synthesis-prop">font-synthesis</a> property to control font synthesis behavior. However, while all browsers support font synthesis, to date only <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=871453">Firefox has implemented</a> the CSS API:</p><span>
+
+</span><div class="highlight"><pre><code class="language-css" data-lang="css"><span class="nc">.selector</span> <span class="p">{</span>
+  <span class="k">font</span><span class="o">-</span><span class="n">synthesis</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>           <span class="c">/* disable synthesis */</span>
+  <span class="k">font</span><span class="o">-</span><span class="n">synthesis</span><span class="o">:</span> <span class="n">weight</span><span class="p">;</span>        <span class="c">/* bold synthesis only */</span>
+  <span class="k">font</span><span class="o">-</span><span class="n">synthesis</span><span class="o">:</span> <span class="n">style</span><span class="p">;</span>           <span class="c">/* italic synthesis only */</span>
+  <span class="k">font</span><span class="o">-</span><span class="n">synthesis</span><span class="o">:</span> <span class="n">weight</span> <span class="n">style</span><span class="p">;</span> <span class="c">/* bold + italic synthesis (default) */</span>
+<span class="p">}</span></code></pre></div><span>
+
+
+</span><h2>Font synthesis as performance optimization?</h2><span>
+
+</span><p><strong>The obvious question to ask is whether we can rely on font synthesis in lieu of an extra resource download?</strong> After all, each font resource adds extra bytes and may delay rendering of page content.</p><span>
+
+</span><p><img src="https://www.igvita.com/posts/14/roboto-synthesis.png" class="center" /></p><span>
+
+</span><p>The synthesized version of oblique Roboto in example above may not look as good, but with a little fiddling (e.g. <code>letter-spacing: -0.3px</code>) can nonetheless produce reasonable results while avoiding the extra font request.</p><span>
+
+</span><p>As a practical example, this site is using Open Sans with two variants: 400 for regular text and 700 for bold. I've tried eliminating the 700 variant and using the synthesized version in the past, and while it didn't look as good (to me), I didn't hear any complaints from the visitors. In the end, I still reverted to requesting both (personal preference), but continued to use the <em>synthesized oblique fonts, which is what you're reading this very moment - surprise!</em></p><span>
+
+</span><p>Your mileage may vary, but it's always a good exercise to periodically sit down and audit what fonts your site is using and ask whether you actually need all of them. In the best case, you can consolidate your styles to use fewer variants, and where you can't, <strong>consider if you can rely on the browser to synthesize some font variants on your behalf!</strong></p><span>
+
+
+  </span><div class="author-callout"><span>
+    </span><img src="https://www.igvita.com/images/igrigorik-small.png" alt="Ilya Grigorik" height="35px" width="35px" /><strong>Ilya Grigorik</strong><span> is a web performance engineer and developer advocate at Google, where his focus is on making the web fast and driving adoption of performance best practices — follow on </span><a href="https://twitter.com/igrigorik">Twitter</a><span>, </span><a href="https://plus.google.com/+IlyaGrigorik">Google+</a><span>.
+  </span></div><span>
+  </span><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

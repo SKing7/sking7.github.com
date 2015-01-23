@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p>SVGs are a great asset in our responsive web design toolkit. But just like any other image format, there are certain steps you should take to make sure you’re delivering optimised resources that don’t have a negative impact on your page’s performance. </p><span>
+</span><p>Here are some things that you can do to make sure you’re delivering better SVGs for the web.</p><span>
+</span><h2>1. Enable Gzip on your SVGs (if it’s not already enabled)</h2><span>
+</span><p>SVGs are text-based, and thus gzip <em>really</em> well. SVGs contain many repeated fragments of text, so they are well suited for lossless data compression algorithms.</p><span>
+</span><p>When an SVG is gzipped, it is referred to as an “SVGZ” image and uses the corresponding <code>.svgz</code> filename extension. An SVGZ file is typically 20 to 50 percent of the original size.</p><span>
+</span><p>As a matter of fact, <a href="http://www.w3.org/TR/SVG2/minimize.html">Appendix G of the SVG specification</a> — that contains a list of features in SVG that promote small file sizes — contains a list of example compression rates resulting from gzipping a bunch of SVGs. The data shows that SVGs gzip really well, reaching a compression ratio as high as 84% in some of the examples. </p><span>
+</span><p>The following table shows a few examples from the tests available in the appendix: </p><span>
+</span><table>
+<colgroup>
+<col />
+<col />
+<col />
+</colgroup>
+<thead>
+<tr>
+<th>Uncompressed SVG</th>
+<th>With gzip compression</th>
+<th>Compression ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12,912</td>
+<td>2,463</td>
+<td>81%</td>
+</tr>
+<tr>
+<td>13,024</td>
+<td>2,041</td>
+<td>84%</td>
+</tr>
+<tr>
+<td>12,164</td>
+<td>2,553</td>
+<td>79%</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>You can enable SVG gzipping in your <code>.htaccess</code> file — thus <a href="http://kaioa.com/node/45">making sure your server serves SVG/SVGZ the right way</a> — by first adding the SVG and SVGZ media types to the <a href="https://github.com/h5bp/html5-boilerplate/blob/master/dist/.htaccess#L217">list of media types</a>:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-code">
+</span><span class="hl-identifier">AddType</span><span class="hl-code"> </span><span class="hl-identifier">image</span><span class="hl-code">/</span><span class="hl-identifier">svg</span><span class="hl-code">+</span><span class="hl-identifier">xml</span><span class="hl-code"> </span><span class="hl-identifier">svg</span><span class="hl-code"> </span><span class="hl-identifier">svgz</span></pre><span>
+</span></div><span>
+</span><p>Next, add the gzip encoding:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-brackets">&lt;</span><span class="hl-reserved">IfModule</span><span class="hl-code"> </span><span class="hl-var">mod_mime</span><span class="hl-code">.</span><span class="hl-var">c</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+  AddEncoding gzip svgz
+</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">IfModule</span><span class="hl-brackets">&gt;</span></pre><span>
+</span></div><span>
+</span><p>This will not gzip your SVGs — it will only make sure the server serves pre-gzipped SVGs correctly.</p><span>
+</span><p>Then, in order to enable dynamic gzipping, you need to specify <code>AddOutputFilterByType DEFLATE</code> and then set the type to <code>image/svg+xml</code>. For example, in the HTML5 Boilerplate <code>.htaccess</code> file, it looks like so:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-brackets">&lt;</span><span class="hl-reserved">IfModule</span><span class="hl-code"> </span><span class="hl-var">mod_filter</span><span class="hl-code">.</span><span class="hl-var">c</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+AddOutputFilterByType DEFLATE "application/atom+xml" \
+                              "application/javascript" \
+                              "application/json" \
+                              ...
+                              "image/svg+xml" \
+                              ...etc.
+</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">IfModule</span><span class="hl-brackets">&gt;</span></pre><span>
+</span></div><span>
+</span><p>HTML5 Boilerplate’s <code>.htaccess</code> file contains a lot of useful reusable code snippets. Check out <a href="https://github.com/h5bp/html5-boilerplate/blob/master/dist/.htaccess#L697">the above snippet</a> and more in the boilerplate’s repository on Github.</p><span>
+</span><h2>2. Avoid multiple requests when providing fallback with <code>&lt;object&gt;</code></h2><span>
+</span><p>The <code>&lt;object&gt;</code> tag is one of the most common <a href="http://www.smashingmagazine.com/2014/11/03/styling-and-animating-svgs-with-css/4/">ways to embed an SVG in a web page</a>. It offers many advantages that other embedding techniques don’t — like scripting with JavaScript, and CSS animations and interactions, without compromising cachability of the referenced SVG.</p><span>
+</span><p>Another reason why <code>&lt;object&gt;</code> is a great embedding technique is that it comes with a standard and default fallback mechanism — you can provide fallback for browsers that don’t support SVG (or even those that do support it but for any reason can’t display the requested SVG) between the opening and closing tag:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-brackets">&lt;</span><span class="hl-reserved">object</span><span class="hl-code"> </span><span class="hl-var">data</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">mySVG.svg</span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-var">type</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">image/svg+xml</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+    </span><span class="hl-brackets">&lt;</span><span class="hl-code">!</span><span class="hl-var">-</span><span class="hl-code"></span><span class="hl-var">fallback</span><span class="hl-code"> </span><span class="hl-var">-</span><span class="hl-code"></span><span class="hl-brackets">&gt;</span><span class="hl-code">
+</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">object</span><span class="hl-brackets">&gt;</span></pre><span>
+</span></div><span>
+</span><p>In most cases, you will want to provide a bitmap version of your image as fallback. For example:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-brackets">&lt;</span><span class="hl-reserved">object</span><span class="hl-code"> </span><span class="hl-var">data</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">mySVG.svg</span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-var">type</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">image/svg+xml</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+    </span><span class="hl-brackets">&lt;</span><span class="hl-reserved">img</span><span class="hl-code"> </span><span class="hl-var">src</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">fallback.png</span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-var">alt</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string"></span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-brackets">/&gt;</span><span class="hl-code">
+</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">object</span><span class="hl-brackets">&gt;</span></pre><span>
+</span></div><span>
+</span><p>The above fallback approach isn’t <em>wrong</em>, but it is an approach you shouldn’t take.</p><span>
+</span><p>The reason the above fallback isn’t optimal is that SVG-capable browsers will request both the SVG <em>and</em> the PNG images, thus resulting in an extra HTTP request that we need to avoid.</p><span>
+</span><p>In order to avoid the double requests, there is a workaround first spotted on the <a href="http://calendar.perfplanet.com/2014/tips-for-optimising-svg-delivery-for-the-web/clearleft.com">ClearLeft website</a> and <a href="http://dbushell.com/2013/02/04/a-primer-to-front-end-svg-hacking/">mentioned by David Bushell</a>: instead of providing the fallback image as a foreground <code>img</code>, set it as a background image to a <code>&lt;div&gt;</code> injected between the opening and closing <code>object</code> tags:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-brackets">&lt;</span><span class="hl-reserved">object</span><span class="hl-code"> </span><span class="hl-var">data</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">mySVG.svg</span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-var">type</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">image/svg+xml</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+    </span><span class="hl-brackets">&lt;</span><span class="hl-reserved">div</span><span class="hl-code"> </span><span class="hl-var">class</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">fallback</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">div</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">object</span><span class="hl-brackets">&gt;</span></pre><span>
+</span></div><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-identifier">.fallback</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code">
+    </span><span class="hl-reserved">background-image:</span><span class="hl-code"> </span><span class="hl-code">url</span><span class="hl-code">(</span><span class="hl-code">path</span><span class="hl-code">/</span><span class="hl-code">to</span><span class="hl-code">/</span><span class="hl-code">fallback</span><span class="hl-code">.</span><span class="hl-code">png</span><span class="hl-code">)</span><span class="hl-reserved"></span><span class="hl-code">;
+    </span><span class="hl-code">
+</span><span class="hl-brackets">}</span></pre><span>
+</span></div><span>
+</span><p>When the image is provided as a background to the <code>div</code>, SVG-capable browsers will not request it — only browsers that don’t support SVG will render and style the fallback <code>div</code> and hence request the background image. </p><span>
+</span><h2>3. Avoid Embedding SVGs as Data URIs when possible</h2><span>
+</span><p>Minimising HTTP requests is considered one of the best practices for better performance. It is also the number one reason why many of us decide to inline images using data URIs — be that in our HTML or CSS. </p><span>
+</span><p>Images embedded inline using data URIs are also kinda convenient — they are generally easy to create, embed and maintain.</p><span>
+</span><p>But..</p><span>
+</span><p>Avoid embedding SVGs as data URIs when possible. </p><span>
+</span><p>Data URI’d images do have some advantages, but <a href="http://www.mobify.com/blog/css-sprites-vs-data-uris-which-is-faster-on-mobile/">research shows</a> that they are sometimes significantly slower than CSS image sprites, and thus may have a bad impact on performance — especially mobile performance.</p><span>
+</span><p>The possible performance impact of inline images is the main reason why <a href="http://calendar.perfplanet.com/2011/why-inlining-everything-is-not-the-answer/">inlining everything is not the answer</a> — as Guy Podjarny confirms in an article he shared right here on the Perf Calendar blog.</p><span>
+</span><p>Based on Podjarny’s and other researches, it is recommended that you limit the use of inlining to small image files. According to Podjarny, “the HTTP Overhead of a request &amp; response is often ~1KB, so files smaller than that should definitely be inlined. Our testing shows you should almost never inline files bigger than 4KB.”</p><span>
+</span><p>Complimentary to Podjarny’s research, another reseach conducted by Peter McLachlan shows that “15–20kB for max data URI size, and no more than 3 – 5 instances seems like a good rule of thumb for mobile.”</p><span>
+</span><p>In addition to that, CSS-inline images affect page rendering since the content of the page will not render before the CSS is parsed. Hence, the bigger the CSS file, the longer it is going to take to render the page. So, inlining inside CSS is a render-blocking procedure that can easily have a visible impact on performance that your users may definitely see and feel. That is, unless the images are inlined in a separate non-critical style sheet that is loaded asynchronously.</p><span>
+</span><p>Also remember that CSS is usually shared across multiple pages. So if your CSS-inlined images are not used across all of these pages, you might be delaying these pages’ rendering and loading unnecessary resources across all of them.</p><span>
+</span><p>Podjarny also recommends that page images (i.e. images referenced from the page, not CSS) rarely be inlined. “Page images tend to be big in size, they don’t block other resources in the normal use, and they tend to change more frequently than CSS and Scripts. To optimise image file loading, load images on-demand instead.”</p><span>
+</span><p>Inlining has its advantages and disadvantages — you should be careful not to abuse it. If your images are not critical for above-the-fold rendering, they don’t need to be inlined. <strong>If — for any reason — you do inline them, try to load them asynchronously.</strong> Same thing applies to inlining in CSS — load the style sheet asynchronously if possible. For example, the workflow used in the Grunticon SVG icon sprite generation process loads the style sheet containing the inlined SVG icons asynchronously. See the last section for more about Grunticon.</p><span>
+</span><p><a href="https://http2.github.io/">HTTP/2</a> brings some important performance optimisations to HTTP requests. The main advantage of inlining — which is saving that extra HTTP request — will no longer be an advantage because HTTP/2 enables the server to send multiple responses (in parallel) for a single client request — also known as, <strong>server push</strong>. This means that this will remove the additional HTTP request concern from the equation. HTTP 2.0 server push makes inlining obsolete. And even without server push, HTTP/2 massively brings down the cost of additional requests, so this excuse no longer becomes valid to data URI SVGs.</p><span>
+</span><p>With all that said, fact remains that HTML-inlined SVGs (be those data URI’d or plain text) cannot be cached, which is also another disadvantage — an HTTP request is saved, but you wouldn’t be leveraging the browser’s caching ability anymore — that is, unless the HTML is cached, which rarely happens. That, and the inlined SVGs will result in extra overhead sent to browsers that may not be able to render it anyway. Feature detection and fallback to non-SVG versions of the graphic might be a good option in a case like this.</p><span>
+</span><h2>4. Don’t base64 inline SVGs</h2><span>
+</span><p>If you do decide to inline SVGs — be that in CSS or HTML — <strong>don’t base64 encode them</strong>.</p><span>
+</span><p>Many developers like to base64 encode images — especially SVG. However, one research shows that <a href="http://www.mobify.com/blog/data-uris-are-slow-on-mobile/">base64 encoded images can cause serious performance bottlenecks on mobile</a>, but the results of that research were later debunked by another <a href="http://www.mobify.com/blog/base64-does-not-impact-data-uri-performance/">research</a>. </p><span>
+</span><p>Nevertheless, base64-encoding an image increases the CSS file size dramatically.</p><span>
+</span><p>SVGs can be embedded inline without base64-encoding them. You can minify the SVG code — removing white space from it — and then embed it as plain text without resorting to base64 encoding. For example, instead of this:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-identifier">.el</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code">
+    </span><span class="hl-reserved">background-image:</span><span class="hl-code"> </span><span class="hl-code">url</span><span class="hl-code">('</span><span class="hl-code">data</span><span class="hl-code">:</span><span class="hl-code">image</span><span class="hl-code">/</span><span class="hl-code">svg</span><span class="hl-code">+</span><span class="hl-code">xml</span><span class="hl-reserved"></span><span class="hl-code">;</span><span class="hl-identifier">base64</span><span class="hl-code">;</span><span class="hl-identifier">iVBORw0</span><span class="hl-code">...');
+    </span><span class="hl-code">
+</span><span class="hl-brackets">}</span></pre><span>
+</span></div><span>
+</span><p>you would do this:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-identifier">.el</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code">
+    </span><span class="hl-reserved">background-image:</span><span class="hl-code"> </span><span class="hl-code">url</span><span class="hl-code">('</span><span class="hl-code">data</span><span class="hl-code">:</span><span class="hl-code">image</span><span class="hl-code">/</span><span class="hl-code">svg</span><span class="hl-code">+</span><span class="hl-code">xml</span><span class="hl-reserved"></span><span class="hl-code">;</span><span class="hl-identifier">charset=utf-8</span><span class="hl-code">,%3C</span><span class="hl-identifier">svg</span><span class="hl-code">%20xmlns...;');
+    </span><span class="hl-code">
+</span><span class="hl-brackets">}</span></pre><span>
+</span></div><span>
+</span><p>The main advantage to using plain text minified (white space removed) SVGs as opposed to base64-encoded SVGs is that the former gzips better. The reason plain text SVG GZips better is that it usually contains a lot of repetitive elements that gzip can easily crunch, significantly reducing file size.</p><span>
+</span><p>In addition to that, base64 encoding needlessly inflates the content by 30%, and although gzip recovers some of this, you still end up with ~10% bloat for no reason. Therefore, it makes sense at this point why it’s best not to base64 encode your SVGs, should you decide to inline them. </p><span>
+</span><h2>5. <code>use</code> a cacheable SVG sprite</h2><span>
+</span><p>There are <a href="http://24ways.org/2014/an-overview-of-svg-sprite-creation-techniques/">several ways for creating SVG sprites</a> — these sprites are mostly used in SVG icon systems.</p><span>
+</span><p>One of the SVG spiriting techniques works by referencing individual icons inside an <code>&lt;svg&gt;</code> container (the actual sprite) using the SVG <code>&lt;use&gt;</code> tag. </p><span>
+</span><p>The SVG sprite can be embedded in the document as a code island using the <code>&lt;svg&gt;</code> tag. The icons would be defined inside the sprite using <code>&lt;symbol&gt;</code> elements for each icon. Each icon <code>&lt;symbol&gt;</code> would have an ID. Then, the icons are referenced anywhere in the document using <code>&lt;use&gt;</code>:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-brackets">&lt;</span><span class="hl-reserved">svg</span><span class="hl-code"> </span><span class="hl-var">style</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">display:none;</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+  </span><span class="hl-brackets">&lt;</span><span class="hl-reserved">symbol</span><span class="hl-code"> </span><span class="hl-var">id</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">twitter-icon</span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-var">viewBox</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">0 0 32 32</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+    </span><span class="hl-brackets">&lt;</span><span class="hl-reserved">path</span><span class="hl-code"> </span><span class="hl-var">d</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string"></span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-var">fill</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">#000000</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">path</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+  </span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">symbol</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+ 
+  </span><span class="hl-brackets">&lt;</span><span class="hl-code"></span><span class="hl-var">remaining</span><span class="hl-code"> </span><span class="hl-var">icons</span><span class="hl-code"> </span><span class="hl-var">here</span><span class="hl-code"></span><span class="hl-brackets">&gt;</span><span class="hl-code">
+  </span><span class="hl-brackets">&lt;</span><span class="hl-reserved">symbol</span><span class="hl-code"> </span><span class="hl-var">id</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">instagram-icon</span><span class="hl-quotes">"</span><span class="hl-code"> </span><span class="hl-var">viewBox</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">0 0 32 32</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+    </span><span class="hl-brackets">&lt;</span><span class="hl-code"></span><span class="hl-var">icon</span><span class="hl-code"> </span><span class="hl-var">contents</span><span class="hl-code"></span><span class="hl-brackets">&gt;</span><span class="hl-code">
+  </span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">symbol</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+ 
+  </span><span class="hl-brackets">&lt;</span><span class="hl-code"></span><span class="hl-var">etc</span><span class="hl-code"></span><span class="hl-brackets">&gt;</span><span class="hl-code">
+</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">svg</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+ 
+ 
+</span><span class="hl-code">
+</span><span class="hl-brackets">&lt;</span><span class="hl-reserved">svg</span><span class="hl-code"> </span><span class="hl-var">class</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">twitter-icon</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+  </span><span class="hl-brackets">&lt;</span><span class="hl-reserved">use</span><span class="hl-code"> </span><span class="hl-var">xlink:href</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">#twitter-icon</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">use</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+</span><span class="hl-brackets">&lt;</span><span class="hl-reserved">svg</span><span class="hl-brackets">&gt;</span></pre><span>
+</span></div><span>
+</span><p>This works just fine in all browsers supporting SVG. But, as we mentioned earlier, the SVG won’t be cached, and by inlining it like so we will be sending unnecessary overhead to non-supporting browsers. In order to avoid this overhead and leverage browser caching, you can reference the icons in an <strong>external</strong> sprite. This would initially cause an extra HTTP request, but the sprite will be cached, thus speeding up any subsequent loads. To reference an external style sheet, the previous <code>&lt;use&gt;</code> would look like so:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-brackets">&lt;</span><span class="hl-reserved">svg</span><span class="hl-code"> </span><span class="hl-var">class</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">twitter-icon</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+  </span><span class="hl-brackets">&lt;</span><span class="hl-reserved">use</span><span class="hl-code"> </span><span class="hl-var">xlink:href</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">path/to/icons.svg#twitter-icon</span><span class="hl-quotes">"</span><span class="hl-brackets">&gt;</span><span class="hl-brackets">&lt;/</span><span class="hl-reserved">use</span><span class="hl-brackets">&gt;</span><span class="hl-code">
+</span><span class="hl-brackets">&lt;</span><span class="hl-reserved">svg</span><span class="hl-brackets">&gt;</span></pre><span>
+</span></div><span>
+</span><p>Much better.</p><span>
+</span><p>Referencing an external sprite in <code>&lt;use&gt;</code> is definitely recommended. However, it does not work in any version of IE. That being said, there is a polyfill available to allow you to do it. To learn more about the polyfill and about this spriting technique — and others — you can refer to <a href="http://24ways.org/2014/an-overview-of-svg-sprite-creation-techniques/">the article I wrote on the 24Ways blog</a>.</p><span>
+</span><h2>6. Optimise Your SVG</h2><span>
+</span><p>Most of the optimisations mentioned so far are made in the last phase — when you actually embed your SVG in your page. However, there are some things you can do in your vector editor that can help you export cleaner code, as well as post-export optimisations, which are one of the most important steps you can do to make your SVGs ready to work with and embed.</p><span>
+</span><p>There are many SVG editors available — some are free and some are not. But they all have one thing in common: none of them outputs perfectly clean and optimised code. So it is your task to make sure you end with usable, readable and optimised code before you put those SVGs to work. Here are some things you can do to make that happen:</p><span>
+</span><h3>6.1 Optimise in the editor</h3><span>
+</span><p>There are many ways for doing the same thing in graphics editors. But some techniques produce better code than others. </p><span>
+</span><ul>
+<li><strong>Simplify paths, and combine them when possible</strong>. The less the path points, the less the path data in the resulting SVG code, and hence the smaller the file size. Combining paths can also decrease file size significantly depending on the illustration and how the elements inside it are drawn.</li>
+<li><strong>Avoid drop shadows, inner or outer glows and Gaussian blur</strong>, particularly if you’re working with Illustrator. Sketch does a better job at exporting these effects as actual SVG filters and effects, but Illustrator currently converts these effects to raster images which are then either embedded into the SVG — dramatically increasing its file size — or provided as external images that are referenced inside an SVG <code>&lt;image&gt;</code>, thus adding an unnecessary extra request.</li>
+<li><strong>Organise and name your layers</strong>. The layer and group names you use in your editor will be translated into element IDs in the SVG code, so instead of ending up with editor-generated names that make absolutely no sense at all, naming your elements and layers appropriately will save you some work in later stages of your work.</li>
+</ul><span>
+</span><p>There are certainly more things you can do in the process of your SVG creation to get better exported code, but these are some of the main points particularly related to file size and performance, so we will skip going over other steps for now.</p><span>
+</span><h4>Take advantage of your editor’s export optimisation options if available</h4><span>
+</span><p>In Illustrator, and after you choose to save your file as SVG, you get an options panel that contains a set of options that can also help further optimise your SVG before you export it.</p><span>
+</span><p>The options in the panel include turning SVG text into outline. This can be useful because it allows you to avoid embedding the font into the SVG. That being said, it <em>may</em> sometimes increase your file size, depending on the font you’re using. For example, decorative fonts may result in larger code when converted to outlines.</p><span>
+</span><p>You can also choose to apply the styles to the SVG using either SVG presentation attributes or CSS — the latter can sometimes be more useful, particularly if you have a lot of repetitive styles which can be applied to multiple elements using class names in CSS, instead of applying them to each and every element with presentation attributes. Choosing the CSS option may help decrease the resulting file size — not to mention that it makes styling and animating the SVG with CSS simpler.</p><span>
+</span><p>Another important option is one that allows you to specify the number of decimal points to use in the code. The less this number, the smaller the file size. By default, Illustrator exports the SVG with three or four decimal places. One decimal is usually enough. If you have an SVG that uses four decimal places and you optimise it using a standalone optimisation tool (we’ll talk about these next) and decrease the number of decimal points to one, it can slash your file size down to the half.</p><span>
+</span><p>It is worth mentioning at this point that it is best to limit the decimal numbers <em>before</em> you export your SVG, because — sometimes — doing this after exporting the SVG <em>could</em> break your SVG. It happened to one of my SVGs once before. The sooner you can make these optimisations, the better it is along the way.</p><span>
+</span><p>For [a lot] more information about Illustrator’s export options panel, refer to <a href="http://creativedroplets.com/export-svg-for-the-web-with-illustrator-cc/">this article</a> by Adobe’s Michaël Chaize.</p><span>
+</span><h3>6.2 Optimise your SVG after exporting it from the editor</h3><span>
+</span><p>Exported SVG code is rarely going to be fully optimal — if ever. Thus, it is recommended that you integrate some kind of optimisation process into your workflow to optimise your SVG before using it in your pages. </p><span>
+</span><p><strong>Optimising an SVG ensures a smaller file size and more readable — and hence more editable — code.</strong></p><span>
+</span><p>Code exported from editors usually contains a lot of redundant elements and groups, editor metadata and non-optimal values that lead to bloated code and an increased file size that can be slashed down to the half (or more) using proper optimisations. This unnecessary code bloat be removed or changed without affecting the rendering result of the SVG. Thus, is it generally a good idea to use a standalone optimisation tool to optimise the after exporting them.</p><span>
+</span><p>Optimising SVGs by hand can be a very daunting task. (Imagine having a big set of images, all of which need manual optimisation, and some of which might be really complex.) So it is definitely best to automate the optimisation process so that it happens “automagically”.</p><span>
+</span><p>Luckily, some smart people have come to create and share tools that allow us to automate SVG optimisation in different ways. Many tools exist, each with its own requirements and limitations. No matter what your workflow is, one of them is sure to fit in.</p><span>
+</span><p>If you’re looking for a quick optimisation tool that doesn’t require any setup and gives you visual feedback, <a href="http://petercollingridge.appspot.com/svg-editor">Peter Collingridge’s online SVG Editor</a> is an excellent tool. The editor gives you real-time feedback showing you the result of applying your optimisations to the SVG as you apply them. The optimisations are presented as a set of options that you can check and uncheck as needed. This is useful because some optimisations may end up breaking your SVG, so being able to “live optimise” the SVG before exporting the optimised code is great.</p><span>
+</span><p>If you don’t want to use an online tool and prefer one that can be integrated into your projects, <a href="https://github.com/svg/svgo">SVGO</a> is going to be your best option. It is a Nodejs-based tool for optimizing SVGs, that is available as a Grunt plugin, Gulp plugin, OS X folder action, and even comes with a simple drag-and-drop GUI.</p><span>
+</span><p>SVGO is great and — if you use Grunt or Gulp — fairly simple to set up and use. The optimisations are available as a set of plugins that you can enable and disable as needed. I recommend you customize it because some of the default optimisations applied are actually bad for SVG use. For example, the plugin removes the SVG <code>viewBox</code> attribute by default, which you should <em>not</em> do! The <code>viewBox</code> is essential and you must make sure it stays where it is, especially if you want to make your SVG responsive.</p><span>
+</span><p>The only drawback to using SVGO is that the optimisations may end up breaking your SVG; in which case you would need to change the plugin’s configuration and re-optimise again. There is currently no way to tell whether the optimisations will break the SVG or not.</p><span>
+</span><p>Note that running your SVG through SVGO several times can yield more optimisations every time. Some developers have reported further optimizations even after running SVGO 15 times on their SVGs!</p><span>
+</span><p>Recently, a tool called <a href="https://github.com/davidderaedt/SVG-NOW"><strong>SVG NOW</strong></a> was created, which practically integrates SVGO into Adobe Illustrator so you can apply SVGO’s optimisations right in the editor. The plugin provides SVGO optimisations as a set of options. You can check the ones that you want to apply and then export the optimised SVG. Once again, there is no way of telling if the optimisations are suitable for the SVG or not, so you <em>may</em> have to make some changes and re-export again if the exported SVG turns out broken.</p><span>
+</span><p>These are the three main SVG optimisation tools available today. SVGO is the most powerful tool, but its only current limitation is not being able to see a preview of the optimised SVG before generating it, but that’s certainly not stopping designers and developers from using it today. </p><span>
+</span><h2>7. Test, test, test.</h2><span>
+</span><p>Sometimes SVG may not be the best format for your image — your image might be better off as a PNG or JPEG. Some images make better SVG candidates, and are more likely to be smaller as SVGs than their PNG and JPEG counterparts. On the other hand, some images are best served as bitmaps instead of SVGs, as the SVG version may be too large to serve without affecting the page’s performance.</p><span>
+</span><p>Small icons and simple illustrations are best candidates for SVG, while more complex images and continuous tone images are better served as PNGs or JPEGs. The best way to determine which format to choose is to compare the sizes, and test the performance of each.</p><span>
+</span><p>No matter which format you end up choosing, make sure you’re delivering properly optimised assets to your users, and always test the SVGs against other formats to make sure they don’t turn into the cause of your page’s performance bottleneck.</p><span>
+</span><p><em>Many thanks to <a href="http://jakearchibald.com/">Jake Archibald</a> for tech-editing and reviewing this article.</em></p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Capability Reporting with Service Worker</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Capability Reporting with Service Worker</h1>
+<div id="post" class="content" itemscope="" itemtype="http://schema.org/Article"><span>
+  </span><span>
+  </span><p class="byline">By <a href="https://www.igvita.com/" rel="author" itemprop="author">Ilya Grigorik</a> on <b itemprop="datePublished" datetime="2014-12-15">December 15, 2014</b></p><span>
+
+  </span><p><em>Some people, when confronted with a problem, think: “I'll use UA/device detection!” Now they have two problems...</em></p><span>
+
+</span><p>But, despite all of its pitfalls, <a href="http://www.otsukare.info/2014/03/31/ua-detection-use-cases">UA/device detection</a> is a <a href="https://etherpad.mozilla.org/uadetection-usecases">fact of life</a>, a <a href="http://www.brucelawson.co.uk/2014/device-detection-responsive-web-design/">growing business</a>, and an enabling business requirement for many. The problem is that UA/device detection often frequently misclassifies capable clients (e.g. <a href="http://msdn.microsoft.com/en-us/library/ie/hh869301%28v=vs.85%29.aspx#ie11">IE11 was forced to change their UA</a>); leads to compatibility nightmares; can't account for continually changing user and runtime preferences. That said, when used correctly it <a href="http://calendar.perfplanet.com/2014/support-the-old-optimise-for-the-new/">can also be used for good</a>.</p><span>
+
+</span><p>Browser vendors would love to drop the User-Agent string entirely, but that would break too many things. However, while it is fashionable to demonize UA/device detection, the root problem is not in the intent behind it, but in how it is currently deployed. <strong>Instead of "detecting" (i.e. guessing) the client capabilities through an opaque version string, we need to change the model to allow the user agent to "report" the necessary capabilities.</strong></p><span>
+
+</span><p>Granted, this is <a href="http://www.w3.org/TR/2004/REC-CCPP-struct-vocab-20040115/">not a new idea</a>, but previous attempts seem to introduce as many issues as they solve: they seek to standardize the list of capabilities; they require agreement between multiple slow-moving parties (UA vendors, device manufacturers, etc); they are over-engineered - RDF, seriously? Instead, what we need is a platform primitive that is:</p><span>
+
+</span><ul>
+<li><em><strong>Flexible:</strong> browser vendors cannot anticipate all the use cases, nor do they want or need to be in this business beyond providing implementation guidance and documenting the best-practices.</em></li>
+<li><em><strong>Easy to deploy:</strong> developers must be in control over which capabilities are reported. No blocking on UA consensus or other third parties.</em></li>
+<li><em><strong>Cheap to operate:</strong> compatible and deployable with existing infrastructure. No need for third-party databases, service contracts, or other dependencies in the serving path.</em></li>
+</ul><span>
+
+
+</span><p><strong>Here is the good news: this mechanism exists, it's Service Worker.</strong> Let's take a closer look...</p><span>
+
+</span><blockquote>Service worker is an event-driven Web Worker, which responds to events dispatched from documents and other sources… The service worker is a generic entry point for event-driven background processing in the Web Platform that is extensible by other specifications - see <a href="https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md">explainer</a>, <a href="http://jakearchibald.com/2014/using-serviceworker-today/">starter</a>, and <a href="http://jakearchibald.com/2014/offline-cookbook/">cookbook</a> docs.</blockquote><span>
+
+
+</span><p><img src="https://www.igvita.com/posts/14/serviceworker.png" class="center" /></p><span>
+
+</span><p>A simple way to understand Service Worker is to think of it as a scriptable proxy that runs in your browser and is able to see, modify, and respond to, all requests initiated by the page it is installed on. As a result, the developer can use it to annotate outbound requests (via HTTP request headers, URL rewriting) with relevant capability advertisements:</p><span>
+
+</span><ol>
+<li>Developer defines what capabilities are reported and on which requests.</li>
+<li>Capability checks are executed on the client - no guessing on the server.</li>
+<li>Reported values are dynamic and able to reflect changes in user preference and runtime environment.</li>
+</ol><span>
+
+
+</span><p><strong>This is not a proposal or a wishlist, this is <a href="http://blog.chromium.org/2014/12/chrome-40-beta-powerful-offline-and.html">possible today</a>, and is a direct result of enabling powerful low-level primitives in the browser - hooray.</strong> As such, now it's only a question of establishing the best practices: what do we report, in what format, and how to we optimize interoperability? Let's consider a real-world example...</p><span>
+
+</span><h2>E.g. optimizing video startup experience</h2><span>
+
+</span><p>Our goal is to deliver the optimal — fast and visually pleasing — video startup experience to our users. Simply starting with the lowest bitrate is suboptimal: fast, but consistently poor visual quality for all users, even for those with a fast connection. Instead, we want to pick a starting bitrate that can deliver the best visual experience from the start, while minimizing playback delays and rebuffers. We don't need to be perfect, but we should account for the current network weather on the client. Once the video starts playing, the adaptive bitrate streaming will take over and adjust the stream quality up or down as necessary.</p><span>
+
+</span><p>The combination of Service Worker and <a href="http://w3c.github.io/netinfo/">Network Information API</a> make this trivial to implement:</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// register the service worker</span>
+<span class="nx">navigator</span><span class="p">.</span><span class="nx">serviceWorker</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">'/worker.js'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">reg</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Installed successfully'</span><span class="p">,</span> <span class="nx">reg</span><span class="p">)</span> <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Worker installation failed'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span> <span class="p">}</span>
+<span class="p">);</span>
+
+<span class="c1">// ... worker.js</span>
+<span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'fetch'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">requestURL</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">URL</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">request</span><span class="p">);</span>
+
+    <span class="c1">// Intercept same origin /video/* requests</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">requestURL</span><span class="p">.</span><span class="nx">origin</span> <span class="o">==</span> <span class="nx">location</span><span class="p">.</span><span class="nx">origin</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="sr">/^\/video\//</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">requestURL</span><span class="p">.</span><span class="nx">pathname</span><span class="p">))</span> <span class="p">{</span>
+            <span class="c1">// append the MD header, set value to NetInfo's downlinkMax:</span>
+            <span class="c1">// http://w3c.github.io/netinfo/#downlinkmax-attribute</span>
+            <span class="nx">event</span><span class="p">.</span><span class="nx">respondWith</span><span class="p">(</span>
+                <span class="nx">fetch</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="nx">headers</span><span class="o">:</span> <span class="p">{</span> <span class="s1">'MD'</span><span class="o">:</span> <span class="nx">navigator</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">downlinkMax</span> <span class="p">}</span>
+                <span class="p">})</span>
+            <span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span></code></pre></div><span>
+
+
+</span><ol>
+<li>Site installs a Service Worker script that is scoped to capture <code>/video/*</code> requests.</li>
+<li>When a video request is intercepted, the worker appends the <a href="http://igrigorik.github.io/http-client-hints/#rfc.section.5">MD header</a> and sets its value to the current <a href="http://w3c.github.io/netinfo/#downlinkmax-attribute">maximum downlink speed</a>. Note: current plan is to enable <code>downlinkMax</code> in Chrome 41.</li>
+<li>Server receives the video request, consults the advertised <code>MD</code> value to determine the starting bitrate, and responds with the appropriate video chunk.</li>
+</ol><span>
+
+
+</span><p>We have full control over the request flow and are able to add additional data to the request prior to dispatching it to the server. Best of all, this logic is transparent to the application, and you are free to customize it further. For example, want to add an explicit user override to set a starting bitrate? Prompt the user, send the value to the worker, and have it annotate requests with whatever value you feel is optimal.</p><span>
+
+</span><div class="callout"><span>
+Tired of writing out srcset rules for every image? Service Worker can help deliver DPR-aware <img />'s: use </span><a href="https://github.com/igrigorik/http-client-hints#delivering-dpr-aware-images">content negotiation</a><span>, or </span><a href="https://github.com/agektmr/responsive-resource-loader">rewrite the image URL's</a><span>. Note that device DPR is a dynamic value: zooming on desktop browsers affects the DPR value! Existing device detection methods cannot account for that.
+</span></div><span>
+
+
+</span><h2>Implementation best practices</h2><span>
+
+</span><p>Service Worker enables us (web developers) to define, customize, and deploy new capability reports at will: we can rewrite requests, implement content-type or origin specific rules, account for user preferences, and <a href="http://jakearchibald.com/2014/offline-cookbook/">more</a>. The new open questions are: what capabilities do our servers need to know about, and what's the best way to deliver them?</p><span>
+
+</span><p>It will be tempting to report every plausibly useful property about a client. Please think twice before doing this, as it can add significant overhead to each request - be judicious. Similarly, it makes sense to optimize for interoperability: use parameter names and format that works well with existing infrastructure and services - caches and CDN's, optimization services, and so on. For example, the <code>MD</code> and <code>DPR</code> request headers used in above examples <a href="https://github.com/igrigorik/http-client-hints#http-client-hints-internet-draft">come from Client-Hints</a>, the goals for which are:</p><span>
+
+</span><ul>
+<li>To document the best practices for communicating client capabilities via HTTP request header fields.</li>
+<li>Acts as a registry for common header fields to help interoperability between different services.
+
+<ul>
+<li><em>e.g. you can already use <code>DPR</code> and <code>RW</code> hints to optimize images with <a href="https://github.com/igrigorik/http-client-hints#hands-on-example">resrc.it service</a>.</em></li>
+</ul>
+</li>
+</ul><span>
+
+
+</span><p>Now is the time to experiment. There will be missteps and poor initial implementations, but good patterns and best practices will emerge. Most importantly, the learning cycle for testing and improving this infrastructure is now firmly in the hands of web developers: deploy Service Worker, experiment, learn, and iterate.</p><span>
+
+
+  </span><div class="author-callout"><span>
+    </span><img src="https://www.igvita.com/images/igrigorik-small.png" alt="Ilya Grigorik" height="35px" width="35px" /><strong>Ilya Grigorik</strong><span> is a web performance engineer and developer advocate at Google, where his focus is on making the web fast and driving adoption of performance best practices — follow on </span><a href="https://twitter.com/igrigorik">Twitter</a><span>, </span><a href="https://plus.google.com/+IlyaGrigorik">Google+</a><span>.
+  </span></div><span>
+  </span><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

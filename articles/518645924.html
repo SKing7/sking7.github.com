@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1></h1>
+<article class="container">
+<p class="intro"><span>InstantClick</span> is a JavaScript library that dramatically speeds up your website, making navigation effectively instant in most&nbsp;cases.
+
+</p><p class="social">
+  
+  <a href="https://twitter.com/instantclickjs" class="twitter-follow-button" data-show-count="true">Follow @instantclickjs</a>
+  
+
+</p><p class="latest-version"><em class="notice">25 December:</em> version 3.1 is here, with support for dynamically added links!
+<br /><a href="http://instantclick.io/download">Download</a> &nbsp; <a href="http://instantclick.io/changelog">Changelog</a>
+
+<h2>Why</h2>
+
+</p><p>Despite huge bandwidth increases, websites don’t get much faster. This is because the biggest bottleneck in loading web pages is latency.<sup id="note-latency-back"><a href="http://instantclick.io/#note-latency">1</a></sup>
+
+<h2>How does it work</h2>
+
+</p><p>Latency is inevitable with today’s internet architecture so InstantClick cheats by preloading links you are likely to click on.
+
+</p><p>Before visitors click on a link, they hover over that link. Between these two events, 200&nbsp;ms to 300&nbsp;ms usually pass by (<a href="http://instantclick.io/click-test">test yourself here</a>). InstantClick makes use of that time to preload the page, so that the page is already there when you click.
+
+</p><p>On mobile devices, preloading starts on “touchstart”, letting 300&nbsp;ms (Android) to 450&nbsp;ms (iOS) for preloading the page.<sup id="note-3g-back"><a href="http://instantclick.io/#note-3g">2</a></sup>
+
+</p><p>If you want your website to not be flooded by requests, you can set a delay before preloading starts when users hover a link. It will still <a href="http://www.nngroup.com/articles/response-times-3-important-limits/" title="Jakob Nielsen – Response Times: The 3 Important Limits">feel instant</a>.
+
+</p><p>If you don’t want any wasted requests, you may preload on “mousedown”. This is when you press your mouse button (a click is when you release it).
+
+</p><p>When loading pages with InstantClick, the browser doesn’t show its standard loading indicators anymore. To make sure the user knows a page has changed, InstantClick includes a (customizable) progress bar.<sup id="note-progress-bar-back"><a href="http://instantclick.io/#note-progress-bar">3</a></sup> The bar automatically scales to appropriate size on mobile devices, so it works even when your site isn’t optimized for mobile.
+
+<hr />
+
+</p><p>InstantClick uses pushState and Ajax (a combo known as <a href="https://github.com/defunkt/jquery-pjax">pjax</a>), replacing only the body and the title in the head.
+
+</p><p>Ajax brings two nice benefits in and of itself:
+<ul>
+  <li>Your browser doesn’t have to throw and recompile scripts and styles on each page change anymore.
+  </li><li>You don’t get a white flash while your browser is waiting for a page to display, making your website <em>feel</em> faster.
+</li></ul>
+
+</p><p>InstantClick supports the following browsers’ versions:
+
+<table class="support">
+  <tr>
+    <th>IE
+    </th><th>Firefox
+    </th><th>Chrome
+    </th><th>Safari
+    </th><th>Opera
+
+    </th><th>iOS Safari
+    </th><th>Android Browser
+    </th><th>Chrome for Android
+  </th></tr><tr>
+    <td>10+
+    </td><td>4.0+
+    </td><td>5+
+    </td><td>5.0+
+    </td><td>11.5+
+
+    </td><td>5.0+
+    </td><td>4.4+
+    </td><td>18+
+</td></tr></table>
+
+</p><p>According to <a href="http://caniuse.com/#search=pushState">Can I use</a>, over 80% of the world supports InstantClick. When a browser doesn't support it, InstantClick fully degrades.
+
+<h2>Getting started</h2>
+
+</p><p>Head to the <a href="http://instantclick.io/download">Download</a> page and follow the instructions.
+
+</p><p>You can follow InstantClick’s news on <a href="https://twitter.com/instantclickjs">Twitter</a>, or participate in InstantClick’s development on <a href="https://github.com/dieulot/instantclick">Github</a>.
+
+<h2>Footnotes</h2>
+
+</p></article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

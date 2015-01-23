@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Tuning initcwnd for optimum performance</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Tuning initcwnd for optimum performance</h1>
+<div id="main" role="main"><span>
+</span><p>Tuning the initial congestion window parameter (initcwnd) on the server can have a <strong>significant improvement in TCP performance</strong>, resulting in faster downloads and faster webpages.</p><span>
+
+</span><p>In this article, I will start with an introduction to how TCP/IP connections work with regards to HTTP. Then I will go into <a href="http://www.cdnplanet.com/blog/tune-tcp-initcwnd-for-optimum-performance/#slow-start">TCP slow start</a> and show how <a href="http://www.cdnplanet.com/blog/tune-tcp-initcwnd-for-optimum-performance/#change-initcwnd">tuning the initcwnd setting</a> on the (Linux) server can greatly improve page performance.</p><span>
+
+</span><p>In our follow-up article we show data on the value of the initcwnd setting for the various CDNs: <a href="http://www.cdnplanet.com/blog/initcwnd-settings-major-cdn-providers/">Initcwnd settings of major CDN providers</a>.</p><span>
+
+</span><h2>Three-way handshake</h2><span>
+
+</span><p>Imagine a <em>client</em> wants to request the webpage http://www.example.com/ from a <em>server</em>. Here is an over simplified version of the transaction between client and server. The requested page is 6 KB and we assume there is no overhead on the server to generate the page (e.g. it's static content cached in memory) or any other overhead: we live in an ideal world ;-)</p><span>
+
+</span><img src="http://st.cdnplanet.com/static/uploads/images/TCP1.png" height="485" width="514" alt="TCP Slow Start" title="Illustration showing TCP Slow Start" /><span>
+
+</span><ul>
+<li>Step 1: Client sends SYN to server - "How are you? My receive window is 65,535 bytes."
+</li><li>Step 2: Server sends SYN, ACK - "Great! How are you? My receive window is 4,236 bytes"
+</li><li>Step 3: Client sends ACK, SEQ - "Great as well... Please send me the webpage http://www.example.com/"
+</li><li>Step 4: Server sends 3 data packets. Roughly 4 - 4.3 kb (3*MSS<sup>1</sup>) of data
+</li><li>Step 5: Client acknowledges the segment (sends ACK)
+</li><li>Step 6: Server sends the remaining bytes to the client
+</li></ul><span>
+</span><small>1. MSS = <a href="http://en.wikipedia.org/wiki/Maximum_segment_size">Maximum Segment Size</a></small><span>
+
+</span><p class="m-t-10">After step 6 the connection can be ended (FIN) or kept alive, but that is irrelevant here, since at this point the browser has already received the data.</p><span>
+
+</span><p>The above transaction took 3*RTT (Round Trip Time) to finish. If your RTT to a server is 200ms this transaction <strong>will</strong> take you <strong>at least</strong> 600ms to complete, no matter how big your bandwidth is. The bigger the file, the more round trips and the longer it takes to download.</p><span>
+
+
+</span><a name="slow-start"></a><h2>Congestion control/TCP Slow Start</h2><span>
+
+</span><p>TCP/IP has a built-in mechanism to avoid congestion on the network called slow start.</p><span>
+
+</span><p>Here is a great explanation by NetQoS Inc.</p><span>
+
+</span><span>
+
+</span><p class="m-t-10">As illustrated in the video and as you have seen in our example transaction in the section above, a server does not necessarily adhere to the client's RWIN (receivers advertised window size). The client told the server it can receive a maximum of 65,535 bytes of un-acknowledged data (before ACK), but the server only sent about 4 KB and then waited for ACK.  This is because the initial congestion window (initcwnd) on the server is set to 3. The server is being cautious. Rather than throw a burst of packets into a fresh connection, the server chooses to ease into it gradually, making sure that the entire network route is not congested. The more congested a network is, the higher is the chances for packet loss. Packet loss results in retransmissions which means more round trips, resulting in higher download times.</p><span>
+
+</span><p>Basically, there are 2 main parameters that affect the amount of data the server can send at the start of a connection: the receivers advertised window size (<em>RWIN</em>) and the value of the initcwnd setting on the server. The initial transfer size will be the lower of the 2, so if the initcwnd value on the server is a lot lower than the RWIN on the computer of the user, the initial transfer size is less then optimal (assuming no network congestion).
+
+It is easy to <a href="http://www.cdnplanet.com/blog/tune-tcp-initcwnd-for-optimum-performance/#change-initcwnd">change the initcwnd setting on the server</a>, but not the RWIN. Different OSes have different RWIN settings, as shown in the table below.</p><span>
+
+</span><table class="simple-table" cellspacing="0">
+  <thead>
+      <tr>
+        <th class="bg-blue-dark white">OS</th>
+        <th class="bg-blue-dark white">RWIN</th>
+     </tr>
+  </thead>
+<!-- research and put table -->
+  <tbody>
+    <tr class="odd">
+        <td>Linux 2.6.32</td>
+        <td>3*MSS (usually 5,840)</td>
+    </tr>
+    <tr class="even">
+        <td>Linux 3.0.0</td>
+        <td>10*MSS (usually 14,600)</td>
+    </tr>
+    <tr class="odd">
+        <td>Windows NT 5.1 (XP)</td>
+        <td>65,535 <sup>2</sup></td>
+    </tr>
+    <tr class="even">
+        <td>Windows NT 6.1 (Windows 7 or Server 2008 R2)</td>
+        <td>8,192 <sup>2</sup></td>
+    </tr>
+    <tr class="odd">
+        <td>Mac OS X 10.5.8 (Leopard)</td>
+        <td>65,535 <sup>2</sup></td>
+    </tr>
+    <tr class="even">
+        <td>Mac OS X 10.6.8 (Snow Leopard)</td>
+        <td>65,535 <sup>2</sup></td>
+    </tr>
+    <tr class="odd">
+        <td>Apple IOS 4.1</td>
+        <td>65,535 <sup>2</sup></td>
+    </tr>
+    <tr class="even">
+        <td>Apple IOS 5.1</td>
+        <td>65,535 <sup>2</sup></td>
+    </tr>
+  </tbody>
+</table><span>
+
+</span><small>2. Some Operating Systems dynamically calculate RWIN based on external factors. The value here is based on SYN packets sent to CDN Planet. The Win flag can also be increased by the client before the transfer actually starts.</small><span>
+
+</span><p class="m-t-10">A you can see from the table, Windows and Mac users would benefit most from servers sending more bytes in the initial transfer (which is almost everybody!)
+</p><span>
+
+
+</span><a name="change-initcwnd"></a><h2>Changing initcwnd</h2><span>
+
+</span><p>Adjusting the value of the initcwnd setting on Linux is simple. Assuming we want to set it to 10:</p><span>
+
+</span><p>Step 1: check route settings.</p><span>
+</span><pre>
+sajal@sajal-desktop:~$ ip route show
+192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.100  metric 1 
+169.254.0.0/16 dev eth0  scope link  metric 1000 
+default via 192.168.1.1 dev eth0  proto static 
+sajal@sajal-desktop:~$ 
+</pre><span>
+</span><p>Make a note of the line starting with default.</p><span>
+
+</span><p>Step 2: Change the default settings.<br />Paste the current settings for default and add <em>initcwnd 10</em> to it.</p><span>
+</span><pre>
+sajal@sajal-desktop:~$ sudo ip route change default via 192.168.1.1 dev eth0  proto static initcwnd 10
+</pre><span>
+
+</span><p>Step 3: Verify</p><span>
+</span><pre>
+sajal@sajal-desktop:~$ ip route show
+192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.100  metric 1 
+169.254.0.0/16 dev eth0  scope link  metric 1000 
+default via 192.168.1.1 dev eth0  proto static  initcwnd 10
+sajal@sajal-desktop:~$ 
+</pre><span>
+
+</span><h2>Changing initrwnd</h2><span>
+</span><p>The advertised receive window on Linux is called initrwnd. It can only be adjusted on linux kernel 2.6.33 and newer <a href="http://blog.habets.pp.se/2011/10/Optimizing-TCP-slow-start" title="Optimizing TCP slow start
+">(H/T: Thomas Habets)</a>.<br />This is relevant for CDN servers because they interact with the origin server and it is relevant to other servers that interact with (3rd party) servers, e.g. most Web 2.0 sites that get/send data via API calls. If the interaction between your server and the other server is faster, then what you are sending to real end users will be faster too!
+</p><span>
+
+</span><p>Step 1: check route settings.</p><span>
+</span><pre>
+sajal@sajal-desktop:~$ ip route show
+192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.100  metric 1 
+169.254.0.0/16 dev eth0  scope link  metric 1000 
+default via 192.168.1.1 dev eth0  proto static 
+sajal@sajal-desktop:~$ 
+</pre><span>
+</span><p>Make a note of the line starting with default.</p><span>
+
+</span><p>Step 2: Change the default settings.<br />Paste the current settings for default and add <em>initrwnd 10</em> to it.</p><span>
+</span><pre>
+sajal@sajal-desktop:~$ sudo ip route change default via 192.168.1.1 dev eth0  proto static initrwnd 10
+</pre><span>
+
+</span><p>Step 3: Verify</p><span>
+</span><pre>
+sajal@sajal-desktop:~$ ip route show
+192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.100  metric 1 
+169.254.0.0/16 dev eth0  scope link  metric 1000 
+default via 192.168.1.1 dev eth0  proto static  initrwnd 10
+sajal@sajal-desktop:~$ 
+</pre><span>
+
+</span><p>This changes the <em>initcwnd</em> and <em>initrwnd</em> until the next reboot. I don't know of any better way to make it persist. if you know of a way please mention it in the comments.</p><span>
+
+</span><p><strong>Note: Don't attempt this if you don't know what you are doing. Maybe it's better to try this at console, so you can recover if you manage to ruin your networking settings. A reboot should fix it.</strong></p><span>
+
+</span><p><span class="clearfix">I have absolutely no idea how to change this for windows servers. If anyone does please post it in comments. We will update this article.</span>
+After <a href="https://twitter.com/#!/dritans">@dritans</a> gave him some pointers, <a href="https://twitter.com/#!/andydavies">@andydavies</a> did the hard work and made it happen on Windows 2008 server. Read how to do it in his excellent blog post <a href="http://www.andysnotebook.com/2011/11/increasing-the-tcp-initial-congestion-window-on-windows-2008-server-r2.html">Increasing the TCP Initial Congestion Window on Windows 2008 Server R2</a>.
+</p><span>
+
+
+</span><h2>Results</h2><span>
+
+</span><p>Take another look at the illustration in the <em>Three-way handshake</em> section. With the new initcwnd setting, the browser-server interaction will look like this:</p><span>
+
+</span><img src="http://st.cdnplanet.com/static/uploads/images/TCP2.png" height="384" width="518" alt="TCP Slow Start - after tuning" title="Illustration showing TCP Slow Start, after tuning" /><span>
+
+</span><p>The entire transaction now happened in 400ms, rather than 600ms. That is a big win and this is just for one HTTP request. Modern browsers open 6 connections to a host which means you will see a faster load time for 6 objects
+</p><span>
+
+</span><p>Here is a before and after comparison of accessing a 14 KB file (13,516 bytes transfered ~10*MSS) from across the globe with different settings.</p><span>
+
+</span><img src="http://st.cdnplanet.com/static/uploads/images/initcwnd_chart.png" height="371" width="600" alt="Accessing 14 KB file with various initcwnd settings" title="Chart showing download times of a 14 KB file with various initcwnd settings" /><span>
+</span><small><a href="http://st.cdnplanet.com/static/uploads/initcwnd-effects.txt">Download the raw data</a></small><span>
+
+</span><p class="m-t-10">It is clear that when initcwnd is larger than the payload size, the entire transaction happens in just 2*RTT. The graph shows that the total load time of this object was reduced by ~50% by increasing initcwnd to 10. A great performance gain!</p><span>
+
+
+</span><h2 id="howtotest">How to test initcwnd?</h2><span>
+
+</span><p>To test this behavior, it is very important to have <a href="http://www.sajalkayan.com/check-if-you-are-behind-a-transparent-proxy.html">clean internet</a>. If there is any proxy between you and the destination host, your test efforts are useless.</p><span>
+
+</span><p>Open your favorite packet capture tool (e.g. <a href="http://www.wireshark.org/">Wireshark</a>) and access a file. If possible, access it from a server with high RTT from you. Analyze the dump. It is very very important to make sure you use a fresh connection -- if testing from browser, restart the browser between tests.</p><span>
+
+</span><img src="http://st.cdnplanet.com/static/uploads/images/dump-maxcdn.png" height="438" width="587" alt="Packet capture of a transaction with MaxCDN" title="Packet capture of a transaction with MaxCDN" /><br /><span>
+
+</span><p class="m-t-10">The image above shows a transaction with MaxCDN. Based on this capture, the RTT is 168ms. The first data packet (shown here as <em>[TCP segment of a reassembled PDU]</em>) arrives at the 409ms mark. So, between 409ms and 577ms there were only 2 data packets received. This shows that MaxCDN will initially allow only 2 un-acknowledged data packets on the wire, hence initcwnd = 2.</p><span>
+
+
+</span><h2>Content Delivery Networks and big sites</h2><span>
+
+</span><p>The initcwnd setting is especially more important for Content Delivery Networks. CDN servers act as a proxy between your content and your users, in two roles:</p><span>
+
+</span><ul>
+    <li><em>Server</em> - Responding to requests from users.
+    </li><li><em>Client</em> - Making requests to the origin server (on cache MISS)
+</li></ul><span>
+
+</span><img class="m-bt-15" src="http://st.cdnplanet.com/static/uploads/images/tcp-performance-tuning_2.png" width="600" height="154" alt="Browser, CDN and origin server interaction and TCP performance settings" title="Illustration showing interaction between browser, CDN server and origin server; and TCP performance settings" /><span>
+
+</span><p>Now, when the CDN acts as the <em>server</em>, the initcwnd setting on the CDN is an important factor in determining the first segment size of a new connection. But when the CDN acts in the <em>Client</em> role, the CDN's advertised receive window will be the bottleneck if the origin server's initcwnd is higher than the CDN server's initrwnd. 
+Since most CDNs do not keep the connection to the origin alive, a cache MISS suffers slow start twice!</p><span>
+
+</span><p>In our opinion, CDNs should tune their servers and have high values for both initcwnd and initrwnd. We are in the process of probing TCP settings of CDNs and popular sites. We will publish our findings in the coming days.</p><span>
+
+</span><p>Interested in more info and insight on tuning initcwnd? Read Google's paper <a href="http://code.google.com/speed/articles/tcp_initcwnd_paper.pdf">An Argument for Increasing TCP's Initial Congestion Window</a>. It's a great resource.</p><span>
+
+
+</span><h2>Wish list</h2><span>
+</span><p>This is what I ask for my next birthday:</p><span>
+
+</span><ul>
+<li>Increase <a href="http://en.wikipedia.org/wiki/Maximum_transmission_unit">MTU</a>
+</li><li>Increase default initcwnd in OSes
+</li><li>Have a better congestion avoiding system. One that does not involve slow start.
+</li><li>CDNs keep persistent connections to origin, at least for few minutes.
+</li><li>CDNs have a large RWIN size (initrwnd), not stick to the default value in Linux
+</li></ul><span>
+
+
+</span><h2>Big disclaimer</h2><span>
+</span><p>Your mileage may vary! Apply any of the suggestions above at your own risk. The author is no expert on networking or TCP/IP. Increasing initcwnd will make the traffic more bursty, some networking equipment may not be able to keep up with that.</p><span>
+</span><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

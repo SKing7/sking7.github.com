@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><h2 id="tldr">TL;DR</h2><span>
+</span><ul>
+<li>We know that improving performance can affect revenue in many situations</li>
+<li>Performance can also save the business money and reduce costs<br />Simple financial modeling can show why investing in performance makes business and financial sense</li>
+<li>Example</li>
+</ul><span>
+</span><p align="center"><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/image04-300x215.png" width="300" height="215" /></p><span>
+</span><h2 id="overview">Overview</h2><span>
+</span><p>I like to make things simple. Ok, if you’ve skimmed ahead you’re already raising an eyebrow. Please bear with me. I promise that I’ll show you another way to easily convince the business to invest in performance.</p><span>
+</span><p>When the business asks us why we should care about performance we always point them to the research done by the commerce giants. <a href="http://www.guypo.com/17-statistics-to-sell-web-performance-optimization/">Performance means revenue</a>! Yea! </p><span>
+</span><p>The benefits to the business doesn’t have to stop at revenue. Performance can also improve the bottom line. This is especially important in situations where it is harder to prove revenue impacts from performance improvements. Focusing on infrastructure and operational savings can make it easier to <span class="c0"><a href="http://calendar.perfplanet.com/2014/changing-culture-at-your-organization/">convince VIPs</a> to invest in performance (while also having the added benefit of having happier and more productive users)</span></p><span>
+</span><p>I’d like to share with you a financial model that I’ve used to show how performance can impact the cost of doing business. </p><span>
+</span><h3 id="caveats">Caveats</h3><span>
+</span><p>As with all things, there always footnotes, caveats and provisos. </p><span>
+</span><p>First, this is just another tool to demonstrate why performance matters – a tool that compares before &amp; after. Using financial modeling can easily lead you into a rathole. There are always details that you will need to defend. Your objective should be to show directionality, not absolute position. (Let your financial experts in your organization compute the actual numbers.)</p><span>
+</span><p>Second, I’m going to use shortcuts and generalities. This is based on my experience owning a business, my years managing Infrastructure and Operations and the many conversations I’ve had with other managers of I&amp;O. I use these shortcuts to, again, show directionality. Don’t mistake shortcut to mean inferior. To the contrary! If anything, using the shortcuts will give conservative numbers.</p><span>
+</span><h3 id="how_it_works_when_to_use_financial_modeling">How it Works; When to Use Financial Modeling</h3><span>
+</span><p>The root premise of this financial model is that improving performance per webpage (or per transaction) is generally accomplished by:</p><span>
+</span><ol>
+<li>reducing number of requests and round trips </li>
+<li>reducing the bytes sent</li>
+<li>reducing processing time on the back-end</li>
+</ol><span>
+</span><p>Number 3 is often tightly connected with #1 and 2. That is you are either building out more hardware or you are optimizing what you have. Building out more hardware per interaction doesn’t scale with user growth. </p><span>
+</span><p>Therefore, this model will work best when you are optimizing backend processes, adding caching layers (back-end, cdn, client) or optimizing user workflows.</p><span>
+</span><p>In contrast this likely will fall down if you try to use it to argue for optimizations such as leveraging the GPU for client rendering, adding webp support.</p><span>
+</span><p>Of course, this is just the beginning. There are many other financial models that you should consider. I’ll leave those for another post! For example:</p><span>
+</span><ul>
+<li>how performance increases sales per user (ARPU)</li>
+<li>how performance increases user growth (CAGR)</li>
+</ul><span>
+</span><h2 id="basic_equation">Basic Equation</h2><span>
+</span><p>The financial model I use boils down to a basic equation:</p><span>
+</span><pre>
+Cash_Flow = Capital_Exenses + Operational_Expenses
+</pre><span>
+</span><p>That is, how much money do you have to spend to buy new hardware (CapEx) and how much money do you have to spend to keep the hardware working and the electricity flowing (OpEx).</p><span>
+</span><p>Each year in the model we will add new hardware, which will increase our operational costs.</p><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/image02.png" /></p><span>
+</span><p>Later on I might use Max PageView as a proxy for load and will compute the peak CashFlow/PV:</p><span>
+</span><pre>
+(OpEx + CapEx) / Max_PageView
+</pre><span>
+</span><p>Once we have these three data points projected, it is as simple as comparing different scenarios. Did your improvements slow the rate of new hardware purchased? Reduce the operating costs? What are the projected costs with and without improved performance? </p><span>
+</span><p>The tricky part is computing the OpEx and CapEx. Here are the equations that I will be using:</p><span>
+</span><pre>
+CapEx = Number_of_New_Servers * Average_Server_Cost
+
+OpEx = Number_of_Servers * Average_Server_KVA * CoLo_Cost_per_KVA
+</pre><span>
+</span><h3 id="avoiding_funny_numbers">Avoiding Funny Numbers</h3><span>
+</span><p>You’re probably thinking about a million variables and inputs I should be using in the numbers above. As I mentioned above, I’m going to stick with generalizations and avoid all the particulars. However, one thing I’m going to stress is that I’m avoiding all the funny numbers – soft costs, contract renegotiations, etc. This will allow you to bypass a 7 week discussion with your procurement about the true cost of your enterprise agreement.</p><span>
+</span><p>For these reasons, I will intentionally avoid:</p><span>
+</span><ul>
+<li>Costs of User Productivity
+<p>(This is truest in funny money. Users and staff will be as productive with the time available. You will not get this money back – but you might be able to invest this time in other activities.)</p>
+</li>
+<li>Software Licensing costs
+<p>(the true cost of an enterprise agreement could power an improbability drive – calculating the savings will require the power from a small star)</p>
+</li>
+<li>Revenue from selling old hardware</li>
+</ul><span>
+</span><h2 id="calculating_capital_expenses_capex">Calculating Capital Expenses (CapEx)</h2><span>
+</span><p>Capital Expenditure is the easiest item to calculate. </p><span>
+</span><p>We want to make sure we are just capturing the cost of procuring the hardware and getting it installed. Once procured, it is a “Sunk Cost” and can’t be recouperated. A more sophisticated model could turn this into an amortization schedule – but we want to show Cash Flow impacts instead.</p><span>
+</span><pre>
+CapEx = Number_of_Servers * Average_Cost
+</pre><span>
+</span><p>To be clear, when we talk about the Average Cost of hardware we should think of it in two ways:</p><span>
+</span><ol>
+<li>What is the fully loaded cost – more than just the list price of the hardware, but also what it takes to install. Cost to procure, security audits, colo service tickets, rack and stack, etc. That said, if you can’t get the fully loaded cost, be conservative and avoid “guestimation”.</li>
+<li>You rarely have a uniform set of hardware. Instead of spending time inventorying your infrastructure use an average cost across hardware. Yes, you might have bigger boxes for db compared to app servers. Use an educated average to make the math simpler. </li>
+</ol><span>
+</span><p>Some good numbers I’ve used are:</p><span>
+</span><ul>
+<li>$5k for a pizza box</li>
+<li>$100k for high density compute server</li>
+</ul><span>
+</span><p>Virtual Servers also require CapEx. You have two options, one is to do the translation of number of VMs per server to actual hardware (don’t forget to factor in vMotion buffer). Or, if your IT group has the cost already computed, you can use the cost per VM. Bottom line: be consistent.</p><span>
+</span><h2 id="calculating_operating_expenses_opex">Calculating Operating Expenses (OpEx)</h2><span>
+</span><p>There are many ways to calculate the cost of operations for your application. The easiest way is to look at it in an aggregate view. That is, how many servers in total are used to deliver your app – regardless of the role.</p><span>
+</span><p>The assumption we start with is that your current infrastructure is necessary to deliver the current level of performance. Increasing user traffic will likewise need to increase your infrastructure proportionally.</p><span>
+</span><p>Most Co-Location providers these days use a simple billing model of charging only for energy used. The beauty of this model is that it usually includes everything you need for hosting as well. Functionally you can assume for the price of energy you get all the cooling, floor space and bandwidth you need.</p><span>
+</span><p>Of course, each datacenter is a special snowflake. Don’t get bogged down in the details and keep the formula general. It is better to underestimate than to overestimate or worse, spend 6 weeks and arrive at a similar number.</p><span>
+</span><p>The equation works out to:</p><span>
+</span><pre>
+OpEx = Number_of_Servers * KVA_per_Server * KVA_Price
+</pre><span>
+</span><p>The KVA per server can be the most challenging to calculate. Some hardware manufacturers provide a power calculator for server configurations. Many provide a range of potentials. Here is my recommendation:</p><span>
+</span><ul>
+<li>Don’t try to calculate each piece of hardware. Pick one configuration that is representative </li>
+<li>If in doubt, use the newest hardware’s power consumption since it will likely be the most efficient</li>
+<li>If the manufacturer offers a fully loaded power use, use 80% of the value</li>
+<li>If the manufacturer only offers one power profile – assume it to already be 80% loaded</li>
+<li>Most hardware reports power as Watts and BTU. Assume a power-factor of 0.9 and use: <code>KVA = Watts / 900</code></li>
+<li>When in doubt I use these approximation numbers:</li>
+<li>0.5KVA for an average pizza box server</li>
+<li>3.5KVA for a 6U high density compute chassis</li>
+</ul><span>
+</span><p>As I mentioned, most colo providers charge by electricity used and bundle all the other amenities into this price. Like all colo solutions there is a range of offerings from high-end <code>($0.70/KVA/mo)</code> to low-end <code>($0.20/KVA/mo)</code>. In my experience, I’ve found that the cost to run your own datacenter can be pretty close to the average cost of renting colo space. </p><span>
+</span><p>You’ll probably have a hard time getting procurement to offer up the price you pay for colo, so to save you the time I’d recommend using a number around <code>$0.50/KVA/mo</code>. This should also be sufficiently padded to account for any MPLS lines or dedicated circuits that your data center might need.</p><span>
+</span><h2 id="what_about_iaas">What about IaaS?</h2><span>
+</span><p>So far this model assumes you own or lease your infrastructure. However, if you use IaaS this model will fall short since you don’t own capital and it is pure operational expenses. The tricky part is that the cost of operations is not based on hardware procured but based on utilization. Savings can still be realized and modeled but it requires a slightly different formula and ultimately requires more insight into your cost of operations. This is worthy of a different talk.</p><span>
+</span><h2 id="pageview_and_interaction_cost">PageView and Interaction Cost</h2><span>
+</span><p>A useful model to measure user load on a system is to look the maximum Page Views per second. Consider a Page View requests that return <code>Content-Type: text/html</code>. The principle is that each user ‘interaction’ or ‘transaction’ with your website will return html. </p><span>
+</span><p>Using PageView isn’t always perfect – especially for single url apps. The goal is to find a metric that everyone can agree on and consistently represents the volume of user activity on your site.</p><span>
+</span><p>Your current configuration of infrastructure is designed to meet a peak in volume of traffic. That is, you have built it to sustain the peak traffic throughout the year and get by with the least number of user complaints. This peak could be Black Friday or it could be annual performance review time.</p><span>
+</span><p>Using the maximum page view per second will tell us how much money is spent to maintain this peak traffic:</p><span>
+</span><pre>
+Interaction_Cost = (OpEx + CapEx) / Page_View_per_Second
+</pre><span>
+</span><p>Each year, you expect to grow the business. As you grow, you will build more hardware in lock step. If you do nothing to improve the performance, then you should expect the Interaction Cost to remain constant, year over year.</p><span>
+</span><h2 id="example">Example:</h2><span>
+</span><p>Let me share an example use of this model – based on real life events.</p><span>
+</span><p>In this example, let’s assume a retailer,  with this configuration:</p><span>
+</span><ul>
+<li>140 “pizza box” type servers ($5k, 0.5KVA)</li>
+<li>400 Page View/s peak</li>
+<li>30% YoY growth rate </li>
+</ul><span>
+</span><p>The problem is that the home page and on key category page account for 40% of the site traffic – all of which cannot be cached by the local varnish or cdn layers and must go back to the datacenter. This is because:</p><span>
+</span><ul>
+<li>html included basic personalization rendered by server side (“Hello Colin”)</li>
+<li>unique shopper cookie is generated for each request (intrinsic for business KPIs)</li>
+</ul><span>
+</span><p>You’re probably shaking your head. I know. But this kind of web application is all too common.</p><span>
+</span><p>Investing in changes to the website html generation would improve the local cache layer and the offload of the cdn – not to mention improve the time to first byte substantially. (To accomplish this, client side javascript could be used to inject the personalization as well as guid generation for shopper tracking. This way the business goals can still be met and now a page is cacheable.)</p><span>
+</span><p>With even a <span class="c0"><a href="https://blogs.akamai.com/2014/12/dynamic-content-a-short-ttl-as-an-alternative-to-purge.html">small TTL</a> (eg: 1min) will result increase the offload from the datacenter by 40%. Assuming we don’t turn off any previously commissioned hardware, we can delay expanding the data center footprint by one year! </span></p><span>
+</span><p>The results are more than enough to justify the cost of investment. The best part is that these projected savings don’t include any costs by the infrastructure teams to maintain the growing footprint. Your I/O teams will approve!</p><span>
+</span><p>Plugging the numbers in we can see the cash spent this year (year 0) and the projected cash flow for next year if we don’t make the changes. In contrast we now have shown how our performance improvement will impact the total cost of ownership</p><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/image00.png" /></p><span>
+</span><p>Looking at it another way, we can see that the cost per interaction also decreases.</p><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/image03.png" /></p><span>
+</span><h2 id="how_can_i_use_this_model">How can I use this model?</h2><span>
+</span><p>The example I gave shows how increasing caching impacts operations but it doesn’t stop there. Any change you make that makes applications more efficient, takes advantage of caches, reduces number of requests or makes requests smaller will impact the cost to the business. Using this simple model we can project the financial impact of those performance improvements. </p><span>
+</span><p>This is only the beginning. I believe that there are many other financial models that can be used to help convince the business that performance matters!</p><span>
+</span><p>A copy of my financial model can be found on <a href="https://docs.google.com/a/bendell.ca/spreadsheets/d/1B8uwGI2sKCVx9ZxuJG08k8gbZh5vY8RPWqopoBWJKJM/edit#gid=2104468533">google docs</a></p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

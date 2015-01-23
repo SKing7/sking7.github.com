@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Obsessions: HTTP Request Reduction</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Obsessions: HTTP Request Reduction</h1>
+<div class="entry"><span>
+						
+						</span><p>
+<strong>TL;DR</strong><br />Reducing lots of HTTP requests into <em><strong>fewer requests</strong></em> is a great idea to improve front-end performance.<br />However, the obsession with blindly <strong>reducing down to one file</strong> isn’t healthy. Having <strong>a few files</strong> (instead of many or one) will tend to give better performance, because it will allow better cache-length, more fine-grained cache-retention, and faster parallel loading.
+</p><span>
+</span><p>I’m firing off this post because of stuff I’m seeing circulate on twitter at the moment, but I may come back and revisit this topic in greater detail at a later time. Here’s what sparked <em>today’s</em> rant:</p><span>
+</span><blockquote class="twitter-tweet"><p>“Once IE6 and IE7 go away for good, there really shouldn’t be the need to use CSS sprites (…) at all.”<a href="http://t.co/a080qMNBTZ" title="http://www.nczonline.net/blog/2010/07/06/data-uris-make-css-sprites-obsolete/">nczonline.net/blog/2010/07/0…</a>by @<a href="https://twitter.com/slicknet">slicknet</a></p>
+<p>— David Bruant (@DavidBruant) <a href="https://twitter.com/DavidBruant/status/331389904246415360">May 6, 2013</a></p></blockquote><span>
+</span><p>The suggestion advocated in the <a href="http://www.nczonline.net/blog/2010/07/06/data-uris-make-css-sprites-obsolete/">linked blog post</a> (which is admittedly almost 3 years old!) by <a href="http://twitter.com/slicknet">@slicknet</a> is essentially that the process of <a href="http://css-tricks.com/css-sprites/">using CSS sprites</a> is considered a “not-so-good practice” and that we should instead be <a href="http://css-tricks.com/data-uris/">using image data URIs</a> embedded directly into our CSS files.</p><span>
+</span><p>The premise for this technique, as well as for the ever popular suggestion that you should combine all your JS into a single file, comes from the original rule in the “big 14″ (now much more expanded, to 35+) <a href="http://developer.yahoo.com/performance/rules.html">performance rules</a> that Steve Souders codified while he was at Yahoo.</p><span>
+</span><p>The “rule” in question is <a href="http://developer.yahoo.com/performance/rules.html#num_http">Minimize HTTP Requests</a>, and the claim is, “This is the most important guideline for improving performance for first time visitors.” <strong>So, that makes it sound like it’s pretty darn important</strong>, and thus almost all front-end developers have adopted this rule into their default mindset. It’s an almost “universal truth” in webdev that for production deployments, all files need to be concatenated into one.</p><span>
+</span><p>Now, that’s not <em>technically</em> true, unless you’re the Google home page, which inlines literally <em>everything</em>. Instead, it’s usually said that we should combine as many files as possible into as few files as possible, and in practice this works out that we combine all CSS into one file, and all JS into one file, and all our images into one file. Or, at least, that’s the <em>holy grail</em> of front-end performance.</p><span>
+</span><p>The rule states:</p><span>
+</span><blockquote><p>
+80% of the end-user response time is spent on the front-end. Most of this time is tied up in downloading all the components in the page: images, stylesheets, scripts, Flash, etc. Reducing the number of components in turn reduces the number of HTTP requests required to render the page. This is the key to faster pages.<br />…<br />Combined files are a way to reduce the number of HTTP requests by combining all scripts into a single script, and similarly combining all CSS into a single stylesheet. Combining files is more challenging when the scripts and stylesheets vary from page to page, but making this part of your release process improves response times.
+</p></blockquote><span>
+</span><p>So, here’s my problem with this “rule”. Developers will often read a guideline or rule and, in reducing it to practice, take it to its logical extreme conclusion. So, the rule suggests minimizing (aka, “reducing”) the number of requests, but we as developers interpret that to mean that we need to get down to one (or zero!) requests.</p><span>
+</span><p>I don’t think this is a healthy mindset. I don’t even think this approach works as a good <em>first pass</em> at the “low hanging fruit”. I think it dangerously and blindly overlooks some very important trade-off balances that <em>mature performance optimization</em> must deal with.</p><span>
+</span><h3 id="lookcloser">Look Closer</h3><span>
+</span><p>Here’s how I would (<a href="http://blog.getify.com/getify-on-javascript/#workshops">and do!</a>) teach that performance rule to front-end engineers. I’m reading between the lines, and combining that with lots of real-world experience, instead of just the black-and-white on the page.</p><span>
+</span><p>
+If you have 20+ files (say, JS files) that you’re currently loading on your page, <strong>that’s too many</strong>. You need to shoot for getting that down to 5 or below, ideally, <strong>maybe even 2 or 3</strong>. But even if you <em>only</em> get down to 10 files, that’s <strong>still a 100% improvement</strong> over where you were.
+</p><span>
+</span><p>You see, this rule <em>should</em> be stressing <strong>reducing HTTP requests</strong>, not <em>getting HTTP requests to the bare minimum possible at all costs</em>. I don’t know which one was Steve’s original intent, but I can tell you unequivocally, my mountain of experience in this area tells me the former is more effective and more mature than the latter.</p><span>
+</span><h3 id="why3not1">Why 3 instead of 1?</h3><span>
+</span><p>So, if moving from 20 down to 3 is great, why isn’t going all the way down to 1 <em>even better</em>?</p><span>
+</span><p>Let me address that question generically (that is, for any/all of JS, CSS and images front-end resources) first, and then I’ll come back and address some resource-specific concerns.</p><span>
+</span><ol>
+<li><a href="http://blog.getify.com/obsessions-http-request-reduction/#caching">Caching</a> (cache-length and cache-retention)</li>
+<li><a href="http://blog.getify.com/obsessions-http-request-reduction/#parallel">Parallel Loading</a> (loading bytes in parallel can be faster)</li>
+</ol><span>
+</span><h4 id="caching">Caching</h4><span>
+</span><p>The biggest concern I have with blindly combining as many files into as few files is that it completely obviates the very powerful feature inherent to the way browsers work: caching.</p><span>
+</span><p>No, I don’t mean that caching can’t work on a single file. I mean that caching can <em>only</em> work on the single file.</p><span>
+</span><p><em>WAT?</em></p><span>
+</span><p>The entire file behaves the same way with respect to caching, particularly cache length. <strong>You can’t tell parts of a file to be cached for one length of time, and other parts of the file to be cached for a different length of time</strong>.</p><span>
+</span><p>Stop for a moment and think about the front-end resources on your site. Is every single JS source file on your site <em>exactly the same</em> in terms of its volatility? That is, when you make <em>any</em> change to one character in one of your JS files, do you also change at least one character in every other JS file, such that they <em>all</em> <strong>need</strong> to be re-downloaded?</p><span>
+</span><p>Chances are, the answer is <strong>no</strong>. And chances are, the answer would similarly be <strong>no</strong> for CSS and even probably for images, too.</p><span>
+</span><p>What does this mean? It means that the mid-term (and long-term) performance of your site is going to suffer if you blindly combine volatile (frequently changing) resources together with stable (infrequently changing) resources.</p><span>
+</span><p>Every time you change one character in your site’s UX code file, you’re going to force the re-download not only of that file’s bytes, but also <strong>all the stable unchanged bytes</strong> from all your 3rd-party libraries you included, like jQuery, etc. In many cases, that can be hundreds of KBs of unnecessary re-download when the difference was only a few KB in one small file that you tweaked.</p><span>
+</span><p><strong>My suggestion:</strong> analyze your resources’ volatility, and group your files into 2 or 3 groups, and set different cache-length rules for each. Your volatile (quickly changing) code file needs a shorter cache length (maybe 48 hours?) and your stable code file needs a longer cache length (maybe 1 month?). <strong>Note:</strong> in practice, I don’t find that cache lengths greater than 1 month really matter that much, because…</p><span>
+</span><p>There’s also the issue of <strong>cache-retention</strong>.</p><span>
+</span><p>Browsers are free to retain, or <em>not retain</em> in our case, resource files for a site, regardless of their expiration lengths. They make these determinations based on a variety of factors, including memory limitations on the device, length of time since the resource was accessed (LRU), and other such things.</p><span>
+</span><p>Guess what happens when the browser considers for ejection a single larger file with all your JS in it. Intuitively, you may want for it to take into account which parts of the file are stable and not, and more often used, or whatever. What will happen, however, is a single decision to retain or eject that resource from the cache. <strong>It cannot split the file up and get rid of only part of it</strong>. Talk about <em>throwing the baby out with the bathwater</em>.</p><span>
+</span><p>If you want for the cache-retention rules to have a chance at <em>ejecting</em> smaller and more frequently updated files while <em>keeping</em> the bigger and more stable files, <strong>they have to actually be in separate files</strong>. Duh.</p><span>
+</span><p>Any strategy which combines files ruthlessly and doesn’t consider (and balance) the impact on caching is a <em>failed strategy</em>.</p><span>
+</span><h4 id="parallel">Parallel Loading</h4><span>
+</span><p>One of the best performance features browsers ever gave us was the ability for them to load more than one file at a time. Browsers loading two JS files (from two &lt;script&gt; tags) in parallel was a huge leap forward in performance optimization on the web, without the web authors having to do anything.</p><span>
+</span><p>The “Minimize HTTP Requests” rule is based on the fundamental idea that a single HTTP request comes with, comparatively speaking, quite a bit of HTTP overhead on top of the actual content of the request. Reducing requests is one sure-fire way to reduce overhead.</p><span>
+</span><p>However, for that <em>comparatively</em> to actually apply, the resource needs to be of a certain size (or smaller). There <em>is</em> a size at which the content of the request far dwarfs the HTTP overhead. It’s at that size that you could start to say that the penalty of the HTTP overhead is not <strong><em>the only/primary concern</em></strong>.</p><span>
+</span><p>So, what would be the counter-consideration if not HTTP overhead? <strong>Parallel loading</strong>, that’s what.</p><span>
+</span><p>Consider this: what if there <em>was</em> a file size, which we could reasonably determine, which on average <strong><em>took longer to load</em></strong> than if that same file had been broken into two roughly equal-sized chunks and loaded in parallel. How could this be? Because the parallel loading effect was enough to overcome the HTTP overhead of the second request.</p><span>
+</span><p>Intuitively, such a number <em>must exist</em>. Practically, finding a <strong>universal number</strong> is <em>nearly impossible</em>.</p><span>
+</span><p>But I’ve done a bunch of testing with JavaScript file loading over the years. And what I’ve found is that this number, in most of my cases, was around 100-125k. That is, if my single combined file (regardless of how many files of whatever sizes were initially combined) is greater than 125k in size, which on JS-heavy sites is quite easy to do, then attempting the chunk-and-parallel-load has a reasonable chance of improving loading performance.</p><span>
+</span><p><strong>Notice closely what I’m suggesting:</strong> consider, <strong>and test</strong>, if the technique of concatenation+chunking+parallel gets you faster loads. I’m not saying it always will, and I’m not saying that the <strong>125k</strong> number is universal. Only that it’s a rough guide that I’ve found over years of my own usage and testing.</p><span>
+</span><p><strong>Note:</strong> please <em>don’t try to chunk a 10k file</em> in half and load in parallel. That’s almost certainly going result in slower loads. For you to see a good improvement in parallel loading (overcoming the HTTP request overhead), you need to have chunks roughly equal in size, and they should each be at least 50-60k, in my experience.</p><span>
+</span><p>I’m suggesting that you should do <em>more</em> than just “Minimize HTTP Requests”. You should first minimize, then try out <em>un-minimizing</em> (chunk+parallel load) in a limited fashion, to see if you too can get faster loads.</p><span>
+</span><p>I’ve been saying this for years, and most of the time when people try it out, they tell me they see <em>some improvement</em>. That’s the best “proof” I can offer.</p><span>
+</span><p>How to chunk your file(s), if you decide to do so, can follow any number of strategies. I talked above about volatility and cache-expiration lengths as one good strategy. Another one might be to chunk your concatenated file in a couple of different slices for different parts of your site. <strong>Try it out</strong> and see what happens.</p><span>
+</span><h3 id="cssdatauris">CSS + Data URIs</h3><span>
+</span><p>Back to the <a href="https://twitter.com/DavidBruant/statuses/331389904246415360">original tweet</a> that sparked this post. It was suggested in that blog post, and the tweets which have gone out since, that one effective way to reduce HTTP requests is to take that single CSS sprite image file (note: you’ve already gone from 50 image files down to 1) and do away with it, and instead put image content directly into your CSS file, via data URIs.</p><span>
+</span><p>So we’re already reducing the potential benefit to being from 1 down to 0, instead of the typical 50-to-1 gains you can easily see. But what are we doing instead?</p><span>
+</span><p>First, we’re saying that none of our images need to be individually cacheable or parallel-loadable (a decision which was actually already made when we chose spriting, to be fair). But secondly, <strong>we’re saying that our images and our CSS</strong> can be combined together, with just one cache-length and just one serial file loading (no parallel loading of those bytes).</p><span>
+</span><p><strong>I think this is a dangerous thing to advocate as an across-the-board strategy</strong>. There might be some value in limited situations of moving some of your images into your CSS, especially small icon files. But just blindly moving all your images into CSS makes very little sense to me, and it <strong>makes even less sense</strong> when it’s suggested that this is an <em>improvement</em> over image spriting.</p><span>
+</span><p>If you can honestly say that every time you tweak a single property in one of your dozens of CSS source files, that this means that you really <em><strong>do</strong></em> want <strong>all</strong> your images (and your CSS!) to be re-downloaded, fine. But you are almost certainly in the tiny minority. I think that kind of situation is extremely rare across the broader web.</p><span>
+</span><p><strong>Side note:</strong> <a href="https://twitter.com/davidbruant/status/331401035123924992">some suggest</a> that instead of combining your data URIs into your main stylesheet, you’d have a separate CSS file just for your data URIs, and load those as two separate files.</p><span>
+</span><p>My question: how is that different from the image sprite technique they were trying to do away with? If I’m using a build tool and/or preprocessor to generate these things, it’s equally easy for that tool to generate an image sprite with associated CSS as it is for it to generate the data URI CSS. That’s a wash. It’s also <strong>not</strong> any less (in fact, it’s more) <a href="https://twitter.com/DavidBruant/status/331402997752029185">of coupling between images and CSS</a>.</p><span>
+</span><h3 id="jsloading">JS Loading</h3><span>
+</span><p>A lot of what I’ve talked about so far is in relation to general resource loading. But it turns out it’s especially true specifically for JS file loading.</p><span>
+</span><p>If your strategy involves concatenating all your many JS files just into one file, and even self-hosting popular CDN’d libraries like jQuery in that file, <strong>I think you’re missing out on some <em>potential</em> performance improvements</strong>.</p><span>
+</span><p>But there’s one last thing to mention: dynamic parallel JS loading is not just about loading 2 files instead of 1. <strong>It’s also about un-pinning the JS loading from the DOM-ready event blocking that naturally occurs when loading scripts with a &lt;script&gt; tag</strong>.</p><span>
+</span><p>Examine these two screenshots of “waterfall” diagrams with 3 script files and two images loading:</p><span>
+</span><p><img src="http://gyazo.com/56b0cd5fc82c2a01ad74dc9a4e9aab0b.png" width="600" /></p><span>
+</span><p><img src="http://gyazo.com/39d4974c612ae1e7b063ddeeb33d1fd9.png" width="600" /></p><span>
+</span><p>The top image is with &lt;script&gt; tags, and the bottom image is with using a dynamic parallel script loader (like my <a href="http://labjs.com/">LABjs</a> loader).</p><span>
+</span><p>The differences in loading time are actually statistically insignificant (as repeated tests would show). The shape of these diagrams are roughly the same in terms of loading.</p><span>
+</span><p>The big difference here is <em><strong>the placement of the blue line</strong></em>, which represents the DOM-ready event. The browser has to assume the worst (that <code>document.write()</code> might be present in those files) and thus blocks the DOM-ready event until they’re all done loading and executing. But with dynamic loading, you are expressly <em>not</em> using <code>document.write()</code> (because it will break your page!), and thus <strong>the browser can let DOM-ready fire much earlier</strong>.</p><span>
+</span><p>This doesn’t do anything to improve the <em>actual</em> load performance of your page, but it has a <strong>huge impact</strong> on the <strong>perceived performance</strong> of the page. The DOM-ready event is the point-in-time when the browser knows enough about the structure of the page to safely let the user start interacting (scrolling, selecting text, etc). It’s also the time when most JS libs fire off events that modify the page.</p><span>
+</span><p><strong>The faster that DOM-ready fires, the faster your page will feel</strong>. So, dynamic parallel script loading also helps your page feel faster, in addition to actually going faster.</p><span>
+</span><h3>That’s All, Folks</h3><span>
+</span><p>So, there ya go, my argument for why <em>just</em> concatenating all your files into one <strong>is only part of the story</strong>. To really get the best loading performance out of your sites, you should <em><strong>also</strong></em> pay attention to, and maturely balance, cache-length, cache-retention, and parallel-loading.</p><span>
+</span><p>Hopefully that helps provide a useful sanity check on <em>performance rule #1</em>.</p><span>
+</span><span>
+						
+												</span><p>
+						<a rel="nofollow" href="http://twitter.com/share?_=4789457400&amp;original_referer=http%3A%2F%2Fblog.getify.com%2Fobsessions-http-request-reduction%2F&amp;related=AustinJS%3AAustin.JavaScript%20monthly%20meetup%20group&amp;text=Obsessions%3A+HTTP+Request+Reduction&amp;url=http%3A%2F%2Fblog.getify.com%2Fobsessions-http-request-reduction%2F" class="twitter-share-button ignore-external-link" data-count="none" data-via="getify" data-related="AustinJS:Austin.JavaScript monthly meetup group">Tweet</a>
+						</p><span>
+						
+						</span><span>
+						
+						</span><span>
+						
+						
+</span><!-- You can start editing here. --><span>
+
+	</span><span>
+	
+	</span><span>
+						
+						</span><span>
+					</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

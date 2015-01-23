@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>GreenSock | CSS animations performance: the untold story</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>GreenSock | CSS animations performance: the untold story</h1>
+<div class="content"><p>There are some interesting (and surprising) performance implications of using CSS animations that aren't widely known. I stumbled across a few of them while running tests for a customer in the advertising industry who is pushing to have GSAP adopted as the standard, so I recorded a screencast explaining what I found. I figured it was worth sharing:</p><span>
+</span><span>
+</span><h2>Summary</h2><span>
+</span><ul>
+<li>Timeline recordings in Chrome Dev Tools <strong>don't show the overhead</strong> involved with CSS animation of transforms, so people often misinterpret the [lack of] data. Recordings <i>look</i> "clean" with CSS and "dirty" with JS which leads to faulty conclusions about performance.</li>
+<li>CSS animations of transforms used <strong>twice</strong> as much CPU compared to JS according to Chrome's task manager.</li>
+<li>CSS animations caused the <strong>main thread</strong> to bog down more than using JavaScript animations. User interaction is typically handled on the main thread, making things feel sluggish to the user. It is especially costly if you animate transforms along with almost any other property at the same time.</li>
+<li>Webkit browsers have <strong>synchronization problems</strong>.</li>
+<li><strong>JavaScript was faster</strong> than CSS animations on every device that I ran this test on â the only exception was animating transforms in Webkit browsers (and then there's that heavy cost on the main thread and sync problems).</li>
+<li>In order to independently control the timing/easing of transform components (rotation, scale, skew, position) in CSS, you must create a DOM node for each which negatively impacts performance. With JavaScript, no such workarounds are necessary. (see note below)</li>
+<li><strong>I love Dev Tools</strong> - I'm not knocking it at all. These things are just tough to measure.</li>
+<li><strong>Do your own tests!</strong> Don't put too much faith in Dev Tools or my tests. Use your eyes because ultimately perception is what matters to end users. Smooth movement and responsive UI are both important.</li>
+</ul><span>
+</span><h2>Links</h2><span>
+</span><span>
+</span><p><strong>UPDATE:</strong> After recording the video, I did some more tests that showed that one of the biggest contributors to the slowdowns in the pure CSS version was the fact that multiple elements had to be nested in order to accomplish the independent transform component controls. In other words, staggering the start/end times (or easing) of rotation, scale, and position is practically impossible in pure CSS unless you nest things like that, but there's a relatively significant performance tradeoff. When nesting could be avoided, pure CSS animation of only transforms did appear smoother on webkit browsers under heavy pressure and it was basically indistinguishable from optimized JS animations under all other levels of pressure.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

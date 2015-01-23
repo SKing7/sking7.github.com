@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>What's in a Function Name?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>What's in a Function Name?</h1>
+<div class="post-detail col-60"><span>
+      </span><p>Every time I contribute to <a href="http://jshint.com/">JSHint</a>, I learn a little more
+about JavaScript. My most recent fantastical knowledge adventure led me to the
+behavior of the <code>name</code> attribute of function objects.</p><span>
+
+</span><p>JSHint has an interesting but lesser-known feature: code analysis reports. When
+used programatically, JSHint will return an object with some data about the
+code it has analyzed. This includes (but is not limited to) information about
+function objects present in the code:</p><span>
+
+</span><div><div class="CodeRay"><span>
+  </span><div class="code"><pre>jshint(<span class="string"><span class="delimiter">'</span><span class="content">function myFn() {}</span><span class="delimiter">'</span></span>);
+console.log(jshint.data().functions);
+
+</pre></div><span>
+</span></div><span>
+</span></div><span>
+
+</span><p>The most prominent usage of this feature comes from <a href="http://jshint.com/">the JSHint website
+itself</a> which produces a “Metrics” report in real time. For
+example:</p><span>
+
+</span><blockquote>
+  <p>Metrics</p>
+
+  <ul>
+    <li>There is only <strong>one</strong> function in this file.</li>
+    <li>It takes <strong>no</strong> arguments.</li>
+    <li>This function is <strong>empty</strong>.</li>
+    <li>Cyclomatic complexity number for this function is <strong>1</strong>.</li>
+  </ul>
+</blockquote><span>
+
+</span><p>I learned that this functionality had been implemented incorrectly while
+working on an unrelated bug. Even more troubling, I discovered that my entire
+understanding of function names in JavaScript was completely wrong. After a few
+hours of existential thrashing (“What does it mean to have a name?”, “Am I a
+real boy?”, etc.), I decided to research the issue and learn the correct
+behavior once and for all. Here’s what I found.</p><span>
+
+</span><h2 id="you-thought-you-knew">You Thought You Knew…</h2><span>
+
+</span><p>First off, I should explain how I originally supposed names were assigned in
+JavaScript.</p><span>
+
+</span><p>I’m used to making one distinction between function objects–whether they are
+function declarations or function expressions. The former requires an
+identifier, so I would typically consider this a “named function”:</p><span>
+
+</span><div><div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="keyword">function</span> <span class="function">myFunction</span>() {
+
+}
+</pre></div><span>
+</span></div><span>
+</span></div><span>
+
+</span><p>…while the latter does not, so I would call this an “anonymous function”:</p><span>
+
+</span><span>
+
+</span><p>This line of reasoning makes some intuitive sense because it plays off the
+plain-English definitions of words like “named” and “anonymous”. This is
+probably why I was not alone in making these mistakes. The truth is: today’s
+JavaScript (ECMAScript 5.1, or “ES5” for short) makes no guarantee about a
+function’s <code>name</code> attribute. A quick review of <a href="http://es5.github.io/#x13">the relevant
+specification</a> will back me up; the identifier we so
+commonly refer to as the “name” of named function expressions is <em>only</em> used to
+create an entry in the environment record (just like a <code>var</code> statement).
+Anything more than that amounts to a platform-specific nicety.</p><span>
+
+</span><p>(Cue existential thrashing)</p><span>
+
+</span><h2 id="but-you-had-no-idea">…but You Had No Idea</h2><span>
+
+</span><p>As it happens, the specification for the next version of JavaScript (a.k.a.
+“ES6”, <a href="https://people.mozilla.org/~jorendorff/es6-draft.html">working draft hosted
+here</a>) formalizes the
+initialization of a function’s <code>name</code> attribute. Conveniently, it all hinges on
+a single <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-abstract-operations">Abstract
+Operation</a>
+called
+<a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-setfunctionname">SetFunctionName</a>.
+Learning the ins-and-outs of function name assignment is as simple (although
+somewhat tedious) matter of studying all references to this operation in the
+draft. This is certainly a necessity for platform implementors, but for our
+purposes, a few examples should do the trick.</p><span>
+
+</span><p>First off, the spec formalizes some of the behavior that we’ve come to expect:</p><span>
+
+</span><div><div class="CodeRay"><span>
+  </span><div class="code"><pre>
+<span class="keyword">function</span> <span class="function">myFunc</span>() {}                  
+(<span class="keyword">function</span>() {}());                    
+</pre></div><span>
+</span></div><span>
+</span></div><span>
+
+</span><p>But it doesn’t stop there! The spec outlines a bunch of situations where a
+function expression (which I previously thought of as “anonymous”) should be
+assigned a name:</p><span>
+
+</span><div><div class="CodeRay"><span>
+  </span><div class="code"><pre>
+<span class="keyword">new</span> Function();                       
+<span class="keyword">var</span> <span class="function">toVar</span> = <span class="keyword">function</span>() {};            
+(<span class="keyword">function</span>() {}).bind();               
+
+<span class="keyword">var</span> obj = {
+  <span class="function">myMethod</span>: <span class="keyword">function</span>() {},            
+  get myGetter() {},                  
+  set mySetter(value) {}              
+};
+</pre></div><span>
+</span></div><span>
+</span></div><span>
+
+</span><p>To be clear, though: the new specification only changes the function object’s
+<code>name</code> property in these cases. When it comes to existing ES5 syntax, the
+behavior of the environment record remains the same. Only <em>function
+declarations</em> create a new entry.</p><span>
+
+</span><p>This behavior surprised me because, unlike in a function declaration, I didn’t
+consider assignment to variables/attributes to be relevant in the creation of
+a function object. In ES6, it is! The JSHint team dubbed this behavior “name
+inference”. The function object itself isn’t defined with an identifier, but
+the runtime takes its initial assignment into account to make a “best guess” as
+to what the function should be called.</p><span>
+
+</span><p>Finally, ES6 defines a whole slew of new code forms that would be syntactically
+invalid in ES5. Some of these further extend the semantics for function name
+inference:</p><span>
+
+</span><div><div class="CodeRay"><span>
+  </span><div class="code"><pre>
+let <span class="function">toLet</span> = <span class="keyword">function</span>() {};            
+const <span class="function">toConst</span> = <span class="keyword">function</span>() {};        
+<span class="reserved">export</span> <span class="keyword">default</span> <span class="keyword">function</span>() {}          
+<span class="keyword">function</span>* myGenerator() {}            
+<span class="keyword">new</span> GeneratorFunction() {}            
+
+<span class="keyword">var</span> obj = {
+  [<span class="string"><span class="delimiter">'</span><span class="content">exp</span><span class="delimiter">'</span></span> + <span class="string"><span class="delimiter">'</span><span class="content">ression</span><span class="delimiter">'</span></span>]: <span class="keyword">function</span>() {}, 
+  myConciseMethod() {},               
+  *myGeneratorMethod() {}             
+};
+
+<span class="reserved">class</span> MyClass {
+  constructor() {}                    
+  myClassMethod() {}                  
+}
+</pre></div><span>
+</span></div><span>
+</span></div><span>
+
+</span><p>That last example surprised me the most–why is the constructor function
+assigned the name of the class and not “constructor”? For most class methods,
+the “concise” form assigns the name you might expect. Constructor methods are
+special because they are essentially references to the class to which they
+belong. This is already the case in ES5:</p><span>
+
+</span><div><div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="keyword">function</span> <span class="function">MyClass</span>() {}
+MyClass.prototype.constructor === MyClass;
+</pre></div><span>
+</span></div><span>
+</span></div><span>
+
+</span><p>The same principle applies to ES6 classes even though the constructor function
+body and the <code>class</code> keyword appear in different expressions.</p><span>
+
+</span><h2 id="standard-deviations">Standard Deviations</h2><span>
+
+</span><p>With a thorough specification in hand, we were able to revisit the process of
+function name inference in JSHint. It wasn’t all roses and lollipops, though;
+there were a couple instances were we intentionally diverged from the spec.</p><span>
+
+</span><p><strong>Expressions</strong> In many cases, implementors are directed to invoke
+<code>SetFunctionName</code> with the result of an expression (e.g. “Let <code>propKey</code> be the
+result of evaluating <code>PropertyName</code>. […] <code>SetFunctionName(propValue</code>,
+<code>propKey)</code>.”). Because JSHint is a static analysis tool, it does not evaluate
+any of the code it inspects*. In these cases, we opted to report the function
+as having the name “(expression)”.</p><span>
+
+</span><p><strong>Unnamed</strong> The specification dictates “If <code>description</code> is <strong>undefined</strong>, then
+let <code>name</code> be the empty String.” This means that functions declared like so:</p><span>
+
+</span><span>
+
+</span><p>…should be assigned the name “”. We decided to instead report the name of
+such functions as “(empty)”. Because JSHint is a tool intended to assist
+developers and not a JavaScript runtime, we’re comfortable re-interpreting the
+specification in situations like this. Specifically: the name JSHint assigns to
+a function in its report does not raise compatibility concerns, so we felt free
+to implement divergent behavior because we feel it is more helpful.</p><span>
+
+</span><p><a href="https://github.com/jshint/jshint/pull/1971">Improved function name inference has landed in JSHint’s <code>master</code>
+branch</a>; you can expect it in the
+next release.</p><span>
+
+</span><h2 id="a-function-by-any-other-name">A Function By Any Other Name</h2><span>
+
+</span><p>I never get tired of reading about the flashy new features coming in the next
+version of JavaScript. That said, function names definitely seem pretty passe
+compared to generators, classes, modules, and promises. The pessimist might
+even argue that this is unnecessary cruft in the language. But as with any good
+standard, this new feature is actually a recognition of a real need.</p><span>
+
+</span><p>A function’s name is included in error stack traces. In the absence of function
+name inference, platforms typically report nameless functions with some generic
+stand-in value like “(anonymous function)”. This tends to reduce the usefulness
+of stack traces overall. Some profilers and consoles today will recognize a
+non-standard property called <code>displayName</code> and fall back to that value when
+producing stack traces. <a href="https://medium.com/@cramforce/on-the-awesomeness-of-fn-displayname-9511933a714a">Malte Ubl recently advocated for its adoption in
+JavaScript library
+code</a>,
+and <a href="https://github.com/emberjs/ember.js/blob/43423f6acd1abd4ffb0de6afb744d4897ae2f768/packages/ember-metal/lib/logger.js#L20">Ember.js does kind of use it a
+little</a>.</p><span>
+
+</span><p>As runtimes implement this behavior, non-standard workarounds like this will
+become less necessary. This small change will help developers focus on solving
+the problem at hand without worrying about mitigating debugging gotchas. So
+while you’re probably not going to see a talk titled “Function Name Inference
+In ES6” at any upcoming JavaScript conferences, this small feature is worth
+celebrating.</p><span>
+
+</span><p>* - <em>JSHint does do <a href="https://github.com/jshint/jshint/blob/d0b3cfd935c9445f14b37ea9694d8a172a52739a/src/jshint.js#L2335-L2348">one kind of neat-o trick by collapsing string
+     concatenation
+     operations</a>,
+     but that can hardly be called code execution.</em></p><span>
+
+      
+        </span><p class="posted-by">
+        This entry was posted by 
+
+<span class="author vcard" data-author="mike-pennisi"><a class="url fn n" href="http://bocoup.com/weblog/author/mike-pennisi/" title="View all posts by Mike Pennisi">Mike Pennisi</a></span>
+
+
+          
+            (<a href="http://twitter.com/jugglinmike">@jugglinmike</a>) 
+          
+          on <abbr>November 25, 2014</abbr>
+          
+          in <a href="http://bocoup.com/weblog/category/javascript/" title="View all posts in JavaScript" rel="category tag">JavaScript</a>, <a href="http://bocoup.com/weblog/category/ecmascript/" title="View all posts in ECMAScript" rel="category tag">ECMAScript</a>, <a href="http://bocoup.com/weblog/category/es6/" title="View all posts in ES6" rel="category tag">ES6</a>, <a href="http://bocoup.com/weblog/category/jshint/" title="View all posts in JSHint" rel="category tag">JSHint</a> and <a href="http://bocoup.com/weblog/category/feature/" title="View all posts in Feature" rel="category tag">Feature</a>.
+          
+        </p><span>
+        
+        </span><p class="sharing-controls">
+          
+<a href="https://twitter.com/share" class="twitter-share-button" data-hashtags="bocoup" data-text="What's in a Function Name?, by @jugglinmike" data-counturl="http://bocoup.com/weblog/whats-in-a-function-name/" data-dnt="true">Tweet</a>
+
+
+        </p><span>
+      
+      
+
+      </span><span>
+
+      </span><span>
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

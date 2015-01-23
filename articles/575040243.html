@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>图灵社区 : 阅读 : 浏览器的时钟精度</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>图灵社区 : 阅读 : 浏览器的时钟精度</h1>
+<div class="post-text"><span>
+</span><span>
+
+</span><p>Nicholas C. Zakas发表于2011年12月14日上午7：00</p><span>
+
+</span><p>标签：JavaScript,性能,时钟</p><span>
+
+</span><p>时钟精度是指时钟更新的频率，大部分情况下，网络浏览器使用诸如setTimeout() 和setInterval()的函数调用系统默认时钟，这意味着浏览器部署代码时只能和系统时钟同步。Internet Explorer的日期对象（Date Object）也把系统时钟作为种子值，因此日期对象的差异也就只能用时钟精度来衡量。</p><span>
+
+</span><p><strong>历史简介</strong></p><span>
+
+</span><p>Windows机器默认时钟精度为10-15.6毫秒（大部分情况是15.6毫秒），亦即浏览器采用的系统时钟遵循该时钟精度。当然，以目前CPU处理器速度而言，10-15.6毫秒是一个极限。IE浏览器到IE 8都还独占系统时钟，以至于John Resig撰文阐释时间精度如何影响基准程序<a href="http://ejohn.org/blog/accuracy-of-javascript-time/">1</a>也就不足为奇了。但是，OS X下浏览器时钟较Windows下更为精确。</p><span>
+
+</span><p>直到最近，Window下其他浏览器也使用系统时钟，遵循15.6毫秒的时钟精度，这在Firefox、Safari和Opera均得到体现。Chrome应该是首个采用高精度时钟的Windows浏览器<a href="http://www.belshe.com/2010/06/04/chrome-cranking-up-the-clock/">2</a>，他们的实验有一些有趣的结论。</p><span>
+
+</span><p>他们最初的想法是让Chrome使用亚毫秒级精度的时钟，但后来放弃了，并换用1毫秒精度。他们决定采用Windows多媒体时钟API，这能够给定达到1毫秒精度的时钟并用以此替代系统时钟。这和Flash和Quicktime等插件使用的时钟相同。</p><span>
+
+</span><p>Chrome 1.0 beta版采用了1毫秒的时钟精度。这看起来不错，但运行时却收到许多bug报告。1毫秒精度的时钟导致CPU高速运转，当CPU运转时，因不能进入睡眠模式（低耗电）而耗电增加<a href="http://software.intel.com/en-us/articles/cpu-power-utilization-on-intel-architectures/">3</a>。这使得Chrome将时钟精度延长到4毫秒。</p><span>
+
+</span><p>这4毫秒的延迟在HTML5中作为时钟部分被记录下来<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html#timers">4</a>，HTML5认为setTimeout()的最小精度应为4毫秒。而setInterval ()的最小精度被设定为10毫秒。</p><span>
+
+</span><p><strong>目前的时钟精度</strong></p><span>
+
+</span><p>和Chrome一样，IE9、Firefox 5、Safari 5.1和 Opera 11也都跟着采用了4毫秒的时钟精度。此前，Firefox 4和Safari 5及它们的早期版本采用的是10毫秒的时钟精度（显然，这是在WebKit内核固定的）。iOS 5上Safari移动浏览器也采用4毫秒精度，Kindle Fire上的Silk采用10毫秒精度，这暗示了它可能是在老版本的WebKit平台上开发的。然而，正因为目前浏览器普遍采用4毫秒精度，并不意味着那就是你能获得的精度。</p><span>
+
+</span><p>大部分浏览器基于不同情况都会采取一些调节措施（使得时钟精度延迟），目的在于在合适时候保护电池——理论上讲，这些时间用户既不会察觉出异样也愿意为延长笔记本或移动设备电池寿命（做些让步）。下面这些情况时钟精度会做相应调整：</p><span>
+
+</span><ul>
+<li>当笔记本使用电池电源时，Chrome 和 IE 9+自动回调到系统时钟，而换上交流电源时又调整到4毫秒精度。</li>
+<li>Firefox 5+、 Chrome 11+和IE 10+对未激活的tab页面使用1000毫秒的时钟精度<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=633421">5</a>。</li>
+<li>使用其他应用程序时，iOS5上的Safari移动浏览器和Kindle Fire上的Silk完全冻结时钟，直至再次使用浏览器时才解冻。</li>
+</ul><span>
+
+</span><p>浏览器往往不断调节适应时钟精度以适应电池供电设备的耗电。HTML5特地为浏览器开发人员预留了完成该调整的空间。</p><span>
+
+</span><p><strong>结论</strong></p><span>
+
+</span><p>随着浏览器近年来的发展，时钟精度一直在悄悄的改进。时钟精度并非经常讨论的热门话题，但当使用setTimeout() 和 setInterval()时，需要对其功能加以深入理解。我们越来越接近对浏览器的每毫秒的监控了，一旦有人解决了高精度时钟运行时的CPU崩溃问题，我们将很可能看到时钟精度的再次提高。但在这之前，记住4毫秒的限值，且牢记我们往往达不到这种状态。</p><span>
+
+</span><p>2011年12月15日更新：更新了关于日期对象的相关信息。</p><span>
+
+</span><p><strong>参考文献</strong></p><span>
+
+</span><ol>
+<li><p><a href="http://ejohn.org/blog/accuracy-of-javascript-time/">Accuracy of JavaScript Time</a> by John Resig </p>
+
+<p>JavaScript时间精度 John Resig</p></li>
+<li><p><a href="http://www.belshe.com/2010/06/04/chrome-cranking-up-the-clock/">Chrome: Cranking up the clock</a> by Mike Belshe  </p>
+
+<p>Chrome：启动时钟管理  Mike Belshe</p></li>
+<li><p><a href="http://software.intel.com/en-us/articles/cpu-power-utilization-on-intel-architectures/">CPU Power Utilization on Intel® Architectures</a> by Karthik Krishnan  </p>
+
+<p>Intel®架构下的CPU电力使用  Karthik Krishnan</p></li>
+<li><p><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html#timers">Timers</a> in HTML5  </p>
+
+<p>HTML5下的时间设置</p></li>
+<li><p><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=633421">Clamp setTimeout/setInterval to something higher than 10ms in inactive tabs</a> </p>
+
+<p>对未激活标签页（tabs）中高于10毫秒精度对象强制设定时钟（setTimeout/setInterval）</p></li>
+<li><p><a href="http://jsfiddle.net/rgrove/rQtUU/embedded/result/">Timer Resolution Test</a> by Ryan Grove   </p>
+
+<p>时钟精度测试  Ryan Grove</p></li>
+</ol><span>
+
+</span><p><strong>声明：</strong>本文所有观点和意见来自Nicholas C. Zakas，无论如何，请勿关联我的雇主、同事、Wrox出版社、O'Reilly出版社或者其它任何人。我仅表达自己的观点，而非为他人。</p><span>
+
+</span><p>原文标题：Timer resolution in browsers</p><span>
+
+</span><p>原文地址：<a href="http://www.nczonline.net/blog/2011/12/14/timer-resolution-in-browsers">http://www.nczonline.net/blog/2011/12/14/timer-resolution-in-browsers</a></p><span>
+                </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

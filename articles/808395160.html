@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The 300 ms Click Delay and iOS 8 -Telerik Developer Network</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The 300 ms Click Delay and iOS 8 -Telerik Developer Network</h1>
+<div class="Article"><span>
+          </span><span>
+
+          </span><p>Oh the 300 ms click delay. It’s my second favorite arcane web development problem—right behind <a href="http://tjvantoll.com/2013/08/30/bugs-with-document-activeelement-in-internet-explorer/">determining which element has focus within an iframe</a>.</p><span>
+</span><p>If you have no idea what the 300 ms click delay is you can start by reading <a href="http://blogs.telerik.com/appbuilder/posts/13-11-21/what-exactly-is.....-the-300ms-click-delay">this guide I wrote to it last year</a>, but here’s the <a href="http://developer.telerik.com/featured/300-ms-click-delay-ios-8/en.wikipedia.org/wiki/TL;DR">tl;dr</a> version: mobile browsers have a gesture known as double tap to zoom, and to make double tap to zoom work, browsers don’t fire a <code>click</code> event (or the various mouse events) until ~300 milliseconds after the user taps the screen. Simply put, without a delay browsers cannot differentiate between a “click” and the first half of a double tap.</p><span>
+</span><p>This behavior is easy to verify with the following snippet of code that measures the time between the <code>touchend</code> event (which isn’t delayed) and the <code>click</code> event (which is):</p><span>
+</span><pre><code class="language-markup">&lt;button&gt;Click&lt;/button&gt;
+&lt;p&gt;Delay was &lt;span&gt;&lt;/span&gt; milliseconds.&lt;/p&gt;
+&lt;script&gt;
+    var button = document.querySelector( "button" ),
+        span = document.querySelector( "span" ),
+        delay;
+
+    button.addEventListener( "touchend", function() {
+        delay = Date.now();
+    });
+    button.addEventListener( "click", function() {
+        span.innerHTML = Date.now() - delay;
+    });
+&lt;/script&gt;</code></pre><span>
+</span><p>The gif below shows the behavior in action on an iPhone running iOS 7 (We’ll get to iOS 8 momentarily). Notice that the delay between button clicks and the <code>click</code> event is consistently just over 300 milliseconds.</p><span>
+</span><p><a href="http://developer.telerik.com/wp-content/uploads/2015/01/ios-delay.gif"><img src="http://developer.telerik.com/wp-content/uploads/2015/01/ios-delay.gif" alt="ios-delay" width="362" height="740" class="aligncenter size-full wp-image-28221" /></a></p><span>
+</span><blockquote><p>You can test this behavior yourself by running <a href="http://jsbin.com/xiculayadu">http://jsbin.com/xiculayadu</a> on your mobile device.</p>
+</blockquote><span>
+</span><p>So what’s the problem? Well as it turns out, humans can detect 300 milliseconds, and apps that have the delay feel sluggish. In fact, studies have shown that <a href="http://www.nngroup.com/articles/response-times-3-important-limits/">“0.1 seconds is about the limit for having the user feel that the system is reacting instantaneously”</a>. So succinctly, mobile apps that don’t address the click delay feel slow.</p><span>
+</span><h2>What’s being done</h2><span>
+</span><p>The good news is that all mobile browser makers have acknowledged this problem. The bad news is they have picked three different ways of handling it.</p><span>
+</span><h3>Chrome and Firefox</h3><span>
+</span><p>Chrome and Firefox for Android <a href="http://updates.html5rocks.com/2013/12/300ms-tap-delay-gone-away">disable the delay when you use a <code>&lt;meta name="viewport"&gt;</code> tag that sets the viewport’s width to the device’s width</a> (or smaller)—for instance <code>&lt;meta name="viewport" content="width=device-width"&gt;</code>.</p><span>
+</span><p>The use of <code>&lt;meta name="viewport" content="width=device-width"&gt;</code> is a staple of responsive designs, so most responsive apps are already excluded from the click delay in Chrome and Firefox.</p><span>
+</span><p>Here’s the same timing example running in Chrome for Android with the addition of the meta viewport tag. Notice that there is now virtually no delay between the <code>touchstart</code> and <code>click</code> events:</p><span>
+</span><p><a href="http://developer.telerik.com/wp-content/uploads/2015/01/android-delay.gif"><img src="http://developer.telerik.com/wp-content/uploads/2015/01/android-delay.gif" alt="android-delay" width="412" height="652" class="aligncenter size-full wp-image-28231" /></a></p><span>
+</span><h3>Internet Explorer</h3><span>
+</span><p>Internet Explorer lets you <a href="http://blogs.telerik.com/appbuilder/posts/13-11-21/what-exactly-is.....-the-300ms-click-delay#pointer-events">avoid the delay with the <code>touch-action</code> CSS property</a>. By setting the <code>touch-action</code> property on all clickable elements to <code>none</code> or <code>manipulation</code>, you can easily eliminate the click delay from your apps.</p><span>
+</span><p>Here’s our timing example running in IE with addition of <code>&lt;style&gt;a[href], button { touch-action: manipulation; }&lt;/style&gt;</code> to remove the click delay. Notice how, like Chrome, the delay is now essentially gone.</p><span>
+</span><p><a href="http://developer.telerik.com/wp-content/uploads/2015/01/windows-phone-delay.gif"><img src="http://developer.telerik.com/wp-content/uploads/2015/01/windows-phone-delay.gif" alt="windows-phone-delay" width="368" height="678" class="aligncenter size-full wp-image-28241" /></a></p><span>
+</span><p>Although different, both Chrome/Firefox and IE’s solutions are sane and really easy to implement. In a few minutes you can remove the 300 ms delay in three of the four big mobile browsers. Now that we’ve covered the sane solutions, let’s move on to iOS.</p><span>
+</span><blockquote><p><b>Update (January 7th, 2014)</b>: I mistakenly omitted that Chrome also supports <code>touch-action</code> <a href="http://caniuse.com/#feat=css-touch-action">since v36</a>, and Firefox has had <code>touch-action</code> <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=795567">implemented behind a flag</a> since v29. I refer to <code>touch-action</code> as IE’s solution because they were the first to implement it, and they don’t have a viewport-based solution yet (<a href="https://twitter.com/jacobrossi/status/552636259571482625">although that may change soon</a>).</p></blockquote><span>
+</span><h2>The curious case of iOS</h2><span>
+</span><p>Historically there has been no built in way to avoid the delay on iOS. Developers have suggested Chrome and IE’s solutions on the WebKit bug tracker (see tickets <a href="https://bugs.webkit.org/show_bug.cgi?id=122212">#122212</a> and <a href="https://bugs.webkit.org/show_bug.cgi?id=133112">#133112</a>, respectively), but neither have been acted on.</p><span>
+</span><p>Then iOS 8 came out. Since iOS Safari is secretly developed in a subterranean bunker, the web development community was forced to reverse engineer the browser to discover whether changes to the delay had been made. <a href="https://twitter.com/patrick_h_lauke">Patrick H. Lauke</a>, who maintains a <a href="http://patrickhlauke.github.io/touch/tests/results/">crazy awesome series of touch and pointer event tests</a>, found that <em>something</em> had changed, and he, <a href="https://github.com/ftlabs/fastclick/issues/262">along with the web development community</a>, eventually boiled it down to a series of heuristics. Yes, <em>heuristics</em>—you might want to grab some coffee.</p><span>
+</span><p>Specifically, he found that while the delay is still in place for “fast taps”, it has been removed for “slow taps”. Stick with me.</p><span>
+</span><p>Whether a tap is fast or slow is determined by how long your finger is on the screen, or more specifically, the difference between the <code>touchstart</code> and <code>touchend</code> events. Taps where your finger is on the screen for &lt; ~125 milliseconds are considered fast, and the delay is maintained; taps where your finger is on the screen for &gt; ~125 milliseconds are considered slow, and the delay is removed.</p><span>
+</span><p>To show this in action, let’s return to the timing example. In the video below I tap the screen twice. The first tap is a slow tap, and the delay before the <code>click</code> event is quite small; the second tap is a fast tap, and the delay is still present.</p><span>
+</span><span>
+</span><p>Why would Apple do this? Fast taps are far more likely to be the first half of a double tap to zoom, so after a fast tap, Safari maintains the delay to wait for a potential second tap. A slow tap is unlikely to be part of a double tap to zoom, so Safari immediately fires the <code>click</code> without a delay.</p><span>
+</span><p>I’ll let you decide whether this approach is clever or insane, but it’s important to know that these heuristics exist, and that <strong>the click delay no longer exists for slow taps in iOS 8 Safari</strong>.</p><span>
+</span><p>Got it? Good, because we’re not done yet.</p><span>
+</span><h2>The UIWebView caveat</h2><span>
+</span><p>Just in case you weren’t confused enough, there’s one more caveat to add: the new iOS 8 heuristics are only present in iOS 8 Safari and iOS’s <a href="http://developer.telerik.com/featured/why-ios-8s-wkwebview-is-a-big-deal-for-hybrid-development/">new <code>WKWebView</code></a> class. The heuristics are <em>not</em> present in the legacy <a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIWebView_Class/index.html"><code>UIWebView</code></a> class, and they’re also not present for apps running as home screen web apps.</p><span>
+</span><p>So does that mean your app’s behavior can vary depending on how it’s opened on iOS? Yes, yes it can. Although home screen web apps aren’t too common on iOS, <code>UIWebView</code> is still used a ton. The Facebook app uses it; the Twitter app uses it; heck, even Chrome for iOS is using a <code>UIWebView</code> under the hood.</p><span>
+</span><h2>What does this mean for my apps?</h2><span>
+</span><p>In my <a href="http://blogs.telerik.com/appbuilder/posts/13-11-21/what-exactly-is.....-the-300ms-click-delay">previous article</a> I recommended using a library such as <a href="http://demos.telerik.com/kendo-ui/mobile-listview/index">Kendo UI Mobile</a>, <a href="https://github.com/ftlabs/fastclick">FastClick</a>, or <a href="https://github.com/filamentgroup/tappy/">Tappy!</a> to workaround the problem for you. And if you’re using one of these libraries already you shouldn’t have to change a thing.</p><span>
+</span><p>These libraries take a creative approach to avoid the delay altogether: they listen for <code>touchend</code> events instead of <code>click</code> events. When they detect a <code>touchend</code> event, they immediately create a synthetic <code>click</code> event using <code>document.createEvent</code>. Next, to avoid triggering <code>click</code> handlers multiple times, the libraries suppress the “real” <code>click</code> event.</p><span>
+</span><p>By using a fast click library you ensure your <code>click</code> event handlers fire immediately without you having to worry about the plumbing to make that happen yourself. This approach has proven to work quite well, and it even functions fine in the context of the new iOS 8 heuristics. Therefore if you’re already using a fast click library of some variety you shouldn’t have to worry.</p><span>
+</span><h3>Do you need a library at all?</h3><span>
+</span><p>The more interesting question is whether you need a fast click library at all now that there are fast click solutions (of some variety) in all mobile browsers. After all, although fast click solutions work, there is a performance and maintenance cost associated with including a JavaScript library. Like all programming decisions the answer depends on your circumstances, but I would say for most web apps the answer is still yes.</p><span>
+</span><p>Most web apps still receive a lot of views from mobile browsers without a baked in fast click solution, including the old Android browser, Chrome versions &lt; 32, iOS 7, <code>UIWebView</code>s, and iOS home screen web apps. Those numbers are going to go down over time as users and developers upgrade, but at the moment, if you don’t include a fast click JavaScript library you’re leaving a lot of users with a suboptimal experience.</p><span>
+</span><p>iOS 8 also complicates things. Even though it has a fast click “solution”, that solution is only present under certain circumstances, and using a fast click JavaScript library makes your app feel responsive regardless of whether your users are fast clickers or slow clickers.</p><span>
+</span><p>That being said, it is unfortunate that we still need to include a JavaScript library to workaround a limitation of the mobile web. Hopefully Apple will follow in Internet Explorer or Chrome’s footsteps and implement something sane in iOS 9, but I’m not holding my breath.</p><span>
+</span><p><em>Header image courtesy of <a href="https://flic.kr/p/5G4WGv">Evil Erin</a></em></p><span>
+
+        </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Roundup on Parallel Connections</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Roundup on Parallel Connections</h1>
+<div id="post-9" class="post-9 post type-post status-publish format-standard hentry category-firefox category-http category-ie8 category-internet-explorer category-performance tag-capacity-planning tag-firefox tag-http tag-ie tag-ie8 tag-opera tag-parallel-downloads tag-proxies tag-safari"><span>
+        	            	</span><span>
+            
+			</span><!-- .entry-meta --><span>
+
+			</span><p>A lot of blogging and follow-up discussion ensued with the announcement that <a href="http://www.microsoft.com/windows/products/winfamily/ie/ie8/readiness/DevelopersNew.htm#ajax">IE8 supports six connections per host</a>. The blogs I saw:</p><span>
+</span><span>
+</span><p>It’s likely that <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=423377">Firefox 3 will support 6 connections per server</a> in an upcoming beta release, which means more discussion is expected. I wanted to pull all the facts into one place and make several points that I think are important and interesting. Specifically I talk about:</p><span>
+</span><ul>
+<li>the HTTP/1.1 RFC</li>
+<li>settings for current browsers</li>
+<li>upperbound of open connections (cool!)</li>
+<li>effect of proxies</li>
+<li>will this break the Internet?</li>
+</ul><span>
+</span><span>
+</span><h3>The HTTP/1.1 RFC</h3><span>
+</span><p><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html#sec8.1.4">Section 8.1.4 of the HTTP/1.1 RFC</a> says a “single-user client SHOULD NOT maintain more than 2 connections with any server or proxy.” The key here is the word “should.” Web clients don’t <em>have</em> to follow this guideline. IE8 isn’t the first to exceed this guideline. Opera and Safari hold that honor supporting 4 connections per server.</p><span>
+</span><p>It’s important to understand that this is on a <em>per server</em> basis. Using multiple domain names, such as 1.mydomain.com, 2.mydomain.com, 3.mydomain.com, etc., allows a web developer to achieve a multiple of the per server connection limit. This works even if all the domain names are CNAMEs to the same IP address.</p><span>
+</span><span>
+</span><h3>Settings for Current Browsers</h3><span>
+</span><p>The table below shows the number of connections per server supported by current browsers for HTTP/1.1 as well as HTTP/1.0.</p><span>
+</span><table border="0" cellspacing="0" cellpadding="4">
+<tbody>
+<tr>
+<td><span>Browser</span></td>
+<td><span>HTTP/1.1</span></td>
+<td><span>HTTP/1.0</span></td>
+</tr>
+<tr>
+<td>IE 6,7</td>
+<td align="center">2</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td>IE 8</td>
+<td align="center">6</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td>Firefox 2</td>
+<td align="center">2</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td>Firefox 3</td>
+<td align="center">6</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td>Safari 3,4</td>
+<td align="center">4</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td>Chrome 1,2</td>
+<td align="center">6</td>
+<td align="center">?</td>
+</tr>
+<tr>
+<td>Chrome 3</td>
+<td align="center">4</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td>Chrome 4+</td>
+<td align="center">6</td>
+<td align="center">?</td>
+</tr>
+<tr>
+<td>iPhone 2</td>
+<td align="center">4</td>
+<td align="center">?</td>
+</tr>
+<tr>
+<td>iPhone 3</td>
+<td align="center">6</td>
+<td align="center">?</td>
+</tr>
+<tr>
+<td>iPhone 4</td>
+<td align="center">4</td>
+<td align="center">?</td>
+</tr>
+<tr>
+<td>Opera 9.63,10.00alpha</td>
+<td align="center">4</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td>Opera 10.51+</td>
+<td align="center">8</td>
+<td align="center">?</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>I provide (some of) the settings for HTTP/1.0 in the table above because some of the blog discussions have confused the connections per server settings for HTTP/1.0 with those for HTTP/1.1. HTTP/1.0 does not have persistant connections so a higher number of connections per server is supported to achieve faster performance. For example, IE7 supports 4 connections per server in HTTP/1.0. In fact, <a href="http://www.aol.com/">AOL</a> intentionally downgrades their responses to HTTP/1.0 to benefit from this increase in parallelization, although they do it at the cost of losing the benefits of persistent connections. They must have data that supports this decision, but I don’t recommend it.</p><span>
+</span><p>It’s possible to reconfigure your browser to use different limits. <a href="http://support.microsoft.com/?kbid=282402">How to configure Internet Explorer to have more than two download sessions</a> describes how the <code>MaxConnectionsPerServer</code> and <code>MaxConnectionsPer1_0Server</code> settings in the Windows Registry control the number of connections per hostname for HTTP/1.1 and HTTP/1.0, respectively. In Firefox these values are controlled by the <code>network.http.max-persistent-connections-per-server</code> and <code>network.http.max-connections-per-server</code> settings in about:config.</p><span>
+</span><p>Note that IE8 automatically drops back to 2 connections per server for users on dialup connections. Also, web developers can <a href="http://go.microsoft.com/fwlink?LinkID=110280">detect the number of connections per server</a> currently in effect by accessing <code>window.maxConnectionsPerServer</code> and <code>window.maxConnectionsPer1_0Server</code> in JavaScript. These are read-only values.</p><span>
+</span><span>
+</span><h3>Upperbound of Open Connections</h3><span>
+</span><p>What’s the maximum number of connections a browser will open?<br />This is relevant as server adminstrators prepare for spikes from browsers with increased parallelization.</p><span>
+</span><p>This <a href="http://stevesouders.com/hpws/max-connections.php">Max Connections</a> test page contains 180 images split across 30 hostnames. That works out to 6 images per hostname. To determine the upperbound of open connections a browser supports I loaded this page and counted the number of simultaneous requests in a packet sniffer. Firefox 1.5 and 2.0 open a maximum of 24 connections (2 connections per hostname across 12 hostnames). This limit is imposed by Firefox’s <code>network.http.max-connections</code> setting which defaults to a value of 24.</p><span>
+</span><p>In IE 6,7&amp;8 I wasn’t able to determine the upperbound. At 2 connections per server, IE 6&amp;7 opened 60 connections in parallel. At 6 connections per server, <em>IE8 opened 180 connections in parallel</em>. I’d have to create more domain names than the 30 I already have to try and find where IE maxes out. (If you load this in other browsers please post your results in a comment below and I’ll update this text.)</p><span>
+</span><span>
+</span><h3>Effect of Proxies</h3><span>
+</span><p>Note that if you’re behind a proxy (at work, etc.) your download characteristics change. If web clients behind a proxy issued too many simulataneous requests an intelligent web server might interpret that as a DoS attack and block that IP address. Browser developers are aware of this issue and throttle back the number of open connections.</p><span>
+</span><p>In Firefox the <code>network.http.max-persistent-connections-per-proxy</code> setting has a default value of 4. If you try the <a href="http://stevesouders.com/hpws/max-connections.php">Max Connections</a> test page while behind a proxy it loads painfully slowly opening no more than 4 connections at a time to download 180 images. IE8 drops back to 2 connections per server when it’s behind a proxy, so loading the <a href="http://stevesouders.com/hpws/max-connections.php">Max Connections</a> test page shows an upperbound of 60 open connections. Keep this in mind if you’re comparing notes with others – if you’re at home and they’re at work you might be seeing different behavior because of a proxy in the middle.</p><span>
+</span><span>
+</span><h3>Will This Break the Internet?</h3><span>
+</span><p>Much of the debate in the blog comments has been about how IE8′s increase in the number of connections per server might bring those web servers to their knees. I found the most insightful comments in Mozilla’s Bugzilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=423377">discussion about increasing Firefox’s number of connections</a>. In <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=423377#c22">comment #22</a> Boris Zbarsky lays out a good argument for why this increase will have no effect on most servers. But in <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=423377#c23">comment #23</a> Mike Hommey points out that persistent connections are kept open for longer than the life of the page request. This last point scares me. As someone who has spent many hours configuring Apache to find the right number of child processes across banks of servers, I’m not sure what impact this will have.</p><span>
+</span><p>Having said that, I’m please that IE8 has taken this step and I’d be even happier if Firefox followed suit. This change in the client will improve page load times from the user’s perspective. It does put the onus on backend developers to watch closely as IE8 adoption grows to see if it affects their capacity planning. But I’ve always believed that part of the responsibility and <em>joy</em> of being a developer is doing extra work on my side that can improve the experience for thousands or millions of users. This is another opportunity to do just that.</p><span>
+            
+            			
+		</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

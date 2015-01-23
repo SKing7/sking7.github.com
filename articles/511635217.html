@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p><a href="http://facebook.github.io/react/">React</a> is a JavaScript library for building user interfaces developed by Facebook. It has been designed from the ground up with performance in mind. In this article I will present how the diff algorithm and rendering work in React so you can optimize your own apps.</p><span>
+</span><h3>Diff Algorithm</h3><span>
+</span><p>Before we go into the implementation details it is important to get an overview of how React works.</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-reserved">var</span><span class="hl-code"> </span><span class="hl-identifier">MyComponent</span><span class="hl-code"> = </span><span class="hl-identifier">React</span><span class="hl-code">.</span><span class="hl-identifier">createClass</span><span class="hl-brackets">(</span><span class="hl-brackets">{</span><span class="hl-code"> </span><span class="hl-identifier">render</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-brackets">)</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code"> </span><span class="hl-reserved">if</span><span class="hl-code"> </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">props</span><span class="hl-code">.</span><span class="hl-identifier">first</span><span class="hl-brackets">)</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code"> </span><span class="hl-reserved">return</span><span class="hl-code"> &lt;</span><span class="hl-identifier">div</span><span class="hl-code"> </span><span class="hl-identifier">className</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">first</span><span class="hl-quotes">"</span><span class="hl-code">&gt;&lt;</span><span class="hl-identifier">span</span><span class="hl-code">&gt;</span><span class="hl-identifier">A</span><span class="hl-code"> </span><span class="hl-identifier">Span</span><span class="hl-code">&lt;/</span><span class="hl-identifier">span</span><span class="hl-code">&gt;&lt;/</span><span class="hl-identifier">div</span><span class="hl-code">&gt;; </span><span class="hl-brackets">}</span><span class="hl-code"> </span><span class="hl-reserved">else</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code"> </span><span class="hl-reserved">return</span><span class="hl-code"> &lt;</span><span class="hl-identifier">div</span><span class="hl-code"> </span><span class="hl-identifier">className</span><span class="hl-code">=</span><span class="hl-quotes">"</span><span class="hl-string">second</span><span class="hl-quotes">"</span><span class="hl-code">&gt;&lt;</span><span class="hl-identifier">p</span><span class="hl-code">&gt;</span><span class="hl-identifier">A</span><span class="hl-code"> </span><span class="hl-identifier">Paragraph</span><span class="hl-code">&lt;/</span><span class="hl-identifier">p</span><span class="hl-code">&gt;&lt;/</span><span class="hl-identifier">div</span><span class="hl-code">&gt;; </span><span class="hl-brackets">}</span><span class="hl-code"> </span><span class="hl-brackets">}</span><span class="hl-code"> </span><span class="hl-brackets">}</span><span class="hl-brackets">)</span><span class="hl-code">;</span></pre><span>
+</span></div><span>
+</span><p>At any point in time, you describe how you want your UI to look like. It is important to understand that the result of render is not an actual DOM node. Those are just lightweight JavaScript objects. We call them the virtual DOM.</p><span>
+</span><p>React is going to use this representation to try to find the minimum number of steps to go from the previous render to the next. For example, if we mount <code>&lt;MyComponent first={true} /&gt;</code>, replace it with <code>&lt;MyComponent first={false} /&gt;</code>, then unmount it, here are the DOM instructions that result:</p><span>
+</span><blockquote><p> None to first</p>
+<ul>
+<li>Create node: <code>&lt;div className="first"&gt;&lt;span&gt;A Span&lt;/span&gt;&lt;/div&gt;</code></li>
+</ul>
+<p>First to second</p>
+<ul>
+<li>Replace attribute: <code>className="first"</code> by <code>className="second"</code></li>
+<li>Replace node: <code>&lt;span&gt;A Span&lt;/span&gt;</code> by <code>&lt;p&gt;A Paragraph&lt;/p&gt;</code></li>
+</ul>
+<p>Second to none</p>
+<ul>
+<li>Remove node: <code>&lt;div className="second"&gt;&lt;p&gt;A Paragraph&lt;/p&gt;&lt;/div&gt;</code></li>
+</ul>
+</blockquote><span>
+</span><h4>Level by Level</h4><span>
+</span><p>Finding the minimal number of modifications between two arbitrary trees is a O(n^3) problem. As you can imagine, this isn’t tractable for our use case. React uses simple and yet powerful heuristics to find a very good approximation in O(n).</p><span>
+</span><p>React only tries to reconcile trees level by level. This drastically reduces the complexity and isn’t a big loss as it is very rare in web applications to have a component being moved to a different level in the tree. They usually only move laterally among children.</p><span>
+</span><p><center><img src="http://calendar.perfplanet.com/wp-content/uploads/2013/12/vjeux/1.png" /></center></p><span>
+</span><h4>List</h4><span>
+</span><p>Let say that we have a component that on one iteration renders 5 components and the next inserts a new component in the middle of the list. This would be really hard with just this information to know how to do the mapping between the two lists of components.</p><span>
+</span><p>By default, React associates the first component of the previous list with the first component of the next list, etc. You can provide a <code>key</code> attribute in order to help React figure out the mapping. In practice, this is usually easy to find out a unique key among the children.</p><span>
+</span><p><center><img src="http://calendar.perfplanet.com/wp-content/uploads/2013/12/vjeux/2.png" /></center></p><span>
+</span><h4>Components</h4><span>
+</span><p>A React app is usually composed of many user defined components that eventually turns into a tree composed mainly of <code>div</code>s. This additional information is being taken into account by the diff algorithm as React will match only components with the same class.</p><span>
+</span><p>For example if a <code>&lt;Header&gt;</code> is replaced by an <code>&lt;ExampleBlock&gt;</code>, React will remove the header and create an example block. We don’t need to spend precious time trying to match two components that are unlikely to have any resemblance.</p><span>
+</span><p><center><img src="http://calendar.perfplanet.com/wp-content/uploads/2013/12/vjeux/3.png" /></center></p><span>
+</span><h3>Event Delegation</h3><span>
+</span><p>Attaching event listeners to DOM nodes is painfully slow and memory-consuming.</p><span>
+</span><span>
+</span><p> Instead, React implements a popular technique called “event delegation”. React goes even further and re-implements a W3C compliant event system. This means that Internet Explorer</p><span>
+</span><span>
+</span><p> 8 event-handling bugs are a thing of the past and all the event names are consistent across browsers.</p><span>
+</span><p>Let me explain how it’s implemented. A single event listener is attached to the root of the document. When an event is fired, the browser gives us the target DOM node. In order to propagate the event through the DOM hierarchy, React doesn’t iterate on the virtual DOM hierarchy.</p><span>
+</span><p>Instead we use the fact that every React component has a unique id that encodes the hierarchy. We can use simple string manipulation to get the id of all the parents. By storing the event listeners in a hash map, we found that it performed better than attaching them to the virtual DOM. Here is an example of what happens when an event is dispatched through the virtual DOM.</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-code"> </span><span class="hl-identifier">clickCaptureListeners</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">a</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-brackets">(</span><span class="hl-identifier">event</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-identifier">clickCaptureListeners</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">a.b</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-brackets">(</span><span class="hl-identifier">event</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-identifier">clickCaptureListeners</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">a.b.c</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-brackets">(</span><span class="hl-identifier">event</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-identifier">clickBubbleListeners</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">a.b.c</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-brackets">(</span><span class="hl-identifier">event</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-identifier">clickBubbleListeners</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">a.b</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-brackets">(</span><span class="hl-identifier">event</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-identifier">clickBubbleListeners</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">a</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-brackets">(</span><span class="hl-identifier">event</span><span class="hl-brackets">)</span><span class="hl-code">;</span></pre><span>
+</span></div><span>
+</span><p>The browser creates a new event object for each event and each listener. This has the nice property that you can keep a reference of the event object or even modify it. However, this means doing a high number of memory allocations. React at startup allocates a pool of those objects. Whenever an event object is needed, it is reused from that pool. This dramatically reduces garbage collection.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

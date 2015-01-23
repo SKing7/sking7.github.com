@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Why Parse the User-Agent?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Why Parse the User-Agent?</h1>
+<div class="content"><p>  
+
+
+People really hate it when web servers decide what to do based on
+<tt>User-Agent</tt>:
+
+<blockquote>
+   "UA strings need to die a horrible horrible death."
+   <br />— <i><a href="https://news.ycombinator.com/item?id=8645607">UnoriginalGuy</a></i>
+   <p>
+   "The UA string is flawed by itself. it shouldn't even be used
+   anymore. The fact that browser manufacturers have to include all
+   sorts of stuff is proof that this system doesn't work."
+   <br />— <i><a href="https://news.ycombinator.com/item?id=8645819">guardian5x</a></i>
+   </p><p>
+   "Well written sites use feature detection, not user-agent
+   detection."
+   <br />— <i><a href="https://news.ycombinator.com/item?id=8645804">Strom</a></i>
+   </p><p>
+   "We'd all be better off if they just stopped sending the UA string
+   altogether"
+   <br />— <i><a href="https://news.ycombinator.com/item?id=8645763">nly</a></i>
+</p></blockquote>
+
+</p><p>
+
+The modern advice is to use feature detection.  Instead of the server
+intepreting the <tt>User-Agent</tt> header to guess at what features
+the browser supports, just run some JavaScript in the browser to see
+if the specific feature you need is supported.  When this fits your
+situation this is great, but it's almost always slower.  Many times
+it's not enough slower to matter, just a few more lines of JavaScript,
+but let's look at a case where the performance issues are substantial.
+
+</p><p>
+
+Let's say I want to show you a picture of a kitten:
+
+</p><p>
+
+<img src="http://www.jefftk.com/xkitten-demo.jpg.pagespeed.ic.ndEZ7SvjCO.jpg" />
+
+</p><p>
+
+How big is that? [1]  It depends how we encode it:
+
+
+
+
+
+Optimizing the JPEG makes it 7.5x smaller, and WebP gets it another
+1.9x smaller on top of that.  (<b>Update 2014-11-23</b>: These sizes
+are off because of mismatched quality settings.  <a href="https://news.ycombinator.com/item?id=8648802">More details.</a>)
+So why doesn't everyone use WebP?  The problem is <a href="http://caniuse.com/#feat=webp">not all browsers</a> support it.
+For now, the best we can do is send WebP to the browsers that support
+it, and optimized JPEG to ones that don't.  With feature detection
+this would look like, roughly:
+
+<pre>
+    &lt;img id=img&gt;
+    &lt;script&gt;
+       var img = document.getElementById("img");
+       if (SupportsWebP()) {
+          img.src = "image.webp";
+       } else {
+          img.src = "image.jpg";
+       }
+    &lt;/script&gt;
+</pre>
+
+First the browser downloads the HTML, then it runs the javascript, and
+then depending on the value of <tt>SupportsWebP()</tt> [2] it either
+loads <tt>image.webp</tt> or <tt>image.jpeg</tt>.  What's inefficient
+about this?  How is this worse than just handling <tt>&lt;img
+src="image.webp"&gt;</tt>?
+
+</p><p>
+
+The problem is this breaks the preload scanner.  Technically, the
+browser is supposed to make its way through the web page piece by
+piece, handling each bit as it comes to it.  For example, if it gets
+to some external JavaScript, it's supposed to fetch and run that
+script before continuing on with anything else.  To load your page
+faster, however, your browser cheats.  While it's waiting for that
+script to load, it looks ahead through the rest of the page for
+resources it thinks it's going to need and fetches them.  And,
+critically, that scanner doesn't run javascript.
+
+</p><p>
+
+Here are two example pages, containing a single external script and an
+image: one loads the image <a href="http://www.jefftk.com/preload-scanner-blocked?PageSpeed=off">with JavaScript</a> and one uses <a href="http://www.jefftk.com/preload-scanner-functional?PageSpeed=off">an ordinary
+<tt>img</tt> tag</a>.  Running these both through <a href="http://www.webpagetest.org/">WebPageTest</a> (<a href="http://www.webpagetest.org/result/141122_KQ_V40/1/details/">1</a>,
+<a href="http://www.webpagetest.org/result/141122_FY_V3X/1/details/">2</a>),
+here are charts showing how the browser loaded the page:
+
+</p><p>
+
+<a href="http://www.jefftk.com/waterfall-preload-scanner-blocked-2x.png"><img src="http://www.jefftk.com/xwaterfall-preload-scanner-blocked.png.pagespeed.ic.cUZp4iGOHC.jpg" srcset="/waterfall-preload-scanner-blocked.png 1x, /waterfall-preload-scanner-blocked-2x.png 2x" /></a>
+<br /><i>loaded with JavaScript</i>
+</p><p>
+<a href="http://www.jefftk.com/waterfall-preload-scanner-functional-2x.png"><img src="http://www.jefftk.com/xwaterfall-preload-scanner-functional.png.pagespeed.ic.te-ah6uDFQ.jpg" srcset="/waterfall-preload-scanner-functional.png 1x, /waterfall-preload-scanner-functional-2x.png 2x" /></a>
+<br /><i>loaded with <tt>img</tt> tag</i>
+
+</p><p>
+
+You can see that in the JavaScript case the browser loaded everything
+in order while when using an <tt>img</tt> tag the two files could be
+loaded in parallel. [3]
+
+</p><p>
+
+To emit html that references either a JPEG or a WebP depending on the
+browser, you need some way that the server can tell whether the
+browser supports WebP.  Because this feature is so valuable, there is
+a standard way of indicating support for it: include
+<tt>image/webp</tt> in the <tt>Accept</tt> header.  Unfortunately this
+doesn't quite work in practice.  For example, Chrome v36 on iOS <a href="http://crbug.com/402514">broke support</a> for WebP images
+outside of <tt>data://</tt> urls but was still sending <tt>Accept:
+image/webp</tt>.  Similarly, Opera added <tt>image/webp</tt> to their
+<tt>Accept</tt> header before they supported WebP lossless.  And no
+one indicates in their <tt>Accept</tt> whether they support animated
+WebP.
+
+</p><p>
+
+This leaves us having to look at the <tt>User-Agent</tt> header to
+figure out what the browser is, and then look up what features that
+browser supports. The header is ugly, I hate having to do this, but
+if we want to make pages fast we need to use the UA.
+
+</p><p>
+
+(The full gory details: <a href="https://code.google.com/p/modpagespeed/source/browse/trunk/src/pagespeed/kernel/http/user_agent_matcher.cc"><tt>kernel/http/user_agent_matcher.cc</tt></a>.)
+
+</p><p>
+<br />[1] I uploaded this picture to my server as a poorly optimized jpeg, but
+I'm running <a href="https://developers.google.com/speed/pagespeed/module">PageSpeed</a>.
+You should be seeing WebP if your browser supports it, or an optimized
+JPEG if it doesn't.
+
+</p><p>
+
+[2] Which would be a bit of an <a href="https://developers.google.com/speed/webp/faq#how_can_i_detect_browser_support_using_javascript">awkward
+function</a>.
+
+</p><p>
+
+[3] This only is a problem because of the external script reference.
+If there were nothing to block the regular parser then both versions
+would be just as good. (<a href="http://www.webpagetest.org/result/141122_6W_V2R/1/details/">1</a>,
+<a href="http://www.webpagetest.org/result/141122_9F_V2S/1/details/">2</a>)
+Most pages do reference external scripts, however, so in practice the
+preload scanner helps a lot and you don't want to disable it.
+
+  
+
+
+
+</p><p>Comment on <a href="https://plus.google.com/103013777355236494008/posts/EHTGQo7bzNG">google plus</a>, <a href="https://www.facebook.com/jefftk/posts/697112209422">facebook</a>, <a href="https://news.ycombinator.com/item?id=8646948">hacker news</a> or write jeff@jefftk.com.
+  <hr />
+  </p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

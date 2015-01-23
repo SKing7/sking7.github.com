@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A Bulletproof Guide to Using HTML5 and CSS3 in Email</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>A Bulletproof Guide to Using HTML5 and CSS3 in Email</h1>
+<div class="post-content"><span>
+            </span><hgroup class="cf">
+                <time class="entry-date" datetime="2014-12-10T13:34:30+00:00">December 10, 2014</time>
+                
+
+                <figure class="author-thumb">
+                    <a href="https://litmus.com/blog/author/kevin" rel="author">
+                        <img alt="" src="https://0.gravatar.com/avatar/4cf3a5818b722f97f43cd25266958052?s=128&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D128&amp;r=G" class="avatar avatar-128 photo" height="128" width="128" />                    </a>
+                </figure>
+
+                
+                        
+
+                        
+                    
+
+                                </hgroup><span>
+
+            </span><p>“You can’t use HTML5 or CSS3 in email.”</p><span>
+</span><p>Due to their “limited” support, this is a commonly-held notion throughout the email design industry. However, we’re calling it a complete myth.</p><span>
+</span><p>While support certainly isn’t universal, many of the leading email clients support HTML5 and CSS3. In fact, about <a href="http://emailclientmarketshare.com/?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">50% of the total market</a> and 3 out of the top 5 email clients support them. Support may be even bigger for your particular audience.</p><span>
+</span><p>But, what about the clients that don’t support these advanced functionalities? How will your email look to those subscribers? When it comes to email, it’s all about providing your subscribers with a great experience. However, this doesn’t mean that your email has to look the same across every client—it just needs to be easily accessible for all of your subscribers.</p><span>
+</span><p>Two of our favorite email rockstars—Jonathan Kim and Brian Graves—have emphasized the varying approaches being used: defensive email design and progressive enhancement.</p><span>
+</span><h3>Defensive email design</h3><span>
+</span><p>Nearly two years ago, <a href="https://twitter.com/hijonathan" target="_blank">Jonathan Kim</a> presented “<a href="https://litmus.com/community/learning/34-pushing-the-limits-of-email?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">Pushing the Limits of Email</a>” at our Mobile Masterclass workshop. During his talk, Jonathan coined the term <strong>defensive email design</strong> to explain the current state of email design.</p><span>
+</span><p>He explained that email designers are stuck in an archaic state of design due to some email clients having limited CSS support. He advocated for email designers to start designing for the clients that support web rendering engines first in order to advance the email design industry.</p><span>
+</span><h3>Progressive enhancement</h3><span>
+</span><p>In a similar fashion, at <a href="https://litmus.com/conference?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">The Email Design Conference 2014</a>, <a href="https://twitter.com/briangraves" target="_blank">Brian Graves</a>, UI designer at DEG, presented on “Winning the Design Battle on Every Screen.” The main focus of his talk was on <strong>progressive enhancement</strong>, which involves providing advanced functionality in environments where its supported.</p><span>
+</span><p>He also emphasized the importance of graceful degradation. Graceful degradation means that if your subscriber’s email client doesn’t support a certain functionality, you’ll still provide them with a pleasant experience.</p><span>
+</span><span>
+</span><span>
+</span><p>Interested in checking out Brian’s full presentation? The <a href="https://litmus.com/conference?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">slides and recording are now available</a>!</p><span>
+</span><p>An escalator is a great example of progressive enhancement and graceful degradation in real life. The late comedian Mitch Hedberg joked, “An escalator can never break: it can only become stairs. You should never see an Escalator Temporarily Out Of Order sign, just Escalator Temporarily Stairs. Sorry for the convenience.” Regardless of its environment, an escalator maintains its functionality.</p><span>
+</span><h2>IMPLEMENTING PROGRESSIVE ENHANCEMENT FOR HTML5 + CSS3</h2><span>
+</span><p>Using progressive enhancement is the most efficient way to approach email design. We know that using conventional HTML5 and CSS3 in email causes a lot of rendering problems across clients. Fallback support is very inconsistent—some HTML and CSS have solid fallbacks whereas others don’t. Different quirks pop up in individual clients. Using standard HTML5 and CSS3 requires a lot more testing and slows down development. So, what is the best way to actually implement progressive enhancement in email?</p><span>
+</span><p>Using HTML5 and CSS3 in email doesn’t have to be difficult. It doesn’t require endless hours of troubleshooting in quirky email clients (we’re looking at you, Outlook). All it takes is the proper framework to quickly implement HTML5 and CSS3 without the hassle or fear of running into rendering problems. And, lucky for you, we have that framework!</p><span>
+</span><p>Here is the single greatest line of code ever made for email designers and developers:</p><span>
+</span><pre><code>@media screen and (-webkit-min-device-pixel-ratio:0) {
+  /* Insert styles here */
+}</code></pre><span>
+</span><p>This media query only targets WebKit-supported email clients—which have incredible support for HTML5 and CSS3. This media query allows you to use of modern techniques like HTML5 video, CSS3 animation, web fonts, and more.</p><span>
+</span><p>This approach also splits email development for modern email clients and older clients in two. You can use Safari/Chrome to test and develop modern techniques for WebKit-supported clients while using Firefox for your baseline experience for older clients like Outlook.</p><span>
+</span><p>Approaching email development this way transitions more of the quality assurance (QA) process to the browser instead of the email client. It gives email designers more power, control, and confidence in developing an email that will render gracefully across all email clients.</p><span>
+</span><div><span>
+</span><table width="100%">
+<tbody>
+<tr>
+<td colspan="2" valign="bottom">
+<p>WebKit Targeting Media Query Support in Email Clients</p>
+</td>
+</tr>
+<tr>
+<td>
+<p>Apple Mail</p>
+</td>
+<td align="center"><img alt="check-green" src="https://litmus.com/blog/wp-content/uploads/2013/11/check-green.png" width="15" height="15" /></td>
+</tr>
+<tr>
+<td>
+<p>iOS (iPhone / iPad)</p>
+</td>
+<td align="center"><img alt="check-green" src="https://litmus.com/blog/wp-content/uploads/2013/11/check-green.png" width="15" height="15" /></td>
+</tr>
+<tr>
+<td>
+<p>Android Mail 2.3</p>
+</td>
+<td align="center"><img alt="check-green" src="https://litmus.com/blog/wp-content/uploads/2013/11/check-green.png" width="15" height="15" /></td>
+</tr>
+<tr>
+<td>
+<p>Android Mail 4.2</p>
+</td>
+<td align="center"><img alt="check-green" src="https://litmus.com/blog/wp-content/uploads/2013/11/check-green.png" width="15" height="15" /></td>
+</tr>
+<tr>
+<td>
+<p>AOL Mail (Chrome)</p>
+</td>
+<td align="center"><img alt="check-green" src="https://litmus.com/blog/wp-content/uploads/2013/11/check-green.png" width="15" height="15" /></td>
+</tr>
+<tr>
+<td>
+<p>Outlook 2011 + 2015 (Mac)</p>
+</td>
+<td align="center"><img alt="check-green" src="https://litmus.com/blog/wp-content/uploads/2013/11/check-green.png" width="15" height="15" /></td>
+</tr>
+</tbody>
+</table><span>
+</span></div><span>
+</span><p>Check out these <a href="https://litmus.com/pub/6dd5ca6" target="_blank">Litmus test results</a>, which shows support for WebKit targeting media queries. It should be noted that Gmail—both as a webmail client and mobile app—does not support media queries, so the tests are not valid for those screenshots.</p><span>
+</span><p>You can also target Gecko (Firefox) rendering with this media query:</p><span>
+</span><pre><code>@-moz-document url-prefix() {
+  /* Insert styles here */
+}</code></pre><span>
+</span><p>Few clients have Gecko (Firefox) as a rendering engine, which is why it’s best to target WebKit for your enhanced version of your email. But, it’s easy to simply add in the same functionality WebKit rendering engines have with this media query for certain clients like Thunderbird.</p><span>
+</span><p>Are there other ways to implement HTML5 and CSS3 in email besides this method? Yes. But, we believe this technique is the fastest way to develop—as well as the most bulletproof. It minimizes the amount of development work needed for quirky email clients like Outlook and focuses on browser-based testing.</p><span>
+</span><h2>SUMMING IT UP: TIPS FOR PROGRESSIVE ENHANCEMENT</h2><span>
+</span><h3>Know your audience</h3><span>
+</span><p>Where are your subscribers opening your emails? Are they using clients with great CSS and HTML support, like iPhone and Apple Mail? You can use <a href="http://litmus.com/email-analytics?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">Litmus’ Email Analytics</a> tool to figure out which email apps are most popular with your subscribers.</p><span>
+</span><p>Based off of this information, you can then determine whether progressive enhancement will work for you. For example, if a large percentage of your audience is using WebKit, which has great support for advanced functionalities, then perhaps trying out innovative techniques like HTML5 video may be a good idea!</p><span>
+</span><h3>Build a baseline experience</h3><span>
+</span><p>Build a baseline email experience for subscribers using email apps with limited support for HTML and CSS—such as Outlook and Gmail—before enhancing your email for other clients. Progressive enhancement should not create suboptimal experiences for other users.</p><span>
+</span><h3>Enhance where possible</h3><span>
+</span><p>Once you have a baseline experience built, enhance that experience for your other users. You can use techniques like CSS3, video, interaction, SVG, and web fonts. Remember, even the email clients with better HTML and CSS support have their own individual quirks and still require testing to see what’s possible.</p><span>
+</span><h2>SEE IT IN ACTION: EXAMPLES OF PROGRESSIVE ENHANCEMENT IN EMAIL</h2><span>
+</span><p>Let’s take a look at a few groundbreaking examples that use progressive enhancement in email. To view the enhancements for these emails, you must be using a WebKit-powered browser like Chrome or Safari.</p><span>
+</span><figure>
+
+
+</figure><span>
+</span><h3>The Email Design Conference 2014 HTML5 Video Background Email</h3><span>
+</span><p>To announce The Email Design Conference 2014, we decided to do some serious <a href="https://litmus.com/blog/how-to-code-html5-video-background-in-email?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">progressive enhancement with an HTML5 video background</a>. Even though this specific technique only worked in Apple Mail and Outlook 2011 (Mac), those two clients accounted for about 40% of our audience for that particular email send.</p><span>
+</span><p><a href="https://litmus.com/builder/c5a1d7a" target="_blank">View the full email here</a></p><span>
+</span><p>The HTML5 video simply fell back to a static background image for all email clients that did not support the video. Our results were amazing—and so was the feedback!</p><span>
+</span><figure></figure><span>
+</span><h3>B&amp;Q Interactive Carousel Email</h3><span>
+</span><p>One of the coolest emails of the year was B&amp;Q’s interactive carousel email. For WebKit clients, the email contained a hotspot carousel where users could tap through to see different sections.</p><span>
+</span><p><a href="https://litmus.com/builder/6ba9f5f" target="_blank">View the full email here</a></p><span>
+</span><p>Perhaps the most impressive part of the entire email is the fallback it used for non-WebKit emails —a beautiful grid layout of the carousel that didn’t hide or duplicate any content!</p><span>
+</span><figure class="aligncenter" id="post-9265 media-9265"><img class=" shaded" alt="b&amp;q-fallback" src="https://litmus.com/blog/wp-content/uploads/2014/12/bq-fallback.jpg" /></figure><span>
+</span><p>You can open the email in Firefox or Internet Explorer to view the fallback.</p><span>
+</span><figure></figure><span>
+</span><h3>Litmus Builder Interactive Tour Email</h3><span>
+</span><p>For the launch of our new email code editor, <a href="http://litmusbuilder.com/?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">Litmus Builder</a>, we made a fully clickable interactive tour inside of the email. Again, this technique only worked in Apple Mail and Outlook 2011 (Mac) but accounted for a large part of our audience. (*Note: The email needs to be at least 800px wide to view the tour.)</p><span>
+</span><p>The tour simply fell back into a static background image and a call to action to the landing page. The email was a massive success, gaining thousands of users of the product in the first few days.</p><span>
+</span><p><a href="https://litmus.com/builder/d965a91" target="_blank">View the full email here</a></p><span>
+</span><p>Interested in giving Litmus Builder a try? <a href="https://signup.litmus.com/builder-plan?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">Sign up free today</a> so you can start experimenting with using HTML5 and CSS3 in your emails!</p><span>
+</span><h2>A FRAMEWORK FOR EMAIL DESIGN INNOVATION</h2><span>
+</span><pre><code>@media screen and (-webkit-min-device-pixel-ratio:0) {
+  /* Insert styles here */
+}</code></pre><span>
+</span><p>This media query provides a simple framework of innovation for email designers. We can build a better experience for the majority of subscribers who have modern email clients.</p><span>
+</span><p>The best defense is a good offense. It’s time to start playing offense. To start innovating in email design with this media query. To push email forward.</p><span>
+</span><p>Do it for your subscribers. For our craft. <a href="https://litmus.com/blog/for-the-love-of-email?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">For the love of email</a>.</p><span>
+</span><p>We can’t wait to see what we build together.</p><span>
+</span><p>If you use this method—or develop more advanced versions of your own—in your email(s), or if you have any questions about the method, please post in the comments below or, better yet, the <a href="http://litmus.com/community?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog" target="_blank">Litmus Community</a>!</p><span>
+</span><h2>DISCOVER YOUR AUDIENCE + TEST YOUR DESIGNS</h2><span>
+</span><p>Feeling inspired to start pushing email forward using advanced techniques like HTML5 and CSS3? Be sure to identify your subscribers’ favorite emails apps, as well as test your newly created emails.</p><span>
+</span><p>With Email Analytics you can understand where your subscribers are opening your emails so you can focus your progressive enhancement (and graceful degradation!) efforts.</p><span>
+</span><p>Testing your designs is also crucial step during this process. Consistently test across over 30+ clients and apps to ensure that your subscribers are easily accessible for your subscribers—regardless of where they are opening your emails.</p><span>
+</span><p>Get 7 days of unlimited Litmus Email Analytics and Email Testing.</p><span>
+</span><p><a class="btn medium orange" href="http://litmus.com/pricing?utm_campaign=bestpractices_HTML5CSS3?utm_source=litmusblog&amp;utm_medium=blog">Get started today →</a></p><span>
+</span><footer>
+    
+        
+
+        
+            <!-- <div class="comments" id="comments">
+                <a href="https://litmus.com/blog/a-bulletproof-guide-to-using-html5-and-css3-in-email#comments" class="view-comments"  title="Comment on A Bulletproof Guide to Using HTML5 and CSS3 in Email"><span class="dsq-postid" rel="9253 https://litmus.com/blog/?p=9253">Viewing 13 Comments</span></a>
+                <a class="view-comments right" href="#respond">Add Your Comment</a>
+            </div> -->
+
+            
+
+
+
+
+
+
+
+</footer><span>
+        </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

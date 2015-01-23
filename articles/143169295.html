@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>  There is no simple solution for local storage ✩
+        Mozilla Hacks – the Web developer blog  </title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>  There is no simple solution for local storage ✩
+        Mozilla Hacks – the Web developer blog  </h1>
+<article class="post" role="article">
+    <p><strong>TL;DR: </strong> we have to stop advocating <code>localStorage</code> as a great opportunity for storing data as it performs badly. Sadly enough the alternatives are not nearly as supported or simple to implement.</p>
+<p>When it comes to web development you will always encounter things that sound too good to be true. Sometimes they are good, and all that stops us from using them is our notion of being conspicuous about *everything* as developers. In a lot of cases, however, they really are not as good as they seem but we only find out after using them for a while that we are actually “doing it wrong”.</p>
+<p>One such case is local storage. There is a <a href="http://www.w3.org/TR/webstorage/#storage">storage specification</a> (falsely attributed to HTML5 in a lot of examples) with an incredibly simple API that was heralded as the cookie killer when it came out. All you have to do to store content on the user’s machine is to access the <code>navigator.localStorage</code> (or <code>sessionStorage</code> if you don’t need the data to be stored longer than the current browser session):</p>
+
+<div class="wp_syntax"><table><tr><td class="code"><pre class="javascript">localStorage.<span>setItem</span><span>(</span> <span>'outofsight'</span><span>,</span> <span>'my data'</span> <span>)</span><span>;</span>
+console.<span>log</span><span>(</span> localStorage.<span>getItem</span><span>(</span> <span>'outofsight'</span> <span>)</span> <span>)</span><span>;</span> <span>// -&gt; 'my data'</span></pre></td></tr></table></div>
+
+<p>This local storage solution has a few very tempting features for web developers:</p>
+<ul>
+<li>It is dead simple</li>
+<li>It uses strings for storage instead of complex databases (and you can store more complex data using JSON encoding)</li>
+<li>It is <a href="http://caniuse.com/#search=webstorage">well supported by browsers</a></li>
+<li>It is endorsed by a lot of companies (and was heralded as amazing when iPhones came out)</li>
+</ul>
+<p>A few known issues with it are that <a href="http://arty.name/localstorage.html">there is no clean way to detect when you reach the limit of local storage</a> and there is no cross-browser way to ask for more space. There are also more <a href="http://htmlui.com/blog/2011-08-23-5-obscure-facts-about-html5-localstorage.html">obscure issues</a> around sessions and HTTPS, but that is just the tip of the iceberg.</p>
+<h2>The main issue: terrible performance</h2>
+<p>LocalStorage also has a lot of drawbacks that aren’t quite documented and certainly not covered as much in “HTML5 tutorials”. Especially performance oriented developers are very much against its use.</p>
+<p>When we covered localStorage a few weeks ago using it to <a href="http://hacks.mozilla.org/2012/02/saving-images-and-files-in-localstorage/">store images and files in localStorage</a> it kicked off a massive thread of comments and an even longer internal mailing list thread about the evils of <code>localStorage</code>. The main issues are:</p>
+<ul>
+<li><code>localStorage</code> is synchronous in nature, meaning when it loads it can block the main document from rendering</li>
+<li><code>localStorage</code> does file I/O meaning it writes to your hard drive, which can take long depending on what your system does (indexing, virus scanning…)</li>
+<li>On a developer machine these issues can look deceptively minor as the operating system cached these requests – for an end user on the web they could mean a few seconds of waiting during which the web site stalls</li>
+<li>In order to appear snappy, web browsers load the data into memory on the first request – which could mean a lot of memory use if lots of tabs do it</li>
+<li><code>localStorage</code> is persistent. If you don’t use a service or never visit a web site again, the data is still loaded when you start the browser</li>
+</ul>
+<p>This is covered in detail in a follow-up blog post by <a href="https://blog.mozilla.com/tglek/2012/02/22/psa-dom-local-storage-considered-harmful/">Taras Glek</a> of the Mozilla performance team and also by <a href="http://webreflection.blogspot.com/2012/03/whats-localstorage-about.html">Andrea Giammarchi</a> of Nokia.</p>
+<p>In essence this means that a lot of articles saying you can use <code>localStorage</code> for better performance are just wrong.</p>
+<h2>Alternatives</h2>
+<p>Of course, browsers always offered ways to store local data, some you probably never heard of as shown by <a href="http://samy.pl/evercookie/">evercookie</a> (I think my fave  when it comes to the “evil genius with no real-world use” factor is the force-cached PNG image to be read out in canvas). In the internal discussions there was a massive thrust towards advocating IndexedDB for your solutions instead of <code>localStorage</code>. We then <a href="http://hacks.mozilla.org/2012/02/storing-images-and-files-in-IndexedDB/">published an article how to store images and files in IndexedDB</a> and found a few issues – most actually related to ease-of-use and user interaction:</p>
+<ul>
+<li>IndexedDB is a full-fledged DB that requires all the steps a SQL DB needs to read and write data – there is no simple key/value layer like <code>localStorage</code> available</li>
+<li>IndexedDB asks the user for permission to store data which can spook them</li>
+<li>The browser support is not at all the same as <code>localStorage</code>, right now IndexedDB is supported in <a href="http://caniuse.com/#search=index">IE10, Firefox and Chrome</a> and there are differences in their implementations</li>
+<li>Safari, Opera, iOS, Opera Mobile, Android Browser favour <a href="http://caniuse.com/#search=websql">WebSQL</a> instead (which is <a href="http://www.w3.org/TR/webdatabase/">yet another standard</a> that has been officially <a href="http://dev.w3.org/html5/webdatabase/">deprecated</a> by the W3C)</li>
+</ul>
+<p>As always when there are differences in implementation someone will come up with an abstraction layer to work around that. Parashuram Narasimhan <a href="http://blog.nparashuram.com/search/label/indexeddb">does a great job with that – even providing a jQuery plugin</a>. It feels wrong though that we as implementers have to use these. It is the HTML5 video debate of WebM vs. H264 all over again.</p>
+<h2>Now what?</h2>
+<p>There is no doubt that the real database solutions and their asynchronous nature are the better option in terms of performance. They are also more matured and don’t have the “shortcut hack” feeling of <code>localStorage</code>. On the other hand they are hard to use in comparison, we already have a lot of solutions out there using <code>localStorage</code> and asking the user to give us access to storing local files is unacceptable for some implementations in terms of UX.</p>
+<p>The answer is that there is no simple solution for storing data on the end users’ machines and we should stop advocating <code>localStorage</code> as a performance boost. What we have to find is a solution that makes everybody happy and doesn’t break the current implementations. This might prove hard to work around. Here are some ideas:</p>
+<ul>
+<li>Build a polyfill library that overrides the <code>localStorage</code> API and stores the content in IndexedDB/WebSQL instead? This is dirty and doesn’t work around the issue of the user being asked for permission</li>
+<li>Implement <code>localStorage</code> in an asynchronous fashion in browsers – actively disregarding the spec? (this could set a dangerous precedent though)</li>
+<li>Change the <code>localStorage</code> spec to store asynchronously instead of synchronously? We could also extend it to have a proper <code>getStorageSpace</code> interface and allow for native JSON support</li>
+<li>Define a new standard that allows browser vendors to map the new API to the existing supported API that matches the best for the use case?</li>
+</ul>
+<p>We need to fix this as it doesn’t make sense to store things locally and sacrifice performance at the same time. This is a great example of how new web standards give us much more power but also make us face issues we didn’t have to deal with before. With more access to the OS, we also have to tread more carefully.</p>    
+  </article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

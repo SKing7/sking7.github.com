@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p><a href="http://www.webopedia.com/TERM/W/Web_beacon.html">Web Beacons</a> have been used by site developers to understand the behavior of customers. These Beacons are used, among other things, to count the users who visit a web page, track scrolling within the page, or count clicks on a particular ad/video etc.</p><span>
+</span><h2 id="the_problem">The Problem</h2><span>
+</span><p>Sometimes these beacons can either take too long or too many beacons are fired from the page, thereby slowing down the performance of the site.</p><span>
+</span><p>Most beacon servers normally have an proxy server fronting them, so all requests pass through them. Lets look at what we can do to minimize the impact of these Beacons on the site performance by using the proxy.</p><span>
+</span><h2 id="figuring_out_what_is_important">Figuring out what is Important</h2><span>
+</span><p>A simple version of a beacon is a tiny clear image that is the size of a pixel. When a web page with this image loads, it will make a call to a server for the image. These clear GIFs are invisible because they record specific activity on a web page rather than deliver content. So what is important is the “recording” part and what is irrelevant is the response from the beacon server (because it stays the same) back to the client.</p><span>
+</span><p>What can we do to return this response faster?</p><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/chiru/image1.png" alt="Beacon call from client" /></p><span>
+</span><h2 id="the_secret_sauce">The Secret Sauce</h2><span>
+</span><p>The first ingredient is by using <a href="https://www.mnot.net/blog/2007/12/12/stale">stale-while-revalidate</a> in the <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=en#cache-control">Cache-Control</a> HTTP header. We can instruct the proxy to respond with a cached copy of the beacon response. We can     specify a large value (in seconds) for stale-while-revalidate to ensure that this gives real benefits.</p><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/chiru/image2.png" alt="stale-while-revalidate" /></p><span>
+</span><p>The returned Cache-Control header will contain the following: <code>"stale-while-revalidate={big_number}"</code>. But what about the “recording”? If we specify stale-while-revalidate, the proxy will not call the server if the cached copy is still fresh (which is determined by “max-age”). But it will asynchronously call the server if the copy is stale. So the second ingredient is to specify the max-age in the Cache-Control header as 0, thereby making the copy stale always. The resulting Cache-Control header will look like the following:</p><span>
+</span><pre>Cache-Control: max-age=0, stale-while-revalidate={big_number}</pre><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/chiru/image3.png" alt="Stale Beacon served from cache" /></p><span>
+</span><p>So all calls to the proxy will result in 2 things:</p><span>
+</span><ul>
+<li>Respond with a cached copy of the response right away</li>
+<li>Asynchronously call the server and “record” the action</li>
+</ul><span>
+</span><p>But wait there is more! This solution can be enhanced further by adding few more things</p><span>
+</span><h2 id="stop_overwriting_cache_entries">Stop overwriting cache entries</h2><span>
+</span><p>Since the HTTP response code from the beacon server on a successful call will be a 200 the cache entry will be continuously updated for each asynchronous call. This is unnecessary since we already know that the response doesn’t change. Besides that writing to the cache continuously can be costly. So once a copy of the response is cached, we can need to do something to trick the proxy into not updating the cache.</p><span>
+</span><h2 id="use_the_same_cache_copy">Use the same cache copy for all URLs to a particular beacon server</h2><span>
+</span><p>Calls to the same beacon server can be different based on the URL query parameters. We can enhance the solution by using the same cache key for all these calls. This saves space in the cache.</p><span>
+</span><h2 id="cache_pinning">Cache pinning</h2><span>
+</span><p>We can prevent the old cached entries from cleanup in the proxy by using options such as <a href="https://docs.trafficserver.apache.org/en/latest/admin/http-proxy-caching.en.html#pinning-content-in-the-cache">Cache Pinning</a> (in ATS) which ensures that certain objects stay put in the cache for a given amount of time.</p><span>
+</span><h2 id="results">Results</h2><span>
+</span><p>We did a test on one of the sites in Yahoo and saw an improvement close to 90% in the beacon response times.</p><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/chiru/image4.png" alt="Improved performance by using SWR and Max-Age" /></p><span>
+</span><p>As you can see, we can improve the performance of the site greatly by creatively using a proxy and making no change to the beacon servers themselves.</p><span>
+</span><h2 id="in_conclusion">In conclusion</h2><span>
+</span><p>At Yahoo, we use <a href="http://trafficserver.apache.org/">Apache Traffic Server</a> (ATS) as a proxy fronting almost all of our sites and beacon servers. ATS has the flexibility (via <a href="https://docs.trafficserver.apache.org/en/latest/reference/configuration/index.en.html">configurations</a> and <a href="https://docs.trafficserver.apache.org/en/latest/reference/plugins/index.en.html">plugins</a>) to allow us to implement all of the steps mentioned above. The results published above were tested against a Yahoo beacon server fronted by ATS.</p><span>
+</span><p><strong>Note:</strong> The open source stale-while-revalidate (SWR) plugin is currently <a href="https://issues.apache.org/jira/browse/TS-1463">not working</a>, but Yahoo has a working version of this plugin. We intend to either contribute towards making SWR work in ATS or submit our plugin to open source soon.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

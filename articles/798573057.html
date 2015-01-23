@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><h2 id="the_setup">The Setup</h2><span>
+</span><p>It’s common for many websites to build a signaling mechanism that, without user action, sends analytics or diagnostics information back to a server for further analysis. I’ve created one at least a half a dozen times to capture all sorts of information: JavaScript errors, browser and device capabilities, client side click paths, the list goes on and on. In fact, the list <em>is actually getting longer</em> with the <a href="http://www.w3.org/">W3C</a>‘s <a href="http://www.w3.org/2010/webperf/">Web Performance Working Group</a> cranking out lots of great Real User Metrics (RUM) specifications for in-browser performance diagnostics like <a href="http://www.w3.org/TR/navigation-timing/">Navigation Timing</a>, <a href="http://www.w3.org/TR/resource-timing/">Resource Timing</a>, <a href="http://www.w3.org/TR/user-timing/">User Timing</a> and the forthcoming <a href="http://w3c.github.io/navigation-error-logging/">Navigation Error Logging</a> and <a href="https://w3c.github.io/frame-timing/">Frame Timing</a>.</p><span>
+</span><p>The signaling code, often called a beacon, has traditionally been implemented in many different ways:</p><span>
+</span><ul>
+<li>A JavaScript based timer which regularly and repeatedly fires AJAX requests to submit the latest data gathered.</li>
+<li>Writing special cookies that become attached to the next “natural” request the browser makes and special server side processing code.</li>
+<li>Synchronous requests made during unload. (Browsers usually ignore asynchronous requests made during unload, so they can’t be trusted.)</li>
+<li>Tracking “pixels”; small non-AJAX requests with information encoded into URL parameters.</li>
+<li>3<sup>rd</sup> party solutions, like Google Analytics, which internally leverage one of the options listed above.</li>
+</ul><span>
+</span><p>Unfortunately, each of these techniques have downsides. Either the amount of data that can be transferred is severely limited, or the act of sending it has negative affects on performance. We need a better way, and that’s where <a href="http://www.w3.org/TR/beacon/">the W3C’s new Beacon API</a> comes into play. </p><span>
+</span><h2 id="the_solution">The Solution</h2><span>
+</span><p>With the new Beacon API, data can be posted to the server during the browsers unload event, without blocking the browser, in a performant manner. The code is rather simple and works as expected:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">addEventListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">unload</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">function</span><span class="hl-code"> </span><span class="hl-brackets">(</span><span class="hl-brackets">)</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code">
+  </span><span class="hl-reserved">var</span><span class="hl-code"> </span><span class="hl-identifier">rum</span><span class="hl-code"> = </span><span class="hl-brackets">{</span><span class="hl-code">
+    </span><span class="hl-identifier">navigation</span><span class="hl-code">: </span><span class="hl-identifier">performance</span><span class="hl-code">.</span><span class="hl-identifier">timing</span><span class="hl-code">,
+    </span><span class="hl-identifier">resources</span><span class="hl-code">: </span><span class="hl-identifier">performance</span><span class="hl-code">.</span><span class="hl-identifier">getEntriesByType</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">resource</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">,
+    </span><span class="hl-identifier">marks</span><span class="hl-code">: </span><span class="hl-identifier">performance</span><span class="hl-code">.</span><span class="hl-identifier">getEntriesByType</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">mark</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">,
+    </span><span class="hl-identifier">measures</span><span class="hl-code">: </span><span class="hl-identifier">performance</span><span class="hl-code">.</span><span class="hl-identifier">getEntriesByType</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">measure</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">
+  </span><span class="hl-brackets">}</span><span class="hl-code">;
+  </span><span class="hl-identifier">rum</span><span class="hl-code"> = </span><span class="hl-identifier">reduce</span><span class="hl-brackets">(</span><span class="hl-identifier">rum</span><span class="hl-brackets">)</span><span class="hl-code">;
+  </span><span class="hl-builtin">navigator</span><span class="hl-code">.</span><span class="hl-identifier">sendBeacon</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">/rum/submit</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">JSON</span><span class="hl-code">.</span><span class="hl-identifier">stringify</span><span class="hl-brackets">(</span><span class="hl-identifier">rum</span><span class="hl-brackets">)</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;</span></pre><span>
+</span></div><span>
+</span><h2 id="the_catch">The Catch</h2><span>
+</span><p>Unfortunately, as of this writing, the Beacon API is not as widely supported as you’d hope. Chrome 39+, Firefox 31+ and Opera 26+ currently support the API. It isn’t supported in Safari and the <a href="https://status.modern.ie/beacon">Internet Explorer team has it listed as “Under Consideration”</a>.</p><span>
+</span><p>The other catch, and this is the biggie to me, stems from this note about <code>navigator.sendBeacon()</code> in the spec:</p><span>
+</span><blockquote>
+<p>If the User Agent limits the amount of data that can be queued to be sent using this API and the size of data causes that limit to be exceeded, this method returns false.</p>
+</blockquote><span>
+</span><p>The specification allows the browser to refuse to send the beacon data (thus returning false) if it deems you’re trying to send too much. At this point, Chrome is the only browser that limits the amount of data that can be sent. Its limit is set to 64KB (65,536 bytes exactly).</p><span>
+</span><h2 id="a_workaround">A Workaround?</h2><span>
+</span><p>To be fair, 64KB sure seems like a lot of data, and it is, but I’ve found myself in the situation where I was unable to beacon back diagnostics information on heavy pages because they had just too much Resource Timing data to send. Being unable to send diagnostics data on the worst performing pages really misses the point of the working group’s charter. Further, this problem will only get worse as more diagnostics information becomes available via all the RUM specifications I mentioned at the top of this post. That said, I’ve implemented several ways to reduce a beacon’s payload size without actually losing or giving up any data:</p><span>
+</span><h3 id="1_use_domstring_over_formdata">1. Use <code>DOMString</code> over <code>FormData</code></h3><span>
+</span><p>The Beacon API allows you to submit four data types: <code>ArrayBufferView</code>, <code>Blob</code>, <code>DOMString</code> or <code>FormData</code>. Given that we want to submit RUM data, <code>FormData</code> and <code>DOMString</code> are the only two we can use. (<code>ArrayBufferView</code> and <code>Blob</code> are for working with arrays of typed numeric data and raw file-like objects.)</p><span>
+</span><p><code>FormData</code> seems like a natural way to go, particularly because model binding engines in frameworks like ASP.NET MVC and Rails work directly with them. However, you’ll save a few bytes by using a <code>DOMString</code> and accessing the request body directly on the server.</p><span>
+</span><p>For simplicity in both encoding and parsing, I encode the data via JSON. (Though you could try a more exotic format for larger gains.) On the server, with JSON.NET you can parse the request body directly like this:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-reserved">var</span><span class="hl-code"> </span><span class="hl-identifier">serializer</span><span class="hl-code"> = </span><span class="hl-reserved">new</span><span class="hl-code"> </span><span class="hl-identifier">JsonSerializer</span><span class="hl-brackets">(</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-identifier">Rum</span><span class="hl-code"> </span><span class="hl-identifier">rum</span><span class="hl-code">;
+</span><span class="hl-identifier">using</span><span class="hl-code"> </span><span class="hl-brackets">(</span><span class="hl-reserved">var</span><span class="hl-code"> </span><span class="hl-identifier">sr</span><span class="hl-code"> = </span><span class="hl-reserved">new</span><span class="hl-code"> </span><span class="hl-identifier">StreamReader</span><span class="hl-brackets">(</span><span class="hl-identifier">Request</span><span class="hl-code">.</span><span class="hl-identifier">InputStream</span><span class="hl-brackets">)</span><span class="hl-brackets">)</span><span class="hl-code">
+</span><span class="hl-identifier">using</span><span class="hl-code"> </span><span class="hl-brackets">(</span><span class="hl-reserved">var</span><span class="hl-code"> </span><span class="hl-identifier">tr</span><span class="hl-code"> = </span><span class="hl-reserved">new</span><span class="hl-code"> </span><span class="hl-identifier">JsonTextReader</span><span class="hl-brackets">(</span><span class="hl-identifier">sr</span><span class="hl-brackets">)</span><span class="hl-brackets">)</span><span class="hl-code">
+</span><span class="hl-brackets">{</span><span class="hl-code">
+  </span><span class="hl-identifier">rum</span><span class="hl-code"> = </span><span class="hl-identifier">serializer</span><span class="hl-code">.</span><span class="hl-identifier">Deserialize</span><span class="hl-code">&lt;</span><span class="hl-identifier">Rum</span><span class="hl-code">&gt;</span><span class="hl-brackets">(</span><span class="hl-identifier">tr</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span></pre><span>
+</span></div><span>
+</span><h3 id="2_make_fewer_http_requests">2. Make Fewer HTTP Requests</h3><span>
+</span><p>My beacon payload size issues arose on pages that had lots of resources (images, scripts, stylesheets, etc) to download, which yielded very large arrays of Resource Timing objects. Reducing the number of HTTP requests that the page was making (by combing scripts and stylesheets and using image sprites) not only helps with page performance, but also reduced the amount of data provided by the Resource Timing API which in turn reduces beacon payload sizes.</p><span>
+</span><h3 id="3_use_positional_values">3. Use Positional Values</h3><span>
+</span><p>As mentioned above, The Resource Timing API yields an array of objects. The User Timing API does the same thing. The problem with JSON encoding arrays of objects is that all the keys for each key/value pair is repeated over and over again for each array item. This repetition adds up quite quickly.</p><span>
+</span><p>Instead, I use a simpler array of <em>arrays</em> structure in which individual values are referenced by position. Here’s the JavaScript to convert from a User Timing API array of objects to an array of arrays:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-code">
+</span><span class="hl-identifier">rum</span><span class="hl-code">.</span><span class="hl-identifier">marks</span><span class="hl-code"> = </span><span class="hl-identifier">rum</span><span class="hl-code">.</span><span class="hl-identifier">marks</span><span class="hl-code">.</span><span class="hl-identifier">map</span><span class="hl-brackets">(</span><span class="hl-reserved">function</span><span class="hl-code"> </span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code"> 
+  </span><span class="hl-reserved">return</span><span class="hl-code"> </span><span class="hl-brackets">[</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">name</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">startTime</span><span class="hl-brackets">]</span><span class="hl-code">; 
+</span><span class="hl-brackets">}</span><span class="hl-brackets">)</span><span class="hl-code">;
+ 
+</span><span class="hl-code">
+</span><span class="hl-identifier">rum</span><span class="hl-code">.</span><span class="hl-identifier">measures</span><span class="hl-code"> = </span><span class="hl-identifier">rum</span><span class="hl-code">.</span><span class="hl-identifier">measures</span><span class="hl-code">.</span><span class="hl-identifier">map</span><span class="hl-brackets">(</span><span class="hl-reserved">function</span><span class="hl-code"> </span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code"> </span><span class="hl-brackets">{</span><span class="hl-code"> 
+  </span><span class="hl-reserved">return</span><span class="hl-code"> </span><span class="hl-brackets">[</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">name</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">startTime</span><span class="hl-brackets">]</span><span class="hl-code">; 
+</span><span class="hl-brackets">}</span><span class="hl-brackets">)</span><span class="hl-code">;</span></pre><span>
+</span></div><span>
+</span><p>On the server I use a custom JSON.NET converter to parse the positional values:</p><span>
+</span><div class="hl-main"><span>
+</span><pre><span class="hl-reserved">public</span><span class="hl-code"> </span><span class="hl-reserved">class</span><span class="hl-code"> </span><span class="hl-identifier">UserTimingConverter</span><span class="hl-code"> : </span><span class="hl-identifier">JsonConverter</span><span class="hl-code">
+</span><span class="hl-brackets">{</span><span class="hl-code">
+    </span><span class="hl-reserved">public</span><span class="hl-code"> </span><span class="hl-identifier">override</span><span class="hl-code"> </span><span class="hl-identifier">object</span><span class="hl-code"> </span><span class="hl-identifier">ReadJson</span><span class="hl-brackets">(</span><span class="hl-identifier">JsonReader</span><span class="hl-code"> </span><span class="hl-identifier">reader</span><span class="hl-code">, 
+                                    </span><span class="hl-identifier">Type</span><span class="hl-code"> </span><span class="hl-identifier">objectType</span><span class="hl-code">, 
+                                    </span><span class="hl-identifier">object</span><span class="hl-code"> </span><span class="hl-identifier">existingValue</span><span class="hl-code">, 
+                                    </span><span class="hl-identifier">JsonSerializer</span><span class="hl-code"> </span><span class="hl-identifier">serializer</span><span class="hl-brackets">)</span><span class="hl-code">
+    </span><span class="hl-brackets">{</span><span class="hl-code">
+        </span><span class="hl-identifier">var</span><span class="hl-code"> </span><span class="hl-identifier">array</span><span class="hl-code"> = </span><span class="hl-identifier">JArray</span><span class="hl-code">.</span><span class="hl-identifier">Load</span><span class="hl-brackets">(</span><span class="hl-identifier">reader</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">return</span><span class="hl-code"> </span><span class="hl-reserved">new</span><span class="hl-code"> </span><span class="hl-identifier">UserTiming</span><span class="hl-code">
+        </span><span class="hl-brackets">{</span><span class="hl-code">
+            </span><span class="hl-identifier">Name</span><span class="hl-code"> = </span><span class="hl-identifier">array</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">ToString</span><span class="hl-brackets">(</span><span class="hl-brackets">)</span><span class="hl-code">,
+            </span><span class="hl-identifier">Duration</span><span class="hl-code"> = </span><span class="hl-identifier">array</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">ToObject</span><span class="hl-code">&lt;</span><span>double</span><span class="hl-code">&gt;</span><span class="hl-brackets">(</span><span class="hl-brackets">)</span><span class="hl-code">,
+            </span><span class="hl-identifier">StartTime</span><span class="hl-code"> = </span><span class="hl-identifier">array</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">ToObject</span><span class="hl-code">&lt;</span><span>double</span><span class="hl-code">&gt;</span><span class="hl-brackets">(</span><span class="hl-brackets">)</span><span class="hl-code">
+        </span><span class="hl-brackets">}</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">
+    </span><span class="hl-code">
+</span><span class="hl-brackets">}</span></pre><span>
+</span></div><span>
+</span><h3 id="4_derive_data_on_client">4. Derive Data on Client</h3><span>
+</span><p>Depending on the requirements, it may be feasible to send fewer values by making some simple derivations on the client. Why send both <code>domainLookupEnd</code> and <code>domainLookupStart</code> if all that’s required is subtracting one from the other to get the <code>domainLookupTime</code>? The more that’s derived on client, the less raw data to send across the wire.</p><span>
+</span><h3 id="5_shorten_url8217s">5. Shorten URL’s</h3><span>
+</span><p>Resource Timing data, in particular, contains a lot of often redundant URL strings. There’s many strategies to reduce URL redundancy:</p><span>
+</span><ol>
+<li>If all the data is being served from the same host, strip the domain and scheme from the URL entirely. (Basically make it a relative URL.) For example: <code>http://domain.com/content/images/logo.png</code> becomes <code>/content/images/logo.png</code></li>
+<li>Shorten common segments into “macros” of limited characters that can be re-expand later. e.g.: <code>/content/images/logo.png</code> becomes <code>/{ci}/logo.png</code></li>
+<li>
+<p><a href="https://www.youtube.com/watch?v=TjNPS1i9QT8">The folks at Akami, who gather tons of Resource Timing data, leverage a tree like structure</a> to reduce redundancy even more. They structure their payload like this: </p>
+<div class="hl-main"><span>
+</span><pre><span class="hl-brackets">{</span><span class="hl-code">
+    </span><span class="hl-quotes">"</span><span class="hl-string">http://</span><span class="hl-quotes">"</span><span class="hl-code">: </span><span class="hl-brackets">{</span><span class="hl-code">
+        </span><span class="hl-quotes">"</span><span class="hl-string">domain.com/</span><span class="hl-quotes">"</span><span class="hl-code">: </span><span class="hl-brackets">{</span><span class="hl-code">
+            </span><span class="hl-quotes">"</span><span class="hl-string">content/style.css</span><span class="hl-quotes">"</span><span class="hl-code">: </span><span class="hl-brackets">[</span><span class="hl-code"> </span><span class="hl-code"> </span><span class="hl-brackets">]</span><span class="hl-code">,
+            </span><span class="hl-quotes">"</span><span class="hl-string">content/images/</span><span class="hl-quotes">"</span><span class="hl-code">: </span><span class="hl-brackets">{</span><span class="hl-code">
+                </span><span class="hl-quotes">"</span><span class="hl-string">logo.png</span><span class="hl-quotes">"</span><span class="hl-code">: </span><span class="hl-brackets">[</span><span class="hl-code"> </span><span class="hl-code"> </span><span class="hl-brackets">]</span><span class="hl-code">,
+                </span><span class="hl-quotes">"</span><span class="hl-string">sprite.png</span><span class="hl-quotes">"</span><span class="hl-code">: </span><span class="hl-brackets">[</span><span class="hl-code"> </span><span class="hl-code"> </span><span class="hl-brackets">]</span><span class="hl-code">
+            </span><span class="hl-brackets">}</span><span class="hl-code">
+        </span><span class="hl-brackets">}</span><span class="hl-code">
+    </span><span class="hl-brackets">}</span><span class="hl-code">
+</span><span class="hl-brackets">}</span></pre><span>
+</span></div>
+</li>
+</ol><span>
+</span><span>
+</span><p>Not all data needs to be included in the beacon payload itself. The server can still gather some diagnostics information from the standard HTTP headers from the beacon’s request. These include things like:</p><span>
+</span><ul>
+<li>Referrer</li>
+<li>UserAgent for browser and device information</li>
+<li>Application specific user data from cookies</li>
+<li>Environment specific data via X-Forwarded-For and other similar headers</li>
+<li>IP Address, and thus approximate geographical location (not technically a header)</li>
+<li>Date and Time (also not a header, but calculated easily on server)</li>
+</ul><span>
+</span><p>With this collection of techniques, you should be able to squeeze a little more out of the Beacon API. If you’ve found another way to shave off a few bytes, please share in the comments.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

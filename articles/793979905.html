@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Image File Formats</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Image File Formats</h1>
+<div>
+
+<hr />
+<h3>Color Representation</h3>
+<p><b>True Color (24 bit):</b> each pixel color is represented using 3 bytes, 
+  one for red, one for green, and one for blue. This is referred to RGB color. 
+  Since a single byte can represent 256 different shades, there are a total of 
+  roughly 16 million (256x256x256) colors that can be represented.</p>
+  <p align="center"> <img src="http://www.willamette.edu/~gorr/classes/GeneralGraphics/imageFormats/24bits.gif" /></p>
+<p><b>True Color (32bit): </b>This is the same as 24 bit true color except that 
+  there is an extra byte, usually referred to as the alpha component, used to 
+  specify transparency.</p>
+    <p align="center"> <img src="http://www.willamette.edu/~gorr/classes/GeneralGraphics/imageFormats/32bits.gif" /></p>
+<p><b>16 bit Color: </b>Each pixel is represented using 16 bits or 2 bytes. There 
+  are 5 bits for red, 6 bits for green, and 5 bits for blue. The total number 
+  of possible colors is about 65 thousand (256x256).</p>
+   <p align="center"> <img src="http://www.willamette.edu/~gorr/classes/GeneralGraphics/imageFormats/16bits.gif" /></p>
+<p><b>8 bit Color:</b> Here, 256 different 24 bit colors (can also use 16 or 32 bit)
+    are selected out of the 
+  16 million possible. These 256 colors are called the palette. Each pixel in the image is 
+  represented by a single byte. This byte is not the color but rather is the location (index)
+  of the color in the palette. When an image is stored, the 8 bit color index 
+  for each pixel is saved along with the palette. For a large image this can be 
+  significant space savings.</p>
+<table border="0">
+ <tr><td> <p>File size = <br /><spacer type="horizontal" size="30">6x3 bytes (palette) + <br /><spacer type="horizontal" size="30">7x5x1 bytes (indices) <br /><spacer type="horizontal" size="15"> = 53 bytes total
+   <td>   <p align="center"> <img src="http://www.willamette.edu/~gorr/classes/GeneralGraphics/imageFormats/palette.gif" /></p></td>
+</spacer></spacer></spacer></p></td></tr>
+</table>
+
+<table border="0">
+ <tr><td> <p>File size = 7x5x3 bytes <br /><spacer type="horizontal" size="15"> = 105 bytes total
+   <td>   <p align="center"> <img src="http://www.willamette.edu/~gorr/classes/GeneralGraphics/imageFormats/notpalette.gif" /></p></td>
+</spacer></p></td></tr>
+</table>
+  
+
+
+
+
+<h3>Image Representation</h3>
+<p>Images are simply 2D arrays of colors where each color is represented using one of 
+  the above color formats (8, 16, 24, or 32 bits).  Raw (uncompressed) images can be very large. 
+    For example, a 800x600 image stored in 32 bit color
+   format would take 
+  </p><p align="center"> (800x600 pixels)x(4 bytes)= 1.92Mbytes.
+
+</p><p> Fortunately, images contain a lot redundancies. Consider the extreme 
+   example where our above 800x600 image happens to be 
+  all one color (not a particularly interesting picture). To store it in raw format
+  requires  1.92Mbytes . However, it can also be can be saved very efficiently 
+  by specifying the single color (4 bytes) and the size of the image. This format 
+  will take on the order of 10's of bytes instead of megabytes. While this is an extreme
+    case, all images can be reduced to some extent.</p>
+
+ <p> Computer algorithms exist that extract the redundances so that 
+   the image  can be stored more efficiently (We say the image has been 
+    encoded or compressed).  Often the image size 
+   is significantly reduced with little 
+   or no loss in image quality. 
+    Which algorithm works best depends on the image and the accuracy you
+    desire. 
+   
+  </p><p> Many different image formats are available. Each
+  format is associated with a different file extension.
+   (e.g. .gif, .jpg. .tiff, .png, .tga, .bmp, etc)
+   Each of these formats uses at least one but often more than one type
+   of image encoding.  
+
+ 
+
+<h3>Some Terminology</h3>
+
+<ul>
+<li><p> The <b>compression ratio</b> refers to the size ratio between the uncompressed data
+   and the compressed. Thus, a 10:1 compression ratio means that the uncompressed image
+   is 10 times larger than the compressed image. 
+ <li><p> Compression techniques can be divided into <b>symmetric</b> and <b>asymmetric</b> methods.  
+  Symmetric methods require approximately the same amount of work to perform the compression as they
+   do for the decompression.  The asymmetric methods do not. There are instances where
+   one is willing to pay a big cost for compressing an image if the decompression 
+   is very fast. Consider images placed on the web. The creater of the image generally
+    doesn't mind if compressing the image takes some time. Besides, the compression 
+     is only done once. However, once it is on the web, there may be thousands of 
+     people wanting to decompress the image. Here, it is important that it be done
+     as quickly as possible not just because of the volume of people performing the
+      compression but also there is an expectation that an image should be able to
+     be viewed quickly.  
+<li><p> <b>Non-adaptive</b> methods perform the exact same set of operations and coding 
+    on all images (e.g. CCITT uses the same dictionary of predefined substrings). 
+   <b>Adaptive</b> methods adjust how images are compressed based on the
+    characteristics of the image (e.g. LZW which builds a unique dictionary).  
+<li> <b>Lossy vs loss-less.</b>  All compression techniques can be characterized as either
+  lossy or loss-less.  Loss-less techniques result in no image degradation. The image
+  that results from compression followed by decompression is identical to the original 
+   image.  In lossy techniques, the original and final image are not identical, however,
+   often the differences are so slight that the view can hardly tell the difference. Lossy
+   compression techniques not surprisingly can result in much greater compression often at
+   little cost to image quality.  </li></p>
+ </li></p></li></p></li></ul>
+
+<h3>Types of Encoding</h3>
+<ul>
+ <li> <b>Run-length Encoding:</b> Used in tiff and bmp. Each row in the image is represented
+  by a series of numbers. Each number is the number of consecutive
+  pixels of a particular color. For example, consider a black and white
+  image (b=black, w = white).  if the row is as follows:
+  <p align="center"> b b b b b b b w w w b b b b b b b b w w w w w w w w w</p>
+  then runlength encoding might give
+  <p align="center">  7 3 8 9 </p>
+   <p> If there are more than two colors, the color (e.g. stored as an index)
+     could be included.
+   For example, if there are 3 colors (b, w, r) we get the following:
+    </p><p align="center"> w w b b w w b b b b w w w r r r r r r r b b b b r r r</p>
+   <p> becomes 2w 2b 2w 4b 3w 7r 4b 3r </p>
+    <p> If the image has many colors and does not have large blocks of 
+    color then run
+  length encoding would be very poor.</p>
+
+</li><li> Predictive Encoding:  Similar to run-length encoding except that instead of sending information 
+    on the runs of identical pixels, the encoder sends the difference between 
+  the current pixel and the predicted value.
+</li><li> <b>Lempel-Ziv-Welch (LZW):</b> Use in gif and tiff. Is referred to as 
+  dictionary based encoding. the algorithm builds a dictionary of data
+   occuring in an uncompressed file. Patterns are identified are are matched 
+   to entries in the dictionary. If a substring is not present in the dictionary, a new
+    dictionary item is created.
+</li><li> <b>CCITT:</b> This is a varient of Huffman encoding. Huffman encoding
+   works by giving items that are frequent a short encoding and items
+   that are infrequent longer encodings.  For example, if a file is mostly
+     red and white with a little blue and green, then we can assign the color red the 
+     coding "1", the color white "0" and the color blue "00, and the color
+     green "10".  These are bits (base 2) representations.
+
+</li><li> <b>Discrete Cosine Transform(DCT)</b> Used in jpeg. Lossy.
+</li><li> <b>Pixel Packing</b> This is not really a compression technique, rather it is 
+   just an efficient method of storing contiguous bytes of information in memory.
+</li><li> <b>Vector images</b> This is also not typically thought of as a compression technique.
+  It does not save the image itself. Rather it is a way of saving information about how 
+  to generate the image. This is typical of files created in postscript and Adobe Illustrater. For example,   a line can be represented as the location of its endpoints.  This type of file
+  effectively has infinite resolution because the image can be generated from scratch onto 
+   any canvas using an exact description. 
+</li></ul>
+ 
+<h3>Common File Formats</h3>
+ </p><p> Different image formats may use one or more of the above encoding techniques. 
+
+</p><p><b>GIF Characteristics:</b> 
+  <ul><li> Assumes a palette of size 256 colors. If the image has more than 
+  256 colors then there will be some loss of information (called lossy), otherwise, 
+  the image will be saved exactly (lossless). 
+  </li><li> Colors that are thrown out can be approximated using 
+  dithering. Dithering is a technique where two existing colors can be placed 
+  near each other to give the effect of a third color. Because of the color limit, 
+  gif is typically used for images that contain a limited number of colors.
+ </li><li> GIF images can have transparency. 
+  This is useful if one wants the web page background color to show through (e.g. 
+  an edge can be faded out). 
+    </li><li> GIFs can be interlaced meaning that a low-quality version of the picture appears
+     first, then gets progressively drawn over by the final image. 
+   </li><li> GIFs use a simple technique called LZW compression to reduce the filesizes of 
+      images, but this compression never degrades the image quality.
+   </li><li>  GIFs can also be animated. 
+</li></ul></p>
+<p><b>JPEG (Joint Photgraphic Experts Group)
+  :</b> JPEG is a lossy format. Once can specify the amount of compression 
+  (and thus the amount of information loss) by setting a quality level. Unlike 
+  GIF, JPEG is not limited to 256 colors. When an image has many different colors 
+  such as in photographs of natural scenes, JPEG is the format of choice. JPEG, 
+  however, does not allow for transparency.</p>
+<p><b><a href="ftp://swrinde.nde.swri.edu/pub/png/documents/png-1.2-pdg-h20.html">PNG</a>:</b> PNG is a more recent file format that is not supported by older 
+  browsers. PNG-24 uses 24 bit color, is lossless, and allows transparency. The 
+  size of the files can be considerably larger than JPEG. PNG-8 assumes a palette. 
+  Like GIF, if the image has a limited number of colors, the compression will 
+  be lossless and will be considerably smaller than PNG-24.</p>
+<p>There are many other image formats such as Targa, PICT, BMP, .... However, 
+  these formats are not supported by any browsers. </p>
+<p>For a summary of file formats (not just graphics) <a href="http://www.why-not.com/articles/formats.htm">click 
+  here</a> or <a href="http://www.dcs.ed.ac.uk/home/mxr/gfx/2d-hi.html">here</a>.</p>
+<p><b>General Rule of Thumb: </b></p>
+<ul>
+  <li>Use JPEG for images with many colors. </li>
+  <li>Use GIF if there are a limited number of colors and transparency is desired. 
+  </li>
+  <li>Use PNG-24 is there are many colors and transparency is required. </li>
+  <li>Photoshop allows you to experiment with the size and quality of the various 
+    formats. When in doubt, experiment.</li>
+  <li>If you want the best resolution and quality of an image then create a thumbnail 
+    image of the image and link it to the full image. That way, a user need not 
+    spend the time to load in the full image if they are interested.</li>
+</ul>
+</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

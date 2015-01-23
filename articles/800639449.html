@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/FullSizeRender.jpg" width="400" /></p><span>
+</span><p>Speed engineers rely on business buy-in to get the job done. Telling a clear story will gain you resources and help when it’s time to balance speed against other marketing considerations.</p><span>
+</span><p>The cost of a garbled message? Wasted time, frustrated users, and lost sales. Last year, <a href="http://www.webperformancetoday.com/2014/10/30/scary-ecommerce-web-performance-infographic/">the big sites got 23% slower and lost billions as a result</a>.</p><span>
+</span><p>We already know how to start the speed story simply. “Customers show up to our slow website, get thwarted, and move on without spending money”. But what happens next? How do you handle the exec who gut-checks by pulling up his cached site from a high-speed T3 line?</p><span>
+</span><h2>Boil it down</h2><span>
+</span><p>You need hard numbers to clearly explain the situation. Unfortunately, many speed measures aren’t intuitive or even very useful. By the time you’ve explained <a href="http://www.dummies.com/how-to/content/how-to-calculate-percentiles-in-statistics.html">95th percentile</a>, you’ve lost your audience.</p><span>
+</span><p>A single measure can explain how the site is performing across all your different pages and customers. It’s got to handle everyone’s intuitive feel that some pages are especially important. And this number should quickly give the gist, even if the details are tricky to compute. <strong>Hierarchal Average Load Time (HALT)</strong> combines the critical attributes:</p><span>
+</span><ul>
+<li>Load times across different pages in the website</li>
+<li>Different connection speeds, geographic locations, caching, etc. proportional to customer usage</li>
+<li>Weighting by customer value, page value, and speed sensitivity</li>
+</ul><span>
+</span><p>HALT is a single number that’s simple to grasp. However, the calculation takes some effort. HALT integrates many different measures, so let’s unpack it a little.</p><span>
+</span><h2>1 – Break your pages down</h2><span>
+</span><p>Different audiences react to speed differently. If your customers display different speed behavior by country, mobile/fixed, or any other trait, split your page-level data. Just make sure these factors are <a href="https://www.statpac.com/surveys/statistical-significance.htm">statistically significant</a>.</p><span>
+</span><h2>2 – Start at the median</h2><span>
+</span><p>The calculation begins with median (not average) load times on each page. Averages get bumped around by this type of data, but the load time for the middle point isn’t skewed by a few 100-second outliers.</p><span>
+</span><h2>3 – Measure in proportion to the userbase</h2><span>
+</span><p>Your coworkers normally access a Potemkin Village version of the website. Cached files, fast connection, and servers next to the browser. It’s artificial, but can feel real when your arguments for performance optimization are being evaluated.</p><span>
+</span><p>If 10% of our users happen to access the site from Topeka, Kansas on a dial-up modem with Internet Explorer during business hours, then 10% of measurements should replicate those conditions. Simple execution if you’re using Real User Measurement tools like <a href="http://www.google.com/analytics/">Google Analytics</a>. If RUM doesn’t work for you, approximate this sampling with careful setup in synthetic measurement tools like <a href="http://www.webpagetest.org/">Web Page Test</a>.</p><span>
+</span><h2>4 – Weight by importance</h2><span>
+</span><p>Let’s face it, your legal disclaimers are less important to your customers than your home page. A weighted average of all the median load times keeps everything in proportion.</p><span>
+</span><p>So how do you judge each page’s importance for weighting?</p><span>
+</span><ul>
+<li>
+<p><strong>Number of page views</strong> –  higher volume pages matter more. RUM pulls this data automatically, but server logs can help you proportion synthetic testing.</p>
+</li>
+<li>
+<p><strong>Page value</strong>  – what’s the average value of goals achieved (goods sold, videos watched, etc.) after visiting this page? If you don’t have an analytics package installed, poll your marketing team to take an educated guess.</p>
+</li>
+<li>
+<p><strong>Speed sensitivity</strong>  – do customers care about speed on this particular page? Is it reflected in page value? For example, your Cart Checkout page might show much more sensitivity than your home page. Be careful  – correlation is definitely not causation. If the numbers are unavailable, assume constant sensitivity.</p>
+</li>
+</ul><span>
+</span><h2>Putting it together</h2><span>
+</span><pre>
+        sum (median load time per page * # of page views * page value * speed sensitivity)
+HALT = ------------------------------------------------------------------------------------
+        sum (number of page views * page value * speed sensitivity)
+</pre><span>
+</span><p><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/HALT-Sample.png" width="400" /></p><span>
+</span><p>Your HALT number will be measured in seconds  – and hopefully trend downwards. If it isn’t headed the right way, start digging in:</p><span>
+</span><ul>
+<li>
+<p>Apply speed technology and coding changes across the board</p>
+</li>
+<li>
+<p>Focus on the most important pages and customer demographics</p>
+</li>
+<li>
+<p>Watch for shifts in the key pages and customers</p>
+</li>
+</ul><span>
+</span><h2>Keep it clean</h2><span>
+</span><p>Load time makes sense to many people, but there are good arguments for different measurements like <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index">Speed Index</a>, Time To Interact or <a href="http://assets.en.oreilly.com/1/event/62/Above%20the%20Fold%20Time_%20Measuring%20Web%20Page%20Performance%20Visually%20Presentation.pdf">Above-The-Fold Time</a>.</p><span>
+</span><p>Whatever you do, play it square. Some useful techniques can modify load times (like deferred loads). If they unfairly skew times, make sure to either highlight the change or adjust numbers in compensation.</p><span>
+</span><p>Likewise, if you take shortcuts, make them obvious. If you don’t have all the information you’d like, no problem. But as you make changes to your numbers, highlight the differences.</p><span>
+</span><p>Remember to use your words and numbers like poetry  – pack them with meaning. Your story will sink in better and coworkers will start thinking speed to reach their goals.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

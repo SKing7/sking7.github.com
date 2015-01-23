@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>demosthenes.info – 
+Big, Beautiful Dropcaps with CSS initial-letter</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>demosthenes.info – 
+Big, Beautiful Dropcaps with CSS initial-letter</h1>
+<div class="entry-content" itemprop="articleBody"><div class="entry-summary"><p>While it’s long been possible to <a href="http://demosthenes.info/blog/51/Drop-Cap-With-CSS">create traditional dropcaps on the web</a> using  the <code class="language-css">::first-letter</code> pseudo selector, the process has been difficult: not only does it require a lot of careful, precise <a href="http://demosthenes.info/blog/css" rel="tag">CSS</a>, but any changes to the surrounding text, such as altering the typeface or line-height, push the dropcap out of alignment, whereas a good dropcap should always be “top and tail” with its associated text:
+
+</p></div><figure id="drop-cap-diagram">
+ <img src="http://demosthenes.info/assets/images/dropcap-lines.png.pagespeed.ce.QD9HQ61EF5.png" alt="Diagram of a dropcap" />
+<figcaption>A true dropcap: note the alignment of baselines and the ascender of the dropcap with the cap-height of paragraph text</figcaption>
+</figure><span>
+</span><p>This complete independence between body text and initial cap meant any changes required alterations to both elements, including within <a href="http://demosthenes.info/mobile/responsive-design" rel="tag">responsive design</a> and <code class="language-css">@media</code> queries. As a result, CSS dropcaps have tended to be individually art-directed, making them extremely expensive to create, and leaving a typographical feature that has been a standard for over 400 years relatively rare on the web… and when they were attempted, <a href="http://dauwhe.tumblr.com/">often done badly</a>.
+</p><p>Along with its excellent work on CSS blend modes, <a href="http://demosthenes.info/blog/css/shapes" rel="tag">shapes</a>, regions and other modules, the Adobe web development team has proposed a new CSS property, <code class="language-css">initial-cap</code>, that addresses just this issue. While support is paltry right now (limited to Chrome Canary), a <a href="http://github.com/adobe-webplatform/dropcap.js">nice little polyfill</a> has been released that provides support for the proposal in all modern browsers, giving developers and designers an easy way to add dropcaps to their pages.
+</p><p><a href="http://dev.w3.org/csswg/css-inline/#DropInitial">The specification</a> works using the same <code>::first-letter</code> selector, but makes the styling of dropcaps much easier. For example, to style the first letter of the very first paragraph in a page, we could add in the <code class="language-css">:first-of-type</code> pseudo selector:
+<pre><code class="language-css">p:first-of-type::first-letter { initial-letter: 3; color: red; }</code></pre>
+</p><p>…meaning “make the dropcap red, and as high as the first three lines of text in the paragraph”. Naturally, the spec covers a lot of territory, including different writing directions, dealing with descenders and short paragraphs, and much more. Right now, the major limitation is that <code class="language-css">::first-letter</code> (and pseudo elements in general) can’t take all the CSS properties required for a truly great dropcap. Until that is resolved, the polyfill requires that we add markup to indicate which letter we want to apply the effect to:
+<pre><code>&lt;p&gt;&lt;span id="dropcap"&gt;M&lt;/span&gt;y father’s family name being Pirrip, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip...
+</code></pre>
+</p><p>Then add the polyfill to the bottom of the page and target the <code>&lt;span&gt;</code>:
+<div class="language-javascript"><span>
+</span><pre><code>&lt;script src="dropcap.min.js"&gt;&lt;/script&gt;</code></pre><span>
+</span><pre><code>&lt;script&gt;</code></pre><span>
+</span><pre><code>var dropcap = document.getElementById("dropcap");</code></pre><span>
+</span><pre><code>window.Dropcap.layout(dropcap, 3);</code></pre><span>
+</span><pre><code>&lt;/script&gt;</code></pre><span>
+</span></div>
+</p><p>Our CSS then changes to target this <a href="http://demosthenes.info/blog/622/The-id-Selector-in-HTML-and-CSS"><code>id</code></a>:
+<pre><code class="language-css">#dropcap { color: red; }</code></pre>
+<aside>
+<p>Naturally, you could use and target a <a href="http://demosthenes.info/blog/597/A-Touch-Of-Class-Using-CSS-Class-Selectors-Effectively"><code>class</code></a> if you wanted multiple dropcaps on the same page.
+</p></aside>
+</p><p>It’s also possible to create a “pop-cap” by specifying a second, optional, <code>baseline</code> value for the method:
+<pre><code class="language-javascript">window.Dropcap.layout(dropcap, 3, 2);</code></pre>
+</p><p>This aligns the baseline of the dropcap with the second line of text, but keeps the dropcap three lines high. (By default, an undeclared <code>baseline</code> automatically takes the <code>line-height</code> value).
+<aside>
+<p>It’s common for dropcaps to be rendered in a different typeface from body text; if you’re using a webfont purely for dropcaps, it makes sense to <a href="http://demosthenes.info/blog/878/Slash-Page-Load-Times-With-CSS-Font-Subsetting">subset the font</a> to capital letters only.
+</p></aside>
+<h2>Making the dropcap responsive</h2>
+</p><p>An initial letter three lines high will likely be too large at the screen size of mobile devices, so it must be reduced at an appropriate breakpoint:
+<div class="language-css"><span>
+</span><pre><code>@media all and (max-width: 600px) {</code></pre><span>
+</span><pre><code>p:first-of-type::first-letter { initial-letter: 2; }</code></pre><span>
+</span><pre><code>}</code></pre><span>
+</span></div>
+</p><p>Making the dropcap responsive with the polyfill is slightly more complex, as it uses <a href="http://demosthenes.info/blog/702/matchMedia-Media-Queries-For-JavaScript"><code>matchMedia</code></a> to switch the size of the letter: consult the <a href="http://codepen.io/dudleystorey/pen/qEEPmw">CodePen repo</a> for more information.
+<h2>Conclusion</h2>
+</p><p><code class="language-css">initial-letter</code> is a promising proposal, filling a typographical gap that has had to be addressed with complex CSS hackery. I’ll return to expand this article as the specification is ironed out and browser support increases; you may wish to <a href="http://twitter.com/dudleystorey">follow me on Twitter</a> to receive alerts on updates. 
+<a href="http://codepen.io/dudleystorey/pen/qEEPmw" id="codepen"><img src="http://demosthenes.info/assets/svg/codepen.svg" alt="" />Explore the code for the reponsive dropcap on Codepen</a></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

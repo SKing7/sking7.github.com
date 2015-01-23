@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Generating Facebook "Look Back" Style Dynamic Videos from HTML5 using PhantomJS and FFmpeg</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Generating Facebook "Look Back" Style Dynamic Videos from HTML5 using PhantomJS and FFmpeg</h1>
+<div class="entry-content"><span>
+      </span><p>This post explains how we built our own HTML5 animation to video converter, similar to what Facebook has done with its <a href="https://www.facebook.com/lookback/">“Look Back” campaign</a>, and more recently its <a href="http://newsroom.fb.com/news/2014/11/introducing-say-thanks/">“Say Thanks”</a> feature.</p><span>
+</span><h2>Background</h2><span>
+</span><p>Using our <a href="http://www.tweetbeam.com/">TweetBeam Twitter wall</a> is a great way to boost exposure for an event, and we wanted a cool way to give our customers a sense of the positive impact it can have. Inspired by Facebook and Vizify’s <a href="https://2012.twitter.com/en/your-year.html">Year On Twitter</a>, we figured a dynamically generated, customer-tailored video would make a great animated infographic. Plus, it’s a nice post-event gift to say thanks for choosing us.</p><span>
+</span><p>It made sense for us to build the video as an HTML5 animation, since this is already what we specialize in. Additionally, building it in HTML5 makes it easy to customize it per event. (We built a simple editor to select the best photos and Tweets per event, then we apply this configuration to the animation template.)</p><span>
+</span><p>To make the video more shareable and run smoothly across devices, we wanted to automatically convert the animations to a real video format (mp4).</p><span>
+</span><h2>Our approach in a nutshell</h2><span>
+</span><p>Simply put, we render the complete HTML5 video frame-by-frame using PhantomJS and then combine all frames into a video using FFmpeg. The pipeline consists of 3 main parts:</p><span>
+</span><ol>
+<li>An animation in the form of a HTML5 + CSS3 + Javascript website</li>
+<li>PhantomJS to render the animation and save the frames as PNG image files</li>
+<li>FFmpeg to combine the individual PNG frames into a video</li>
+</ol><span>
+</span><h2>Taking screenshots with PhantomJS</h2><span>
+</span><p><a href="http://phantomjs.org/">PhantomJS</a> makes it easy to render a website server-side. Using the <a href="http://phantomjs.org/api/webpage/method/render.html"><em>page.render</em></a> method we can create a screenshot of the animation.</p><span>
+</span><p>Of course, we can’t just call this method in a loop and expect all frames of a smooth video as output. For a smooth video, we need to capture a frame of the animation at least 30 times per second, each frame exactly <em>1/fps</em> seconds after the other.</p><span>
+</span><p>The code to achieve this looks like:</p><span>
+</span><pre><code>var frame = 0;
+var target_fps = 30;
+var frames = page.evaluate(function () {
+    return getTotalDurationInSeconds();
+}) * target_fps;
+
+for(var frame = 0; frame &lt; frames; frame++) {
+    page.evaluate(function (time) {
+        pauseAnimationAt(time);
+    }, frame * (1 / target_fps));
+    page.render(outDir+'/frame_' + padWithZeroes(frame, 5) + '.png', { format: "png" });
+    frame++;
+}
+</code></pre><span>
+</span><h2>Pausing the HTML animation with Greensock</h2><span>
+</span><p>The trick in the above snippet is that we use <a href="http://phantomjs.org/api/webpage/method/evaluate.html"><em>page.evaluate</em></a> to call two methods exposed by the website (our animation): <em>getTotalDurationInSeconds</em> and <em>pauseAnimationAt</em>. The first one should speak for itself. The second one pauses the HTML animation at a specific frame based on a given point in time, and requires a little more explanation.</p><span>
+</span><p>Unfortunately, pausing a CSS3 animation or transition at a specific time (seeking) is not possible. This means we need to use an animation library with more fine-grained timeline control.</p><span>
+</span><p>At TweetBeam, we use the excellent <a href="http://www.greensock.com/">Greensock</a> library for high performance javascript based animations. Its <a href="http://greensock.com/timelinemax">TimelineMax</a> library supports all the seeking features we need.</p><span>
+</span><p>Using Greensock and TimelineMax, we can fill in the methods we need to call from our PhantomJS script as follows:</p><span>
+</span><pre><code>function pauseAnimationAt(time) {
+    timeline.pause(time); // timeline is a TimelineMax instance
+}
+
+function getTotalDurationInSeconds() {
+    return timeline.totalDuration();
+}
+</code></pre><span>
+</span><h2>Stitching the frames into a video using FFmpeg</h2><span>
+</span><p>Now that our PhantomJS script can load a webpage and generate screenshots of all the frames in the animation, we can use FFmpeg to combine them into a video:</p><span>
+</span><pre><code>ffmpeg -y -r 30 -i frame_%05d.png -c:v libx264 -r 30 -pix_fmt yuv420p video.mp4
+</code></pre><span>
+</span><p><em>Note: I think it should also be possible to pipe PhantomJS directly to FFmpeg instead of writing the frames to disk first, which would be faster. <strong>Update 12/5</strong>: See Peter’s comment below on how to accomplish this</em></p><span>
+</span><h2>The result</h2><span>
+</span><p>We can now easily generate customized videos per customer. For example this one, which we created after the MongoDB World conference:</p><span>
+</span><span>
+</span><p>The feedback from our customers has been overwhelmingly positive. They spend a lot of time and effort organizing their events, so it’s great to have a nice video looking back on the highlights.</p><span>
+</span><p>It should be noted that generating personalized videos at the scale that Facebook does comes with its <a href="https://code.facebook.com/posts/236248456565933/looking-back-on-look-back-videos/">own set of engineering challenges</a>. Using the methods described above it takes about 20-30 minutes for us to generate a video, which is perfectly fine for the scale we’re operating at.</p><span>
+</span><p>I hope this article inspired you to combine some great technologies! Like it? Questions? Drop me a note <a href="http://www.twitter.com/yousefed">@YousefED</a> or in the comments below.</p><span>
+</span><p><em>Special thanks to <a href="http://www.twitter.com/erikagain">@erikagain</a> for reviewing this blog post</em></p><span>
+</span><span>
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

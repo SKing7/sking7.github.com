@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>   Object.create history and memory leaks</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>   Object.create history and memory leaks</h1>
+<div class="article-content"><span>
+</span><!--<div style="background-color: #F3FAAC; font-size: 14px; line-height: 22px; margin-top: 20px; margin-bottom: 20px; padding: 8px; width: 650px; border: 1px solid #B8A500; border-radius: 1px;"></div>--><span>
+		</span><p>There are at least a few ways to create an object in JavaScript based on a given prototype object. One of them is the Object.create function that was a part of the ECMAScript 5 release. However, before ECMAScript 5 was introduced this function had had to be implemented by programmers themselves and it actually has existed in our programs in a few versions. That said, it’s worth digging into the history of Object.create to see how we used to make objects based on a prototype object. It can lead us to very interesting observations, particularly on how memory leaks can occur in our code and why optimization can be evil.<span id="more-2371"></span></p><span>
+</span><h3>Version 1 (2006-06-07)</h3><span>
+</span><p>For many years Douglas Crockford’s <a href="http://javascript.crockford.com/prototypal.html">proposal for prototypal inheritance</a> has been the first choice solution for implementing the object inheritance based on a prototype chain. Although it has slightly evolved over years, it can be essentially expressed in a few lines of JavaScript:</p><span>
+</span><pre><code>function object(o) {
+	function F() {}
+	F.prototype = o;
+	return new F();
+}</code></pre><span>
+</span><p>In most cases it works great and is a sufficient tool for creating new objects when <span class="f">Object.create</span> is not available (older browsers). However, things get worse when you are concerned about performance. If you pay close attention, you will easily notice that in order to make a new object, every single time a new function <span class="f">function F() {}</span> needs to be initiated. It means a new piece of memory has to be assigned which takes extra space and time.</p><span>
+</span><p>Even though it’s a rare issue for the most common tasks we deal with at work like home pages and small SPAs, and modern browsers have already adopted ECMAScript 5 Object.create so you possibly don’t even have to care about this, the optimized version becomes a quite interesting lesson of optimization and JavaScript memory leaks.</p><span>
+</span><h3>Version 2 (2007-10-21)</h3><span>
+</span><p>One of reasonable ways to speed up the above example is defining <span class="f">F</span> function once and then reusing it. The oldest source of this improvement I could find was <a href="https://groups.google.com/forum/message/raw?msg=comp.lang.javascript/_HTITf7-JqA/yyEZ9EiuPsYJ">Richard Cornford’s post on comp.lang.javascript group</a>:</p><span>
+</span><pre><code>var object = (function() {
+	function F() {};
+	return function(obj) {
+		F.prototype = obj;
+		return new F();
+	};
+}());</code></pre><span>
+</span><p>Richard wrote:</p><span>
+</span><blockquote><p>The assigning to the prototype does need to happen every time, but I  don’t see why it is necessary to have a new constructor created for each execution of the function.</p></blockquote><span>
+</span><p>As you can see on the line 2 Richard defined <span class="f">function F() {}</span> in the IIFE, which serves as a skeleton to create new objects based on whatever prototype we pass to <span class="f">object()</span> as <span class="f">obj</span> parameter. That works fine which means an empty function is created only once and it doesn’t matter how many objects will be produced.</p><span>
+</span><p>However, this solution has a very important drawback, that can be overlooked and never get on the radar until we notice something weird is happening to the memory consumption in our application. It also shows, that code optimization can be dangerous. To figure out why, let’s make a new object:</p><span>
+</span><pre><code>var myObject = object({
+	foo: "bar"
+});</code></pre><span>
+</span><p>It works just fine, which can be tested by executing the following:</p><span>
+</span><pre><code>myObject.foo; // bar</code></pre><span>
+</span><p>The fun part starts however when <em>myObject</em> no longer references the same object. Let’s trigger it manually at the last line:</p><span>
+</span><pre><code>var myObject = object({
+	foo: "bar"
+});
+
+myObject = null;</code></pre><span>
+</span><p>What happened is that we successfully reassigned <span class="f">myObject</span> to no longer reference the object literal object, however, not everything is eligible for garbage collection. Notice that we passed an object literal to the <span class="f">object</span> function:</p><span>
+</span><pre><code>{
+	foo: "bar"
+}</code></pre><span>
+</span><p>It occurs to be a problem, since this object actually gets stuck in the memory. It can be caught up if we analyzed the <span class="f">object</span> body:</p><span>
+</span><pre><code>var object = (function() {
+	function F() {};
+	return function(obj) {
+		F.prototype = obj;
+		return new F();
+	};
+}());</code></pre><span>
+</span><p>In order to create <span class="f">object</span> we defined <span class="f">F</span> function in the IIFE. It stays in its scope forever and will be never collected out. Then, at the line 4 we assign a new prototype to it (our foo: bar object in this case). Eventually, the whole thing returns a new object formed by calling <span class="f">new F()</span>. So after executing it for the first time we have a new object referenced by <em>myObject</em>, and it’s important that <em>object</em> function doesn’t keep track of it and it doesn’t know if it gets removed or whatever. What is most important is that our <span class="f">F</span> function kept a reference to </p><span>
+</span><pre><code>{
+	foo: "bar"
+}</code></pre><span>
+</span><p>since <em>F</em> was defined in the IIFE and will never get removed from the memory until we close the browser window. It happens, because of assigning it to the F’s prototype:</p><span>
+</span><pre><code>F.prototype = obj;</code></pre><span>
+</span><p>So during the application life-time <em>{ foo: „bar” }</em> is not eligible for garbage collection as it’s bundled with F.prototype. The only way to force this is creating a new object using <em>object()</em>. By doing this the old cached object will be eligible for garbage collection, however the new one will still leak. And it will happen over and over again every time we make a new object. </p><span>
+</span><p>It shows by the way how „optimization is the root of all evil”. Version 2 is an optimization but version 1 will actually perform well enough in virtually all real world cases. So was the optimization ever worth it?</p><span>
+</span><h3>Version 3 (2013-04-11)</h3><span>
+</span><p>Leaving the answer for the previous question, the memory leak fix is relatively easy. I believe the originator of this was <a href="http://webreflection.blogspot.com/">Andrea Giammarchi</a> in his <a href="https://github.com/WebReflection/maria/commit/8f76b6336d9f2348150aa13295634832d69bd153">pull request</a> for the Maria library. His change basically comes down to nulling the F’s prototype in <em>object</em> function (line 6):</p><span>
+</span><pre><code>var object = (function() {
+	function F() {};
+	return function(obj) {
+		F.prototype = obj;
+		obj = new F();
+		F.prototype = null;
+		return obj;
+	};
+}());</code></pre><span>
+</span><p>This way we manually break F’s reference to the prototype object so that F will not prevent that object from being garbage collected. The other interesting exercise might be to inspect modern engines and examine them to see how they handle such memory leaks as it was definitely an issue in the old good years of our beloved enemies like IE6. I made <a href="http://jsbin.com/mexuvucuci">a tiny example of Version 2 at JSBin</a> and then inspected Google Chrome’s 39.0.2171.95 GC following <a href="https://www.youtube.com/watch?v=ZKzw3VEqifw">a nice video tutorial I found at YouTube</a>:</p><span>
+</span><p class="image"><a href="http://ferrante.pl/wp-content/uploads/2015/01/Image-2015-01-14-at-2.01.24-PM.png"><img src="http://ferrante.pl/wp-content/uploads/2015/01/Image-2015-01-14-at-2.01.24-PM-1024x423.png" alt="Image 2015-01-14 at 2.01.24 PM" width="512" height="216" class="alignnone size-large wp-image-2375" /></a></p><span>
+</span><h3>Summary</h3><span>
+</span><p>The above history timeline of Object.create alternatives is something I was really excited about at the time I discussed it with <a href="http://peter.michaux.ca/">Peter Michaux</a>. He used it in his great MVC library called <a href="http://peter.michaux.ca/maria/">Maria</a>. Truth to be told, it perfectly illustrates the problem of memory leaks in JavaScript and what makes it even more great is that you can demonstrate it using just a few lines of code.</p><span>
+</span><h3>Update: Version 4 (2015-01-15)</h3><span>
+</span><p>After a short Twitter conversation with Andrea Giammarchi I was told about his another variation of Version 3 which seems to be more bullet-proof since nulling the prototype object might <a href="http://twitter.com/WebReflection/status/555661342762622976">cause a browser crash</a> in Opera/Debian:</p><span>
+</span><pre><code>var inherit = (function () {
+	function Constructor() {
+		// always reassign the initial
+		// prototype to avoid problems
+		// in jurassic engines
+		Constructor.prototype = cp;
+	}
+	// original prototype
+	var cp = Constructor.prototype;
+	// the inherit function
+	return function (object) {
+		// assign it once
+		Constructor.prototype = object;
+		// and drop any reference once constructoed
+		return new Constructor;
+  	};
+}());</code></pre><span>
+</span><p>Above <span class="f">inherit</span> function is a part of <a href="https://github.com/WebReflection/es-class">es-class</a> library by Andrea Giammarchi and avoid nulling the prototype object by restoring an original prototype object which is initially assigned to <span class="f">cp</span> variable.</p><span>
+</span><hr /><span>
+</span><p>Thanks to Peter Michaux for his help with gathering some important facts about the topic.</p><span>
+		</span><span>
+	</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
