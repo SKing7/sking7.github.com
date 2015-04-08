@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Updated: Parallax Effects in Hybrid/Web Apps</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Updated: Parallax Effects in Hybrid/Web Apps</h1>
+<div class="entry-content"><span>
+		</span><p>A while back I wrote about adding <a href="http://modernweb.com/2013/12/23/parallax-ui-for-phonegap-and-mobile-web-apps/" target="_blank">parallax effects to your HTML/JS experiences</a> to make them feel a bit richer and closer to a native experience. &nbsp;I’ve just added this subtle (key word *subtle*) effect to a new project and made a few changes I wanted to share here.</p><span>
+</span><p>If you are wondering what I am talking about with “parallax effects” – Parallax movement is where objects in the background move at a different rate than objects in the foreground, thus causing the perception&nbsp;of depth. &nbsp;<a href="http://en.wikipedia.org/wiki/Parallax" target="_blank">Read more about it</a> if you’re interested.</p><span>
+</span><p>First, here’s a quick video of this latest app in action. &nbsp;It’s a hybrid <a href="http://ibm.com/mobilefirst" target="_blank">MobileFirst</a> app, but this technique could be used in any <a href="http://cordova.apache.org/" target="_blank">Cordova</a>/<a href="http://phonegap.com/" target="_blank">PhoneGap</a>/<a href="http://ibm.com/mobilefirst" target="_blank">MobileFirst</a>/mobile web app experience. &nbsp;The key is to keep it subtle and not too much “in your face”, and yes, it is very subtle in this video. &nbsp;You have to watch closely.</p><span>
+</span><span>
+</span><p>The techniques that I wrote about in the previous post still apply – I’ve just added a bit more to cover more use cases.</p><span>
+</span><p>First let’s look at the CSS.</p><span>
+</span><pre class="brush: css; title: ; notranslate" title="">body {
+    background-image: url('../images/cloud_advisor_bkgd.png');
+    background-attachment: fixed;
+    background-position: center;
+    background-size: auto 120%;
+}</pre><span>
+</span><p>This sets the background image and default position. &nbsp;The distinct change here is that I set the background size to “auto” width and 120% height. &nbsp;In this case, you can have a huge image that shrinks down to just slightly larger than the window size, or a small image that scales up to a larger window size. &nbsp;This way you don’t end up with seams in a repeated background or a background that is too big to highlight the parallax effect effectively.</p><span>
+</span><p>Next let’s take a quick look at the JS involved.</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var position = "center";
+var lastPosition = "center";
+var contentCSS = "";
+var body = $("body");
+var content = $(".content");
+window.suspendAnimation = false;
+
+var xMovement = 15;
+var yMovement = 30;
+var halfX = xMovement/2;
+var halfY = yMovement/2;
+
+window.ondeviceorientation = function(event) {
+ var gamma = event.gamma/90;
+ var beta = event.beta/180;
+
+ var temp = 0;
+
+ //fix for holding the device upside down
+ if ( gamma &gt;= 1 ) {
+  gamma = 2- gamma;
+ } else if ( gamma &lt;= -1) {
+  gamma = -2 - gamma;
+ }
+
+ // shift values/motion based upon device orientation
+ switch (window.orientation) {
+  case 90:
+   temp = gamma;
+   gamma = beta;
+   beta = temp;
+   break;
+  case -90:
+   temp = -gamma;
+   gamma = beta;
+   beta = temp;
+   break;
+
+ }
+
+ // update positions to be used for CSS
+ var yPosition = -yMovement - (beta * yMovement);
+ var xPosition = -xMovement - (gamma * xMovement);
+ var contentX = (-xMovement - xPosition)/2;
+ var contentY = (-yMovement - yPosition)/2;
+
+ // generate css styles
+ position = xPosition.toFixed(1) + "px " + yPosition.toFixed(1) + "px";
+ contentCSS = "translate3d( " + (contentX.toFixed(1)) + "px, " + (contentY.toFixed(1)) + "px, " + " 0px)";
+}
+
+function updateBackground() {
+
+ if (!window.suspendAnimation) {
+  if ( position.valueOf() != lastPosition.valueOf() ) {
+
+   body.css( "background-position", position);
+   content.css( "-webkit-transform", contentCSS);
+   lastPosition = position;
+  }
+ } else {
+  lastPosition = "translate3d(0px, 0px, 0px)";;
+ }
+
+ window.requestAnimationFrame(updateBackground);
+}
+
+window.requestAnimationFrame(updateBackground);</pre><span>
+</span><p>The html where this would be used would be something like this:</p><span>
+</span><pre class="brush: xml; title: ; notranslate" title="">&lt;body&gt;
+  &lt;div class="content"&gt;put your foreground stuff here.&lt;/div&gt;
+&lt;/body&gt;</pre><span>
+</span><p>There are some subtle but important changes here:</p><span>
+</span><ol>
+<li>In the <a href="http://www.html5rocks.com/en/tutorials/speed/animations/" target="_blank">requestAnimationFrame</a> loop, it only applies changes *if* there are changes to apply. &nbsp;This prevents needless calls to apply CSS even if the CSS styles hadn’t changed. &nbsp;In this, I also truncate&nbsp;the numeric CSS string so that it isn’t reapplying CSS if the position should shift by 0.01 pixels. <em>Side note: If you aren’t using requestAnimationFrame for HTML animations, you should learn about&nbsp;it.</em></li>
+<li>If you used my old code and were holding the device upside down, it wouldn’t work. &nbsp;Not even a little bit. &nbsp;This has that fixed (see comments inline above).</li>
+<li>This moves the background in CSS, which doesn’t cause <a href="https://developers.google.com/speed/articles/reflow" target="_blank">browser reflow operations</a>, and moves the foreground content (inside of a div) using <a href="http://www.html5rocks.com/en/mobile/optimization-and-performance/" target="_blank">translate3d</a>, which also doesn’t cause browser reflow operations. &nbsp;This helps keep animations smooth and the UX performing optimally.</li>
+<li>I also added a global variable to turn parallax on and off very quickly, if you need it.</li>
+</ol><span>
+</span><p>The result is a faster experience that is more efficient and less of a strain on CPU and battery. &nbsp;Feel free to test this technique out on your own.</p><span>
+</span><p>If you use the code above, you can modify the xMovement and yMovement variables to exaggerate the parallax effect.</p><span>
+	</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

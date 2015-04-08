@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Meta-programming JavaScript Using Proxies</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Meta-programming JavaScript Using Proxies</h1>
+<section class="post-content">
+                <p>Thew new Proxy api presented in ecmascript6 allows us to do some really sick stuff to JavaScript’s syntax, which in my point of view is great. <br />I love meta-programming and up until now it was an extremely problematic/hack-ish thing to in JavaScript.</p>
+
+<p>If you want to try out the code-snippets I will post in this article, you will have to use Chrome/Chromium and enable the “Experimental JavaScript” flag in your browser. </p>
+
+<p>You can do it simply by typing chrome://flags/ in your address bar and CTRL+F-ing “Experimental JavaScript”.</p>
+
+<p>Proxies allow us to define JS objects in a way that were impossible before. <br />Below is a small example made by Mozilla:  </p>
+
+<pre><code class="prettyprint javascript">var proxy;
+
+var handler = {  
+    has: function (name) {
+        return name == 'foo';
+    },
+    get: function (rcvr, name) {
+        if (name != 'foo')
+            return undefined;
+        print(proxy !== rcvr);
+        return "bye";
+    },
+};
+
+proxy = Proxy.create(handler);
+
+var c = Object.create(proxy);
+
+print(c.foo); // prints: 'true' (from "proxy !== rcvr") and 'bye' (from "c.foo").  
+// In this example, the get trap rcvr argument is the c object while proxy is its prototype
+</code></pre>
+
+<h2 id="implementingpipes">Implementing Pipes</h2>
+
+<p>After fiddling around with the Proxy API myself, I was able to get some pretty cool results. <br />First thing I wanted to try is to implement pipes in JS.</p>
+
+<p>I already done it once using pseudo operator overloading (you can see the result <a href="https://github.com/dzautner/jsPipe">here</a> but I wanted to see how easy it will be with proxies. The answer is “pretty damn easy”. <br />You can see the result below:</p>
+
+<pre><code class="prettyprint javascript">var pipe = (function () {
+
+    var pipe;
+
+    return function (value) {
+        pipe = [];
+        return Object.create(Proxy.create({
+            get: function (pipeObject, fnName) {
+                if (fnName == "get")
+                    return pipe.reduce(function (val, fn) { return fn(val); }, value);
+
+                pipe.push(window[fnName]);
+                return pipeObject;
+            }
+        }));
+    }
+}());
+
+var double        = function (n) { return n*2 },  
+    pow           = function (n) { return n*n },
+    reverseInt    = function (n) { return n.toString().split('').reverse().join('')|0 };
+
+
+var pipedExample = pipe(3) . double . pow . reverseInt . get  
+console.log(pipedExample); //63  
+</code></pre>
+
+<h2 id="wellthatscoolbuthowfarcanyoutakeit">Well that’s cool, but how far can you take it?</h2>
+
+<p>As far as overloading getters on objects allows us, which is pretty far. <br />Using Proxies I was able to create a query like syntax for filtering repositories represented in JSON. <br />Here is the result:</p>
+
+<pre><code class="prettyprint javascript">var ChristmasList = Repository([
+
+    {
+        name: "Daniel",
+        age: 12,
+        wants: "a dog",
+    },
+
+
+    {
+        name: "Julia",
+        age: 8,
+        wants: "a bottle of rum"
+    },
+
+
+    {
+        name: "Vitaly",
+        age: Infinity,
+        wants: "a dog"
+    },
+
+    {
+        name: "Ina",
+        age: 20,
+        wants: "Vitaly"
+    }
+]);
+
+
+ChristmasList.wants['a dog'].get; // [ {age: 12, name: "Daniel",wants: "a dog"}, {age: Infinity, name: "Vitaly", wants: "a dog"} ]  
+ChristmasList.age['&lt;']['12'].get; // {name: "Julia", age: 8, wants: "a bottle of rum"}  
+ChristmasList.wants['a dog'].age["&gt;"]["12"].get; // {name: "Vitaly", age: Infinity, wants: "a dog"};  
+ChristmasList.wants[  
+    ChristmasList.wants['a dog'].age["&gt;"]["12"].get.name
+].get // {name: "Ina", age: 20, wants: "Vitaly"}
+</code></pre>
+
+<p>For the implementation that allowed the code above to happen, feel free to check the <a href="https://github.com/dzautner/json-repository-query">Github repository</a>. <br />Don’t forget to star it and feel free to fork it (:</p>
+            </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

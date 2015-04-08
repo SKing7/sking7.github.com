@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>【翻译】如何自己检查NodeJS的代码是否存在内存泄漏</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>【翻译】如何自己检查NodeJS的代码是否存在内存泄漏</h1>
+<div class="callout"><span> </span><blockquote>
+<p>原文：<a href="http://www.nearform.com/nodecrunch/self-detect-memory-leak-node">http://www.nearform.com/nodecrunch/self-detect-memory-leak-node</a></p>
+</blockquote><span>
+</span><p>追踪NodeJS代码中的内存泄漏一直是一个很有挑战的难题。本文讨论如何从一个node写的应用里自动的跟踪到内存泄漏问题，在这里笔者向大家推荐两款追查内存问题的神器 —— <a href="https://www.npmjs.com/package/memwatch">memwatch</a> 和 <a href="https://github.com/bnoordhuis/node-heapdump">heapdump</a></p><span>
+</span><p><img src="http://www.nearform.com/wp-content/uploads/2015/03/memory-leak2.png" alt="memoryleak" /></p><span>
+</span><p>首先，我们来看一个简单的内存泄漏</p><span>
+</span><pre><code class="lang-javascript">var http = require('http');
+
+var server = http.createServer(function (req, res) {
+ for (var i=0; i&lt;1000; i++) {
+   server.on('request', function leakyfunc() {});
+ }
+
+ res.end('Hello World\n');
+}).listen(1337, '127.0.0.1');
+server.setMaxListeners(0);
+console.log('Server running at http://127.0.0.1:1337/. Process PID: ', process.pid);
+</code></pre><span>
+</span><p>每一个请求我们增加了1000个导致泄漏的监听器。如果我们在一个shell控制台中执行以下命令：</p><span>
+</span><pre><code>while true; do curl "http://127.0.0.1:1337/"; done
+</code></pre><p>然后在另外一个shell控制台中查看我们的进程</p><span>
+</span><pre><code class="lang-bash">top -pid
+</code></pre><span>
+</span><p>我们会看到node进程产生异常高的内存占用，我们的node进程看起来失控了。那么，当我们的node进程出现这种情况的时候，通常我们该怎样诊断出问题的根源？</p><span>
+</span><h2 id="-">内存泄露的检测</h2><span>
+</span><p>npm模块 memwatch 是一个非常好的内存泄漏检查工具，让我们先将这个模块安装到我们的app中去，执行以下命令：</p><span>
+</span><pre><code class="lang-bash">npm install --save memwatch
+</code></pre><span>
+</span><p>然后，在我们的代码中，添加：</p><span>
+</span><pre><code class="lang-javascript">var memwatch = require('memwatch');
+//memwatch.setup();  原文有这行代码，最新版本的memwatch已去掉这个方法（译者注）
+</code></pre><span>
+</span><p>然后监听 leak 事件</p><span>
+</span><pre><code class="lang-javascript">memwatch.on('leak', function(info) {
+ console.error('Memory leak detected: ', info);
+});
+</code></pre><span>
+</span><p>这样当我们执行我们的测试代码，我们会看到下面的信息：</p><span>
+</span><pre><code>{
+ start: Fri Jan 02 2015 10:38:49 GMT+0000 (GMT),
+ end: Fri Jan 02 2015 10:38:50 GMT+0000 (GMT),
+ growth: 7620560,
+ reason: 'heap growth over 5 consecutive GCs (1s) - -2147483648 bytes/hr'
+}
+</code></pre><p>memwatch发现了内存泄漏！memwatch 判定内存泄漏事件发生的规则如下：</p><span>
+</span><p><strong>当你的堆内存在5个连续的垃圾回收周期内保持持续增长，那么一个内存泄漏事件被派发</strong></p><span>
+</span><p>了解更加详细的内容，查看 <a href="https://www.npmjs.com/package/memwatch">memwatch</a></p><span>
+</span><h2 id="-">内存泄漏分析</h2><span>
+</span><p>使用memwatch我们发现了存在内存泄漏，这非常好，但是现在呢？我们还需要定位内存泄漏出现的实际位置。要做到这一点，有两种方法可以使用。</p><span>
+</span><h3 id="memwatch-heap-diff">memwatch heap diff</h3><span>
+</span><p>通过memwatch你可以得到堆内存使用量和内存随程序运行产生的差异。详细的文档在<a href="https://www.npmjs.com/package/memwatch">这里</a></p><span>
+</span><p>例如，我们可以在两个leak事件发生的间隔中做一个<code>heap dump</code>：</p><span>
+</span><pre><code class="lang-javascript">var hd;
+memwatch.on('leak', function(info) {
+ console.error(info);
+ if (!hd) {
+   hd = new memwatch.HeapDiff();
+ } else {
+   var diff = hd.end();
+   console.error(util.inspect(diff, true, null));
+   hd = null;
+ }
+});
+</code></pre><span>
+</span><p>执行这段代码会输出更多的信息：</p><span>
+</span><pre><code>{ before: {
+   nodes: 244023,
+   time: Fri Jan 02 2015 12:13:11 GMT+0000 (GMT),
+   size_bytes: 22095800,
+   size: '21.07 mb' },
+ after: {
+   nodes: 280028,
+   time: Fri Jan 02 2015 12:13:13 GMT+0000 (GMT),
+   size_bytes: 24689216,
+   size: '23.55 mb' },
+ change: {
+   size_bytes: 2593416,
+   size: '2.47 mb',
+   freed_nodes: 388,
+   allocated_nodes: 36393,
+   details:
+   [ { size_bytes: 0,
+   '+': 0,
+   what: '(Relocatable)',
+   '-': 1,
+   size: '0 bytes' },
+   { size_bytes: 0,
+   '+': 1,
+   what: 'Arguments',
+   '-': 1,
+   size: '0 bytes' },
+   { size_bytes: 2856,
+   '+': 223,
+   what: 'Array',
+   '-': 201,
+   size: '2.79 kb' },
+   { size_bytes: 2590272,
+   '+': 35987,
+   what: 'Closure',
+   '-': 11,
+   size: '2.47 mb' },
+...
+</code></pre><p>所以在内存泄漏事件之间，我们发现堆内存增长了2.47MB，而导致内存增长的罪魁祸首是<strong>闭包</strong>。如果你的泄漏是由某个class造成的，那么<code>what</code>字段可能会输出具体的class名字，所以这样的话，你会获得足够的信息来帮助你最终定位到泄漏之处。</p><span>
+</span><p>然而，在我们的例子中，我们唯一获得的信息只是泄漏来自于闭包，这个信息非常有用，但是仍不足以在一个复杂的应用中迅速找到问题的来源（复杂的应用往往有很多的闭包，不知道哪一个造成了内存泄漏——译者注）</p><span>
+</span><p>所以我们该怎么办呢？这时候该Heapdump出场了。</p><span>
+</span><h2 id="heapdump">Heapdump</h2><span>
+</span><p>npm模块node-heapdump是一个非凡的模块，它可以使用来将v8引擎的堆内存内容dump出来，这样你就可以在Chrome的开发者工具中查看问题。你可以在开发工具中对比不同运行阶段的堆内存快照，这样可以帮助你定位到内存泄漏的位置。要想了解heapdump的更多内容，可以阅读<a href="https://strongloop.com/strongblog/how-to-heap-snapshots/">这篇文章</a></p><span>
+</span><p>现在让我们来试试 heapdump，在每一次发现内存泄漏的时候，我们都将此时的内存堆栈快照写入磁盘中：</p><span>
+</span><pre><code class="lang-javascript">memwatch.on('leak', function(info) {
+ console.error(info);
+ var file = '/tmp/myapp-' + process.pid + '-' + Date.now() + '.heapsnapshot';
+ heapdump.writeSnapshot(file, function(err){
+   if (err) console.error(err);
+   else console.error('Wrote snapshot: ' + file);
+  });
+});
+</code></pre><span>
+</span><p>运行我们的代码，磁盘上会产生一些<code>.heapsnapshot</code>的文件到<code>/tmp</code>目录下。现在，在Chrome浏览器中，启动开发者工具（在mac下的快捷键是alt+cmd+i），点击<code>Profiles</code>标签并点击<code>Load</code>按钮载入我们的快照。</p><span>
+</span><p>我们能够很清晰地发现原来leakyfunc()是内存泄漏的元凶。</p><span>
+</span><p><img src="http://www.nearform.com/wp-content/uploads/2015/03/Damian-1.png" alt="leakyfunc" /></p><span>
+</span><p>我们依然还可以通过对比两次记录中heapdump的不同来更加迅速确认两次dump之间的内存泄漏:</p><span>
+</span><p><img src="http://www.nearform.com/wp-content/uploads/2015/03/Damian-2.png" alt="heapdump" /></p><span>
+</span><p>想要进一步了解开发者工具的<code>memory profiling</code>功能，可以阅读 <a href="http://addyosmani.com/blog/taming-the-unicorn-easing-javascript-memory-profiling-in-devtools/"> Taming The Unicorn: Easing JavaScript Memory Profiling In Chrome DevTools</a> 这篇文章。</p><span>
+</span><h2 id="turbo-test-runner">Turbo Test Runner</h2><span>
+</span><p>我们给<a href="https://www.npmjs.com/package/turbo-test-runner">Turbo</a> - <a href="http://www.feedhenry.com/">FeedHenry</a>开发的测试工具提交了一个小补丁 — 使用了上面所说的内存泄漏检查技术。这样就可以让开发者写针对内存的单元测试了，如果模块有内存问题，那么测试结果中就会产生相应的警告。详细了解具体的内容，可以访问<a href="https://www.npmjs.com/package/turbo-test-runner">Turbo</a>模块。</p><span>
+</span><h2 id="-">结论和其他细节</h2><span>
+</span><p>上面的内容讨论了一种检测NodeJS内存泄漏的基本方法，以下是一些结论：</p><span>
+</span><ul>
+<li><a href="https://www.npmjs.com/package/heapdump">heapdump</a>有一些潜规则，例如快照大小等。仔细阅读<a href="https://www.npmjs.com/package/heapdump#caveats">说明文档</a>，并且生成快照也是比较消耗CPU资源的。</li>
+<li>还有些其他方法也能生成快照，各有利弊，针对你的项目选择最适合的方式。（例如，发送sigusr2到进程等等，这里有一个<a href="https://www.npmjs.com/package/memwatch-sigusr2">memwatch-sigusr2</a>项目）</li>
+<li>需要考虑在什么情况下开启memwatch/heapdump。只有在测试环境中有开启它们的必要，另外也需要考虑heapdump的频度以免耗尽了CPU。总之，选择最适合你项目的方式。</li>
+<li>也可以考虑其他的方式来检测内存的增长，比如直接监控<code>process.memoryUsage()</code>是一个可以考虑的方法。</li>
+<li>当内存问题被探测到之后，你应该要确定这确实是个内存泄漏问题，然后再告知给相关人员。</li>
+<li>当心误判，短暂的内存使用峰值表现得很像是内存泄漏。如果你的app突然要占用大量的CPU和内存，处理时间可能会跨越数个垃圾回收周期，那样的话memwatch很有可能将之误判为内存泄漏。但是，这种情况下，一旦你的app使用完这些资源，内存消耗就会降回正常的水平。所以，你其实需要注意的是持续报告的内存泄漏，而可以忽略一两次突发的警报。</li>
+<li>memwatch目前仅支持node 0.10.x，node 0.12.x（可能还有io.js)支持的版本在<a href="https://github.com/marcominetti/node-memwatch">这个分支</a></li>
+<li>这篇文章相关的代码我放在<a href="https://gist.github.com/dberesford/28876b39d26b02b7683a">gist</a>上。</li>
+</ul><span>
+ </span><div id="wx-qrcode" class="wx_qrcode_box"><img src="http://7j1xbq.com1.z0.glb.clouddn.com/qrcode_for_gh_229345f1b408_258.jpg" alt="w3ctech微信" class="weixin_qrcode" /><p>扫码关注w3ctech微信公众号</p></div></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

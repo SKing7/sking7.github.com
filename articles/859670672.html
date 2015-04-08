@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Where to Store your JWTs</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Where to Store your JWTs</h1>
+<div class="clearfix"><p>Stormpath has recently worked on token authentication features using JSON Web Tokens (JWT), and we have had many conversations about the security of these tokens and where to store them.</p><span>
+
+</span><p>If you are curious about your options, this post is for you.  We will cover the basics of JSON Web Tokens (JWT), cookies, HTML5 web storage (localStorage/sessionStorage), and basic information about cross-site scripting (XSS) and cross site request forgery (CSRF).</p><span>
+
+</span><p>Let’s get started…</p><span>
+
+</span><h2>JSON Web Tokens (JWT): A Crash Course</h2><span>
+
+</span><p>The most implemented solutions for API authentication and authorization are the OAuth 2.0 and JWT specifications, which are fairly dense. Cliff’s Notes Time! Here’s what you need to know:</p><span>
+
+</span><!--more--><span>
+
+
+</span><ul>
+<li>JWTs are a great authentication mechanism. They give you a structured and stateless way to declare a user and what they can access. They can be cryptographically signed and encrypted to prevent tampering on the client side.</li>
+<li>JWTs are a great way to declare information about the token and authentication.  You have a ton of freedom to decide what makes sense for your application because you are working with JSON.</li>
+<li>The concept behind scopes is powerful yet incredibly simple: you have the freedom to design your own access control language because, again, you are working with JSON.</li>
+</ul><span>
+
+
+</span><p>If you encounter a token in the wild, it looks like this:</p><span>
+
+</span><pre><code>"dBjftJeZ4CVP.mB92K27uhbUJU1p1r.wW1gFWFOEjXk..."
+</code></pre><span>
+
+</span><p>This is a Base64 encoded string. If you break it apart you’ll actually find three separate sections:</p><span>
+
+</span><pre><code>eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9
+.
+eyJpc3MiOiJodHRwOi8vZ2FsYXhpZXMuY29tIiwiZXhwIjoxMzAwODE5MzgwLCJzY29wZXMiOlsiZXhwbG9yZXIiLCJzb2xhci1oYXJ2ZXN0ZXIiXSwic3ViIjoic3RhbmxleUBhbmRyb21lZGEuY29tIn0
+.
+edK9cpfKKlGtT6BqaVy4bHnk5QUsbnbYCWjBEE7wcuY
+</code></pre><span>
+
+</span><p>The first section is a header that describes the token.  The second section is a payload which contains the juicy bits, and the third section is a signature hash that can be used to verify the integrity of the token (if you have the secret key that was used to sign it).</p><span>
+
+</span><p>When we magically decode the second section, the payload, we get this nice JSON object:</p><span>
+
+</span><pre><code>{
+  "iss": "http://galaxies.com",
+  "exp": 1300819380,
+  "scopes": ["explorer", "solar-harvester", "seller"],
+  "sub": "tom@andromeda.com"
+}
+</code></pre><span>
+
+</span><p>This is the payload of your token. It allows you to know the following:</p><span>
+
+</span><ul>
+<li>Who this person is (sub, short for subject)</li>
+<li>What this person can access with this token (scope)</li>
+<li>When the token expires (exp)</li>
+<li>Who issued the token (iss, short for issuer)</li>
+</ul><span>
+
+
+</span><p>These declarations are called ‘claims’ because the token creator claims a set of assertions that can be used to ‘know’ things about the subject. Because the token is signed with a secret key, you can verify its signature and implicitly trust what is claimed.</p><span>
+
+</span><p>Tokens are given to your users after they present some credentials, typically a username and password, but they can also provide API keys, or even tokens from another service. This is important because it is better to pass a token (that can expire, and have limited scope) to your API than a username and password.  If the username and password are compromised in a man-in-the-middle attack, it is like giving an attacker keys to the castle.</p><span>
+
+</span><p>Stormpath’s <a href="http://docs.stormpath.com/guides/api-key-management/">API Key Authentication Feature</a> is an example of this. The idea is that you present your hard credentials once, and then get a token to use in place of the hard credentials.</p><span>
+
+</span><p>The JSON Web Token (JWT) specification is quickly gaining traction. Recommended highly by Stormpath, it provides structure and security, but with the flexibility to modify it for your application. Here is a longer article on it: <a href="https://stormpath.com/blog/jwt-the-right-way/">Use JWT the Right Way!</a></p><span>
+
+</span><h2>Where to Store Your JWTs</h2><span>
+
+</span><p>So now that you have a good understanding of what a JWT is, the next step is to figure out how to store them.  If you are building a web application, you have a couple options:</p><span>
+
+</span><ul>
+<li>HTML5 Web Storage (localStorage/sessionStorage)</li>
+<li>Cookies</li>
+</ul><span>
+
+
+</span><p>To compare these two, let’s say we have a fictitious AngularJS or single page app (SPA) called <code>galaxies.com</code> with a login route (<code>/token</code>) to authenticate users to return a JWT.  To access the other APIs endpoints that serve your SPA, the client needs to pass an valid JWT.</p><span>
+
+</span><p>The request that the single page app makes would resemble:</p><span>
+
+</span><pre><code>HTTP/1.1
+
+POST /token
+Host: galaxies.com
+Content-Type: application/x-www-form-urlencoded
+
+username=tom@galaxies.com&amp;password=andromedaisheadingstraightforusomg&amp;grant_type=password
+</code></pre><span>
+
+</span><p>Your server’s response will vary based on whether you are using cookies or Web Storage.  For comparison, let’s take a look at how you would do both.</p><span>
+
+</span><h3>Web Storage</h3><span>
+
+</span><p>Exchanging a username and password for a JWT to store it in browser storage (sessionStorage or localStorage) is rather simple. The response body would contain the JWT as an access token:</p><span>
+
+</span><pre><code>HTTP/1.1 200 OK
+
+  {
+  "access_token": "eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB",
+       "expires_in":3600
+   }
+</code></pre><span>
+
+</span><p>On the client side, you would store the token in HTML5 Web Storage (assuming that we have a success callback):</p><span>
+
+</span><pre><code>function tokenSuccess(err, response) {
+    if(err){
+        throw err;
+    }
+    $window.sessionStorage.accessToken = response.body.access_token;
+}
+</code></pre><span>
+
+</span><p>To pass the access token back to your protected APIs, you would use the HTTP Authorization Header and the <code>Bearer</code> scheme.  The request that your SPA would make would resemble:</p><span>
+
+</span><pre><code>HTTP/1.1
+
+GET /stars/pollux
+Host: galaxies.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB
+</code></pre><span>
+
+</span><h3>Cookies</h3><span>
+
+</span><p>Exchanging a username and password for a JWT to store it in a cookie is simple as well. The response would use the <code>Set-Cookie</code> HTTP header:</p><span>
+
+</span><pre><code>HTTP/1.1 200 OK
+
+Set-Cookie: access_token=eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB; Secure; HttpOnly;
+</code></pre><span>
+
+</span><p>To pass the access token back to your protected APIs on the same domain, the browser would automatically include the cookie value.  The request to your protected API would resemble:</p><span>
+
+</span><pre><code>GET /stars/pollux
+Host: galaxies.com
+
+Cookie: access_token=eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB;
+</code></pre><span>
+
+</span><h2>So, What’s the difference?</h2><span>
+
+</span><p>If you compare these approaches, both receive a JWT down to the browser. Both are stateless because all the information your API needs is in the JWT.  Both are simple to pass back up to your protected APIs. The difference is in the medium.</p><span>
+
+</span><h3>Web Storage</h3><span>
+
+</span><p>Web Storage (localStorage/sessionStorage) is accessible through JavaScript on the same domain.  This means that any JavaScript running on your site will have access to web storage, and because of this can be vulnerable to cross-site scripting (XSS) attacks.  XSS in a nutshell is a type of vulnerability where an attacker can inject JavaScript that will run on your page.  Basic XSS attacks attempt to inject JavaScript through form inputs, where the attacker puts <code>&lt;script&gt;alert('You are Hacked');&lt;/script&gt;</code> into a form to see if it is run by the browser and can be viewed by other users.</p><span>
+
+</span><p>To prevent XSS, the common response is to escape and encode all untrusted data.  But this is far from the full story.  In 2015, modern web apps use JavaScript hosted on CDNs or outside infrastructure. Modern web apps include 3rd party JavaScript libraries for A/B testing, funnel/market analysis, and ads.  We use package managers like Bower to import other peoples’ code into our apps.</p><span>
+
+</span><p>What if only one of the scripts you use is compromised?  Malicious JavaScript can be embedded on the page, and Web Storage is compromised.   These types of XSS attacks can get <strong>everyone’s</strong> Web Storage that visits your site, without their knowledge. This is probably why a <a href="https://www.owasp.org/index.php/HTML5_Security_Cheat_Sheet#Local_Storage">bunch</a> of <a href="https://blog.whitehatsec.com/web-storage-security/">organizations</a> advise not to store anything of value or trust any information in web storage.  This includes session identifiers and tokens.</p><span>
+
+</span><p>As a storage mechanism, Web Storage does not enforce any secure standards during transfer.  Whoever reads Web Storage and uses it must do their due diligence to ensure they always send the JWT over <code>HTTPS</code> and never <code>HTTP</code>.</p><span>
+
+</span><h3>Cookies</h3><span>
+
+</span><p>Cookies, when used with the <code>HttpOnly</code> cookie flag, are not accessible through JavaScript, and are immune to XSS. You can also set the <code>Secure</code> cookie flag to guarantee the cookie is only sent over HTTPS. This is one of the main reasons that cookies have been leveraged in the past to store tokens or session data.  Modern developers are hesitant to use cookies because they traditionally required state to be stored on the server, thus breaking RESTful best practices.  Cookies as a storage mechanism do not require state to be stored on the server if you are storing a JWT in the cookie.  This is because the JWT encapsulates everything the server needs to serve the request.</p><span>
+
+</span><p>However, cookies are vulnerable to a different type of attack: cross-site request forgery (CSRF).  A CSRF attack is a type of attack that occurs when a malicious web site, email, or blog causes a user’s web browser to perform an unwanted action on a trusted site on which the user is currently authenticated.  This is an exploit of how the browser handles cookies.  A cookie can only be sent to the domains in which it is allowed.  By default, this is the domain that originally set the cookie. The cookie will be sent for a request regardless of whether you are on <code>galaxies.com</code> or <code>hahagonnahackyou.com</code>.</p><span>
+
+</span><p>CSRF works by attempting to lure you to <code>hahagonnahackyou.com</code>. That site will have either an <code>img</code> tag or JavaScript to emulate a form post to <code>galaxies.com</code> and attempt to hijack your session, if it is still valid, and modify your account.</p><span>
+
+</span><p>For example:</p><span>
+
+</span><pre><code>&lt;body&gt;
+
+  &lt;!-- CSRF with an img tag --&gt;
+
+  &lt;img href="http://galaxies.com/stars/pollux?transferTo=tom@stealingstars.com" /&gt;
+
+  &lt;!-- or with a hidden form post --&gt;
+
+  &lt;script type="text/javascript"&gt;
+  $(document).ready(function() {
+    window.document.forms[0].submit();
+  });
+  &lt;/script&gt;
+
+  &lt;div style="display:none;"&gt;
+    &lt;form action="http://galaxies.com/stars/pollux" method="POST"&gt;
+      &lt;input name="transferTo" value="tom@stealingstars.com" /&gt;
+    &lt;form&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+</code></pre><span>
+
+</span><p>Both would send the cookie for <code>galaxies.com</code> and could potentially cause an unauthorized state change.  CSRF can be prevented by using synchronized token patterns.  This sounds complicated, but all modern web frameworks have <a href="https://docs.angularjs.org/api/ng/service/$http#cross-site-request-forgery-xsrf-protection">support</a> <a href="https://github.com/expressjs/csurf">for</a> <a href="http://spring.io/blog/2013/08/21/spring-security-3-2-0-rc1-highlights-csrf-protection/">this</a>.</p><span>
+
+</span><p>For example, AngularJS has a solution to validate that the cookie is accessible by only your domain. Straight from <a href="https://docs.angularjs.org/api/ng/service/$http">AngularJS docs</a>:</p><span>
+
+</span><blockquote><p>When performing XHR requests, the <code>$http</code> service reads a token from a cookie (by default, XSRF-TOKEN) and sets it as an HTTP header (<code>X-XSRF-TOKEN</code>). Since only JavaScript that runs on your domain can read the cookie, your server can be assured that the XHR came from JavaScript running on your domain.</p></blockquote><span>
+
+</span><p>You can make this CSRF protection stateless by including a <code>xsrfToken</code> JWT claim:</p><span>
+
+</span><pre><code>{
+  "iss": "http://galaxies.com",
+  "exp": 1300819380,
+  "scopes": ["explorer", "solar-harvester", "seller"],
+  "sub": "tom@andromeda.com",
+  "xsrfToken": "d9b9714c-7ac0-42e0-8696-2dae95dbc33e"
+}
+</code></pre><span>
+
+</span><p>If you are using the <a href="https://github.com/stormpath/stormpath-sdk-angularjs">Stormpath SDK for AngularJS</a>, you get stateless CSRF protection with no development effort.</p><span>
+
+</span><p>Leveraging your web app framework’s CSRF protection makes cookies rock solid for storing a JWT. CSRF can also be partially prevented by checking the HTTP <code>Referer</code> and <code>Origin</code> header from your API. CSRF attacks will have <code>Referer</code> and <code>Origin</code> headers that are unrelated to your application.</p><span>
+
+</span><p>Even though they are more secure to store your JWT, cookies can cause some developer headaches, depending on if your applications require cross-domain access to work.  Just be aware that cookies have additional properties (Domain/Path) that can be modified to allow you to specify where the cookie is allowed to be sent. Using AJAX, your server side can also notify browsers whether credentials (including Cookies) should be sent with requests with CORS.</p><span>
+
+</span><h3>Conclusion</h3><span>
+
+</span><p>JWTs are a awesome authentication mechanism. They give you a structured way to declare users and what they can access. They can be encrypted and signed for to prevent tampering on the client side, but the devil is in the details and where you store them.  Stormpath recommends that you store your JWT in cookies for web applications, because of the additional security they provide, and the simplicity of protecting against CSRF with modern web frameworks.  HTML5 Web Storage is vulnerable to XSS, has a larger attack surface area, and can impact all application users on a successful attack.</p><span>
+
+</span><p>Questions or comments? We would love to hear them! Let me know if you have any questions in the discussion below or at <a href="mailto:tom@stormpath.com">tom@stormpath.com</a> / <a href="https://twitter.com/omgitstom">@omgitstom</a>.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

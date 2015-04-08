@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p>Season’s Greetings! </p><span>
+</span><p>There are many reasons why your first byte can be slow but I am going to talk about a <a href="https://support.microsoft.com/kb/214397/en-us">very specific interaction</a> thats very well known to network geeks but can use some circulation among the front-end developers for it happens to be in the critical path of the browser. In particular this has a tendency to effect the boundaries at which SSL record layer hands off control to the HTTP layer.</p><span>
+</span><p>It is not a bad idea to refresh <a href="http://chimera.labs.oreilly.com/books/1230000000545/ch02.html" title="Basics of TCP">your basics of TCP </a> before diving in to read the rest of this article. </p><span>
+</span><h2 id="background-motivation">Background &amp; Motivation</h2><span>
+</span><p>First, Let us understand a problem called <a href="http://en.wikipedia.org/wiki/Silly_window_syndrome">Silly Window Syndrome</a> that begat both <a href="https://tools.ietf.org/html/rfc1122#page-98">Nagle’s Algorithm</a> and <a href="https://tools.ietf.org/html/rfc1122#page-96">Delayed Acknowledgements</a> as solutions.</p><span>
+</span><p>Visually  the problem can be pictured as follows:</p><span>
+</span><p><img src="http://bigqueri.es/uploads/default/457/762cfde4d0c1e0d2.png" width="650" height="403" /></p><span>
+</span><p>As you can see we spend 120 bytes of TCP header overhead to transport 1 byte of data. To prevent this gross inefficiency/underutilization of the network the following distributed solution was implemented:</p><span>
+</span><p><strong>Solution to SWS Problem:</strong></p><span>
+</span><ul>
+<li>Receiver<br />– avoid advertising small TCP window advances<br />– delay acknowledgements</li>
+<li>Sender<br />– delay transmission of partially filled segments until all previously transmitted data has been acknowledged</li>
+</ul><span>
+</span><p>The BSD folks developed the client side solution and the server side was implemented by John Nagle. The deadlock introduced by the interaction of the two components was not noticed until it got deployed in the real world production networks.</p><span>
+</span><h4 id="notes-on-delayed-acks"> Delayed Ackowledgements</h4><span>
+</span><p>Traditional TCP implementations hold up acknowledgements for up to 200ms, hoping to piggy-back ACK on a data bearing outgoing packet. However, an immediate ACK is generated after every second full size (MSS-sized) packet. The motivation for delayed ACKs is to save bandwidth. Now we incur the following costs due to its deployment:</p><span>
+</span><p>    * During slow start and congestion avoidance, <em> <a href="http://en.wikipedia.org/wiki/Congestion_window">congestion window</a></em> growth is driven by the number of acknowledgements received. For bulk transfers, you tend to get an immediate ACKs every second packet – so the sender sees half as many ACKs. This means that slow start is significantly slower than the “double cwnd every roundtrip” that you read in textbooks. The naive expectation is to send 2,4,8,18 segments in the first 4 roundtrips whereas in reality you would see the pattern of 2,3,5,8 cumulative segments sent with this in effect. Also the effect on congestion avoidance is also significant: the usual TCP throughput bound (for high bandwidth, large receiver windows, low-but-nonzero packet loss) is reduced by a factor 1/sqrt(2) with delayed ACKs on. </p><span>
+</span><p>    * Various timer-related anomalies. For instance, if you were to let <a href="http://repo.hackerzvoice.net/depot_madchat/ebooks/TCP-IP_Illustrated/tcp_time.htm"> RTO</a> fall below 200ms, the sender may decide a packet is lost when the receiver was simply holding up an ACK. Hence, TCP stacks generally don’t let RTO ever fall below 200ms, even when this would otherwise be desirable, such as on a small RTT link.</p><span>
+</span><p>Linux modifies this delayed ack timeout to be adjusted to the inter-arrival spacing by sampling around a small time interval like 15-20 ms and enforces a typical maximum thats much less than 200 ms ( around 40 ms delay is common). However Windows Network stack sets the maximum timeout at 200 ms with a rapid increase during the connection life time.I am not </p><span>
+</span><p>Note that in the case of request/response traffic such as HTTP, there is no hope<br />of piggybacking ACKs on data anyway, so one of the key motivations for delayed ACKs is gone.In relatively high-bandwidth links, the bandwidth cost of additional ACKs is small. Overall, it is almost certain that delayed ACKs are more complicated to implement for the (small) gain it warrants.</p><span>
+</span><h4 id="notes-on-nagles-algo">Nagle’s Algorithm</h4><span>
+</span><p>The first standard describing this algorithm is RFC 896 which says send no new segments (any size!), <em>when new  data arrives from the user</em> while there are any unacknowledged segments (any size!). This worked well. However, RFC 1122 relaxed the original central clause and allows you to send out full segments early. Now the significance of the outstanding packet size became controversial among implementers as to what constitutes a full sized packet (MSS, PMTUD, receiver not knowing what sender’s MSS,etc). I wont go into the gory details of why <a href="http://en.wikipedia.org/wiki/Maximum_segment_size">MSS</a> the calculation is messy but be assured that Nagle’s algorithm is not consistently implemented across stacks thanks to this confusion</p><span>
+</span><p>One could argue that <a href="https://tools.ietf.org/html/rfc896">Nagle</a> is irrelevant to today’s Internet, and that floods of small packets are no longer a problem worth solving. This argument fails on at least three grounds:</p><span>
+</span><ol>
+<li>Many people connect to the network over wireless links, which usually are both slow and shared</li>
+<li>Even on fast links, excessive use of small packets makes inefficient use of expensive resources, such as routers</li>
+<li>Nagles’ algorithm is a useful firewall against sloppy applications or complex bugs that would otherwise send too many tiny packets.</li>
+</ol><span>
+</span><p>There was a proposal to <a href="https://tools.ietf.org/html/draft-minshall-nagle-01">rethink the Nagle algorithm</a> which seems promising.Mac OS X is the only IS that integrated this modification into their kernel but given that this is a server side option, it would be interesting to see the same on Linux to gauge its impact </p><span>
+</span><h2 id="the-classic-deadlock-problem">The Classic Deadlock Problem </h2><span>
+</span><p>
+Now that we have seen why the components of TCP lets see how their interaction causes a deadlock.Instead of a contrived example to demonstrate this classic problem ,  lets take a look at this <a href="http://www.webpagetest.org/forums/showthread.php?tid=13322">problem in the wild</a>. The thread has a lot of details from WPT waterfalls to tcpdumps. The TLDR can be read <a href="https://josephscott.org/archives/2014/12/nginx-1-7-8-fixes-200ms-delay-with-spdy/">here if you are impatient</a></p><span>
+</span><p>The problem can be summarized as follows:</p><span>
+</span><p><img src="http://bigqueri.es/uploads/default/442/1ce7cc6edc8d7bba.png" width="650" /> </p><span>
+</span><p>Nagle’s Algorithm kicks in and starts to wait for its in-flight data to be acknowledged before sending more.Delayed ACK applies to a single packet and even number of full sized packets will trigger an ACK immediately but odd number of packets will have to pay the tax of delayed ack timeout which is 200ms in the case here using a windows WPT client</p><span>
+</span><p>To summarize the performance-killing effect:</p><span>
+</span><p><strong>Nagle/Delayed ack Interaction:</strong></p><span>
+</span><ul>
+<li>Nagle won’t send the last bit of data until it gets an ACK
+</li><li> Delayed ACK won’t send that ACK until it gets some response data
+</li><li> TCP won’t release the response to the application until it gets all the data acknowledged<br />–  and so on till a timeout occurs</li>
+</ul><span>
+</span><h4 id="standard-solution"> Standard Solution</h4><span>
+</span><p>This classic problem does not occur with non-persistent HTTP requests because closing the TCP connection also immediately<br />sends any data waiting for transmission. For persistent connection this can be resolved by disabling Nagle’s algorithm,<br />thus disabling the aspect of SWS avoidance which interferes with performance. If traffic is predominantly HTTP based, disabling Nagle’s algorithm in the TCP stack  may generate a slightly larger number of packets but throughput will usually be better. Routinely people do enable a socket option called <strong>TCP_NODELAY</strong> that effectively disabled Nagle’s algorithm and lets the server send the data without waiting or the acknowledgement from the client </p><span>
+</span><p>Analytically if the bottleneck is around 200 ms per transaction then you can only do 5 such transactions per second compared to at least 15 (assuming each transaction takes 62 ms) as seen in the following example</p><span>
+</span><p>Nagle Turned ON:</p><span>
+</span><p>&lt;<img src="http://bigqueri.es/uploads/default/459/e3457aa3aabaf1cf.png" width="492" height="355" />
+ </p><span>
+</span><p>Nagle Turned OFF:</p><span>
+</span><p><img src="http://bigqueri.es/uploads/default/458/b0822683acefde2a.png" width="597" height="338" /> </p><span>
+</span><p>Returning to the problem posted by the original poster the solution of disabling nagle did not work as intended and needed a bugfix from <a href="http://trac.nginx.org/nginx/changeset/2c10db908b8c4a9c0532c58830275d5ad84ae686/nginx/src">nginx folks that made it work</a></p><span>
+</span><h4 id="variants-of-the-problem"><i class="icon-pencil"></i> Variants of the Problem</h4><span>
+</span><p>This problem albeit reported in October 2014 has a precedent in 1997 when <a href="http://www.isi.edu/lsam/publications/phttp_tcp_interactions/">Heidemann</a> investigated performance problems of persistent connections. Specifically, an object that has an odd number of full MSS packets followed by a short packet on a persistent connection will lead to a 200ms delay, which doesn’t occur if the object had an even number of large packets. This is common at the beginning or the end with a potential in between : </p><span>
+</span><p><strong>Short initial segment problem:</strong></p><span>
+</span><ul>
+<li>Slow start kicks off with initial congestion window (was 2 in his time and 10 currenly)</li>
+<li>TCP delays ACK’s up to 200ms but acknowledges at least every other <em>full</em> segment if the number of segments is even but otherwise a delay between 1 and 3 packets if the first packet is less than the MSS</li>
+<li>The broader observation made in the paper is that delaying ACK (hope to piggyback) is rarely successful in request/response traffic. (They note that delayed ACK is also bad for FTP).</li>
+</ul><span>
+</span><p><strong>Odd/Short-Final-Segment problem</strong></p><span>
+</span><p>Suppose have odd number of full segments and a short final segment.  The sender won’t sent this final segment if it is small (less than half the clients advertised window) because of <a href="http://kohala.com/start/#books">silly-window-avoidance+ Nagle </a>  until it sees an ACK. But, for same reasons as above, the client will delay ACK. So again, about 200ms delay.</p><span>
+</span><p><strong>Slow Start Restart Problem</strong></p><span>
+</span><p>If all data is acknowledged and no more data is sent for one retransmission time out period, then congestion window is set back to initial value and repeat slow-start as the network information might be out of date</p><span>
+</span><p>The above reason is why persistent connections are not as effective  as one might think. People usually disable the socket option <strong>tcp_slow_start_after_idle</strong> to prevent this behavior and is important for single connection transfers like SPDY</p><span>
+</span><h2 id="ssl-impact">SSL Impact</h2><span>
+</span><p>My own brush with this problem took the form pictured below:</p><span>
+</span><p><img src="http://bigqueri.es/uploads/default/444/a98ce3279e170d55.png" width="642" height="500" /> </p><span>
+</span><p>The two gray shaded areas above represent the slowness during SSL handshake with a WPT client and we were at a loss to understand why SSL handshake was so slow particularly when dealing with Windows clients and now you all know the solution</p><span>
+</span><h2 id="the-solution-space">The Solution Space</h2><span>
+</span><p>The best way to attack this problem is in the application space rather than tweaking global socket transport. For example any application that is doing a write can actually selectively disable Nagle ONLY on the last write of the application which improves the performance while not sacrificing the benefits. </p><span>
+</span><p>Most of the times, these days the underlying framework does the writes for you (like nginx, apache, openssl, etc) but given the rising trend of microservices the following tactics can be employed to avoid these deadlocks if you are writing to the network</p><span>
+</span><p><strong>Application Write Strategies :</strong></p><span>
+</span><ul>
+<li> Use Vectored (Scatter/Gather) I/O if a single module does all the writes to network
+</li><li> Use Coalesced Writes if multiple modules are writing to the socket
+</li><li> Use <a href="http://www.stuartcheshire.org/papers/nagledelayedack/index.html"> Double Buffering </a> after Nagle is turned OFF with the cost of extra packet
+</li><li> Investigate TCP_CORK and MSG_MORE Semantics as it befits your application to make sure you never send any segments smaller than MSS
+</li><li> Microsoft and Apple can reduce their Delayed ACK timeout implementation  as 200 ms is an arbitrary choice based on original estimate for inter-arrival time of segments by choosing to use an adaptive policy
+</li><li> Linux can definitely implement the modifications to Nagle mentioned in <a href="http://hps.googlecode.com/files/ccr-200101-mogul.pdf">Minshall &amp; Mogul </a> albeit wont help the SSL interaction issues
+</li>
+</ul><span>
+</span><h2 id="final-thoughts-conclusion">Final Thoughts &amp; Conclusion</h2><span>
+</span><p>None of the classic TCP modeling efforts factor in the effect of delayed acknowledgements and please note that most web traffic flows never leave slow start phase so the impact of delayed acknowledgements is pretty severe on short web flows</p><span>
+</span><p> Most people tend to disable Nagle rather than disable delayed acknowledgements because they can control the server side easily and have no control on the clients.There is a control knob at the edge servers of your CDN where I have seen this being disabled with no deleterious effects</p><span>
+</span><p> So the last frontier is to selectively enable them at the client rather than pay the tax of these messy interactions. Personally I would like to study the effects on how much do we lose (my guess is a max of 1-2 RTTs for long flows and nothing for short flows) if we indeed did disable delayed acknowledgements. This helps put a number to the cost of SWS avoidance and we can do a cost benefit analysis. </p><span>
+</span><p>I leave you with a note by  <a href="https://news.ycombinator.com/item?id=8381957">John Nagle</a> on the same :</p><span>
+</span><blockquote><p>
+   A delayed ACK is a bet. You’re betting that there will be a reply, upon with an ACK can be piggybacked, before the fixed timer runs out. If the fixed timer runs out, and you have to send an ACK as a separate message, you lost the bet. Current TCP implementations will happily lose that bet forever without turning off the ACK delay. That’s just wrong.<br />The right answer is to track wins and losses on delayed and non-delayed ACKs. Don’t turn on ACK delay unless you’re sending a lot of non-delayed ACKs closely followed by packets on which the ACK could have been piggybacked. Turn it off when a delayed ACK has to be sent.</p>
+<p>I should have pushed for this in the 1980s.</p>
+</blockquote><span>
+</span><p>Thank you for reading thus far and I hope this conveyed the messy and somewhat surprising interactions among TCP components that affect your web performance timings.</p><span>
+</span><p>Happy Holidays and Hopefully 2015 will see less of these problems</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

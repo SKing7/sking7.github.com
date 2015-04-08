@@ -1,0 +1,254 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Best Practices for Using the Vary Header</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Best Practices for Using the Vary Header</h1>
+<div class="node content clearfix"><span>
+    </span><footer class="submitted">August 18, 2014<br />By: Rogier Mulhuijzen</footer><span>
+
+</span><p><img src="http://www.fastly.com/img/blog/Vary_Header.png" /></p><span>
+
+</span><p><span begin-excerpt="">Vary is one of the most powerful HTTP response headers. Used correctly, it can do wonderful things. Unfortunately, this header is frequently used incorrectly, which can lead to abysmal hit ratios. Worse still, if it's not used when it should be, the wrong content could be delivered.</span></p><span>
+
+</span><p>Instead of just pointing you to the <a href="http://tools.ietf.org/html/rfc7231#section-7.1.4">Vary specification</a>, I'm going to explain the Vary header using the most common use case: compression.</p><span>
+
+</span><p>If you're using Apache's <a href="http://httpd.apache.org/docs/2.4/mod/mod_deflate.html">mod_deflate</a>, the correct Vary header is automatically added to your responses. The same goes for Fastly's <a href="http://docs.fastly.com/guides/caching/how-do-i-enable-automatic-gzipping">gzip feature</a>. But as this is a very simple real world use of Vary, I will use it to demonstrate how Vary works.</p><span>
+
+</span><h3>Anatomy of an HTTP Request</h3><span>
+
+</span><p>Normally, when a request comes into one of Fastly's caches, only two parts of the request are used to find an object in the cache: the path (and query string, if present), and the Host header.</p><span>
+
+</span><p>This is a pretty average request for http://example.com/somepage.php:</p><span>
+
+</span><pre>
+GET <b>/somepage.php</b> HTTP/1.1
+Host: <b>example.com</b>
+Connection: keep-alive
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36
+Accept-Language: en-US,en;q=0.8
+Accept-Encoding: gzip,deflate,sdch
+</pre><span>
+
+</span><p>As shown above, the browser sends a lot of information along with the URL. The Accept header tells you what sort of content the browser prefers, User-Agent specifies which version of what browser it is, Accept-Language contains a list of languages (and dialects) that the user has configured, and Accept-Encoding shows which compression schemes the browser supports.</p><span>
+
+</span><p>For practical purposes, we only care about <code>gzip</code>. <code>deflate</code> is ancient, and <code>sdch</code> is not used by anyone except Google.</p><span>
+
+</span><h3>Compression at Work</h3><span>
+
+</span><p>Hypothetical situation: You have a webserver without <code>mod_deflate</code>, but you've figured out how to do gzip compression in PHP. So when you see <code>gzip</code> in the <code>Accept-Encoding</code> header, you set the <code>Content-Encoding: gzip</code> header to tell the browser what you're doing, and you compress the response body.</p><span>
+
+</span><p>Now imagine that this server is the origin for a Fastly service, and this page is one that we can cache. What would happen if a browser that doesn't understand compression is the first to ask for this page? We'd end up with the uncompressed page in our cache.</p><span>
+
+</span><p>Is this a problem? Just a small one. If a browser that does understand compression requests this page, it will get the uncompressed version from our cache, and will render just fine. But the uncompressed version is bigger, so it will cost more bandwidth to transmit, resulting in slower delivery for the end user and higher costs for you.</p><span>
+
+</span><p>The bigger problem is when the first request for an object comes from a browser that does do compression, and we end up with the compressed version in our cache. Now, when a browser comes along that doesn't understand compression, it gets the compressed version and has no idea what to do other than display gibberish.</p><span>
+
+</span><h3>Vary to the Rescue</h3><span>
+
+</span><p>There are two ways that you can fix this. In the first, you can <a href="http://docs.fastly.com/guides/caching/how-do-i-change-what-the-cache-key-is-defined-as">change your cache key</a> in your Fastly configuration, but that will cause additional problems:</p><span>
+
+</span><ol>
+<li>You would have to purge both the compressed and uncompressed versions separately.</li>
+<li>A mistake made here could cause all URLs to return the same single object.</li>
+</ol><span>
+
+</span><p>Instead, you can use the Vary header and avoid both of these problems.</p><span>
+
+</span><p>The Vary header tells any HTTP cache which parts of the request header, other than the path and the Host header, to take into account when trying to find the right object. It does this by listing the names of the relevant headers, which in this case is <code>Accept-Encoding</code>. If there are multiple headers that influence the response, they would all be listed in a single header, separated by a comma.</p><span>
+
+</span><p>The response headers for a compressed response should look something like:</p><span>
+
+</span><pre>
+HTTP/1.1 200 OK
+Content-Length: 3458
+Cache-Control: max-age=86400
+Content-Encoding: gzip
+<b>Vary: Accept-Encoding</b>
+</pre><span>
+
+</span><p>And for an uncompressed response, the response headers look like:</p><span>
+
+</span><pre>
+HTTP/1.1 200 OK
+Content-Length: 8365
+Cache-Control: max-age=86400
+<b>Vary: Accept-Encoding</b>
+</pre><span>
+
+</span><p>Note that the Vary header is present in the response regardless of whether or not compression is used.</p><span>
+
+</span><p>Why is this? Let's look at what happens when it is actually there.</p><span>
+
+</span><p>First, a request comes in for an object, without an Accept-Encoding header. The object is not in the cache, so we request it from the origin, which returns it with the Vary header. When Fastly stores the object in the cache, the Vary header is noted, and the values of the relevant headers from the request are stored as well.</p><span>
+
+</span><p>So now there's an object in the cache that has a little flag on it that says "only to be used for requests that have no <code>Accept-Encoding</code> in the request."</p><span>
+
+</span><p>Now, imagine a browser comes along that does understand compression and sends the request as outlined above. First, we look it up by the Host header and path. This will find the object, but the request has an Accept-Encoding header, set to <code>gzip,deflate,sdch</code>, and that doesn't match the flag put on this object.</p><span>
+
+</span><p>So Fastly goes to your origin again, and this time we should get back a compressed version of the object. This response is then stored with a flag saying that this version should only be used for requests with <code>Accept-Encoding: gzip,deflate,sdch</code>.</p><span>
+
+</span><p>If the Vary header hadn't been there in the first response, we wouldn't have known that we couldn't use the cached object for the second request.</p><span>
+
+</span><h3>Normalization</h3><span>
+
+</span><p>You might wonder if all browsers these days send the same Accept-Encoding header.</p><span>
+
+</span><p>Unfortunately, the answer is no.</p><span>
+
+</span><p>I sampled 100,000 requests on one of our caches, and got 44 different Accept-Encoding headers. (For those interested in how I did that, or the numbers, see <a href="https://gist.github.com/drwilco/aa44665c561453442fed">here</a>)</p><span>
+
+</span><p>If all of those requests had been for the same URL, we would have had 44 "different" versions in our cache. But because the origin can only generate two versions, one if <code>gzip</code> is present in <code>Accept-Encoding</code> and one if it's not, that's 42 requests to the origin we'd like to avoid.</p><span>
+
+</span><p>Since the origin only cares whether gzip is there or not, why don't we normalize the Accept-Encoding header to either contain <code>gzip</code> or not be present at all?</p><span>
+
+</span><p>There are only ever two variations of the Accept-Encoding header in our requests, and therefore we will only ever have two variations of the object in our cache.</p><span>
+
+</span><p>This is easily done with a little VCL:</p><span>
+</span><div class="highlight"><pre><code class="language-perl" data-lang="perl"><span class="c1"># do this only once per request</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">restarts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1"># normalize Accept-Encoding to reduce vary</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span> <span class="o">~</span> <span class="s">"gzip"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span> <span class="o">=</span> <span class="s">"gzip"</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">unset</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>You still might want to support some ancient HTTP clients, so let's add support for <code>deflate</code> as well, and let's make sure Internet Explorer 6 doesn't need to deal with compression (it's notoriously bad at it).</p><span>
+</span><div class="highlight"><pre><code class="language-perl" data-lang="perl"><span class="c1"># do this only once per request</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">restarts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1"># normalize Accept-Encoding to reduce vary</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">User</span><span class="o">-</span><span class="nv">Agent</span> <span class="o">~</span> <span class="s">"MSIE 6"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">unset</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">elsif</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span> <span class="o">~</span> <span class="s">"gzip"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span> <span class="o">=</span> <span class="s">"gzip"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">elsif</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span> <span class="o">~</span> <span class="s">"deflate"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span> <span class="o">=</span> <span class="s">"deflate"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nv">unset</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Accept</span><span class="o">-</span><span class="nv">Encoding</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>A piece of VCL eerily similar to this has been part of the Fastly Master VCL since our company was founded.</p><span>
+
+</span><h3>Bad to the Bone</h3><span>
+
+</span><p><img src="http://gifshost.com/g60050g6868.gif" alt="B b b bad" title="Don't try this at home, kids!" /></p><span>
+
+</span><p>As you can see, just adding a simple Vary header to your response without doing some normalization of the request headers could have had a pretty disastrous impact on the amount of requests sent to the origin. The only thing preventing it is the standard normalization that Fastly does.</p><span>
+
+</span><p>First of all, you don't want to Vary on a header that has a lot of variations without normalization.</p><span>
+
+</span><p>Second, when normalizing, try to bring the header down to a handful of possibilities at most. One way to do this is to have the values hardcoded in your VCL instead of relying on <code>regsub()</code>. A good rule of thumb: for popular content with long expiry times, the amount of traffic to your origin scales in a linear fashion with the amount of possible values.</p><span>
+
+</span><p>Here are some Vary headers I've seen over the years, why they're bad, and how to normalize them.</p><span>
+
+</span><h4>Vary: User-Agent</h4><span>
+
+</span><p>There are literally thousands of different User-Agent strings. In a sample of 100,000 requests, I found just shy of 8,000 different ones.</p><span>
+
+</span><p>In one scenario, you want to present different formatting to mobile users. Note that with this example, the User-Agent header is replaced with a simple string that looks nothing like the regular values for this header. If you use this, make sure your origin knows how to deal with it.</p><span>
+
+</span><p>You could use VCL like this:</p><span>
+</span><div class="highlight"><pre><code class="language-perl" data-lang="perl"><span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">User</span><span class="o">-</span><span class="nv">Agent</span> <span class="o">~</span> <span class="s">"(Mobile|Android|iPhone|iPad)"</span> <span class="p">{</span>
+  <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">User</span><span class="o">-</span><span class="nv">Agent</span> <span class="o">=</span> <span class="s">"mobile"</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">User</span><span class="o">-</span><span class="nv">Agent</span> <span class="o">=</span> <span class="s">"desktop"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><h4>Vary: Referer</h4><span>
+
+</span><p>If your content is very popular, it will get linked to by many other sites, and every search query on Google has a unique URL. Both of these things will lead to a large number of unique Referer values.</p><span>
+
+</span><p>Say you want to show some sort of welcome pop-up to people who arrived on one of your pages from a page that is not part of your site, but you don't want this to happen for people navigating within your site.</p><span>
+
+</span><p>The VCL needed would look like:</p><span>
+</span><div class="highlight"><pre><code class="language-perl" data-lang="perl"><span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Referer</span> <span class="o">~</span> <span class="s">"^https?://www.example.com/"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Referer</span> <span class="o">=</span> <span class="s">"http://www.example.com/"</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="nv">unset</span> <span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Referer</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><h4>Vary: Cookie</h4><span>
+
+</span><p><code>Cookie</code> is probably one of the most unique request headers, and is therefore very bad. Cookies often carry authentication details, in which case you're better off not trying to cache pages, but just passing them through. If you're interested in caching with tracking cookies, read more <a href="http://www.fastly.com/blog/how-to-cache-with-tracking-cookies/" target="_blank">here</a>.</p><span>
+
+</span><p>However, sometimes cookies are used for A/B testing purposes, in which case it's a good idea to Vary on a custom header and leave the Cookie header intact. This avoids a lot of additional logic to make sure the Cookie header is left for URLs that need it (and are probably not cacheable).</p><span>
+</span><div class="highlight"><pre><code class="language-perl" data-lang="perl"><span class="k">sub </span><span class="nf">vcl_recv</span> <span class="p">{</span>
+  <span class="c1"># set the custom header</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Cookie</span> <span class="o">~</span> <span class="s">"ABtesting=B"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">X</span><span class="o">-</span><span class="nv">ABtesting</span> <span class="o">=</span> <span class="s">"B"</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">set</span> <span class="nv">req</span><span class="o">.</span><span class="nv">X</span><span class="o">-</span><span class="nv">ABtesting</span> <span class="o">=</span> <span class="s">"A"</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="o">...</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+
+<span class="k">sub </span><span class="nf">vcl_fetch</span> <span class="p">{</span>
+  <span class="c1"># vary on the custom header</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">beresp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Vary</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">set</span> <span class="nv">beresp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Vary</span> <span class="o">=</span> <span class="nv">beresp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Vary</span> <span class="s">", X-ABtesting"</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">set</span> <span class="nv">beresp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Vary</span> <span class="o">=</span> <span class="s">"X-ABtesting"</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+
+<span class="k">sub </span><span class="nf">vcl_deliver</span> <span class="p">{</span>
+  <span class="c1"># Hide the existence of the header from downstream</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">beresp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Vary</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">set</span> <span class="nv">beresp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Vary</span> <span class="o">=</span> <span class="nv">regsub</span><span class="p">(</span><span class="nv">beresp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Vary</span><span class="p">,</span> <span class="s">"X-ABtesting"</span><span class="p">,</span> <span class="s">"Cookie"</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1"># Set the ABtesting cookie if not present in the request</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Cookie</span> <span class="o">!~</span> <span class="s">"ABtesting="</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1"># 75% A, 25% B</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">randombool</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nv">add</span> <span class="nv">resp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Set</span><span class="o">-</span><span class="nv">Cookie</span> <span class="o">=</span> <span class="s">"ABtesting=A; expires="</span> <span class="nv">now</span> <span class="o">+</span> <span class="mi">180</span><span class="nv">d</span> <span class="s">"; path=/;"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nv">add</span> <span class="nv">resp</span><span class="o">.</span><span class="nv">http</span><span class="o">.</span><span class="nv">Set</span><span class="o">-</span><span class="nv">Cookie</span> <span class="o">=</span> <span class="s">"ABtesting=B; expires="</span> <span class="nv">now</span> <span class="o">+</span> <span class="mi">180</span><span class="nv">d</span> <span class="s">"; path=/;"</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="o">...</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>In <code>vcl_recv</code>, which is before the lookup in the cache, you use VCL to add a custom header, based on the Cookie. This assumes that the cookie value is either <code>B</code> or <code>A</code>, and if the cookie is missing, it defaults to <code>A</code>.</p><span>
+
+</span><p>Then in <code>vcl_fetch</code> you add your custom header to the Vary. And finally in <code>vcl_deliver</code>, you replace your custom header in the Vary with <code>Cookie</code>. Not only will this hide the existence of the custom header from the outside world, but if there happens to be a shared cache between Fastly and the end users, they will still get the correct variation.</p><span>
+
+</span><p>And now you have A/B testing, where all the browsers see is just another cookie, and your origin only needs to do something different based on a very simple header. (<code>X-ABtesting</code>)</p><span>
+
+</span><h4>Vary: *</h4><span>
+
+</span><p>Don't use this, period.</p><span>
+
+</span><p>The HTTP RFC says that if a Vary header contains the special header name <code>*</code>, each request for said URL is supposed to be treated as a unique (and uncacheable) request.</p><span>
+
+</span><p>This is much better indicated by using <code>Cache-Control: private</code>, which is clearer to anyone reading the response headers. It also signifies that the object shouldn't ever be stored, which is much more secure.</p><span>
+
+</span><h4>Vary: Accept-Encoding, User-Agent, Cookie, Referer</h4><span>
+
+</span><p>I'm not kidding. I have seen this. Without any normalization. As you might have guessed, there's maybe one in a googolplex chance that this will ever see a cache hit.</p><span>
+
+</span><h3>The Next Level</h3><span>
+
+</span><p>So far I've discussed Vary for compression, introduced some (simple) logic for device detection, and set up A/B testing logic at the edge. In my next blog post, I'll go into more advanced uses of Vary, like GeoIP and Accept-Language.</p><span>
+
+
+    
+  </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

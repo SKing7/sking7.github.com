@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>how to fix the cryptic "Script error." in javascript ?</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>how to fix the cryptic "Script error." in javascript ?</h1>
+<div><span>
+</span><!-- Custom Roles --><span>
+</span><p>This tech post is related to a nagging JavaScript error that I debugged almost a year ago. If you look at any javascript
+error report, you will see a cryptic error polluting the reports under the name <em>"Script error."</em> without any information about
+the error. This happens in Firefox, Safari, and Chrome when an exception violates the browser's same-origin policy - i.e.
+when the error occurs in a script that's hosted on a domain other than the domain of the current page. This tech post details
+how you can fix this error and decrypt the error message.</p><span>
+</span><!-- TEASER_END --><span>
+</span><div class="section" id="background"><span>
+</span><h2>Background</h2><span>
+</span><p>The <em>"Script error."</em> happens in Firefox, Safari, and Chrome when an exception violates the browser's same-origin policy - i.e., when
+the error occurs in a script that's hosted on a domain other than the domain of the current page. This is a very common scenario
+when the javascript served on a webpage is hosted on a CDN (Content Delivery Network) such as Akamai where the domain of the javascript
+file is different from the webpage that is including the JS and running it.</p><span>
+</span><p>This behavior is intentional. It prevent scripts from leaking information to external domains. For an example, imagine that you
+accidentally visited a site called <em>evilsite.com</em> that serves a script pointing to your bank's home page such as <em>"mybank.com/index.html"</em>.</p><span>
+</span><table class="codetable"><tr>
+<td class="linenos"></td>
+<td class="code"><pre class="code html"><a name="rest_code_cc2ee03368944c20b201f73e8bf80a84-1"></a><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"mybank.com/index.html"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></td>
+</tr></table><span>
+</span><p>Please note that the script tag is pointing to an html file rather than JavaScript. This will result in a script error, but the
+error might be interesting because it might tell us if you are logged in or not. Imagine that if you're logged in, the error
+spitted out might be something like <em>"Welcome Ravi.. is undefined"</em>, whereas if you're not logged in, it might be
+<em>"Please Login ... is undefined"</em> or something similar.</p><span>
+</span><p>If <em>evilsite.com</em> does this for the top 20 or so bank institutions, they'd have a pretty good idea of which banking sites you
+visit, and enables it to target you with a superior <em>phishing</em> page. This is one such example as to why browsers shouldn't allow
+any data leak across domains.</p><span>
+</span><p>Source: StackOverflow user <a class="reference external" href="http://stackoverflow.com/users/109538/broofa">broofa's</a> explanation of "Script error." at
+<a class="reference external" href="http://stackoverflow.com/questions/5913978/cryptic-script-error-reported-in-javascript-in-chrome-and-firefox">Cryptic-Script-Error SO Post</a>.</p><span>
+</span></div><span>
+</span><div class="section" id="why-does-the-browser-say-script-error-instead-of-something-meaningful"><span>
+</span><h2>Why does the browser say "Script error." instead of something meaningful ?</h2><span>
+</span><p>The browser is trying to hide the original error source and everything related to it. Surfacing anything meaningful would go
+against the very purpose of issuing the "Script error." message. See <a class="reference external" href="http://trac.webkit.org/browser/branches/chromium/648/Source/WebCore/dom/ScriptExecutionContext.cpp?rev=77122#L301">Webkit source</a>
+that checks for origin (Chrome/Safari) and <a class="reference external" href="http://mxr.mozilla.org/mozilla-beta/source/dom/base/nsJSEnvironment.cpp#316">Firefox source</a> that handle this error.</p><span>
+</span><p>Source: StackOverflow user <a class="reference external" href="http://stackoverflow.com/users/109538/broofa">broofa's</a> explanation of "Script error." at
+<a class="reference external" href="http://stackoverflow.com/questions/5913978/cryptic-script-error-reported-in-javascript-in-chrome-and-firefox">Cryptic-Script-Error SO Post</a>.</p><span>
+</span></div><span>
+</span><div class="section" id="how-do-i-fix-the-script-error"><span>
+</span><h2>How do I fix the "Script error." ?</h2><span>
+</span><p>This is where <a class="reference external" href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS (Cross Origin Resource Sharing)</a> comes into play.
+Cross-origin resource sharing (CORS) is a mechanism that allows many resources (e.g., fonts, JavaScript, etc.) on a web page to be
+requested from another domain outside the domain from which the resource originated. In particular, JavaScript's AJAX calls can use
+the XMLHttpRequest mechanism. Such "cross-domain" requests would otherwise be forbidden by web browsers, per the
+<a class="reference external" href="http://en.wikipedia.org/wiki/Same-origin_policy">same origin security policy</a>.</p><span>
+</span><p>Enabling CORS on the server and client side fixes the issue in Chromium, Chrome and Firefox as of October 2014. No such on Safari :(.</p><span>
+</span><p><a class="reference external" href="http://enable-cors.org/">http://enable-cors.org/</a> has listed the steps to enable CORS on both client and server side in a simple manner. I will list the same for you.</p><span>
+</span><div class="section" id="server"><span>
+</span><h3>Server</h3><span>
+</span><p>Make sure that the server serving your static JavaScript files adds <em>Access-Control-Allow-Origin</em> header to it's response.</p><span>
+</span><table class="codetable"><tr>
+<td class="linenos"></td>
+<td class="code"><pre class="code text"><a name="rest_code_acca9883ddf84df5887e267bb4bc078a-1"></a>Access-Control-Allow-Origin: *
+</pre></td>
+</tr></table><span>
+</span><p>You can also whitelist domains instead of allowing every site with "*". As per <a class="reference external" href="http://www.w3.org/TR/cors/#access-control-allow-origin-response-header">Access-Control-Allow-Origin header W3 spec</a>,
+the value should either be a single origin or the string "null" or "*".</p><span>
+</span><table class="codetable"><tr>
+<td class="linenos"></td>
+<td class="code"><pre class="code text"><a name="rest_code_314856e52e97463f82d76fb47c5a0144-1"></a>Access-Control-Allow-Origin: http://mysite.com
+</pre></td>
+</tr></table><span>
+</span><p>If your files are served by a CDN, you need to contact them to serve this header with JavaScript files.</p><span>
+</span></div><span>
+</span><div class="section" id="client"><span>
+</span><h3>Client</h3><span>
+</span><p>Set the <em>crossorigin</em> attribute in the script tag to <em>anonymous</em>.</p><span>
+</span><table class="codetable"><tr>
+<td class="linenos"></td>
+<td class="code"><pre class="code html"><a name="rest_code_c15b2291734941debfa121853962143d-1"></a><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"http://someotherdomain.com/js/test.js"</span> <span class="na">crossorigin=</span><span class="s">"anonymous"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></td>
+</tr></table><span>
+</span><p>See <a class="reference external" href="http://www.w3.org/TR/html5/infrastructure.html#cors-settings-attribute">CORS Settings attributes W3 spec</a> for more details on the crossorigin
+attribute and all the values it can take. It is important to note that this attribute has no effect on browsers that don't support CORS,
+see <a class="reference external" href="http://caniuse.com/#feat=cors">CanIUseCors</a> to check which browsers support it. Also, some browsers like Chrome expect
+the <em>Access-Control-Allow-Origin</em> to be set in the response header when it sees the <em>crossorigin</em> attribute on the script tag.
+If this header is missing , it will refuse to the load the script.</p><span>
+</span></div><span>
+</span></div><span>
+</span><div class="section" id="example"><span>
+</span><h2>Example</h2><span>
+</span><div class="section" id="setup"><span>
+</span><h3>Setup</h3><span>
+</span><p>I have setup two external javascript files (think of it as CDN-ed, although they are powered by <a class="reference external" href="https://cloud.google.com/appengine/docs">Google App Engine</a> internally) namely,</p><span>
+</span><ul class="simple">
+<li>
+<a class="reference external" href="http://enablecors.appspot.com/assets/js/no-cors.js">no-cors.js</a> that has no Access-Control-Allow-Origin header in it's response</li>
+<li>
+<a class="reference external" href="http://enablecors.appspot.com/assets/js-cors/cors.js">cors.js</a> that has Access-Control-Allow-Origin header in it's response</li>
+</ul><span>
+</span><p>The contents of both the javascript files are exactly the same and is served from <a class="reference external" href="http://enablecors.appspot.com/">http://enablecors.appspot.com/</a> domain,
+while the webpage using it is under <a class="reference external" href="http://ravikiranj.net/">http://ravikiranj.net</a>. The <em>window.clickMe</em> is trying to call an undefined function that should trigger an error.
+This function is called when the user clicks the <em>Click Me! button</em> in the test webpage that also remains the same across both tests except for the
+script URL it's pointing to and the crossorigin attribute.</p><span>
+</span><p>I have modified the <em>window.onerror</em> function that is described in detail at <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers.onerror">MDN - window.onerror</a>
+to showcase the error message, error stack, file and line number on the webpage. The two examples shown below are iframed urls pointing to <a class="reference external" href="http://ravikiranj.net/hacks/cors-demo/no-cors.html">http://ravikiranj.net/hacks/cors-demo/no-cors.html</a>
+and <a class="reference external" href="http://ravikiranj.net/hacks/cors-demo/cors.html">http://ravikiranj.net/hacks/cors-demo/cors.html</a> respectively.</p><span>
+</span></div><span>
+</span><div class="section" id="html"><span>
+</span><h3>HTML</h3><span>
+</span><table class="codetable"><tr>
+<td class="linenos"></td>
+<td class="code"><pre class="code html"><a name="rest_code_0265ba468a054254980936ca6ac85c8c-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-2"></a><span class="nt">&lt;html&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-3"></a>    <span class="nt">&lt;head&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-4"></a>        <span class="nt">&lt;title&gt;</span>CORS Example<span class="nt">&lt;/title&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-5"></a>        <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-6"></a>        <span class="nt">div</span> <span class="p">{</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-7"></a>            <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span> <span class="m">#C0C0C0</span><span class="p">;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-8"></a>            <span class="k">padding</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-9"></a>            <span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-10"></a>            <span class="k">margin</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-11"></a>        <span class="p">}</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-12"></a>        <span class="nc">.btn</span> <span class="p">{</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-13"></a>            <span class="k">display</span><span class="o">:</span> <span class="k">block</span><span class="p">;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-14"></a>            <span class="k">margin</span><span class="o">:</span> <span class="m">10px</span> <span class="m">5px</span><span class="p">;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-15"></a>        <span class="p">}</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-16"></a>        <span class="nt">&lt;/style&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-17"></a>    <span class="nt">&lt;/head&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-18"></a>    <span class="nt">&lt;body&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-19"></a>        <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"MSG"</span><span class="nt">&gt;</span>Error Stack<span class="nt">&lt;/div&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-20"></a>        <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"STACK"</span><span class="nt">&gt;</span>Error Stack<span class="nt">&lt;/div&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-21"></a>        <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"FILE"</span><span class="nt">&gt;</span>File<span class="nt">&lt;/div&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-22"></a>        <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"LINE_NO"</span><span class="nt">&gt;</span>Line Number<span class="nt">&lt;/div&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-23"></a>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">class=</span><span class="s">"btn"</span> <span class="na">onclick=</span><span class="s">"window.clickMe();"</span> <span class="na">value=</span><span class="s">"Click Me!"</span> <span class="nt">/&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-24"></a>        <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"http://enablecors.appspot.com/assets/js-cors/cors.js"</span> <span class="na">crossorigin=</span><span class="s">"anonymous"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-25"></a>        <span class="c">&lt;!--&lt;script src="http://enablecors.appspot.com/assets/js/no-cors.js"&gt;&lt;/script&gt;--&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-26"></a>    <span class="nt">&lt;/body&gt;</span>
+<a name="rest_code_0265ba468a054254980936ca6ac85c8c-27"></a><span class="nt">&lt;/html&gt;</span>
+</pre></td>
+</tr></table><span>
+</span></div><span>
+</span><div class="section" id="cdn-js"><span>
+</span><h3>CDN JS</h3><span>
+</span><table class="codetable"><tr>
+<td class="linenos"></td>
+<td class="code"><pre class="code javascript"><a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-1"></a><span class="nb">window</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">errorMsg</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">lineNo</span><span class="p">,</span> <span class="nx">colNo</span><span class="p">,</span> <span class="nx">errStack</span><span class="p">)</span> <span class="p">{</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-2"></a>    <span class="s2">"use strict"</span><span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-3"></a>    <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="nx">errorMsg</span> <span class="o">?</span> <span class="nx">errorMsg</span> <span class="o">:</span> <span class="s2">"null"</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-4"></a>    <span class="p">,</span> <span class="nx">stack</span> <span class="o">=</span> <span class="nx">errStack</span> <span class="o">?</span> <span class="nx">errStack</span> <span class="o">:</span> <span class="s2">"null, only Chrome/Chromium/Firefox based browsers support errorStack"</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-5"></a>    <span class="p">,</span> <span class="nx">errFile</span> <span class="o">=</span> <span class="nx">file</span> <span class="o">?</span> <span class="nx">file</span> <span class="o">:</span> <span class="s2">"null"</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-6"></a>    <span class="p">,</span> <span class="nx">errLineNo</span> <span class="o">=</span> <span class="nx">lineNo</span> <span class="o">?</span> <span class="nx">lineNo</span> <span class="o">:</span> <span class="s2">"null"</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-7"></a>    <span class="p">,</span> <span class="nx">msgElem</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"MSG"</span><span class="p">)</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-8"></a>    <span class="p">,</span> <span class="nx">stackElem</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"STACK"</span><span class="p">)</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-9"></a>    <span class="p">,</span> <span class="nx">fileElem</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"FILE"</span><span class="p">)</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-10"></a>    <span class="p">,</span> <span class="nx">lineElem</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"LINE_NO"</span><span class="p">)</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-11"></a>    <span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-12"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">msgElem</span> <span class="o">&amp;&amp;</span> <span class="nx">stackElem</span> <span class="o">&amp;&amp;</span> <span class="nx">fileElem</span> <span class="o">&amp;&amp;</span> <span class="nx">lineElem</span><span class="p">)</span> <span class="p">{</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-13"></a>      <span class="nx">msgElem</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-14"></a>      <span class="nx">stackElem</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-15"></a>      <span class="nx">fileElem</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">errFile</span><span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-16"></a>      <span class="nx">lineElem</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">errLineNo</span><span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-17"></a>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-18"></a>      <span class="nx">alert</span><span class="p">(</span><span class="s2">"Unable to find div ids MSG, STACK, FILE, LINE_NO on page"</span><span class="p">);</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-19"></a>    <span class="p">}</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-20"></a><span class="p">};</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-21"></a>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-22"></a><span class="nb">window</span><span class="p">.</span><span class="nx">clickMe</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-23"></a>    <span class="s2">"use strict"</span><span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-24"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-25"></a>      <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-26"></a>    <span class="p">}</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-27"></a>    <span class="kd">var</span> <span class="nx">l</span> <span class="o">=</span> <span class="s2">"test"</span><span class="p">;</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-28"></a>    <span class="nx">l</span><span class="p">.</span><span class="nx">callme</span><span class="p">();</span>
+<a name="rest_code_8136df00f15c4a1d951eefb300c1e03d-29"></a><span class="p">};</span>
+</pre></td>
+</tr></table><span>
+</span></div><span>
+</span><p>
+<h3>"Script error." demo without CORS</h3>
+
+</p><span>
+</span><div class="section" id="actual-js-error-with-cors-enabled"><span>
+</span><h3>Actual JS Error with CORS enabled</h3><span>
+</span><p><br />As you can see from the above, Enabling CORS on both the server and the client side has indeed fixed the issue.
+To make sure that you are indeed serving the header, you can use Chrome's Network tab to inspect them as below.</p><span>
+</span><img alt="chrome dev tools screenshot showing cors headers in net tab" class="block-img" src="http://ravikiranj.net/images/cors-headers.png" /><span>
+</span></div><span>
+</span><span>
+</span></div><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

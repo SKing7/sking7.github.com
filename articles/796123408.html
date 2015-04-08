@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><style type="text/css">td {text-align: left; }</style><span>
+</span><h2>Spinning a web</h2><span>
+</span><p>In the early days of the web, non-technical users (and a few technical ones too) would wait for the browser spinner to stop spinning before interacting with a web page, which in terms of JavaScript, was when the <code>window.onload</code> event fired (with non-obvious exceptions based on the fancy of various browser authors).</p><span>
+</span><p>This restraint was not unfounded since many pages loaded images without specifying a height or width, so content could jump out from under your mouse if you clicked while something rendered, or you’d have a page that depended on JavaScript that only ran in the <code>onload</code> event, or even worse, JavaScript that used <code>document.write</code> to modify the contents of the page.</p><span>
+</span><p>Shudder!!</p><span>
+</span><p>Well, thankfully those days are mostly behind us, and there are ways to deal with bad third parties that still use <code>document.write</code>.</p><span>
+</span><p>This means that users have gotten used to interacting with pages before the spinner stops spinning, and page developers have become smarter about building pages that are usable before they are fully loaded. So for everyone hoping to measure perceived performance, the <code>window.onload</code> event is no longer the best event to determine when a page is usable.</p><span>
+</span><h2>User Intentions and Journeys</h2><span>
+</span><p>In the past, we’ve looked at various approaches of determining in a generic manner when a particular page is usable, but for a given site, the developer or site owner knows the use cases that the site was designed to handle, and knows which elements are pre-requisites for a particular user to act on their intention.</p><span>
+</span><p>Once we start thinking in terms of user intentions, we are no longer constrained by the concept of a page, so our measurement strategy will work equally well with single-page apps and can also be extended to an entire user journey across multiple pages (or intents).</p><span>
+</span><h2>Timeline</h2><span>
+</span><p>In order to measure this intent, we need at least two interesting events, one where the user signals their intent to do something, and the second when the page is in a state where they can accomplish their task or their task is complete.</p><span>
+</span><p>The user may signal intent by entering a URL into the browser, clicking on something, or submitting a form.</p><span>
+</span><p>An intent to read an article is typically considered complete when the content of that article is visible in the browser, while my intent to submit this article is complete once I hit the Publish button and the browser responds with a success state.</p><span>
+</span><p>An intent to purchase a gift for someone, on the other hand, may involve a long process with multiple clicks, and submits going through multiple products, reviews, and a checkout process.</p><span>
+</span><h2>The code</h2><span>
+</span><p>Today we’ll look at some simple code to measure when certain things have happened on a page using a <code>MutationObserver</code>.</p><span>
+</span><p>If a user clicks on something, we set a timer, but we also start a <code>MutationObserver</code>:</p><span>
+</span><span>
+</span><p>This <code>MutationObserver</code> will look for any changes to the DOM starting from the <code>document</code> object and nesting down into all children and will call the <code>callback</code> on those changes.</p><span>
+</span><p>The callback needs to do a few things:</p><span>
+</span><span>
+</span><p>So this is all fairly simple, and it’s <a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver">well documented</a>.  The part we really care about is the “check for interestingness” that I’ve included in comments above.</p><span>
+</span><h3>Check to see if a particular element has loaded</h3><span>
+</span><span>
+</span><h3>Check to see if an image or script has loaded</h3><span>
+</span><span>
+</span><h3>Handling innerHTML</h3><span>
+</span><p>Unfortunately, the <code>MutationObserver</code> does not work well when changing <code>innerHTML</code>.  If you manipulate an element’s <code>innerHTML</code>, only top level elements in the HTML fire the callback, so we do something else:</p><span>
+</span><span>
+</span><h2>Multiple page journeys</h2><span>
+</span><p>Multiple page journeys take this idea a little further.  The technical matters of timing the events remains the same.  The big difference is that you now need to leverage <code>localStorage</code> or <code>cookies</code> to store timer information while you wait for the journey to complete.</p><span>
+</span><p>There are a large number of documents on working with both, so I won’t go into the code today.</p><span>
+</span><h2>Browser Support</h2><span>
+</span><p>According to CanIUse, MutationObserver is <a href="http://caniuse.com/#feat=mutationobserver">fairly well supported</a> among modern browsers, and there’s a polyfill for older browsers.</p><span>
+</span><h2>boomerang</h2><span>
+</span><p>We have been thinking about these approaches for a while now.  <a href="https://twitter.com/bbrewer">Buddy</a> and I <a href="http://www.slideshare.net/buddybrewer/2014-1118-rip-onload">presented about it at Velocity EU</a> this year, and <a href="https://twitter.com/nicj">Nic Jansma</a> and I have been working on getting the code into <a href="https://github.com/lognormal/boomerang/">boomerang</a>.</p><span>
+</span><p>I’d especially like to thank Nic for all his work on this project.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

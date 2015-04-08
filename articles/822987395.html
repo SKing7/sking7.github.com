@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Understanding the Node.js Event Loop</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Understanding the Node.js Event Loop</h1>
+<div class="blog-content markdown"><span>
+            </span><p>Node's "event loop" is central to being able to handle high throughput scenarios. It is a magical place filled with unicorns and rainbows, and is the reason Node can essentially be "single threaded" while still allowing an arbitrary number of operations to be handled in the background. This post will shed light on how the event loop operates so you too can enjoy the magic.</p><span>
+</span><h2 id="event-driven-programming">Event Driven Programming <a href="https://nodesource.com/blog/understanding-the-nodejs-event-loop?utm_source=nodeweekly&amp;utm_medium=email#event-driven-programming" class="blog-anchor">#</a></h2><span>
+</span><p>The first thing needed in order to understand the event loop is an understanding of the event-driven programming paradigm. This has been well understood since the 1960's. Today, event-driven programming is largely used in UI applications. A major usage of JavaScript is to interact with the DOM, so the use of event-based APIs was natural.</p><span>
+</span><p>Defined simply: event-driven programming is application flow control that is determined by events or changes in state. The general implementation is to have a central mechanism that listens for events and calls a callback function once an event has been detected (i.e. state has changed). Sound familiar? It should. That's the basic principle behind Node's event loop.</p><span>
+</span><p>For those familiar with client-side JavaScript development, think of all the <code>.on*()</code> methods, such as <code>element.onclick()</code>, that are used in conjunction with DOM Elements to convey user interaction. This pattern works well when a single item can emit many possible events. Node uses this pattern in the form of the <code>EventEmitter</code>, and is located in places such as <code>Server</code>, <code>Socket</code> and the <code>'http'</code> module. It's useful when we need to emit more than one type of state change from a single instance.</p><span>
+</span><p>Another common pattern is succeed or fail. There are two common implementations around today. First is the "error back" callback style, where the error of the call is the first argument passed to the callback. The second has emerged with ES6, using <code>Promises</code>.</p><span>
+</span><p>The <code>'fs'</code> module mostly uses the error back callback style. It would technically be possible to emit additional events for some calls, such as <code>fs.readFile()</code>, but the API was made to only alert the user if the desired operation succeeded or if something failed. This API selection was an architecture decision and not due to technical limitations.</p><span>
+</span><p>A common misconception is that event emitters are somehow asynchronous in nature on their own, but this is incorrect. The following is a trivial code snippet to demonstrate this.</p><span>
+</span><pre><code class="lang-javascript"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">MyEmitter</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">MyEmitter</span><span class="p">,</span> <span class="nx">EventEmitter</span><span class="p">);</span>
+
+<span class="nx">MyEmitter</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">doStuff</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">doStuff</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'before'</span><span class="p">)</span>
+  <span class="nx">emitter</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'fire'</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'after'</span><span class="p">)}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">me</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyEmitter</span><span class="p">();</span>
+<span class="nx">me</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'fire'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'emit fired'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">me</span><span class="p">.</span><span class="nx">doStuff</span><span class="p">();</span>
+<span class="c1">// Output:</span>
+<span class="c1">// before</span>
+<span class="c1">// emit fired</span>
+<span class="c1">// after</span>
+</pre></div>
+
+</code></pre><span>
+</span><p><code>EventEmitter</code> often appears asynchronous because it is regularly used to signal the completion of asynchronous operations, but the <code>EventEmitter</code> API is entirely synchronous. The emit function may be called asynchronously, but note that all the listener functions will be executed synchronously, in the order they were added, before any execution can continue in statements following the call to emit.</p><span>
+</span><h2 id="mechanical-overview">Mechanical Overview <a href="https://nodesource.com/blog/understanding-the-nodejs-event-loop?utm_source=nodeweekly&amp;utm_medium=email#mechanical-overview" class="blog-anchor">#</a></h2><span>
+</span><p>Node itself depends on multiple libraries. One of those is libuv, the magical library that handles the queueing and processing of asynchronous events.  For the remainder of this post please keep in mind that I won't distinguish if a point made relates directly to Node or libuv.</p><span>
+</span><p>Node utilizes as much of what's already available from the operating system's kernel as possible. Responsibilities like making write requests, holding connections and more are therefore delegated to and handled by the system. For example, incoming connections are queued by the system until they can be handled by Node.</p><span>
+</span><p>You may have heard that Node has a thread pool, and might be wondering "if Node pushes all those responsibilities down why would a thread pool be needed?" It's because the kernel doesn't support doing everything asynchronously. In those cases Node has to lock a thread for the duration of the operation so it can continue executing the event loop without blocking.</p><span>
+</span><p>Here is a simplified diagram to explain the mechanical overview of when things run:</p><span>
+</span><p><img src="https://nodesource.com/assets/blog/understanding-nodejs-event-loop/event-loop.png" alt="diagram" /></p><span>
+</span><p>A couple important notes about the inner workings of the event loop that would be difficult to include in the diagram are:</p><span>
+</span><ul>
+<li><p>All callbacks scheduled via <code>process.nextTick()</code> are run at the end of a
+phase of the event loop (e.g. timers) before transitioning to the next phase.
+This creates the potential to unintentionally starve the event loop with
+recursive calls to <code>process.nextTick()</code>.</p>
+</li>
+<li><p>"Pending callbacks" is where callbacks are queued to run that aren't handled
+by any other phase (e.g. a callback passed to <code>fs.write()</code>).</p>
+</li>
+</ul><span>
+</span><h2 id="event-emitter-and-the-event-loop">Event Emitter and the Event Loop <a href="https://nodesource.com/blog/understanding-the-nodejs-event-loop?utm_source=nodeweekly&amp;utm_medium=email#event-emitter-and-the-event-loop" class="blog-anchor">#</a></h2><span>
+</span><p>To simplify interaction with the event loop the <code>EventEmitter</code> was created. It is a generic wrapper that more easily allows creating event-based APIs. Because of some of the confusion that surrounds how these two interact we'll now address common points that tend to trip up developers.</p><span>
+</span><p>The following example shows how forgetting that emitting events happens synchronously can cause events to be missed by the user.</p><span>
+</span><pre><code class="lang-javascript"><div class="highlight"><pre><span class="c1">// Post v0.10, require('events').EventEmitter is not necessary.</span>
+<span class="kd">var</span> <span class="nx">EventEmitter</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'events'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'util'</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">MyThing</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+  <span class="nx">doFirstThing</span><span class="p">();</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'thing1'</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">MyThing</span><span class="p">,</span> <span class="nx">EventEmitter</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">mt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyThing</span><span class="p">();</span>
+
+<span class="nx">mt</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'thing1'</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">onThing1</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Sorry, never going to happen.</span>
+<span class="p">});</span>
+</pre></div>
+
+</code></pre><span>
+</span><p>The flaw with the above is that <code>'thing1'</code> can never be captured by the user because <code>MyThing()</code> must finish instantiating before listening for any events. Here is a simple solution that also doesn't require any additional closures:</p><span>
+</span><pre><code class="lang-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">EventEmitter</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'events'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'util'</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">MyThing</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+  <span class="nx">doFirstThing</span><span class="p">();</span>
+  <span class="nx">setImmediate</span><span class="p">(</span><span class="nx">emitThing1</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">MyThing</span><span class="p">,</span> <span class="nx">EventEmitter</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">emitThing1</span><span class="p">(</span><span class="nx">self</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">self</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'thing1'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">mt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyThing</span><span class="p">();</span>
+
+<span class="nx">mt</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'thing1'</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">onThing1</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Whoot!</span>
+<span class="p">});</span>
+</pre></div>
+
+</code></pre><span>
+</span><p>The following would also work, but at a drastic performance cost:</p><span>
+</span><pre><code class="lang-javascript"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">MyThing</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+  <span class="nx">doFirstThing</span><span class="p">();</span>
+  <span class="c1">// Using Function#bind() makes the world much slower.</span>
+  <span class="nx">setImmediate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'thing1'</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">MyThing</span><span class="p">,</span> <span class="nx">EventEmitter</span><span class="p">);</span>
+</pre></div>
+
+</code></pre><span>
+</span><p>Another problem case is with emitting errors. Figuring out problems with your application can be hard enough, but losing the call stack can make it impossible. A call stack is lost when an <code>Error</code> is instantiated on the far end of an asynchronous request. The two most reasonable solutions to get around this problem are to emit synchronously or to make sure other important information propagates with the error.  The following example shows each one being used:</p><span>
+</span><pre><code class="lang-javascript"><div class="highlight"><pre><span class="nx">MyThing</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// This error will be emitted asynchronously.</span>
+  <span class="kd">var</span> <span class="nx">er</span> <span class="o">=</span> <span class="nx">doFirstThing</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">er</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// The error needs to be created immediately to preserve</span>
+    <span class="c1">// the call stack.</span>
+    <span class="nx">setImmediate</span><span class="p">(</span><span class="nx">emitError</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Bad stuff'</span><span class="p">));</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Emit the error immediately so it can be handled.</span>
+  <span class="kd">var</span> <span class="nx">er</span> <span class="o">=</span> <span class="nx">doSecondThing</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">er</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'error'</span><span class="p">,</span> <span class="s1">'More bad stuff'</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+</code></pre><span>
+</span><p>Consider the situation. It may be possible that the error being emitted should be handled immediately, before the application proceeds executing. Or it may be something as trivial as a bad argument that needs to be reported and can easily be handled later. Also, it's not a good idea to have a constructors that emit errors, since the object instance's construction may very well be incomplete. Just throw an exception in that case.</p><span>
+</span><h2 id="wrapping-up">Wrapping Up <a href="https://nodesource.com/blog/understanding-the-nodejs-event-loop?utm_source=nodeweekly&amp;utm_medium=email#wrapping-up" class="blog-anchor">#</a></h2><span>
+</span><p>This post has been very light on the technical details and inner workings of the event loop. Which was deliberate. That information will be covered in the future, but first we needed to make sure every one was on the same page with these basics. Look forward to another article on how the event loop interacts with your system's kernel to achieve the asynchronous magic that allows Node to run.</p><span>
+
+          </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

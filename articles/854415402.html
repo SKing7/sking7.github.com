@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>HTTP/2: the Future of the Internet</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>HTTP/2: the Future of the Internet</h1>
+<div id="blurb"><span>
+            </span><header></header><span>
+
+            </span><p>HTTP/2<sup><a href="https://http2.akamai.com/#fn1" id="ref1">[1]</a></sup> is about to get very real. <a title="Mark Nottingham talks about HTTP/2" href="https://www.mnot.net/blog/2015/02/18/http2">The standard has just been finalized</a>, leading browsers are beginning to support it and so
+                is Akamai. But why is this important?</p><span>
+
+            </span><p><img alt="HTTP Timeline" src="https://http2.akamai.com/resources/HTTP2-graphic.png" /></p><strong>The web has dramatically evolved over the last 20+ years, yet HTTP - the
+            workhorse of the Web - has not. Web developers have worked around HTTP's limitations, but:</strong><span>
+
+            </span><ul>
+                <li>Performance still falls short of full bandwidth utilization</li>
+
+                <li>Web design and maintenance are more complex</li>
+
+                <li>Resource consumption increases for client and server</li>
+
+                <li>Cacheability of resources suffers</li>
+            </ul><strong>HTTP/2 attempts to solve many of the shortcomings and inflexibilities of HTTP/1.1.<p>Its many benefits include:</p></strong><span>
+
+            </span><ul>
+                <li><strong> Multiplexing and concurrency:</strong> Several requests can be sent in rapid succession on the same TCP connection, and responses can be received out of order -
+                    eliminating the need for multiple connections between the client and the server</li>
+
+                <li><strong>Stream dependencies:</strong> the client can indicate to the server which of the resources are more important<br />than the others</li>
+
+                <li><strong>Header compression:</strong> HTTP header size is drastically reduced</li>
+
+                <li><strong>Server push:</strong> The server can send resources the client has not yet requested</li>
+            </ul><span>
+
+            </span><p>You will not need to change your websites or applications to ensure they continue to work properly. Not only will your application code and HTTP APIs continue to work
+                uninterrupted, but your application will also likely perform better and consume fewer resources on both client and server.</p><span>
+
+            </span><p>As it becomes more prevalent, organizations looking to benefit from the performance and security features of HTTP/2 should start thinking about how they are invested to fully capitalize on these new capabilities.  Such considerations include:</p><span>
+
+            </span><ul>
+                <li><strong>Encrypting:</strong> Applications running over HTTP/2 are likely to experience improvements in performance over secure connections.  This is an important consideration for companies contemplating the move to TLS.</li>
+
+                <li><strong>Optimizing the TCP layer:</strong> Applications should be designed with a TCP layer implemented to account for the switch from multiple TCP connections to a single long-lived one, especially when adjusting the congestion window in response to packet loss.</li>
+
+                <li><strong>Undoing HTTP/1.1 best practices:</strong> Many “best practices” associated with applications delivered over HTTP/1.1 (such as domain sharding, image spriting, resource in-lining and concatenation) are not only unnecessary when delivering over HTTP/2, and in some cases may actually cause sub-optimizations.</li>
+
+                <li><strong>Deciding what and when to push:</strong> Applications designed to take advantage of the new server push capabilities in HTTP/2 must be carefully designed to balance performance and utility.</li>
+            </ul><span>
+
+            </span><p>Akamai can help and is working hard to address these and additional challenges, including possibly the toughest one: optimizing differently for HTTP/1.1 vs. HTTP/2 connections as
+                browsers and other clients gradually transition over the next several years.</p><span>
+
+            </span><p>Akamai supports HTTP/2 in limited beta and is working hard to broaden availability to additional customers. Akamai's Mark Nottingham chairs the IETF working group that defined the
+                new standard - demonstrating our commitment to benefit users, content providers, service providers, developers and the Internet community at large</p><span>
+
+            </span><p>For a preview of how your website or application is likely to perform on HTTP/2 once it is widely supported, you can experiment on the Akamai platform with SPDY/3.1. It is
+                important to note that Akamai and leading browsers intend to stop supporting SPDY when HTTP/2 is ready to take its place.</p><span>
+
+            </span><p>For questions, please reach out to your Akamai representative, visit the <a title="Akamai Community Site" href="http://community.akamai.com/">Akamai&nbsp;Community</a> or <a href="http://www.akamai.com/html/forms/sales_form.html">click&nbsp;here</a> to contact us.</p><span>
+            </span><p><sup id="fn1">1. Formerly know as HTTP/2.0 or HTTP 2.0<a href="https://http2.akamai.com/#ref1" title="Jump back to footnote 1 in the text.">↩</a></sup>
+        </p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

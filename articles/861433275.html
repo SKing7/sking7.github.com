@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>daniel.haxx.se</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>daniel.haxx.se</h1>
+<div class="entry"><span>
+				</span><p><img class="alignright size-medium wp-image-4290" title="SSL padlock" src="http://daniel.haxx.se/blog/wp-content/uploads/2012/10/ssl-padlock-207x300.jpg" alt="SSL padlock" width="207" height="300" />I’ve written the <a href="http://daniel.haxx.se/http2/">http2 explained</a> document and I’ve done several <a href="http://daniel.haxx.se/blog/2015/02/01/http2-right-now/">talks about HTTP/2</a>. I’ve gotten a lot of questions about TLS in association with HTTP/2 due to this, and I want to address some of them here.</p><span>
+</span><h2>TLS is not mandatory</h2><span>
+</span><p>In the <a href="https://tools.ietf.org/html/draft-ietf-httpbis-http2-17">HTTP/2 specification that has been approved</a> and that is about to become an official RFC any day now, there is no language that mandates the use of TLS for securing the protocol. On the contrary, the spec clearly explains how to use it both in clear text (over plain TCP) as well as over TLS. <em>TLS is not mandatory for HTTP/2</em>.</p><span>
+</span><h2>TLS mandatory in effect</h2><span>
+</span><p>While the spec doesn’t force anyone to implement HTTP/2 over TLS but allows you to do it over clear text TCP, representatives from both the Firefox and the Chrome development teams have expressed their intents to only implement HTTP/2 over TLS. This means HTTPS:// URLs are the only ones that will enable HTTP/2 for these browsers. Internet Explorer people have expressed that they intend to also support the new protocol without TLS, but when they shipped their first test version as part of the Windows 10 tech preview, that browser also only supported HTTP/2 over TLS. As of this writing, there has been no browser released to the public that speaks clear text HTTP/2. Most existing servers only speak HTTP/2 over TLS.</p><span>
+</span><p>The difference between what the spec allows and what browsers will  provide is the key here, and browsers and all other user-agents are all  allowed and expected to each select their own chosen path forward.</p><span>
+</span><p>If you’re implementing and deploying a server for HTTP/2, you pretty much have to do it for HTTPS to get users. And your clear text implementation will not be as tested…</p><span>
+</span><p>A valid remark would be that browsers are not the only HTTP/2 user-agents and there are several such non-browser implementations that implement the non-TLS version of the protocol, but I still believe that the browsers’ impact on this will be notable.</p><span>
+</span><h2>Stricter TLS</h2><span>
+</span><p>When opting to speak HTTP/2 over TLS, <a href="https://tools.ietf.org/html/draft-ietf-httpbis-http2-17#section-9.2">the spec mandates stricter TLS requirements</a> than what most clients ever have enforced for normal HTTP 1.1 over TLS.</p><span>
+</span><p>It says TLS 1.2 or later is a MUST. It forbids compression and renegotiation. It specifies fairly detailed “worst acceptable” key sizes and cipher suites. HTTP/2 will simply use safer TLS.</p><span>
+</span><p>Another detail here is that HTTP/2 over TLS requires the use of ALPN which is a relatively new TLS extension, <a href="https://tools.ietf.org/html/rfc7301">RFC 7301</a>, which helps us negotiate the new HTTP version without losing valuable time or network packet round-trips.</p><span>
+</span><h2>TLS-only encourages more HTTPS</h2><span>
+</span><p>Since browsers only speak HTTP/2 over TLS (so far at least), sites that want HTTP/2 enabled must do it over HTTPS to get users. It provides a gentle pressure on sites to offer proper HTTPS. It pushes more people over to end-to-end TLS encrypted connections.</p><span>
+</span><p>This (more HTTPS) is generally considered a good thing by me and us who are concerned about users and users’ right to privacy and right to avoid mass surveillance.</p><span>
+</span><h2>Why not mandatory TLS?</h2><span>
+</span><p>The fact that it didn’t get in the spec as mandatory was because quite simply there was never a consensus that it was a good idea for the protocol. A large enough part of the working group’s participants spoke up against the notion of mandatory TLS for HTTP/2. TLS was not mandatory before so the starting point was without mandatory TLS and we didn’t manage to get to another stand-point.</p><span>
+</span><p>When I mention this in discussions with people the immediate follow-up question is…</p><span>
+</span><h2>No really, <em>why</em> not mandatory TLS?</h2><span>
+</span><p>The motivations why anyone would be against TLS for HTTP/2 are plentiful. Let me address the ones I hear most commonly, in an order that I think shows the importance of the arguments from those who argued them.</p><span>
+</span><h3>1. A desire to inspect HTTP traffic</h3><span>
+</span><p><img class="alignright size-full wp-image-7246" title="looking-glass" src="http://daniel.haxx.se/blog/wp-content/uploads/2015/03/looking-glass.jpg" alt="looking-glass" width="200" height="143" />There is a claimed “need” to inspect or intercept HTTP traffic for various reasons. Prisons, schools, anti-virus, IPR-protection, local law requirements, whatever are mentioned. The absolute requirement to cache things in a proxy is also often bundled with this, saying that you can never build a decent network on an airplane or with a satellite link etc without caching that has to be done with intercepts.</p><span>
+</span><p>Of course, MITMing proxies that terminate SSL traffic are not even rare these days and HTTP/2 can’t do much about limiting the use of such mechanisms.</p><span>
+</span><h3>2. Think of the little ones</h3><span>
+</span><p><img class="alignright size-full wp-image-7249" title="small-big-dog" src="http://daniel.haxx.se/blog/wp-content/uploads/2015/03/small-big-dog.jpg" alt="small-big-dog" width="174" height="241" />“<em>Small devices cannot handle the extra TLS burden</em>“. Either because of the extra CPU load that comes with TLS or because of the cert management in a billion printers/fridges/routers etc. Certificates also expire regularly and need to be updated in the field.</p><span>
+</span><p>Of course there will be a least acceptable system performance required to do TLS decently and there will always be systems that fall below that threshold.</p><span>
+</span><h3>3. Certificates are too expensive</h3><span>
+</span><p>The price of certificates for servers are historically often brought  up as an argument against TLS even it isn’t really HTTP/2 related and I  don’t think it was ever an argument that was particularly strong against  TLS within HTTP/2. Several CAs now offer zero-cost or very close to  zero-cost certificates these days and with the upcoming efforts like <a href="http://letsencrypt.com/">letsencrypt.com</a>, chances are it’ll become even better in the not so distant future.</p><span>
+</span><p><img class="alignleft size-full wp-image-7253" title="pile-of-money" src="http://daniel.haxx.se/blog/wp-content/uploads/2015/03/pile-of-money.jpg" alt="pile-of-money" width="250" height="167" />Recently someone even claimed that HTTPS limits the freedom of  users since you need to give personal information away (he said) in  order to get a certificate for your server. This was not a price he was willing to pay apparently. This is however simply not true for  the simplest kinds of certificates. For Domain Validated (DV)  certificates you usually only have to prove that you “control” the  domain in question in some way. Usually by being able to receive email  to a specific receiver within the domain.</p><span>
+</span><h3>4. The CA system is broken</h3><span>
+</span><p>TLS of today requires a PKI system where there are trusted <a href="http://en.wikipedia.org/wiki/Certificate_authority">certificate authorities</a> that sign certificates and this leads to a situation where all modern  browsers trust several hundred CAs to do this right. I don’t think a lot  of people are happy with this and believe this is the ultimate security  solution. There’s a portion of the Internet that advocates for <a href="https://tools.ietf.org/html/rfc6698">DANE</a> (DNSSEC) to address parts of the problem, while others work on gradual  band-aids like <a href="http://www.certificate-transparency.org/">Certificate Transparency</a> and <a href="http://en.wikipedia.org/wiki/OCSP_stapling">OCSP stapling</a> to make it suck less.</p><span>
+</span><p><a href="http://daniel.haxx.se/blog/wp-content/uploads/2015/03/please-trust-me.jpg"><img class="size-medium wp-image-7259   aligncenter" title="please trust me" src="http://daniel.haxx.se/blog/wp-content/uploads/2015/03/please-trust-me-300x225.jpg" alt="please trust me" width="300" height="225" /></a></p><span>
+</span><p>My personal belief is that rejecting TLS on the grounds that it isn’t  good enough or not perfect is a weak argument. TLS and HTTPS are the  best way we currently have to secure web sites. I wouldn’t mind seeing  it improved in all sorts of ways but I don’t believe running protocols  clear text until we have designed and deployed the next generation secure protocol is a  good idea – and I think it will take a long time (if ever) until we see  a TLS replacement.</p><span>
+</span><h2>Who were against mandatory TLS?</h2><span>
+</span><p>Yeah, lots of people ask me this, but I will refrain from naming specific people or companies here since I have no plans on getting into debates with them about details and subtleties in the way I portrait their arguments. You can find them yourself if you just want to and you can most certainly make educated guesses without even doing so.</p><span>
+</span><h2>What about opportunistic security?</h2><span>
+</span><p>A text about TLS in HTTP/2 can’t be complete without mentioning this part. A lot of work in the IETF these days are going on around introducing and making sure opportunistic security is used for protocols. It was also included in the HTTP/2 draft for a while but was moved out from the core spec in the name of simplification and because it could be done anyway without being part of the spec. Also, far from everyone believes opportunistic security is a good idea. The opponents tend to say that it will hinder the adoption of “real” HTTPS for sites. I don’t believe that, but I respect that opinion because it is a guess as to how users will act just as well as my guess is they won’t act like that!</p><span>
+</span><p><a href="https://tools.ietf.org/html/draft-ietf-httpbis-alt-svc-06">Opportunistic security for HTTP</a> is now being pursued outside of the HTTP/2 spec and allows clients to upgrade plain TCP connections to instead do “unauthenticated TLS” connections. And yes, it should always be emphasized: with opportunistic security, there should never be a “padlock” symbol or anything that would suggest that the connection is “secure”.</p><span>
+</span><p>Firefox supports opportunistic security for HTTP and it will be <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1113790">enabled by default from Firefox 37</a>.</p><span>
+</span><p><strong>Translations</strong></p><span>
+</span><p>Пост доступен на сайте softdroid.net: <a href="http://softdroid.net/tls-v-http2">Восстановление: TLS в HTTP/2</a>. (Russian)</p><span>
+
+				
+				</span><span>
+
+			</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

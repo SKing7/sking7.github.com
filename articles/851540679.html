@@ -1,0 +1,263 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Track JavaScript, AngularJS and jQuery errors with Google Analytics</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Track JavaScript, AngularJS and jQuery errors with Google Analytics</h1>
+<div class="entry"><span>
+        </span><div itemprop="articleBody"><span>
+            </span><p>Google Analytics is <a href="http://en.wikipedia.org/wiki/Google_Analytics#Popularity">the most popular website statistics service</a>.
+It is used for many purposes: from tracking visitors and sessions to campaigns and events.</p><span>
+
+</span><p>Ability to track any events provides us possibility to send and track any data in Google Analytics.
+One of the most useful in that case for web developers might be errors analytics.</p><span>
+
+</span><p>So far Google proposes 2 ways of tracking events:</p><span>
+
+</span><ol>
+<li>Classic <a href="https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide"><strong>ga.js</strong></a> with the for tracking like <code>_gaq.push(...)</code></li>
+<li>Newer <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/events"><strong>analytics.js</strong></a> has syntax <code>ga('send', ...)</code> and is part of the new <a href="https://support.google.com/analytics/answer/2790010"><strong>Universal Analytics</strong></a></li>
+</ol><span>
+
+</span><p>Let's provide JavaScript, AngularJS and jQuery errors checking.</p><span>
+
+</span><span>
+
+</span><h2 id="classic-ga.js">Classic <code>ga.js</code></h2><span>
+
+</span><p>This way works when you include Google Analytics in the next way:</p><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">_gaq</span> <span class="o">=</span> <span class="nx">_gaq</span> <span class="o">||</span> <span class="p">[];</span>
+<span class="nx">_gaq</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="s1">'_setAccount'</span><span class="p">,</span> <span class="s1">'UA-XXXXXXXX-X'</span><span class="p">]);</span>
+<span class="nx">_gaq</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="s1">'_trackPageview'</span><span class="p">]);</span>
+<span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">ga</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">'script'</span><span class="p">);</span>
+    <span class="nx">ga</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s1">'text/javascript'</span><span class="p">;</span>
+    <span class="nx">ga</span><span class="p">.</span><span class="nx">async</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="nx">ga</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'https:'</span> <span class="o">==</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">?</span> <span class="s1">'https://ssl'</span> <span class="o">:</span> <span class="s1">'http://www'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'.google-analytics.com/ga.js'</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">'script'</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="nx">s</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">ga</span><span class="p">,</span> <span class="nx">s</span><span class="p">);</span>
+<span class="p">})();</span>
+</code></pre></div><span>
+</span><h3 id="javascript-errors">JavaScript errors</h3><span>
+
+</span><p>The following code sends to GA data about all thrown JS errors (error message and place when error appeared).
+<code>navigator.userAgent</code> provides info about the browser to simpify detecting problems in difficult cases.</p><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Pure JavaScript errors handler</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'error'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">lineAndColumnInfo</span> <span class="o">=</span> <span class="nx">err</span><span class="p">.</span><span class="nx">colno</span> <span class="o">?</span> <span class="s1">' line:'</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">lineno</span> <span class="o">+</span><span class="s1">', column:'</span><span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">colno</span> <span class="o">:</span> <span class="s1">' line:'</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">lineno</span><span class="p">;</span>
+    <span class="nx">_gaq</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span>
+        <span class="s1">'_trackEvent'</span><span class="p">,</span>
+        <span class="s1">'JavaScript Error'</span><span class="p">,</span>
+        <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+        <span class="nx">err</span><span class="p">.</span><span class="nx">filename</span> <span class="o">+</span> <span class="nx">lineAndColumnInfo</span> <span class="o">+</span> <span class="s1">' -&gt; '</span> <span class="o">+</span>  <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="kc">true</span>
+    <span class="p">]);</span>
+<span class="p">});</span>
+</code></pre></div><span>
+</span><h3 id="angularjs-exceptions-handler">AngularJS exceptions handler</h3><span>
+
+</span><p>AngularJS delegates all uncaught exceptions to <a href="https://docs.angularjs.org/api/ng/service/$exceptionHandler"><code>$exceptionHandler</code> service</a>.</p><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// AngularJS errors handler</span>
+<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'loggerApp'</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">$provide</span><span class="p">.</span><span class="nx">decorator</span><span class="p">(</span><span class="s2">"$exceptionHandler"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$delegate</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exception</span><span class="p">,</span> <span class="nx">cause</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">$delegate</span><span class="p">(</span><span class="nx">exception</span><span class="p">,</span> <span class="nx">cause</span><span class="p">);</span>
+                    <span class="nx">_gaq</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span>
+                        <span class="s1">'_trackEvent'</span><span class="p">,</span>
+                        <span class="s1">'AngularJS error'</span><span class="p">,</span>
+                        <span class="nx">exception</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+                        <span class="nx">exception</span><span class="p">.</span><span class="nx">stack</span><span class="p">,</span>
+                        <span class="mi">0</span><span class="p">,</span>
+                        <span class="kc">true</span>
+                    <span class="p">]);</span>
+                <span class="p">};</span>
+            <span class="p">});</span>
+        <span class="p">});</span>
+</code></pre></div><span>
+</span><h3 id="jquery">jQuery</h3><span>
+
+</span><h4 id="jquery-errors">jQuery errors</h4><span>
+
+</span><p>jQuery provides util method <a href="http://api.jquery.com/jquery.error/">.error()</a> which is advised for developers to use for exceptions.</p><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// jQuery errors handler (jQuery API)</span>
+<span class="nx">jQuery</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">_gaq</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span>
+        <span class="s1">'_trackEvent'</span><span class="p">,</span>
+        <span class="s1">'jQuery Error'</span><span class="p">,</span>
+        <span class="nx">message</span><span class="p">,</span>
+        <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="kc">true</span>
+    <span class="p">]);</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><h4 id="jquery-ajax-errors-handler">jQuery AJAX errors handler</h4><span>
+
+</span><p>Whenever an Ajax request completes with an error, jQuery triggers the <a href="http://api.jquery.com/ajaxerror/"><code>ajaxError</code> event</a>.</p><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// jQuery AJAX errors handler (jQuery API)</span>
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ajaxError</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">request</span><span class="p">,</span> <span class="nx">settings</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">_gaq</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span>
+        <span class="s1">'_trackEvent'</span><span class="p">,</span>
+        <span class="s1">'jQuery Ajax Error'</span><span class="p">,</span>
+        <span class="nx">settings</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+        <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+            <span class="nx">result</span><span class="o">:</span> <span class="nx">event</span><span class="p">.</span><span class="nx">result</span><span class="p">,</span>
+            <span class="nx">status</span><span class="o">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span>
+            <span class="nx">statusText</span><span class="o">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">statusText</span><span class="p">,</span>
+            <span class="nx">crossDomain</span><span class="o">:</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">crossDomain</span><span class="p">,</span>
+            <span class="nx">dataType</span><span class="o">:</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">dataType</span>
+        <span class="p">}),</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="kc">true</span>
+    <span class="p">]);</span>
+<span class="p">});</span>
+</code></pre></div><span>
+</span><h2 id="modern-analytics.js">Modern <code>analytics.js</code></h2><span>
+
+</span><p>You can use it when include the analytics like:</p><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="nx">s</span><span class="p">,</span><span class="nx">o</span><span class="p">,</span><span class="nx">g</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">m</span><span class="p">){</span><span class="nx">i</span><span class="p">[</span><span class="s1">'GoogleAnalyticsObject'</span><span class="p">]</span><span class="o">=</span><span class="nx">r</span><span class="p">;</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">=</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">||</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="p">(</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">].</span><span class="nx">q</span><span class="o">=</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">].</span><span class="nx">q</span><span class="o">||</span><span class="p">[]).</span><span class="nx">push</span><span class="p">(</span><span class="nx">arguments</span><span class="p">)},</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">].</span><span class="nx">l</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="k">new</span> <span class="nb">Date</span><span class="p">();</span><span class="nx">a</span><span class="o">=</span><span class="nx">s</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">o</span><span class="p">),</span>
+        <span class="nx">m</span><span class="o">=</span><span class="nx">s</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="nx">o</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span><span class="nx">a</span><span class="p">.</span><span class="nx">async</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">a</span><span class="p">.</span><span class="nx">src</span><span class="o">=</span><span class="nx">g</span><span class="p">;</span><span class="nx">m</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">m</span><span class="p">)</span>
+<span class="p">})(</span><span class="nb">window</span><span class="p">,</span><span class="nb">document</span><span class="p">,</span><span class="s1">'script'</span><span class="p">,</span><span class="s1">'//www.google-analytics.com/analytics.js'</span><span class="p">,</span><span class="s1">'ga'</span><span class="p">);</span>
+
+<span class="nx">ga</span><span class="p">(</span><span class="s1">'create'</span><span class="p">,</span> <span class="s1">'UA-XXXXXXXX-X'</span><span class="p">,</span> <span class="s1">'auto'</span><span class="p">);</span>
+<span class="nx">ga</span><span class="p">(</span><span class="s1">'send'</span><span class="p">,</span> <span class="s1">'pageview'</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>Here is <a href="https://developers.google.com/analytics/devguides/collection/upgrade/reference/gajs-analyticsjs#events">the manual</a>
+about updating Event Tracking to Universal Analytics (analytics.js)</p><span>
+
+</span><h3 id="javascript-errors">JavaScript errors</h3><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Pure JavaScript errors handler</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'error'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">lineAndColumnInfo</span> <span class="o">=</span> <span class="nx">err</span><span class="p">.</span><span class="nx">colno</span> <span class="o">?</span> <span class="s1">' line:'</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">lineno</span> <span class="o">+</span><span class="s1">', column:'</span><span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">colno</span> <span class="o">:</span> <span class="s1">' line:'</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">lineno</span><span class="p">;</span>
+    <span class="nx">ga</span><span class="p">(</span>
+        <span class="s1">'send'</span><span class="p">,</span>
+        <span class="s1">'event'</span><span class="p">,</span>
+        <span class="s1">'JavaScript Error'</span><span class="p">,</span>
+        <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+        <span class="nx">err</span><span class="p">.</span><span class="nx">filename</span> <span class="o">+</span> <span class="nx">lineAndColumnInfo</span> <span class="o">+</span> <span class="s1">' -&gt; '</span> <span class="o">+</span>  <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="kc">true</span>
+    <span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div><span>
+</span><h3 id="angularjs-exceptions-handler">AngularJS exceptions handler</h3><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// AngularJS errors handler</span>
+<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'loggerApp'</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">$provide</span><span class="p">.</span><span class="nx">decorator</span><span class="p">(</span><span class="s2">"$exceptionHandler"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$delegate</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exception</span><span class="p">,</span> <span class="nx">cause</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">$delegate</span><span class="p">(</span><span class="nx">exception</span><span class="p">,</span> <span class="nx">cause</span><span class="p">);</span>
+                    <span class="nx">ga</span><span class="p">(</span>
+                        <span class="s1">'send'</span><span class="p">,</span>
+                        <span class="s1">'event'</span><span class="p">,</span>
+                        <span class="s1">'AngularJS error'</span><span class="p">,</span>
+                        <span class="nx">exception</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+                        <span class="nx">exception</span><span class="p">.</span><span class="nx">stack</span><span class="p">,</span>
+                        <span class="mi">0</span><span class="p">,</span>
+                        <span class="kc">true</span>
+                    <span class="p">);</span>
+                <span class="p">};</span>
+            <span class="p">});</span>
+        <span class="p">});</span>
+</code></pre></div><span>
+</span><h3 id="jquery">jQuery</h3><span>
+
+</span><h4 id="jquery-errors">jQuery errors</h4><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// jQuery errors handler (jQuery API)</span>
+<span class="nx">jQuery</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ga</span><span class="p">(</span>
+        <span class="s1">'send'</span><span class="p">,</span>
+        <span class="s1">'event'</span><span class="p">,</span>
+        <span class="s1">'jQuery Error'</span><span class="p">,</span>
+        <span class="nx">message</span><span class="p">,</span>
+        <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="kc">true</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><h4 id="jquery-ajax-errors-handler">jQuery AJAX errors handler</h4><span>
+</span><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// jQuery AJAX errors handler (jQuery API)</span>
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ajaxError</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">request</span><span class="p">,</span> <span class="nx">settings</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ga</span><span class="p">(</span>
+        <span class="s1">'send'</span><span class="p">,</span>
+        <span class="s1">'event'</span><span class="p">,</span>
+        <span class="s1">'jQuery Ajax Error'</span><span class="p">,</span>
+        <span class="nx">settings</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+        <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+            <span class="nx">result</span><span class="o">:</span> <span class="nx">event</span><span class="p">.</span><span class="nx">result</span><span class="p">,</span>
+            <span class="nx">status</span><span class="o">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span>
+            <span class="nx">statusText</span><span class="o">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">statusText</span><span class="p">,</span>
+            <span class="nx">crossDomain</span><span class="o">:</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">crossDomain</span><span class="p">,</span>
+            <span class="nx">dataType</span><span class="o">:</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">dataType</span>
+        <span class="p">}),</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="kc">true</span>
+    <span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div><span>
+</span><h2 id="demo">Demo</h2><span>
+
+</span><p>In the prepared demos all output from developer console is shown in special block under buttons.</p><span>
+
+</span><p>You can generate errors and check in "Network" tab that for each error GA sends request to:</p><span>
+
+</span><ol>
+<li><code>ga.js</code> - to <code>http://www.google-analytics.com/__utm.gif?...</code></li>
+<li><code>analytics.js</code> - to <code>http://www.google-analytics.com/r/collect?...</code></li>
+</ol><span>
+
+</span><h3 id="classic-ga.js">Classic <code>ga.js</code></h3><span>
+
+</span><span>
+
+</span><h3 id="modern-analytics.js">Modern <code>analytics.js</code></h3><span>
+
+</span><span>
+
+</span><h2 id="checking-analytics-data-in-ga">Checking analytics data in GA</h2><span>
+
+</span><p>In GA you can find two main reports for <code>Events</code>:</p><span>
+
+</span><span>
+
+</span><p><img src="http://i.imgur.com/xOGfMIo.png" alt="Real-Time Events" /></p><span>
+
+</span><span>
+
+</span><p><img src="http://i.imgur.com/YkUt26G.gif" alt="Common Events Report" /></p><span>
+
+</span><h2 id="0,-true-params-in-the-end"><code>0, true</code> params in the end</h2><span>
+
+</span><p>These params mean respectively according <a href="https://developers.google.com/analytics/devguides/collection/upgrade/reference/gajs-analyticsjs#events">the manual</a>:</p><span>
+
+</span><ul>
+<li><code>0</code> - opt_value (default value is <code>0</code>)</li>
+</ul><span>
+
+</span><p><a href="http://stackoverflow.com/a/22722302/1120798">Detailed info about this param</a></p><span>
+
+</span><ul>
+<li><code>true</code> - opt_noninteraction (default value is <code>false</code>)</li>
+</ul><span>
+
+</span><p>Is set to <code>true</code> to not affect the bounce rate. Here is <a href="http://stackoverflow.com/a/15651831/1120798">the description</a> in more details</p><span>
+
+</span><h2 id="exceptions---web-tracking-(analytics.js)">Exceptions - Web Tracking (analytics.js)</h2><span>
+
+</span><p><a href="https://support.google.com/analytics/answer/2790010"><strong>Universal Analytics</strong></a> proposes other way to track exceptions- <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/exceptions">Exceptions - Web Tracking (analytics.js)</a>.</p><span>
+
+</span><p>But after some research it appeared that report for it is <a href="http://stackoverflow.com/a/21718577/1120798">not so easy to configure and even to find</a>.</p><span>
+
+        </span></div><span>
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

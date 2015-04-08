@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p>Mozilla <a href="http://people.mozilla.org/~josh/lossy_compressed_image_study_july_2014/">has done a study of image formats</a> and concluded that WebP and JPEG XR are not a big-enough improvement over <em>well-optimized</em> JPEG. In the study only HEVC (H.265) was significantly better, but it’s a patent-encumbered format, so it can’t be used freely (<a href="http://bellard.org/bpg/">shhhh!</a>)</p><span>
+</span><p>It seems that Mozilla has a short-term and a long-term plan for image compression. They’re sponsoring development of the <a href="http://people.xiph.org/~xiphmont/demo/daala/update1.shtml">Daala codec</a>, which is technically <a href="http://people.xiph.org/~xiphmont/demo/daala/demo1.shtml">very interesting</a>, but not production-ready yet.</p><span>
+</span><p>For the short term Mozilla has developed <a href="https://github.com/mozilla/mozjpeg">MozJPEG — a modernized JPEG encoder</a> that offers better compression while remaining fully standard-compliant, so it’s compatible with all browsers, operating systems and native apps, and you can use it today without waiting for the whole world to upgrade (BTW: if you need the same for images with alpha channel, try <a href="http://pngmini.com/lossypng.html">lossy PNG</a>).</p><span>
+</span><h2>MozJPEG features</h2><span>
+</span><h3>Advanced compression</h3><span>
+</span><p>In addition to all standard libjpeg optimizations MozJPEG performs <em>progressive scan optimization</em>—a trick from the <code>jpegcrush</code>/<code>jpegrescan</code> tool. Parameters of progressive JPEG passes influence compression, so it’s possible to make smaller files by tuning them just right. It’s like having <a href="https://imageoptim.com/">ImageOptim</a> built-in.</p><span>
+</span><p>MozJPEG also brings to JPEG a technique from modern video codecs called <em>trellis quantization</em>. Simple JPEG encoders discard a fixed amount of detail according to quality set, but MozJPEG looks how many bits it would cost to write each detail and discards details that compress the least. This makes files much smaller, but also tends to make images look softer (which, depending on an image, may be a good or a bad thing).</p><span>
+</span><h3>Cleaner black-on-white text and lines</h3><span>
+</span><p>JPEG is <a href="http://lbrandy.com/blog/2008/10/my-first-and-last-webcomic/">known for</a> being terrible for compression of text and cartoons. Well, <a href="https://pornel.net/deringing">I’ve fixed that</a> (partially): now MozJPEG won’t create ugly gray halos around high-contrast edges on a white background.</p><span>
+</span><span>
+</span><p>BTW: In this case JPEG’s file size is about the same as 32-color PNG’s! Image by <a href="http://xkcd.com/1448/">xkcd</a>.</p><span>
+</span><h3>Smoother high-DPI “compressive” images</h3><span>
+</span><p>JPEG files have <em>quantization tables</em> that allow fine-tuning of quality for various levels of detail. It’s like an audio equalizer with 64 knobs—e.g. you can choose whether you want sharper edges or less blocky gradients).</p><span>
+</span><p>Modification of quantization tables used to be a hidden option reserved for the most advanced users. MozJPEG made it more accessible by adding a few good presets. It’s especially useful for high-resolution images. Standard JPEG tables have been tuned for low-DPI displays, and for <a href="http://www.netvlies.nl/blog/design-interactie/retina-revolution">compressive images</a> tend to put too much emphasis on tiny details over accurate color reproduction.</p><span>
+</span><span>
+</span><p>To be fair, technically you can get a decent result from ImageMagick, but it takes a few obscure options and <em>an XML file</em>.</p><span>
+</span><h2>libjpeg and libjpeg-turbo compatibility</h2><span>
+</span><p>MozJPEG is binary-compatible with both <a href="http://libjpeg-turbo.virtualgl.org/">libjpeg-turbo</a> and the classic libjpeg. This makes it possible to use MozJPEG as a drop-in replacement for libjpeg, and even install it as a system-wide replacement.</p><span>
+</span><p>The latest release has been made with help of libjpeg-turbo maintainer. MozJPEG and libjpeg-turbo adopted a common future-proof API that allows programs to be compatible with both libraries and still take advantage of each library’s specific features.</p><span>
+</span><h2>How can I use it?</h2><span>
+</span><p>Ask makers of your favorite graphics programs to integrate MozJPEG! No, really. MozJPEG is a library for developers, and on its own is not useful to people who don’t like compiling C programs.</p><span>
+</span><p>I’ve <a href="https://imageoptim.com/mozjpeg">quickly hacked a web interface</a>&nbsp;for you.</p><span>
+</span><p>If you want to run MozJPEG&nbsp;on your own machine, then you’ll need to use an ugly command-line program. I’ve built <a href="https://github.com/pornel/mozjpeg/releases">a binary for OS X</a>, but on other systems you may need to <a href="https://raw.githubusercontent.com/mozilla/mozjpeg/master/BUILDING.txt">compile it yourself</a>:</p><span>
+</span><ol>
+<li><a href="https://github.com/mozilla/mozjpeg/releases">Get the latest mozjpeg release</a>.</li>
+<li>Run <code>./configure &amp;&amp; make</code> in mozjpeg source directory (you’ll need a compiler installed.)</li>
+<li>Hope you don’t get a million compilation errors.</li>
+<li>If it succeeds, you’ll be able to run <code>./cjpeg</code> in this directory (the <code>./</code> prefix is important, otherwise you may invoke an old version bundled with your system.)</li>
+<li>You can run <code>sudo make install</code> if you want <code>cjpeg</code> (and other mozjpeg libraries/tools) installed system-wide.</li>
+</ol><span>
+</span><p>And then:</p><span>
+</span><pre>./cjpeg -quality 70 -outfile compressed-image.jpg source-image.png
+</pre><span>
+</span><ul>
+<li>The <code>-quality</code> option accepts fractional numbers (necessary if you want to make <a href="http://pornel.net/faircomparison">a fair benchmark</a>) and two numbers separated by commas to set quality of brightness and color separately, e.g. <code>-quality 60,70</code>.</li>
+<li><code>-sample 1x1</code> enables full-resolution color (e.g. red lines won’t be smudged as badly), but it makes files larger.</li>
+<li><code>-quant-table 2</code> (mentioned earlier) makes images softer and reduces posterization in low qualities.</li>
+<li><code>-notrellis</code> makes images sharper, but increases file size.</li>
+<li><code>-outfile</code> defines path where result is (over)written to.</li>
+<li>And the last argument is the source image. It can be a PNG, a very high-quality JPEG or <a href="http://en.wikipedia.org/wiki/Truevision_TGA">Targa</a>.</li>
+</ul><span>
+</span><p>You can combine <code>cjpeg</code> with ImageMagick like this:</p><span>
+</span><pre> convert -resize 50% source-image.png TGA:- | 
+  ./cjpeg -outfile compressed-image.jpg -targa
+</pre><span>
+</span><p>The <code>TGA:- |</code> bit tells ImageMagick to quickly and cheaply pipe uncompressed data to <code>cjpeg</code>, so you don’t waste CPU on generating a temporary PNG file.</p><span>
+</span><h2>Happy compressing</h2><span>
+</span><p>Xiph.org’s researcher Tim Terriberry calls JPEG an “alien technology from the future”. <span>JPEG, designed over 20 years ago</span>, has got so many details right that it still remains competitive today, despite being much simpler and faster to decode than newer formats trying to dethrone it. And MozJPEG isn’t done yet!</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

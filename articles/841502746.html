@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Aerotwist - FLIP Your Animations</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Aerotwist - FLIP Your Animations</h1>
+<div class="left column"><span>
+</span><p>Right now you’ll need the <a href="https://github.com/web-animations/web-animations-js">Web Animations API polyfill</a> to use the code above, though, but it’s pretty lightweight and does make life a lot easier!</p><span>
+
+</span><p>If you want a more “in-production” context for <strong>FLIP</strong> <a href="https://github.com/GoogleChrome/devsummit/blob/master/src/static/scripts/components/card.js#L263-296">check out the source for cards on the Chrome Dev Summit site</a>.</p><span>
+
+</span><span>
+
+</span><blockquote>
+<p>There is a window of 100ms after someone interacts with your site where you’re able to do work without them noticing.</p>
+</blockquote><span>
+
+</span><p>It’s absolutely superb for times where you are responding to user input and then animating something in response. So, for example, in the case of Chrome Dev Summit, I was expanding cards that the user tapped on. Often the start and end locations and dimensions of the elements aren’t known, because – say – the site is responsive and things move around. This will help you because it’s explicitly measuring elements and giving you the correct values at runtime.</p><span>
+
+</span><p>The reason you can afford to do this relatively expensive precalculation is because there is a window of 100ms after someone interacts with your site where you’re able to do work without them noticing. If you’re inside that window users will feel like the site responded instantly! It’s only when things are moving that you need to maintain 60fps.</p><span>
+</span><figure>
+  <img alt="Taking advantage of user perception." src="http://aerotwist.com/static/blog/flip-your-animations/window.jpg" />
+  <figcaption>Taking advantage of user perception.</figcaption>
+</figure><span>
+</span><p>We can use that window of time to do all that <code>getBoundingClientRect</code> work (or <code>getComputedStyle</code> if that’s your poison) in JavaScript, and from there we make sure that we’re reducing the animation down to nice-and-fast, compositor-friendly, look-ma-no-paints <code>transform</code> and <code>opacity</code> changes. (Why just those? Check out my <a href="http://aerotwist.com/blog/pixels-are-expensive/">Pixels are Expensive</a> post.)</p><span>
+
+</span><blockquote>
+<p>Animations that can be remapped to transform and opacity changes are the perfect fit.</p>
+</blockquote><span>
+
+</span><p>Animations that <em>can</em> be remapped to <code>transform</code> and <code>opacity</code> changes are the perfect fit. If you’re already limiting to those properties in your JS or CSS animations then you’re probably good to go; this technique works best when you’re changing layout properties (like width and height, left and top) and you want to remap them to cheaper properties.</p><span>
+
+</span><p>Sometimes you will need to rethink your animations to fit this model, and on many occasions I’ve separated and animated elements individually just so that I can animate them without distortion, and <strong>FLIP</strong> as much as possible. You may feel like that’s overkill, but to me it’s not, and for two reasons:</p><span>
+
+</span><ol>
+<li><strong>People want this.</strong> My colleague and friend <a href="http://paul.kinlan.me/what-news-readers-want/">Paul Kinlan recently ran a survey on what people want from a news app</a>. The most popular answer (which was a surprise to him, at least) wasn’t offline support, sync, notifications, or anything like that. It was <em>smooth navigation</em>. Smooth, like no jank, no stutter, no judder. (/me mutters something about #perfmatters.)</li>
+
+<li><strong>Native app devs do this.</strong> Of course this is a sliding scale and subjective, but I’ve heard many times of native developers spending days on end getting the transitions in their apps <em>just right</em>. Those “little touches” are a differentiator and, as we get faster loading sites through Service Worker, we’re going to be in the same boat. People will judge our sites based on how well they feel when they’re running.</li>
+</ol><span>
+
+</span><span>
+
+</span><p>There are a couple of things to bear in mind if you <strong>FLIP</strong>:</p><span>
+
+</span><ol>
+<li><strong>Don’t exceed the 100ms window.</strong> It’s important to remember that you shouldn’t exceed that window, because your app will appear non-responsive if you do. Keep an eye on it through DevTools to know if you’re busting that budget.</li>
+
+<li><strong>Orchestrate your animations carefully.</strong> Imagine, if you will, that you’re running one of these animations all transformy and opacity-y and then you decide to do another, which requires a bunch of precalculation. That’s going to interrupt the animation that’s in flight, which is bad. The key here is to make sure your precalculation work is done in idle or the “response window” I talked about, and that two animations don’t stomp over each other.</li>
+
+<li><strong>Content can get distorted</strong>. When you’re working in a scale and transform world some elements can get distorted. As I said above I’ve been known to restructure my markup a little to allow me to <strong>FLIP</strong> without distortion, but it can end up being quite the wrangle.</li>
+</ol><span>
+
+</span><span>
+
+</span><p>I’ve come to love <strong>FLIP</strong> as a way of thinking about animations, because it’s a good match of JavaScript and CSS. Calculate in JavaScript, but let CSS handle the animations for you. You don’t have to use CSS to do the animations, though, you could just as easily use the Web Animations API or JavaScript itself, whatever’s easiest. The main point is that you’re reducing the per-frame complexity and cost (which normally means <code>transform</code> and <code>opacity</code>) to try and give the user the best possible experience.</p><span>
+
+</span><p>I have more to tell you about <strong>FLIP</strong> and a broader, unified model of performance, but that’s going to be the next blog post or so I’d say!</p><span>
+
+</span><p>So, uhh, <strong>FLIP</strong> on.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

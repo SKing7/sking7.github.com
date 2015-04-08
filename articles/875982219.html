@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Full-Text Search Algorithm in JavascriptBurak Kanber's Blog</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Full-Text Search Algorithm in JavascriptBurak Kanber's Blog</h1>
+<div class="post single"><span>
+		</span><span>
+		</span><p class="grey">On March 22, 2015</p><span>
+		</span><!-- AddThis Button BEGIN --><span>
+		</span><span>
+		</span><!-- AddThis Button END --><span>
+
+		</span><p>Full-text search, unlike most of the topics in this machine learning series, is a problem that most web developers have encountered at some point in their daily work. A client asks you to put a search field somewhere, and you write some SQL along the lines of <code>WHERE title LIKE %:query%</code>. It’s convincing at first, but then a few days later the client calls you and claims that “search is broken!”</p><span>
+</span><p>Of course, your search isn’t <em>broken</em>, it’s just not doing what the client wants. Regular web users don’t really understand the concept of exact matches, so your search quality ends up being poor. You decide you need to use full-text search. With some MySQL fidgeting you’re able to set up a FULLTEXT index and use a more evolved syntax, the “MATCH() … AGAINST()” query.</p><span>
+</span><p>Great! Problem solved. For smallish databases.</p><span>
+</span><p>As you hit the hundreds of thousands of records, you notice that your database is sluggish. MySQL just isn’t <em>great</em> at full-text search. So you grab ElasticSearch, refactor your code a bit, and deploy a Lucene-driven full-text search cluster that works wonders. It’s fast and the quality of results is great.</p><span>
+</span><p>Which leads you to ask: what the heck is Lucene doing <em>so right</em>?</p><span>
+</span><p>This article (on TF-IDF, Okapi BM-25, and relevance scoring in general) and the next one (on inverted indices) describe the basic concepts behind full-text search.</p><span>
+</span><h2>Relevance</h2><span>
+</span><p>It would be convenient to be able to define a “relevance score” that relates a document to a search query. And then, when users search for things, we can sort by the relevance score instead of sorting chronologically. That way the most relevant documents come up on top, regardless (or maybe not) of how old they are.</p><span>
+</span><p>There are many, many ways to relate one text to another, but let’s start simple and use a statistics-based approach that doesn’t need to understand language itself, but rather looks at the statistics of word usage and matches and weighs documents based on the prevalence of their unique words.</p><span>
+</span><p>This algorithm doesn’t care about verbs or nouns or even meaning. All it cares about is the simple fact that there are common words and there are rare words, and if your search phrase includes both common and rare words, you’d be better off to rank the documents that have that rare word in it higher, and put less weight on matched common words.</p><span>
+</span><p>The algorithm we’ll use is called <a title="Okapi BM25" href="http://en.wikipedia.org/wiki/Okapi_BM25" target="_blank">Okapi BM25</a>, but it builds on two basic concepts: <em>term frequency (“TF”) </em>and <em>inverse document frequency (“IDF”). </em>Together, these concepts form “TF-IDF”, which is a statistical measure that represents how important a term is to a document.</p><span>
+</span><h2>TF-IDF</h2><span>
+</span><p><em>Term Frequency, </em>abbreviated “TF”, is a simple metric: it’s the number of times a certain word appears in a document. You can also represent it as the fraction of the number of times a word appears over the total number of tokens (ie, total words) in a document. Term frequency says “I’m 100 words long and ‘the’ shows up 8 times, so the term frequency of ‘the’ is 8 or 8/100 or 8%” (depending on the representation you want).</p><span>
+</span><p><em>Inverse Document Frequency, </em>abbreviated “IDF”, is more evolved: the <em>rarer</em> a word is, the <em>higher</em> this value. It’s the log ratio of the number of total documents over the number of documents a term appears in. Rarer words, therefore, yield bigger “IDF”s.</p><span>
+</span><p>If you multiply these two numbers together, (TF*IDF), you’ll get the importance of a word to a document. “Importance” being defined as “how rare is this word and how often does it appear in this document?”</p><span>
+</span><p>You can then use this concept to relate a document to a search query. For each term in a search query, calculate its TF-IDF score, add them all up, and whichever document has the highest score is your winner.</p><span>
+</span><p>Cool? Cool.</p><span>
+</span><h2>Okapi BM25</h2><span>
+</span><p>The algorithm described above is <em>okay </em>but not wonderful. It does provide us with statistically-derived relevance scores, but it could be improved.</p><span>
+</span><p>Okapi BM25 is considered a state-of-the-art ranking algorithm (<a href="http://www.elastic.co/guide/en/elasticsearch/guide/current/pluggable-similarites.html" target="_blank">so says ElasticSearch</a>). The major improvements that Okapi BM25 bring over TF-IDF are two tunable parameters, called k1 and b, that modulate “term frequency saturation” and “field-length normalization”. What?</p><span>
+</span><p>To intuit term frequency saturation, imagine two documents of roughly the same length that both talk about baseball. Imagine that the overall corpus doesn’t have much to do with baseball, so the term “baseball”s IDF is pretty high — it’s a rare and important-ish word. These two documents both talk about baseball, and talk about it a lot, but one of them uses the term “baseball” way more. Should that document <em>really</em> show up that much higher in the rankings? Both the documents talk about baseball a hefty amount, and at a certain point it shouldn’t really matter if you use the word “baseball” 40 times or 80 times. Anything above 30 is enough!</p><span>
+</span><p>This is “term frequency saturation.” The naive TF-IDF algorithm doesn’t saturate, so the document that uses “baseball” 80 times will have twice the score as the one that uses it 40 times. Sometimes that’s desired, sometimes it’s not.</p><span>
+</span><p>Okapi BM25, on the other hand, has a parameter called “k1″ that actually lets you tune how quickly term frequency will saturate. The parameter k1 is usually taken between 1.2 and 2.0. Lower values result in quicker saturation (meaning that those two documents above will have similar scores, because they both have a significant number of “baseball”s).</p><span>
+</span><p>Field-length normalization considers the length of the document and normalizes against the average length of all documents. It’s useful in single-field collections (like ours) to put documents of differing lengths on the same playing field. It’s doubly useful in multiple-field collections (like “title” and “body”) in putting the title and body fields on the same playing field as well. The term “b” is ranged from 0 to 1, with 1 giving full normalization and 0 giving no normalization.</p><span>
+</span><h2>The Algorithm</h2><span>
+</span><p>You can see the formula for the Okapi BM25 algorithm on the <a href="http://en.wikipedia.org/wiki/Okapi_BM25" target="_blank">Okapi BM25 Wikipedia page</a>. Now that you know what each of the terms are, it should be pretty straight-forward to understand, so we won’t dive into the equation here. Let’s dive into code:</p><span>
+</span><pre class="code">BM25.Tokenize = function(text) {
+    text = text
+        .toLowerCase()
+        .replace(/\W/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .split(' ')
+        .map(function(a) { return stemmer(a); });
+
+    // Filter out stopStems
+    var out = [];
+    for (var i = 0, len = text.length; i &lt; len; i++) {
+        if (stopStems.indexOf(text[i]) === -1) {
+            out.push(text[i]);
+        }
+    }
+
+    return out;
+};
+</pre><span>
+</span><p>We define a simple <code class="code">Tokenize()</code> static method whose purpose is to parse a string into an array of tokens. Along the way, we lower-case all the tokens (to reduce entropy), we run the Porter Stemmer Algorithm to reduce the entropy of the corpus and also to improve matching (so that “walking” and “walk” match the same), and we also filter out stop-words (very common words) to further reduce entropy. I’ve written about all these concepts in-depth previously, so please excuse me if I’m glossing over this section. <img src="http://burakkanber.com/blog/wp-includes/images/smilies/icon_smile.gif" alt=":)" class="wp-smiley" /></p><span>
+</span><pre class="code">BM25.prototype.addDocument = function(doc) {
+    if (typeof doc.id === 'undefined') { throw new Error(1000, 'ID is a required property of documents.'); };
+    if (typeof doc.body === 'undefined') { throw new Error(1001, 'Body is a required property of documents.'); };
+
+    // Raw tokenized list of words
+    var tokens = BM25.Tokenize(doc.body);
+
+    // Will hold unique terms and their counts and frequencies
+    var _terms = {};
+
+    // docObj will eventually be added to the documents database
+    var docObj = {id: doc.id, tokens: tokens, body: doc.body};
+
+    // Count number of terms
+    docObj.termCount = tokens.length;
+
+    // Increment totalDocuments
+    this.totalDocuments++;
+
+    // Readjust averageDocumentLength
+    this.totalDocumentTermLength += docObj.termCount;
+    this.averageDocumentLength = this.totalDocumentTermLength / this.totalDocuments;
+
+    // Calculate term frequency
+    // First get terms count
+    for (var i = 0, len = tokens.length; i &lt; len; i++) {
+        var term = tokens[i];
+        if (!_terms[term]) { 
+            _terms[term] = {
+                count: 0,
+                freq: 0
+            }; 
+        };
+        _terms[term].count++;
+    }
+
+    // Then re-loop to calculate term frequency.
+    // We'll also update inverse document frequencies here.
+    var keys = Object.keys(_terms);
+    for (var i = 0, len = keys.length; i &lt; len; i++) {
+        var term = keys[i];
+        // Term Frequency for this document.
+        _terms[term].freq = _terms[term].count / docObj.termCount;
+
+        // Inverse Document Frequency initialization
+        if (!this.terms[term]) {
+            this.terms[term] = {
+                n: 0, // Number of docs this term appears in, uniquely
+                idf: 0
+            };
+        }
+
+        this.terms[term].n++;
+    };
+
+    // Calculate inverse document frequencies
+    // This is SLOWish so if you want to index a big batch of documents,
+    // comment this out and run it once at the end of your addDocuments run
+    // If you're only indexing a document or two at a time you can leave this in.
+    // this.updateIdf();
+
+    // Add docObj to docs db
+    docObj.terms = _terms;
+    this.documents[docObj.id] = docObj;
+};
+</pre><span>
+</span><p>This <code class="code">addDocument()</code> method is where most of the magic happens. We’re essentially building and maintaining two similar data structures: <code class="code">this.documents</code>, and <code class="code">this.terms</code>.</p><span>
+</span><p><code class="code">this.documents</code> is our database of individual documents, but along with storing the full, original text of the document, we also store the document length and a list of all the tokens in the document along with their count and frequency. Using this data structure we can easily and quickly (with a super-fast, O(1) hash table lookup) answer the question “in document #3, how many times did the word ‘walk’ occur?”</p><span>
+</span><p>We also build a second data structure called <code class="code">this.terms</code>. This represents all terms in the entire corpus. Through this O(1) data structure we can quickly answer the questions “how many documents does ‘walk’ appear in? And what’s its idf score?”.</p><span>
+</span><p>Finally, we record the document length for each individual document, and also maintain an average document length for the whole corpus.</p><span>
+</span><p>Of course, you see above that idf is initialized to zero, and I’ve even commented out the <code class="code">updateIdf()</code> call above. That’s because it’s quite slow, and only needs to be run once at the end of the indexing operation. No need to run this 50,000 times when once will suffice. Leaving this commented out and running it only once at the end of a bulk index operation really speeds things up. Here’s the method:</p><span>
+</span><pre class="code">BM25.prototype.updateIdf = function() {
+    var keys = Object.keys(this.terms);
+    for (var i = 0, len = keys.length; i &lt; len; i++) {
+        var term = keys[i];
+        var num = (this.totalDocuments - this.terms[term].n + 0.5);
+        var denom = (this.terms[term].n + 0.5);
+        this.terms[term].idf = Math.max(Math.log10(num / denom), 0.01);
+    }
+};
+</pre><span>
+</span><p>It’s a simple function, but since it loops over the entire corpus terms list, updating each one, it’s a somewhat expensive operation. The implementation is the standard formula for inverse document frequency (which you can easily find <a href="http://en.wikipedia.org/wiki/Tf–idf" target="_blank">on Wikipedia</a>) — it’s the log ratio of total documents to the number of documents a term appears in. I’ve also modified it to always be above zero.</p><span>
+</span><pre class="code">BM25.prototype.search = function(query) {
+
+    var queryTerms = BM25.Tokenize(query);
+    var results = [];
+
+    // Look at each document in turn. There are better ways to do this with inverted indices.
+    var keys = Object.keys(this.documents);
+    for (var j = 0, nDocs = keys.length; j &lt; nDocs; j++) {
+        var id = keys[j];
+        // The relevance score for a document is the sum of a tf-idf-like
+        // calculation for each query term.
+        this.documents[id]._score = 0;
+
+        // Calculate the score for each query term
+        for (var i = 0, len = queryTerms.length; i &lt; len; i++) {
+            var queryTerm = queryTerms[i];
+
+            // We've never seen this term before so IDF will be 0.
+            // Means we can skip the whole term, it adds nothing to the score
+            // and isn't in any document.
+            if (typeof this.terms[queryTerm] === 'undefined') {
+                continue;
+            }
+
+            // This term isn't in the document, so the TF portion is 0 and this
+            // term contributes nothing to the search score.
+            if (typeof this.documents[id].terms[queryTerm] === 'undefined') {
+                continue;
+            }
+
+            // The term is in the document, let's go.
+            // The whole term is :
+            // IDF * (TF * (k1 + 1)) / (TF + k1 * (1 - b + b * docLength / avgDocLength))
+
+            // IDF is pre-calculated for the whole docset.
+            var idf = this.terms[queryTerm].idf;
+            // Numerator of the TF portion.
+            var num = this.documents[id].terms[queryTerm].count * (this.k1 + 1);
+            // Denomerator of the TF portion.
+            var denom = this.documents[id].terms[queryTerm].count 
+                + (this.k1 * (1 - this.b + (this.b * this.documents[id].termCount / this.averageDocumentLength)));
+
+            // Add this query term to the score
+            this.documents[id]._score += idf * num / denom;
+        }
+
+        if (!isNaN(this.documents[id]._score) &amp;&amp; this.documents[id]._score &gt; 0) {
+            results.push(this.documents[id]);
+        }
+    }
+
+    results.sort(function(a, b) { return b._score - a._score; });
+    return results.slice(0, 10);
+};
+
+</pre><span>
+</span><p>Finally, the <code class="code">search()</code> method loops through all documents and assigns a BM25 relevance score to each, sorting the highest scores at the end. Of course, it’s silly to loop through every document in the corpus when searching, but that’s the subject of Part Two (inverted indices and performance).</p><span>
+</span><p>The code above is documented inline, but the gist is as follows: for each document and for each query term, calculate the BM25 score. The idf score for each query term is globally pre-calculated and just a simple look-up, the term frequency is document-specific but was also pre-calculated, and the rest of the work is simply multiplication and division! We add a temporary variable called <code class="code">_score</code> to each document, and then sort the results by the score (descending) and return the top 10.</p><span>
+</span><h2>Demo, Source Code, Notes, and Next Steps</h2><span>
+</span><p>There are lots of ways the above can be improved, and we’ll explore those in Part Two of “Full-Text Search”! Stay tuned. I hope to publish it in a few weeks. Some things we’ll accomplish next time are:</p><span>
+</span><ul>
+<li>Inverted index for faster searches</li>
+<li>Faster indexing</li>
+<li>Even better search results</li>
+</ul><span>
+</span><p>For this demo, I built a little Wikipedia crawler that grabs the first paragraph of a decent number (85,000) of Wikipedia articles. Since indexing all 85k documents takes about 90 seconds on my computer I’ve cut the corpus in half for this demo. Don’t want you guys to waste your laptop battery juice on indexing Wikipedia articles for a simple full-text demo.</p><span>
+</span><p>Because the indexing is a CPU-heavy, blocking operation, I implemented it as a Web Worker. The indexing runs in a background thread — you can find the <a href="http://burakkanber.com/mlinjs/bm25.js" target="_blank">full source code here</a>. You’ll also find references to the stemmer algorithm and my stop-word list in the source code. The code license, as always, is free to use for educational purposes but not for any commercial purpose.</p><span>
+</span><p>Finally, here’s the demo. Once the indexing is complete, try searching for random things and phrases that Wikipedia might know about. Note that there’s only 40,000 paragraphs indexed here, so you might have to try a few topics before you find one that the system knows about.</p><span>
+</span><span>
+</span><span>
+</span><link href="http://cdn-images.mailchimp.com/embedcode/classic-081711.css" rel="stylesheet" type="text/css" /><span>
+</span><span>
+</span><span>
+
+		</span><span>
+		
+</span><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><span>
+	</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

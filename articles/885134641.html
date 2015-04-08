@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Loading CSS without blocking render by Keith Clark</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Loading CSS without blocking render by Keith Clark</h1>
+<article class="grid__item">
+<p>This article demonstrates a technique to get content in front of visitors as quickly as possible by asynchronously downloading stylesheets to prevent them from blocking page render.</p>
+<p> Warning! I posted this with the best of intentions, but it would be irresponsible not to make readers aware of the following issues. Community feedback is coming in thick and fast (something I'm very grateful for) and it's becoming apparent that this technique isn't as robust as I'd hoped. Despite my testing and using it successfully in my own work, many developers are seeing issues in IE and Firefox (apparently crashing FF beta) while others are reporting success in Chrome and Safari. My advice right now is: DON'T use this in production. I am planning to digest the feedback and will update this post with any relevant information. </p>
+<p>The principles behind these techniques aren't new. Filament group, for example, have published great content on <a href="https://github.com/filamentgroup/loadCSS">loading CSS</a> and <a href="http://www.filamentgroup.com/lab/font-loading.html">fonts</a>. I've written this article to document my thoughts and ideas for loading non-blocking resources.</p>
+<p>The trick to triggering an asynchronous stylesheet download is to use a <code>&lt;link&gt;</code> element and set an invalid value for the <code>media</code> attribute (I'm using <code>media="none"</code>, but any value will do). When a media query evaluates to false, the browser will still download the stylesheet, but it won't wait for the content to be available before rendering the page.</p>
+<figure class="figure">
+<pre class="figure__item image codeblock"><code class="code code--html">&lt;link rel="stylesheet" href="css.css" media="none"&gt;</code></pre>
+</figure>
+<p>Once the stylesheet has finished downloading the <code>media</code> attribute must be set to a valid value so the style rules will be applied to the document. The <code>onload</code> event is used to switch the <code>media</code> property to <code>all</code>:</p>
+<figure class="figure">
+<pre class="figure__item image codeblock"><code class="code code--html">&lt;link rel="stylesheet" href="css.css" media="none" onload="if(media!='all')media='all'"&gt;</code></pre>
+</figure>
+<p>This method of loading CSS will deliver useable content to visitors <em>much</em> quicker than the standard approach. Critical CSS can still be served with the usual blocking approach (or you can inline it for ultimate performance) and non-critical styles can be progressively downloaded and applied later in the parsing / rendering process.</p>
+<p>This technique uses JavaScript, but you can cater for non-JavaScript browsers by wrapping the equivalent blocking <code>&lt;link&gt;</code> elements in a <code>&lt;noscript&gt;</code> element:</p>
+<figure class="figure">
+<pre class="figure__item image codeblock"><code class="code code--html">&lt;link rel="stylesheet" href="css.css" media="none" onload="if(media!='all')media='all'"&gt;
+&lt;noscript&gt;&lt;link rel="stylesheet" href="css.css"&gt;&lt;/noscript&gt;</code></pre>
+</figure>
+<p>There is a side-effect to this technique. Once a non-blocking stylesheet has finished downloading the document will be repainted to reflect any new rules it defines. Injecting new styles into the page can trigger content reflows, but this is only really an issue for the <em>first</em> page load with an unprimed cache. As with all things related to performance, you'll need to make a judgement call on when the need to control a reflow outweighs the potential speed gain.</p>
+<h2 id="using-non-blocking-css-to-load-fonts">Using non-blocking CSS to load fonts</h2>
+<p>Fonts are an issue for first-paint performance, they are a blocking resource and can render text invisible while they download . Using the non-blocking link example above, it's possible to download a stylesheet containing font data in the background, unblocking the page render:</p>
+<figure class="figure">
+<pre class="figure__item image codeblock"><code class="code code--html">&lt;link rel="stylesheet" href="main.css"&gt;
+&lt;link rel="stylesheet" href="font.css" media="none" onload="if(media!='all')media='all'"&gt;</code></pre>
+</figure>
+<p><code>font.css</code> contains a base64 encoded WOFF version of the <a href="http://www.google.com/fonts/specimen/Merriweather">Merriweather font</a>.</p>
+<figure class="figure">
+<pre class="figure__item image codeblock"><code class="code code--css">@font-face {
+  font-family: Merriweather;
+  font-style: normal;
+  font-weight: 400;
+  src: local('Merriweather'), url('data:application/x-font-woff;charset=utf-8;base64,...')
+}</code></pre>
+</figure>
+<p><code>main.css</code> contains all the rules required to style the site. Here's the font declaration:</p>
+<figure class="figure">
+<pre class="figure__item image codeblock"><code class="code code--css">body {
+  font-family: Merriweather, "Lucida Grande", ...;
+}</code></pre>
+</figure>
+<p>While the font is downloading, the first matching fallback font (<strong>Lucida Grande</strong>, in this case) is used to render the page content. Once the font stylesheet is applied, <strong>Merriweather</strong> will be used. I try to ensure the fallback shares similar layout characteristics to the preferred font, so that the inevitable reflow is as subtle as possible. </p>
+<p>I'm testing blocking vs non-blocking using my <a href="https://keithclark.github.io/gadebugger/">Google Analytics Debugger site</a> in Chrome over a simulated 3G connection. Local testing produces the following network graphs; notice the <code>DOMContentLoaded</code> event fires around 450ms earlier and assets begin downloading sooner when non-blocking is used:</p>
+<figure class="figure">
+<span class="figure__item figure__item--inset image "><img alt="" src="http://keithclark.co.uk/articles/loading-css-without-blocking-render/non-blocking-vs-blocking-graph.png" width="1092" height="475" /></span>
+<figcaption class="figure__caption caption">Simulated 3G network graph. Top shows blocking fonts. Bottom shows non-blocking fonts.</figcaption>
+</figure>
+<p>Deploying this to a test server and running <a href="http://www.webpagetest.org/">webpagetest</a> with 3G connection shaping produces the following timeline:</p>
+<figure class="figure">
+<span class="figure__item figure__item--inset image "><img alt="" src="http://keithclark.co.uk/articles/loading-css-without-blocking-render/non-blocking-vs-blocking-timeline1.png" width="1898" height="327" /></span>
+<figcaption class="figure__caption caption">3G timeline. Top shows blocking fonts. Bottom shows non-blocking fonts.</figcaption>
+</figure>
+<p>Both methods take 2.8 seconds to completely render the page, but the non-blocking method causes painting to being a <em>second</em> earlier than the normal blocking approach. Running the same test with the main stylesheet inlined shows a 0.7 second gain when non-blocking CSS is used to serve the font:</p>
+<figure class="figure">
+<span class="figure__item figure__item--inset image "><img alt="" src="http://keithclark.co.uk/articles/loading-css-without-blocking-render/non-blocking-vs-blocking-timeline2.png" width="1898" height="327" /></span>
+<figcaption class="figure__caption caption">3G timeline with main CSS inlined. Top shows blocking fonts. Bottom shows non-blocking fonts.</figcaption>
+</figure>
+<p>This technique does work well for fonts but I recommend keeping an eye on the new <a href="http://dev.w3.org/csswg/css-font-loading/">CSS Font Loading Module</a>, which gives far greater control over font loading.</p>
+<h2 id="summary">Summary</h2>
+<p>Loading fonts is one example of applying this non-blocking technique, but it could also be used for other purposes, such as separating JavaScript enhanced styles from core CSS. </p>
+<p>I've started to experiment with the idea of breaking up CSS into scaffolding (core layout) and presentation (everything else), allowing vital page layout to block the page render and have the visual styles arrive later.</p>
+<p class="note">Thanks to <a href="https://twitter.com/mathias">Mathias Bynens</a> for taking the time to share a <a href="https://twitter.com/mathias/status/581515558304219136">shortened version</a> of the <code>&lt;link&gt;</code> onload handler.</p>
+<h2 id="update-1-apr-2015">Update: 1 Apr 2015</h2>
+<ul class="bullet-list">
+<li>This method does not work in Android &lt; 4.4 because the onload handler does not fire when content is available - I'm looking into a work around for this.</li>
+<li>Some browsers appear to still block CSS render despite <code>media="none"</code>. This means CSS loads as it usually would — I'm looking into this.</li>
+</ul>
+</article></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

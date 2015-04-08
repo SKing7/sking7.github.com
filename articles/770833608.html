@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Node.js Security Tips - via @codeship</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Node.js Security Tips - via @codeship</h1>
+<summery class="article__summery colxs100">
+                      <p>This is a republished blog post by <a href="https://twitter.com/nthgergo">Gergely Nemeth</a> from <a href="http://risingstack.com/?utm_source=Codeship">RisingStack</a>. They do Full Stack Javascript Development and Consulting. Gergely loves contributing to open-source projects like node-restify, <a href="http://oneshot.risingstack.com/">organizing conferences</a>, DevOps, Microservices and cycling. You can find his original article <a href="http://blog.risingstack.com/node-js-security-tips/?utm_source=Codeship">here</a>.</p>
+<p>Node.js is getting more and more mature, no doubt – despite this, not a lot of security guidelines are out there.</p>
+<p>In this post I will share some points you should keep in mind when it comes to Node.js security.</p>
+<h2>No eval, or friends</h2>
+<p>Eval is not the only one you should avoid – in the background each one of the following expressions use <code>eval</code>:</p>
+<ul>
+<li><code>setInterval(String, 2)</code></li>
+<li><code>setTimeout(String, 2)</code></li>
+<li><code>new Function(String)</code></li>
+</ul>
+<p>But why should you avoid <code>eval</code>?</p>
+<p>It can open up your code for injections attacks (<code>eval</code> of user input – <em>wow, it hurts even to write down</em>, please never do this) and is slow (as it will run the interpreter/compiler).</p>
+<h2>Strict mode, please</h2>
+<p>With this flag you can opt in to use a restricted variant of JavaScript. It eliminates some silent errors and will throw them all the time.</p>
+<h2>Undeletable properties</h2>
+<pre>'use strict';  
+delete Object.prototype; // TypeError  
+</pre>
+<h2>Object literals must be unique</h2>
+<pre>'use strict';  
+var obj = {  
+    a: 1, 
+    a: 2 
+}; 
+// syntax error
+</pre>
+<h2>Prohibits with</h2>
+<pre>var obj = { x: 17 };  
+with (obj) // !!! syntax error  
+{
+
+}
+</pre>
+<p>To get a complete list of these silent errors, visit <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode">MDN</a>.</p>
+<h2>Static code analysis</h2>
+<p>Use either <a href="http://www.jslint.com/">JSLint</a>, <a href="http://www.jshint.com/">JSHint</a> or <a href="https://github.com/eslint/eslint">ESLint</a>. Static code analysis can catch a lot of potential problems with your code early on.</p>
+<h2>Testing</h2>
+<p>I hope it goes without saying: testing, testing and a little bit more testing.</p>
+<p><img src="https://blog.codeship.com/wp-content/uploads/2014/11/pic_darthvader_nodejs_security.jpg" alt="The Most Important Node.js Security Tips" width="885" height="500" class="alignnone size-full wp-image-1054" /></p>
+<p>Sure, it’s not just unit tests – you should shoot for the <a href="http://martinfowler.com/bliki/TestPyramid.html">test pyramid</a>.</p>
+<h2>Say no to sudo node app.js</h2>
+<p>I see this a lot: people are running their Node app with superuser rights. Why? Because they want the application to listen on port 80 or 443.</p>
+<p>This is just wrong. In case of an error/bug your process can bring down the entire system, as it will have credentials to do anything.</p>
+<p>Instead of this, what you can do is to set up an HTTP server/proxy to forward the requests. This can be nginx, Apache, you name it.</p>
+<h2>Avoid command injection</h2>
+<p>What is the problem with the following snippet?</p>
+<pre>child_process.exec('ls', function (err, data) {  
+    console.log(data);
+});
+</pre>
+<p>Under the hood <code>child_process.exec</code> makes a call to execute <code>/bin/sh</code>, so it is a bash interpreter and not a program launcher.</p>
+<p>This is problematic when user input is passed to this method – can be either a backtick or <code>$()</code>, a new command can be injected by the attacker.</p>
+<p>To overcome this issue simply use <code>child_process.execFile</code>.</p>
+<p>For the original blogpost dealing with command injection, please visit <a href="https://blog.liftsecurity.io/2014/08/19/Avoid-Command-Injection-Node.js">LiftSecurity</a>.</p>
+<h2>Temp files</h2>
+<p>Pay extra attention when creating files, like handling uploaded files. These files can easily eat up all your disk space.</p>
+<p>To deal with this, you should use Streams.</p>
+<h2>Securing your web application</h2>
+<p>This part is not just about Node – but about how you should secure your web applications in general.</p>
+<p><a href="https://codeship.com/?utm_source=CodeshipBlog&amp;utm_medium=blogbanner&amp;utm_campaign=blog_banner_CI_CTA" target="_blank"><img src="https://blog.codeship.com/wp-content/uploads/2015/01/codeship_blogbanner.jpg" alt="Try Codeship –&nbsp;The simplest Continuous Integration service out there." width="1770" height="200" class="alignnone size-full wp-image-1166" /></a></p>
+<h2>Reflected Cross Site Scripting</h2>
+<p>This occurs when an attacker injects executable code to an HTTP response. When an application is vulnerable to this type of attack it will send back unvalidated input to the client (mostly written in Javascript). It enables the attacker to steal cookies, perform clipboard theft and modify the page itself.</p>
+<h3>Example</h3>
+<p><code>http://example.com/index.php?user=&lt;script&gt;alert(123)&lt;/script&gt;</code></p>
+<p>If the user query string is sent back to the client without validation, and is inserted into the DOM, it will be executed.</p>
+<h3>How to prevent it?</h3>
+<ul>
+<li>never insert untrusted data into the DOM</li>
+<li>HTML escape before inserting</li>
+</ul>
+<p>More info on <a href="https://www.owasp.org/index.php/Testing_for_Reflected_Cross_site_scripting_%28OWASP-DV-001%29">Reflected Cross Site Scripting</a> and how to <a href="https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet">avoid it</a>.</p>
+<h2>Stopping Cookie Theft</h2>
+<p>By default, cookies can be read by Javascript on the same domain. This can be dangerous in case of a Cross Site Scripting attack. But not just that: any third-party javascript library can read them.</p>
+<h3>Example</h3>
+<p><code>var cookies = document.cookie.split('; ');</code></p>
+<h3>How to prevent it?</h3>
+<p>To prevent this you can set the <code>HttpOnly</code> flag on cookies, which will make your cookies unreachable for Javascript.</p>
+<h2>Content Security Policy</h2>
+<p><em>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks.</em></p>
+<p>CSP can be enabled by the <code>Content-Security-Policy</code> HTTP header.</p>
+<h3>Example</h3>
+<p><code>Content-Security-Policy: default-src 'self' *.mydomain.com</code></p>
+<p>This will allow content from a trusted domain and its subdomains.</p>
+<p>More info and examples on <a href="https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Using_Content_Security_Policy">CSP</a>.</p>
+<h2>Cross-Site Request Forgery</h2>
+<p><em>CSRF is an attack which forces an end user to execute unwanted actions on a web application in which he/she is currently authenticated.</em></p>
+<p>It can happen because cookies are sent with every request to a website – even when those requests come from a different site.</p>
+<h3>Example</h3>
+<pre><code>&lt;body onload="document.forms[0].submit()"&gt;  
+  &lt;form method="POST" action="http://yoursite.com/user/delete"&gt;
+    &lt;input type="hidden" name="id" value="123555."&gt;
+  &lt;/form&gt;
+&lt;/body&gt;  
+</code></pre>
+<p>The result of the above snippet can easily result in deleting your user profile.</p>
+<h3>How to prevent it?</h3>
+<p>To prevent CSRF, you should implement the synchronizer token pattern – luckily the Node community has already done it for you. In short, this is how it works:</p>
+<ul>
+<li>When a <code>GET</code> request is being served check for the CSRF token – if it does not exists, create one</li>
+<li>When a user input is showed, make sure to add a hidden input with the CSRF token’s value</li>
+<li>When the form is sent, make sure that the value coming from the form and from the session are a match.</li>
+</ul>
+<h2>In practice</h2>
+<p>To see all this in action you should do the <a href="https://github.com/toolness/security-adventure">Security Adventure</a> workshopper which will guide you through a real life example on how to secure an Express-based application.</p>
+<h2>Secure your Express application: Helmet for the rescue</h2>
+<p><a href="https://github.com/evilpacket/helmet">Helmet</a> is a series of middlewares that help secure your Express/Connect apps. Helmet helps with the following middlewares:</p>
+<ul>
+<li>csp</li>
+<li>crossdomain</li>
+<li>xframe</li>
+<li>xssfilter</li>
+<li>and much more</li>
+</ul>
+<p>For more info and on how to use, check out its repository: <a href="https://github.com/evilpacket/helmet">https://github.com/evilpacket/helmet</a>.</p>
+<h2>Tools to use</h2>
+<p><code>npm shrinkwrap</code>: Locks down dependency versions recursively and creates a <code>npm-shrinkwrap.json</code> file out of it. This can be extremely helpful when creating releases. For more info, pay <a href="https://www.npmjs.org/doc/cli/npm-shrinkwrap.html">NPM</a> a visit.</p>
+<p><strong>retire.js</strong>: The goal of Retire.js is to help you detect the use of module versions with known vulnerabilities. Simply install with <code>npm install -g retire</code>. After that, running it with the <code>retire</code> command will look for vulnerabilities in your <code>node_modules</code> directory. (<em>Also note, that retire.js works not only with node modules, but with front end libraries as well</em>.)</p>
+<h2>Stay updated</h2>
+<p>If you want to stay updated on potential security vulnerabilities (I hope you do!) then follow the <a href="https://nodesecurity.io/">Node Security</a> project. Their goal is to audit every single module in NPM, and if they find issues, fix them.</p>
+            
+                  </summery></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

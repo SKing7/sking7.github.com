@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Detecting injected content from third-parties on your site</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Detecting injected content from third-parties on your site</h1>
+<div class="entry-content"><p>Is your site on HTTPS? No? Do you know if any ISP’s or other services are injecting Ads or anything else in to your site? No. I thought not. I don’t either… well, maybe until now.</p><span>
+
+</span><h2 id="tldr">TL;DR</h2><span>
+
+</span><blockquote>
+  <p>It’s incredibly hard to detect if an ISP is manipulating your site, however it is relatively easy to aggregate many of the content injections occurring across your site.</p>
+</blockquote><span>
+
+</span><blockquote>
+  <p>As a publisher of content you should be concerned with what people are doing with your output, the only way that you can understand the impact is to first measure it.  You should be moving to HTTPS as quickly as possible.</p>
+</blockquote><span>
+
+</span><p>If you can enable CSP reporting for your site, enable it.  If you can’t use CSP reporting then consider a script like the one in this article to enable you to track what goes on in your site more effectively.</p><span>
+
+</span><p>I started this post <em>only</em> concerned about giving you the tools to detect if an ISP has injected content or ads into your site because you were not on HTTPS.  After creating some simple tools in my own blog, I have found that a lot more goes on my pages that I don’t know about and for me it is quite disconcerting.</p><span>
+
+</span><p>With the introduction of Service Worker and more specifically Push Messaging, the web is getting more
+capabilities that allow us to create things that we have never seen before. There is one major caveat: your site needs to be running on HTTPS. </p><span>
+
+</span><p>One part of my role in Developer Relations is to work out strategies to try and change the industry at scale.  I believe Push Messaging is a tool that will change the way that users experience sites and will give developers the opportunity to not build a native app just to maintain engagement with their users.  Outside of communications apps, I believe that an unbelievable strong use-case is for publishers and news sites to engage with their audience via notifications for new or important content that the user has subscribed to. </p><span>
+
+</span><p>However, if you look at nearly all of the News sites, they are ostensibly not on HTTPS. To see a change in the industry, we need HTTPS to be supported more broadly across the web.</p><span>
+
+</span><p>I think we all know that adding HTTPS to any site is a major hurdle to straddle, but it is a valid and 
+worthwhile one.  I recently added support for SSL on this blog and it took all of 20 minutes to set up.  However, I am only a small site, large sites have very real concerns when moving their entire site to HTTPS:</p><span>
+
+</span><ul>
+  <li>Why do we need to add HTTPS/TLS for my content only site?</li>
+  <li>My site is considered a different origin, will I get lose out in search when my competitors don’t move?</li>
+  <li>SSL is slow.</li>
+</ul><span>
+
+</span><p>All valid concerns without context. I will only deal with “Why do we need to add HTTPS/TLS for my content only site?” in this post.</p><span>
+
+</span><p>If you are a publisher you need to care about HTTPS on your site, not because of new features (although it helps) but because if you are not using SSL, you can’t for certain say that someone in between you and your reader has not manipulated your content.  Depending on your organization this is important for a variety of reasons: Editorial integrity and independence; Revenue — is someone intermediate adding ads to your content?; Or both. Unless you are looking for it you won’t know.</p><span>
+
+</span><p>HTTPS is a massively important step. It is not, however, the only tool you need to rely on. Content injection can come in many other places.</p><span>
+
+</span><h2 id="how-do-you-detect-content-injection">How do you detect content injection?</h2><span>
+
+</span><p>There is already a technical solution: <a href="http://www.html5rocks.com/en/tutorials/security/content-security-policy/">Content Security Policy</a>. CSP lets you control the third-party domains your site can request content (scripts, images, CSS etc) from; often an XSS attack will inject a script or other asset that will be used to pass on user details to a third-party, or it could be that a network provider intercepts the request and injects their own ads or other content into your site. If you can restrict the outbound requests to a known set of sites then you can mitigate many of these issues because the browser will simply not be able to make the request.</p><span>
+
+</span><p>The CSP spec also has another feature that I like: <a href="http://www.html5rocks.com/en/tutorials/security/content-security-policy/#reporting">Reporting</a>. You can configure a reporting URL so that any exception to the CSP rules are sent though to your server.  CSP Reporting lets you debug ahead of time the implications of setting up CSP on your site. It gets even more interesting when you set it up as canary to analyze un-expected requests being made from your page.</p><span>
+
+</span><p>In practice, I find CSP a nightmare to deploy and I know a lot of developers feel the same, but after what I have discovered I do think it is important that we all consider 1) HTTPS and 2) Setting up a Content-Security-Policy with reporting to actively detect and prevent unintended access to your site.</p><span>
+
+</span><p>In lieu of every site having their own CSP reporting infrastructure I started to think about the problem a little.  How can I make it easier to visualize the effect of content injection on your users?  A huge number of people have Google Analytics, and I know the <a href="http://www.html5rocks.com/en/tutorials/webperformance/usertiming/#toc-dataout">browser can give me information about every single request</a> it makes (<code>window.performance.getEntriesByType</code>)…</p><span>
+
+</span><p>I have come up with the following naive script that you can configure to send an event to Google Analytics for every instance of a request that doesn’t match a domain that you know about on your site.</p><span>
+
+
+
+</span><p>There are a lot of caveats to this script:</p><span>
+
+</span><ul>
+  <li>I’ve only tested this on Chrome. IE11 should work, <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=822480">Firefox too</a>.</li>
+  <li>It requires Google Analytics (you can plug in your own tool easily)</li>
+  <li>If you are not on HTTPS, a service could strip out the logic</li>
+  <li>If your network is actively manipulating your content but not injecting 3rd party resources you won’t be able to tell.</li>
+</ul><span>
+
+</span><p>After I deployed this script to my site and even with all these caveats, I have found something very  interesting: Many requests are being made from my page’s that I didn’t explicitly invoke.</p><span>
+
+</span><p>Now, I need to be really careful about how I say this as it is not an  there are potentially many reasons why a request was made: An extension might be installed on the users machine; content injection via an ISP; A bookmarklet the user runs; a virus. All I know is that some visitors to my site had some content injected into the page.</p><span>
+
+</span><p>Regardless, I found the new data that I was getting in my Google Analytics fascinating:</p><span>
+
+</span><p><img src="https://paul.kinlan.me/images/bonkers-injection.png" alt="Injection or Extension or Virus?" /></p><span>
+
+</span><p>Twitter.com is expected, however all these others looks very suspicious.  In some cases, I received a relatively large number of requests</p><span>
+
+</span><p><img src="https://paul.kinlan.me/images/injection-balloon.png" alt="Extension?" /></p><span>
+
+</span><p>A large number came from Ballloon.com and after a bit of research I found that it is a Chrome extension that lets you save to the cloud.  Is this a good thing?  Probably not, but a lot of extensions on all platforms do it.</p><span>
+
+</span><p><img src="https://paul.kinlan.me/images/unknown-injection.png" alt="Unknown?" /></p><span>
+
+</span><p>Many requests completely flummoxed me.  I can’t tell yet what is causing these requests and the only references I can find are from sites suggesting a relationship to software that is a virus.  This really doesn’t feel great to me and as a site owner it is something that I want to actively block, especially if it is potentially malware or placing ads on my site.</p><span>
+
+</span><h2 id="what-to-do">What to do?</h2><span>
+
+</span><p>I am going to keep this running on my site over the next couple of weeks and then I am going to actively turn on CSP to restrict the request that are made from my site, I will then monitor all the change to see if there is the drop in outbound requests (I strongly expect that there will be a reduction).</p><span>
+
+</span><h2 id="help-me">Help me</h2><span>
+
+</span><p>If you can add this script to your site and report the results to me, or if you have done something similar past please let me know.</p><span>
+
+</span><p>The only way we will get people to care about this is if we raise the awareness that this is happening on a relatively large scale.</p><span>
+
+</span><h2 id="tldrtldr">TL;DR;TL;DR</h2><span>
+
+</span><ul>
+  <li>Enable HTTPS on your site</li>
+  <li>Enable CSP Reporting (or my script ;)</li>
+  <li>Enable CSP</li>
+</ul><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

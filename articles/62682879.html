@@ -1,0 +1,1879 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>  The CSS3 matrix() Transform for the Mathematically Challenged</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>  The CSS3 matrix() Transform for the Mathematically Challenged</h1>
+<div class="entry"><span>
+				
+
+
+</span><div class="importantNotes"><span>
+</span><h3>Notes:</h3><span>
+</span><ul>
+<li><strong>This article was not rendering correctly in Firefox 4.x due to a change in how that browser handles MathML.</strong>  This issue has now been fixed as of May 1, 2011.</li>
+<li>If you are not familar with 2D-Transforms, take a look at my other article <cite><a href="http://www.useragentman.com/blog/2010/03/09/cross-browser-css-transforms-even-in-ie/">Cross Browser CSS Transforms – even in IE</a></cite></li>
+</ul><span>
+</span></div><span>
+
+
+</span><span>
+
+
+</span><p>The CSS3 <code>transform</code> property can do some really cool things - with it, web designers can rotate, scale, skew and flip objects quite easily.  However, in order for deisgners to have <strong>fine-grained, pixel level control over their transforms</strong>, it would be really helpful to understand how the <strong><code>matrix()</code> function</strong> works.  With the <code>matrix()</code> function, designers can position and shape their transformations exactly where they want to.</p><span>
+
+</span><p>The problem is, <strong>not many people actually understand what the numbers in the matrix filter actually mean</strong>.  To solve this issue, I have created a tool, which I call the <a href="http://www.useragentman.com/matrix/">CSS3 Matrix Construction Set</a> that can take any block-element, positioned anywhere on the page, transform it anywhere else on the page using the <code>matrix()</code> filter, and reveal the correct CSS code for this operation.  <a href="http://www.useragentman.com/matrix/">Look at the tool now</a> and if that is all you are interested in, you can stop there.  However, <strong>if you what to know what the numbers in the <code>matrix()</code> function actually mean</strong>, and why you want such knowledge in the first place, read on.  I'll try to explain this as simply as possible (and please feel free to use the feedback form if you have any opinions on how to make this article better).</p><span>
+
+</span><a class="exampleLink" href="http://www.useragentman.com/matrix/">Take a Look at the CSS3 Matrix Construction Set</a><span>
+
+</span><div class="importantNotes"><span>
+</span><p><strong>Note:</strong> This tool works in all modern versions of Firefox, Sarari and Chrome.  Although it is not usable in Opera (due to its lack of support for <a href="http://www.useragentman.com/blog/2010/01/10/cross-browser-html5-drag-and-drop/">HTML5 drag and drop</a>) the CSS code it produces in other browsers <strong>is</strong> usable in that browser.  The tool also does not work in IE since neither that browser, nor my CSS3 polyfill library, <a href="http://www.useragentman.com/blog/csssandpaper-a-css3-javascript-library/">cssSandpaper</a>, support the <code>transform-origin</code> property.  I hope to fix cssSandpaper to implement this in a future release, but in the meantime, please read the note at the end of this article for a workaround for this issue.</p><span>
+</span></div><span>
+
+</span><h2>Matrices: Why Should I Care?</h2><span>
+
+</span><p>Matrices are to transforms like RGB hex codes are to colors: they are representations that are easy for computers to understand, but not human beings.  Sure, web designers can use the <code>rotate()</code>, <code>skew()</code>, <code>scale()</code> and <code>translate()</code> functions to fulfill their transformation needs ... why should we bother with <code>matrix()</code> at all?  There are a few cases when you may want to:</p><span>
+
+</span><dl>
+     <dt>Brevity:</dt>
+     <dd>Using matrices, it is possible to represent a complex string of 2D transforms like this:
+
+<blockquote class="code">
+<pre>
+#object {
+    transform-origin: 0 0;
+    transform: rotate(15deg) translateX(230px)  scale(1.5, 2.6) skew(220deg, -150deg) translateX(230px)
+}
+</pre>
+</blockquote>
+
+using one <code>matrix()</code> rule like this:
+
+<blockquote class="code">
+<pre>
+#object {
+    transform-origin: 0 0;
+    transform: matrix(1.06, 1.84, 0.54, 2.8, 466px, 482px)
+}
+</pre>
+</blockquote>
+
+<p>(<strong>Note:</strong> I have ignored the vendor-specific variants (e.g. <code>moz-transform</code>, etc.) for the sake of brevity).</p>
+
+</dd>
+     <dt>Pixel-Perfection:</dt>
+     <dd>If you know exactly how you want your transformation to look, it'll take a bit of fiddling around to get it to look how you want using the other transform functions, and it may not be pixel perfect if you lack patience (like I do).  However, using a tool like the Matrix Construction Set, you can place the transform exactly where you want (This is analogous to using a color wheel to choose RGB colors for you, instead of using keywords like <code>red</code>, <code>green</code> or <code><a href="http://www.colordic.org/colorsample/1019.html">peachpuff</a></code>).</dd>
+
+     <dt>JavaScript:</dt>
+     <dd>Revealing an object's transform information using JavaScript's <code>getComputedStyle()</code> function will yield a <code>matrix()</code> function in all current web browsers that support CSS3 transforms, <strong>even if it was rendered using other transform functions like <code>rotate()</code></strong>.  For example, the object below has been rotated 45° using <code>transform: rotate(45deg)</code>:
+
+
+<div class="exampleBackground"><span>
+</span><p>
+This object has been rotated 45°
+</p><span>
+</span></div>
+
+But <a href="http://www.useragentman.com/blog/2011/01/07/css3-matrix-transform-for-the-mathematically-challenged/#" onclick="
+  if (!window.getComputedStyle) {
+     alert('This browser does not support getComputedStyle()');
+     return false;
+  }
+  var props = ['MozTransform', 'WebkitTransform', 'OTransform', 'MSTransform', 'transform'];
+  var compStyle = window.getComputedStyle(document.getElementById('exampleRotation'), null);
+  for (var i=0; i&lt;props.length; i++) {
+
+    var style = compStyle[props[i]];
+    if (style != null) {
+       alert('Calling getComputedStyle() on the rotated element gives: ' + style);
+       return false;
+    }
+  }
+  alert('This browser doesn\'t support CSS3 Transforms');
+    return false;">this link, which shows the object's computed style</a> will reveal that internally it stores a <code>matrix()</code> function.</dd>
+</dl><span>
+
+
+</span><h2>Ok, What Does The Markup Look Like?</h2><span>
+
+</span><p>The <code>matrix()</code> function takes 6 parameters in order for it to work:</p><span>
+ 
+</span><blockquote class="code">
+<pre>
+#transformedObject {
+     -moz-transform:    matrix(1.4488, -0.3882, 0.3882, 1.4489, 400px, -100px);
+     -webkit-transform: matrix(1.4488, -0.3882, 0.3882, 1.4489, 400, -100);
+     -o-transform:      matrix(1.4488, -0.3882, 0.3882, 1.4489, 400, -100);
+     transform:         matrix(1.4488, -0.3882, 0.3882, 1.4489, 400, -100);
+}
+</pre>
+</blockquote><span>
+
+</span><p><strong>Note the difference with the Firefox implementation of <code>matrix()</code></strong> — the last two elements need the <code>px</code> units after it.  For now, think of it is a difference in notation, but we'll explain why this is later.</p><span>
+
+
+</span><h2>But What Do The Numbers Mean?</h2><span>
+ 
+</span><p>In order to explain what they mean, I will have to define a few math-concepts here.  <strong>Don't panic if you are mathematically challenged</strong>.  These concepts are not that hard to understand, but there is a bit of explanation needed.  Why should you torture yourself if you hate math?</p><span>
+
+</span><dl>
+<dt>If you are a designer:</dt>
+<dd>Think of the stuff below as informational.  If you use the Matrix Construction Set <strong>you won't need to calculate anything by hand</strong> (but wouldn't you want to have an idea what the numbers mean anyway?)</dd>
+<dt>If you are a JavaScript developer:</dt>
+<dd><em>This information will be invaluable when optimizing scripts that rely on transformation effects.</em>  Just try to understand the basic concepts here, and if you still need help, use the <a href="http://sylvester.jcoglan.com/">Sylvester JavaScript library</a> to do the heavy lifting for you.</dd>
+<dt>If you want to be an über-geek:</dt>
+<dd>All those matrix jokes you hear at parties will suddenly start to make sense!</dd>
+</dl><span>
+
+</span><div class="wp-caption aligncenter"><span>
+</span><a href="http://xkcd.com/184/"><img src="http://www.useragentman.com/blog/wp-content/uploads/2011/01/matrix_transform.png" alt="In fact, draw all your rotational matrices sideways. Your professors will love it! And then they'll go home and shrink." title="In fact, draw all your rotational matrices sideways. Your professors will love it! And then they'll go home and shrink." width="400" height="152" class="aligncenter size-full wp-image-2186" /></a><span>
+</span><p class="wp-caption-text">Finally you'll be able to understand why all the geeks at work find <a href="http://xkcd.com/184/">this XKCD comic</a> so funny.</p><span>
+</span></div><span>
+
+
+</span><h2>Terminology</h2><span>
+
+</span><h3>Matrix</h3><span>
+
+</span><p>The easiest way to think of a matrix is as a group of numbers written in a rectangle or square.  For our purposes, we will be dealing with 3x3 matrices, such as this one below:</p><span>
+
+</span><p>
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>3</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>2</mn> </mtd>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>6</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+</p><span>
+
+</span><p>That's nine numbers!  So how come the CSS3 <code>matrix()</code> function only has six?</p><span>
+
+</span><blockquote class="code">
+<pre>
+#transformedObject {
+     transform:  matrix(1, 2, 3, 4, 5, 6);
+}
+</pre>
+</blockquote><span>
+
+For CSS3 2D transforms, we only deal with 3x3 matrices that have the </span><strong>two bottom-left numbers that are equal to zero, and the bottom-right value equal to 1</strong><span>. As a result, these two notations are equal:
+
+</span><p>
+<code>matrix(1, 2, 3, 4, 5, 6) = </code>
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>3</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>2</mn> </mtd>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>6</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+</p><span>
+
+
+</span><h3>Dot Product</h3><span>
+
+</span><p>Next we are going to explain what a <strong>dot product</strong> is.  At first, this may not seem like this is related to matrices at all, but I promise it does ... just read on and you'll understand why in no time.  Trust me. :-)</p><span>
+
+</span><p>Let's say you have two (x, y) points,
+
+
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>2</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>
+	and
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>.  The dot product of these two points (written <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>2</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>
+	·
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>) is what you get when you multiply the two x-coordinates, multiply the two y-coordinates, and then add them together:</p><span>
+
+</span><p>
+    <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>2</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	          <mo>·</mo>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		  </mtable>
+                  <mo> ) </mo>
+          </mrow> </math>
+	         = 1x4 + 2x5 = 4 + 10 = 14
+</p><span>
+
+This doesn't only work for 2-dimensional coordinates, but also in 3-dimensions and higher:
+
+</span><div class="equation"><span>
+    </span><math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>2</mn> </mtd>
+                      <mtd> <mn>3</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math><span>
+	·
+	</span><math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+                      <mtd> <mn>6</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math><span> = 1x4 + 2x5  + 3x6 = 4 + 10 + 18  = 32
+</span><p><math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>2</mn> </mtd>
+                      <mtd> <mn>3</mn> </mtd>
+                      <mtd> <mn>10</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>
+	·
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+                      <mtd> <mn>6</mn> </mtd>
+                      <mtd> <mn>20</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math> = 1x4 + 2x5  + 3x6 + 10x20 = 4 + 10 + 18 + 200 = 232
+</p></div><span>
+
+</span><p>Got it?  It's pretty simple, right?  Note that when we write (x, y) co-ordinates like <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>x</mn> </mtd>
+		      <mtd> <mn>y</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>, we call <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>x</mn> </mtd>
+		      <mtd> <mn>y</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math> a <strong>vector</strong>.  Vector notation can be written horizontally, (e.g. <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>x</mn> </mtd>
+		      <mtd> <mn>y</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>) or vertically (e.g. <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>x</mn> </mtd>
+		      
+		    </mtr>
+                    <mtr>
+                       <mtd> <mn>y</mn> </mtd>
+                    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math>).  <strong>When using them in 2D transforms, we always add an extra co-ordinate with a number 1 at the end.</strong>  So (20, 90) would be written 
+<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>20</mn> </mtd>
+		      <mtd> <mn>90</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math> or like <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>20</mn> </mtd>
+		      
+		    </mtr>
+                    <mtr>
+                       <mtd> <mn>90</mn> </mtd>
+                    </mtr>
+                    <mtr>
+                       <mtd> <mn>1</mn> </mtd>
+                    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+	  </mrow>
+	</math> in vector notation.
+
+<h3>Multiplicatying a Matrix with a Vector</h3>
+
+</p><p>So, what does the dot product have to do with matrices?  Well the idea of the dot product can also be extended to matrices.  Let's say you need to multiply the following together: </p><span>
+
+</span><p>
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr color="#ff0000" fontweight="bold">
+		      <mtd mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>3</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>4</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>2</mn> </mtd>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>30</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+</p><span>
+
+To do this, you need to produce the dot product of each of the matrix's rows with the vector like this:
+
+</span><p>
+	<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr color="#ff0000" fontweight="bold">
+		      <mtd mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>3</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>4</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>2</mn> </mtd>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>30</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> =  <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn><mo>×</mo><mn>20</mn> <mo>+</mo> <mn>3</mn><mo>×</mo><mn>30</mn> <mo>+</mo> <mn>4</mn><mo>×</mo><mn>1</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+        = 
+ <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>20</mn><mo>+</mo><mn>90</mn><mo>+</mo><mn>4</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn> 114</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math>
+
+</p><span>
+
+</span><p>
+    <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>3</mn> </mtd>
+		      <mtd> <mn>4</mn> </mtd>
+		    </mtr>
+		    <mtr color="#ff0000" fontweight="bold">
+		      <mtd mathbackground="#ffcccc"> <mn>2</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>4</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>5</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>30</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> =  <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>115</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>2</mn><mo>×</mo><mn>20</mn> <mo>+</mo> <mn>4</mn><mo>×</mo><mn>30</mn> <mo>+</mo> <mn>5</mn><mo>×</mo><mn>1</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>115</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>40</mn> <mo>+</mo> <mn>120</mn> <mo>+</mo> <mn>5</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>115</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>165</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+</p><span>
+
+
+</span><p>
+    <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>3</mn> </mtd>
+		      <mtd> <mn>4</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>2</mn> </mtd>
+		      <mtd> <mn>4</mn> </mtd>
+		      <mtd> <mn>5</mn> </mtd>
+		    </mtr>
+		    <mtr color="#ff0000" fontweight="bold">
+		      <mtd mathbackground="#ffcccc"> <mn>0</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>0</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>30</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> =  <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>115</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>165</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>0</mn><mo>×</mo><mn>20</mn> <mo>+</mo> <mn>0</mn><mo>×</mo><mn>30</mn> <mo>+</mo> <mn>1</mn><mo>×</mo><mn>1</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>115</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>165</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>0 + 0 + 1</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>115</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>165</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"><mn>1</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+</p><span>
+
+A little bit more complicated that the dot product, but not too bad.
+
+</span><h2>So, How Does This Relate To CSS3 Transforms?</h2><span>
+
+A transformation of an block using the </span><code>matrix()</code><span> function is done by </span><strong>multiplying the matrix with each of the corner-coordinates of the block</strong><span> which will give the corners of the new object </span><strong>when the <code>transform-origin</code> is set to <code>0 0</code></strong><span>. For example let's say you have an HTML element styled like this:</span><span>
+
+</span><blockquote class="code">
+<pre>
+#transformedObject {
+     position: absolute;
+     left: 0px;
+     top: 0px;
+     width: 200px;
+     height: 80px;
+     transform:  matrix(0.9, -0.05, -0.375, 1.375, 220, 20);
+     transform-origin: 0 0;
+}
+</pre>
+</blockquote><span>
+
+</span><p>What is the end result?  Well, first let's take a look at the object <strong>without</strong> the transform CSS:</p><span>
+
+
+</span><div id="originalExample" class="exampleBackground"><span>
+    </span><span>
+    </span><span>
+    </span><span>
+    </span><span>
+    </span><p>(0, 0)</p><span>
+      </span><p>(200, 0)</p><span>
+      </span><p>(0, 80)</p><span>
+      </span><p>(200, 80)</p><span>
+   </span><span>
+</span></div><span>
+
+</span><p>When the browser applies the transform to this block, it takes the matrix and multiplies it to each of the corner coordinates.  For example, taking the bottom-right corner, (200, 80) or 
+<math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>200</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>80</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+                  </mtable>
+                <mo> ) </mo>
+          </mrow>
+</math>, we get:
+</p><span>
+
+</span><div class="equation"><span>
+    </span><p>
+    <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd mathbackground="#ffcccc"> <mn>0.9</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>-0.375</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>220</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>-0.05</mn> </mtd>
+		      <mtd> <mn>1.375</mn> </mtd>
+		      <mtd> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>200</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>80</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> =  <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>0.9</mn><mo>×</mo><mn>200</mn> <mo>+</mo> <mn>-0.375</mn><mo>×</mo><mn>80</mn> <mo>+</mo> <mn>220</mn><mo>×</mo><mn>1</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math>  = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>180</mn> <mo>-</mo><mn>30</mn> <mo>+</mo> <mn>220</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>370</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+        </p><span>
+        </span><p>
+              <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0.9</mn> </mtd>
+		      <mtd> <mn>-0.375</mn> </mtd>
+		      <mtd> <mn>220</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd mathbackground="#ffcccc"> <mn>-0.05</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>1.375</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>200</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>80</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>370</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>-0.05</mn><mo>×</mo><mn>200</mn> <mo>+</mo> <mn>1.375</mn><mo>×</mo><mn>80</mn> <mo>+</mo> <mn>20</mn><mo>×</mo><mn>1</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+       </math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>370</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>-10</mn> <mo>+</mo> <mn>110</mn> <mo>+</mo> <mn>20</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>370</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>120</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>.</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math>
+        </p><span>
+
+          </span><p>
+              <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0.9</mn> </mtd>
+		      <mtd> <mn>-0.375</mn> </mtd>
+		      <mtd> <mn>220</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>-0.05</mn> </mtd>
+		      <mtd> <mn>1.375</mn> </mtd>
+		      <mtd> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd mathbackground="#ffcccc"> <mn>0</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>0</mn> </mtd>
+		      <mtd mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>200</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>80</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>370</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>120</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>0×200 + 0×80 + 1×1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+       </math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>370</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>120</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>0</mn> <mo>+</mo> <mn>0</mn> <mo>+</mo> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>370</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>120</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd color="#0000ff" fontweight="bold" mathbackground="#ffcccc"> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math>
+        </p><span>
+</span></div><span>
+
+</span><p>Let's look at the results for the other three coordinates.  For (200, 0):</p><span>
+
+</span><div class="equation"><span>
+    </span><p>
+    <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0.9</mn> </mtd>
+		      <mtd> <mn>-0.375</mn> </mtd>
+		      <mtd> <mn>220</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>-0.05</mn> </mtd>
+		      <mtd> <mn>1.375</mn> </mtd>
+		      <mtd> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>200</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> =  <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0.9</mn><mo>×</mo><mn>200</mn> <mo>+</mo> <mn>-0.375</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>220</mn><mo>×</mo><mn>1</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>-0.05</mn><mo>×</mo><mn>200</mn> <mo>+</mo> <mn>1.375</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>20</mn><mo>×</mo><mn>1</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn><mo>×</mo><mn>200</mn> <mo>+</mo> <mn>0</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>20</mn><mo>×</mo><mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math>  = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>400</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>10</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+        </p><span>
+</span></div><span>
+
+
+</span><p>For (0, 80) test:</p><span>
+
+</span><div class="equation"><span>
+    </span><p>
+    <math display="inline">
+	    <mrow>
+    <mo>(</mo>
+    <mtable>
+      <mtr>
+        <mtd>
+          <mn>0.9</mn>
+        </mtd>
+        <mtd>
+          <mn>-0.375</mn>
+        </mtd>
+        <mtd>
+          <mn>220</mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mn>-0.05</mn>
+        </mtd>
+        <mtd>
+          <mn>1.375</mn>
+        </mtd>
+        <mtd>
+          <mn>20</mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mn>0</mn>
+        </mtd>
+        <mtd>
+          <mn>0</mn>
+        </mtd>
+        <mtd>
+          <mn>1</mn>
+        </mtd>
+      </mtr>
+    </mtable>
+    <mo>)</mo>
+  </mrow>
+  <mo>·</mo>
+  <mrow>
+    <mo>(</mo>
+    <mtable>
+      <mtr>
+        <mtd>
+          <mn>0</mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mn>80</mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mn>1</mn>
+        </mtd>
+      </mtr>
+    </mtable>
+    <mo>)</mo>
+  </mrow>
+
+  <mo>=</mo>
+  <mrow>
+    <mo>(</mo>
+    <mtable>
+      <mtr>
+        <mtd>
+          <mn>0.9</mn>
+          <mo>×</mo>
+          <mn>0</mn>
+          <mo>+</mo>
+          <mn>-0.375</mn>
+          <mo>×</mo>
+          <mn>80</mn>
+          <mo>+</mo>
+          <mn>220<mn><mo>×</mo><mn>1</mn></mn></mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mn>-0.05</mn>
+          <mo>×</mo>
+          <mn>0</mn>
+          <mo>+</mo>
+          <mn>1.375</mn>
+          <mo>×</mo>
+          <mn>80</mn>
+          <mo>+</mo>
+          <mn>20</mn>
+          <mo>×</mo>
+          <mn>1</mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mn>0</mn>
+          <mo>×</mo>
+          <mn>0</mn>
+          <mo>+</mo>
+          <mn>0</mn>
+          <mo>×</mo>
+          <mn>80</mn>
+          <mo>+</mo>
+          <mn>20</mn>
+          <mo>×</mo>
+          <mn>1</mn>
+        </mtd>
+      </mtr>
+    </mtable>
+    <mo>)</mo>
+  </mrow>
+<mo>=</mo>	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>190</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>130</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+        </p><span>
+</span></div><span>
+
+
+
+</span><p>And finally, for (0, 0):</p><span>
+
+</span><div class="equation"><span>
+    </span><p>
+    <math display="inline">
+	  <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0.9</mn> </mtd>
+		      <mtd> <mn>-0.375</mn> </mtd>
+		      <mtd> <mn>220</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>-0.05</mn> </mtd>
+		      <mtd> <mn>1.375</mn> </mtd>
+		      <mtd> <mn>20</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+	</math>
+	·
+	<math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>  
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> =  <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0.9</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>-0.375</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>220</mn><mo>×</mo><mn>1</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>-0.05</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>1.375</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>20</mn><mo>×</mo><mn>1</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>0</mn><mo>×</mo><mn>0</mn> <mo>+</mo> <mn>1</mn><mo>×</mo><mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math>  = <math display="inline">	
+		<mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>220</mn> </mtd>
+		     
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>20</mn> </mtd>
+		      
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow> 
+	</math> 
+        </p><span>
+</span></div><span>
+
+</span><p>Here is the result:</p><span>
+
+</span><div id="transformedExample" class="exampleBackground"><span>
+       </span><span>
+      </span><span>
+      </span><span>
+      </span><span>
+      </span><p>(220, 20)</p><span>
+      </span><p>(400, 10)</p><span>
+      </span><p>(190, 130)</p><span>
+      </span><p>(370, 120)</p><span>
+   </span><span>
+</span></div><span>
+
+</span><p>I don't expect anyone to calculate these by hand on a regular basis (I personally don't).  But now you know what these numbers mean.  :-)</p><span>
+
+</span><h2>What About Internet Explorer?</h2><span>
+</span><p>Although <code>transform-origin</code> doesn't work with IE, it is possible to generate the matrix in another browser and use <a href="http://www.useragentman.com/blog/csssandpaper-a-css3-javascript-library/">cssSandpaper</a> to generate the shape of the transform in that browser.  In order to fix the positioning, one can use <a href="http://paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/">Paul Irish's conditional stylesheet fix</a> to position that block manually in IE only (it is what I used on this page so that the matrix transform in my example above appeared correctly in IE).  I hope to have transform-origin working in cssSandpaper soon so that it will be unnecessary to do this.</p><span>
+
+</span><h2>Other Interesting Facts About Matrices</h2><span>
+
+</span><ol>
+<li>All the other CSS3 transform functions have equivalent matrix notation:
+
+<table class="dataTable">
+<thead class="centered">
+<tr>
+<th>
+scale(a)
+</th>
+<th>
+scaleX(x)
+</th>
+<th>
+scaleY(y)
+</th>
+<th>translateX(x)</th>
+<th>translateY(y)</th>
+<th>translate(x,y)</th>
+
+
+
+
+</tr>
+</thead>
+
+<tbody class="centered">
+<tr>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>a</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>a</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>x</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>y</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>x</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>y</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>x</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>y</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+
+
+</tr>
+</tbody></table>
+
+<table class="dataTable">
+<thead class="centered">
+<tr>
+<th>skewX(x)</th>
+<th>skewY(y)</th>
+<th>skew(x,y)</th>
+<th>rotate(θ)</th>
+
+</tr>
+</thead>
+<tbody class="centered">
+<tr>
+
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mo>tan</mo><mi>x</mi> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mo>tan</mo><mi>y</mi> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mo>tan</mo><mi>x</mi> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mo>tan</mo><mi>y</mi> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+<td>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mo>cos</mo><mi>θ</mi> </mtd>
+		      <mtd> <mo>-sin</mo><mi>θ</mi> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mo>sin</mo><mi>θ</mi> </mtd>
+		      <mtd> <mo>cos</mo><mi>θ</mi> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</td>
+</tr>
+</tbody></table>
+
+
+</li>
+
+<li>A list of transforms in CSS3 like this:
+
+<blockquote class="code">
+<pre>
+#o1 {
+   transform-origin: 0px 0px;
+   transform: rotate(15deg) translateX(230px) scale(1.5);
+}
+</pre>
+</blockquote>
+
+is the same as multiplying the equivalent matrices together:
+
+<p>
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mo>cos</mo><mi>15°</mi> </mtd>
+		      <mtd> <mo>-sin</mo><mi>15°</mi> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mo>sin</mo><mi>15°</mi> </mtd>
+		      <mtd> <mo>cos</mo><mi>15°</mi> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math> ·
+<math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>230</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math> · <math display="inline">
+     <mrow>
+		  <mo> ( </mo>
+		  <mtable>
+		    <mtr>
+		      <mtd> <mn>1.5</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		    </mtr>
+		    <mtr>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>0</mn> </mtd>
+		      <mtd> <mn>1</mn> </mtd>
+		    </mtr>
+		  </mtable>
+		  <mo> ) </mo>
+		</mrow>
+</math>
+</p>
+
+(I know, I didn't tell you how to multiply matrices together. 
+<a href="http://people.hofstra.edu/stefan_waner/RealWorld/index.html">Stephan Waner</a> has written <a href="http://people.hofstra.edu/stefan_waner/realworld/tutorialsf1/frames3_2.html">a good tutorial for matrix multiplication</a> if you are interested.)</li>
+
+
+<li><strong>CSS3 2D-Transforms can only transform blocks into parallelograms</strong>.  For example, it is impossible to transform a block into this shape:
+
+
+<div id="transformedExample" class="exampleBackground"><span>
+      </span><img src="http://www.useragentman.com/blog/wp-content/uploads/2011/01/irregular.png" alt="[Irregular Shape]" title="irregular" /><span>
+</span></div>
+
+In order to do this, one must use <a href="http://www.w3.org/TR/css3-3d-transforms/">CSS3 3D Transforms</a>.  This is why the Matrix Construction Set only has three control points to drag around, not four.  If you would like to see a version of the Matrix Construction Set to use <code>matrix3d()</code>, please let me know by leaving a comment below.</li>
+
+
+
+
+</ol><span>
+
+</span><h2>In Conclusion</h2><span>
+
+</span><p>I don't expect anyone to be an expert in matrix artithmetic after reading this article.  But at least you know what those pesky numbers mean, and this information may become useful in the future.</p><span>
+
+</span><h2>Acknowledgments</h2><span>
+
+</span><ul>
+<li>The MathML markup used to display the mathematical equations in this article were rendered by <a href="http://www.mathjax.org/">MathJax</a>, an excellent open-source JavaScript library</li>
+<li>The equations on  <a href="http://www.physicsforums.com/showthread.php?t=360963">this Physics Forum post</a> was quite helpful in the creation of the Matrix Construction Set.</li>
+<li>The Matrix Construction Set uses <a href="http://sylvester.jcoglan.com/">the Sylvester JavaScript library</a> written by <a href="http://jcoglan.com/">James Coglan</a> for performing matrix calculations.  It also used my own <a href="http://www.useragentman.com/blog/2010/01/10/cross-browser-html5-drag-and-drop/">DragDropHelpers</a> library to smooth out the different browser implementations of HTML5 Drag and Drop.</li>
+<li>A blog post that has a bunch of math equations on it may be scary for web designers.  My apologies.</li>
+</ul><span>
+							</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Media Queries: Width vs. Device Width</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Media Queries: Width vs. Device Width</h1>
+<section class="article_body">
+
+            <p>Far too often I see people don’t quite understand the differences between <code>width</code> and <code>device-width</code> (and expanding upon that, other examples such as <code>min-device-width</code> and <code>max-device-width</code>), when using CSS media queries. This misunderstanding results in poor code and ultimately more work for the developer. I’ve seen this question quite often over on the <a href="http://community.sitepoint.com/">SitePoint Forums</a>, so I felt it was time to give some further explanation. I’ll be touching on this, along with expanding on which option you should be using when building your responsive websites.</p>
+<h2 id="basic-definitions">Basic Definitions</h2>
+<p>Let’s define what we mean when we talk about media queries based on “width” and “device-width”. The following quotes are from <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Media_queries">MDN’s article on Media Queries</a> and below is the definition of “width”:</p>
+<blockquote>
+<p>The <code>width</code> media feature describes the width of the rendering surface of the output device (such as the width of the document window, or the width of the page box on a printer).</p>
+</blockquote>
+<p>And following is MDN’s definition of “device-width”.</p>
+<blockquote>
+<p>Describes the width of the output device (meaning the entire screen or page, rather than just the rendering area, such as the document window).</p>
+</blockquote>
+<p>So what does this really mean? Well, in basic terms, <code>width</code> and <code>device-width</code> refer to the width of the device and not the width of the viewport, which could be something totally different. All you are essentially interested in is the width of the viewport <em>no matter the device</em>.</p>
+<p>However the main difference between <code>width</code> and <code>device-width</code> is that device-widths don’t always match the layout viewport of said device. </p>
+<p>Many tablets and mobile devices don’t always have 1 device pixel per CSS pixel. The iPhone 4, for example, has 2 device pixels per CSS pixel. For reference, you should know that the iPhone 4 has a regular screen layout viewport of 640×960. This means that, in this example, the <code>device-width</code> of the iPhone4 is 320×480. This is the case because Apple realizes that not every website is built responsively (shame on them) and tries to please everyone by having around 980px width to accommodate the desktop view of the website. This means, that if there is no meta viewport tag in place, the iPhone4 will take your website, render it as if it were 980px wide, squish it into a 320px display, and as a result, would be zoomed out to the user.</p>
+<h2 id="getting-started">Getting Started</h2>
+<p>First, as with getting all websites to become responsive and adhere to media queries, the viewport <code>meta</code> tag must be placed in the <code>&lt;head&gt;</code> section of your web page. The basic standard version of this is shown below.</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;
+</pre>
+<p>Once we have this snippet of code in our webpage, if we view the page with different devices, the different media queries will be able to have the correct effect. Without this, viewing the page in the specific device would basically just display a zoomed-out version of your page; it would be attempting to cram your entire website into its 320px wide display. Not good for you or your users! Users don’t like having to zoom to view your website’s content, and they certainly don’t want to deal with the vertical scrolling that would result.</p>
+<p>For example, let’s take the iPhone 4, which has a <a href="https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html#//apple_ref/doc/uid/TP40006509-SW27">980px width default viewport</a>. Without the <code>meta</code> tag in place, your attempt at media queries would go horribly wrong and it would incorrectly reference the default viewport. Most mobile media queries target around 500px or under. This is usually accomplished by a simple <code>max-width</code> media query. Without the<code>meta</code> tag, you wouldn’t see this query take effect, since the iPhone 4 would still be displaying the 980px width version of your website. Take a look at the below example:</p>
+<pre class="brush: css; title: ; notranslate" title="">
+body {
+  background: white;    
+}
+
+@media screen and (min-width: 980px) /* Desktop */ {
+  body {
+    background: red;
+  }
+}
+
+@media screen  and (max-width: 979px) /* Tablet */ {
+  body {
+    background: blue;
+  }
+}
+
+@media screen and (max-width: 500px) /* Mobile */ {
+  body {
+    background: green;
+  }
+}
+</pre>
+<p>There are two demo links with accompanying screenshots below, taken using an iPhone 4. Both pages have the above CSS, but one uses the viewport <code>meta</code> tag while the other does not. Please note that if you test the demos, <strong><em>you need to test on a small mobile device to see the correct results</em></strong>.</p>
+<p><a href="http://codepen.io/SitePoint/full/9d2ee535ca7a59095fef5b9bbab7755e/"><strong>Here’s the first demo (without the meta tag)</strong></a></p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2015/03/1426483085without-meta.jpg" alt="Without viewport meta tag" width="821" height="617" class="aligncenter size-full wp-image-101410" /></p>
+<p>The above page did not have the <code>meta</code> tag and, as a result, the background is red and is emulating the 980px wide default layout viewport instead of using the 500px mobile media query!</p>
+<p><a href="http://codepen.io/SitePoint/full/b537cc8b0572bbef45bbefb77812450b/"><strong>Here’s the second demo (with the meta tag)</strong></a></p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2015/03/1426483089with-meta.jpg" alt="With viewport meta tag" width="821" height="617" class="aligncenter size-full wp-image-101411" /></p>
+<p>Now the meta tag is in place and iOS is correctly showing the page how we want it: It’s based on the 320px width and allowing our media queries to work the way we expect it to.</p>
+<h2 id="why-choose-device-width">Why Choose <code>device-width</code>?</h2>
+<p>I’ll be honest from the get-go and let you know that this article is headed towards <em>not</em> using <code>device-width</code>. <code>device-width</code> does have its place; if you intend on targeting specific devices, then yes by all means use <code>device-width</code>. </p>
+<p>From a CSS and RWD standpoint, a good website is one that is essentially ‘device-agnostic’ and does not attempt to pander to each individual device width. Targeting the specific breakpoints for different ‘types’ of devices (e.g. tablets or mobile devices) is achieved by focusing on how the content displays at certain viewport widths and then making changes with media queries as appropriate. So the device does not dictate the breakpoint, the layout and content does, and ultimately this will produce the best results; both from your perspective and for your users.</p>
+<p>This might also be why I see people having issues building responsive designs, complaining how difficult it is. But if they are trying to style devices individually, they’re fighting a losing battle: the number of devices you would have to account for (to be thorough) is just too overwhelming and just amounts to poor coding. Also I should mention that if you were to go with <code>device-width</code>, you would have to also provide separate rules for orientation (portrait vs. landscape): device widths do not change simply because you rotate the device sideways. That’s adding even more code, and more headaches!</p>
+<p>However, let’s look at the other option we have.</p>
+<h2 id="what-about-width">What About “width”?</h2>
+<p>I’m of the opinion, <a href="http://www.quirksmode.org/blog/archives/2010/09/combining_meta.html">along with many other seasoned developers</a>, that having a fully responsive page that behaves as expected throughout all possible screen sizes is the easiest and most beneficial way to go about getting the most effective layouts on all devices.</p>
+<p>To build a fully responsive and fluid page, the developer simply has to ensure that all viewports are accounted for and the page restructures and resizes as needed to suit the content and the design.</p>
+<p>All you need for a fully responsive web page is a fluid website, and some well targeted media queries to target the normal range of mobile devices, tablet devices, and desktop+ viewports. I prefer using <a href="http://foundation.zurb.com/docs/media-queries.html">Foundation’s Media Queries</a>, which I find to be quite accurate and encompasses all the necessary viewports.</p>
+<p>Of course, like anything in development, using width-based queries alone is not a solution to all layout bugs. It likely will still be necessary to test on individual mobile devices for random bugs and rendering quirks, But as far as seeing how the different mobile devices will look, it’s as easy as taking your browser window and resizing it.</p>
+<p>For testing, I use the Chrome extension <a href="https://chrome.google.com/webstore/detail/responsive-web-design-tes/objclahbaimlfnbjdeobicmmlnbhamkg?hl=en">Responsive Web Design Tester</a>. It lets you select a specific device and you’ll see the device size and the way your page will display in that device. </p>
+<p>One more quick benefit I’d like to add is that using width-based queries ensures future devices will still display the website fine. It’s essentially future-proof, because you’re targeting something that’s universal — the general viewport size — not something that’s specific to the device.</p>
+<h2 id="in-conclusion">In Conclusion</h2>
+<p>Do you still plan on using <code>device-width</code> in your media queries? Were my arguments not compelling enough? Using the regular “width” and the viewport of the device simplifies responsive design and, ultimately, I feel like is the better choice, and something that should be used almost exclusively. Feel free to leave a comment in the discussion below and let me know your thoughts and whether or not you agree.</p>
+
+        </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

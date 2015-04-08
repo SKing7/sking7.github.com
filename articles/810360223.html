@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Stop More Bugs with our Code Review Checklist</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Stop More Bugs with our Code Review Checklist</h1>
+<div class="post" id="post-4682"><span>
+				
+				</span><p class="quiet">
+	January 8th, 2015 by Gareth Wilson (2 min read)</p><span>				
+				</span><span>
+
+				</span><div class="entry"><span>
+					
+					</span><p>In our blog about effective <a href="http://blog.fogcreek.com/effective-code-reviews-9-tips-from-a-converted-skeptic" target="_new">code reviews</a>, we recommended the use of a checklist. Checklists are a great tool in code reviews – they ensure that reviews are consistently performed throughout your team. They’re also a handy way to ensure that common issues are identified and resolved.<br /><img src="http://blog.fogcreek.com/wp-content/uploads/2015/01/100_blue-1-300x199.png" alt="100_blue (1)" width="300" height="199" class="alignright size-medium wp-image-4683" align="right" /><br />Research by the Software Engineering Institute suggests that programmers make 15-20 common mistakes. So by adding such mistakes to a checklist, you can make sure that you spot them whenever they occur and help drive them out over time.</p><span>
+</span><p>To get you started with a checklist, here’s a list of typical items:</p><span>
+</span><h3>Code Review Checklist</h3><span>
+</span><p><b>General</b></p><span>
+</span><ul>
+<li>Does the code work? Does it perform its intended function, the logic is correct etc.</li>
+<li>Is all the code easily understood?</li>
+<li>Does it conform to your agreed coding conventions? These will usually cover location of braces, variable and function names, line length, indentations, formatting, and comments.</li>
+<li>Is there any redundant or duplicate code?</li>
+<li>Is the code as modular as possible?</li>
+<li>Can any global variables be replaced?</li>
+<li>Is there any commented out code?</li>
+<li>Do loops have a set length and correct termination conditions?</li>
+<li>Can any of the code be replaced with library functions?</li>
+<li>Can any logging or debugging code be removed?</li>
+</ul><span>
+</span><p><b>Security</b></p><span>
+</span><ul>
+<li>Are all data inputs checked (for the correct type, length, format, and range) and encoded?</li>
+<li>Where third-party utilities are used, are returning errors being caught?</li>
+<li>Are output values checked and encoded?</li>
+<li>Are invalid parameter values handled?</li>
+</ul><span>
+</span><p><b>Documentation</b></p><span>
+</span><ul><img src="http://blog.fogcreek.com/wp-content/uploads/2014/11/test-work-300x198.jpg" alt="integration testing" width="300" height="198" class="alignright size-medium wp-image-4572" align="right" />
+<li>Do comments exist and describe the intent of the code?</li>
+<li>Are all functions commented?</li>
+<li>Is any unusual behavior or edge-case handling described?</li>
+<li>Is the use and function of third-party libraries documented?</li>
+<li>Are data structures and units of measurement explained?</li>
+<li>Is there any incomplete code? If so, should it be removed or flagged with a suitable marker like ‘TODO’?</li>
+</ul><span>
+</span><p><b>Testing</b></p><span>
+</span><ul>
+<li>Is the code testable? i.e. don’t add too many or hide dependencies, unable to initialize objects, test frameworks can use methods etc.</li>
+<li>Do tests exist and are they comprehensive? i.e. has at least your agreed on code coverage.</li>
+<li>Do unit tests actually test that the code is performing the intended functionality?</li>
+<li>Are arrays checked for ‘out-of-bound’ errors?</li>
+<li>Could any test code be replaced with the use of an existing API?</li>
+</ul><span>
+</span><p>You’ll also want to add to this checklist any language-specific issues that can cause problems.</p><span>
+</span><p>The checklist is deliberately not exhaustive of all issues that can arise. You don’t want a checklist, which is so long no-one ever uses it. It’s better to just cover the common issues. </p><span>
+</span><h3>Optimize Your Checklist</h3><span>
+</span><p>Using the checklist as a starting point, you should optimize it for your specific use-case. A great way to do this is to get your team to note the issues that arise during code reviews for a short time. With this data, you’ll be able to identify your team’s common mistakes, which you can then build into a custom checklist. Be sure to remove any items that don’t come up (you may wish to keep rarely occurring, yet critical items such as security related issues). </p><span>
+</span><h3>Get Buy-in and Keep It Up To Date</h3><span>
+</span><p>As a general rule, any items on the checklist should be specific and, if possible, something you can make a binary decision about. This helps to avoid inconsistency in judgments. It is also a good idea to share the list with your team and get their agreement on its content. Make sure to review the checklist periodically too, to check that each item is still relevant.</p><span>
+</span><p>Armed with a great checklist, you can raise the number of defects you detect during code reviews. This will help you to drive up coding standards and avoid inconsistent code review quality.</p><span>
+</span><p>To learn more about code reviews at Fog Creek, check out the following video:</p><span>
+</span><div><span>
+</span><p><a href="http://fast.wistia.net/embed/iframe/vigy79tuhq?popover=true" class="wistia-popover[height=281,playerColor=7b796a,width=500]"><img src="https://embed-ssl.wistia.com/deliveries/226295f00dc4c88429575c6fb479fdfb86b02f72.jpg?image_play_button=true&amp;image_play_button_color=7b796ae0&amp;image_crop_resized=500x281" alt="" /></a></p><span>
+</span></div><span>
+
+					
+					</span><span>
+
+				</span></div><span>
+				
+								
+			</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,297 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSS Testing with PhantomCSS, PhantomJS, CasperJS and Grunt</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>CSS Testing with PhantomCSS, PhantomJS, CasperJS and Grunt</h1>
+<div class="entry-content"><span>
+					</span><p>A new and exciting area of Front-end Development is regression testing. I know, I know… Testing is exciting? Well in a field that has had no formal testing practices, and is constantly plagued by unexpected regressions, the opportunity to write effective tests is incredibly welcome!</p><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-06-14.53.10.png"><img class="wp-image-9688  alignnone" title="An example of Visual Regression in action" alt="Screenshot 2015-03-06 14.53.10" src="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-06-14.53.10-1024x486.png" width="614" height="292" /></a></p><span>
+</span><p>Now we’re not talking Test Driven Design or anything, but one form of CSS Testing, called Visual Regression Testing, allows us to make visual comparisons between the correct (baseline) versions of our site and versions in development or just about to be deployed &nbsp;(new). The process is as simple as taking a screenshot of each page and comparing the pixels to find differences (diff)… Okay, it does get a bit more complicated, but that’s where it gets fun.</p><span>
+</span><style><!--
+img {max-width: 100%; height: auto;}
+--></style><span>
+</span><p>At <a href="http://hubs.ly/y0C4N60" target="_blank">Redhat.com</a> we’ve been developing a robust end to end solution for using Visual Regression Testing and I wanted to take a little time to lay out the tools and processes that we are using. It’s still a work in progress, so in one sense I want to share this so others may benefit, but as we continue to hone this system, any feedback is extremely welcome!</p><span>
+</span><h2>The Testing Tools</h2><span>
+</span><p>We start things off by picking our tools. We decided to use <a href="https://github.com/Huddle/PhantomCSS">PhantomCSS</a>&nbsp;as our testing tool. It is a powerful combination of 3 different tools:</p><span>
+</span><ol>
+<li><a href="http://phantomjs.org/" target="_blank">PhantomJS</a>&nbsp;is a headless Webkit browser that allows you to quickly render web pages, and most importantly, take screenshots of them</li>
+<li><a href="http://casperjs.org/" target="_blank">CasperJS</a>&nbsp;is a navigation and scripting tool that allows us to interact with the page rendered by PhantomJS. We are able to move the mouse, perform clicks, enter text into fields and even perform javascript functions directly in the DOM</li>
+<li><a href="http://huddle.github.io/Resemble.js/" target="_blank">ResembleJS</a>&nbsp;is a comparison engine that can compare two images and determining if there are any pixel differences between them</li>
+</ol><span>
+</span><p>We also wanted to automate the entire process, so we pulled PhantomCSS into <a href="http://gruntjs.com/" target="_blank">Grunt</a>&nbsp;and set up a few custom grunt commands to test all, or just part of our test suite.</p><span>
+</span><p><strong>If you want to follow along, you can find all of this code on&nbsp;<a href="https://github.com/micahgodbolt/p2phantomcss">github</a>.</strong></p><span>
+</span><h3>Getting Grunt Set Up</h3><span>
+</span><p>Now before you run off and download the first Grunt PhantomCSS you find on Google, I’ll have to warn you that it is awfully stale. Sadly someone grabbed the prime name-space and then just totally disappeared….like not even a tweet for the past 2 years. This has lead to a few people taking it upon themselves to &nbsp;continue on with the codebase, merging in existing pull requests and keeping things current. One of the better ones is maintained by Anselm Hannemann and <a href="https://github.com/anselmh/grunt-phantomcss" target="_blank">can be found here</a>.</p><span>
+</span><p>First you’ll need to import Anselm’s Grunt PhantomCSS project into your Grunt project. He doesn’t have a NPM namespace picked out yet, so we’ll just be pulling it in directly from Github:</p><!-- Crayon Syntax Highlighter v2.6.9 --><span>
+
+		</span><div id="crayon-5524a2bd92102433640888" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">
+npm i --save-dev git://github.com/anselmh/grunt-phantomcss.git</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-i">npm</span><span class="crayon-h"> </span><span class="crayon-v">i</span><span class="crayon-h"> </span><span class="crayon-o">--</span><span class="crayon-v">save</span><span class="crayon-o">-</span><span class="crayon-e">dev </span><span class="crayon-v">git</span><span class="crayon-o">:</span><span class="crayon-c">//github.com/anselmh/grunt-phantomcss.git</span></p></div></td>
+					</tr>
+				</table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0010 seconds] --><span>
+</span><p>With that installed we need to do the typical Grunt things like loading the task in the <code>Grunfile.js</code></p><!-- Crayon Syntax Highlighter v2.6.9 --><span>
+
+		</span><div id="crayon-5524a2bd92119355140479" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">
+grunt.loadNpmTasks('grunt-phantomcss');</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">grunt</span><span class="crayon-sy">.</span><span class="crayon-e">loadNpmTasks</span><span class="crayon-sy">(</span><span class="crayon-s">'grunt-phantomcss'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0007 seconds] --><span>
+</span><p>Then set a few options for PhantomCSS, also in the <code>Gruntfile.js</code>. &nbsp;Most of these are just default:</p><!-- Crayon Syntax Highlighter v2.6.9 --><span>
+
+		</span><div id="crayon-5524a2bd92125153574642" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">
+phantomcss: {
+        options: {
+          mismatchTolerance: 0.05,
+          screenshots: 'baselines',
+          results: 'results',
+          viewportSize: [1280, 800],
+          },
+          src: [
+             'phantomcss.js'
+          ]
+      },</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">phantomcss</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">options</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">mismatchTolerance</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">0.05</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">screenshots</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-s">'baselines'</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">results</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-s">'results'</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">viewportSize</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-cn">1280</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">800</span><span class="crayon-sy">]</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">src</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">[</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span class="crayon-s">'phantomcss.js'</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">]</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p></div></td>
+					</tr>
+				</table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0028 seconds] --><span>
+</span><span>
+</span><ul>
+<li><strong>mismatchTolerance:&nbsp;</strong>We can set a threshold for finding visual differences. This helps account for anti aliasing or other minor, non critical differences</li>
+<li><strong>screenshots:</strong>&nbsp;Choose a folder to place baseline images in</li>
+<li><strong>results:&nbsp;</strong>After running comparison tests, the results will be placed in this folder</li>
+<li><strong>viewportSize:</strong>&nbsp; We can always adjust the viewport size with Casper.js<strong><br /></strong></li>
+<li><strong>src:&nbsp;</strong>Just a path to our test file, relative to our gruntfile</li>
+</ul><span>
+</span><h3>Our Test File</h3><span>
+</span><p>Next, in our phantomcss.js file, this is where Casper.js kicks in. PhantomCSS is going to spin up a PhantomJS web browser, but it is up to Casper.js to navigate to a web page and perform all of the various actions needed.</p><span>
+</span><p>We decided the best place to test our components would be inside of our styleguide. It shared the same CSS with our live site, and it was a consistent target that we could count on not to change from day to date. So we start off by having casper navigate us to that URL.</p><!-- Crayon Syntax Highlighter v2.6.9 --><span>
+
+		</span><div id="crayon-5524a2bd92131021805927" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">
+casper.start('http://localhost:9001/cta-link.html')
+.then(function() {
+  phantomcss.screenshot('.cta-link', 'cta-link');
+})
+.then(function() {
+  this.mouse.move('.cta-button');
+  phantomcss.screenshot('.cta-link', 'cta-link-hover');
+});</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">casper</span><span class="crayon-sy">.</span><span class="crayon-e">start</span><span class="crayon-sy">(</span><span class="crayon-s">'http://localhost:9001/cta-link.html'</span><span class="crayon-sy">)</span></p><p><span class="crayon-sy">.</span><span class="crayon-st">then</span><span class="crayon-sy">(</span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">phantomcss</span><span class="crayon-sy">.</span><span class="crayon-e">screenshot</span><span class="crayon-sy">(</span><span class="crayon-s">'.cta-link'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">'cta-link'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span><span class="crayon-sy">)</span></p><p><span class="crayon-sy">.</span><span class="crayon-st">then</span><span class="crayon-sy">(</span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">mouse</span><span class="crayon-sy">.</span><span class="crayon-e">move</span><span class="crayon-sy">(</span><span class="crayon-s">'.cta-button'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">phantomcss</span><span class="crayon-sy">.</span><span class="crayon-e">screenshot</span><span class="crayon-sy">(</span><span class="crayon-s">'.cta-link'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">'cta-link-hover'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0033 seconds] --><span>
+</span><p>After starting up casper at the correct page, we use Javascript method chaining to string together a list of all the screen shots we need to take. &nbsp;First we target the&nbsp;
+			<span id="crayon-5524a2bd9213c116965319" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco"><span class="crayon-pre crayon-code"><span class="crayon-sy">.</span><span class="crayon-v">cta</span><span class="crayon-o">-</span><span class="crayon-v">link</span></span></span>&nbsp;and take a screen shot. We aptly call it “cta-link”. That will be its base file name in the baselines folder.</p><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-10-16.29.12.png"><img class="alignnone size-full wp-image-9713" alt="Screenshot 2015-03-10 16.29.12" src="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-10-16.29.12.png" width="595" height="46" /></a></p><span>
+</span><p>Next we need to test our button to make sure it behaves like we’d expect when we hover over it. We can use Casper.js to actually move the cursor inside of PhantomJS so that when we take our next screenshot, and call it <code>cta-link-hover</code>, we get the following:</p><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-10-16.33.16.png"><img class="alignnone size-full wp-image-9716" alt="Screenshot 2015-03-10 16.33.16" src="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-10-16.33.16.png" width="597" height="69" /></a></p><span>
+</span><span>
+</span><h3>Making A Comparison</h3><span>
+</span><p>With those baselines in place we are now able to run the test over and over again. Normally images created by the new tests will be identical to the baseline images and everything will pass. But if something were to change…..say someone accidentally added the following to their css while they were working on some other feature:</p><!-- Crayon Syntax Highlighter v2.6.9 --><span>
+
+		</span><div id="crayon-5524a2bd92147546131031" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">
+.cta-link {
+  text-transform: lowercase;
+}</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-k ">.cta-link </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-e ">text-transform</span><span class="crayon-sy">:</span><span class="crayon-h"> </span><span class="crayon-i ">lowercase</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0006 seconds] --><span>
+</span><p>The next time we ran our comparison tests we’d get the following:</p><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-10-16.46.11.png"><img class="alignnone size-full wp-image-9719" alt="Screenshot 2015-03-10 16.46.11" src="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-10-16.46.11.png" width="558" height="217" /></a></p><span>
+</span><p>As expected, the change from uppercase to lowercase created a failure. Not only was the text different, but the button ended up being shorter. The 3rd “fail” image shows us which pixels were different between the two images.</p><span>
+</span><h3>Running The Entire Suite</h3><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-11-08.29.29.png"><img class="alignright size-full wp-image-9725" alt="Screenshot 2015-03-11 08.29.29" src="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-11-08.29.29.png" width="260" height="444" /></a>After doing this for each component (or feature) we want to test in our styleguide, we can run &nbsp;
+			<span id="crayon-5524a2bd92153996792799" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco"><span class="crayon-pre crayon-code"><span class="crayon-sy">$</span><span class="crayon-h"> </span><span class="crayon-e">grunt </span><span class="crayon-v">phantomcss</span></span></span>&nbsp;&nbsp;and it will do the following:</p><span>
+</span><ol>
+<li>Spin up a PhantomJS browser</li>
+<li>Use CasperJS to navigate to a page in our styleguide</li>
+<li>Take a screen shot of a single component on that page</li>
+<li>Interact with the page: click the mobile nav, hover over links, fill out a form, submit the form etc</li>
+<li>Take screen shots of every one of those states</li>
+<li>Compare all of those screenshots with baseline images we captured and committed when the&nbsp;component was created</li>
+<li>Report if all images are the same (PASS!) or if there is an image that has changed (FAIL!)</li>
+<li>Repeat this process for every component and layout in our library.</li>
+</ol><span>
+</span><h2>What Do We Do With Failing Tests?</h2><span>
+</span><p>Obviously if your feature branch is concerned with changing the physical appearance of a component (adjusting font size or background color etc…) you are going to get failing tests. The point is that you should ONLY be getting failing tests on the component you were working on. If you are trying to update the cta-link and you get failing tests on your cta-link&nbsp;AND your pagination component, one of two things happened:</p><span>
+</span><ol>
+<li>You changed something you shouldn’t have. Maybe your changes were too global, or you fat fingered some keystrokes in the wrong partial. Either way, find out what changed on the pagination component, and fix it.</li>
+<li>On the other hand, you might determine that the changes you made to the cta-link SHOULD have affected the pagination too. Perhaps they share the same button mixin, and for brand constancy they should be using the same button styles. At this point you’d need to head back to the story owner/designer/person-who-makes-decisions-about-these-things and ask them if they meant for these changes to apply to both components, and you act accordingly.</li>
+</ol><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/failures.png"><img class="size-full wp-image-9729 alignnone" alt="failures" src="http://www.phase2technology.com/wp-content/uploads/2015/03/failures.png" width="624" height="139" /></a></p><span>
+</span><p>Regardless of the reasons you might have had some false positives, you will still be left with a ‘failing’ test because the old baseline is no longer correct. In this case, just delete the old baselines and commit the new ones. If this new look is the brand approved one, then these new baselines needs to be committed with your feature branch code so that once your code is merged in, it doesn’t cause failures when others run the test.</p><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-11-08.54.30.png"><img class="alignnone size-full wp-image-9730" alt="Screenshot 2015-03-11 08.54.30" src="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-11-08.54.30.png" width="422" height="126" /></a></p><span>
+</span><p>The magic of this approach is that at any given time, every single component in your entire system has a “gold standard” image that the current state can be compared to. This also means that this test suite can be run at anytime, in any branch, and should always pass without a single failure. So, as we do….we push this to the cloud.</p><span>
+</span><h2>To the cloud!</h2><span>
+</span><p>At Red Hat we already have a large suite of Behavior Tests that are automatically by <a href="http://jenkins-ci.org/" target="_blank">Jenkins CI</a>&nbsp;before any code gets merged into master, or deployed to production. These tests insure that our application is working. We can create nodes, edit them, display them so on and so forth. &nbsp;Since these tests are performed by Jenkins, &nbsp;we have a single, consistent environment to run the tests. No more “but it worked on my machine”. These environments mirror those used in production, so we rarely have surprises once our passing code goes live.</p><span>
+</span><p>Using a similar methodology we plan on using Jenkins to run our suite of Visual Regression Tests before any code is merged, or any code is pushed to production. &nbsp;This means that a developer’s merge request must pass all PhantomCSS tests before the code is accepted. Now if you recall, there are 2 ways that developers can deal with failing tests. They can either fix the code that is causing the problem, or if it was an expected change, they can commit a new baseline for the changed component. So as long as you are doing sufficient merge reviews, and keeping an eye out for unexpected new baselines, there is no way for code to sneak through that breaks the visual integrity of the design system.</p><span>
+</span><h2>Making it Our Own</h2><span>
+</span><p>I started to work with Anselm’s code at the beginning of the Red Hat project and found that it met 90% of our needs, but it was that last 10% that I really needed to make our workflow come together. &nbsp;So as any self respecting developer does, I forked it and started in on some modifications that make it fit our specific implementations. Let me walk you through some of those changes that I have in my branch labeled <a href="https://github.com/micahgodbolt/grunt-phantomcss/tree/alt-runner" target="_blank">alt-runner</a></p><!-- Crayon Syntax Highlighter v2.6.9 --><span>
+
+		</span><div id="crayon-5524a2bd92163037617863" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">
+//New Settings
+
+//Package.json
+"grunt-phantomcss": "git://github.com/micahgodbolt/grunt-phantomcss.git#alt-runner",
+
+// Gruntfile.js
+phantomcss: {
+        options: {
+          mismatchTolerance: 0.05,
+        },
+        webux: {
+          options: {
+            altRunner: true, // Turn on altRunner
+            screenshots: 'baselines',
+            results: 'results',
+            viewportSize: [1280, 800],
+          },
+          src: [
+             'src/sass/**/*-test.js' // select all files ending in -test.js
+          ]
+        },
+      },</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content"><p>1</p><p>2</p><p>3</p><p>4</p><p>5</p><p>6</p><p>7</p><p>8</p><p>9</p><p>10</p><p>11</p><p>12</p><p>13</p><p>14</p><p>15</p><p>16</p><p>17</p><p>18</p><p>19</p><p>20</p><p>21</p><p>22</p></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-c">//New Settings</span></p><p><span class="crayon-c">//Package.json</span></p><p><span class="crayon-s">"grunt-phantomcss"</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-s">"git://github.com/micahgodbolt/grunt-phantomcss.git#alt-runner"</span><span class="crayon-sy">,</span></p><p><span class="crayon-c">// Gruntfile.js</span></p><p><span class="crayon-v">phantomcss</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">options</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">mismatchTolerance</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">0.05</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">webux</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">options</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">altRunner</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-t">true</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-c">// Turn on altRunner</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">screenshots</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-s">'baselines'</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">results</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-s">'results'</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">viewportSize</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-cn">1280</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">800</span><span class="crayon-sy">]</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">src</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-sy">[</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span class="crayon-s">'src/sass/**/*-test.js'</span><span class="crayon-h"> </span><span class="crayon-c">// select all files ending in -test.js</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">]</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p></div></td>
+					</tr>
+				</table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0041 seconds] --><span>
+</span><span>
+</span><h3>Place Baselines in Component Folder</h3><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-06-14.11.58.png"><img class="alignright  wp-image-9680" alt="Screenshot 2015-03-06 14.11.58" src="http://www.phase2technology.com/wp-content/uploads/2015/03/Screenshot-2015-03-06-14.11.58-678x1024.png" width="285" height="430" /></a>One thing important to us was good encapsulation. We put everything in the component folder….i mean everything!</p><span>
+</span><ul>
+<li>Sass files for typographic and layout styles</li>
+<li>HTML partial with the component’s canonical markup</li>
+<li>Data file used to generate the component display when fed into our templating engine</li>
+<li>Documentation file that feed into our Hologram style guide explaining component features, options and implementation details</li>
+<li>Test file with tests written for every variation of the component (open/close, light theme/dark theme, field empty/field filled etc…)</li>
+</ul><span>
+</span><p>Because of this, &nbsp;we also really wanted our baseline images to stay inside of the component folder. This would make it easier to find the baselines for each component, and when a merge request contains new baselines, the images are in the same folder as the code change that made them necessary.</p><span>
+</span><p>The default behavior of Grunt PhantomCSS is to place all of the baselines, for every test in our system, into the same folder. And then when we ran our regression tests, all of those images were placed into a single results folder. &nbsp;With dozens of different components in our system, each with up to a dozen different tests, this process just didn’t scale. So&nbsp;one of the key changes I made in the&nbsp;<a href="https://github.com/micahgodbolt/grunt-phantomcss/tree/alt-runner" target="_blank">alt-runner</a>&nbsp;was to put baseline images into a folder called <strong>baseline</strong> right next to each individual test file.</p><span>
+</span><h3>Run Each Component Test Suite Individually</h3><span>
+</span><p>Secondly, &nbsp;I changed the test behavior to test each component individually, instead of all together. Instead of running all 100+ tests and telling me if the build passed or failed I now get a pass/fail for every component.</p><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/tests.png"><img class="alignnone size-full wp-image-9731" alt="tests" src="http://www.phase2technology.com/wp-content/uploads/2015/03/tests.png" width="370" height="145" /></a></p><span>
+</span><h2>OR</h2><span>
+</span><p><a href="http://www.phase2technology.com/wp-content/uploads/2015/03/newfailure.png"><img class="alignnone size-full wp-image-9732" alt="newfailure" src="http://www.phase2technology.com/wp-content/uploads/2015/03/newfailure.png" width="628" height="252" /></a></p><span>
+</span><h3></h3><span>
+</span><h3>Test Portability</h3><span>
+</span><p>The last change I made is that I wanted my tests to be more portable. Instead of a single test file, we had broken our tests up into dozens of different tests files that Grunt pulled in when it ran the test.&nbsp;The original implementation required that the first test file start with 
+			<span id="crayon-5524a2bd92172851387650" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco"><span class="crayon-pre crayon-code"><span class="crayon-v">casper</span><span class="crayon-sy">.</span><span class="crayon-e">start</span><span class="crayon-sy">(</span><span class="crayon-s">'http://mysite.com/page1'</span><span class="crayon-sy">)</span></span></span>&nbsp;&nbsp;and all subsequent files start &nbsp;
+			<span id="crayon-5524a2bd9217d455480746" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco"><span class="crayon-pre crayon-code"><span class="crayon-v">casper</span><span class="crayon-sy">.</span><span class="crayon-e">thenOpen</span><span class="crayon-sy">(</span><span class="crayon-s">'http://mysite.com/page2'</span><span class="crayon-sy">)</span></span></span>&nbsp;. &nbsp;This become problematic because the order in which Grunt chose to run these files was based on alphabetical order. So as soon I added a test starting with a letter 1 earlier in the alphabet than my current starting test, my test suite broke!</p><span>
+</span><p>The fix was relatively easy as I just needed to call 
+			<span id="crayon-5524a2bd92188772859398" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco"><span class="crayon-pre crayon-code"><span class="crayon-v">casper</span><span class="crayon-sy">.</span><span class="crayon-v">start</span></span></span>&nbsp;&nbsp;as soon as Grunt initiates the task, and then all of the tests can start with <code>casper.thenOpen</code> without any problems.</p><!-- Crayon Syntax Highlighter v2.6.9 --><span>
+
+		</span><div id="crayon-5524a2bd92192758228044" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">
+casper.thenOpen('http://localhost:9001/component_-_cta.html')
+    .then(function () {
+        this.viewport(600, 1000);
+        phantomcss.screenshot('.rh-cta-link', 'cta-link');
+    })
+    .then(function () {
+        this.mouse.move(".rh-cta-link"); 
+        phantomcss.screenshot('.rh-cta-link', 'cta-link-hover');
+    });</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">casper</span><span class="crayon-sy">.</span><span class="crayon-e">thenOpen</span><span class="crayon-sy">(</span><span class="crayon-s">'http://localhost:9001/component_-_cta.html'</span><span class="crayon-sy">)</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">.</span><span class="crayon-st">then</span><span class="crayon-sy">(</span><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-e">viewport</span><span class="crayon-sy">(</span><span class="crayon-cn">600</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">1000</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">phantomcss</span><span class="crayon-sy">.</span><span class="crayon-e">screenshot</span><span class="crayon-sy">(</span><span class="crayon-s">'.rh-cta-link'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">'cta-link'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">.</span><span class="crayon-st">then</span><span class="crayon-sy">(</span><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">mouse</span><span class="crayon-sy">.</span><span class="crayon-e">move</span><span class="crayon-sy">(</span><span class="crayon-s">".rh-cta-link"</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">phantomcss</span><span class="crayon-sy">.</span><span class="crayon-e">screenshot</span><span class="crayon-sy">(</span><span class="crayon-s">'.rh-cta-link'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">'cta-link-hover'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0048 seconds] --><span>
+</span><span>
+</span><h2>Where to next?</h2><span>
+</span><p>We’re in a bit of a holding pattern until we get full Jenkins integration set up, and I’m also anxious for PhantomJS 2.0 to make it down the line. The 1.X version is sadly a bit out of date with modern browsers and is missing important features like flex-box that make the tests less valuable than they could be.&nbsp;Therefore we are currently just writing our test, making sure we have sufficient coverage, and working out the kinks in the NPM module and our workflow.</p><span>
+</span><p>So if you feel like diving in, please feel free to kick the tires a bit and toss up any issues or pull-requests into the alt-runner branch. The branch is a bit raw, and needs a lot of documentation, so any help is appreciated! I’m hoping to clean it up as much as I can to either get a pull request ready for Anselm’s fork, or publish it as a separate NPM module.</p><span>
+</span><p>Visual Regression Testing is a really hot area right now. New tools are being built all the time, but the real challenge is finding ways to work those tools into our current workflows. So go out, experiment, try them all, and write about it! I’d love to read about your own experiences.</p><span>
+</span><p><a href="http://landing.phase2technology.com/subscribe-to-phase2-techblog" target="_blank"><strong>Don’t miss any future front-end thought leadership and news! Sign up for the Phase2 newsletter!</strong></a></p><span>
+									</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,259 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>How gzip uses Huffman coding</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>How gzip uses Huffman coding</h1>
+<div class="entry-content"><p>I wrote a blog post quite a while ago called <a href="http://jvns.ca/blog/2013/10/24/day-16-gzip-plus-poetry-equals-awesome/">gzip + poetry = awesome</a>
+where I talked about how the gzip compression program uses the LZ77 algorithm
+to identify repetitions in a piece of text.</p><span>
+</span><p>In case you don’t know what LZ77 is (I sure didn’t), here’s the video from that
+post that gives you an example of gzip identifying repetitions in a poem!</p><span>
+</span><span>
+</span><span>
+</span><p>I thought this was a great demonstration, but it’s only half the story about
+how gzip works, and it’s taken me until now to write the rest of it down. So!
+Without further ado, let’s say we’re compressing this text:</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">a tapping, as of someone gently 
+</span><span class="line">r{apping},{ rapping}
+</span><span class="line">at my chamber door</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+ 
+</span><p>It’s identified <code>apping</code> and <code>rapping</code> as being repeated, so gzip then encodes
+that as, roughly</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">a tapping, as of someone gently
+</span><span class="line">r{back 30 characters, copy 6},
+</span><span class="line">{back 9 characters, copy 8} at my chamber door</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>Once it’s gotten rid of the repetitions, the next step is to compress the
+individual characters. That is – if we have some text like</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">ab bac ead gae haf iaj kal man oap</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>there isn’t any repetition to eliminate, but <code>a</code> is the most common letter, so
+we should compress it more than the other letters <code>bcdefghijklmnop</code>.</p><span>
+</span><h3 id="how-gzip-uses-huffman-coding-to-represent-individual-characters">How gzip uses Huffman coding to represent individual characters</h3><span>
+</span><p>gzip compresses bytes, so to make an improvement we’re going to want to be able
+to represent some bytes using less than a byte (8 bits) of space. Our
+compressed text might look something like</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0101010010101010001010010010010101001010001010100101010101
+</span><span class="line">1001010101010010011111111000000110000100000101000000000000</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>Those were totally made up 0s and 1s and do not mean anything. But, reading
+something like this, how can you know where the boundaries between characters
+are? Does 01 represent a character? 010? 0101? 01010?</p><span>
+</span><p>This is where a really smart idea called <strong>Huffman coding</strong> comes in! The idea
+is that we represent our characters (like a, b, c, d, ….) with codes like</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">a: 00
+</span><span class="line">b: 010
+</span><span class="line">c: 011
+</span><span class="line">d: 1000
+</span><span class="line">e: 1001
+</span><span class="line">f: 1010
+</span><span class="line">g: 1011
+</span><span class="line">h: 1111</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>If you look at these carefully, you’ll notice something special! It’s that none
+of these codes is a prefix of any other code. So if we write down
+<code>010001001011</code> we can see that it’s <code>010 00 1001 011</code> or <code>baec</code>! There wasn’t
+any ambiguity, because <code>0</code> and <code>01</code> and <code>0100</code> don’t mean anything.</p><span>
+</span><p>You might ALSO notice that these are all less than 8 bits! That means we’re
+doing COMPRESSION. This Huffman table will let us compress anything that only
+has <code>abcdefgh</code>s in it.</p><span>
+</span><p>These Huffman tables are usually represented as <strong>trees</strong>. Here’s the Huffman
+tree for the table I wrote down above:</p><span>
+</span><p><img src="http://jvns.ca/images/huffmantree.png" /></p><span>
+</span><p>You can see that, for instance, if you follow the path <code>011</code> then you get to <code>c</code>.</p><span>
+</span><h3 id="lets-read-some-real-huffman-tables">Let’s read some real Huffman tables!</h3><span>
+</span><p>It’s all very well and good to have a theoretical idea of how this works, but I
+like looking at Real Stuff.</p><span>
+</span><p>There’s a really great program called <code>infgen</code> that I found this morning that
+helps you see the contents of a gzip file. You can get it with</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">wget http://zlib.net/infgen.c.gz
+</span><span class="line">gunzip infgen.c.gz</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>When we run<code>./infgen raven.txt.gz</code>, it prints out some somewhat cryptic output like</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">litlen 10 6
+</span><span class="line">litlen 32 5
+</span><span class="line">litlen 33 9
+</span><span class="line">litlen 34 10
+</span><span class="line">litlen 39 8
+</span><span class="line">litlen 44 6
+</span><span class="line">litlen 45 9
+</span><span class="line">litlen 46 9
+</span><span class="line">litlen 59 9
+</span><span class="line">litlen 63 10
+</span><span class="line">[... lots more ...]
+</span><span class="line">literal 'Once upon a midnight dreary, while I 
+</span><span class="line">match 3 31
+</span><span class="line">literal 'dered weak an
+</span><span class="line">match 5 9
+</span><span class="line">match 3 33
+</span><span class="line">literal 10 'Over many
+</span><span class="line">match 3 62
+</span><span class="line">literal 'quaint
+</span><span class="line">match 5 30
+</span><span class="line">literal 'curious volume of forgotten lore,</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>This is really neat! It’s telling us how gzip’s chosen to compress The Raven.
+We’re going to ignore the parts that make sense (“Once upon a midnight
+dreary..”) and just focus on the confusing <code>litlen</code> parts.</p><span>
+</span><p>These <code>litlen</code> lines are weird! Thankfully I spent 5 straight days thinking
+about gzip <a href="http://jvns.ca/blog/2013/10/16/day-11-how-does-gzip-work/">in October 2013</a>
+so I know what they mean. <code>litlen 10 6</code> means “The ASCII character 10 is
+represented with a code of length 6”. Which initially seems totally unhelpful!
+Like, who cares if it’s represented with a code of length 6 if I DON’T KNOW
+WHAT THAT CODE IS?!!</p><span>
+</span><p>BUT! Let’s sort these by code length first, and translate the ASCII codes to
+characters.</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">   ' ' 6
+</span><span class="line">   'a' 6
+</span><span class="line">   'e' 6
+</span><span class="line">   'i' 6
+</span><span class="line">   'n' 6
+</span><span class="line">   'o' 6
+</span><span class="line">   'r' 6
+</span><span class="line">   's' 6
+</span><span class="line">   't' 6
+</span><span class="line">  '\n' 7
+</span><span class="line">   ',' 7
+</span><span class="line">   'b' 7
+</span><span class="line">   'c' 7</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>For starters, these are some of the most common letters in the English
+language, so it TOTALLY MAKES SENSE that these would be encoded most
+efficiently. Yay!</p><span>
+</span><p>The gzip specification actually specifies an algorithm for translating these
+lengths into a Huffman table! We start with 000000, and then add 1 in binary
+each time. If the code length ever increases, then we shift left. (so 100 -&gt;
+1010). Let’s apply that to these code lengths!</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">  ' ' 000000
+</span><span class="line">   'a' 000001
+</span><span class="line">   'e' 000010
+</span><span class="line">   'i' 000011
+</span><span class="line">   'n' 000100
+</span><span class="line">   'o' 000101
+</span><span class="line">   'r' 000110
+</span><span class="line">   's' 000111
+</span><span class="line">   't' 001000
+</span><span class="line">  '\n' 0010010
+</span><span class="line">   ',' 0010011
+</span><span class="line">   'b' 0010100
+</span><span class="line">   'c' 0010101
+</span><span class="line">   'd' 0010110
+</span><span class="line">   'f' 0010111
+</span><span class="line">   'h' 0011000
+</span><span class="line">   'l' 0011001
+</span><span class="line">   'm' 0011010
+</span><span class="line">   'p' 0011011
+</span><span class="line">   'u' 0011100</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>I found all this out by reading <a href="http://www.infinitepartitions.com/art001.html">this incredibly detailed page</a>, in case you want to know
+more.</p><span>
+</span><p>I wrote a script to do this, and you can try it out yourself! It’s at
+<a href="https://github.com/jvns/gzip-huffman-tree/">https://github.com/jvns/gzip-huffman-tree</a></p><span>
+</span><p>I tried it out on the compressed source code <code>infgen.c.gz</code>, and you can totally
+see it’s source code and not a novel!</p><span>
+</span><div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class=""><span class="line"> ' ' 00000
+</span><span class="line"> 'a' 000010
+</span><span class="line"> 'e' 000011
+</span><span class="line"> 'i' 000100
+</span><span class="line"> 'n' 000101
+</span><span class="line"> 'o' 000110
+</span><span class="line"> 'r' 000111
+</span><span class="line"> 's' 001000
+</span><span class="line"> '"' 0010010
+</span><span class="line"> '(' 0010011
+</span><span class="line"> ')' 0010100
+</span><span class="line"> ',' 0010101
+</span><span class="line"> '-' 0010110</span></code></pre></td></tr></table></div></figure></notextile></div><span>
+</span><p>I really like going through explorations like this because they give
+me a better idea of how things like Huffman codes are used in real
+life! It’s kind of my favorite when things I learned about in math
+class show up in the programs I use every day. And now I feel like I
+have a better idea of when it would be appropriate to use a technique
+like this.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

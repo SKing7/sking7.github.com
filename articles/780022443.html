@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Performance Calendar</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Performance Calendar</h1>
+<div class="entry unit"><p>Delivering web page content to users as quickly as possible is important. It is equally important to ensure that this downloaded content provides a smooth and responsive user experience. Page scrolls that are <a href="http://jankfree.org/">Janky</a>, delays when typing in text boxes or choppy animations are just as bad as pages that take a long time to load. Users spend longer using the page than waiting for it to load and we should ensure that the page renders at 60 frames per second at all times. </p><span>
+</span><p>Most modern web browsers have <a href="http://i.imgur.com/zR2f1.gif">tools</a> that could help identify the <a href="http://calendar.perfplanet.com/2013/the-runtime-performance-checklist/">various things that could slow a web page</a> down. However, rapid release cycles make it hard to do regular performance audits. Tools exist to <a href="https://github.com/addyosmani/psi/">automate network performance</a> audits. It would be great to have a tool that automate the rendering perf audits too. </p><span>
+</span><h2>browser-perf</h2><span>
+</span><p><a href="https://github.com/axemclion/browser-perf">browser-perf</a> is a NodeJS based tool that picks up performance data from browser developer tools and converts them to  metrics like frame rates, expensive event handlers, paints, layouts, etc. It is based on Chromium’s performance test suite called <a href="http://www.chromium.org/developers/telemetry">telemetry</a>. It runs tests on real browsers using the <a href="http://docs.seleniumhq.org/projects/webdriver/">Selenium Web driver</a> to mimic typical user interactions.</p><span>
+</span><p>To test your website, </p><span>
+</span><ol class="task-list">
+<li>Ensure that you have selenium installed and running. </li>
+<li>Install <a href="http://npmjs.org/package/browser-perf">browser-perf</a> from npm using <code>npm install -g browser-perf</code>
+</li>
+<li>Run <code>browser-perf http://example.com --verbose</code>
+</li>
+</ol><span>
+</span><p><a href="http://www.youtube.com/watch?v=0HmAFrUCIUI"><br /><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/1.jpg" alt="1" width="480" height="360" class="alignnone size-full wp-image-1688" /><br /></a></p><span>
+</span><p>These metrics can be collected not just during a page scroll, but also during actions like clicking buttons or typing content. The tool can record metrics from desktop (Firefox, IE, Chrome, Safari), mobile (Android and iOS) browsers and even Cordova or Hybrid apps (<a href="https://www.youtube.com/watch?v=TG_eTe_H-s4">demo</a>). </p><span>
+</span><h2>Case Study – The story of 5 commits</h2><span>
+</span><p>browser-perf can also be used as a Node module and the metrics collected can be plotted as a graph over time. A <a href="http://nparashuram.com/perfslides/perfjankie">graph</a> generated from the <a href="https://github.com/axemclion/perfslides/commits/perf">last four commits</a> of <a href="https://github.com/axemclion/perfslides">this project</a> illustrates how browser-perf can be used to identify commits that may slow down a page. </p><span>
+</span><p>The five commits under consideration are </p><span>
+</span><ol class="task-list">
+<li>First commit – Baseline, basic HTML with no styling.</li>
+<li>Added bootstrap styling, responsive design, resize/hide images.
+</li>
+<li>Added code that uses scroll handler and sets style <code>top</code>. The scroll handler does a lot of work, making the scroll janky.</li>
+<li>The scroll handler is improved, moving most logic to requestAnimationframe, and uses CSS transforms. </li>
+<li>Final Commit – Add external widgets, social buttons, etc. </li>
+</ol><span>
+</span><p>Metrics like the <a href="http://nparashuram.com/perfslides/perfjankie/#/detail?pagename=localhost:8080&amp;browser=chrome&amp;metric=mean_frame_time">average frame time</a> and <a href="http://nparashuram.com/perfslides/perfjankie/#/detail?pagename=localhost:8080&amp;browser=chrome&amp;metric=Layout">layout times</a> show an increase when a bad scroll handler is added in the third commit. On the fourth commit when the code from the scroll handler is moved to a requestAnimationFrame, the frame rates and layouts get better.<br />Similarly, adding external widgets shows an increase in the time taken to <a href="http://nparashuram.com/perfslides/perfjankie/#/detail?pagename=localhost:8080&amp;browser=chrome&amp;metric=ParseHTML">parse the HTML</a> and even the <a href="http://nparashuram.com/perfslides/perfjankie/#/detail?pagename=localhost:8080&amp;browser=chrome&amp;metric=CompositeLayers">number of layers</a> since each widget is an iFrame.  </p><span>
+</span><p><a href="http://nparashuram.com/perfslides/perfjankie"><br /><img src="http://calendar.perfplanet.com/wp-content/uploads/2014/12/2.png" alt="2" width="1044" height="741" class="alignnone size-full wp-image-1689" /><br /></a></p><span>
+</span><blockquote>
+<p>These graphs were generated using another node module called <a href="http://npmjs.org/package/perfjankie">perfjankie</a> that sits on top of browser-perf and saves the data and HTML for the graphs in a couchDB database. Perfjankie can also be used as a <a href="https://github.com/axemclion/perfslides/blob/61657ebbf7a581ca90d4147758953c3918ef8c49/Gruntfile.js#L57">Grunt task</a>.</p>
+</blockquote><span>
+</span><p>A similar experiment of <a href="http://nparashuram.com/bootstrap-perf">graphing</a> the render performance of the bootstrap CSS library, from version 1 to the current version, shows some interesting trends. </p><span>
+</span><h2>Next steps</h2><span>
+</span><p>Integrating this module into your workflow should be simple. More documentation and instructions to setup and test for various environments are on the project’s <a href="https://github.com/axemclion/browser-perf/wiki">wiki page</a>. <a href="http://www.perfmonkey.com/#/trynow">This link</a> also lets you quickly test your web page by running browser-perf on <a href="https://travis-ci.org/PerfMonkeyCo/browser-perf-runner/pull_requests">Travis</a>.<br />Monitoring network and rendering performance can ensure a great overall experience for your users.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
