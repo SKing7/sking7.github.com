@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSS retina hairline, the easy way</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>CSS retina hairline, the easy way</h1>
+<div>
+    
+
+    <p>At WWDC this year 2014, in session 517 “Designing Responsive Web Experiences”, Ted O’Connor talked about “retina hairlines”, borders of just one physical pixel on retina screens, and how developers dealt with it.
+
+    </p><p>They introduced what would come to iOS 8 and OS X Yosemite:
+
+    </p><p class="no-margin"><img class="wwdc-screen" src="http://dieulot.net/css-retina-hairline/wwdc-hairline.png" title="WWDC’s hypothetical Retina hairline border syntax" />
+
+    </p><p>OMG, so easy! Right?
+
+    </p><p>Not so easy (WWDC slides usually simplify), but not too far from it.
+
+    </p><p>The problem is that browsers on a retina screen that don’t know about 0.5px borders will interpret it as 0px. No border. This includes iOS 7 and prior, OS X Mavericks and prior, and Android devices.
+
+    
+
+    </p><p>The solution is to detect with JavaScript if the browser handles 0.5px borders, and if it does, add a class to the &lt;html&gt; element.
+
+    <!--<script src="https://gist.github.com/dieulot/520a49463f6058fbc8d1.js"></script>-->
+    
+
+    </p><p>Then, using hairline borders with CSS is easy:
+
+    <!--<script src="https://gist.github.com/dieulot/e7028ebb86eecfeb6b5b.js"></script>-->
+    
+
+    </p><p>That’s it. Best of all, unlike previous solutions involving <a href="http://mir.aculo.us/2013/09/16/how-to-create-a-web-app-that-looks-like-a-ios7-native-app-part-1/">SVG or GIF</a> or <a href="http://atirip.com/2013/09/22/yes-we-can-do-fraction-of-a-pixel/">transforms</a> or linear-gradient<sup id="note-gradient-back"><a href="http://dieulot.net/css-retina-hairline#note-gradient">1</a></sup>, <strong>you can have retina hairlines on elements with rounded corners</strong> (border-radius).
+
+    </p><p>This is supported by most desktop browsers, and now by Safari 8 on both iOS and OS X. Chrome on Android is a notable absent, but no doubt it will eventually follow suit. When a browser doesn’t support it, it just displays a regular border. No big deal.
+
+    </p><p>If you don’t have a compatible retina device, you can use Chrome/Firefox/Opera and zoom the page 200% to simulate a retina display when developing.
+
+    </p><p>I’ve also noticed that *.5px values can be used with other properties. For example <code>top</code>/<code>right</code>/<code>bottom</code>/<code>left</code>. Not all properties that work in Chrome work in Safari though, but those related to position seem to work everywhere.
+
+    </p><p>P.S. About the upcoming iPhone 6 Plus (at @3x downsampled to 1080p): I don’t have one to test, but seeing how the new Apple.com goes at it, it looks like you’re expected to just optimize for @2x and not worry about @3x — the display is so sharp it doesn’t matter anymore.
+
+    
+
+    </p><p class="stackoverflow"><a href="http://stackoverflow.com/questions/8640521/can-you-have-a-0-5px-border-on-a-retina-display/25910251#25910251">I also posted a short version of this on StackOverflow.</a>
+
+    </p><p>– Alex Dieulot (<a href="https://twitter.com/Dieulot">@Dieulot</a>), <span class="date">17 September 2014</span>
+
+    </p><p><a href="http://dieulot.net/">‹ Back to dieulot.net</a>
+
+    
+  </p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Object-ively Javascript</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Object-ively Javascript</h1>
+<section class="post-content">
+    <p><em>Part 4 of a series on Javascript Fundamentals. See the <a href="http://www.datchley.name/tag/fundamentals">full list of posts</a></em></p>
+
+<p>The goal of this post is to, at a high level, cover some of the basics of creating, using and implementing objects in Javascript.  In a second part, we'll follow up with understanding Javascript object prototype, the prototype chain and making better use of composition and delegation over inheritance.</p>
+
+<p><em>I'll mention objects being "prototype linked" to other objects in this article quite often. If you're still confused by Javascript's prototype based object delegation scheme, just hold tight for the second part coming soon</em></p>
+
+<h2 id="makingobjects">Making Objects</h2>
+
+<p>The easiest way to create objects in Javascript, and the most efficient, is using object literals.  </p>
+
+<pre><code>var actor = {  
+  name: "David Tennant",
+  age: 44
+};
+</code></pre>
+
+<p>Here,<code>actor</code> is an object with two properties, <code>name</code>, which contains a string, and <code>age</code> which contains a number.  This is the same as using <code>var obj = new Object()</code> and then assigning properties. Both objects are prototype linked the standard <code>Object</code> prototype. </p>
+
+<p>We can also create a function to make objects by calling it as a <em>constructor</em> function using the <code>new</code> operator.  </p>
+
+<pre><code>function Person(name, age) {  
+   this.name = name;
+   this.age = age;
+}
+var actor = new Person("David Tennant", 44);  
+</code></pre>
+
+<p>Using the <code>new</code> operator introduces some implicit operations, which we'll discuss shortly.</p>
+
+<p>We also have <code>Object.create()</code> as well, though it works a bit differently.</p>
+
+<p><code>Object.create()</code> takes two parameters and returns a new object. This object is prototype linked to the first object passed as a parameter.  The second parameter is an optional object containing property descriptors to assign directly on the newly returned object.  </p>
+
+<p>A property descriptor object is an object containing definitions for properties. The property names in this descriptor object are themselves objects which contain various attributes attributed to that property, such as: <code>value</code>, <code>writable</code>, <code>configurable</code>, and <code>enumerable</code>. </p>
+
+<ul>
+<li><code>value</code> (<em>any</em>) - is the value assigned to that property</li>
+<li><code>writeable</code> (<em>boolean</em>) - if false, means the value of that property can not be changed</li>
+<li><code>enumerable</code> (<em>boolean</em>) - if true, means that property will be iterated over when a user does a <code>for..in</code> or similar operation.</li>
+<li><code>configurable</code> (<em>boolean</em>) - if false, any attempts to delete the property or change its value will fail. </li>
+</ul>
+
+<p>Try the following in Chrome DevTools to see how basic object properties are setup:</p>
+
+<pre><code>var obj = { a: 42 };  
+console.log("%o", Object.getOwnPropertyDescriptor(obj, 'a'));  
+// Object
+//    configurable: true
+//    enumerable: true
+//    value: 42
+//    writable: true
+//    ...
+</code></pre>
+
+<p>Using <code>Object.create()</code> we can create objects using another object as a prototype (<em>an exemplar</em>); and an optional property descriptor object. Any properties on the exemplar are accessed via the object's prototype chain; and any properties in the descriptor object are <em>own properties</em> assigned directly to the new object returned.</p>
+
+<pre><code>// creates a new, empty object linked to Object.prototype
+var obj = Object.create({});  
+
+// create a new, empty object not linked to Object.prototype
+obj = Object.create(null);
+
+var person_proto = {  
+      name: "", age: null
+    },
+    descriptor = {
+      tardis: { value: "blue box" }
+    };
+
+// creates a new object based on person_proto
+var actor = Object.create(person_proto, descriptor)  
+actor.name = "David Tennant";  
+actor.age = 44;  
+// actor:
+//   name: "David Tennant"
+//   age: 44
+//   tardis: "blue box"
+</code></pre>
+
+<p>In ES6, we could use the following pattern in creating our <code>actor</code> instance instead:</p>
+
+<pre><code>var actor = Object.assign(Object.create(person_proto), {  
+  tardis: "blue box"
+});
+</code></pre>
+
+<p>ES6's <code>Object.assign()</code> is similar to the many <code>extend()</code> style functions that libraries like jQuery and Underscore use to create/extend objects using one or more objects.</p>
+
+<h3 id="understandingwhatnewdoes">Understanding what <code>new</code> does</h3>
+
+<p>There is much magic happening in a function invoked with the <code>new</code> operator.  At its most basic, when using <code>new</code>, the function invocation is hijacked and given a new, empty object as context, which is assigned to the local variable <code>this</code> inside the function.  </p>
+
+<p>The expectation of functions called as constructors is that they do something with that context: assigning properties or otherwise manipulating it; and magically, that same context object is returned from the function.</p>
+
+<p>Using <code>new</code> works similarly to the following function:  </p>
+
+<pre><code>function _new(/* constructor, param, ... */) {  
+  var  args = [].slice.call(arguments),
+       constructor = args.shift(), 
+       context = Object.create(constructor.prototype),
+       res;
+
+  res = constructor.apply(context, args);
+  return (typeof res === 'object' &amp;&amp; res != null) ? res : context;
+}
+var actor = _new(Person, "David Tennant", 44);  
+</code></pre>
+
+<p>This is very simplified, but it gives you an idea of what's going on. </p>
+
+<p>But as <a href="https://medium.com/javascript-scene/common-misconceptions-about-inheritance-in-javascript-d5d9bab29b0a">Eric Elliot</a>, <a href="http://raganwald.com/2014/07/09/javascript-constructor-problem.html">Reginald Braithwaite</a> and <a href="http://davidwalsh.name/javascript-objects">Kyle Simpson</a> point out using <code>new</code> and constructor functions can be problematic for a number of reasons.</p>
+
+<blockquote>
+  <p>“If a feature is sometimes dangerous, and there is a better option, then always use the better option.” -- Douglas Crockford</p>
+</blockquote>
+
+<h2 id="objectaccess">Object Access</h2>
+
+<p>Objects have properties.  Properties are named keys on the object that can hold values. Those values can be basic types like strings, numbers, booleans or even object types like arrays, functions or other objects stored as references.  The easiest way to access properties on an object is using the <code>.</code> operator.  </p>
+
+<pre><code>var obj = {  
+  foo: "bar", 
+  baz: 42,
+  print: function(s){ console.log(s); }
+};
+
+obj.foo;  
+obj.print("hi");  
+</code></pre>
+
+<p>You can also access object properties using the <code>[]</code> operator. The <code>[]</code> operator expects a string argument that identifies the property key you're trying to access.  Any non-string value will be coerced to a string and then used.</p>
+
+<pre><code>var obj = {};  
+obj["name"] = "David Tennant";  
+obj["age"] = 44;  
+obj["33"] = "what?";  // can only access using [] operator  
+obj[true] = "true";   // coercion to property named "true"
+
+obj.33;      // syntax error!  
+obj["33"];   // "what?"  
+obj["true"]; // "true"  
+obj.true;    // "true"  
+</code></pre>
+
+<p>This makes it easy to dynamically access properties at runtime by storing or building the property names.</p>
+
+<p>ES6 gives us a way to specify properties as shorthand, as well as computed property names.  For example,</p>
+
+<pre><code>let age = 44;  
+let obj = {  
+  name: "David Tennant",
+  // short for, who: function(){...}
+  who() { console.log("the doctor"); },
+  // short for age: age
+  age,
+  // computed property names!
+  ["hello_" + (() =&gt; "sweetie")()]: "the wife"
+};
+
+obj.who();                       // "the doctor"  
+console.log(obj.hello_sweetie);  // "the wife"  
+</code></pre>
+
+<p>I'll point out some more resources on the new ES6 object features at the end of this post.  Outside of computed property names, most of the object literal shorthand notation is just syntactic sugar to make declaring and working with objects in Javascript easier.</p>
+
+<h2 id="iteratingobjects">Iterating Objects</h2>
+
+<p>Now that our objects have all these properties, maybe we want to iterate through them.  Objects themselves are not <em>iterable objects</em> like arrays - they don't have an iterator defined for them, as access isn't as straight forward as one might think - you might iterate over the property names or property values; and what about prototype linked objects?</p>
+
+<p>You can iterate over objects using the special <code>for..in</code> loop, which does iterate over the object's property keys, not it's values.  But, <code>for..in</code> will iterate over prototype linked, enumerable properties as well, so be sure and use a <code>.hasOwnProperty()</code> to help limit the scope and recursion into the prototype chain of the object you're iterating.</p>
+
+<pre><code>var obj = { a: 1, b: 2 },  
+    obj2 = Object.create(obj, {
+      c: { value: 3, enumerable: true },
+      d: { value: 4, enumerable: true } 
+    });
+
+for (var prop in obj2) {  
+    console.log(prop);
+}
+// a b c d
+for (var prop in obj2) {  
+    if (obj2.hasOwnProperty(prop)) {
+        console.log(prop);
+    }
+}
+// c d
+</code></pre>
+
+<p>You can get access to an object's property keys using <code>Object.keys()</code>. The benefit of which, is that it only returns enumerable properties directly on the object in question - not prototype linked, enumerable properties.</p>
+
+<pre><code>Object.keys(obj2).forEach(function(p) {  
+  console.log(p + " = " + obj2[p]);
+});
+// c = 3
+// d = 4
+</code></pre>
+
+<p>For information on ES6's new object shorthand properties and computed properties, check out <a href="https://strongloop.com/strongblog/javascript-es6-object-notation/">Strongloop's article</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer">MDN</a>.</p>
+
+<p>Also take a look at Kyle Simpson's <a href="https://github.com/getify/You-Dont-Know-JS/tree/master/this%20%26%20object%20prototypes">You Don't Know JS: this &amp; Object properties</a> for more details about Javascript objects, <code>new</code> and more.</p>
+
+<p><em>In the next article I'll cover specifically Javascript objects and prototypes and talk about why you should be using composition and delegation instead of trying to mimic "class" style inheritance with <code>new</code> and constructor functions.</em></p>
+    Tags:  <span class="post-tag" id="tag-id-2"><a href="http://www.datchley.name/tag/fundamentals">fundamentals</a></span>  <span class="post-tag" id="tag-id-5"><a href="http://www.datchley.name/tag/javascript">javascript</a></span> 
+  </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

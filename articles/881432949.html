@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Faster Font Loading with Font Events</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Faster Font Loading with Font Events</h1>
+<section class="post-content" itemprop="articleBody">
+          <p>Web fonts are great and make the web a more beautiful space; however, loading them can be slow, which results in an unwanted side effect: FOIT (Flash of Invisible Text). I’ve experienced FOIT on my website, particular on mobile connections, but with the help of some homework and fantastic resources, plus some JavaScript and CSS, I managed to fix it.</p>
+
+<!--more-->
+
+<h2 id="flash-of-invisible-text">Flash of Invisible Text</h2>
+
+<p>FOIT is a result of the browser timing out by displaying text in a default font after attempting to load a web font. During its attempt to load the web font, the browser hides the text for a period of time, usually a few seconds but is known to go up as high as 30 seconds. Here’s what FOIT looked like on my site when I loaded fonts with CSS <code class="highlighter-rouge">@font-face</code> rules:</p>
+
+<figure>
+  
+    <img data-aload="/assets/images/blog/font-loading-with-font-events/foit.jpg" alt="" />
+    <noscript><img src="https://jonsuh.com/assets/images/blog/font-loading-with-font-events/foit.jpg" alt="" /></noscript>
+  
+  
+    <figcaption>FOIT when traditionally loading custom web fonts (throttled on a 3G network)</figcaption>
+  
+</figure>
+
+<p>Notice that as the page loads, the text becomes invisible in frames 2 and 3 (the type is set in Helvetica in frame 1 and Roboto in frame 4), which makes the content of the page unreadable. Although in many cases the FOIT lasted only 2–4 seconds, it’s definitely noticeable. I’ve also experienced the worst-case scenario, which is the content being permanently invisible.</p>
+
+<p>The goal here is to get the content to your users as quickly as possible at the expense of FOUT and visual changes that occur when the font becomes available.</p>
+
+<h2 id="detect-when-fonts-have-been-loaded">Detect when fonts have been loaded</h2>
+
+<p>This is where <a href="https://dev.opera.com/articles/better-font-face/" target="_blank">Font Load Events</a> come in, which is designed to do just that. <a href="https://twitter.com/bramstein" target="_blank">Bram Stein</a> created <a href="https://github.com/bramstein/fontfaceobserver" target="_blank">Font Face Observer</a>, a lightweight (2.7KB minified, 1.1KB gzipped) polyfill for the font event API to allow you to detect if and when a font has been loaded.</p>
+
+<p class="small">Alternatively I could have gone with a full-featured font loader like <a href="https://github.com/typekit/webfontloader" target="_blank">Web Font Loader</a> by Google and Typekit, but I decided to go with Font Face Observer in favor of its weight and approach.</p>
+
+<p>Load your fonts like you normally would (whether it be custom <code class="highlighter-rouge">@font-face</code> rules in your CSS or using a font service such as <a href="http://fonts.google.com/" target="_blank">Google Fonts</a> or <a href="http://typekit.com/" target="_blank">Typekit</a>). Then set up Font Face Observer for each font family:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">observer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FontFaceObserver</span><span class="p">(</span><span class="s2">"Font Name"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">weight</span><span class="p">:</span> <span class="mi">400</span>
+<span class="p">});</span>
+
+<span class="nx">observer</span><span class="p">.</span><span class="nx">check</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Font is available"</span><span class="p">);</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Font is not available"</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div>
+
+<p><code class="highlighter-rouge">check()</code> starts observing font loads and <code class="highlighter-rouge">then()</code> handles the callback when it finishes (which is done through a <a href="https://promisesaplus.com/" target="_blank">Promise</a>).</p>
+
+<p>One thing to note about Font Face Observer is that by default it will give up if the font loading exceeds 3 seconds. You can change the duration of the timeout by passing in an integer in milliseconds as the second parameter of <code class="highlighter-rouge">check()</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nx">observer</span><span class="p">.</span><span class="nx">check</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="mi">5000</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Font is available"</span><span class="p">);</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Font is not available after waiting 5 seconds"</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div>
+
+<p>Read more about how to use Font Face Observer by <a href="https://github.com/bramstein/fontfaceobserver#readme" target="_blank">reading its documentation</a>.</p>
+
+<h2 id="progressively-loading-fonts-with-font-events">Progressively loading fonts with Font Events</h2>
+
+<p>Using font events with Font Face Observer, specify a fallback font to the <code class="highlighter-rouge">body</code> as the fonts are loading, then add a class to <code class="highlighter-rouge"><span class="nt">&lt;html&gt;</span></code> once the fonts are done loading.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nt">body</span> <span class="p">{</span>
+  <span class="nl">font-family</span><span class="p">:</span> <span class="n">Helvetica</span><span class="p">,</span> <span class="n">Arial</span><span class="p">,</span> <span class="nb">sans-serif</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.fonts-loaded</span> <span class="nt">body</span> <span class="p">{</span>
+  <span class="nl">font-family</span><span class="p">:</span> <span class="s1">"Roboto"</span><span class="p">,</span> <span class="n">Helvetica</span><span class="p">,</span> <span class="n">Arial</span><span class="p">,</span> <span class="nb">sans-serif</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">roboto</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FontFaceObserver</span><span class="p">(</span><span class="s2">"Roboto"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">weight</span><span class="p">:</span> <span class="mi">400</span>
+<span class="p">});</span>
+
+<span class="nx">roboto</span><span class="p">.</span><span class="nx">check</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">getElement</span><span class="p">.</span><span class="nx">className</span> <span class="o">+=</span> <span class="s2">"fonts-loaded"</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div>
+
+<p>You can also hook this up to handle multiple font families and/or weights, which I was able to figure out with the help of the smart folks at <a href="http://www.filamentgroup.com/" target="_blank" class="no-break">Filament Group</a> and their <a href="http://www.filamentgroup.com/lab/font-events.html" target="_blank">Font Loading Revisited with Font Events</a> post by <a href="https://twitter.com/scottjehl" target="_blank" class="no-break">Scott Jehl</a>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">roboto400</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FontFaceObserver</span><span class="p">(</span><span class="s2">"Roboto"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">weight</span><span class="p">:</span> <span class="mi">400</span>
+<span class="p">});</span>
+<span class="kd">var</span> <span class="nx">roboto500</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FontFaceObserver</span><span class="p">(</span><span class="s2">"Roboto"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">weight</span><span class="p">:</span> <span class="mi">500</span>
+<span class="p">});</span>
+<span class="kd">var</span> <span class="nx">roboto700</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FontFaceObserver</span><span class="p">(</span><span class="s2">"Roboto"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">weight</span><span class="p">:</span> <span class="mi">700</span>
+<span class="p">});</span>
+
+<span class="nx">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span>
+  <span class="nx">roboto400</span><span class="p">.</span><span class="nx">check</span><span class="p">(),</span>
+  <span class="nx">roboto500</span><span class="p">.</span><span class="nx">check</span><span class="p">(),</span>
+  <span class="nx">roboto700</span><span class="p">.</span><span class="nx">check</span><span class="p">()</span>
+<span class="p">]).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">className</span> <span class="o">+=</span> <span class="s2">" fonts-loaded"</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div>
+
+<p>This method also uses a Promise. Keep in mind if you’re not using Font Face Observer’s standalone version (which comes baked with the <a href="https://github.com/bramstein/promis" target="_blank">Promise polyfill</a>), be sure to include it separately.</p>
+
+<p>The result? No sign of FOIT!</p>
+
+<figure>
+  
+    <img data-aload="/assets/images/blog/font-loading-with-font-events/foit-solved.jpg" alt="" />
+    <noscript><img src="https://jonsuh.com/assets/images/blog/font-loading-with-font-events/foit-solved.jpg" alt="" /></noscript>
+  
+  
+    <figcaption>Detecting the loading of custom web fonts with Font Face Observer (throttled on a 3G network)</figcaption>
+  
+</figure>
+
+<p>You can see that although Roboto wasn’t available until the 3rd frame, the text was visible the entire time.</p>
+
+<p>Another note about Font Face Observer—if the connection is extremely slow and it gives up on checking the font loading, the given solution above will cause the document to stay in its fallback state (in this case the text will remain set in <code class="highlighter-rouge">Helvetica, Arial, sans-serif</code>).</p>
+
+<p>We can use the catch to give the <code class="highlighter-rouge">html</code> element a unique class name to handle the timeout state.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nx">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span>
+  <span class="nx">roboto400</span><span class="p">.</span><span class="nx">check</span><span class="p">(),</span>
+  <span class="nx">roboto500</span><span class="p">.</span><span class="nx">check</span><span class="p">(),</span>
+  <span class="nx">roboto700</span><span class="p">.</span><span class="nx">check</span><span class="p">()</span>
+<span class="p">]).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">className</span> <span class="o">+=</span> <span class="s2">" fonts-loaded"</span><span class="p">;</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">className</span> <span class="o">+=</span> <span class="s2">" fonts-unavailable"</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div>
+
+<h2 id="local-fonts">Local fonts</h2>
+
+<p>By loading fonts with <code class="highlighter-rouge">@font-face</code> rules and font events, we’ve eliminated FOIT, but the user will still notice FOUT (Flash of Unstyled Text). The ideal situation is to have the text styled properly the moment it loads, which requires the user to have the font installed locally. While there’s only a small possibility the user may have it installed, we can work a solution to accommodate the ideal situation by trying to reference the local font and using fallback fonts if it fails to combat FOUT, all while still eliminating FOIT.</p>
+
+<p>Alongside the solution presented above, let’s also create a custom <code class="highlighter-rouge">font-family</code> name using a custom <code class="highlighter-rouge">@font-face</code> rule that references the local font in the <code class="highlighter-rouge">src</code>. Then include the name as the first of the <code class="highlighter-rouge">font-family</code> stack. The string inside of <code class="highlighter-rouge">local("")</code> should be the font’s family name and/or PostScript name.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">@font-face</span> <span class="p">{</span>
+  <span class="nl">font-family</span><span class="p">:</span> <span class="s1">"RobotoLocal"</span><span class="p">;</span>
+  <span class="nl">font-style</span><span class="p">:</span> <span class="nb">normal</span><span class="p">;</span>
+  <span class="nl">font-weight</span><span class="p">:</span> <span class="m">400</span><span class="p">;</span>
+  <span class="nl">src</span><span class="p">:</span> <span class="n">local</span><span class="p">(</span><span class="s1">"Roboto"</span><span class="p">),</span>
+       <span class="n">local</span><span class="p">(</span><span class="s1">"Roboto-Regular"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nt">body</span> <span class="p">{</span>
+  <span class="nl">font-family</span><span class="p">:</span> <span class="s1">"RobotoLocal"</span><span class="p">,</span> <span class="n">Helvetica</span><span class="p">,</span> <span class="n">Arial</span><span class="p">,</span> <span class="nb">sans-serif</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.fonts-loaded</span> <span class="nt">body</span> <span class="p">{</span>
+  <span class="nl">font-family</span><span class="p">:</span> <span class="s1">"Roboto"</span><span class="p">,</span> <span class="n">Helvetica</span><span class="p">,</span> <span class="n">Arial</span><span class="p">,</span> <span class="nb">sans-serif</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div>
+
+<p>This ensures that the local font will be used before the completion of the font event if the local font is available, and if it’s available, we’ve eliminated both FOIT and FOUT.</p>
+
+<h2 id="resources">Resources</h2>
+
+<p>I set up a demo page to show you font events in action.</p>
+
+<p><a href="http://labs.jonsuh.com/font-loading-with-font-events/" class="button button--labs" target="_blank">Font Loading with Font Events Demo</a></p>
+
+<p>Here are some great posts and resources on font loading and font events:</p>
+
+
+
+        </section><section class="post-author">
+          <img src="https://jonsuh.com/assets/images/avatar-512.jpg" alt="Jonathan Suh" class="post-author-image" />
+          
+          <p class="post-author-about">I’m a multidisciplinary developer &amp; designer. I’m currently with the folks at <a href="http://juiceinteractive.com/" class="no-break" target="_blank">Juice Interactive</a>, and I’ve worked with well-known brands and agencies, which include Allstate, Brian Hoff Design, Leo Burnett, and OLSON. <a href="https://jonsuh.com/about/">More about me</a>. <span class="post-author-twitter"><a href="https://twitter.com/intent/follow?screen_name=jonsuh" class="post-author-twitter-link js-social-twitter-share" target="_blank"><span class="post-author-twitter-icon"><svg class="svg-icon svg-icon-twitter">
+  <use xlink:href="/assets/images/icons.svg#svg-icon-twitter"></use>
+</svg></span> Follow @jonsuh</a></span></p>
+        </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

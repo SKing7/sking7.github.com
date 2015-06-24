@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Parashuram's blog: perf</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Parashuram's blog: perf</h1>
+<div class="post-body entry-content" id="post-body-5561033755041320468" itemprop="description articleBody"><span>
+</span><div><span>
+</span><i><span>A node script to test scroll jank on WebPageTest - (<a href="https://gist.github.com/axemclion/138a078ce4073496607d">link</a>) </span></i></div><span>
+</span><br /><span>
+</span><a href="http://www.webpagetest.org/">WebPageTest</a><span> is a great way for testing the loading performance of web page. It provides information like the resource loading waterfall, and actionable metrics like </span><a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index">speed index</a><span>.</span><p><a href="https://github.com/WPO-Foundation/webpagetest/releases/tag/WebPagetest-2.15">Recently</a>, WebPageTest also added the ability to get diagnostic information like the Chrome developer timeline, tracing events and allowed the ability to run custom scripts. With these in place, I wanted to see if I could do scroll jank testing similar to what <a href="http://github.com/axemclion/browser-perf">browser-perf</a> does.</p><p>A scroll jank test loads a page on a browser, scrolls it vertically (or horizontally) and records the average frame rate (or the number of frames per second). The number roughly corresponds to how smooth a web page feels, and helps identify any event handlers that may be causing the jank. <a href="http://www.chromium.org/developers/telemetry">Chromium's Telemetry</a> performance suite has a good scroll jank test implementation on which browser-perf is roughly based. For this exercise, I looked to reuse a lot of browser-perf code to get the measurement.</p><p>For a scroll jank test, we would typically need -<br /><ol>
+</ol>
+<h3>
+1. A way to scroll a web page</h3>
+WebPageTest has a <a href="https://github.com/WPO-Foundation/webpagetest/blob/e6d6db1fa92df42b0b629045c32bcf9a45e5a342/agent/browser/ie/pagetest/ScriptEngine.cpp">custom script parser</a> that allows execution of custom javascript. I could simply inject the <a href="https://github.com/axemclion/browser-perf/blob/80c51bd3d09c2f6d234d00455c6f2dd675c21df1/lib/actions/page_scripts/chrome_scroll.js">same javascript that I use in browser-perf</a>&nbsp; to make the page scroll. To make it simpler, we could place some restrictions on the scroll action.
+<br /><ul>
+<li>It would be enough to run the scroll only on Chrome</li>
+<li>The page would only scroll a fixed number of pixels. </li>
+<li>The scroll needs to be as close to the real scroll - should generate the same events and follow similar page. </li>
+</ul>
+This basically narrows down the script to just use the <span>window.chrome.gpuBenchmarking.smoothScrollBy</span> function, and pass a couple of flags (<span>--enable-gpu-benchmarking</span>) to Chrome to make the function available.&nbsp; </p><p><h3>
+2. A way to record the frame rates</h3>
+This is available from the
+about:tracing information. If enabled before the test, the ensure tracing information will be available as a downloadable file with a URL. To calculate frame rates from this, I simply <a href="https://github.com/axemclion/browser-perf/blob/80c51bd3d09c2f6d234d00455c6f2dd675c21df1/lib/metrics/ChromeTracingMetrics.js">re-used the parsing logic from browser-perf</a>, which in turn is based on Chromium Telementry's logic.</p><p><h4>
+Trying it on your pages</h4>
+I ran the tests on a private instance. This was a Windows 7 VM running on a HyperV on my dev box. It had WebPageTest 2.15 and was running Apache 2.2 and wptdriver.exe. I had also set the timeout in the wptdriver.ini to 10 seconds, to try out many sites quickly.</p><p>The tests can be started from the Web UI., Fill up these fields in addition to the URL<br /><ul>
+<li>Chrome Tab &gt; In command line args, enter&nbsp; <span>--enable-gpu-benchmarking --enable-thread-composting</span></li>
+<li>Chrome Tab &gt; Check the box that says "Capture Chrome Trace (about://tracing) "</li>
+<li>In the Script tab, Enter Script text box, use<br /><textarea>navigate    http://nparashuram.com/perfslides
+exec    window.chrome.gpuBenchmarking.smoothScrollBy(5000,function(){},0.5,0.5,chrome.gpuBenchmarking.DEFAULT_INPUT,"down",500);</textarea></li>
+</ul>
+You can also look at this <a href="https://gist.github.com/axemclion/138a078ce4073496607d">gist</a>, that uses the REST interface to interact with your instance of WebPageTest. Ensure that you have the required node_modules installed and the URL variables changed appropriately. </p><p><h4>
+Caveats and Future ideas </h4>
+This script is by no means perfect. There are multiple factors that may add inaccuracies to the results.<br /><ol>
+<li>The tracing information is capture not just while scrolling, but also when loading a page. If the page has components like auto-scroll, this would impact the frame rates. I am working on seeing if I could manually start and stop collecting traces (<a href="https://github.com/WPO-Foundation/webpagetest/blob/a591b2a23f4c098fb7c072b26b6a27cbb1a5a745/agent/browser/chrome/extension/release/wpt/background.js#L14013">code</a>).</li>
+<li>On Webpagetest.org, the script takes a really long time to run. I am trying to figure out how to stop the script slowly, using a permutation of execAndWait, waitForJS, etc. No luck yet :(</li>
+<li>Need to use the full scrolling script - it does things like check if the scroll is completed, allow horizontal scrolling, control the scroll speed, etc. </li>
+<li>The test script does not scroll certain pages at certain resolutions - no idea why - this needs investigation</li>
+<li>To run this across multiple browsers, the frame rates are calculated using <a href="https://github.com/axemclion/browser-perf/blob/80c51bd3d09c2f6d234d00455c6f2dd675c21df1/lib/probes/RafBenchmarkingProbe.js#L15">requestAnimationFrame trick</a>. I was not able to make "Custom Metrics" access a variable that I was setting in a Script tag.&nbsp;</li>
+</ol>
+<br />I would love to improve this scripts and find answers to the questions above. You can also try out <a href="http://github.com/axemclion/browser-perf">browser-perf</a> to run scroll tests on a selenium server - the mechanism is very similar and the <a href="https://github.com/axemclion/browser-perf/wiki">wiki pages</a> have more information.&nbsp; <br /><ol>
+</ol>
+</p>
+</div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

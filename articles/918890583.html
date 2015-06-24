@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>We Tested How Googlebot Crawls Javascript And Here's What We Learned</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>We Tested How Googlebot Crawls Javascript And Here's What We Learned</h1>
+<div itemprop="articleBody" class="body-content"><span>
+				
+							</span><span>
+							
+							</span><p><img class="aligncenter size-large wp-image-199963" src="http://searchengineland.com/figz/wp-content/seloads/2014/08/google-algorithm-blue-ss-1920-800x450.jpg" alt="google-algorithm-blue-ss-1920" width="800" height="450" /></p><span>
+</span><h2>TL;DR</h2><span>
+</span><p>1. We ran a series of&nbsp;tests that verified Google is able to execute and index JavaScript with a multitude of implementations. We also confirmed Google is able to render the entire page and read&nbsp;the DOM, thereby indexing dynamically generated content.</p><span>
+</span><p>2. SEO signals in the DOM (page titles, meta descriptions, canonical tags, meta robots tags, etc.) are respected. Content dynamically inserted in the DOM is also crawlable and indexable. Furthermore, in certain cases, the DOM signals may even take precedence over contradictory statements in HTML source code. This will need more work, but was the case for several of our tests.</p><span>
+</span><h2>Introduction: Google Executing Javascript &amp; Reading The DOM</h2><span>
+</span><p>As early as 2008, Google <a href="http://searchengineland.com/google-now-crawling-and-indexing-flash-content-14299">was successfully crawling JavaScript</a>, but probably in a limited fashion.</p><span>
+</span><p>Today, it’s clear that Google has not only evolved what types of JavaScript they&nbsp;crawl and index, but they’ve made significant strides in rendering complete web pages (especially in the last 12-18 months).</p><span>
+</span><p>At Merkle, our SEO technical team wanted to better understand what types of JavaScript events Googlebot could crawl and index. We found some eye-opening results and verified that Google is not only executing various types of JavaScript events, they are also indexing dynamically generated content. How? Google is reading the DOM.</p><span>
+</span><h2>What Is The DOM?</h2><span>
+</span><p>Far too few SEOs have an understanding of the <a href="http://www.w3.org/TR/DOM-Level-2-Core/introduction.html" target="_blank">Document Object Model</a>, or DOM.</p><span>
+</span><div id="attachment_220180" class="wp-caption aligncenter"><a href="http://searchengineland.com/figz/wp-content/seloads/2015/05/Microsoft-PowerPoint-2.jpg"><img class="wp-image-220180 size-medium" src="http://searchengineland.com/figz/wp-content/seloads/2015/05/Microsoft-PowerPoint-2-600x333.jpg" alt="When a browser requests a web page" width="600" height="333" /></a><p class="wp-caption-text">What happens when a browser requests a web page, and how the DOM is involved.</p></div><span>
+</span><p>As used in web browsers, the DOM is essentially an application programming interface, or API, for markup and structured data such as HTML and XML. It’s the interface that allows web browsers&nbsp;to assemble structured documents.</p><span>
+</span><p>The DOM also defines how that structure is accessed and manipulated. While the DOM is a language-agnostic API (not tied to a specific programming language or library), it is most commonly used in web applications for JavaScript and dynamic content.</p><span>
+</span><p>The DOM represents the interface, or “bridge,” that connects web pages and programming languages. The HTML is parsed, JavaScript is executed, and the result is the DOM. The content of a web page is not (just) source code, it’s the DOM. This makes it pretty important.</p><span>
+</span><div id="attachment_220182" class="wp-caption aligncenter"><a href="http://searchengineland.com/figz/wp-content/seloads/2015/05/Microsoft-PowerPoint.jpg"><img class="size-medium wp-image-220182" src="http://searchengineland.com/figz/wp-content/seloads/2015/05/Microsoft-PowerPoint-600x360.jpg" alt="How JavaScript works with the DOM interface." width="600" height="360" /></a><p class="wp-caption-text">How JavaScript works with the DOM interface.</p></div><span>
+</span><p>We were thrilled to discover Google’s ability to read the DOM and interpret signals and content that were&nbsp;dynamically inserted, such as title tags, page text, heading tags&nbsp;and&nbsp;meta annotations like&nbsp;rel=canonical. Read on for the full details.</p><span>
+</span><h2>The Series Of Tests And&nbsp;Results</h2><span>
+</span><p>We created a series of tests to examine how different JavaScript functions would be crawled and indexed, isolating the behavior to Googlebot. Controls were created to make sure activity to the URLs would be understood in isolation. Below, let’s break down a few of the more interesting test results in detail. They are divided into five&nbsp;categories:</p><span>
+</span><ol>
+<li>JavaScript Redirects</li>
+<li>JavaScript Links</li>
+<li>Dynamically Inserted&nbsp;Content</li>
+<li>Dynamically Inserted&nbsp;Meta Data and&nbsp;Page Elements</li>
+<li>An Important Example with rel=“nofollow”</li>
+</ol><span>
+</span><div id="attachment_220184" class="wp-caption aligncenter"><img class="has-border wp-image-220184 size-large" src="http://searchengineland.com/figz/wp-content/seloads/2015/05/Google-Chrome-706x600.jpg" alt="One example of a page used for testing Googlebot's abilities to understand JavaScript." width="706" height="600" /><p class="wp-caption-text">One example of a page used for testing Googlebot’s abilities to understand JavaScript.</p></div><span>
+</span><h3>1. JavaScript Redirects</h3><span>
+</span><p>We first tested common JavaScript redirects, varying how the URL was represented in different ways. The method we chose was the <em>window.location</em> function. Two tests were performed: Test&nbsp;A&nbsp;included the absolute URL attributed in the <em>window.location</em> function. Test B&nbsp;used a relative URL.</p><span>
+</span><p><strong>Result:</strong> The redirects were quickly followed by Google.&nbsp;From an&nbsp;indexing standpoint, they were interpreted as 301s — the end-state URLs replaced the redirected URLs in Google’s index.</p><span>
+</span><p>In a subsequent test, we utilized an authoritative page and implemented a JavaScript redirect to a new page on the site with exactly the same content. The original URL ranked on the first&nbsp;page of Google for popular queries.</p><span>
+</span><p><strong>Result:</strong> As expected, the redirect was followed by Google and the original page dropped from the index. The new URL was indexed and immediately ranked in the same position&nbsp;for the same queries. This surprised us, and&nbsp;seems to indicate&nbsp;that JavaScript redirects can (at times) behave exactly like permanent 301 redirects from a ranking standpoint.</p><span>
+</span><p>The next time your client wants to implement JavaScript redirects for their site move, your answer might not need to&nbsp;be, “please don’t.” It appears there is a transfer of ranking signals in this relationship.&nbsp;Supporting this finding&nbsp;is a <a href="https://support.google.com/webmasters/answer/2721217?hl=en">quote from Google’s guidelines</a>:</p><span>
+</span><blockquote><p><em>Using JavaScript to redirect users can be a legitimate practice. For example, if you redirect users to an internal page once they’re logged in, you can use JavaScript to do so. When examining JavaScript or other redirect methods to ensure your site adheres to our guidelines, consider the intent. Keep in mind that 301 redirects are best when moving your site, but you could use a JavaScript redirect for this purpose if you don’t have access to your website’s server.</em></p></blockquote><span>
+</span><h3>2. JavaScript Links</h3><span>
+</span><p>We tested several different types of JavaScript links, coded various ways.</p><span>
+</span><p>We tested dropdown menu links. Historically search engines haven’t been able to follow these types of links consistently. Our test sought to identify if the <em>onchange</em> event handler would be followed. Importantly, this is a specific&nbsp;type of execution point:&nbsp;we are asking for an interaction to change something, not a forced action like the JavaScript redirects above.</p><span>
+</span><div id="attachment_220185" class="wp-caption aligncenter"><img class="has-border wp-image-220185 size-full" src="http://searchengineland.com/figz/wp-content/seloads/2015/05/Google-Chrome-2.jpg" alt="An example drop down language selector on a Google for Work page." width="579" height="311" /><p class="wp-caption-text">An example drop down language selector on a Google for Work page.</p></div><span>
+</span><p><strong>Result:</strong> The links were fully crawled and followed.</p><span>
+</span><p>We also tested standard&nbsp;JavaScript links. These are the most common types of JavaScript links that SEOs have traditionally recommended be changed to plain text. These tests included JavaScript links coded with:</p><span>
+</span><ul>
+<li>Functions&nbsp;outside of the <em>href</em> Attribute-Value Pair (AVP) but within the <em>a</em> tag (“<em>onClick”</em>)</li>
+<li>Functions inside the <em>href</em> AVP (“<em>javascript:window.location</em>“)</li>
+<li>Functions outside of the <em>a</em> but called within the <em>href</em> AVP (<em>“javascript:openlink()”</em>)</li>
+<li>etc.</li>
+</ul><span>
+</span><p><strong>Result:</strong> The links were&nbsp;fully crawled and followed.</p><span>
+</span><p>Our next test was to examine further event handlers like the <em>onchange</em> test above. Specifically, we were looking at the idea of mouse movements as the event handler and then hiding the URL with variables that only get executed when the event handler (in this case <em>onmousedown</em> and <em>onmouseout</em>) is fired.</p><span>
+</span><p><strong>Result:</strong> The links were crawled and followed.</p><span>
+</span><p>Concatenated links:&nbsp;we knew Google can&nbsp;execute JavaScript, but wanted to confirm they were reading the variables within the code. In this test, we concatenated a string of characters that created a URL once it was&nbsp;constructed.</p><span>
+</span><p><strong>Result:</strong> The link was crawled and followed.</p><span>
+</span><h3>3. Dynamically Inserted&nbsp;Content</h3><span>
+</span><p>This is clearly an important one: dynamically inserted text, images, links and navigation. Quality text content is critical to a search engine’s understanding of the topic and content of a&nbsp;page. In this era of dynamic websites it’s even more important SEOs get on top of this.</p><span>
+</span><p>These tests were designed to check for dynamically inserted text in two different situations.</p><span>
+</span><p>1. Test the search engine’s ability to account for dynamically inserted text when the text is within the HTML source of the page.</p><span>
+</span><p>2. Test the search engine’s ability to account for dynamically inserted text when the text is outside the HTML source of the page (in an external JavaScript file).</p><span>
+</span><p><strong>Result:</strong> In both cases, the text was crawled and indexed, and the page ranked for the content. Winning!</p><span>
+</span><p>For more on this, we tested a client’s global navigation that is coded in JavaScript, with all links&nbsp;inserted with a <em>document.writeIn</em> function, and confirmed they were fully crawled and followed. It should be noted that this type of functionality by Google explains how sites built using the AngularJS framework and the HTML5 History API (pushState) can be rendered and indexed by Google, ranking as well as conventional static HTML pages.&nbsp;That’s why it is important to <a href="http://searchengineland.com/google-webmaster-guidelines-updated-warn-blocking-css-javascript-files-206714">not block Googlebot</a> from accessing external files and JavaScript assets, and also likely why Google is moving away from its&nbsp;<a href="http://searchengineland.com/google-may-discontinue-ajax-crawlable-guidelines-216119">supporting Ajax for SEO</a>&nbsp;guidelines. Who needs HTML snapshots when you can simply render the entire page?</p><span>
+</span><p>Our tests found the same result regardless of content type. For example,&nbsp;images&nbsp;were crawled and indexed when loaded in the DOM.&nbsp;We even created a test whereby we dynamically generated <a href="https://developers.google.com/structured-data/breadcrumbs" target="_blank">data-vocabulary.org&nbsp;structured data markup for breadcrumbs</a> and inserted it in the DOM.&nbsp;Result?&nbsp;Successful breadcrumbs rich snippets in Google’s SERP.</p><span>
+</span><p>Of note, Google now <a href="http://googlewebmastercentral.blogspot.com/2015/01/new-structured-data-testing-tool.html" target="_blank">recommends JSON-LD markup</a> for some structured data. More to come I’m sure.</p><span>
+</span><h3>4. Dynamically Inserted Meta Data &amp;&nbsp;Page Elements</h3><span>
+</span><p>We dynamically inserted&nbsp;in the DOM various tags that are critical for SEO:</p><span>
+</span><ul>
+<li>Title&nbsp;elements</li>
+<li>Meta descriptions</li>
+<li>Meta robots</li>
+<li>Canonical tags</li>
+</ul><span>
+</span><p><strong>Result:</strong>&nbsp;In all cases the tags were crawled&nbsp;respected, behaving exactly as HTML elements in source code should.</p><span>
+</span><p>An interesting follow-up test will help us understand order of precedence. When conflicting signals exist, which one wins? What happens if there’s a <em>noindex,nofollow</em> in source code and a <em>noindex,follow</em> in the DOM? How does the HTTP x-robots response header behave as another variable in this arrangement? This will be a part of future comprehensive testing. However, our tests showed that Google can disregard the tag in source code in favor of the DOM.</p><span>
+</span><h3>5. An Important Example with rel=”nofollow”</h3><span>
+</span><p>One example proved instructive. We wanted to test how Google would react to link-level nofollow attributes placed in source code and placed in the DOM. We also created a control without nofollow applied at all.</p><span>
+</span><div id="attachment_220188" class="wp-caption aligncenter"><a href="http://searchengineland.com/figz/wp-content/seloads/2015/05/Google-Chrome-3.jpg"><img class="wp-image-220188 size-medium" src="http://searchengineland.com/figz/wp-content/seloads/2015/05/Google-Chrome-3-600x203.jpg" alt="Our nofollow test isolating source code vs DOM generated annotations." width="600" height="203" /></a><p class="wp-caption-text">Our nofollow test isolating source code vs DOM generated annotations.</p></div><span>
+</span><p>The nofollow in source code worked as expected (the link wasn’t followed). The nofollow in the DOM did not work (the link was followed, and the page indexed). Why? Because the modification of the <em>a&nbsp;href</em> element in the DOM happened too late: Google already crawled the link and queued the URL before it executed the JavaScript function that adds the <em>rel=“nofollow”</em> tag. However, if the entire <em>a href</em> element with nofollow is inserted in the DOM, the&nbsp;nofollow is seen at the same time as the link (and its URL) and is therefore respected.</p><span>
+</span><h2>Ramifications</h2><span>
+</span><p>Historically, SEO recommendations have centered around having&nbsp;‘plain text’ content whenever possible. Dynamically generated content, AJAX, and JavaScript links have been a detriment to SEO for the major search engines. Clearly, that is no longer the case for Google. Javascript links work in a similar manner to plain HTML links (at face value, we do not know what’s happening behind the scenes in the algorithms).</p><span>
+</span><ul>
+<li>Javascript redirects are treated in a similar manner as 301 redirects.</li>
+<li>Dynamically inserted content, and even meta signals such as rel canonical annotations, are treated in an equivalent manner whether in the HTML source, or fired after the initial HTML is parsed with JavaScript in the DOM.</li>
+<li>Google appears to fully render the page and sees the DOM and not just&nbsp;the source code anymore. Incredible! (Remember to allow Googlebot access to those&nbsp;external files and JavaScript assets.)</li>
+</ul><span>
+</span><p>Google has innovated at a frightening pace and left the other search engines in the dust. We hope to see the same type of innovation from other engines if they are to stay competitive and relevant in the new era of web development, which only means more HTML5, more JavaScript, and more dynamic websites.</p><span>
+</span><p>SEOs, too, who haven’t kept pace with the underlying concepts here and abilities of Google would do well to study up and evolve their consulting to reflect current technologies. If you don’t take the DOM into consideration, you may be missing half of the picture.</p><span>
+							
+							</span><hr /><span>
+														</span><p><em>Some opinions expressed in this article may be those of a guest author and not necessarily Search Engine Land. Staff authors are listed <a href="http://searchengineland.com/staff">here</a>.</em></p><span>
+							</span><hr /><span>
+														
+							</span><div><span>
+	</span><a href="http://searchmarketingexpo.com/east/?utm_source=ml&amp;utm_medium=display&amp;utm_campaign=smx+east+2015&amp;utm_content=module" onclick="_gaq.push(['_trackEvent','advertising','click','story+smxeast15']);"><img src="http://searchengineland.com/images/partners/east15_800x250_b.jpg" /></a><span>
+	</span><p>
+		Be a part of the world's largest search marketing conference, Search Engine Land's <a href="http://searchmarketingexpo.com/east/?utm_source=sel&amp;utm_medium=module&amp;utm_campaign=smx+east+2015" onclick="_gaq.push(['_trackEvent','advertising','click','story+smxeast15']);">SMX East</a>. The robust <a href="http://searchmarketingexpo.com/east/agenda/?utm_source=sel&amp;utm_medium=module&amp;utm_campaign=smx+east+2015" onclick="_gaq.push(['_trackEvent','advertising','click','story+smxeast15']);">agenda</a> covers the latest tactics in paid search, SEO, mobile, analytics and more. <a href="http://searchmarketingexpo.com/east/register/?utm_source=sel&amp;utm_medium=module&amp;utm_campaign=smx+east+2015" onclick="_gaq.push(['_trackEvent','advertising','click','story+smxeast15']);">Register today</a> and save $300, or come as a team and save 10%-20%.</p><span>
+		</span><span>
+</span></div><span>
+							
+							</span><div class="about-author row"><span>
+	</span><h3>About The Author</h3><span>
+	</span><div class="information col-lg-12 col-md-12 col-sm-12"><span>
+		</span><div class="author-module"><span>
+			</span><div class="avatar"><span>
+			</span><img src="http://searchengineland.com/images/authors/audette-lg.jpg" /><span>			</span></div><span>
+			</span><div class="about"><span>
+				</span><span>
+				</span><span>
+				Adam Audette is SVP Organic Search at </span><a href="http://www.rimmkaufman.com/about/people/management-team/adam-audette">Merkle</a><span>. During his 15 year career in digital marketing, Adam has held various executive management roles on both the agency and in-house sides. He founded his own agency which was acquired by RKG (now part of Merkle Group). A well known expert on the topics of SEO and e-commerce, Adam and his team have helped drive growth for brands including Zappos, Amazon, HSN, Walmart, Urban Outfitters, UnderArmour, Google, Intuit, Apollo Group, Symantec, Edmunds, National Geographic, Experian and many other household names.			</span></div><span>
+		</span></div><span>
+	</span></div><span>
+</span></div><span>							
+							</span><br /><span>
+							
+							</span><span>
+				
+							</span><h6>(Some images used under license from <a href="http://www.shutterstock.com/" rel="nofollow">Shutterstock.com</a>.)</h6><span>
+							
+						</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Hero Image Custom Metrics</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Hero Image Custom Metrics</h1>
+<div id="post-4284" class="post-4284 post type-post status-publish format-standard hentry category-browsers category-performance category-speedcurve category-web-development tag-custom-metrics tag-filmstrips tag-hero-image tag-responsive tag-rwd tag-waterfalls"><span>
+        	            	</span><span>
+            
+			</span><!-- .entry-meta --><span>
+
+			</span><p>The takeaways from this post are:</p><span>
+</span><ol>
+<li>If your website has a hero image, make sure it loads and renders as early as possible. Many designs that feature a hero image suffer from HID (Hero Image Delay) mostly due to blocking scripts and stylesheets.</li>
+<li>You should add custom metrics to your website to make sure you know how quickly (or slowly) important content gets displayed. I’ll describe a new technique for measuring when images are <em>rendered</em> so you can track that as a custom metric.</li>
+</ol><span>
+</span><h2>HID (Hero Image Delay)</h2><span>
+</span><p>The size of websites is <a title="HTTP Archive" href="http://httparchive.org/trends.php#bytesTotal&amp;reqTotal">growing</a>. The average website contains over 2 MB of downloaded content. Of that, <a title="HTTP Archive" href="http://httparchive.org/interesting.php#bytesperpage">1.3 MB (65%) is images</a>. Many websites use images as a major design element in the page – these are called <em>hero images</em>. Because these hero images are critical design elements, it’s important that they render quickly, and yet often hero images load too late frequently getting pre-empted by less critical resources on the page.</p><span>
+</span><p>Popular websites that use hero images include <a href="https://jawbone.com/">Jawbone</a>, <a href="http://www.homeaway.com/">Homeaway</a>, and <a href="https://www.airbnb.com/">Airbnb</a>. Using <a href="https://speedcurve.com/features/responsive/">SpeedCurve’s Responsive Design Dashboard</a>, we can see how their hero images load over time across different screen sizes.</p><span>
+</span><h3>Jawbone</h3><span>
+</span><p>Jawbone’s site features an image of a woman in a sweater wearing the Up fitness tracker. While this picture is stunning, it takes 2.5-3.5 seconds before it’s displayed.</p><span>
+</span><p><a href="http://stevesouders.com/images/hero-jawbone.jpg"><img alt="" src="http://stevesouders.com/images/hero-jawbone.jpg" width="100%" /></a></p><span>
+</span><p>Figure 1: Jawbone Responsive Design Dashboard</p><span>
+</span><p>Often we think that’s the price we have to pay for rich images like this – they simply take longer to download. But investigating further we find that’s often not the cause of the delayed rendering. Looking at the <a href="https://speedcurve.com/test/150427_9S_16/hja21ghdsja6743ghjfdskjhs2133j/">waterfall chart for Jawbone</a> in Figure 2, we see that the image loaded in ~700 ms. (Look for the white URL ending in “sweater-2000.v2.jpg”.)</p><span>
+</span><p>So why didn’t the hero image get rendered until almost 2600 ms? First, it’s referenced as a background image in a stylesheet. That means the browser’s <a href="http://www.stevesouders.com/blog/2013/11/07/prebrowsing/">preloader</a> can’t find it for early downloading and the browser isn’t even aware of the image’s URL until after the stylesheet is downloaded and its rules are parsed and applied to the page. All of this means the image doesn’t even start downloading until ~650 ms after the HTML document arrives.&nbsp;Even after the image finishes downloading it’s blocked from rendering for ~550 ms by the scripts in the page.</p><span>
+</span><p><a href="https://speedcurve.com/test/150427_9S_16/hja21ghdsja6743ghjfdskjhs2133j/"><img class="aligncenter" alt="" src="http://stevesouders.com/images/hero-jawbone-waterfall.jpg" width="100%" /></a></p><span>
+</span><p>Figure 2: Jawbone waterfall</p><span>
+</span><h3>Homeaway</h3><span>
+</span><p>Homeaway’s entire front page is one big hero image. Without the image, the page looks broken with a gray background and a floating form. For larger screen sizes, the hero image isn’t shown for over 2.5 seconds.</p><span>
+</span><p><a href="http://stevesouders.com/images/hero-homeaway.jpg"><img class="aligncenter" alt="" src="http://stevesouders.com/images/hero-homeaway.jpg" width="100%" /></a></p><span>
+</span><p>Figure 3: Homeaway Responsive Design Dashboard</p><span>
+</span><p>The <a href="https://speedcurve.com/test/150427_YF_132/hja21ghdsja6743ghjfdskjhs2133j/">Homeaway waterfall</a> in Figure 4 shows that the (initial, low-res version of the) hero image loads early and quickly (request #9). But then it’s blocked from rendering for over 2 seconds by other scripts in the page.</p><span>
+</span><p><a href="https://speedcurve.com/test/150427_YF_132/hja21ghdsja6743ghjfdskjhs2133j/"><img class="aligncenter" alt="" src="http://stevesouders.com/images/hero-homeaway-waterfall.jpg" width="80%" /></a></p><span>
+</span><p>Figure 4: Homeaway waterfall</p><span>
+</span><h3>Airbnb</h3><span>
+</span><p>Similar to Homeaway, Airbnb uses a beautiful hero image to cover nearly the entire front page. But again, this critical hero image is blocked from rendering for 1.5 to 2.5 seconds.</p><span>
+</span><p><a href="http://stevesouders.com/images/hero-airbnb.jpg"><img class="aligncenter" alt="" src="http://stevesouders.com/images/hero-airbnb.jpg" width="100%" /></a></p><span>
+</span><p>Figure 5: Airbnb Responsive Design Dashboard</p><span>
+</span><p>Once again, the hero image is blocked from rendering because of the many scripts on the page, but <a href="https://speedcurve.com/test/150427_6A_PR/hja21ghdsja6743ghjfdskjhs2133j/">Airbnb’s waterfall</a> shows an interesting effect of the preloader. While the preloader, overall, makes pages load much quicker, in this case it actually hurts the user experience for Airbnb users. The Airbnb home page puts several scripts at the bottom of the page, but doesn’t load them asynchronously. While <a href="https://developer.yahoo.com/blogs/ydn/high-performance-sites-rule-6-move-scripts-bottom-7200.html">moving scripts to the bottom</a> was a good performance optimization in 2007, that was before preloaders were created. Today, for optimal performance it’s important to&nbsp;<a href="http://www.stevesouders.com/blog/2009/04/27/loading-scripts-without-blocking/">load scripts asynchronously</a>.</p><span>
+</span><p>In this case, when Airbnb is loaded in a modern browser those scripts at the bottom get scheduled earlier by the preloader and end up being requests 3, 5, 6 and 9. They add up to 238K of gzipped JavaScript. Ungzipped it turns into 797K of JavaScript that has to be parsed and executed before the hero image can be displayed.</p><span>
+</span><p><a href="https://speedcurve.com/test/150427_6A_PR/hja21ghdsja6743ghjfdskjhs2133j/"><img class="aligncenter" alt="" src="http://stevesouders.com/images/hero-airbnb-waterfall.jpg" width="80%" /></a></p><span>
+</span><p>Figure 6: Airbnb waterfall</p><span>
+</span><h2>Image Custom Metrics</h2><span>
+</span><p>Most of the performance metrics used today focus on the mechanics of the browser (window.onload) or network performance (time to first byte and Resource Timing). Unfortunately, these don’t tell us enough about what matters the most: the user’s experience. When does the page’s content get shown to the user so she can start interacting with the page?</p><span>
+</span><p>To measure what matters, we need to shift our focus to metrics that better represent the user experience. These&nbsp;metrics are specific to each individual website measuring the most important design elements on each page. Because they must be created on a case-by-case basis we call them&nbsp;<em>custom metrics</em>.&nbsp;The earliest and most well known example of a custom metric is in a <a href="https://blog.twitter.com/2012/improving-performance-on-twittercom">2012 article from Twitter</a> where they describe how their most important performance metric is Time to First Tweet, defined as “the amount of time it takes from navigation (clicking the link) to viewing the first Tweet on each page’s timeline.” Note that they don’t talk about how long it takes to <em>download</em> the tweets. Instead, they care about when the tweet can be <em>viewed</em>.</p><span>
+</span><p>Sites that have hero images need to do the same thing: focus on when the hero image is <em>viewed</em>. This is trickier than it sounds. There are no hooks in today’s browsers that can be used to know when content is viewable. But we can find a solution by thinking about the three things that block an image from rendering: synchronous scripts,&nbsp;stylesheets, and&nbsp;the image itself being slow.</p><span>
+</span><p>Talking to some web performance experts (thanks <a href="https://twitter.com/bluesmoon">Philip</a>, <a href="https://twitter.com/patmeenan">Pat</a>, <a href="https://twitter.com/scottjehl">Scott</a>, <a href="https://twitter.com/andydavies">Andy</a>&nbsp;and <a href="https://twitter.com/paul_irish">Paul</a>!), I identified five candidate techniques for measuring when an image is displayed:</p><span>
+</span><span>
+</span><p>I created a <a href="http://stevesouders.com/tests/image-custom-metric.php">test page</a> that has a synchronous script, a stylesheet, and an image that are programmed to take a specific amount of time to download (3 seconds, 5 seconds, and 1 second respectively). Running them in WebPagetest I confirmed that the image isn’t displayed until after 5 seconds. I then implemented each of the techniques and found that:</p><span>
+</span><ul>
+<li>Resource Timing reports a time of ~1.5 seconds, which is accurate for when the image <em>downloads</em> but is not accurate for measuring when the image is viewable.</li>
+<li>The image onload handler, mutation observer, and polling techniques all report a time of ~3 seconds which is too early.</li>
+<li>Only the inline script timer technique reports a time that matches when the image is displayed.</li>
+</ul><span>
+</span><p>This test page addresses the scenarios of a synchronous script and stylesheet. We still need to find an accurate measurement technique for the case when the image itself is slow to load. A <a href="http://stevesouders.com/tests/image-custom-metric.php?s=7">slight variation of the test page</a> includes a 7-second image and, of the five techniques, only Resource Timing and image onload handler correctly measure when the image is displayed – the other techniques report a time that is too early. Of those two, image onload is preferred over Resource Timing because it’s simpler and more widely supported.</p><span>
+</span><p><em>Therefore, to create a custom metric that determines when an image is displayed you should take the max of the values reported by the inline script timer and image onload.</em></p><span>
+</span><p>We’re all pretty familiar with image onload handlers. The inline script timer is simple as well – it’s just an inline script that records the time immediately following the IMG tag. Here’s what the code looks like:</p><span>
+</span><pre class="codesample">&lt;img src="hero.jpg" onload="performance.mark('hero1')"&gt;
+&lt;script&gt;performance.mark('hero2')&lt;/script&gt;</pre><span>
+</span><p>The code above takes advantage of the&nbsp;<a href="http://www.w3.org/TR/user-timing/">User Timing API</a>. It’s easy to polyfill for browsers that don’t support it; I recommend using&nbsp;<a href="https://gist.github.com/pmeenan/5902672#file-user-timing-js">Pat Meenan’s polyfill</a>. You need to take the max value of the hero1 and hero2 marks; this can be done either on the client or on the backend server that’s collecting your metrics. Refer to my&nbsp;<a href="http://stevesouders.com/tests/image-custom-metric.php">test page</a>&nbsp;to see live code of all five measurement techniques.</p><span>
+</span><p>The most important thing to do is get your hero images to render quickly. Use Custom Metrics to make sure you’re doing that well.</p><span>
+            
+            			
+		</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

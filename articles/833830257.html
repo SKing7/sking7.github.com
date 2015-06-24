@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>  Using The CSS :target Selector To Create JavaScript-less UI Effects : Adobe Dreamweaver Team Blog</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>  Using The CSS :target Selector To Create JavaScript-less UI Effects : Adobe Dreamweaver Team Blog</h1>
+<div class="entry-content"><span>
+							
+							
+                </span><p>Instead of linking to new pages, sometimes links (<code>&lt;a&gt;</code> elements) reference sections, fragments or other elements of the same page. These kind of links are prevalent in one-page website navigation.</p><span>
+</span><p>The CSS <code>:target</code> pseudo-class selector is used to select and style the target of an internal link in a document, the fragment of the page referenced in a link’s <code>href</code> attribute.</p><span>
+</span><p>For example, if you have an anchor tag linking to a “further reading” section of an article…</p><span>
+</span><blockquote><p>&lt;a href=”#further-reading” title=”Further reading resources” /&gt;</p>
+<p>&lt;!– … –&gt;</p>
+<p>&lt;section id=”further-resources” &gt;</p>
+<p>&lt;!— … —&gt;</p>
+<p>&lt;/section&gt;</p></blockquote><span>
+</span><p>…you can use the <code>:target</code> selector to highlight this section when the link is clicked to guide the reader’s eye to it. This highlighting technique is known as the yellow fade technique and was first <a href="https://signalvnoise.com/archives/000558.php" target="_blank">introduced by 37 Signals</a>.</p><span>
+</span><blockquote><p>#further-resources:target {</p>
+<p>animation: highlight .8s ease-out;</p>
+<p>}</p>
+<p>@keyframes highlight {</p>
+<p>0% { background-color: #FFFF66; }</p>
+<p>100% { background-color: #FFFFFF; }</p>
+<p>}</p></blockquote><span>
+</span><span>
+</span><p>The technique requires that you use a CSS animation to show the color for only a short period of time and then remove it again—the point is to highlight it only enough to guide the reader to it. Check out <a href="http://codepen.io/SaraSoueidan/pen/ogBWmL?editors=110" target="_blank">the live demo showing this technique in action</a>:</p><span>
+</span><p class="codepen" data-height="268" data-theme-id="0" data-slug-hash="ogBWmL" data-default-tab="result" data-user="SaraSoueidan">See the Pen <a href="http://codepen.io/SaraSoueidan/pen/ogBWmL/">ogBWmL</a> by Sara Soueidan (<a href="http://codepen.io/SaraSoueidan">@SaraSoueidan</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><span>
+</span><p>The above example applied temporary styles to the target of the link. But if you apply more persistent styles, you can create effects scaling elements up, changing their visibility, and much more.</p><span>
+</span><p>I have recently used this technique on <a href="http://sarasoueidan.com/" target="_blank">my own website</a> to show a search overlay for my readers to search for articles in. As part of the main navigation, there is a link that links to the search overlay wrapper—a <code>&lt;div&gt;</code> element, containing the search input field.</p><span>
+</span><blockquote><p>&lt;a href=”#search”&gt;Search&lt;/a&gt;</p>
+<p>&lt;!– … –&gt;</p>
+<p>&lt;div id=”search”&gt;</p>
+<p>&lt;a href=”#” class=”overlay-close”&gt;Close&lt;/a&gt;</p>
+<p>&lt;h4&gt;Search articles archive.&lt;/h4&gt;</p>
+<p>&lt;!– … –&gt;</p>
+<p>&lt;/div&gt;</p></blockquote><span>
+</span><p>The search overlay is initially hidden using <code>opacity: 0;</code>. It is positioned so that is remains fixed relative to the viewport using <code>position: fixed;</code>. And in order to make sure that it doesn’t block pointer events from the rest of the page “beneath” it, <code>pointer-events</code> are set to <code>none</code>.</p><span>
+</span><blockquote><p><strong><strong>&nbsp;</strong></strong>#search-overlay {</p>
+<p>position: fixed;</p>
+<p>top: 1em;</p>
+<p>bottom: 1em;</p>
+<p>right: 1em;</p>
+<p>left: 1em;</p>
+<p>/* … */</p>
+<p>opacity: 0;</p>
+<p>transition: opacity .3s ease-in-out;</p>
+<p>pointer-events: none;</p>
+<p>}</p></blockquote><span>
+</span><p>Once the Search anchor is clicked, and using the <code>:target</code> selector, the overlay is shown and pointer events are dispatched on it again. In order to show the overlay smoothly, a transition is applied that creates a fading in effect.<strong><strong><br /></strong></strong></p><span>
+</span><blockquote><p>#search-overlay:target {</p>
+<p>opacity: 1;</p>
+<p>pointer-events: auto;</p>
+<p>}</p></blockquote><span>
+</span><p>The search overlay fades in. Mission…half accomplished—we need to make sure it fades out again when the user requests so.</p><span>
+</span><p>The overlay container needs to contain another link that will allow us to go back to the main page. To do that, we could give the <code>body</code> or <code>html</code> element an ID, and then have the Close link to that ID—this would do it. However, that is not necessary. By linking to no particular fragment using only the <code>#</code> as a value, you’re practically linking to the main page, but you gain the advantage of not adding any fragment identifier to your page’s URL.</p><span>
+</span><p>Once the Close link is clicked, we want the search overlay to fade out, so we’re going to add a transition again to the <code>#search-overlay:target</code> to make sure its opacity transitions to <code>0</code>. You can, of course, avoid this step if you just want to make it disappear instantly when the user closes it.</p><span>
+</span><blockquote><p>#search-overlay:target {</p>
+<p>opacity: 1;</p>
+<p>pointer-events: auto;</p>
+<p>transition: opacity .3s ease-in-out;</p>
+<p>}</p></blockquote><span>
+</span><p>Check out <a href="http://codepen.io/SaraSoueidan/pen/d7f8907168d30003e3dc03dd87dcec2f?editors=110" target="_blank">the live demo</a>.</p><span>
+</span><p>You can take it further and add a transformation animation to the overlay so that it scales up into view as it fades in—kind of like (yes, you guessed it) a Lightbox effect. Instead of an overlay with a search form, you could have an image that would scale into view when its respective thumbnail is clicked. Manoela Ilic has a nice and complete <a href="http://tympanus.net/codrops/2011/12/26/css3-lightbox/" target="_blank">working image gallery</a> showing this in action, with a tutorial explaining the code behind it.</p><span>
+</span><p>Christian Heilmann also wrote <a href="http://hacks.mozilla.org/2012/02/a-simple-image-gallery-using-only-css-and-the-target-selector/" target="_blank">a post about creating a simple image gallery using the <code>:target</code> selector</a> that is also worth checking out.</p><span>
+</span><p><a href="http://benschwarz.github.io/gallery-css/" target="_blank">CSS-only image galleries</a>, <a href="http://drublic.github.io/css-modal/" target="_blank">modals</a>, and <a href="http://codepen.io/chriscoyier/pen/umEgv" target="_blank">off-canvas navigation</a>, are &nbsp;all examples of fully-functional UI components that you can create using only CSS, by taking advantage of the the <code>:target</code> selector.</p><span>
+</span><p>I hope this introduction helped show you to the possibilities at hand when using and styling content with CSS pseudo-class selectors.</p><span>
+</span><p>More to come! 😉</p><span>
+
+                </span><span>
+						</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

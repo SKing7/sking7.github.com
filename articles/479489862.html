@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Essential Web Performance Metrics</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Essential Web Performance Metrics</h1>
+<div class="entry-content"><p><a href="http://blog.smartbear.com/wp-content/uploads/2013/11/159141779.jpg"><img class="size-full wp-image-14679 aligncenter" alt="Essential Web Performance Metrics" src="http://blog.smartbear.com/wp-content/uploads/2013/11/159141779.jpg" width="498" height="344" /></a></p><span>
+</span><p>In last week’s post, <a title="Essential Web Performance Metrics — A Primer, Part 1" href="http://blog.smartbear.com/web-performance/essential-web-performance-metrics-a-primer-part-1/" target="_blank">Essential Web Performance Metrics — Part 1</a>, we led off with a venerated stat from Amazon who reported in 2006 that for every 100ms improvement in response time, they received a 1% increase in revenue.</p><span>
+</span><p>We then delved into the components that make up the traditional concept of response time, including DNS time, TCP connect time, HTTP redirect time, time to first byte, HTML content time, and full page object load time. In the process we pointed out the quandary of these network-side metrics: they can tell you where to look if you have a problem, but they don’t necessarily uncover the effect of the problem on your users.</p><span>
+</span><p>So where do you look? When talking about speed improvements that translate into revenue, we’re talking about user perception — how the user is actually experiencing your website and applications. While these backend metrics can provide insight around specific technical problems that may or may not be increasing/decreasing overall page load and response times, there is no direct connection between their measurements and the user’s experience.</p><span>
+</span><p>This post will introduce some new metrics you should be monitoring and how they contribute to the user’s perception, including:</p><span>
+</span><ul>
+<li>Page load time</li>
+<li>DOM load time</li>
+<li>First paint time</li>
+<li>Above-the-fold time.</li>
+</ul><span>
+</span><p>Technically, page load time and DOM load time are browser timings, not user timings, but they help set the stage for what the user perceives.</p><span>
+</span><p><b>Page load time</b> represents the entire time it takes from the user command through the finished loading of the page and all referenced objects. It is the end-all, be-all of response time metrics as it includes all of the page’s documents, all referenced objects and scripts, style-sheets, and images. While page load time may seem important, it really isn’t <i>because it includes everything</i> — whether visible to the user or not. As we’ll see later, what the users don’t know won’t hurt them.</p><span>
+</span><p><b>DOM load time</b> is the time it takes to finish parsing the page’s documents beginning with the first byte, but not including referenced style-sheets, images and sub-frames.</p><span>
+</span><p>It is the browser’s job to piece together each page element and load external files into memory.&nbsp; The DOM, or Document Object Module, defines a standard way of structuring and parsing the elements of an HTML page, including text, i-frames, and the like so they can be logically assembled before being loaded.</p><span>
+</span><p>The “DOMContentLoaded” event is fired when the document has been completely loaded and parsed without waiting for stylesheets, images, and subframes to finish loading. That means DOM load time is concerned with the structure of the page rather than its content. If, after a while, a website begins to bog down, it’s often because front-end blocks of code in the DOM become exaggerated or locked or refer to hidden bits.</p><span>
+</span><p>A high number of DOM elements can be a sign that the markup of the page needs fixing without necessarily removing content. For example, throwing in extra &lt;div&gt;s only to fix layout issues can create unnecessary complexity over time. Increased complexity means slower DOM access in JavaScript. Having to loop through 1000 DOM elements versus only 100 can materially slow the DOM load time.</p><span>
+</span><p>When simplifying a complex page, take note that differing parsing engines sequence the elements for assembly differently. Chrome, Safari, Firefox, and Opera may all load your page in different orders, which can make a difference to the user’s perception.</p><span>
+</span><p><b>Bueller? Bueller?</b></p><span>
+</span><p>A lot has been written about the impatience of Internet users, but nothing frustrates them more than being flat-out ignored.</p><span>
+</span><p><b>First paint time</b> measures the time duration from when a web page URL is entered into a browser window to the moment when the user sees the first burst of visual activity on the Web page in the browser window..</p><span>
+</span><p>First paint tells the user that the site is responding to their action. How long will she wait? About as long as it takes to blink.&nbsp; According to a New York Times article, if users don’t get that acknowledgement in 250 milliseconds — <a title="For Impatient Web Users, an Eye Blink Is Just Too Long to Wait" href="http://www.nytimes.com/2012/03/01/technology/impatient-web-users-flee-slow-loading-sites.html?pagewanted=all" target="_blank">literally the time it takes to blink </a>— they will abandon the site.</p><span>
+</span><p>Once the first paint begins, the order in which elements load becomes critically important.&nbsp; Web users spend 80% of their time looking at information above the page fold. Although users do scroll, <a title="Scrolling and Attention" href="http://www.nngroup.com/articles/scrolling-and-attention/" target="_blank">they only allocate 20% of their attention below the fold</a>.<sup><a title="" href="http://blog.smartbear.com/performance/essential-web-performance-metrics-part-2/#_ftn2"><br /></a></sup></p><span>
+</span><p><b>Above-the-fold </b>is where users focus, and it’s where you should focus too.</p><span>
+</span><p>Above-the-fold time measures the time it takes for the <i>visible</i> page’s content to reach its final rendering, with enough intelligence to adapt for animated GIFs, streaming video, rotating ads, etc.</p><span>
+</span><p>The first thing above-the-fold time tells us is that you shouldn’t set your site to load all the images when the page starts. A site’s assets should load in roughly the order of importance to the user, first loading content and images that are above the fold.</p><span>
+</span><p>The good news is you can dramatically improve the user’s perceived response time without struggling to reduce the real response time at all. Simply reorder the execution so anything that’s not immediately important loads after anything that is.</p><span>
+</span><p>In the end, web performance monitoring is like politics — perception is reality.&nbsp; While traditional backend metrics can provide insight around specific technical problems, they don’t provide much insight into the thing that matters most: the user’s experience. By incorporating a few user-centric metrics in your WPM plan, you can quickly get a handle on opportunities to optimize your site in ways the directly translate into increased revenue.</p><span>
+</span><h4>See Also:</h4><span>
+</span><span>
+</span><span>
+</span><p><div><div class="dfad dfad_pos_1 dfad_first" id="_ad_14893"><a href="http://blog.smartbear.com/subscribe?ga_source=sub-cta&amp;ga_medium=article&amp;ga_content=blue&amp;ga_campaign=subscribe-blog"><img src="http://blog.smartbear.com/wp-content/uploads/2013/11/subscribe-2.png" alt="subscribe-2" width="595" height="46" class="aligncenter size-full wp-image-14894" /></a></div></div></p><span>
+</span><span>
+</span><span>
+</span><!--<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:dc="http://purl.org/dc/elements/1.1/"
+			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+		<rdf:Description rdf:about="http://blog.smartbear.com/performance/essential-web-performance-metrics-part-2/"
+    dc:identifier="http://blog.smartbear.com/performance/essential-web-performance-metrics-part-2/"
+    dc:title="Essential Web Performance Metrics — Part 2"
+    trackback:ping="http://blog.smartbear.com/performance/essential-web-performance-metrics-part-2/trackback/" />
+</rdf:RDF>--><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

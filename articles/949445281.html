@@ -1,0 +1,361 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Things I've Learned About Building & Coding HTML Email Templates</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Things I've Learned About Building & Coding HTML Email Templates</h1>
+<div class="post"><span>
+	</span><p><a href="https://twitter.com/share" class="twitter-share-button" data-lang="en">Tweet</a></p><span>
+	</span><p>I previously published “<a href="http://www.leemunroe.com/sending-email-designers-developers/">Things I've learned about sending email</a>". A lot of people seemed to like the post and thought it was a great intro to sending email or quick cheat sheet.</p><span>
+
+</span><p>Some people followed up with me and wanted to know more about the building and testing process when it comes to HTML email. Here’s a <strong>brain dump</strong> of what I’ve learned about building and coding HTML emails.</p><span>
+
+</span><h3>Email clients and rendering engines</h3><span>
+
+</span><p>Email clients use different rendering engines to render HTML emails:</p><span>
+
+</span><ul>
+<li>Apple Mail, Outlook for Mac, Android Mail and iOS Mail use <strong>WebKit</strong></li>
+<li>Outlook 2000/02/03 use <strong>Internet Explorer</strong></li>
+<li>Outlook 2007/10/13 use <strong>Microsoft Word</strong> (yes, Word!)</li>
+<li>Web clients use their browser's respective engine e.g. <strong>Safari uses WebKit, Chrome uses Blink</strong></li>
+</ul><span>
+
+</span><p>Gmail <strong>strips out <code>&lt;link&gt;</code> tags and any CSS in the <code>&lt;style&gt;</code> tags</strong>, and any other CSS that isn't inlined. Not just Gmail web but also the native Gmail mobile apps.</p><span>
+
+</span><p>Remember clients will also add their own flavor of styles on top of yours e.g. Gmail sets all <code>&lt;td&gt;</code> fonts to <code>font-family: arial,sans-serif;</code>.</p><span>
+
+</span><p>Litmus has a handy website dedicated to the current <a href="http://emailclientmarketshare.com/">email client market share</a>, based on their own internal stats (~1 billion emails).</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/emailclient.png" width="500" alt="Email Client Market Share" /></p><span>
+
+</span><p>As of April 2015 the top 5 looks like so:</p><span>
+
+</span><ol>
+<li>Apple iPhone 28%</li>
+<li>Gmail 16%</li>
+<li>Apple iPad 11%</li>
+<li>Outlook 8%</li>
+<li>Apple Mail 8%</li>
+</ol><span>
+
+</span><p>Of course you should <strong>look at your own stats</strong> to know which clients you need to focus on for your recipients.</p><span>
+
+</span><h3>MIME Multi-part and plain text</h3><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/mime.png" width="300" alt="MIME Multi-part" /></p><span>
+
+</span><p>When you send an email it’s important to send both <strong>plain text and HTML</strong>. You do this by sending your email as multi-part MIME. Even in a world where you think every one uses clients that render HTML, you should still send plain text.</p><span>
+
+</span><p>Most ESPs will construct the MIME for you so you don’t really need to worry about it. Some will also create a plain text version for you based on your HTML version.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/applewatch.jpg" width="500" alt="Apple Watch email" /></p><span>
+
+</span><p>Note that with the recent launch of Apple Watch, a <strong><a href="https://litmus.com/blog/how-to-send-hidden-version-email-apple-watch">new MIME</a> part has surfaced: <code>text/watch-html</code></strong>. This content will only be displayed in the Apple Watch (and any other clients that support this MIME type going forward).</p><span>
+
+</span><h3>Use tables not divs</h3><span>
+
+</span><p><strong>Divs have positioning and box model issues</strong> in different clients, in particular those that use Microsoft Word (Outlook) to render. You can use divs if you want but safer to code like it's 1999 and stick to tables.</p><span>
+
+</span><ul>
+<li>Tables instead of divs</li>
+<li>#ffffff instead of #fff</li>
+<li>Padding instead of margins</li>
+<li>CSS2 instead of CSS3</li>
+<li>HTML4 instead of HTML5</li>
+<li>background-color instead of background</li>
+<li>HTML attributes instead of CSS</li>
+<li>Inline CSS instead of stylesheets</li>
+</ul><span>
+
+</span><p>These approaches are recommended best practices. You can certainly ignore the safe route and go above and beyond.</p><span>
+
+</span><p>When using tables don't forget <code>border="0" cellpadding="0" cellspacing="0"</code>. If you're using <a href="https://github.com/premailer/premailer">Premailer</a> it has special <a href="https://github.com/premailer/premailer#premailer-specific-css">CSS declarations</a> for applying these HTML attributes.</p><span>
+
+</span><h3>Inline CSS</h3><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/inline.png" width="500" alt="Inline CSS" /></p><span>
+
+</span><p>Gmail will strip any CSS that isn’t inlined. You have a couple of options here:</p><span>
+
+</span><ul>
+<li>Write CSS inline as you go</li>
+<li>Use a <strong>web-based</strong> CSS inliner</li>
+<li>Use a <strong>programmatic</strong> CSS inliner</li>
+<li>Let your <strong>ESP (Email Service Provider)</strong> handle the inlining for you (if they support it)</li>
+</ul><span>
+
+</span><p>Writing inline as you go isn’t exactly a scalable or maintainable solution so I tend not to, but I know a lot of email builders prefer it this way to maintain 100% control. If you do write your CSS inline manually then I recommend <strong>making use of <a href="http://www.hongkiat.com/blog/sublime-code-snippets/">snippets</a> and/or a templating language</strong> with <a href="http://blog.teamtreehouse.com/handlebars-js-part-2-partials-and-helpers">partials and helpers</a>. This will save you repeating yourself.</p><span>
+
+</span><p>Web based inliners include <a href="http://inliner.cm/">Campaign Monitor</a>, <a href="http://templates.mailchimp.com/resources/inline-css/">Mailchimp</a> and Zurb’s <a href="http://zurb.com/ink/inliner.php">Ink</a>.</p><span>
+
+</span><p>For a programmatic inliner I typically use the <a href="https://github.com/premailer/premailer">Premailer gem</a>, or another package based on it.</p><span>
+
+</span><p><em>Sidenote: Check out my <a href="https://github.com/leemunroe/grunt-email-workflow">grunt email design workflow</a>, which will inline your Sass, compress your images, send you a preview and automate a bunch more of useful stuff.</em></p><span>
+
+</span><h3>Conditional targeting</h3><span>
+
+</span><p>We can apply specific CSS styles and <strong>show/hide elements and content</strong> for different versions of Outlook.</p><span>
+
+</span><p>This would target all Microsoft Word based versions of Outlook:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!--[if mso]&gt;</span>
+<span class="c">&lt;p&gt;Only Microsoft Word based versions of Outlook would see this.&lt;/p&gt;</span>
+<span class="c">&lt;![endif]--&gt;</span>
+</code></pre></div><span>
+</span><p>This would target all IE based versions of Outlook:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!--[if (IE)]&gt;</span>
+<span class="c">&lt;p&gt;Only IE based versions of Outlook would see this.&lt;/p&gt;</span>
+<span class="c">&lt;![endif]--&gt;</span>
+</code></pre></div><span>
+</span><p>We can also target specific version numbers of Outlook:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!--[if mso 12]&gt;</span>
+<span class="c">&lt;p&gt;Only Outlook 2007 would see this.&lt;/p&gt;</span>
+<span class="c">&lt;![endif]--&gt;</span>
+</code></pre></div><span>
+</span><p>More on <a href="http://labs.actionrocket.co/microsoft-outlook-conditional-statements">conditional statements</a> for Outlook.</p><span>
+
+</span><p>We can target WebKit based clients with a media query like this:</p><span>
+</span><div class="highlight"><pre><code class="language-css" data-lang="css"><span class="nc">.special-webkit-element</span> <span class="p">{</span>
+  <span class="k">display</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">@media</span> <span class="nt">screen</span> <span class="nt">and</span> <span class="o">(</span><span class="nt">-webkit-min-device-pixel-ratio</span><span class="nd">:0</span><span class="o">)</span> <span class="p">{</span>  
+  <span class="nc">.special-webkit-element</span> <span class="p">{</span>
+    <span class="k">display</span><span class="o">:</span> <span class="k">block</span> <span class="cp">!important</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>More on <a href="https://litmus.com/blog/understanding-media-queries-in-html-email">media queries</a> for WebKit.</p><span>
+
+</span><h3>Mobile, media queries and responsive solutions</h3><span>
+
+</span><p>With email opens on mobile around the <a href="http://www.emailmonday.com/mobile-email-usage-statistics">50% mark</a>, it's more important than ever to ensure your emails are accessible and usable on smaller devices.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-mobile1.jpg" width="500" alt="Responsive" /></p><span>
+
+</span><p>There are various solutions for making emails responsive. One of which is using media queries. <strong>Media queries cannot be inlined</strong>, therefore your CSS should look something like this.</p><span>
+</span><div class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">&lt;</span><span class="nt">style</span> <span class="nt">type</span><span class="o">=</span><span class="s2">"text/css"</span><span class="o">&gt;</span>
+  <span class="k">@media</span> <span class="nt">only</span> <span class="nt">screen</span> <span class="nt">and</span> <span class="o">(</span><span class="nt">max-width</span><span class="nd">:480px</span><span class="o">)</span><span class="p">{</span>
+
+    <span class="nc">.container</span> <span class="p">{</span>
+      <span class="k">padding</span><span class="o">:</span> <span class="m">5px</span> <span class="cp">!important</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nt">img</span> <span class="p">{</span>
+      <span class="k">height</span><span class="o">:</span> <span class="k">auto</span> <span class="cp">!important</span><span class="p">;</span>
+      <span class="k">max-width</span><span class="o">:</span> <span class="m">100%</span> <span class="cp">!important</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="o">&lt;/</span><span class="nt">style</span><span class="o">&gt;</span>
+</code></pre></div><span>
+</span><p><code>!important;</code> is important here, for lack of a better word, as you will be overriding your inline styles.</p><span>
+
+</span><p>Don't forget to add this to the head of your email:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"viewport"</span> <span class="na">content=</span><span class="s">"width=device-width"</span> <span class="nt">/&gt;</span>
+</code></pre></div><span>
+</span><p>Some clients will strip out any CSS that isn't inlined, most notably the Gmail mobile apps, therefore this responsive technique will not work for Gmail. <a href="http://webdesign.tutsplus.com/tutorials/creating-a-future-proof-responsive-email-without-media-queries--cms-23919">Other</a> <a href="http://www.slideshare.net/flcarneiro/emaildesign-current">solutions</a> exist that do work in Gmail, and you can always go with a 100% fluid width layout or narrow fixed layout for all devices.</p><span>
+
+</span><p>Here is ActionRocket's approach to <a href="http://labs.actionrocket.co/can-you-just-make-it-responsive">designing responsive emails</a>.</p><span>
+
+</span><p>Things you may want to alter for smaller devices include:</p><span>
+
+</span><ul>
+<li>Font size</li>
+<li>Columns</li>
+<li>Padding</li>
+<li>Hide or show elements</li>
+</ul><span>
+
+</span><p>Anna Yeaman has a long list of <a href="http://stylecampaign.com/blog/2012/10/responsive-email-support/">media query in email support</a>, Brian Graves has a great website listing <a href="http://responsiveemailresources.com/">responsive email resources</a> and Campaign Monitor have a detailed <a href="https://www.campaignmonitor.com/guides/mobile/">responsive email design guide</a>.</p><span>
+
+</span><p><em>Sidenote: Mailgun has a set of simple <a href="http://blog.mailgun.com/transactional-html-email-templates/">transactional HTML email templates</a> available for download that are responsive.</em></p><span>
+
+</span><h3>Bullet proof buttons</h3><span>
+
+</span><p>It’s painful trying to achieve the perfect cross client button. As mentioned above you should be using tables and table cells for everything. This includes buttons.</p><span>
+
+</span><p>My preference is to use this solution. Instead of styling a button like this:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#"</span> <span class="na">class=</span><span class="s">"btn btn-primary"</span><span class="nt">&gt;</span>Click Here<span class="nt">&lt;/a&gt;</span>
+</code></pre></div><span>
+</span><p>I’ll write it like this:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;table</span> <span class="na">border=</span><span class="s">"0"</span> <span class="na">cellspacing=</span><span class="s">"0"</span> <span class="na">cellpadding=</span><span class="s">"0"</span> <span class="na">class=</span><span class="s">"btn btn-primary"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">align=</span><span class="s">"center"</span> <span class="na">valign=</span><span class="s">"top"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#"</span><span class="nt">&gt;</span>Click Here<span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+</code></pre></div><span>
+</span><p>Then once my CSS is inlined it will look like this:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;table</span> <span class="na">border=</span><span class="s">"0"</span> <span class="na">cellspacing=</span><span class="s">"0"</span> <span class="na">cellpadding=</span><span class="s">"0"</span> <span class="na">style=</span><span class="s">"box-sizing: border-box; border-collapse: separate !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto; padding-bottom: 15px; margin-left: auto; margin-right: auto;"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">align=</span><span class="s">"center"</span> <span class="na">valign=</span><span class="s">"top"</span> <span class="na">style=</span><span class="s">"box-sizing: border-box; vertical-align: top; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-radius: 5px; text-align: center; background: #1271db;"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#"</span> <span class="na">style=</span><span class="s">"box-sizing: border-box; color: #ffffff; text-decoration: none; border-radius: 5px; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #1271db; margin: 0; padding: 12px 25px; border: 1px solid #1271db;"</span><span class="nt">&gt;</span>Click Here<span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+</code></pre></div><span>
+</span><p>This is just one way of implementing buttons in emails. I prefer it as it's simpler and doesn't involve image assets or VML. Admittedly it doesn't always look amazing in every client, but I can live with that.</p><span>
+
+</span><p>If you need pixel perfection across all clients, <a href="https://twitter.com/stigm/">Stig</a> from Campaign Monitor created a handy <a href="http://buttons.cm/">bullet proof button tool</a>.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-buttons.png" width="&lt;/div&gt;&lt;/div&gt;
+" alt="Bulletproof buttons" /></p><span>
+
+</span><h3>Typography</h3><span>
+
+</span><p>In general it's easier to <strong>stick with standard system fonts</strong>. That includes Helvetica, Arial etc.</p><span>
+
+</span><p>However, we can use web fonts like Google fonts. You should put them behind a WebKit conditional media query otherwise Outlook will mess up your type e.g.</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;style&gt;</span>
+<span class="k">@import</span> <span class="nt">url</span><span class="o">(</span><span class="nt">http</span><span class="o">://</span><span class="nt">fonts</span><span class="nc">.googleapis.com</span><span class="o">/</span><span class="nt">css</span><span class="o">?</span><span class="nt">family</span><span class="o">=</span><span class="nt">Pacifico</span><span class="o">)</span><span class="p">;</span>
+
+<span class="c">/* Type styles for all clients */</span>
+<span class="nt">h1</span> <span class="p">{</span>
+  <span class="k">font-family</span><span class="o">:</span> <span class="n">Helvetica</span><span class="o">,</span> <span class="n">Arial</span><span class="o">,</span> <span class="k">serif</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c">/* Type styles for WebKit clients */</span>
+<span class="k">@media</span> <span class="nt">screen</span> <span class="nt">and</span> <span class="o">(</span><span class="nt">-webkit-min-device-pixel-ratio</span><span class="nd">:0</span><span class="o">)</span> <span class="p">{</span>  
+  <span class="nt">h1</span> <span class="p">{</span>
+    <span class="k">font-family</span><span class="o">:</span> <span class="n">Pacifico</span><span class="o">,</span> <span class="n">Helvetica</span><span class="o">,</span> <span class="n">Arial</span><span class="o">,</span> <span class="k">serif</span> <span class="cp">!important</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span>
+</code></pre></div><span>
+</span><p>More on <a href="http://www.emaildesignreview.com/html-email-coding/web-fonts-in-email-1482/">web fonts in email</a> by ActionRocket.</p><span>
+
+</span><p>Remember to include font-family, font-size and color on every <code>&lt;td&gt;</code> or you risk the client overwriting your carefully chosen type styles.</p><span>
+
+</span><h3>Images and videos</h3><span>
+
+</span><p>Assume images are off/blocked by default.</p><span>
+
+</span><ul>
+<li>Outlook, AOL, Yahoo have images <strong>blocked by default</strong></li>
+<li>Apple Mail, iOS, Gmail have images turned on</li>
+</ul><span>
+
+</span><p>Remember to include good <strong>alt text</strong>. That could either tell the user what the image says or just reference what it is e.g. company logo, photos that link to interesting things</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-images1.jpg" width="600" alt="Images" /></p><span>
+
+</span><p>You can also be <a href="http://www.emailmonks.com/blog/email-marketing/creative-use-of-alt-text-in-email-learn-more-with-our-easter-campaign/">creative with alt text</a> for clients that have images turned off.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-images2.jpg" width="400" alt="Alt Text" /></p><span>
+
+</span><p>Remember to include a basic image reset for all images e.g.</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">""</span> <span class="na">alt=</span><span class="s">""</span> <span class="na">width=</span><span class="s">""</span> <span class="na">height=</span><span class="s">""</span> <span class="na">border=</span><span class="s">"0"</span> <span class="na">style=</span><span class="s">"border:0; outline:none; text-decoration:none; display:block;"</span><span class="nt">&gt;</span>
+</code></pre></div><span>
+</span><p>Animated gifs are supported in most clients. <strong>Outlook 2007-2013 does not support animated gifs</strong>. They fall back to the first frame.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-email3.gif" width="400" alt="Animated gifs" /></p><span>
+
+</span><p>Other than Jonah Hill screaming, animated gifs are really useful for feature announcements in emails.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-gif1.gif" width="400" alt="Animated gifs" /></p><span>
+
+</span><p><strong>Video is supported in iOS, Apple Mail, Outlook.com</strong>. You can use media queries to show/hide the video based on the client. More on <a href="http://www.emailonacid.com/blog/details/C13/a_how_to_guide_to_embedding_html5_video_in_email">email video support</a> at Email on Acid.</p><span>
+
+</span><p>Kevin Mandeville wrote this great tutorial on <a href="https://litmus.com/blog/how-to-code-html5-video-background-in-email">coding HTML5 video</a> as a background in an email. Impressive stuff and worth a look.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-video1.gif" width="400" alt="Video" /></p><span>
+
+</span><p>Remember to <strong>compress your media assets</strong> and upload them to a <strong>CDN</strong> (Content Delivery Network e.g. <a href="http://www.rackspace.co.uk/cloud/files">Rackspace</a> or <a href="http://aws.amazon.com/">AWS</a>). Most ESPs will handle this for you.</p><span>
+
+</span><p>SVG (Scalable Vector Graphics) have a <a href="https://css-tricks.com/icon-fonts-vs-svg/">lot of advantages</a> when using them for the web. As you would expect, email support <a href="http://emailcodegeek.com/svg-images/">varies</a> and they require a couple of fallback hacks/conditionals. I typically stay away from SVG in email.</p><span>
+
+</span><p>Icon fonts, like <a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a>, fall into the same bucket as web fonts (see above). WebKit clients may or may not support them.</p><span>
+
+</span><p>For retina ready images, supply a large (2-3x) image and resize it. I’ll typically save a low quality image that has 2x dimensions, which seems to work well (more on <a href="http://www.leemunroe.com/designing-for-high-resolution-retina-displays/">that technique</a>). </p><span>
+
+</span><p>Keep in mind that for Outlook you should tell the image how wide it should be with a <strong>width attribute</strong> otherwise it may render the actual width of the image and break your email.</p><span>
+
+</span><h3>Forms</h3><span>
+
+</span><p>Support for form elements vary. Best to <strong>stay clear</strong> and link to an <strong>external form</strong> if you need one. Campaign Monitor has some <a href="https://www.campaignmonitor.com/resources/will-it-work/forms/">advice on forms here</a>.</p><span>
+
+</span><p>Obviously it depends on what your objectives are. It is safer to stay away from forms but I have seen <a href="http://rebelmail.com/">RebelMail</a> and <a href="https://mixmax.com/">MixMax</a> doing interesting things with forms for surveys and ecommerce with good fallback support.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-forms1.png" width="400" alt="Surveys" /></p><span>
+
+</span><h3>What the heck is VML?</h3><span>
+
+</span><p>VML (Vector Markup Language) is supported by Outlook. I honestly never use it and try to design emails in a way that I can avoid thinking about it.</p><span>
+
+</span><blockquote>
+<p>Vector Markup Language (VML) is obsolete in Internet Explorer 10 (quirks and 10 document modes).
+— <a href="https://msdn.microsoft.com/library/hh801223(v=vs.85).aspx">Microsoft</a></p>
+</blockquote><span>
+
+</span><p>VML is <strong>no longer supported in new versions of IE</strong>, although as long as Outlook 2007/10/13 are around you will see it used. Typically for <a href="http://www.emailonacid.com/blog/details/C13/emailology_vector_markup_language_and_backgrounds">background images</a>.</p><span>
+
+</span><h3>Can I use CSS3 and HTML5?</h3><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-css3.png" width="300" alt="HTML5 CSS3" /></p><span>
+
+</span><p>Sort of. Be sure to keep <strong>progressive enhancement</strong> in mind when using these.</p><span>
+
+</span><p>Recently I’ve switched to using HTML5 doctype but not other HTML5 elements.</p><span>
+
+</span><p>CSS3 wise, like the web, if you include rounded corners, box shadows etc. they will drop back for clients that don’t support them. CSS animations, for example, are supported in WebKit clients. It all comes down to what the <strong>rendering engine</strong> is for each client.</p><span>
+
+</span><h3>How do I include Gmail actions in my subject line?</h3><span>
+
+</span><p>These are handy <a href="https://developers.google.com/gmail/markup/actions/actions-overview">actions available for Gmail</a>. You've probably seen them from the likes of GitHub for issues or Amazon for orders.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-gmail1.png" width="400" alt="Gmail actions" /></p><span>
+
+</span><p>Adding the code is straight forward. You have <a href="https://developers.google.com/gmail/markup/actions/declaring-actions">two options</a>:</p><span>
+
+</span><ol>
+<li>JSON-LD</li>
+<li>Microdata</li>
+</ol><span>
+
+</span><p>Getting white listed involves a <a href="https://developers.google.com/gmail/markup/registering-with-google">few more steps</a>. You can test Gmail actions with a @gmail.com address.</p><span>
+
+</span><h3>Don’t forget about preheader text</h3><span>
+
+</span><p>Some clients show <strong>extra descriptions</strong> next to or under the subject lines. These clients include iOS, Apple Mail, Outlook 2013, Gmail, AOL.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-preheader.png" width="500" alt="Preheader text" /></p><span>
+
+</span><p>Clients will grab the first bit of text they find in your email body and add it here. </p><span>
+
+</span><p>Make the most of this and <strong>add a hidden element</strong> to your body content that appears first. This text should be an extra incentive for the user to open your email. Hide the text like so:</p><span>
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;span</span> <span class="na">style=</span><span class="s">"color: transparent; display: none !important; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;"</span><span class="nt">&gt;</span>Preheader text goes here<span class="nt">&lt;/span&gt;</span>
+</code></pre></div><span>
+</span><p>Use this <a href="http://codepen.io/awoodall/full/XbpMbo/">subject/preheader tool</a> by Austin Woodall to preview your email subjects and preheaders.</p><span>
+
+</span><h3>How do I test my email before sending it?</h3><span>
+
+</span><p>I always use <a href="http://www.litmus.com/">Litmus</a> as well as emailing myself and checking it on 2 or 3 devices. <a href="https://www.emailonacid.com/">Email on Acid</a> seems like a good alternative.</p><span>
+
+</span><p class="aligncenter"><img src="http://www.leemunroe.com/img/build-litmus1.png" width="500" alt="Litmus" /></p><span>
+
+</span><h3>Conclusion</h3><span>
+
+</span><p>Building HTML email is a lot like building a web page. 10 years ago. </p><span>
+
+</span><p>Email clients haven't been as progressive as web browsers in adopting new standards, while we users and companies haven't adopted new email clients like we have web browsers. Add to that the rise of mobile, we're left in this state where we have to support so many convoluted clients and versions.</p><span>
+
+</span><p>You can keep it simple and design email with a "What's the minimal amount of effort required to get the maximum effect" approach. You can provide a bunch of fallbacks or hacks to ensure your emails are "bulletproof" and look identical across all clients. Or you can go above and beyond and experiment with things like web fonts, SVG, animations, video and provide a supperior experience for those that support it.</p><span>
+
+</span><p><strong><em>What'd I miss? What advice would you add to this list for any one else reading?</em></strong></p><span>
+
+	</span><p><a href="https://twitter.com/share" class="twitter-share-button" data-lang="en">Tweet</a></p><span>
+	</span><p>
+	   
+	    <a href="http://www.leemunroe.com/rapid-user-research">« Rapid User Research with Intercom, PowWow and GoToMeeting</a> 
+	   
+	   
+	</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

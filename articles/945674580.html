@@ -1,0 +1,427 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Static Site Generation with React and Webpack</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Static Site Generation with React and Webpack</h1>
+<div class="prose mb3"><p>I’ve been dabbling with React for a few months now and using it in several small open source projects
+to better understand the technology.
+React’s focus on reusablility, along with the ability to install and require components via npm,
+provides an elegant way to rapidly build application UI in an efficient and consistent way.
+It’s also a great way to handle server-side rendering and provides high cohesion between markup and display logic.</p><span>
+</span><h2 id="why"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#why">Why</a></h2><p>React is incredibly intuitive and flexible to work with,
+but relying solely on client side rendering
+leaves a lot to be desired in regards to percieved performance.
+With a static React site, the page loads just like any other static HTML,
+and the JavaScript kicks in whenever it’s downloaded.
+This is extremely helpful for combining documentation with interactive demonstrations,
+like <a href="http://jxnblk.com/colorable">Colorable</a> or <a href="http://jxnblk.com/react-icons">Building SVG Icons with React</a>.
+Using React with webpack also allows you to consolidate the entire build process 
+in Node and take advantage of anything in the npm ecosystem.
+Last but not least, React is just fun to use.</p><span>
+</span><h2 id="how"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#how">How</a></h2><p>Although there are several ways to render static sites with React,
+the following is what I’ve found to be easiest.</p><span>
+</span><p>First start a fresh project and initialize npm.</p><span>
+</span><pre>mkdir react-static-site
+<span class="hljs-built_in">cd</span> react-static-site
+npm init</pre><p>Install the following modules.</p><span>
+</span><pre>npm i --save-dev react webpack webpack-dev-server jsx-loader static-site-generator-webpack-plugin react-router</pre><p><a href="http://webpack.github.io/" target="_blank">Webpack</a> and webpack-dev-server will be used for the entire build process and can also handle assets such as CSS, images, and fonts.
+The jsx-loader is used to transpile imported jsx files. If you prefer ES6, you can use babel-loader instead of jsx-loader.
+The <a href="https://github.com/markdalgleish/static-site-generator-webpack-plugin" target="_blank">static-site-generator-webpack-plugin</a> module is what is used to generate static HTML.
+And <a href="http://rackt.github.io/react-router/" target="_blank">React Router</a> is used to handle routing. For single page static sites, React Router is not needed.</p><span>
+</span><h2 id="set-up-webpack"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#set-up-webpack">Set up Webpack</a></h2><p>Webpack is a module bundler similar to Browserify, but can also replace front-end build systems like Grunt and Gulp.</p><span>
+</span><p>First off, you’ll need a <code>webpack.config.js</code> file. The webpack command line interface will use this config file.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> StaticSiteGeneratorPlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'static-site-generator-webpack-plugin'</span>)
+<span class="hljs-keyword">var</span> data = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./data'</span>)
+
+<span class="hljs-built_in">module</span>.exports = {
+  entry: <span class="hljs-string">'./entry.js'</span>,
+
+  output: {
+    filename: <span class="hljs-string">'bundle.js'</span>,
+    path: __dirname,
+    libraryTarget: <span class="hljs-string">'umd'</span>
+  },
+
+  <span class="hljs-built_in">module</span>: {
+    loaders: [
+      { test: <span class="hljs-regexp">/\.jsx$/</span>, loader: <span class="hljs-string">'jsx-loader'</span> }
+    ]
+  },
+
+  plugins: [
+    <span class="hljs-keyword">new</span> StaticSiteGeneratorPlugin(<span class="hljs-string">'bundle.js'</span>, data.routes, data)
+  ]
+}</pre><h2 id="create-an-entry-file"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#create-an-entry-file">Create an Entry File</a></h2><p>The entry file is what webpack will read to build <code>bundle.js</code>,
+and the static-site-generator-webpack-plugin uses the bundle to generate HTML.</p><span>
+</span><p>For a single rendered page, you can skip React Router and create an <code>entry.js</code> file like the following.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Root = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/Root.jsx'</span>)
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">locals, callback</span>) </span>{
+  <span class="hljs-keyword">var</span> html = React.renderToStaticMarkup(React.createElement(Root, locals))
+  callback(<span class="hljs-literal">null</span>, <span class="hljs-string">'&lt;!DOCTYPE html&gt;'</span> + html)
+}</pre><p>For handling multiple routes, update the entry file using React Router and create a <code>Routes.jsx</code> file.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> Routes = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Routes.jsx'</span>)
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">locals, callback</span>) </span>{
+  Router.run(Routes, locals.path, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Handler</span>) </span>{
+    <span class="hljs-keyword">var</span> html = React.renderToStaticMarkup(React.createElement(Handler, locals))
+    callback(<span class="hljs-literal">null</span>, <span class="hljs-string">'&lt;!DOCTYPE html&gt;'</span> + html)
+  })
+}</pre><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> Route = Router.Route
+<span class="hljs-keyword">var</span> DefaultRoute = Router.DefaultRoute
+<span class="hljs-keyword">var</span> Root = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/Root.jsx'</span>)
+<span class="hljs-keyword">var</span> Index = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/Index.jsx'</span>)
+
+<span class="hljs-keyword">var</span> Routes = (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Route</span> <span class="hljs-attribute">handler</span>=<span class="hljs-value">{Root}</span> <span class="hljs-attribute">path</span>=<span class="hljs-value">'/'</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">DefaultRoute</span> <span class="hljs-attribute">handler</span>=<span class="hljs-value">{Index}</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">Route</span>&gt;</span>
+)</span>
+
+<span class="hljs-built_in">module</span>.exports = Routes</pre><h2 id="create-a-data-file"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#create-a-data-file">Create a Data File</a></h2><p>Next create a <code>data.js</code> file that will include initial props passed to the Root component and routes used for the router.</p><span>
+</span><pre>
+<span class="hljs-built_in">module</span>.exports = {
+  title: <span class="hljs-string">'My Static Site'</span>,
+  routes: [
+    <span class="hljs-string">'/'</span>
+  ]
+}</pre><h2 id="create-root-jsx"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#create-root-jsx">Create Root.jsx</a></h2><p>The Root component will include the <code>&lt;html&gt;</code> element, <code>&lt;head&gt;</code> and other code that will be shared across all pages.
+The page components themselves will be passed through the <code>&lt;RouteHander&gt;</code> component with React Router.
+To keep things somewhat organized, create this file in a new <code>components</code> directory.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> RouteHandler = Router.RouteHandler
+
+<span class="hljs-keyword">var</span> Root = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>{this.props.title}<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">RouteHandler</span> {<span class="hljs-attribute">...this.props</span>} /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+    )</span>
+  }
+})
+
+<span class="hljs-built_in">module</span>.exports = Root</pre><h2 id="create-index-jsx"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#create-index-jsx">Create Index.jsx</a></h2><p>The Index component will be the page rendered with <code>&lt;DefaultRoute&gt;</code> and should contain the content for the root <code>index.html</code> file.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+
+<span class="hljs-keyword">var</span> Index = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">main</span>&gt;</span>
+        Index component
+      <span class="hljs-tag">&lt;/<span class="hljs-title">main</span>&gt;</span>
+    )</span>
+  }
+})
+
+<span class="hljs-built_in">module</span>.exports = Index</pre><h2 id="package-scripts"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#package-scripts">Package Scripts</a></h2><p>Add the following scripts to <code>package.json</code> to run webpack.</p><span>
+</span><pre>"scripts": {
+  "webpack": "webpack --progress --colors",
+  "dev": "webpack-dev-server --progress --colors",
+  "start": "npm run dev"
+}</pre><p>Run the start script to start a development server.</p><span>
+</span><pre>npm start</pre><p>Open <a href="http://localhost:8080/" target="_blank">http://localhost:8080</a> in a browser.
+You should see an unstyled page with the words <em>Index component</em>.</p><span>
+</span><h2 id="adding-pages"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#adding-pages">Adding Pages</a></h2><p>Next, add a new route for an <em>about</em> page.
+In <code>data.js</code> add <code>/about</code> to the routes array.</p><span>
+</span><pre>
+<span class="hljs-built_in">module</span>.exports = {
+  title: <span class="hljs-string">'My Static Site'</span>,
+  routes: [
+    <span class="hljs-string">'/'</span>,
+    <span class="hljs-string">'/about'</span>
+  ]
+}</pre><p>Edit the <code>Routes.jsx</code> file to handle the new route.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> Route = Router.Route
+<span class="hljs-keyword">var</span> DefaultRoute = Router.DefaultRoute
+<span class="hljs-keyword">var</span> Root = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/Root.jsx'</span>)
+<span class="hljs-keyword">var</span> Index = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/Index.jsx'</span>)
+<span class="hljs-keyword">var</span> About = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/About.jsx'</span>)
+
+<span class="hljs-keyword">var</span> Routes = (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Route</span> <span class="hljs-attribute">handler</span>=<span class="hljs-value">{Root}</span> <span class="hljs-attribute">path</span>=<span class="hljs-value">'/'</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">DefaultRoute</span> <span class="hljs-attribute">handler</span>=<span class="hljs-value">{Index}</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">Route</span> <span class="hljs-attribute">path</span>=<span class="hljs-value">'/about'</span> <span class="hljs-attribute">handler</span>=<span class="hljs-value">{About}</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">Route</span>&gt;</span>
+)</span>
+
+<span class="hljs-built_in">module</span>.exports = Routes</pre><p>Create a new <code>About.jsx</code> component.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+
+<span class="hljs-keyword">var</span> About = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">main</span>&gt;</span>
+        About component
+      <span class="hljs-tag">&lt;/<span class="hljs-title">main</span>&gt;</span>
+    )</span>
+  }
+})
+
+<span class="hljs-built_in">module</span>.exports = About</pre><p>Stop and restart the development server and navigate to
+<a href="http://localhost:8080/about" target="_blank">http://localhost:8080/about</a>.
+You should see a page similar to the index but with the words <em>About component</em>.</p><span>
+</span><p>React-router can also handle route params such as <code>posts/:id</code> for dynamic routing –
+<a href="http://rackt.github.io/react-router/" target="_blank">View the docs</a> to learn more.</p><span>
+</span><h2 id="render-to-static-markup"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#render-to-static-markup">Render to Static Markup</a></h2><p>Stop the development server and run <code>npm run webpack</code>. This should generate two static <code>index.html</code> files in the root and <code>about</code> directories.</p><span>
+</span><h2 id="adding-client-side-js"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#adding-client-side-js">Adding Client-Side JS</a></h2><p>In order to use React for client side JavaScript, you’ll need to ensure that the props match up between the static page and the bundle.js file.</p><span>
+</span><p>First, edit <code>entry.js</code> to change the render function
+from <code>React.renderToStaticMarkup</code> to <code>React.renderString</code>
+and add a conditional block that will only run client-side.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> Routes = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Routes.jsx'</span>)
+
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">document</span> !== <span class="hljs-string">'undefined'</span>) {
+  <span class="hljs-keyword">var</span> initialProps = <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'initial-props'</span>).innerHTML)
+  Router.run(Routes, Router.HistoryLocation, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Handler</span>) </span>{
+    React.render(React.createElement(Handler, initialProps), <span class="hljs-built_in">document</span>)
+  })
+}
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">locals, callback</span>) </span>{
+  Router.run(Routes, locals.path, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Handler</span>) </span>{
+    <span class="hljs-keyword">var</span> html = React.renderToString(React.createElement(Handler, locals))
+    callback(<span class="hljs-literal">null</span>, <span class="hljs-string">'&lt;!DOCTYPE html&gt;'</span> + html)
+  })
+}</pre><p>The <code>initialProps</code> value will come from a script tag with the id <code>initial-props</code>.
+Update the Root component to add this script tag, add a <code>safeStringify</code> function, and link to the <code>bundle.js</code> file.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> RouteHandler = Router.RouteHandler
+
+<span class="hljs-keyword">var</span> Root = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> initialProps = {
+      __html: safeStringify(<span class="hljs-keyword">this</span>.props)
+    }
+
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>{this.props.title}<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">RouteHandler</span> {<span class="hljs-attribute">...this.props</span>} /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">script</span>
+            <span class="hljs-attribute">id</span>=<span class="hljs-value">'initial-props'</span>
+            <span class="hljs-attribute">type</span>=<span class="hljs-value">'application/json'</span>
+            <span class="hljs-attribute">dangerouslySetInnerHTML</span>=<span class="hljs-value">{initialProps}</span> /&gt;</span><span class="xml">
+          <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">'bundle.js'</span> /&gt;</span><span class="xml">
+        <span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+    )</span></span></span>
+  }
+})
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">safeStringify</span>(<span class="hljs-params">obj</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>.stringify(obj).replace(<span class="hljs-regexp">/&lt;\/script/g</span>, <span class="hljs-string">'&lt;\\/script'</span>).replace(<span class="hljs-regexp">/&lt;!--/g</span>, <span class="hljs-string">'&lt;\\!--'</span>)
+}
+
+<span class="hljs-built_in">module</span>.exports = Root</pre><p>To link the pages together, create a new Header component.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+
+<span class="hljs-keyword">var</span> Header = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">header</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">a</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">'/'</span>&gt;</span>Index<span class="hljs-tag">&lt;/<span class="hljs-title">a</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">a</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">'/about'</span>&gt;</span>About<span class="hljs-tag">&lt;/<span class="hljs-title">a</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-title">header</span>&gt;</span>
+    )</span>
+  }
+})
+
+<span class="hljs-built_in">module</span>.exports = Header</pre><p>Add the Header to the Root component’s render function.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> RouteHandler = Router.RouteHandler
+<span class="hljs-keyword">var</span> Header = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Header.jsx'</span>)
+
+<span class="hljs-keyword">var</span> Root = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> initialProps = {
+      __html: safeStringify(<span class="hljs-keyword">this</span>.props)
+    }
+
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>{this.props.title}<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">Header</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">RouteHandler</span> {<span class="hljs-attribute">...this.props</span>} /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">script</span>
+            <span class="hljs-attribute">id</span>=<span class="hljs-value">'initial-props'</span>
+            <span class="hljs-attribute">type</span>=<span class="hljs-value">'application/json'</span>
+            <span class="hljs-attribute">dangerouslySetInnerHTML</span>=<span class="hljs-value">{initialProps}</span> /&gt;</span><span class="xml">
+          <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">'bundle.js'</span> /&gt;</span><span class="xml">
+        <span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+    )</span></span></span>
+  }
+})
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">safeStringify</span>(<span class="hljs-params">obj</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>.stringify(obj).replace(<span class="hljs-regexp">/&lt;\/script/g</span>, <span class="hljs-string">'&lt;\\/script'</span>).replace(<span class="hljs-regexp">/&lt;!--/g</span>, <span class="hljs-string">'&lt;\\!--'</span>)
+}
+
+<span class="hljs-built_in">module</span>.exports = Root</pre><h2 id="using-client-side-routing"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#using-client-side-routing">Using Client-Side Routing</a></h2><p>React router can also do client-side routing using the Link component.
+This can make transitioning pages feel faster and behaves like a fake single-page application.</p><span>
+</span><p>To use client-side routing, replace the anchor links in the Header with React Routers’s Link components.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> Link = Router.Link
+
+<span class="hljs-keyword">var</span> Header = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">header</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">Link</span> <span class="hljs-attribute">to</span>=<span class="hljs-value">'/'</span>&gt;</span>Index<span class="hljs-tag">&lt;/<span class="hljs-title">Link</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">Link</span> <span class="hljs-attribute">to</span>=<span class="hljs-value">'/about'</span>&gt;</span>About<span class="hljs-tag">&lt;/<span class="hljs-title">Link</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-title">header</span>&gt;</span>
+    )</span>
+  }
+})
+
+<span class="hljs-built_in">module</span>.exports = Header</pre><h2 id="adding-critical-css"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#adding-critical-css">Adding Critical CSS</a></h2><p>Although there are many different approaches to styling components in React,
+adding some critical CSS base styles to the head can help speed up performance and development time.
+You can skip this step if you prefer using inline styles or linking to a larger stylesheet.</p><span>
+</span><p><em>UPDATE: Originally, this tutorial showed how to include CSS using props.
+Using a combination of css-loader and cssnext-loader seems to be a better solution
+as it doesn't require restarting the server when making changes to the stylesheet
+and doesn't duplicate the CSS in the <code>initialProps</code> JSON object.</em></p><span>
+</span><p>First install <a href="http://basscss.com/" target="_blank">Basscss</a>,
+<a href="https://github.com/webpack/css-loader" target="_blank">css-loader</a>,
+and <a href="https://github.com/cssnext/cssnext-loader" target="_blank">cssnext-loader</a>.</p><span>
+</span><pre>npm i --save-dev basscss css-loader cssnext-loader</pre><p>Add css-loader and cssnext-loader to the webpack config as well as options for cssnext.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> StaticSiteGeneratorPlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'static-site-generator-webpack-plugin'</span>)
+<span class="hljs-keyword">var</span> data = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./data'</span>)
+
+<span class="hljs-built_in">module</span>.exports = {
+  entry: <span class="hljs-string">'./entry.js'</span>,
+
+  output: {
+    filename: <span class="hljs-string">'bundle.js'</span>,
+    path: __dirname,
+    libraryTarget: <span class="hljs-string">'umd'</span>
+  },
+
+  <span class="hljs-built_in">module</span>: {
+    loaders: [
+      { test: <span class="hljs-regexp">/\.jsx$/</span>, loader: <span class="hljs-string">'jsx-loader'</span> },
+      { test: <span class="hljs-regexp">/\.css/</span>, loader: <span class="hljs-string">'css-loader!cssnext-loader'</span> }
+    ]
+  },
+
+  plugins: [
+    <span class="hljs-keyword">new</span> StaticSiteGeneratorPlugin(<span class="hljs-string">'bundle.js'</span>, data.routes, data)
+  ],
+
+  cssnext: {
+    compress: <span class="hljs-literal">true</span>,
+    features: {
+      rem: <span class="hljs-literal">false</span>,
+      pseudoElements: <span class="hljs-literal">false</span>,
+      colorRgba: <span class="hljs-literal">false</span>
+    }
+  }
+
+}</pre><p>In the cssnext configuration options, the output is compressed and the rem and colorRgba postcss plugins have been disabled.</p><span>
+</span><p>Create a new <code>css</code> directory and a <code>base.css</code> file.
+Import Basscss and set a new value for the <code>--font-family</code> custom property.</p><span>
+</span><pre>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">'basscss'</span></span>;
+
+<span class="hljs-pseudo">:root</span> <span class="hljs-rules">{
+  <span class="hljs-rule"><span class="hljs-attribute">--font-family</span>:<span class="hljs-value"> <span class="hljs-string">'Avenier Next'</span>, <span class="hljs-string">'Hevletica Neue'</span>, sans-serif</span></span>;
+}</span></pre><p>In the Root component, import the stylesheet, add a style tag to the head, and add some padding to the body.</p><span>
+</span><pre>
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>)
+<span class="hljs-keyword">var</span> Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react-router'</span>)
+<span class="hljs-keyword">var</span> RouteHandler = Router.RouteHandler
+<span class="hljs-keyword">var</span> Header = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Header.jsx'</span>)
+<span class="hljs-keyword">var</span> css = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../css/base.css'</span>)
+
+<span class="hljs-keyword">var</span> Root = React.createClass({
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> initialProps = {
+      __html: safeStringify(<span class="hljs-keyword">this</span>.props)
+    }
+
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>{this.props.title}<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-title">style</span> <span class="hljs-attribute">dangerouslySetInnerHTML</span>=<span class="hljs-value">{{</span> <span class="hljs-attribute">__html:</span> <span class="hljs-attribute">css</span> }} /&gt;</span><span class="css">
+        &lt;/<span class="hljs-tag">head</span>&gt;
+        &lt;<span class="hljs-tag">body</span> <span class="hljs-tag">className</span>='<span class="hljs-tag">p2</span>'&gt;
+          &lt;<span class="hljs-tag">Header</span> /&gt;
+          &lt;<span class="hljs-tag">RouteHandler</span> <span class="hljs-rules">{...this.props}</span> /&gt;
+          &lt;<span class="hljs-tag">script</span>
+            <span class="hljs-tag">id</span>='<span class="hljs-tag">initial-props</span>'
+            <span class="hljs-tag">type</span>='<span class="hljs-tag">application</span>/<span class="hljs-tag">json</span>'
+            <span class="hljs-tag">dangerouslySetInnerHTML</span>=<span class="hljs-rules">{initialProps}</span> /&gt;
+          &lt;<span class="hljs-tag">script</span> <span class="hljs-tag">src</span>='<span class="hljs-tag">bundle</span><span class="hljs-class">.js</span>' /&gt;
+        &lt;/<span class="hljs-tag">body</span>&gt;
+      &lt;/<span class="hljs-tag">html</span>&gt;
+    )</span></span>
+  }
+})
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">safeStringify</span>(<span class="hljs-params">obj</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>.stringify(obj).replace(<span class="hljs-regexp">/&lt;\/script/g</span>, <span class="hljs-string">'&lt;\\/script'</span>).replace(<span class="hljs-regexp">/&lt;!--/g</span>, <span class="hljs-string">'&lt;\\!--'</span>)
+}
+
+<span class="hljs-built_in">module</span>.exports = Root</pre><p>Restart the dev server to see the changes.</p><span>
+</span><p>You should now have a basic static site rendered with React.
+For a complete example, see the
+<a href="https://github.com/jxnblk/react-static-site-boilerplate" target="_blank">Boilerplate Demo</a>
+or check out the
+<a href="https://github.com/jxnblk/writing" target="_blank">source for this blog</a>, which uses a very similar approach.</p><span>
+</span><h2 id="other-considerations-and-improvements"><a href="http://jxnblk.com/writing/posts/static-site-generation-with-react-and-webpack/#other-considerations-and-improvements">Other Considerations and Improvements</a></h2><p>Since this uses webpack, there are also ways to include image assets and fonts in the bundle, but I haven’t tried this so your mileage may vary.</p><span>
+</span><p>The <code>routes</code> array is passed in as props, and navigation links could be created dynamically rather than being hard coded.
+This could make handling lots of pages easier.</p><span>
+</span><p>If you’re hosting the static site on gh-pages, you’ll need a way to handle the base url when using React Router’s Link component.
+I don’t know of a good way to do this yet and would love to hear suggestions on how to improve that.</p><span>
+</span><p><del>Handling the CSS as shown above can lead to a fairly large chunk of JSON being inserted into the initial-props script tag,
+and I’m not sure if there’s a better way to handle that.</del></p><span>
+</span><p>This is just one way to build static sites with React.
+If you’ve seen other ways or have any suggestions for improving on this, I’d love to hear them.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

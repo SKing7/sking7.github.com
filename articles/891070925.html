@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Motion Blur Effect with SVG</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Motion Blur Effect with SVG</h1>
+<div class="ct-post-content"><span>
+								</span><p>A tutorial on how to create a motion blur effect on HTML elements using JavaScript and an SVG blur filter.</p><span>								</span><div class="ct-ad-article-wrapper"><span>
+										</span><div class="ct-ad-article"><span>
+																						</span><img class="ct-ad-img" src="http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/themes/codropstheme03/images/advertisement.jpg" /><span>
+												
+											</span><span>
+										</span></div><span>
+									</span></div><span>
+								
+								</span><p><a href="http://tympanus.net/Tutorials/MotionBlurEffect/"><img src="http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/uploads/2015/04/MotionBlur.jpg" alt="MotionBlur" width="580" height="315" class="alignnone size-full wp-image-23828" /></a></p><span>
+</span><p><a class="demo" href="http://tympanus.net/Tutorials/MotionBlurEffect/">View demo</a> <a class="download" href="http://tympanus.net/Tutorials/MotionBlurEffect/MotionBlurEffect.zip" onclick="var that=this;_gaq.push(['_trackEvent','Download','ZIP',this.href]);setTimeout(function(){location.href=that.href;},400);return false;">Download source</a></p><span>
+</span><p>Today we are going to show you how to make a motion blur effect and apply it to regular JS or CSS animations of HTML elements.</p><span>
+</span><p>Motion blur is a technique widely used in motion graphics and animation in general to make movement seem more smooth and natural. </p><span>
+</span><blockquote><p>
+Motion blur is the apparent streaking of rapidly moving objects in a still image or a sequence of images such as a movie or animation. It results when the image being recorded changes during the recording of a single frame, either due to rapid movement or long exposure.</p>
+<p>— <a href="http://en.wikipedia.org/wiki/Motion_blur" title="Motion blur">Motion blur on Wikipedia</a>
+</p></blockquote><span>
+</span><p>In this article, we’ll take a look at how to make an approximation of that effect, for horizontal or vertical transitions.</p><span>
+</span><p>
+<strong>Attention:</strong> Please keep in mind that this effect is <strong>highly experimental</strong> and only supported by some modern browsers. Chrome seems to have the best performance for it as of now.
+</p><span>
+</span><p>In order to apply a motion blur effect to an animation, we need to apply a directional blur to the object according to the speed and direction it is moving, for every frame.</p><span>
+</span><p><img src="http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/uploads/2015/04/MotionBlur_01.jpg" alt="MotionBlur_01" width="890" height="551" class="alignnone size-full wp-image-23829" /></p><span>
+</span><p>Let’s take a look at the steps we need to take to understand how the effect works:</p><span>
+</span><h2>Setting the blur</h2><span>
+</span><p>Since the regular CSS blur filter does not support directional blur, we are going to have to use SVG filters.<br />We’ve already covered the basics of SVG filters in the <a href="http://tympanus.net/codrops/2015/03/10/creative-gooey-effects/#section_svgfilters" title="Creative Gooey Effects">Creative Gooey Effects article</a>.</p><span>
+</span><p>For this effect, we will only be using the <strong>feGaussianBlur</strong> filter primitive.</p><span>
+</span><pre class="brush:html">
+<code>&lt;svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="filters"&gt;
+	&lt;defs&gt;
+		&lt;filter id="blur"&gt;
+			&lt;feGaussianBlur in="SourceGraphic" stdDeviation="0,0" /&gt;
+		&lt;/filter&gt;
+	&lt;/defs&gt;
+&lt;/svg&gt;</code></pre><span>
+</span><p>The <strong>stdDeviation</strong> attribute is used to set the blur intensity, and can take up to two parameters, for blur in the horizontal and vertical orientation.</p><span>
+</span><p>Applying the filter to an element, as we’ve seen before, is simple enough:</p><span>
+</span><pre class="brush:css"><code>.selector{
+	-webkit-filter: url("#blur");
+	filter: url("../index.html#blur");
+}
+</code></pre><span>
+</span><p>For the motion blur effect, however, we are going to have to update the filter dynamically for every frame through JS. </p><span>
+</span><p>First we will have to select and store the filter in a variable so that we can access it later. Since jQuery doesn’t play well with SVG elements, we need to select the element using native JS functions:</p><span>
+</span><pre class="brush:js"><code>var filters = document.querySelector(".filters"), // the SVG that contains the filters
+	defs = filters.querySelector("defs"), // the <defs> element inside the SVG
+	blur = defs.querySelector("#blur"), // the blur filter
+	blurFilter = blur.firstElementChild; // the feGaussianBlur primitive
+</defs></code></pre><span>
+</span><p>Setting the intensity then, is just a matter of changing the <strong>stdDeviation</strong> attribute of the filter primitive. For example, to set a horizontal 12px blur:</p><span>
+</span><pre class="brush:js"><code>blurFilter.setAttribute("stdDeviation","12,0");
+</code></pre><span>
+</span><p><img src="http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/uploads/2015/04/MotionBlur_02.gif" alt="MotionBlur_02" width="890" height="498" class="alignnone size-full wp-image-23830" /></p><span>
+</span><p>Keep in mind that this blur filter only supports directional blur on either the X or the Y direction, and not on any arbitrary angle, so you should plan your animations accordingly.</p><span>
+</span><p>Note though, that changing the blur filter affects all objects linked to it, so we need a new <code>&lt;filter&gt;</code> element for each object we want to apply this effect to. Here is a simple way of creating these filters dynamically:</p><span>
+</span><pre class="brush:js"><code>// go through all the objects that need a blur filter
+$(".js-blur").each(function(i){
+	// clone the filter
+	var blurClone=blur.cloneNode(true);
+
+	// create and set a new ID so we can use the filter through CSS
+	var blurId="blur"+i;
+	blurClone.setAttribute("id",blurId);
+
+	defs.appendChild(blurClone);
+
+	// set the CSS
+	var filter="url(#"+blurId+")";
+	$(this)
+		.css({
+			webkitFilter:filter,
+			filter:filter
+		})
+		// store the filter reference on the object for practicity
+		.data("blur",blurClone)
+	;
+});
+</code></pre><span>
+</span><div class="ct-ad-article-wrapper ct-ad-article-wrapper-in"><div class="ct-ad-article"><img class="ct-ad-img" src="http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/themes/codropstheme03/images/advertisement.jpg" /></div></div><span>
+</span><h2>Measuring the speed</h2><span>
+</span><p>For the next step, we need to be able to calculate, how far the object has moved since the last frame. We need to do this for every frame. The method for achieving this might vary according to how everything is set up; how the animation is done, etc. In this tutorial, we’ll take a more generalist approach, which, while it might not be optimized for all use cases, should work with most JS and CSS animations.</p><span>
+</span><p>To get the position, we’ll be using jQuery’s <strong>offset</strong> function, which is just what we need: it returns the element’s coordinates relative to the document (rather than its parent), and takes the <strong>transform</strong> property into account. </p><span>
+</span><p>To be able to check for changes and update every frame, we’ll use <strong>requestAnimationFrame</strong>.</p><span>
+</span><p>Here’s an example:</p><span>
+</span><pre class="brush:js"><code>// the element we want to apply the effect
+var $element=$(".selector");
+// storing the last position, to be able to measure changes
+var lastPos=$element.offset();
+// a multiplier, to be able to control the intensity of the effect
+var multiplier=0.25;
+
+// a helper to simplify setting the blur. 
+function setBlur(x,y){
+	blurFilter.setAttribute("stdDeviation",x+","+y);	
+}
+
+(function updateMotionBlur(){
+	// get the current position of the element
+	var currentPos=$element.offset();
+
+	// calculate the changes from the last frame and apply the multiplier
+	var xDiff=Math.abs(currentPos.left-lastPos.left)*multiplier;
+	var yDiff=Math.abs(currentPos.top-lastPos.top)*multiplier;
+
+	// set the blur
+	setBlur(xDiff,yDiff);
+
+	// store current position for the next frame
+	lastPos=currentPos;
+
+	// call to update in the next frame
+	requestAnimationFrame(updateMotionBlur);
+})();
+</code></pre><span>
+</span><p>And here is the result:</p><span>
+</span><p><img src="http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/uploads/2015/04/blur_modal.gif" alt="blur_modal" width="880" height="575" class="alignnone size-full wp-image-23832" /></p><span>
+</span><p>This is the basic approach which takes only one element into consideration. A more complicated use might require code optimized for it in particular. For a more sophisticated take, you may look into applying the motion blur effect to multiple objects, disabling the blur and the speed calculation when there’s no animation, and so on. </p><span>
+</span><p><img src="http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/uploads/2015/04/blur_gallery.gif" alt="blur_gallery" width="880" height="440" class="alignnone size-full wp-image-23831" /></p><span>
+</span><p>And we’re done here! <em>Again, with all things filter, please be aware that this effect can be resource intensive, so you should refrain from using it on large objects. </em></p><span>
+</span><span>
+</span><p><a class="demo" href="http://tympanus.net/Tutorials/MotionBlurEffect/">View demo</a> <a class="download" href="http://tympanus.net/Tutorials/MotionBlurEffect/MotionBlurEffect.zip" onclick="var that=this;_gaq.push(['_trackEvent','Download','ZIP',this.href]);setTimeout(function(){location.href=that.href;},400);return false;">Download source</a></p><span>
+								
+																	</span><span> </span><!-- ct-post-nav --><span>
+																
+							</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

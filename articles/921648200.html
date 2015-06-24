@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Automatic Cache Busting for Your CSS</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Automatic Cache Busting for Your CSS</h1>
+<section class="post-content">
+            <blockquote>
+  <p>This article is a guest post from <a href="https://twitter.com/sufianrhazi">Sufian Rhazi</a>, who is a speaker at <a href="http://jsconfbp.com/?utm_source=rsblog&amp;utm_medium=cachebusting&amp;utm_campaign=JSConf/">JSConf Budapest</a> on 14-15th May 2015.</p>
+</blockquote>
+
+<h2 id="astsandcodetransformation">ASTs and Code Transformation</h2>
+
+<p>In order to have a high-performance website, you’ve got to take advantage of HTTP caching. If a CDN or your browser has some of your site in its cache, that translates to less time waiting for packets to transfer over the wire.</p>
+
+<p>In an ideal world, all of your JS, CSS, and images should be able to live in a cache forever. But how can this be done if these assets need to change over time?</p>
+
+<p>In this article, I’ll show you a strategy to transform image URLs in your CSS files so that you can make your website faster.</p>
+
+<h2 id="httpcaching101">HTTP Caching 101</h2>
+
+<p>HTTP works on request and response pairs: a request is made to a URL, and a response contains the contents of the resource that exists at that URL.</p>
+
+<p><img src="http://blog.risingstack.com/content/images/2015/04/request-response-without-cache-busting.png" alt="Request -&gt; Response without Cache Busting" /></p>
+
+<p>Responses also can hold <a href="http://tools.ietf.org/html/rfc7234">caching headers</a> that tell clients that they can re-use responses to requests if certain conditions apply. For example, if you ask for the same URL twice within the cache lifetime, you’ll be able to save a network request and get the second response from a cache.</p>
+
+<p>Since URLs are the primary key for determining whether a response is contained in a cache, it’s common practice to add a cache buster to a URL in order to force the request to be unique and avoid a cached response.</p>
+
+
+
+<p>Your CSS probably contains several image URL references. Since we want to take advantage of caching, it’d be fantastic if we could tell clients that our images should be cacheable forever. Adding a <code>Cache-Control: max-age=31536000</code> header and an <code>Expires</code> header with a year from now date should do the trick.</p>
+
+<pre><code class="css">/* File: simple.css */
+
+.simple {
+    background: url('one.jpg');
+}
+.complex {
+    background: url("two.png") center bottom no-repeat,
+        url(three.png) left top no-repeat;
+}
+</code></pre>
+
+<p>When your browser sees this CSS file and needs to render matching HTML, it will make requests for those images. If we set the expiration date to a year, browsers will only need to make requests to those images once. But what if the images need to be changed?</p>
+
+<p>We’ll need to add a cache buster to these URLs so that we don’t accidentally show people the old cached images. Some people suggest adding timestamps or numbers in a query parameter to the URLs, but I prefer to add a hash of the contents to the filename itself, since that will always change when the image contents change and additionally <a href="https://github.com/h5bp/server-configs-apache/blob/02a601e5914a504e019c46b76bb21adab89cb686/src/.htaccess#L677-692">work with all HTTP caches</a>.</p>
+
+<p>For this, since we care mostly about the hash value changing if images we provide have changed, let’s use <a href="http://en.wikipedia.org/wiki/MD5">MD5</a>, a cryptographic hash function. While MD5 is not appropriate for verification of untrusted data, it does provide <a href="http://stackoverflow.com/a/8199245">uniform distribution</a> when truncated and if we use the first 32 bits, there will be a <a href="http://davidjohnstone.net/pages/hash-collision-probability">1 in 3,506,097</a> chance of a collision if we have 50 revisions of the same file. That seems to be pretty good odds for most sites, but you could always add more bits for additional collision resistance.</p>
+
+<p>If we place these cache busters right before the file extension and strip it out server side, when a file gets modified and our images get new cache busters, the HTTP requests will look like this:</p>
+
+<p><img src="http://blog.risingstack.com/content/images/2015/04/cache-busting-and-file-changes.png" alt="Cache Busting and File Changes" /></p>
+
+<blockquote>
+  <p><strong>Note</strong>: Before <a href="https://tools.ietf.org/html/rfc7230">RFC 7230</a> was published, <a href="https://tools.ietf.org/html/rfc2616">RFC 2616</a> had language which <a href="http://www.rfc-editor.org/errata_search.php?rfc=2616&amp;eid=3056">did not include the query as part of the URL</a>. There are many <a href="http://stevesouders.com/blog/2008/08/23/revving-filenames-dont-use-querystring">old and misconfigured caches</a> which do not accept the latest HTTP standards, I would avoid using query parameters for cache busting. </p>
+</blockquote>
+
+
+
+<p>So let’s write some JS that transforms the above simple.css to what we want:</p>
+
+<pre><code>/* File: simple.transformed.css */
+
+.simple {
+    background: url(one.cbe7e7eb.jpg);
+}
+
+.complex {
+    background: url(two.b4238023.png) center bottom no-repeat,
+        url(three.c8bf6e59.png) left top no-repeat;
+}
+</code></pre>
+
+<p>Instead of blindly replacing strings, let’s parse the file into an AST, search for URLs within the AST, replace them with URLs that contain the cache buster and then generate the built CSS file from the transformed AST. To do this, we’ll be using the gonzales and MD5 npm packages to parse CSS and calculate MD5 hashes.</p>
+
+<p>Gonzales has a very simple API. The core transformation function in our script is very straightforward:</p>
+
+<pre><code>var fs = require('fs');  
+var path = require('path');  
+var gonzales = require('gonzales');  
+var md5 = require('MD5');
+
+function transformCSS(sourcePath, destPath) {  
+    var contents = fs.readFileSync(sourcePath, 'utf-8');
+
+    // Parse our CSS into an AST
+    var ast = gonzales.srcToCSSP(contents);
+
+    // Perform the AST transformation
+    var transformedAst = transformAst(ast, versionUrl);
+
+    // Generate CSS from the transformed AST
+    var output = gonzales.csspToSrc(ast);
+    fs.writeFileSync(destPath, output, 'utf-8');
+}
+</code></pre>
+
+<p>Once we parse the source with gonzales, we have an AST, which gonzales represents as a nested array. It’s a bit of a strange format, but our original CSS looks like this parsed:</p>
+
+<pre><code>["stylesheet",
+  ["ruleset",
+    ["selector",
+      ["simpleselector",
+        ["clazz",
+          ["ident", "simple"]
+        ],
+        ["s", " "]
+      ]
+    ],
+    ["block",
+      ["s", " "],
+      ["declaration",
+        ["property",
+          ["ident", "background"]
+        ],
+        ["value",
+          ["s", " "],
+          ["uri", [ "string", "\"one.jpg\""]]
+        ]
+      ]
+    ]
+    ...etc...
+</code></pre>
+
+<p>If you look through the gonzales AST documentation, you can find out what each of these arrays means. But if you just tilt your head to the side, squint a little, and ignore the s items that represent whitespace, you’ll see this tree:</p>
+
+<p>ast</p>
+
+<p>Which represents the first part of our CSS file:</p>
+
+<pre><code>.simple {
+    background: url("one.jpg");
+}
+</code></pre>
+
+<p>This data structure represents the parsed values of the CSS code. Now all we need to do is find all of the URL nodes and replace them with a filename that includes the cache busting hash.</p>
+
+<p>So all we need to do is write a recursive function which will walk through the AST and replace the nodes with the result of a visitor:</p>
+
+<pre><code>function transformAst(node, transformer) {  
+    for (var i = 1; i &lt; node.length; ++i) {
+        if (Array.isArray(node[i])) {
+            node[i] = transformAst(node[i], transformer);
+        }
+    }
+    return transformer(node);
+}
+</code></pre>
+
+<p>With this transformAst function, we can simply write a visitor function looks for uri nodes and replaces them with those that have cache-busting paths:</p>
+
+<pre><code>function transformWalker(node) {  
+    if (node[0] === 'uri') {
+        var url;
+        // There are 2 types of strings in URI nodes
+        if (node[1][0] === 'string') {
+            // One which is surrounded by quotes
+            url = node[1][1].substr(1, node[1][1].length - 2);
+        } else if (node[1][0] === 'raw') {
+            // The other which is simply raw text
+            url = node[1][1];
+        }
+        var buffer = fs.readFileSync(url);
+        var cachebuster = md5(buffer).substr(0, 8); // only first 32 bits
+        var ext = path.extname(url);
+        var versioned = url.substr(0, ext.length) + cachebuster + ext;
+        return ['uri', ['raw', versioned]];
+    }
+    return node;
+}
+</code></pre>
+
+<p>And there we have it, a script that adds cache busting hashes to image URLs found within a CSS file!</p>
+
+<p>Using ASTs is a strategy that can be used to accomplish tasks that are much more complex than simple string replacement. It could be used to programmatically change CSS units, perform automatic browser prefixing of declaration properties, or do even more drastic structural changes. In fact, it’d be very easy to modify this code to automatically inline small images into base64 data uris, which could save additional HTTP requests.</p>
+
+<p>AST transformation is not limited to CSS; this can be used to parse <strong>any</strong> structured languages: JavaScript, HTML, CSS, C, Go, Lisp, C++, Haskell, or even FORTRAN. So go ahead and <strong>use your newfound skills to transform your code!</strong></p>
+
+<blockquote>
+  <p>This article is a guest post from <a href="https://twitter.com/sufianrhazi">Sufian Rhazi</a>, who is a speaker at <a href="http://jsconfbp.com/?utm_source=rsblog&amp;utm_medium=cachebusting&amp;utm_campaign=JSConf/">JSConf Budapest</a> on 14-15th May 2015.</p>
+</blockquote>
+        </section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

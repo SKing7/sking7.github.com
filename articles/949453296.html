@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Importing CSS Breakpoints Into JavaScript</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Importing CSS Breakpoints Into JavaScript</h1>
+<div class="u-layout-content-grid"><p>There are a lot of challenges within responsive web design, and one that that has constantly been a pain is triggering JavaScript based on the current CSS media query breakpoint. The problem is that the breakpoints are in CSS, which JavaScript has no native way to access. Many solutions (including <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia">window.matchMedia()</a>, and <a href="http://wicky.nillia.ms/enquire.js/">Enquire.js</a>) involve declaring your breakpoints in both CSS and JS, or require IE10+. The problem with these solutions is that when you change a breakpoint value, you have to change it twice. However, it doesn't need to be like this.</p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

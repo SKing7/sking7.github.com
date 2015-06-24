@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>iphone - Can you have a 0.5px border on a Retina Display? - Stack Overflow</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>iphone - Can you have a 0.5px border on a Retina Display? - Stack Overflow</h1>
+<div class="post-text" itemprop="text"><span>
+</span><span>
+
+</span><p>Safari 8 (in both iOS and OS X) brings <code>border-width: 0.5px</code>. You can use that if you’re ready to accept that current versions of Android and old versions of iOS and OS X will just show a regular border (a fair compromise in my opinion).</p><span>
+
+</span><p>You can’t use this directly though, because browsers that don’t know about <code>0.5px</code> borders will interpret it as <code>0px</code>. No border. So what you need to do is add a class to your <code>&lt;html&gt;</code> element when it is supported:</p><span>
+
+</span><pre><code>if (window.devicePixelRatio &amp;&amp; devicePixelRatio &gt;= 2) {
+  var testElem = document.createElement('div');
+  testElem.style.border = '.5px solid transparent';
+  document.body.appendChild(testElem);
+  if (testElem.offsetHeight == 1)
+  {
+    document.querySelector('html').classList.add('hairlines');
+  }
+  document.body.removeChild(testElem);
+}
+// This assumes this script runs in &lt;body&gt;, if it runs in &lt;head&gt; wrap it in $(document).ready(function() {   })
+</code></pre><span>
+
+</span><p>Then, using retina hairlines becomes really easy:</p><span>
+
+</span><pre><code>div {
+  border: 1px solid #bbb;
+}
+
+.hairlines div {
+  border-width: 0.5px;
+}
+</code></pre><span>
+
+</span><p>Best of all, you can use border-radius with it. And you can use it with the 4 borders (top/right/bottom/left) as easily.</p><span>
+
+</span><p>Source: <a href="http://dieulot.net/css-retina-hairline">http://dieulot.net/css-retina-hairline</a></p><span>
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
