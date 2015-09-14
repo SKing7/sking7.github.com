@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Optimising a canvas animation</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>Optimising a canvas animation</h1>
+<div class="post-content"><p>I've been working on a small canvas animation for <a href="http://2015.ffconf.org/">ffconf 2015</a> and realised two important optimisations that I've missed out on the past.</p><span>
+</span><p>The net result: no more humming fan on my laptop.</p><span>
+</span><!--more--><span>
+</span><p>The result is this simple retro animation that will only last a few days in production, so I've included a tweaked version here:</p><span>
+</span><p><a class="jsbin-embed" href="https://jsbin.com/zulaha/8/embed?js,output">JS Bin on jsbin.com</a></p><span>
+</span><p>For the sake of brevity (and actually getting this post written under the usual <em>several hours</em>), I'm just going to talk about what I changed.</p><span>
+</span><h2>Pinning FPS</h2><p>I knew that the "right" approach was to use <code>requestAnimationFrame</code> (rAF) for animation, but my problems historically is that the call rate of my update function was way, way too often. This can either cause my animation to appear to be <em>too</em> quick, or results in the CPU overheating.</p><span>
+</span><p>One nice advantage of rAF for animation is that it will stop firing when the tab is out of focus (i.e. if you switch to another tab). Whereas <code>setInterval</code> not only doesn't hit the timing you want, but it'll <em>keep</em> firing, burning up battery.</p><span>
+</span><p><strong>TIL</strong> <code>requestAnimationFrame</code> passes in a <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame#Parameters">high resolution timestamp</a> to the callback.</p><span>
+</span><p>Using the timestamp, we can get a delta of the last run, and if, and only if, the last frame was drawn X FPS ago, then we'll draw a new frame. For example:</p><span>
+</span><pre><code class="language-js">var lastFrameTime = 0;
+function draw(elapsedTime) {
+  // calculate the delta since the last frame
+  var delta = elapsedTime - (lastFrameTime || 0);
+
+  // queue up an rAF draw call
+  window.requestAnimationFrame(draw);
+
+  // if we *don't* already have a first frame, and the
+  // delta is less than 33ms (30fps in this case) then
+  // don't do anything and return
+  if (lastFrameTime &amp;&amp; delta &lt; 33) {
+    return;
+  }
+  // else we have a frame we want to draw at 30fps...
+
+  // capture the last frame draw time so we can work out
+  // a delta next time.
+  lastFrameTime = elapsedTime;
+
+  // now do the frame update and render work
+  // ...
+}
+</code></pre><span>
+</span><h2>Minimise your paints</h2><p>Originally my demo was drawing a number of squares that would scale towards the viewer giving the impression of movement. Initially innocuous:</p><span>
+</span><pre><code class="language-js">function draw() {
+  // ... calculate x, y, scale, etc
+  // makes the shape: |_|
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y + y2);
+  ctx.lineTo(x + x2, y + y2);
+  ctx.lineTo(x + x2, y);
+  ctx.stroke();
+  ctx.closePath();
+}
+
+// update is called on a new frame
+function update() {
+  // ... update state then draw:
+  for (i = 0; i &lt; boxes.length; i++) {
+    boxes[i].draw();
+  }
+}
+</code></pre><span>
+</span><p>This would be repeated for every "box" animating towards the viewer. Since I'm just drawing lines, I could batch all these together all in one go and group the collective shapes under one path, then run a <em>single</em> stroke:</p><span>
+</span><pre><code class="language-js">function draw() {
+  // ... calculate x, y, scale, etc
+  // makes the shape: |_|
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y + y2);
+  ctx.lineTo(x + x2, y + y2);
+  ctx.lineTo(x + x2, y);
+}
+
+// update is called on a new frame
+function update() {
+  // ... update state then draw:
+  ctx.beginPath();
+  for (i = 0; i &lt; boxes.length; i++) {
+    boxes[i].draw();
+  }
+  ctx.stroke();
+  ctx.closePath();
+}
+</code></pre><span>
+</span><p>It's a fairly tiny optimisation, but the result is the same, but with less interaction with the canvas, and given we're aiming to be in and out quickly, it's not a bad thing.</p><span>
+</span><h2>Single rAF handler</h2><p>If you've got more than one animation running, you'll need to set-up multiple callbacks to <code>requestAnimationFrame</code>, but having multiple rAF callbacks isn't ideal, and starts to get unwieldy when you're working with others who <em>also</em> want to queue up their animations.</p><span>
+</span><p>You really want everything to be handled in a <em>single</em> rAF handler.</p><span>
+</span><p>I've written a small gist called <strong><a href="https://gist.github.com/remy/36f388d72c1ef161582f">raf.js</a></strong> that allows me to put all my rAF calls through a single handler (and added some niceties like the FPS pinning and a <code>running</code> boolean flag).</p><p class="follow">Posted 13-Jul 2015 under code. <span class="note">Find me on Twitter <a href="http://twitter.com/rem">here</a> I'll tweet about JavaScript, HTML5 and other such gems (amongst usual tweet-splurges)</span></p></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

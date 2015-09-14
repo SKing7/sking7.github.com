@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>querySelectorAll from an element probably doesn't do what you think it does</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>querySelectorAll from an element probably doesn't do what you think it does</h1>
+<div><span>
+</span><p>Modern browsers have APIs called <code>querySelector</code> and <code>querySelectorAll</code>. They
+find one or more elements matching a CSS selector. I'm assuming basic
+familiarity with CSS selectors: how you select elements, classes and ids. If
+you haven't used them, the Mozilla Developer Network has an excellent
+<a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Getting_started/Selectors">introduction</a>.</p><span>
+</span><p>Imagine the following HTML page:</p><span>
+</span><pre class="code literal-block"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;img</span> <span class="na">id=</span><span class="s">"outside"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"my-id"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;img</span> <span class="na">id=</span><span class="s">"inside"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"lonely"</span><span class="nt">&gt;&lt;/div&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"outer"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"inner"</span><span class="nt">&gt;&lt;/div&gt;</span>
+        <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre><span>
+</span><p><code>document.querySelectorAll("div")</code> returns a <code>NodeList</code> of all of the <code>&lt;div&gt;</code>
+elements on the page. <code>document.querySelector("div.lonely")</code> returns that
+single lonely div.</p><span>
+</span><p><code>document</code> supports both <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector"><code>querySelector</code></a> and
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll"><code>querySelectorAll</code></a>, letting you find elements in the entire
+document. Elements themselves also support both <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelector"><code>querySelector</code></a> and
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelectorAll"><code>querySelectorAll</code></a>, letting you query for elements that are
+descendants of that element. For example, the following expression will find
+images that are descendants of <code>#my-id</code>:</p><span>
+</span><pre class="code literal-block"><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"#my-id"</span><span class="p">).</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s2">"img"</span><span class="p">)</span>
+</pre><span>
+</span><p>In the sample HTML page above, it will find <code>&lt;img id="inside"&gt;</code> but not <code>&lt;img
+id="outside"&gt;</code>.</p><span>
+</span><p>With that in mind, what do these two expressions do?</p><span>
+</span><pre class="code literal-block"><span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s2">"#my-id div div"</span><span class="p">);</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"#my-id"</span><span class="p">).</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s2">"div div"</span><span class="p">);</span>
+</pre><span>
+</span><p>You might reasonably expect them to be equivalent. After all, one asks for
+<code>div</code> elements inside <code>div</code> elements inside <code>#my-id</code>, and the other asks for
+<code>div</code> elements inside <code>div</code> elements that are <em>descendants</em> of
+<code>#my-id</code>. However, when you look at <a href="http://jsbin.com/hineco/edit?html,js,output">this JSbin</a>, you'll see that they
+produce very different results:</p><span>
+</span><pre class="code literal-block"><span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s2">"#my-id div div"</span><span class="p">).</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">1</span><span class="p">;</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"#my-id"</span><span class="p">).</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s2">"div div"</span><span class="p">).</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">3</span><span class="p">;</span>
+</pre><span>
+</span><p>What is going on here?</p><span>
+</span><p>It turns out that <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelectorAll"><code>element.querySelectorAll</code></a> doesn't match elements
+starting from <code>element</code>. Instead, it matches elements matching the query that
+are also descendants of <code>element</code>. Therefore, we're seeing three <code>div</code>
+elements: <code>div.lonely</code>, <code>div.outer</code>, <code>div.inner</code>. We're seeing them because
+they both match the <code>div div</code> selector and are all descendants of <code>#my-id</code>.</p><span>
+</span><p>The trick to remembering this is that CSS selectors are absolute. They are not
+relative to any particular element, not even the element you're calling
+<code>querySelectorAll</code> on.</p><span>
+</span><p>This even works with elements <em>outside</em> the element you're calling
+<code>querySelectorAll</code> on. For example, this selector:</p><span>
+</span><pre class="code literal-block"><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"#my-id"</span><span class="p">).</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"div div div"</span><span class="p">)</span>
+</pre><span>
+</span><p>... matches <code>div.inner</code> in this snippet (<a href="http://jsbin.com/woropuc/edit?html,js,output">JSbin</a>):</p><span>
+</span><pre class="code literal-block"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;div&gt;</span>
+      <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"my-id"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"inner"</span><span class="nt">&gt;&lt;/div&gt;</span>
+      <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre><span>
+</span><p>I think this API is surprising, and the front-end engineers I've asked seem to
+agree with me. This is, however, not a bug. It's how the spec defines it to
+work, and browsers consistently implement it that way.
+Safari. <a href="http://ejohn.org/blog/thoughts-on-queryselectorall/">John Resig commented</a> how he and others felt this behavior
+was quite confusing back when the spec came out.</p><span>
+</span><p>If you can't easily rewrite the selector to be absolute like we did above,
+there are two alternatives: the <code>:scope</code> CSS pseudo-selector, and
+<code>query</code>/<code>queryAll</code>.</p><span>
+</span><p>The <code>:scope</code> pseudo-selector matches against the current scope. The
+name comes from the <a href="https://html.spec.whatwg.org/multipage/semantics.html#attr-style-scoped">CSS scoping</a>, which limits the scope
+of styles to part of the document. The element we're calling
+<code>querySelectorAll</code> on also counts as a scope, so this expression only
+matches <code>div.inner</code>:</p><span>
+</span><pre class="code literal-block"><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"#my-id"</span><span class="p">).</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s2">":scope div div"</span><span class="p">);</span>
+</pre><span>
+</span><p>Unfortunately, <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/%3Ascope#Browser_compatibility">browser support</a> for scoped CSS and the <code>:scope</code>
+pseudo-selector is extremely limited. Only recent versions of Firefox support
+it by default. Blink-based browsers like Chrome and Opera require the
+well-hidden experimental features flag to be turned on. Safari has a buggy
+implementation. Internet Explorer doesn't support it at all.</p><span>
+</span><p>The other alternative is <code>element.query</code>/<code>queryAll</code>. These are alternative
+methods to <code>querySelector</code> and <code>querySelectorAll</code> that exist on DOM parent
+nodes. They also take selectors, except these selectors are interpreted
+relative to the element being queried from. Unfortunately, these methods are
+even more obscure: they are not referenced on MDN or <code>caniuse.com</code>, and are
+missing from the <a href="http://www.w3.org/TR/dom/#interface-parentnode">current DOM4 working draft</a>, dated 18
+June 2015. They were still present in <a href="http://www.w3.org/TR/2014/WD-dom-20140204/#interface-parentnode">an older version</a>, dated 4
+February 2014, as well as in the <a href="https://dom.spec.whatwg.org/#interface-parentnode">WHATWG Living Document</a> version
+of the spec. They have also been implemented by at least two polyfills:</p><span>
+</span><span>
+</span><p>In conclusion, the DOM spec doesn't always necessarily do the most obvious
+thing. It's important to know pitfalls like these, because they're difficult
+to discover from just the behavior. Fortunately, you can often rewrite your
+selector so that it isn't a problem. If you can't, there's always a polyfill
+to give you the modern API you want. Alternatively, libraries like jQuery can
+also help you get a consistent, friendly interface for querying the DOM.</p><span>
+</span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>

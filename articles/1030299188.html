@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>网页正文及内容图片提取算法</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>网页正文及内容图片提取算法</h1>
+<div class="entry-content"><span>
+      </span><span>
+        </span><p><strong>问题：</strong>如何提取任意（尤其是新闻、资讯类）网页的正文内容，提取与文章内容相关的图片，源码可见：<a href="https://github.com/rainyear/cix-extractor-py/blob/master/extractor.py">extractor.py</a>。</p><span>
+
+</span><p>抓取单个网站网页内容时通常采用正则匹配的方式，但不同网站之间结构千奇百怪，很难用统一的正则表达式进行匹配。<a href="http://cx-extractor.googlecode.com/files/%E5%9F%BA%E4%BA%8E%E8%A1%8C%E5%9D%97%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0%E7%9A%84%E9%80%9A%E7%94%A8%E7%BD%91%E9%A1%B5%E6%AD%A3%E6%96%87%E6%8A%BD%E5%8F%96%E7%AE%97%E6%B3%95.pdf">《基于行块分布函数的通用网页正文抽取算法》</a>的作者总结了一般从网页中提取文章正文的方法，提出基于行块分布的正文抽取算法，并给出了 PHP 、Java 等实现。这一算法的主要原理基于两点：</p><span>
+
+</span><ol>
+<li>正文区密度：在去除HTML中所有tag之后，正文区字符密度更高，较少出现多行空白；  </li>
+<li>行块长度：非正文区域的内容一般单独标签（行块）中较短。</li>
+</ol><span>
+
+</span><p>算法步骤如下：</p><span>
+
+</span><ul>
+<li>去除所有tag，包括样式、Js脚本内容等，但保留原有的换行符<code>\n</code>：</li>
+</ul><span>
+
+</span><pre><code class="language- python">reCOMM = r'&lt;!--.*?--&gt;'  
+reTRIM = r'&lt;{0}.*?&gt;([\s\S]*?)&lt;\/{0}&gt;'  
+reTAG  = r'&lt;[\s\S]*?&gt;|[ \t\r\f\v]'
+
+def processTags(body=""):  
+  body = re.sub(reCOMM, "", body)
+  body = re.sub(reTRIM.format("script"), "" ,re.sub(reTRIM.format("style"), "", body))
+  body = re.sub(reTAG, "", body)
+  return body
+</code></pre><span>
+
+</span><ul>
+<li>将网页内容按行分割，定义行块 $block_i$ 为第 $[i, i + blockSize]$ 行文本之和并给出行块长度基于行号的分布函数：</li>
+</ul><span>
+
+</span><pre><code class="language- python">def processBlocks(body=""):  
+  ctexts = body.split("\n")
+  textLens = [len(text) for text in ctexts]
+  cblocks  = [0] * (len(ctexts) - blockSize)
+
+  lines = len(ctexts)
+  for i in range(blockSize):
+    cblocks = list(map(lambda x,y: x+y, textLens[i : lines-1-blockSize+i], cblocks))
+  return cblocks
+</code></pre><span>
+
+</span><ul>
+<li>正文出现在最长的行块，截取两边至行块长度为 0 的范围：</li>
+</ul><span>
+
+</span><pre><code class="language- python">def getContext(ctexts, cblocks):  
+  maxTextLen = max(cblocks)
+
+  start = end = cblocks.index(maxTextLen)
+  while start &gt; 0 and cblocks[start] &gt; min(textLens):
+      start -= 1
+  while end &lt; lines - blockSize and cblocks[end] &gt; min(textLens):
+    self.end += 1
+
+  return "".join(ctexts[start:end])
+</code></pre><span>
+
+</span><ul>
+<li>如果需要提取正文区域出现的图片，只需要在第一步去除tag时保留<code>&lt;img&gt;</code>标签的内容：</li>
+</ul><span>
+
+</span><pre><code class="language- python">reIMG  = re.compile(r'&lt;img[\s\S]*?src=[\'|"]([\s\S]*?)[\'|"][\s\S]*?&gt;')  
+def processImages(body):  
+  return reIMG.sub(r'{{\1}}', body)
+</code></pre><span>
+
+</span><h3 id="">总结</h3><span>
+
+</span><p>以上算法基本可以应对大部分（中文）网页正文的提取，针对有些网站正文图片多于文字的情况，可以采用保留<code>&lt;img&gt;</code> 标签中图片链接的方法，增加正文密度。目前少量测试发现的问题有：1）文章分页或动态加载的网页；2）评论长度过长喧宾夺主的网页。</p><span>
+
+</span><h3 id="">参考</h3><span>
+
+</span><span>
+      </span><span>
+      </span><span>
+    </span></div></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
