@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>The Evolution of Asynchronous JavaScript</title>
+<link rel="stylesheet" href="../css/article.css" />
+</head>
+<body>
+<div class="m-content">
+<h1>The Evolution of Asynchronous JavaScript</h1>
+<section class="post-content">
+<div><span>
+</span><img data-cfsrc="/content/images/2015/08/the-evolution-of-asynchronous-javascript.png" alt="asynchronous-javascript-cover"><noscript><img src="/content/images/2015/08/the-evolution-of-asynchronous-javascript.png" alt="asynchronous-javascript-cover"/></noscript><span>
+</span></div>
+<p>The <code>async</code> functions are just around the corner - but the journey to here was quite long. Not too long ago we just wrote <a href="https://blog.risingstack.com/node-js-best-practices/">callbacks</a>, then the Promise/A+ specification emerged followed by <a href="https://blog.risingstack.com/hapi-on-steroids-using-generator-functions-with-hapi/">generator functions</a> and now the async functions.</p>
+<p>Let's take a look back and see how asynchronous JavaScript evolved over the years.</p>
+<h2 id="callbacks">Callbacks</h2>
+<p><em>It all started with the <a href="https://blog.risingstack.com/node-js-best-practices/">callbacks</a>.</em> </p>
+<h3 id="asynchronousjavascript">Asynchronous JavaScript</h3>
+<p>Asynchronous programming, as we know now in JavaScript, can only be achieved with functions being first-class citizens of the language: they can be passed around like any other variable to other functions. This is how callbacks were born: if you pass a function to another function <em>(a.k.a. <strong>higher order function</strong>)</em> as a parameter, within the function you can call it when you are finished with your job. No return values, only calling another function with the values.</p>
+<pre><code class="language-javascript">Something.save(function(err) {  
+  if (err)  {
+    //error handling
+    return;
+  }
+  console.log('success');
+});
+</code></pre>
+<p>These so called <strong>error-first callbacks</strong> are in the heart of Node.js itself - the core modules are using it as well as most of the modules found on NPM.</p>
+<p>The challenges with callbacks:</p>
+<ul>
+<li>it is easy to build callback hells or spaghetti code with them if not used properly</li>
+<li>error handling is easy to miss</li>
+<li>can't return values with the <code>return</code> statement, nor can use the <code>throw</code> keyword</li>
+</ul>
+<p>Mostly because of these points the JavaScript world started to look for solutions that can make asynchronous JavaScript development easier.</p>
+<p>One of the answers was the <a href="https://www.npmjs.com/package/async">async</a> module. If you worked a lot with callbacks, you know how complicated it can get to run things in parallel, sequentially or even mapping arrays using asynchronous functions. Then the async module was born thanks to <a href="https://twitter.com/caolan">Caolan McMahon</a>.</p>
+<p>With async, you can easily do things like:</p>
+<pre><code class="language-javascript">async.map([1, 2, 3], AsyncSquaringLibrary.square,  
+  function(err, result){
+  // result will be [1, 4, 9]
+});
+</code></pre>
+<p>Still, it is not that easy to read nor to write - so comes the Promises.</p>
+<h2 id="promises">Promises</h2>
+<p>The current JavaScript Promise specifications date back to 2012 and available from ES6 - however Promises were not invented by the JavaScript community. The term comes from <a href="https://en.wikipedia.org/wiki/Daniel_P._Friedman">Daniel P. Friedman</a> from 1976. </p>
+<p><strong>A promise represents the eventual result of an asynchronous operation.</strong></p>
+<p>The previous example with Promises may look like this:</p>
+<pre><code class="language-javascript">Something.save()  
+  .then(function() {
+    console.log('success');
+  })
+  .catch(function() {
+    //error handling
+  })
+</code></pre>
+<p>You can notice that of course Promises utilize callbacks as well. Both the <code>then</code> and the <code>catch</code> registers callbacks that will be invoked with either the result of the asynchronous operation or with the reason why it could not be fulfilled. Another great thing of Promises is that they can be chained:</p>
+<pre><code class="language-javascript">saveSomething()  
+  .then(updateOtherthing)
+  .then(deleteStuff)  
+  .then(logResults);
+</code></pre>
+<p>When using Promises you may have to use polyfills in runtimes that don't have it yet. A popular choice in these cases is to use <a href="https://github.com/petkaantonov/bluebird">bluebird</a>. These libraries may provide a lot more functionality than the native one - even in these cases <strong>limit yourself to the features provided by Promises/A+ specifications</strong>.</p>
+<p>But why shouldn't you use the sugar methods? Read <a href="http://blog.getify.com/promises-part-4/">Promises: The Extension Problem</a>. For more information on Promises, refer to the <a href="https://promisesaplus.com/">Promises/A+ specification</a>.</p>
+<p><em>You may ask: how can I use Promises when most of the libraries out there exposes a callback interfaces only?</em></p>
+<p>Well, it is pretty easy - the only thing that you have to do is wrapping the callback the original function call with a Promise, like this: </p>
+<pre><code class="language-javascript">function saveToTheDb(value) {  
+  return new Promise(function(resolve, reject) {
+    db.values.insert(value, function(err, user) { // remember error first ;)
+      if (err) {
+        return reject(err); // don't forget to return here
+      }
+      resolve(user);
+    })
+  }
+}
+</code></pre>
+<p>Some libraries/frameworks out there already support both, providing a callback and a Promise interface at the same time. If you build a library today, it is a good practice to support both. You can easily do so with something like this:</p>
+<pre><code class="language-javascript">function foo(cb) {  
+  if (cb) {
+    return cb();
+  }
+  return new Promise(function (resolve, reject) {
+
+  });
+}
+</code></pre>
+<p>Or even simpler, you can choose to start with a Promise-only interface and provide backward compatibility with tools like <a href="https://www.npmjs.com/package/callbackify">callbackify</a>. Callbackify basically does the same thing that the previous code snippet shows, but in a more general way.</p>
+<h2 id="generatorsyield">Generators / yield</h2>
+<p><a href="https://blog.risingstack.com/introduction-to-koa-generators/">JavaScript Generators</a> is a relatively new concept, they were introduced in ES6 <em>(also known as ES2015)</em>.</p>
+<blockquote>
+<p>Wouldn't it be nice, that when you execute your function, you could pause it at any point, calculate something else, do other things, and then return to it, even with some value and continue?</p>
+</blockquote>
+<p>This is exactly what generator functions do for you. When we call a generator function it doesn't start running, we will have to iterate through it manually.</p>
+<pre><code class="language-javascript">function* foo () {  
+  var index = 0;
+  while (index &lt; 2) {
+    yield index++;
+  }
+}
+var bar =  foo();
+
+console.log(bar.next());    // { value: 0, done: false }  
+console.log(bar.next());    // { value: 1, done: false }  
+console.log(bar.next());    // { value: undefined, done: true }  
+</code></pre>
+<p>If you want to use generators easily for writing asynchronous JavaScript, you will need <a href="https://www.npmjs.com/package/co">co</a> as well.</p>
+<blockquote>
+<p>Co is a generator based control flow goodness for Node.js and the browser, using promises, letting you write non-blocking code in a nice-ish way.</p>
+</blockquote>
+<p>With <code>co</code>, our previous examples may look something like this:</p>
+<pre><code class="language-javascript">co(function* (){  
+  yield Something.save();
+}).then(function() {
+  // success
+})
+.catch(function(err) {
+  //error handling
+});
+</code></pre>
+<p>You may ask: what about operations running in parallel? The answer is simpler than you may think <em>(under the hoods it is just a <code>Promise.all</code>)</em>:</p>
+<pre><code>yield [Something.save(), Otherthing.save()];  
+</code></pre>
+<h2 id="asyncawait">Async / await</h2>
+<p>Async functions were introduced in ES7 - and currently only available using a transpiler like <a href="http://babeljs.io/">babel</a>. <em>(disclaimer: now we are talking about the <code>async</code> keyword, not the async package)</em></p>
+<p>In short, with the <code>async</code> keyword we can do what we are doing with the combination of <code>co</code> and generators - except the hacking. </p>
+<div><span>
+</span><img data-cfsrc="/content/images/2015/08/denicola-yield-await-asynchronous-javascript.JPG" alt="denicola-yield-await-asynchronous-javascript"><noscript><img src="/content/images/2015/08/denicola-yield-await-asynchronous-javascript.JPG" alt="denicola-yield-await-asynchronous-javascript"/></noscript><span>
+</span></div>
+<p>Under the hood <code>async</code> functions using Promises - this is why the async function will return with a <code>Promise</code>.</p>
+<p>So if we want to do the same thing as in the previous examples, we may have to rewrite our snippet to the following:</p>
+<pre><code class="language-javascript">async function save(Something) {  
+  try {
+    await Something.save()
+  } catch (ex) {
+    //error handling
+  }
+  console.log('success');
+} 
+</code></pre>
+<p>As you can see to use an async function you have to put the <code>async</code> keyword before the function declaration. After that, you can use the <code>await</code> keyword inside your newly created async function.</p>
+<p>Running things in parallel with <code>async</code> functions is pretty similar to the <code>yield</code> approach - except now the <code>Promise.all</code> is not hidden, but you have to call it:</p>
+<pre><code class="language-javascript">async function save(Something) {  
+  await Promise.all[Something.save(), Otherthing.save()]
+} 
+</code></pre>
+<p><a href="http://koajs.com/">Koa</a> already supports <code>async</code> functions, so you can try them out today using <code>babel</code>.</p>
+<pre><code class="language-javascript">import koa from koa;  
+let app = koa();
+
+app.experimental = true;
+
+app.use(async function (){  
+  this.body = await Promise.resolve('Hello Reader!')
+})
+
+app.listen(3000);  
+</code></pre>
+<h2 id="furtherreading">Further reading</h2>
+<p>Currently we are using <a href="https://blog.risingstack.com/hapi-on-steroids-using-generator-functions-with-hapi/">Hapi with generators</a> in production in most of our new projects - alongside with <a href="https://blog.risingstack.com/introduction-to-koa-generators/">Koa as well</a>.</p>
+<blockquote>
+<p>Which one do you prefer? Why? I would love to hear your comments!</p>
+</blockquote>
+</section></div>
+<script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script></body>
+</html>
