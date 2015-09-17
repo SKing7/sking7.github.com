@@ -1,0 +1,57 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Chrome Dev Summit 2014: The Applied Science of Runtime Performance</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Chrome Dev Summit 2014: The Applied Science of Runtime Performance</h1>
+            <section class="content">
+    <p>Late last year I built the <a href="https://developer.chrome.com/devsummit/">Chrome Dev Summit</a> site. I wanted it to have a <a href="http://www.google.com/design/spec/">Material Design</a> look and feel, since it’s a great design language, and I felt it would be a great fit for the kind of site I wanted to create. But, as with any new design language, there are questions, challenges, and decisions to take, and especially so when dealing with the conventions of the web.</p>
+
+<p>One aspect of the site that was particularly challenging to create was the  “takeover” effect when you click on a card.</p>
+
+<p>
+  <img src="http://updates.html5rocks.com/assets/2015-05-01/takeover-5255882d5e4de99ab1efcb7fe0ecd1f0.gif" alt="The card takeover effect">
+</p>
+
+<p>Getting an effect like this to run at 60fps took some thinking, prototyping, and a few interesting compromises. At Chrome Dev Summit, I spoke about this effect and explained in gory detail how I went about building it.</p>
+
+
+
+<h1 id="building-a-high-performance-animation">Building a high performance animation</h1>
+
+<p><a href="http://www.html5rocks.com/en/tutorials/speed/high-performance-animations/">High performance animations</a>, today at least, are those that favor the browser’s compositor. If you’re able to stick to changing transform and opacity properties, typically you’ll see great performance. The general approach I took to the card animation does just that:</p>
+
+<ol>
+  <li>Measure the position of all the elements in the card when the card is collapsed.</li>
+  <li>Toggle the card’s classes to expand it (without animating).</li>
+  <li>Remeasure the position of the elements in the card now the card is expanded.</li>
+  <li>Calculate the differences.</li>
+  <li>Apply negative transforms to move the elements back to the start positions.</li>
+  <li>Switch on animations.</li>
+  <li>Remove the negative transforms and watch the elements whizz out to their final locations on screen.</li>
+</ol>
+
+<p>All of this might sound expensive, but there is a window of 100ms from the moment a user interacts before the animation must start. Any more than this and the user will perceive a delay. You can use this time to do expensive preparatory work so that you can run more cheaply during the animation itself. There is also a window at the end of about 50-100ms to do tidy up work, which may be handy depending on what you’re trying to do.</p>
+
+<p>
+  <img src="http://updates.html5rocks.com/assets/2015-05-01/100ms-vs-60fps-273d0646f1b653cc5b573f7a7e66fd55.png" alt="Perception window for animations.">
+</p>
+
+<p>The expensive work to do the animation is done inside that first 100ms and, on a Nexus 5 the work takes something in the region of 70ms, so there’s room to spare.</p>
+
+<h1 id="get-the-code">Get the code</h1>
+
+<p>If you’re interested in looking at the site in more detail you’ll be pleased to hear that <a href="https://github.com/GoogleChrome/devsummit">the code has been released on GitHub</a>, so go and take a look!</p>
+
+
+  </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

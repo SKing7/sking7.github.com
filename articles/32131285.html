@@ -1,0 +1,477 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>ECMA-262    » ECMA-262-3 in detail. Chapter 6. Closures.</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>ECMA-262    » ECMA-262-3 in detail. Chapter 6. Closures.</h1>
+            <div class="entrytext"><span>
+
+				</span><p>Read this article in: <a href="http://dmitrysoshnikov.com/ecmascript/ru-chapter-6-closures/" title="http://dmitrysoshnikov.com/ecmascript/ru-chapter-6-closures/">Russian</a>, <a href="http://goddyzhao.tumblr.com/post/11311499651/closures">Chinese</a>.</p><span>
+</span><div class="ds-toc"><ol><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#introduction" title="Introduction">Introduction</a></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#general-theory" title="General theory">General theory</a><ol><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#definitions" title="Definitions">Definitions</a></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#funarg-problem" title="Funarg problem">Funarg problem</a></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#closure" title="Closure">Closure</a></li></ol></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#ecmascript-closures-implementation" title="ECMAScript closures implementation">ECMAScript closures implementation</a><ol><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#one-codescopecode-value-for-them-all" title="One [[Scope]] value for “them all”">One [[Scope]] value for “them all”</a></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#funarg-and-codereturncode" title="Funarg and return">Funarg and return</a></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#theory-versions" title="Theory versions">Theory versions</a></li></ol></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#practical-usage-of-closures" title="Practical usage of closures">Practical usage of closures</a></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#conclusion" title="Conclusion">Conclusion</a></li><li><a href="http://dmitrysoshnikov.com/ecmascript/chapter-6-closures/#additional-literature" title="Additional literature">Additional literature</a></li></ol></div><span>
+</span><span>
+</span><p>In this article we will talk about one of the most discussed topics related with JavaScript — about <em>closures</em>. The topic, as a matter of fact, is not new and was discussed many times. However we will try to discuss and understand it more from theoretical point of view, and also will look at how closures are made in ECMAScript from within.<br><span id="more-118"></span></p><span>
+</span><p>Two previous chapters devoted to <a href="http://dmitrysoshnikov.com/ecmascript/chapter-4-scope-chain/">scope chain</a> and <a href="http://dmitrysoshnikov.com/ecmascript/chapter-2-variable-object/">variable object</a> can be good to consider first, since in this chapter we will use material discussed earlier.</p><span>
+</span><span>
+</span><p>Before the discussion of closures directly in ECMAScript, it is necessary to specify a number of definitions from the general theory of <a href="http://en.wikipedia.org/wiki/Functional_programming">functional programming</a>.</p><span>
+</span><p>As is known, in functional languages (and ECMAScript supports this paradigm and stylistics), functions are <em>data</em>, i.e. they can be <em>assigned to variables</em>, passed as <em>arguments</em> to other functions, <em>returned</em> from functions etc. Such functions have special names and structure.</p><span>
+</span><span>
+</span><p class="definition">A <em>functional argument (“Funarg”)</em> — is an argument which value is a function.</p><span>
+</span><p>Example:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">function exampleFunc(funArg) {
+  funArg();
+}
+
+exampleFunc(function () {
+  alert('funArg');
+});</pre><span>
+</span><p>The actual parameter related with the “funarg” in this case is the anonymous function <em>passed</em> to the <code>exampleFunc</code> function.</p><span>
+</span><p class="definition">In turn, the function which <em>receives</em> another function as the argument is called a <em>higher-order function (HOF)</em>.</p><span>
+</span><p>Another name of a HOF is a <em>functional</em> or, closer to mathematics, an <em>operator</em>. In the example above, <code>exampleFunc</code> function is a <em>higher-order function</em>.</p><span>
+</span><p>As it was noted, a function can be not only passed as an argument, but also <em>returned</em> as a <em>value</em> from another function.</p><span>
+</span><p class="definition">The functions which <em>return</em> other functions are called <em>functions with functional value</em>  (or <em>function valued</em> functions).</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">(function functionValued() {
+  return function () {
+    alert('returned function is called');
+  };
+})()();</pre><span>
+</span><p class="definition">Functions which can participate as normal data, i.e. be passed as arguments, receive functional arguments or be returned as functional values, are called <em>first-class functions</em>.</p><span>
+</span><p>In ECMAScript <em>all</em> functions are <em>first-class</em>.</p><span>
+</span><p>A function which receives itself as an argument, is called an <em>auto-applicative (or self-applicative) function</em>:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">(function selfApplicative(funArg) {
+
+  if (funArg &amp;&amp; funArg === selfApplicative) {
+    alert('self-applicative');
+    return;
+  }
+
+  selfApplicative(selfApplicative);
+
+})();</pre><span>
+</span><p>A function which returns itself is called an <em>auto-replicative (or self-replicative)</em> function. Sometimes, the name <em>self-reproducing</em> is used in a literature:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">(function selfReplicative() {
+  return selfReplicative;
+})();</pre><span>
+</span><div class="note"><span>One of interesting patterns of </span><em>self-replicative</em><span> functions is a </span><em>declarative form</em><span> of working with a single argument of a collection instead of accepting the collection itself:</span><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">// imperative function
+// which accepts collection
+
+function registerModes(modes) {
+  modes.forEach(registerMode, modes);
+}
+
+// usage
+registerModes(['roster', 'accounts', 'groups']);
+
+// declarative form using
+// self-replicating function
+
+function modes(mode) {
+  registerMode(mode); // register one mode
+  return modes; // and return the function itself
+}
+
+// usage: we just *declare* modes
+
+modes
+  ('roster')
+  ('accounts')
+  ('groups')
+</pre><span>
+</span><p>However, in practice working with the collection itself can be more efficient and intuitive.
+</p></div><span>
+</span><p>Local variables which are defined in the passed functional argument are of course accessible at <em>activation</em> of this function, since the <a href="http://dmitrysoshnikov.com/ecmascript/chapter-2-variable-object/">variable object</a> which stores the data of the context is created every time on entering the context:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">function testFn(funArg) {
+
+  // activation of the funarg, local
+  // variable "localVar" is available
+
+  funArg(10); // 20
+  funArg(20); // 30
+
+}
+
+testFn(function (arg) {
+
+  var localVar = 10;
+  alert(arg + localVar);
+
+});</pre><span>
+</span><p>However, as we know from the <a href="http://dmitrysoshnikov.com/ecmascript/chapter-4-scope-chain/">chapter 4</a>, functions in ECMAScript may be <em>enclosed</em> with <em>parent functions</em> and <em>use variables</em> from <em>parent contexts</em>. With this feature so-called a <em>funarg problem</em> is related.</p><span>
+</span><span>
+</span><p>In <a href="http://en.wikipedia.org/wiki/Stack-oriented_programming_language">stack-oriented programming languages</a> local variables of functions are stored on a <em>stack</em> which is <em>pushed</em> with these variables and function arguments every time when the function is <em>called</em>.</p><span>
+</span><p>On <em>return</em> from the function the variables are <em>removed</em> from the stack. This model is a <em>big restriction</em> for using functions as <em>functional values</em> (i.e. returning them from parent functions). Mostly this problem appears when a function uses <em>free variables</em>.</p><span>
+</span><p class="definition">A <em>free variable</em> is a variable which is used by a function, but is neither a parameter, nor a local variable of the function.</p><span>
+</span><p>Example:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">function testFn() {
+
+  var localVar = 10;
+
+  function innerFn(innerParam) {
+    alert(innerParam + localVar);
+  }
+
+  return innerFn;
+}
+
+var someFn = testFn();
+someFn(20); // 30</pre><span>
+</span><p>In this example <code>localVar</code> variable is <em>free</em> for the <code>innerFn</code> function.</p><span>
+</span><p>If this system had use a <em>stack-oriented</em> model for storing local variables, it would mean that on return from <code>testFn</code> function all its local variables would be <em>removed</em> from the stack. And this would cause an error at <code>innerFn</code> function activation from the <em>outside</em>.</p><span>
+</span><p>Moreover, in this particular case, in the stack-oriented implementation, returning of the <code>innerFn</code> function would not be possible at all, since <code>innerFn</code> is also <em>local</em> for <code>testFn</code> and therefore is also removed on returning from the <code>testFn</code>.</p><span>
+</span><p>Another problem of functional objects is related with passing a function as an argument in a system with <a href="http://en.wikipedia.org/wiki/Scope_(programming)#Dynamic_scoping">dynamic scope</a> implementation.</p><span>
+</span><p>Example (pseudo-code):</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var z = 10;
+
+function foo() {
+  alert(z);
+}
+
+foo(); // 10 – with using both static and dynamic scope
+
+(function () {
+
+  var z = 20;
+  foo(); // 10 – with static scope, 20 – with dynamic scope
+
+})();
+
+// the same with passing foo
+// as an arguments
+
+(function (funArg) {
+
+  var z = 30;
+  funArg(); // 10 – with static scope, 30 – with dynamic scope
+
+})(foo);</pre><span>
+</span><p>We see that in systems with dynamic scope, <em>variable resolution</em> is managed with a <em>dynamic (active) stack of variables</em>. Thus, free variables are searched in the <em>dynamic chain</em> of the <em>current activation</em> — in the place where the function is <em>called</em>, but not in the <em>static (lexical) scope chain</em> which is saved at <em>function creation</em>.</p><span>
+</span><p>And this can lead to ambiguity. Thus, even if <code>z</code> exists (in contrast with the previous example where local variables would be removed from a stack), there is a question: which value of <code>z</code> (i.e. <code>z</code> from which <em>context</em>, from which <em>scope</em>) should be used in various calls of <code>foo</code> function?</p><span>
+</span><p class="definition">The described cases are two types of the <em>funarg problem</em> — depending on whether we deal with the <em>functional value</em> returned from a function <em>(upward funarg)</em>, or with the <em>functional argument</em> passed to the function <em>(downward funarg)</em>.</p><span>
+</span><p>For solving this problem (and its subtypes) the concept of a <em>closure</em> was proposed.</p><span>
+</span><span>
+</span><p class="definition">A <em>closure</em> is a combination of a <em>code block</em> and <em>data</em> of a context in which this code block is <em>created</em>.</p><span>
+</span><p>Let’s see an example in a pseudo-code:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var x = 20;
+
+function foo() {
+  alert(x); // free variable "x" == 20
+}
+
+// Closure for foo
+fooClosure = {
+  call: foo // reference to function
+  lexicalEnvironment: {x: 20} // context for searching free variables
+};</pre><span>
+</span><p>In the example above, <code>fooClosure</code> of course is a pseudo-code whereas in ECMAScript <code>foo</code> function already contains as one of its internal property a scope chain of a context in which it has been created.</p><span>
+</span><p>The word “lexical” is often omitted, since goes without saying, and in this case it focuses attention that a closure saves its parent variables in the <em>lexical place</em> of the <em>source code</em>, that is — where the function is <em>defined</em>. At next activations of the function, free variables are searched in this saved <em>(closured)</em> context, that we can see in examples above where variable <code>z</code> always should be resolved as <code>10</code> in ECMAScript.</p><span>
+</span><p>In definition we used a generalized concept — “the code block”, however usually the term “function” is used. Though, not in all implementations closures are associated only with functions: for example, in Ruby programming language, as a closure may be: a procedure object, a lambda-expression or a code block.</p><span>
+</span><p>As to implementations, for storing local variables after the context is destroyed, the <em>stack-based</em> implementation <em>is not fit any more</em> (because it contradicts the definition of stack-based structure). Therefore in this case closured data of the parent context are saved in the <em>dynamic memory</em> allocation (in the “heap”, i.e. <em>heap-based</em> implementations), with using a <em>garbage collector (GC)</em> and <em>references counting</em>. Such systems are less effective by speed than stack-based systems. However, implementations may always optimize it: at parsing stage to find out, whether free variables are used in function, and depending on this decide — to place the data in the stack or in the “heap”.</p><span>
+</span><span>
+</span><p>Having discussed the theory, we at last have reached closures regarding directly ECMAScript. Here it is necessary to notice that ECMAScript uses <em>only</em> <a href="http://en.wikipedia.org/wiki/Scope_(programming)#Lexical_scoping">static (lexical) scope</a> (whereas in some languages, for example in Perl, variables can be declared using both static or dynamic scope).</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var x = 10;
+
+function foo() {
+  alert(x);
+}
+
+(function (funArg) {
+
+  var x = 20;
+
+  // variable "x" for funArg is saved statically
+  // from the (lexical) context, in which it was created
+  // therefore:
+
+  funArg(); // 10, but not 20
+
+})(foo);</pre><span>
+</span><p>Technically, the variables of a parent context are saved in the internal <code>[[Scope]]</code> property of the function. So if you completely understand the <code>[[Scope]]</code> and a <em>scope chain</em> topics, which in detail where discussed in the <a href="http://dmitrysoshnikov.com/ecmascript/chapter-4-scope-chain/">chapter 4</a>, the question on understanding closures in ECMAScript will disappear by itself.</p><span>
+</span><p>Referencing to <a href="http://dmitrysoshnikov.com/ecmascript/chapter-5-functions/#algorithm-of-function-creation">algorithm of functions creation</a>, we see that <em>all functions in ECMAScript are closures</em>, since <em>all</em> of them at creation save scope chain of a parent context. The important moment here is that, regardless — whether a function will be activated later or not — the parent scope <em>is already saved</em> to it <em>at creation moment</em>:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var x = 10;
+
+function foo() {
+  alert(x);
+}
+
+// foo is a closure
+foo: &lt;FunctionObject&gt; = {
+  [[Call]]: &lt;code block of foo&gt;,
+  [[Scope]]: [
+    global: {
+      x: 10
+    }
+  ],
+  ... // other properties
+};</pre><span>
+</span><p>As we mentioned, for optimization purpose, when a function does not use free variables, implementations may not to save a parent scope chain. However, in ECMA-262-3 specification nothing is said about it; therefore, formally (and by the technical algorithm) — all functions save scope chain in the <code>[[Scope]]</code> property at creation moment.</p><span>
+</span><p>Some implementations allow access to the closured scope directly. For example in Rhino, for the <code>[[Scope]]</code> property of a function, corresponds a non-standard property <code>__parent__</code> which we <a href="http://dmitrysoshnikov.com/ecmascript/chapter-2-variable-object/#feature-of-implementations-property-__parent__">discussed</a> in the chapter about variable object:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var global = this;
+var x = 10;
+
+var foo = (function () {
+
+  var y = 20;
+
+  return function () {
+    alert(y);
+  };
+
+})();
+
+foo(); // 20
+alert(foo.__parent__.y); // 20
+
+foo.__parent__.y = 30;
+foo(); // 30
+
+// we can move through the scope chain further to the top
+alert(foo.__parent__.__parent__ === global); // true
+alert(foo.__parent__.__parent__.x); // 10</pre><span>
+</span><span>
+</span><p>It is necessary to notice that closured <code>[[Scope]]</code> in ECMAScript is the <em>same</em> object for the several inner functions created in this parent context. It means that modifying the closured variable from one closure, <em>reflects</em> on reading this variable in <em>another</em> closure.</p><span>
+</span><p class="definition">That is, all <em>inner</em> functions <em>share</em> the <em>same parent</em> scope.</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var firstClosure;
+var secondClosure;
+
+function foo() {
+
+  var x = 1;
+
+  firstClosure = function () { return ++x; };
+  secondClosure = function () { return --x; };
+
+  x = 2; // affection on AO["x"], which is in [[Scope]] of both closures
+
+  alert(firstClosure()); // 3, via firstClosure.[[Scope]]
+}
+
+foo();
+
+alert(firstClosure()); // 4
+alert(secondClosure()); // 3</pre><span>
+</span><p>There is a widespread mistake related with this feature. Often programmers get unexpected result, when create functions in a <em>loop</em>, trying to associate with every function the loop’s counter variable, expecting that every function will keep its “own” needed value.</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var data = [];
+
+for (var k = 0; k &lt; 3; k++) {
+  data[k] = function () {
+    alert(k);
+  };
+}
+
+data[0](); // 3, but not 0
+data[1](); // 3, but not 1
+data[2](); // 3, but not 2</pre><span>
+</span><p>The previous example explains this behavior — a scope of a context which creates functions is the <em>same</em> for <em>all three</em> functions. Every function refers it through the [[Scope]] property, and the variable <code>k</code> in this parent scope can be easily changed.</p><span>
+</span><p>Schematically:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">activeContext.Scope = [
+  ... // higher variable objects
+  {data: [...], k: 3} // activation object
+];
+
+data[0].[[Scope]] === Scope;
+data[1].[[Scope]] === Scope;
+data[2].[[Scope]] === Scope;</pre><span>
+</span><p>Accordingly, at the moment of function activations, last assigned value of <code>k</code> variable, i.e. <code>3</code> is used.</p><span>
+</span><p class="note">This relates to the fact that all variables are created before the code execution, i.e. <a href="http://dmitrysoshnikov.com/ecmascript/chapter-2-variable-object/#entering-the-execution-context">on entering the context</a>. This behavior is also known as <a href="http://dmitrysoshnikov.com/notes/note-4-two-words-about-hoisting/">“hosting”</a>.</p><span>
+</span><p>Creation of additional enclosing context may help to solve the issue:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var data = [];
+
+for (var k = 0; k &lt; 3; k++) {
+  data[k] = (function _helper(x) {
+    return function () {
+      alert(x);
+    };
+  })(k); // pass "k" value
+}
+
+// now it is correct
+data[0](); // 0
+data[1](); // 1
+data[2](); // 2</pre><span>
+</span><p>Let’s see what has happened in this case.</p><span>
+</span><p>First, the function <code>_helper</code> is created and <em>immediately activated</em> with the argument <code>k</code>.</p><span>
+</span><p>Then, returned value of the <code>_helper</code> function is <em>also a function</em>, and exactly <em>it</em> is saved to the corresponding element of the <code>data</code> array.</p><span>
+</span><p>This technique provides the following effect: being activated, the <code>_helper</code> every time creates a <em>new activation object</em> which has argument <code>x</code>, and the <em>value</em> of this argument is the <em>passed</em> value of <code>k</code> variable.</p><span>
+</span><p>Thus, the <code>[[Scope]]</code> of returned functions is the following:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">data[0].[[Scope]] === [
+  ... // higher variable objects
+  AO of the parent context: {data: [...], k: 3},
+  AO of the _helper context: {x: 0}
+];
+
+data[1].[[Scope]] === [
+  ... // higher variable objects
+  AO of the parent context: {data: [...], k: 3},
+  AO of the _helper context: {x: 1}
+];
+
+data[2].[[Scope]] === [
+  ... // higher variable objects
+  AO of the parent context: {data: [...], k: 3},
+  AO of the _helper context: {x: 2}
+];</pre><span>
+</span><p>We see that now the <code>[[Scope]]</code> property of functions have the reference to the needed value — via the <code>x</code> variable which is captured by the <em>additionally</em> created scope.</p><span>
+</span><p>Notice, that from the returned functions we still may of course reference <code>k</code> variable — with the same correct for all functions value <code>3</code>.</p><span>
+</span><p>Often JavaScript closures <em>incompletely</em> reduced only to the showed above pattern — with creation of the additional function to capture the needed value. From the practical viewpoint, this pattern really is known, however, from the theoretical viewpoint as we noted, <em>all functions</em> in ECMAScript are closures.</p><span>
+</span><p>The described pattern is not a unique though. To get the needed value of <code>k</code> variable is also possible, for example, using the following approach:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var data = [];
+
+for (var k = 0; k &lt; 3; k++) {
+  (data[k] = function () {
+    alert(arguments.callee.x);
+  }).x = k; // save "k" as a property of the function
+}
+
+// also everything is correct
+data[0](); // 0
+data[1](); // 1
+data[2](); // 2</pre><span>
+</span><span>
+</span><p>Another feature is <em>returning</em> from closures. In ECMAScript, a <code>return</code> statement from a closure returns the control flow to a <em>calling context</em> (a caller). In other languages, for example in Ruby, various forms of closures, which process <code>return</code> statement differently, are possible: it may be return to a caller, or in others cases — a full exit from an active context.</p><span>
+</span><p>ECMAScript standard <code>return</code> behavior:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">function getElement() {
+
+  [1, 2, 3].forEach(function (element) {
+
+    if (element % 2 == 0) {
+      // return to "forEach" function,
+      // but not return from the getElement
+      alert('found: ' + element); // found: 2
+      return element;
+    }
+
+  });
+
+  return null;
+}
+
+alert(getElement()); // null, but not 2</pre><span>
+</span><p>Though, in ECMAScript in such case throwing and catching of some special “break”-exception may help:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var $break = {};
+
+function getElement() {
+
+  try {
+
+    [1, 2, 3].forEach(function (element) {
+
+      if (element % 2 == 0) {
+        // "return" from the getElement
+        alert('found: ' + element); // found: 2
+        $break.data = element;
+        throw $break;
+      }
+
+    });
+
+  } catch (e) {
+    if (e == $break) {
+      return $break.data;
+    }
+  }
+
+  return null;
+}
+
+alert(getElement()); // 2</pre><span>
+</span><span>
+</span><p>As we noted, often programmers incompletely reduced closures only to inner functions returned from parent context. Even more incomplete reduction of closures can be only to anonymous functions.</p><span>
+</span><p class="definition">Let’s make a note again, that <em>all functions</em>, independently from their type: <em>anonymous</em>, <em>named</em>, <a href="http://dmitrysoshnikov.com/ecmascript/chapter-5-functions/#function-expression">function expression</a> or <a href="http://dmitrysoshnikov.com/ecmascript/chapter-5-functions/#function-declaration">function declaration</a>, because of the <a href="http://dmitrysoshnikov.com/ecmascript/chapter-4-scope-chain/">scope chain</a> mechanism, <em>are closures</em>.</p><span>
+</span><p>An exception to this rule are <a href="http://dmitrysoshnikov.com/ecmascript/chapter-5-functions/#functions-created-via-function-constructor">functions created via Function constructor</a> which <code>[[Scope]]</code> contains <em>only global object</em>.</p><span>
+</span><p>And to clarify this question, let’s provide two correct versions of closures regarding ECMAScript:</p><span>
+</span><p><em>Closures in ECMAScript are</em>:</p><span>
+</span><ul>
+<li>from the <em>theoretical</em> viewpoint: <em>all functions</em>, since all they save <em>at creation</em> variables of a parent context. Even <em>a simple global function</em>, referencing a global variable refers a <em>free variable</em> and therefore, the general scope chain mechanism is used;<br clear="all"><br clear="all"></li>
+<li>from the <em>practical</em> viewpoint: those functions are interesting which:
+<ul>
+<li>continue to exist after their parent context is finished, e.g. inner functions returned from a parent function;</li>
+<li>use <em>free variables</em>.</li>
+</ul>
+</li>
+</ul><span>
+</span><span>
+</span><p>In practice closures may create elegant designs, allowing customization of various calculations defined by a “funarg”. An example the <code>sort</code> method of arrays which accepts as an argument the sort-condition function:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">[1, 2, 3].sort(function (a, b) {
+  ... // sort conditions
+});</pre><span>
+</span><p>Or, for example, so-called, <em>mapping functionals</em> as the <code>map</code> method of arrays which <em>maps</em> a new array by the condition of the functional argument:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">[1, 2, 3].map(function (element) {
+  return element * 2;
+}); // [2, 4, 6]</pre><span>
+</span><p>Often it is convenient to implement search functions with using functional arguments defining almost unlimited conditions for search:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">someCollection.find(function (element) {
+  return element.someProperty == 'searchCondition';
+});</pre><span>
+</span><p>Also, we may note <em>applying functionals</em> as, for example, a <code>forEach</code> method which <em>applies</em> a function to an array of elements:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">[1, 2, 3].forEach(function (element) {
+  if (element % 2 != 0) {
+    alert(element);
+  }
+}); // 1, 3</pre><span>
+</span><p>By the way, methods of function objects <code>apply</code> and <code>call</code>, also originate in <em>applying functionals</em> of functional programming. We already discussed these methods in a note about <a href="http://dmitrysoshnikov.com/ecmascript/chapter-3-this/#manual-setting-of-this-value-for-a-function-call">this value</a>; here, we see them in a role of <em>applying functionals</em> — a function is <em>applied</em> to arguments (to a list of arguments — in <code>apply</code>, and to positioned arguments — in <code>call</code>):</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">(function () {
+  alert([].join.call(arguments, ';')); // 1;2;3
+}).apply(this, [1, 2, 3]);</pre><span>
+</span><p>Another important application of closures are <em>deferred calls</em>:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var a = 10;
+setTimeout(function () {
+  alert(a); // 10, after one second
+}, 1000);</pre><span>
+</span><p>And also <em>callback functions</em>:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">...
+var x = 10;
+// only for example
+xmlHttpRequestObject.onreadystatechange = function () {
+  // callback, which will be called deferral ,
+  // when data will be ready;
+  // variable "x" here is available,
+  // regardless that context in which,
+  // it was created already finished
+  alert(x); // 10
+};
+..</pre><span>
+</span><p>Or e.g. creation of an encapsulated scope for the purpose of hiding auxiliary objects:</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">var foo = {};
+
+// initialization
+(function (object) {
+
+  var x = 10;
+  
+  object.getX = function _getX() {
+    return x;
+  };
+
+})(foo);
+
+alert(foo.getX()); // get closured "x" – 10</pre><span>
+</span><span>
+</span><p>This article has turned out more about the general theory than about ECMA-262-3 specification, however, I think that this general theory can better help to clarified some aspects and allow to get closer ECMAScript functions. If you have questions, I will answer them with pleasure in comments.</p><span>
+</span><span>
+</span><span>
+</span><span>
+</span><p>
+<strong>Translated by:</strong> Dmitry Soshnikov.<br><strong>Published on:</strong> 2010-02-28</p><span>
+</span><p><strong>Originally written by</strong>: Dmitry Soshnikov [ru, <a href="http://dmitrysoshnikov.com/ecmascript/ru-chapter-6-closures/">read »</a>]<br><strong>Originally published on:</strong> 2009-07-20 [ru]</p><span>
+</span><span>
+
+</span><p>Tags: <a href="http://dmitrysoshnikov.com/tag/closure/" rel="tag">Closure</a>, <a href="http://dmitrysoshnikov.com/tag/ecma-262-3/" rel="tag">ECMA-262-3</a>, <a href="http://dmitrysoshnikov.com/tag/ecmascript/" rel="tag">ECMAScript</a>, <a href="http://dmitrysoshnikov.com/tag/first-class-objects/" rel="tag">First-class objects</a>, <a href="http://dmitrysoshnikov.com/tag/funarg/" rel="tag">Funarg</a>, <a href="http://dmitrysoshnikov.com/tag/functional-programming/" rel="tag">Functional programming</a></p><span>
+
+</span><span>
+
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

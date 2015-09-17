@@ -1,0 +1,83 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Stop using tail -f (mostly)</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Stop using tail -f (mostly)</h1>
+            <section class="post-content">
+            <p>I still see a lot of people using <code>tail -f</code> to monitor files that are changing, mostly log files. If you are one of them, let me show you a better alternative: <code>less +F</code></p>
+
+<p>The <code>less</code> documentation explains well what this <code>+F</code> is all about: </p>
+
+<blockquote>
+<p>Scroll  forward,  and keep trying to read when the end of file is reached.  Normally this command would be used when already at the end of the file.  It is a way to monitor the tail of a file which is
+growing while it is being viewed.  (The behavior is similar to the "tail -f" command.)</p>
+</blockquote>
+
+<p>So it says that it's similar to <code>tail -f</code>, but why I think it's better?</p>
+
+<p>Simply put, it allows you to switch between navigation and watching mode. We all have been there: You are watching a file with <code>tail -f</code>, and then you need to search for something in this file, or just navigate up and down.
+Now you need to exit <code>tail</code> (or open a new shell), and <code>ack</code> this file or open it with <code>vim</code> to find what you are looking for. After that, you run <code>tail</code> again to continue watching the file. There's no need to do that when
+you are using <code>less</code>.</p>
+
+<p>Let's say you want to watch the file <code>production.log</code>:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>less +F production.log
+
+Important
+log
+information
+here
+
+Waiting <span class="k">for</span> data... <span class="o">(</span>interrupt to abort<span class="o">)</span>
+</code></pre></div>
+<p>Here you have pretty much the same behaviour you'd get with <code>tail</code>.  </p>
+
+<p>Now let's say something interesting appears, and you want to search all the occurrences of "foo". You can just hit <code>Ctrl-c</code> to go to "normal" <code>less</code> 
+mode (as if you had opened the file without the <code>+F</code> flag), and then you have all the normal <code>less</code> features you'd expect, including the search with <code>/foo</code>. You can go to the next or previous occurrence with <code>n</code> or <code>N</code>,
+up and down with <code>j</code> and <code>k</code>, create marks with <code>m</code> and do all sort of things that <code>less(1)</code> says you can do.</p>
+
+<p>Once you are done, just hit <code>F</code> to go back to watching mode again. It's that easy.</p>
+
+
+
+<p>When you need to watch multiple files at the same time, <code>tail -f</code> can actually give you a better output. It will show you something like this:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>tail -f *.txt
+
+<span class="o">==</span>&gt; file1.txt &lt;<span class="o">==</span>
+content <span class="k">for</span> first <span class="nv">file</span>
+
+<span class="o">==</span>&gt; file2.txt &lt;<span class="o">==</span>
+content <span class="k">for</span> second <span class="nv">file</span>
+
+<span class="o">==</span>&gt; file3.txt &lt;<span class="o">==</span>
+content <span class="k">for</span> third file
+</code></pre></div>
+<p>When a change happens, it prints the file name and the new content, which is quite handy.</p>
+
+<p>With <code>less</code>, it would be like this:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>less +F *.txt
+
+content <span class="k">for</span> first file
+</code></pre></div>
+<p>It shows the content of just one file at a time. If you want to see what's happening in the second file, you need to first <code>Ctrl-c</code> to go to normal mode, then type <code>:n</code> to go to the next buffer, and then <code>F</code> again to go back to the watching mode.</p>
+
+<p>Depending on your needs, it might still be worth to use <code>less</code> for multiple files, but most of the time I just go with <code>tail</code> for these cases. The important thing is to know the tools that we have available and use the right one 
+for the job at hand.</p>
+
+<blockquote>
+<blockquote>
+<p>Статья на сайте softdroid.net: <a href="http://softdroid.net/perestante-ispolzovat-f-chasto">Блог о файлах и данных: Перестаньте использовать -f (часто)</a></p>
+</blockquote>
+</blockquote>
+
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

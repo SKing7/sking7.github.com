@@ -1,0 +1,158 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Revisiting :Visited</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Revisiting :Visited</h1>
+            <div class="content"><span>
+  </span><p>As I sat there, staring at the cat-centric listicle load before my eyes for the third time that day, I wondered whether to blame myself for clicking into the same page so consistently, or if the blame lay with the designers and developers who allowed this to happen.</p><span>
+
+</span><p>Links used to be beautiful, I recalled, perhaps not aesthetically pleasing, but those bright blue underlines were so clear, so succinct. I always knew where I was going and what would take me there. Just as important, <strong>I always knew where I’d been</strong>.</p><span>
+
+</span><p>Right then, in front of the now-too-familiar cat gifs, I really missed that.</p><span>
+
+</span><h2>Forgetting Our Past</h2><span>
+
+</span><p>The web has come a long way since those early days. We’ve gone through cycles of aesthetic trends and have become so much better at creating beautiful websites. Somewhere along the way, though, we forgot (or chose to forget) about the&nbsp;:visited pseudo-class, the CSS hook that lets you differentiate links that lead to pages your users have already seen. </p><span>
+
+</span><figure>
+  <img src="http://joelcalifa.com/assets/images/blog/revisiting-visited/samesame.png"><figcaption>I’ve seen one of these. Can you tell which one?</figcaption>
+</figure><span>
+
+</span><p>Indicated visited links provide context, telling users where they’ve been and preventing them from wasting time. A Nielsen study summed this up nicely <a href="http://www.nngroup.com/articles/change-the-color-of-visited-links/">over ten years ago</a>, “People get lost and move in circles when websites use the same link color for visited and new destinations. To reduce navigational confusion, select different colors for the two types of links.” </p><span>
+
+</span><p>Can’t we, as an industry, get behind that reasoning? A “visited” link isn’t that far off from a “read” email. They both provide the user with the tacit understanding of where they’ve been. This prevents users from accidental repeat visits, and gets around the frustration that would follow.&nbsp;</p><span>
+
+</span><div><img src="http://joelcalifa.com/assets/images/blog/revisiting-visited/unread.png" alt="Gmail read vs unread" class="noBorder"></div><span>
+
+</span><p>An email client without read/unread functionality would be unacceptable, so why are we fine with a site without&nbsp;:visited styling?</p><span>
+
+</span><h2>The Fall of a Pseudo-Class</h2><span>
+
+</span><p>I see two causes behind today’s relative scarcity of :visited styling.</p><span>
+
+</span><p>The first is the web becoming more beautiful, and the subsequently raised aesthetic standards. Defaults are viewed as <a href="http://motherfuckingwebsite.com/">unattractive</a>, so most sites override them, sometimes sacrificing function for form. We want link styling that fits with our brands. We want links that will mesh well with their surroundings, and with links’ default bright blue, and :visited links’ purple, this is usually not the case. We’ve lost a fantastic convention and replaced it with, well, nicer looking links. </p><span>
+
+</span><p>Unfortunately, simply setting a new color for links in your CSS is enough to override the default styles for both&nbsp;:active (red) and&nbsp;:visited (purple) states. I’m guessing most designers and developers don’t actually want to get rid of the&nbsp;:visited state, but have unwittingly lost it by overriding unattractive defaults.</p><span>
+
+</span><p>The second cause I’ve recognized is less direct. A few years ago it became known that certain sites were sniffing visitors’ browsing histories by checking which links on the page were flagged as visited. The people behind leading browsers rallied to plug the privacy leak and successfully limited what developers could do with :visited. </p><span>
+
+</span><p>This doesn’t stop us from differentiating a visited link’s color, but it does hold us back from implementing more interesting solutions. For instance, we can’t apply CSS to the link’s child elements. We can’t add extra pseudo-elements. We can’t change font size, or weight, or letter-spacing. We can’t add borders, or change their width and style (only color). We can’t alter image links. Today, we can only change the color and the background of the text link itself. Online media has evolved tremendously over the past decade, but our :visited links still only work for text. This security fix, while definitely in our best interests, severely limited what we could accomplish.</p><span>
+
+</span><h2>Revisiting&nbsp;:Visited</h2><span>
+
+</span><p>Unstyled :visited links hav long been a pet peeve of mine, especially in other portfolios. Every time I browse one, I end up returning to a project several times before finally exiting in frustration, and unfairly blaming the designer responsible. My portfolio, I decided, wouldn’t anger its visitors at my expense.</p><span>
+
+</span><div><img src="http://joelcalifa.com/assets/images/blog/revisiting-visited/seen.png" alt="The seen tags on my site" class="noBorder"></div><span>
+
+</span><p>The design I settled on consisted of clear checkmarks with the word ‘Seen’ next to every link a user has been to. Not exactly the Mona Lisa, but this would both reduce my visitors’ cognitive stress, and the novelty could potentially delight and motivate them to visit all of the pages and see more of my work than they would have otherwise. Win win.</p><span>
+
+</span><p>The way I wanted to mark this up—a pseudo-element with a checkmark and the word 'Seen’—was more than&nbsp;:visited would allow for with its shiny new limitations. To build what I wanted, I would need to have a new hook on visited elements, one that worked like any other class. JavaScript wouldn’t recognize visited links, nor would any other method I tried to hack together.&nbsp;</p><span>
+
+</span><p>But wait! What’s that in the sky? Is it a bird? Is it a plane? No, it’s HTML 5 to the rescue! With its super powered <a href="http://dev.w3.org/html5/webstorage/">persistent local storage</a>, it saved the day. Local Storage is a technology similar to cookies. It stores data on the client-side that persists beyond page refreshes. This means it can be used to store a users’ visited pages without us having to create a database, which means it can work on static sites, which means it’s awesome.</p><span>
+
+</span><p>My implementation is laughably simple. On each individual page, I add code to log it as visited inside the localStorage. I do this by simply grabbing the current page’s pathname and using that as the key.</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'visited-'</span><span class="o">+</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span><span class="p">,</span><span class="kc">true</span><span class="p">)</span></code></pre></div><span>
+
+</span><p>I then iterate through all the links on the page.&nbsp;</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">links</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">links</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>   
+  <span class="kd">var</span> <span class="nx">link</span> <span class="o">=</span> <span class="nx">links</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+<span class="p">}</span></code></pre></div><span>
+
+</span><p>For each link, I make sure that it’s internal (we can’t make this work consistently for external links) and that the page its linking to has been visited. I do this using the previously set localStorage data.</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">if</span> <span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">host</span> <span class="o">==</span> <span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">host</span> 
+<span class="o">&amp;&amp;</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'visited-'</span> <span class="o">+</span> <span class="nx">link</span><span class="p">.</span><span class="nx">pathname</span> <span class="o">+</span> <span class="s1">'/'</span><span class="p">))</span> <span class="p">{</span></code></pre></div><span>
+
+</span><p>If it’s both internal and the pathname matches a previously visited pathname, I add a data-attribute of “visited.” This will appear as <strong>data-visited</strong> on my achor tags.</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">link</span><span class="p">.</span><span class="nx">dataset</span><span class="p">.</span><span class="nx">visited</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span></code></pre></div><span>
+
+</span><p>Now I can style visited links to my heart’s content, like so:</p><span>
+
+</span><div class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">a</span><span class="o">[</span><span class="nt">data-visited</span><span class="o">]</span> <span class="p">{</span>
+  <span class="k">border-bottom</span><span class="o">:</span> <span class="m">1px</span> <span class="k">dashed</span> <span class="nb">purple</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">a</span><span class="o">[</span><span class="nt">data-visited</span><span class="o">]</span><span class="nd">:after</span> <span class="p">{</span>
+  <span class="k">content</span><span class="o">:</span> <span class="s1">' (Seen)'</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div><span>
+
+</span><p>Feel free to grab the entire code for your own site:</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// http://joelcalifa.com/blog/revisiting-visited</span>
+<span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'visited-'</span><span class="o">+</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span><span class="p">,</span><span class="kc">true</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">links</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">links</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>   
+  <span class="kd">var</span> <span class="nx">link</span> <span class="o">=</span> <span class="nx">links</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">host</span> <span class="o">==</span> <span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">host</span> 
+  <span class="o">&amp;&amp;</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'visited-'</span> <span class="o">+</span> <span class="nx">link</span><span class="p">.</span><span class="nx">pathname</span> <span class="o">+</span> <span class="s1">'/'</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">link</span><span class="p">.</span><span class="nx">dataset</span><span class="p">.</span><span class="nx">visited</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div><span>
+
+</span><p>That’s it. A few short lines of code and we’ve replicated the power of the original&nbsp;:visited pseudo-class. With little work you could also extend this to external links that users click on from within your site. <a href="http://caniuse.com/#feat=namevalue-storage">It works in all modern browsers</a>, including mobile, and based on the feedback I’ve gotten since the site’s release, it can have a huge impact on your visitors’ experience.&nbsp;</p><span>
+
+</span><figure class="grow">
+  <img src="http://joelcalifa.com/assets/images/blog/revisiting-visited/seenall.png"><figcaption>Gotta catch em all.</figcaption>
+</figure><span>
+
+</span><h2>What’s Next?</h2><span>
+
+</span><p>This is just one possible implementation of a valuable idea that has been neglected for years. One that can improve the experience of almost any site online today.&nbsp;</p><span>
+
+</span><p>While content sites with simple text links should definitely be taking advantage of&nbsp;:visited again, It would be great to see people come up with creative solutions for image and video links. More complex&nbsp;:visited states are currently greenfield, but with some experimentation we could end up with a new convention for all types of media. Wouldn’t it be great to take one look at any kind of element and just <em>know</em>?</p><span>
+
+</span><figure>
+  <img src="http://joelcalifa.com/assets/images/blog/revisiting-visited/youtube.png"><figcaption>YouTube, for instance, already does a great job</figcaption>
+</figure><span>
+
+</span><p>And considering websites around the web will likely continue overriding the default blue and purple, is there a feasible way to make all visited text links relatively consistent? If there are pink and green and red links out there, how can users know what’s visited and what’s just a link? </p><span>
+
+</span><p>My site has orange links. Like most designers, I’m not above the desire to have a beautiful site, and bright blue links got in the way of that. The way I chose to go about it was to mimic the relationship between the blue and purple—a link becoming darker once it’s visited. My links become dark orange, but this could work with any custom link color.</p><span>
+
+</span><div><img class="noBorder" src="http://joelcalifa.com/assets/images/blog/revisiting-visited/visitedlinks.png"></div><span>
+
+</span><p>By no means was this a comprehensive design process. I haven’t done usability testing and I don’t know which combinations will work for people who are color blind. But it’s a start. If you’re looking for a way to differentiate your custom links, make them darker, and maybe we can get this design pattern to a place where it provides the same kind of tacit information that purple links have come to signify. </p><span>
+
+</span><p>That said, if you’re able to use blue and purple, doing so will give you these affordances for free.</p><span>
+
+</span><figure>
+  <img src="http://joelcalifa.com/assets/images/blog/revisiting-visited/butdifferent.png"><figcaption>I really want to click on this cat, but now I know better.</figcaption>
+</figure><span>
+
+</span><p>I understand the realities of developing products. You don’t have time to do everything. <a href="https://twitter.com/cap">Cap Watkins</a> discussed this in a fantastic post we can all relate to titled <a href="http://blog.capwatkins.com/good-enough">“Good Enough.”</a> But when the investment is so small (a single&nbsp;:visited style or a few lines of code) and the return is potentially so great (substantially less user errors in aggregate, much less frustration, happier users), how can we justify continuing to neglect this?</p><span>
+
+</span><p>I know we all have piles and piles of UX improvements in all our backlogs, a thousand tweaks that we’re itching to get out the door. But please, if you find just a moment, <a href="http://joelcalifa.com/blog/revisiting-visited">revisit :visited</a>.</p><span>
+
+</span><p><em>Hey, thanks for reading! I’d love to hear your thoughts :) <a href="https://news.layervault.com/stories/49667-revisiting-visited">Add comments on DN.</a></em></p><span>
+  
+
+    </span><div class="talk"><span>
+	  </span><p><strong>Joel Califa is a Designer and Developer at DigitalOcean in NYC.</strong><br class="full tablet"> Beyond design, his passion in life is making awesome new friends.<br class="full tablet">  If you enjoyed this, hit him up <a href="http://twitter.com/notdetails">on Twitter</a> or <a href="mailto:joel@joelcalifa.com">via email</a>!
+	</p></div><span>
+
+	  </span><!-- Begin MailChimp Signup Form --><span>
+	</span><link href="//cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css"><span>
+	</span><style type="text/css">
+		#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+	</style><span>
+	</span><span>
+	</span><!--End mc_embed_signup--><span>
+
+	
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

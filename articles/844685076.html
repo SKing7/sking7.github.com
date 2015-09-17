@@ -1,0 +1,853 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Classes in ECMAScript 6 (final semantics)</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Classes in ECMAScript 6 (final semantics)</h1>
+            <div class="post-body entry-content"><span>
+</span><p><strong>Updates:</strong> </p><span>
+</span><ul>
+<li><strong>[2015-02-17]</strong> I added two new sections:<ul>
+<li><a href="http://www.2ality.com/2015/02/es6-classes-final.html#constructor_static_methods_prototype_methods"><code>constructor</code>, static methods, prototype methods</a></li>
+<li><a href="http://www.2ality.com/2015/02/es6-classes-final.html#computed_method_names">Computed method names</a></li>
+</ul>
+</li>
+<li><strong>[2015-02-16]</strong> I simplified sections 3 and 4 (covering details).</li>
+</ul><span>
+</span><p><a href="https://github.com/rwaldron/tc39-notes/blob/master/es6/2015-01/jan-27.md#44-subclass-instantiation-reformation-status-and-open-issues">Recently</a>, TC39 decided on the final semantics of classes in ECMAScript 6 <a class="ptr">[2]</a>. This blog post explains how their final incarnation works. The most significant recent changes were related to how subclassing is handled.</p><span>
+</span><a name="more"></a><span>
+
+
+
+</span><h3 id="overview" class="countheads">Overview</h3><pre class="javascript">    class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        toString() {
+            return '(' + this.x + ', ' + this.y + ')';
+        }
+    }
+    
+    class ColorPoint extends Point {
+        constructor(x, y, color) {
+            super(x, y);
+            this.color = color;
+        }
+        toString() {
+            return super.toString() + ' in ' + this.color;
+        }
+    }
+    
+    let cp = new ColorPoint(25, 8, 'green');
+    cp.toString(); // '(25, 8) in green'
+    
+    console.log(cp instanceof ColorPoint); // true
+    console.log(cp instanceof Point); // true
+</pre><span>
+
+
+</span><h3 id="the_essentials">The essentials</h3><h4 id="base_classes">Base classes</h4><p>A class is defined like this in ECMAScript 6 (ES6):</p><span>
+</span><pre class="javascript">    class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        toString() {
+            return '(' + this.x + ', ' + this.y + ')';
+        }
+    }
+</pre><span>
+</span><p>You use this class just like an ES5 constructor function:</p><span>
+</span><pre class="repl">    &gt; var p = new Point(25, 8);
+    &gt; p.toString()
+    '(25, 8)'
+</pre><span>
+</span><p>In fact, the result of a class definition is a function:</p><span>
+</span><pre class="repl">    &gt; typeof Point
+    'function'
+</pre><span>
+</span><p>However, you can only invoke a class via <code>new</code>, not via a function call (<a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-function-objects-call-thisargument-argumentslist">Sect. 9.2.2</a> in the spec):</p><span>
+</span><pre class="repl">    &gt; Point()
+    TypeError: Classes can’t be function-called
+</pre><span>
+</span><h5 id="class_declarations_are_not_hoisted">Class declarations are not hoisted</h5><p>Function declarations are <em>hoisted</em>: When entering a scope, the functions that are declared in it are immediately available – independently of where the declarations happen. That means that you can call a function that is declared later:</p><span>
+</span><pre class="javascript">    foo(); // works, because `foo` is hoisted
+    
+    function foo() {}
+</pre><span>
+</span><p>In contrast, class declarations are not hoisted. Therefore, a class only exists after execution reached its definition and it was evaluated. Accessing it beforehand leads to a <code>ReferenceError</code>:</p><span>
+</span><pre class="javascript">    new Foo(); // ReferenceError
+    
+    class Foo {}
+</pre><span>
+</span><p>The reason for this limitation is that classes can have an <code>extends</code> clause whose value is an arbitrary expression. That expression must be evaluated in the proper “location”, its evaluation can’t be hoisted.</p><span>
+</span><p>Not having hoisting is less limiting than you may think. For example, a function that comes before a class declaration can still refer to that class, but you have to wait until the class declaration has been evaluated before you can call the function.</p><span>
+</span><pre class="javascript">    function functionThatUsesBar() {
+        new Bar();
+    }
+    
+    functionThatUsesBar(); // ReferenceError
+    class Bar {}
+    functionThatUsesBar(); // OK
+</pre><span>
+</span><h5 id="class_expressions">Class expressions</h5><p>Similarly to functions, there are two kinds of <em>class definitions</em>, two ways to define a class: <em>class declarations</em> and <em>class expressions</em>.</p><span>
+</span><p>Also similarly to functions, the identifier of a class expression is only visible within the expression:</p><span>
+</span><pre class="javascript">    const MyClass = class Me {
+        getClassName() {
+            return Me.name;
+        }
+    };
+    let inst = new MyClass();
+    console.log(inst.getClassName()); // Me
+    console.log(Me.name); // ReferenceError: Me is not defined
+</pre><span>
+</span><h4 id="inside_the_body_of_a_class_definition">Inside the body of a class definition</h4><p>A class body can only contain methods, but not data properties. Prototypes having data properties is generally considered an anti-pattern, so this just enforces a best practice.</p><span>
+</span><h5 id="constructor_static_methods_prototype_methods"><code>constructor</code>, static methods, prototype methods</h5><p>Let’s examine three kinds of methods that you often find in class literals.</p><span>
+</span><pre class="javascript">    class Foo {
+        constructor(prop) {
+            this.prop = prop;
+        }
+        static staticMethod() {
+            return 'classy';
+        }
+        prototypeMethod() {
+            return 'prototypical';
+        }
+    }
+    let foo = new Foo(123);
+</pre><span>
+</span><p>The object diagram for this class declaration looks as follows. Tip for understanding it: <code>[[Prototype]]</code> is an inheritance relationship between objects, while <code>prototype</code> is a normal property whose value is an object. The property <code>prototype</code> is only special because the <code>new</code> operator uses its value as the prototype for instances it creates.</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://2.bp.blogspot.com/-aEhytnJ2uaI/VOOTiNkupVI/AAAAAAAAA6w/W9jqDXiwfVo/s1600/methods.jpg" imageanchor="1"><img border="0" src="http://2.bp.blogspot.com/-aEhytnJ2uaI/VOOTiNkupVI/AAAAAAAAA6w/W9jqDXiwfVo/s1600/methods.jpg"></a></div><span>
+</span><span>
+</span><p><strong>First, the pseudo-method <code>constructor</code>.</strong> This method is special, as it defines the function that represents the class:</p><span>
+</span><pre class="repl">    &gt; Foo === Foo.prototype.constructor
+    true
+    &gt; typeof Foo
+    'function'
+</pre><span>
+</span><p>It is sometimes called a <code>class constructor</code>. It has features that normal constructor functions don’t have (mainly the ability to constructor-call its super-constructor via <code>super()</code>, which is explained later).</p><span>
+</span><p><strong>Second, static methods.</strong> <em>Static properties</em> (or <em>class properties</em>) are properties of <code>Foo</code> itself. If you prefix a method definition with <code>static</code>, you create a class method:</p><span>
+</span><pre class="repl">    &gt; typeof Foo.staticMethod
+    'function'
+    &gt; Foo.staticMethod()
+    'classy'
+</pre><span>
+</span><p><strong>Third, prototype methods.</strong> The <em>prototype properties</em> of <code>Foo</code> are the properties of <code>Foo.prototype</code>. They are usually methods and inherited by instances of <code>Foo</code>.</p><span>
+</span><pre class="repl">    &gt; typeof Foo.prototype.prototypeMethod
+    'function'
+    &gt; foo.prototypeMethod()
+    'prototypical'
+</pre><span>
+
+
+</span><h5 id="getters_and_setters">Getters and setters</h5><p>The syntax for getters and setters is just like <a href="http://speakingjs.com/es5/ch17.html#getters_setters">in ECMAScript 5 object literals</a>:</p><span>
+</span><pre class="javascript">    class MyClass {
+        get prop() {
+            return 'getter';
+        }
+        set prop(value) {
+            console.log('setter: '+value);
+        }
+    }
+</pre><span>
+</span><p>You use <code>MyClass</code> as follows.</p><span>
+</span><pre class="repl">    &gt; let inst = new MyClass();
+    &gt; inst.prop = 123;
+    setter: 123
+    &gt; inst.prop
+    'getter'
+</pre><span>
+</span><h5 id="computed_method_names">Computed method names</h5><p>You can define the name of a method via an expression, if you put it in square brackets. For example, the following ways of defining <code>Foo</code> are all equivalent.</p><span>
+</span><pre class="javascript">    class Foo() {
+        myMethod() {}
+    }
+    
+    class Foo() {
+        ['my'+'Method']() {}
+    }
+    
+    const m = 'myMethod';
+    class Foo() {
+        [m]() {}
+    }
+</pre><span>
+</span><p>Several special methods in ECMAScript 6 have keys that are symbols <a class="ptr">[3]</a>. Computed method names allow you to define such methods. For example, if an object has a method whose key is <code>Symbol.iterator</code>, it is <em>iterable</em> <a class="ptr">[4]</a>. That means that its contents can be iterated over by the <code>for-of</code> loop and other language mechanisms.</p><span>
+</span><pre class="javascript">    class IterableClass {
+        [Symbol.iterator]() {
+            ···
+        }
+    }
+</pre><span>
+</span><h5 id="generator_methods">Generator methods</h5><p>If you prefix a method definition with an asterisk (<code>*</code>), it becomes a <em>generator method</em> <a class="ptr">[4]</a>. Among other things, a generator is useful for defining the method whose key is <code>Symbol.iterator</code>. The following code demonstrates how that works.</p><span>
+</span><pre class="javascript">    class IterableArguments {
+        constructor(...args) {
+            this.args = args;
+        }
+        * [Symbol.iterator]() {
+            for (let arg of this.args) {
+                yield arg;
+            }
+        }
+    }
+    
+    for (let x of new IterableArguments('hello', 'world')) {
+        console.log(x);
+    }
+    
+    // Output:
+    // hello
+    // world
+</pre><span>
+</span><h4 id="subclassing">Subclassing</h4><p>The <code>extends</code> clause lets you create a subclass of an existing constructor (which may or may not have been defined via a class):</p><span>
+</span><pre class="javascript">    class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        toString() {
+            return '(' + this.x + ', ' + this.y + ')';
+        }
+    }
+    
+    class ColorPoint extends Point {
+        constructor(x, y, color) {
+            super(x, y); // (A)
+            this.color = color;
+        }
+        toString() {
+            return super.toString() + ' in ' + this.color; // (B)
+        }
+    }
+</pre><span>
+</span><p>Again, this class is used like you’d expect:</p><span>
+</span><pre class="repl">    &gt; let cp = new ColorPoint(25, 8, 'green');
+    &gt; cp.toString()
+    '(25, 8) in green'
+    
+    &gt; cp instanceof ColorPoint
+    true
+    &gt; cp instanceof Point
+    true
+</pre><span>
+</span><p>There are two kinds of classes:</p><span>
+</span><ul>
+<li><code>Point</code> is a <em>base class</em>, because it doesn’t have an <code>extends</code> clause.</li>
+<li><code>ColorPoint</code> is a <em>derived class</em>.</li>
+</ul><span>
+</span><p>There are two ways of using <code>super</code>:</p><span>
+</span><ul>
+<li>A <em>class constructor</em> (the pseudo-method <code>constructor</code> in a class literal) uses it like a function call (<code>super(···)</code>), in order to make a super-constructor call (line A).</li>
+<li>Method definitions (in object literals or classes, with or without <code>static</code>) use it like property references (<code>super.prop</code>) or method calls (<code>super.method(···)</code>), in order to refer to super-properties (line B).</li>
+</ul><span>
+</span><h5 id="the_prototype_of_a_subclass_is_the_superclass">The prototype of a subclass is the superclass</h5><p>The prototype of a subclass is the superclass in ECMAScript 6:</p><span>
+</span><pre class="repl">    &gt; Object.getPrototypeOf(ColorPoint) === Point
+    true
+</pre><span>
+</span><p>That means that static properties are inherited:</p><span>
+</span><pre class="javascript">    class Foo {
+        static classMethod() {
+            return 'hello';
+        }
+    }
+    
+    class Bar extends Foo {
+    }
+    Bar.classMethod(); // 'hello'
+</pre><span>
+</span><p>You can even super-call static methods:</p><span>
+</span><pre class="javascript">    class Foo {
+        static classMethod() {
+            return 'hello';
+        }
+    }
+    
+    class Bar extends Foo {
+        static classMethod() {
+            return super.classMethod() + ', too';
+        }
+    }
+    Bar.classMethod(); // 'hello, too'
+</pre><span>
+</span><h5 id="super-constructor_calls">Super-constructor calls</h5><p>In a derived class, you must call <code>super()</code> before you can use <code>this</code>:</p><span>
+</span><pre class="javascript">    class Foo {}
+    
+    class Bar extends Foo {
+        constructor(num) {
+            let tmp = num * 2; // OK
+            this.num = num; // ReferenceError
+            super();
+            this.num = num; // OK
+        }
+    }
+</pre><span>
+</span><p>Implicitly leaving a derived constructor without calling <code>super()</code> also causes an error:</p><span>
+</span><pre class="javascript">    class Foo {}
+    
+    class Bar extends Foo {
+        constructor() {
+        }
+    }
+    
+    let bar = new Bar(); // ReferenceError
+</pre><span>
+</span><h5 id="overriding_the_result_of_a_constructor">Overriding the result of a constructor</h5><p>Just like in ES5, you can override the result of a constructor by explicitly returning an object:</p><span>
+</span><pre class="javascript">    class Foo {
+        constructor() {
+            return Object.create(null);
+        }
+    }
+    console.log(new Foo() instanceof Foo); // false
+</pre><span>
+</span><p>If you do so, it doesn’t matter whether <code>this</code> has been initialized or not. In other words: you don’t have to call <code>super()</code> in a derived constructor if you override the result in this manner.</p><span>
+</span><h5 id="default_constructors_for_classes">Default constructors for classes</h5><p>If you don’t specify a <code>constructor</code> for a base class, the following definition is used:</p><span>
+</span><pre class="javascript">    constructor() {}
+</pre><span>
+</span><p>For derived classes, the following default constructor is used:</p><span>
+</span><pre class="javascript">    constructor(...args) {
+        super(...args);
+    }
+</pre><span>
+</span><h5 id="subclassing_built-in_constructors">Subclassing built-in constructors</h5><p>In ECMAScript 6, you can finally subclass all built-in constructors (there are <a href="http://speakingjs.com/es5/ch28.html">work-arounds for ES5</a>, but these have significant limitations).</p><span>
+</span><p>For example, you can now create your own exception classes (that will inherit the feature of having a stack trace in most engines):</p><span>
+</span><pre class="javascript">    class MyError extends Error {    
+    }
+    throw new MyError('Something happened!');
+</pre><span>
+</span><p>You can also create subclasses of <code>Array</code> whose instances properly handle <code>length</code>:</p><span>
+</span><pre class="javascript">    class MyArray extends Array {
+        constructor(len) {
+            super(len);
+        }
+    }
+    
+    // Instances of of `MyArray` work like real arrays:
+    let myArr = new MyArray(0);
+    console.log(myArr.length); // 0
+    myArr[0] = 'foo';
+    console.log(myArr.length); // 1
+</pre><span>
+</span><p>Note that subclassing built-in constructors is something that engines have to support natively, you won’t get this feature via transpilers.</p><span>
+
+
+</span><h3 id="the_details_of_classes">The details of classes</h3><p>What we have seen so far are the essentials of classes. You only need to read on if you are interested how things happen under the hood. Let’s start with the syntax of classes. The following is a slightly modified version of the syntax shown in <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-functions-and-classes">Sect. A.4 of the ECMAScript 6 specification</a>.</p><span>
+</span><pre class="undefined">    ClassDeclaration:
+        "class" BindingIdentifier ClassTail
+    ClassExpression:
+        "class" BindingIdentifier? ClassTail
+    
+    ClassTail:
+        ClassHeritage? "{" ClassBody? "}"
+    ClassHeritage:
+        "extends" AssignmentExpression
+    ClassBody:
+        ClassElement+
+    ClassElement:
+        MethodDefinition
+        "static" MethodDefinition
+        ";"
+    
+    MethodDefinition:
+        PropName "(" FormalParams ")" "{" FuncBody "}"
+        "*" PropName "(" FormalParams ")" "{" GeneratorBody "}"
+        "get" PropName "(" ")" "{" FuncBody "}"
+        "set" PropName "(" PropSetParams ")" "{" FuncBody "}"
+    
+    PropertyName:
+        LiteralPropertyName
+        ComputedPropertyName
+    LiteralPropertyName:
+        IdentifierName  /* foo */
+        StringLiteral   /* "foo" */
+        NumericLiteral  /* 123.45, 0xFF */
+    ComputedPropertyName:
+        "[" Expression "]"
+</pre><span>
+</span><p>Two observations:</p><span>
+</span><ul>
+<li><p>The value to be extended can be produced by an arbitrary expression. Which means that you’ll be able to write code such as the following:</p>
+<pre class="javascript">    class Foo extends combine(MyMixin, MySuperClass) {}
+</pre>
+</li>
+<li><p>Semicolons are allowed between methods.</p>
+</li>
+</ul><span>
+</span><h4 id="various_checks">Various checks</h4><ul>
+<li><p>Error checks: the class name cannot be <code>eval</code> or <code>arguments</code>; duplicate class element names are not allowed; the name <code>constructor</code> can only be used for a normal method, not for a getter, a setter or a generator method.</p>
+</li>
+<li><p>Classes can’t be function-called. They throw a <code>TypeException</code> if they are.</p>
+</li>
+<li><p>Prototype methods cannot be used as constructors:</p>
+<pre class="javascript">    class C {
+        m() {}
+    }
+    new C.prototype.m(); // TypeError
+</pre>
+</li>
+</ul><span>
+</span><h4 id="attributes_of_properties">Attributes of properties</h4><p>Class declarations create (mutable) let bindings. For a given class <code>Foo</code>:</p><span>
+</span><ul>
+<li>Static methods <code>Foo.*</code> are writable and configurable, but not enumerable. Making them writable allows for dynamic patching.</li>
+<li>A constructor and the object in its property <code>prototype</code> have an immutable link:<ul>
+<li><code>Foo.prototype</code> is non-writeable, non-enumerable, non-configurable.</li>
+<li><code>Foo.prototype.constructor</code> is non-writeable, non-enumerable, non-configurable.</li>
+</ul>
+</li>
+<li>Prototype methods <code>Foo.prototype.*</code> are writable and configurable, but not enumerable.</li>
+</ul><span>
+</span><p>Note that method definitions in object literals produce enumerable properties.</p><span>
+
+
+</span><h3 id="the_details_of_subclassing">The details of subclassing</h3><p>In ECMAScript 6, subclassing looks as follows.</p><span>
+</span><pre class="javascript">    class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        ···
+    }
+    
+    class ColorPoint extends Point {
+        constructor(x, y, color) {
+            super(x, y);
+            this.color = color;
+        }
+        ···
+    }
+    
+    let cp = new ColorPoint(25, 8, 'green');
+</pre><span>
+</span><p>This code produces the following objects.</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://1.bp.blogspot.com/-73QVO-T4h2g/VOJGo-OkwmI/AAAAAAAAA6g/RFkPFFdnQPw/s1600/subclassing_es6.jpg" imageanchor="1"><img border="0" src="http://1.bp.blogspot.com/-73QVO-T4h2g/VOJGo-OkwmI/AAAAAAAAA6g/RFkPFFdnQPw/s1600/subclassing_es6.jpg"></a></div><span>
+</span><span>
+</span><p>The next subsection examines the prototype chains (in the two columns), the subsection after that examines how <code>cp</code> is allocated and initialized.</p><span>
+</span><h4 id="prototype_chains">Prototype chains</h4><p>In the diagram, you can see that there are two <em>prototype chains</em> (objects linked via the <code>[[Prototype]]</code> relationship, which is an inheritance relationship):</p><span>
+</span><ul>
+<li><p>Left column: classes (functions). The prototype of a derived class is the class it extends. The prototype of a base class is <code>Function.prototype</code>, which is also the prototype of functions:</p>
+<pre class="repl">    &gt; const getProto = Object.getPrototypeOf.bind(Object);
+    
+    &gt; getProto(Point) === Function.prototype
+    true
+    &gt; getProto(function () {}) === Function.prototype
+    true
+</pre>
+</li>
+<li><p>Right column: the prototype chain of the instance. The whole purpose of a class is to set up this prototype chain. The prototype chain ends with <code>Object.prototype</code> (whose prototype is <code>null</code>), which is also the prototype of objects created via object literals:</p>
+<pre class="repl">    &gt; const getProto = Object.getPrototypeOf.bind(Object);
+    
+    &gt; getProto(Point.prototype) === Object.prototype
+    true
+    &gt; getProto({}) === Object.prototype
+    true
+</pre>
+</li>
+</ul><span>
+</span><p>The prototype chain in the left column leads to static properties being inherited.</p><span>
+</span><h4 id="allocating_and_initializing_the_instance_object">Allocating and initializing the instance object</h4><p>The data flow between class constructors is different from the canonical way of subclassing in ES5. Under the hood, it roughly looks as follows.</p><span>
+</span><pre class="javascript">    // Instance is allocated here
+    function Point(x, y) {
+        // Performed before entering this constructor:
+        this = Object.create(new.target.prototype);
+    
+        this.x = x;
+        this.y = y;
+    }
+    ···
+    
+    function ColorPoint(x, y, color) {
+        // Performed before entering this constructor:
+        this = uninitialized;
+    
+        this = Reflect.construct(Point, [x, y], new.target); // (A)
+            // super(x, y);
+    
+        this.color = color;
+    }
+    Object.setPrototypeOf(ColorPoint, Point);
+    ···
+    
+    let cp = Reflect.construct( // (B)
+                 ColorPoint, [25, 8, 'green'],
+                 ColorPoint);
+        // let cp = new ColorPoint(25, 8, 'green');
+</pre><span>
+</span><p>The instance object is created in different locations in ES6 and ES5:</p><span>
+</span><ul>
+<li>In ES6, it is created in the base constructor, the last in a chain of constructor calls.</li>
+<li>In ES5, it is created in the operand of <code>new</code>, the first in a chain of constructor calls.</li>
+</ul><span>
+</span><p>The previous code uses two new ES6 features:</p><span>
+</span><ul>
+<li><p><code>new.target</code> is an implicit parameter that all functions have. It is to constructor calls what <code>this</code> is to method calls.</p>
+<ul>
+<li>If a constructor has been directly invoked via <code>new</code>, its value is that constructor (line B).</li>
+<li>If a constructor was called via <code>super()</code>, its value is the <code>new.target</code> of the constructor that made the call (line A).</li>
+<li>During a normal function call, it is <code>undefined</code>. That means that you can use <code>new.target</code> to determine whether a function was function-called or constructor-called (via <code>new</code>).</li>
+<li>Inside an arrow function, <code>new.target</code> refers to the <code>new.target</code> of the surrounding non-arrow function.</li>
+</ul>
+</li>
+<li><p><code>Reflect.construct()</code> <a class="ptr">[5]</a> lets you do a constructor call while specifying <code>new.target</code> via the last parameter.</p>
+</li>
+</ul><span>
+</span><p>The advantage of this way of subclassing is that it enables normal code to subclass built-in constructors (such as <code>Error</code> and <code>Array</code>). A later section explains why a different approach was necessary.</p><span>
+</span><h5 id="safety_checks">Safety checks</h5><ul>
+<li><code>this</code> originally being uninitialized in derived constructors means that an error is thrown if they access <code>this</code> in any way before they have called <code>super()</code>.</li>
+<li>Once <code>this</code> is initialized, calling <code>super()</code> produces a <code>ReferenceError</code>. This protects you against calling <code>super()</code> twice.</li>
+<li>If a constructor returns implicitly (without a <code>return</code> statement), the result is <code>this</code>. If <code>this</code> is uninitialized, a <code>ReferenceError</code> is thrown. This protects you against forgetting to call <code>super()</code>.</li>
+<li>If a constructor explicitly returns a non-object (including <code>undefined</code> and <code>null</code>), the result is <code>this</code> (this behavior is required to remain compatible with ES5 and earlier). If <code>this</code> is uninitialized, a <code>TypeError</code> is thrown.</li>
+<li>If a constructor explicitly returns an object, it is used as its result. Then it doesn’t matter whether <code>this</code> is initialized or not.</li>
+</ul><span>
+</span><h5 id="the_extends_clause">The <code>extends</code> clause</h5><span>
+
+</span><p>Let’s examine how the <code>extends</code> clause influences how a class is set up (<a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-runtime-semantics-classdefinitionevaluation">Sect. 14.5.14 of the spec</a>).</p><span>
+</span><p>The value of an <code>extends</code> clause must be “constructible” (invocable via <code>new</code>). <code>null</code> is allowed, though.</p><span>
+</span><pre class="javascript">    class C {
+    }
+</pre><span>
+</span><ul>
+<li>Constructor kind: base</li>
+<li>Prototype of <code>C</code>: <code>Function.prototype</code> (like a normal function)</li>
+<li>Prototype of <code>C.prototype</code>: <code>Object.prototype</code> (which is also the prototype of objects created via object literals)</li>
+</ul><span>
+</span><pre class="javascript">    class C extends B {
+    }
+</pre><span>
+</span><ul>
+<li>Constructor kind: derived</li>
+<li>Prototype of <code>C</code>: <code>B</code></li>
+<li>Prototype of <code>C.prototype</code>: <code>B.prototype</code></li>
+</ul><span>
+</span><pre class="javascript">    class C extends Object {
+    }
+</pre><span>
+</span><ul>
+<li>Constructor kind: derived</li>
+<li>Prototype of <code>C</code>: <code>Object</code></li>
+<li>Prototype of <code>C.prototype</code>: <code>Object.prototype</code></li>
+</ul><span>
+</span><p>Note the following subtle difference with the first case: If there is no <code>extends</code> clause, the class is a base class and allocates instances. If a class extends <code>Object</code>, it is a derived class and <code>Object</code> allocates the instances. The resulting instances (including their prototype chains) are the same, but you get there differently.</p><span>
+</span><pre class="javascript">    class C extends null {
+    }
+</pre><span>
+</span><ul>
+<li>Constructor kind: derived</li>
+<li>Prototype of <code>C</code>: <code>Function.prototype</code></li>
+<li>Prototype of <code>C.prototype</code>: <code>null</code></li>
+</ul><span>
+</span><p>Such a class is not very useful: <code>new</code>-calling it leads to an error, because the default constructor makes a super-constructor call and <code>Function.prototype</code> (the super-constructor) can’t be constructor-called. The only way to make the error go away is by adding a <code>constructor</code> that returns an object.</p><span>
+
+
+
+
+
+</span><h4 id="why_can%E2%80%99t_you_subclass_built-in_constructors_in_es5%3F">Why can’t you subclass built-in constructors in ES5?</h4><p>In ECMAScript 5, most built-in constructors can’t be subclassed (<a href="http://speakingjs.com/es5/ch28.html">several work-arounds exist</a>).</p><span>
+</span><p>To understand why, let’s use the canonical ES5 pattern to subclass <code>Array</code>. As we shall soon find out, this doesn’t work.</p><span>
+</span><pre class="javascript">    function MyArray(len) {
+        Array.call(this, len); // (A)
+    }
+    MyArray.prototype = Object.create(Array.prototype);
+</pre><span>
+</span><p>Unfortunately, if we instantiate <code>MyArray</code>, we find out that it doesn’t work properly: The instance property <code>length</code> does not change in reaction to us adding array elements:</p><span>
+</span><pre class="repl">    &gt; var myArr = new MyArray(0);
+    &gt; myArr.length
+    0
+    &gt; myArr[0] = 'foo';
+    &gt; myArr.length
+    0
+</pre><span>
+</span><p>There are two obstracles that prevent <code>myArr</code> from being a proper array.</p><span>
+</span><p><strong>First obstacle: initialization.</strong> The <code>this</code> you hand to the constructor <code>Array</code> (in line A) is completely ignored. That means you can’t use <code>Array</code> to set up the instance that was created for <code>MyArray</code>.</p><span>
+</span><pre class="repl">    &gt; var a = [];
+    &gt; var b = Array.call(a, 3);
+    &gt; a !== b  // a is ignored, b is a new object
+    true
+    &gt; b.length // set up correctly
+    3
+    &gt; a.length // unchanged
+    0
+</pre><span>
+</span><p><strong>Second obstacle: allocation.</strong> The instance objects created by <code>Array</code> are <em>exotic</em> (a term used by the ECMAScript specification for objects that have features that normal objects don’t have): Their property <code>length</code> tracks and influences the management of array elements. In general, exotic objects can be created from scratch, but you can’t convert an existing normal object into an exotic one. Unfortunately, that is what <code>Array</code> would have to do, when called in line A: It would have to turn the normal object created for <code>MyArray</code> into an exotic array object.</p><span>
+</span><h5 id="the_solution%3A_es6_subclassing">The solution: ES6 subclassing</h5><p>In ECMAScript 6, subclassing <code>Array</code> looks as follows:</p><span>
+</span><pre class="javascript">    class MyArray extends Array {
+        constructor(len) {
+            super(len);
+        }
+    }
+</pre><span>
+</span><p>This works (but it’s not something that ES6 transpilers can support, it depends on whether a JavaScript engine supports it natively):</p><span>
+</span><pre class="repl">    &gt; let myArr = new MyArray(0);
+    &gt; myArr.length
+    0
+    &gt; myArr[0] = 'foo';
+    &gt; myArr.length
+    1
+</pre><span>
+</span><p>We can now see how the ES6 approach to subclassing circumvents the obstacles:</p><span>
+</span><ul>
+<li>Allocation happens in the base constructor, which means that <code>Array</code> can allocate an exotic object. While most of the new approach is due to how derived constructors behave, this step requires that a base constructor is aware of <code>new.target</code> and makes <code>new.target.prototype</code> the protoype of the allocated instance.</li>
+<li>Initialization also happens in the base constructor, a derived constructor receives an initialized object and works with that one instead of passing its own instance to the super-constructor and requiring it to set it up.</li>
+</ul><span>
+</span><h4 id="referring_to_super-properties_in_methods">Referring to super-properties in methods</h4><p>The following ES6 code makes a super-method call in line B.</p><span>
+</span><pre class="javascript">    class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        toString() { // (A)
+            return '(' + this.x + ', ' + this.y + ')';
+        }
+    }
+    
+    class ColorPoint extends Point {
+        constructor(x, y, color) {
+            super(x, y);
+            this.color = color;
+        }
+        toString() {
+            return super.toString() // (B)
+                   + ' in ' + this.color;
+        }
+    }
+    
+    let cp = new ColorPoint(25, 8, 'green');
+    console.log(cp.toString()); // (25, 8) in green
+</pre><span>
+</span><p>To understand how super-calls work, let’s look at the object diagram of <code>cp</code>:</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://4.bp.blogspot.com/-kbhA-oD5CP4/VOD3o6bWluI/AAAAAAAAA6M/xavVqGgHnwM/s1600/supercalls.jpg" imageanchor="1"><img border="0" src="http://4.bp.blogspot.com/-kbhA-oD5CP4/VOD3o6bWluI/AAAAAAAAA6M/xavVqGgHnwM/s1600/supercalls.jpg"></a></div><span>
+</span><span>
+</span><p><code>ColorPoint.prototype.toString</code> makes a super-call (line B) to the method (starting in line A) that it has overridden. Let’s call the object, in which a method is stored, the <em>home object</em> of that method. For example, <code>ColorPoint.prototype</code> is the home object of <code>ColorPoint.prototype.toString()</code>.</p><span>
+</span><p>The super-call in line B involves three steps:</p><span>
+</span><ol>
+<li><p>Start your search in the prototype of the home object of the current method.</p>
+</li>
+<li><p>Look for a method whose name is <code>toString</code>. That method may be found in the object where the search started or later in the prototype chain.</p>
+</li>
+<li><p>Call that method with the current <code>this</code>. The reason for doing so is: the super-called method must be able to access the same instance properties (in our example, the properties of <code>cp</code>).</p>
+</li>
+</ol><span>
+</span><p>Note that even if you are only getting or setting a property (not calling a method), you still have to consider <code>this</code> in step #3, because the property may be implemented via a getter or a setter.</p><span>
+</span><p>Let’s express these steps in three different, but equivalent, ways:</p><span>
+</span><pre class="javascript">    // Variation 1: super-method calls in ES5
+    var result = Point.prototype.toString.call(this) // steps 1,2,3
+    
+    // Variation 2: ES5, refactored
+    var superObject = Point.prototype; // step 1
+    var superMethod = superObject.toString; // step 2
+    var result = superMethod.call(this) // step 3
+    
+    // Variation 3: ES6
+    var homeObject = ColorPoint.prototype;
+    var superObject = Object.getPrototypeOf(homeObject); // step 1
+    var superMethod = superObject.toString; // step 2
+    var result = superMethod.call(this) // step 3
+</pre><span>
+</span><p>Variation 3 is how ECMAScript 6 handles super-calls. This approach is supported by <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-function-environment-records">two internal <em>bindings</em></a> that the <em>environments</em> of functions have (<em>environments</em> provide storage space, so-called <em>bindings</em>, for the variables in a scope):</p><span>
+</span><ul>
+<li><code>[[thisValue]]</code>: This internal binding also exists in ECMAScript 5 and stores the value of <code>this</code>.</li>
+<li><code>[[HomeObject]]</code>: Refers to the home object of the environment’s function. Filled in via an internal property <code>[[HomeObject]]</code> that all methods have that use <code>super</code>. Both the binding and the property are new in ECMAScript 6.</li>
+</ul><span>
+</span><p>A method definition in a class literal that uses <code>super</code> is now special: Its value is still a function, but it has the internal property <code>[[HomeObject]]</code>. That property is set up by the method definition and can’t be changed in JavaScript. Therefore, you can’t meaningfully move such a method to a different object.</p><span>
+</span><p>Using <code>super</code> to refer to a property is not allowed in function declarations, function expressions and generator functions.</p><span>
+</span><p>Referring to super-properties is handy whenever prototype chains are involved, which is why you can use it in method definitions inside object literals and class literals (the class can be derived or not, the method can be static or not).</p><span>
+
+
+</span><h3 id="constructor_calls_explained_via_javascript_code">Constructor calls explained via JavaScript code</h3><p>The JavaScript code in this section is a much simplified version of how the specification describes constructor calls and super-constructor calls. It may be interesting to you if you prefer code to explanations in human language. Before we can delve into the actual functionality, we need to understand a few other mechanisms.</p><span>
+</span><h4 id="internal_variables_and_properties">Internal variables and properties</h4><p>The specification writes internal variables and properties in double brackets (<code>[[Foo]]</code>). In the code, I use double underscores, instead (<code>__Foo__</code>).</p><span>
+</span><p>Internal variables used in the code:</p><span>
+</span><ul>
+<li><code>[[NewTarget]]</code>: The operand of the <code>new</code> operator that triggered the current constructor call (passed on if <code>[[Construct]]</code> is called recursively via <code>super()</code>).</li>
+<li><code>[[thisValue]]</code>: Stores the value of <code>this</code>.</li>
+<li><code>[[FunctionObject]]</code>: Refers to the function that is currently executed.</li>
+</ul><span>
+</span><p>Internal properties used in the code:</p><span>
+</span><ul>
+<li><code>[[Construct]]</code>: All constructor functions (including those created by classes) have this own (non-inherited) method. It implements constructor calls and is invoked by <code>new</code>.</li>
+<li><code>[[ConstructorKind]]</code>: A property of constructor functions whose value is either <code>'base'</code> or <code>'derived'</code>.</li>
+</ul><span>
+</span><h4 id="environments">Environments</h4><p><em>Environments</em> provide storage space for variables, there is one environment per scope. Environments are managed as a stack. The environment on top of that stack is considered active. The following code is a sketch of how environments are handled.</p><span>
+</span><pre class="javascript">    /**
+     * Function environments are special, they have a few more
+     * internal variables than other environments.
+     * (`Environment` is not shown here)
+     */
+    class FunctionEnvironment extends Environment {
+        constructor(Func) {
+            // [[FunctionObject]] is a function-specific
+            // internal variable
+            this.__FunctionObject__ = Func;
+        }    
+    }
+    
+    /**
+     * Push an environment onto the stack
+     */
+    function PushEnvironment(env) { ··· }
+    
+    /**
+     * Pop the topmost environment from the stack
+     */
+    function PopEnvironment() { ··· }
+    
+    /**
+     * Find topmost function environment on stack
+     */
+    function GetThisEnvironment() { ··· }
+</pre><span>
+</span><h4 id="constructor_calls">Constructor calls</h4><p>Let’s start with the default way (<a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-function-objects-construct-argumentslist-newtarget">ES6 spec Sect. 9.2.3</a>) in which constructor calls are handled for functions:</p><span>
+</span><pre class="javascript">    /**
+     * All constructible functions have this own method,
+     * it is called by the `new` operator
+     */
+    AnyFunction.__Construct__ = function (args, newTarget) {
+        let Constr = this;
+        let kind = Constr.__ConstructorKind__;
+    
+        let env = new FunctionEnvironment(Constr);
+        env.__NewTarget__ = newTarget;
+        if (kind === 'base') {
+            env.__thisValue__ = Object.create(newTarget.prototype);
+        } else {
+            // While `this` is uninitialized, getting or setting it
+            // throws a `ReferenceError`
+            env.__thisValue__ = uninitialized;
+        }
+    
+        PushEnvironment(env);
+        let result = Constr(...args);
+        PopEnvironment();
+    
+        // Let’s pretend there is a way to tell whether `result`
+        // was explicitly returned or not
+        if (WasExplicitlyReturned(result)) {
+            if (isObject(result)) {
+                return result;
+            }
+            // Explicit return of a primitive
+            if (kind === 'base') {
+                // Base constructors must be backwards compatible
+                return env.__thisValue__; // always initialized!
+            }
+            throw new TypeError();
+        }
+        // Implicit return
+        if (env.__thisValue__ === uninitialized) {
+            throw new ReferenceError();
+        }
+        return env.__thisValue__;
+    }
+</pre><span>
+</span><h4 id="super-constructor_calls_2">Super-constructor calls</h4><p>Super-constructor calls are handled as follows (<a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-super-keyword-runtime-semantics-evaluation">ES6 spec Sect. 12.3.5.1</a>).</p><span>
+</span><pre class="javascript">    /**
+     * Handle super-constructor calls
+     */
+    function super(...args) {
+        let env = GetThisEnvironment();
+        let newTarget = env.__NewTarget__;
+        let activeFunc = env.__FunctionObject__;
+        let superConstructor = Object.getPrototypeOf(activeFunc);
+    
+        env.__thisValue__ = superConstructor
+                            .__Construct__(args, newTarget);
+    }
+</pre><span>
+
+
+</span><h3 id="the_species_pattern">The species pattern</h3><p>One more mechanism of built-in constructors has been made extensible in ECMAScript 6: If a method such as <code>Array.prototype.map()</code> returns a fresh instance, what constructor should it use to create that instance? The default is to use the same constructor that created <code>this</code>, but some subclasses may want it to remain a direct instance of <code>Array</code>. ES6 lets subclasses override the default, via the so-called <em>species pattern</em>:</p><span>
+</span><ul>
+<li>When creating a new instance of <code>Array</code>, methods such as <code>map()</code> use the constructor stored in <code>this.constructor[Symbol.species]</code>.</li>
+<li>If a sub-constructor of <code>Array</code> does nothing, it inherits <code>Array[Symbol.species]</code>. That property is a getter that returns <code>this</code>.</li>
+</ul><span>
+</span><p>You can override the default, via a static getter (line A):</p><span>
+</span><pre class="javascript">    class MyArray1 extends Array {
+    }
+    let result1 = new MyArray1().map(x =&gt; x);
+    console.log(result1 instanceof MyArray1); // true
+    
+    class MyArray2 extends Array {
+        static get [Symbol.species]() { // (A)
+            return Array;
+        }
+    }
+    let result2 = new MyArray2().map(x =&gt; x);
+    console.log(result2 instanceof MyArray2); // false
+</pre><span>
+</span><p>An alternative is to use <code>Object.defineProperty()</code> (you can’t use assignment, as that would trigger a setter, which doesn’t exist):</p><span>
+</span><pre class="javascript">    Object.defineProperty(
+        MyArray2, Symbol.species, {
+            value: Array
+        });
+</pre><span>
+</span><p>The following getters all return <code>this</code>, which means that methods such as <code>Array.prototype.map()</code> use the constructor that created the current instance for their results.</p><span>
+</span><ul>
+<li><code>Array.get [Symbol.species]()</code></li>
+<li><code>ArrayBuffer.get [Symbol.species]()</code></li>
+<li><code>Map.get [Symbol.species]()</code></li>
+<li><code>Promise.get [Symbol.species]()</code></li>
+<li><code>RegExp.get [Symbol.species]()</code></li>
+<li><code>Set.get [Symbol.species]()</code></li>
+<li><code>%TypedArray%.get [Symbol.species]()</code></li>
+</ul><span>
+
+
+</span><h3 id="conclusion">Conclusion</h3><h4 id="the_specialization_of_functions">The specialization of functions</h4><p>There is an interesting trend in ECMAScript 6: Previously, a single kind of function took on three roles: real function, method and constructor. In ES6, there is specialization:</p><span>
+</span><ul>
+<li><p>Arrow functions are specialized for non-method callbacks, where them picking up the <code>this</code> of their surrounding method or constructor is an advantage. Without <code>this</code>, they don’t make much sense as methods and they throw an exception when invoked via <code>new</code>.</p>
+</li>
+<li><p>Method definitions enable the use of <code>super</code>, by setting up the property <code>[[HomeObject]]</code>. The functions they produce can’t be constructor-called.</p>
+</li>
+<li><p>Class definitions are the only way to create derived constructors (enabling ES6-style subclassing that works for built-in constructors). Class definitions produce functions that can only be constructor-called.</p>
+</li>
+</ul><span>
+</span><h4 id="the_future_of_classes">The future of classes</h4><p>The design maxim for classes was “maximally minimal”. Several advanced features were discussed, but ultimately discarded in order to get a design that would be unanimously accepted by TC39.</p><span>
+</span><p>Upcoming versions of ECMAScript can now extend this minimal design – classes will provide a foundation for features such as traits (or mixins), value objects (where different objects are equal if they have the same content) and const classes (that produce immutable instances).</p><span>
+</span><h4 id="does_javascript_need_classes%3F">Does JavaScript need classes?</h4><p>Classes are controversial within the JavaScript community. On one hand, people coming from class-based languages are happy that they don’t have to deal with JavaScript’s unorthodox inheritance mechanisms, anymore. On the other hand, there are many JavaScript programmers who argue that what’s complicated about JavaScript is not prototypal inheritance, but constructors <a class="ptr">[6]</a>.</p><span>
+</span><p>ES6 classes provide a few clear benefits:</p><span>
+</span><ul>
+<li><p>They are backwards compatible with much of the current code.</p>
+</li>
+<li><p>Compared to constructors and constructor inheritance, classes make it easier for beginners to get started.</p>
+</li>
+<li><p>Subclassing is supported within the language.</p>
+</li>
+<li><p>Built-in constructors are subclassable.</p>
+</li>
+<li><p>No library for inheritance is needed, anymore; code will become more portable between frameworks.</p>
+</li>
+<li><p>They provide a foundation for advanced features in the future (mixins and more).</p>
+</li>
+<li><p>They help tools that statically analyze code (IDEs, type checkers, style checkers, etc.).</p>
+</li>
+</ul><span>
+</span><p>I have made my peace with classes and am glad that they are in ES6. I would have preferred them to be prototypal (based on constructor objects <a class="ptr">[6]</a>, not constructor functions), but I also understand that backwards compatibility is important.</p><span>
+
+
+</span><h3 id="further_reading">Further reading</h3><p>Acknowledgement: #1 was an important source of this blog post.</p><span>
+</span><ol class="reflist">
+<li>“<a href="https://github.com/rwaldron/tc39-notes/blob/master/es6/2015-01/jan2015-allen-slides.pdf">Instantiation Reform: One last time</a>”, slides by Allen Wirfs-Brock.</li>
+<li>“<a href="http://exploringjs.com/">Exploring ES6: Upgrade to the next version of JavaScript</a>”, book by Axel</li>
+<li><a href="http://www.2ality.com/2014/12/es6-symbols.html">Symbols in ECMAScript 6</a></li>
+<li><a href="http://www.2ality.com/2013/06/iterators-generators.html">Iterators and generators in ECMAScript 6</a></li>
+<li><a href="http://www.2ality.com/2014/12/es6-proxies.html">Meta programming with ECMAScript 6 proxies</a></li>
+<li><a href="http://www.2ality.com/2011/06/prototypes-as-classes.html">Prototypes as classes – an introduction to JavaScript inheritance</a></li>
+</ol><span>
+</span><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

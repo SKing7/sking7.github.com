@@ -1,0 +1,77 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Send beacon data in Chrome 39</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Send beacon data in Chrome 39</h1>
+            <section class="content">
+    <p>Sometimes it is handy to send some data from a web page to a web server
+without the need to wait for a reply. For example, we might want
+to submit analytics or diagnostic data before the user exits a page.</p>
+
+<p>Typically, sending data before the exit involved listening to the <code>unload</code> event,
+because sending the request anytime earlier would result in incomplete data
+- e.g. we might have missed a click that happened just before the exit.
+The caveat was that the requests sent in the unload handler needed
+to be synchronous, because most browsers typically ignore asynchronous XMLHttpRequests made in an unload handler.
+This approach slows down navigation, as the user needs
+to wait for the request to come back before a new page could be rendered.</p>
+
+<p>The <a href="http://www.w3.org/TR/beacon/"><em>Beacon API</em></a> solves this problem by letting you asynchronously
+send HTTP requests with small data payloads from a browser to a web server,
+without delaying other code in the page’s unload event or
+affecting the performance of the next page navigation.</p>
+
+<p>The <code>navigator.sendBeacon()</code> method queues the data to be
+transmitted by the browser as soon as possible,
+but does not slow down navigation.
+It returns <code>true</code> if the browser is able to successfully queue
+the data for transfer. Otherwise it returns <code>false</code>.</p>
+
+<p>Let’s say we have a server endpoint available for receiving
+beacon data from our page at this address:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">https://putsreq.herokuapp.com/Dt7t2QzUkG18aDTMMcop</code></pre></div>
+
+<p>If we add a <code>sendBeacon()</code> method in the <code>pagehide</code> event handler,
+the endpoint will receive the data when the user navigates away from the page:</p>
+
+<div class="highlight-module highlight-module--code highlight-module--right"><span>
+    </span><div class="highlight-module__container"><span>
+      </span><code class="html"><div class="highlight"><pre>    <span class="nt">&lt;script&gt;</span>
+      <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'pagehide'</span><span class="p">,</span> <span class="nx">logData</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="kd">function</span> <span class="nx">logData</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">navigator</span><span class="p">.</span><span class="nx">sendBeacon</span><span class="p">(</span>
+              <span class="s1">'https://putsreq.herokuapp.com/Dt7t2QzUkG18aDTMMcop'</span><span class="p">,</span>
+              <span class="s1">'Sent by a beacon!'</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}();</span>
+    <span class="nt">&lt;/script&gt;</span>
+</pre></div></code><span>
+      </span><a class="highlight-module__cta" href="http://updates.html5rocks.com/samples/beacon/index.html" target="_blank">View full sample</a><span>
+    </span></div><span>
+  </span></div>
+
+<p>If you inspect the network tab in Chrome Dev Tools with the
+<strong>preserve logs</strong> checkbox ticked, you’ll see an HTTP POST request
+to the above endpoint being sent when you navigate away from the page.</p>
+
+<p>Alternatively, you can visit the
+<a href="https://putsreq.herokuapp.com/Dt7t2QzUkG18aDTMMcop/inspect">PutsReq inspect page</a>
+to see if the beacon data was received.</p>
+
+<p>There is also a <a href="http://www.polymer-project.org/">Polymer</a> custom element that lets you send beacon data - <code>&lt;beacon-send&gt;</code>. Check it out at <a href="http://ebidel.github.io/beacon-send/components/beacon-send/">ebidel.github.io/beacon-send</a>.</p>
+
+
+  </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

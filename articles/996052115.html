@@ -1,0 +1,205 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>
+    
+      ES6 Tail Call Optimization Explained · Kyle Owen
+    
+  </title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>
+    
+      ES6 Tail Call Optimization Explained · Kyle Owen
+    
+  </h1>
+            <div class="post"><span>
+  </span><span>
+  </span><span class="post-date">19 Jul 2015</span><span>
+  </span><p>From Wikipedia: “A tail call is a subroutine call performed as the final action of a procedure.”</p><span>
+
+</span><span>
+
+</span><p>A tail call optimization may occur when the last thing to evaluate before a function returns is a function invocation. In certain circumstances, the interpreter can the reuse current stack frame for the function call instead of creating a new one. Below I will explain what circumstances are necessary and why this is an optimization.</p><span>
+
+</span><h2 id="interpreter">Interpreter</h2><span>
+
+</span><p>Before we begin, it’s important to understand that the ES6 tail call optimization is an optimization implemented by the interpreter. ES6 does not specify new syntax for denoting tail call optimization, so don’t continue reading expecting to see any new JS syntax. Instead, pay attention to how the code is structured.</p><span>
+
+</span><p>To talk about the tail call optimization, it’ll be useful to discuss different ways to calculate fibonacci numbers, and the difference between a recursive process and a recursive procedure. Although tail call optimizations can occur in non-recursive functions, the fibonacci examples below are useful for understanding some situations where the optimization will occur. You may have seen some of this before, but I promise - it’ll be worth the read.</p><span>
+
+</span><h2 id="fibonacci">Fibonacci</h2><span>
+
+</span><p>Let’s first calculate fibonacci numbers using a recursive process:</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">n</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div><span>
+
+</span><p>Below is a diagram of how this process will develop - each node in this tree represents a function call to fib.</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="cm">/*</span>
+
+<span class="cm">                           fib(5)</span>
+<span class="cm">                          /      \</span>
+<span class="cm">                         /        \</span>
+<span class="cm">                    fib(4)         fib(3)</span>
+<span class="cm">                   /     \           /   \</span>
+<span class="cm">                  /       \         /     \</span>
+<span class="cm">            fib(3)         fib(2)    .........</span>
+<span class="cm">            /  \            /  \</span>
+<span class="cm">           /    \          /    \</span>
+<span class="cm">        fib(2)  fib(1)  fib(1)  fib(0)</span>
+<span class="cm">        /   \</span>
+<span class="cm">       /     \</span>
+<span class="cm">    fib(1)  fib(0)</span>
+
+<span class="cm">*/</span></code></pre></div><span>
+
+</span><p>Notice, none of these nodes has any clue that they are part of a huge process to calculate fib(5). For example, the calls to fib(2) have no clue that they are part of a process to calculate the value of fib(5).</p><span>
+
+</span><p>Also, none of the nodes on this tree have enough information to encapsulate the entire state of the process. What I mean is, looking at the local variables inside any one of the environments these calls are running in, it’d be impossible to determine what point in the process for calculating fib(5) you were at.</p><span>
+
+</span><p>So, what is keeping track of this information? What keeps track of how each of these nodes should be combined? The call stack.</p><span>
+
+</span><p>The call stack keeps track of how each call to fib must be combined after their calculations complete. The call stack is the one remembering to combine the calls of fib(3) and fib(2) to get fib(4), and the calls of fib(4) and fib(3) to get fib(5).</p><span>
+
+</span><p>If we were to stop the interpreter partway through the process and resume execution in a new environment with a clean call stack, there would be no way to complete the process, since all of the information about how to combine recursive calls would have been lost. <strong>Think of a recursive process as a series of deferred operations, where there is information hidden to each recursive call - that hidden information is in the call stack.</strong></p><span>
+
+</span><p>When executing this in a browser, there are a bunch of stack frames which are created, with new environments for each call. You can see this in your browser’s debugger.</p><span>
+
+</span><h2 id="fibonacci-another-way">Fibonacci another way</h2><span>
+
+</span><p>Besides the fact that the algorithm above repeats a lot of calculations unnecessarily (fib(1) is calculated many times), the algorithm has O(n) memory complexity for the call stack. Looking at the bottom of left branch of the fib tree above, when calculating fib(1) the callstack has 5 frames on it - the calls to fib 5 to 1 each remembering how to combine with the other calls. When fib(1) completes, that stack frame is popped off the call stack (so fib(2) would be at the top of the stack), and then another stack frame gets added to calculated fib(0). So for the fib implementation above, the call stack will have at most n stack frames at any given time. O(n) memory complexity.</p><span>
+
+</span><p>Now, here is an iterative way to calculate fibonacci sequence:</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">fibIter</span><span class="p">(</span><span class="nx">n</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">temp</span><span class="p">;</span>
+
+  <span class="k">while</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+    <span class="nx">temp</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span>
+    <span class="nx">a</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+    <span class="nx">b</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
+    <span class="nx">n</span><span class="o">--</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+
+<span class="cm">To picture this, imagine a,b moving</span>
+<span class="cm">along the sequence as such:</span>
+
+<span class="cm">b,a</span>
+<span class="cm">0,1,1,2,3,5 ....</span>
+
+<span class="cm">  b,a</span>
+<span class="cm">0,1,1,2,3,5 ....</span>
+
+<span class="cm">    b,a</span>
+<span class="cm">0,1,1,2,3,5 ....</span>
+
+<span class="cm">etc...</span>
+
+<span class="cm">*/</span></code></pre></div><span>
+
+</span><p>This function will only use one stack frame on the call stack since there are no other function calls.
+Now, what if we define this same process recursively?</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">fibIterRecursive</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">){</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">b</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">fibIterRecursive</span><span class="p">(</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">a</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">function</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">fibIterRecursive</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div><span>
+
+</span><p>Calculating fib(5), here is what the calls will look like</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">fib</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="nx">fibIterRecursive</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nx">fibIterRecursive</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="nx">fibIterRecursive</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="nx">fibIterRecursive</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nx">fibIterRecursive</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="nx">fibIterRecursive</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span></code></pre></div><span>
+
+</span><p>In this implementation, the entire state of the process <strong>is</strong> encapsulated in each function call. Notice, each call has enough information to complete the process for calculating fib(5). If we stopped that process at fibIterRecursive(2, 3, 2) and then resumed it in a different environment with a clean call stack, we would still get the correct number. This is in contrast to the recursive process’ nodes from above, which had no clue how they were being combined (the interpreter kept track of that).</p><span>
+
+</span><p><strong>We can call the fibIterRecursive implementation a recursive procedure - a function that calls itself, but does not have hidden information which the interpreter needs to keep track of.</strong></p><span>
+
+</span><h2 id="the-optimization">The Optimization</h2><span>
+
+</span><p>The fibIterRecursive function mirrors the fibIter function from above, so one would hope that the number of stack frames in each process would be the same. Ideally, when calculating fibIterRecursive, the call stack would not bother remembering a bunch of information in stack frames, since that would be unnecessary. But, it still does in ES5 - for each call to fibIterRecursive, a new stack frame is created. That means that in ES5, we still have O(n) memory complexity. <strong>In ES6, new stack frames will not be created thus allowing for a O(1) memory complexity - and that is the optimization</strong>. Let’s see how that works…</p><span>
+
+</span><p>In ES6, using the same exact code as fibIterRecursive, the interpreter will notice a few things:</p><span>
+
+</span><ul>
+  <li>the last thing that needs to evaluate before the return statement is a function call (see next point)</li>
+  <li>there is no action after the function call that the interpreter needs to remember to do (like combining fib(n-1) and fib(n-2) in the first example)</li>
+  <li>the next recursive call does not need access to any of the local variables in the current stack frame</li>
+</ul><span>
+
+</span><p>So, instead of creating a new stack frame for each call, the current stack frame will be cleared and reused. This is great because, in es5, calling fibIterRecursive(30000) will give you a stack overflow due to the O(n) memory complexity, but in es6 with the optimization, the stack frame will be reused and it won’t cause a stack overflow (however, without a bigInt library, fibIterRecursive(30000) would return Infinity because of JS number limits).</p><span>
+
+</span><p><strong>To summarize, if the last thing that happens before the return statement is the invocation of a function which does not need to access any of the current local variables, the interpreter specified by ES6 will optimize that call by reusing the stack frame.</strong> Something important to notice: this optimization will not apply to <strong>recursive processes</strong> as defined above (since they are characterized by interpreters keeping track of hidden information). The optimization will apply to <strong>recursive procedures</strong> as defined above, and other non-recursive processes. Here are some other examples:</p><span>
+
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// In sumTwoNumbers, the call to add will be optimized:</span>
+
+<span class="kd">function</span> <span class="nx">sumTwoNumbers</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// But in sumFourNumbers:</span>
+
+<span class="kd">function</span> <span class="nx">sumFourNumbers</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">c</span><span class="p">,</span><span class="nx">d</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">)</span> <span class="o">+</span> <span class="nx">add</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span><span class="nx">d</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// the optimization won't happen because the</span>
+<span class="c1">// interpreter needs to remember to add together</span>
+<span class="c1">// the values returned by add(1,2) and add(3,4).</span>
+<span class="c1">// The last thing to happen before the return</span>
+<span class="c1">// is not a function invocation.</span>
+
+<span class="c1">// here's another example where the optimization won't happen:</span>
+
+<span class="kd">function</span> <span class="nx">addOne</span><span class="p">(</span><span class="nx">a</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">one</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kd">function</span> <span class="nx">inner</span><span class="p">(</span><span class="nx">b</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">b</span> <span class="o">+</span> <span class="nx">one</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">inner</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// the optimization won't happen because addToOne needs to</span>
+<span class="c1">// access the variable 'one' from addOne's enviroment</span></code></pre></div><span>
+
+</span><p>It’s an interpreter thing. Note: you must be in strict mode for this optimization to work. Here is a link to the <a href="https://kangax.github.io/compat-table/es6/">ES6 compatibility</a> to see where the optimization has been implemented. Other resources for understanding tail calls that I’ve found helpful include: <a href="http://www.2ality.com/2015/06/tail-call-optimization.html">this</a> and <a href="http://raganwald.com/2015/02/07/tail-calls-defult-arguments-recycling.html">that</a>. Also, my favorite resource for understanding recursion: <a href="https://mitpress.mit.edu/sicp/">SICP</a></p><span>
+
+</span><p>Note: there is a creative way to get around this in es5. It’s not used often. If you’re interested check out <a href="http://raganwald.com/2013/03/28/trampolines-in-javascript.html">this great blog post</a>.</p><span>
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

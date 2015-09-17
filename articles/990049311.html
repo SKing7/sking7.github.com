@@ -1,0 +1,203 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Avoiding Callback Hell in Node.js</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Avoiding Callback Hell in Node.js</h1>
+            <div class="post-content"><span>
+						</span><h2 id="introduction">Introduction</h2><span>
+
+</span><p>I'll admit that I was one of those people that decided to learn Node.js simply because of the buzz around it and how much everyone was talking about it. I figured there must be something special about it if it has this much support so early on in its life. I mostly came from a C, Java, and Python background, so JavaScript's asynchronous style was much different than anything I had encountered before.</p><span>
+
+</span><p>As many of you probably know, all JavaScript really is underneath is a single-threaded event loop that processes queued events. If you were to execute a long-running task within a single thread then the process would block, causing other events to have to wait to be processed (i.e. UI hangs, data doesn't get saved, etc). This is exactly what you want to avoid in an event-driven system. <a href="https://www.youtube.com/watch?v=QgwSUtYSUqA" rel="nofollow" target="_blank">Here</a> is a great video explaining much more about the JavaScript event loop.</p><span>
+
+</span><p>To solve this blocking problem, JavaScript heavily relies on callbacks, which are functions that run after a long-running process (IO, timer, etc) has finished, thus allowing the code execution to proceed past the long-running task.</p><span>
+
+</span><pre><code class="language-javascript">downloadFile('example.com/weather.json', function(err, data) {  
+    console.log('Got weather data:', data);
+});
+</code></pre><span>
+
+</span><h2 id="theproblemcallbackhell">The problem: Callback hell</h2><span>
+
+</span><p>While the concept of callbacks is great in theory, it can lead to some really confusing and difficult-to-read code. Just imagine if you need to make callback after callback:</p><span>
+
+</span><pre><code class="language-javascript">getData(function(a){  
+    getMoreData(a, function(b){
+        getMoreData(b, function(c){ 
+            getMoreData(c, function(d){ 
+                getMoreData(d, function(e){ 
+                    ...
+                });
+            });
+        });
+    });
+});
+</code></pre><span>
+
+</span><p>As you can see, this can really get out of hand. Throw in some <code>if</code> statements, <code>for</code> loops, function calls, or comments and you'll have some very hard-to-read code. Beginners especially fall victim to this, not understanding how to avoid this "pyramid of doom".</p><span>
+
+</span><h2 id="alternatives">Alternatives</h2><span>
+
+</span><h3 id="designaroundit">Design around it</h3><span>
+
+</span><p>So many programmers get caught up in callback hell because of this (poor design) alone. They don't really think about their code structure ahead of time and don't realize how bad their code has gotten until after its too late. As with any code you're writing, you should stop and think about what can be done to make it simpler and more readable before, or while, writing it. Here are a few tips you can use to <strong>avoid callback hell</strong> (or at least manage it).</p><span>
+
+</span><h4 id="usemodules">Use modules</h4><span>
+
+</span><p>In just about every programming language, one of the best ways to reduce complexity is to modularize. JavaScript programming is no different. Whenever you're writing code, take some time to step back and figure out if there has been a common pattern you frequently encounter.</p><span>
+
+</span><p>Are you writing the same code multiple times in different places? Do different parts of your code follow a common theme? If so, you have an opportunity to clean things up and abstract out and reuse code.</p><span>
+
+</span><p>There are thousands of modules out there you can look at for reference, but here are a few to consider. They handle common, but very specific, tasks that would otherwise clutter your code and reduce readability: <a href="https://github.com/blakeembrey/pluralize" rel="nofollow" target="_blank">Pluralize</a>, <a href="https://www.npmjs.com/package/csv" rel="nofollow" target="_blank">csv</a>, <a href="https://www.npmjs.com/package/qs" rel="nofollow" target="_blank">qs</a>, <a href="https://www.npmjs.com/package/clone" rel="nofollow" target="_blank">clone</a>.</p><span>
+
+</span><h4 id="giveyourfunctionsnames">Give your functions names</h4><span>
+
+</span><p>When reading code (especially messy, unorganized code), its easy to lose track of the logic flow, or even syntax, when small spaces are congested with so many nested callbacks. One way to help combat this is to name your functions, so all you'll have to do is glance at the name and you'll a better idea as to what it does. It also gives your eyes a syntax reference point.</p><span>
+
+</span><p>Consider the following code:</p><span>
+
+</span><pre><code class="language-javascript">var fs = require('fs');
+
+var myFile = '/tmp/test';  
+fs.readFile(myFile, 'utf8', function(err, txt) {  
+    if (err) return console.log(err);
+
+    txt = txt + '\nAppended something!';
+    fs.writeFile(myFile, txt, function(err) {
+        if(err) return console.log(err);
+        console.log('Appended text!');
+    });
+});
+</code></pre><span>
+
+</span><p>Looking at this may take you a few seconds to realize what each callback does and where it starts. Adding a little extra information (names) to the functions can make a big difference for readability, especially when you're multiple levels deep in callbacks:</p><span>
+
+</span><pre><code class="language-javascript">var fs = require('fs');
+
+var myFile = '/tmp/test';  
+fs.readFile(myFile, 'utf8', function appendText(err, txt) {  
+    if (err) return console.log(err);
+
+    txt = txt + '\nAppended something!';
+    fs.writeFile(myFile, txt, function notifyUser(err) {
+        if(err) return console.log(err);
+        console.log('Appended text!');
+    });
+});
+</code></pre><span>
+
+</span><p>Now just a quick glance will tell you the first function appends some text while the second function notifies the user of the change.</p><span>
+
+</span><h4 id="declareyourfunctionsbeforehand">Declare your functions beforehand</h4><span>
+
+</span><p>One of the best ways to reduce code clutter is by maintaining better separation of code. If you declare a callback function beforehand and call it later, you'll avoid the deeply nested structures that make callback hell so difficult to work with.</p><span>
+
+</span><p>So you could go from this...</p><span>
+
+</span><pre><code class="language-javascript">var fs = require('fs');
+
+var myFile = '/tmp/test';  
+fs.readFile(myFile, 'utf8', function(err, txt) {  
+    if (err) return console.log(err);
+
+    txt = txt + '\nAppended something!';
+    fs.writeFile(myFile, txt, function(err) {
+        if(err) return console.log(err);
+        console.log('Appended text!');
+    });
+});
+</code></pre><span>
+
+</span><p>...to this:</p><span>
+
+</span><pre><code class="language-javascript">var fs = require('fs');
+
+function notifyUser(err) {  
+    if(err) return console.log(err);
+    console.log('Appended text!');
+};
+
+function appendText(err, txt) {  
+    if (err) return console.log(err);
+
+    txt = txt + '\nAppended something!';
+    fs.writeFile(myFile, txt, notifyUser);
+}
+
+var myFile = '/tmp/test';  
+fs.readFile(myFile, 'utf8', appendText);  
+</code></pre><span>
+
+</span><p>While this can be a great way to help ease the problem, it doesn't completely solve the problem. When reading code written in this way, if you don't remember exactly what each function does then you'll have to go back and look at each one to retrace the logic flow, which can take time.</p><span>
+
+</span><h3 id="asyncjs">Async.js</h3><span>
+
+</span><p>Thankfully, libraries like <a href="https://github.com/caolan/async" rel="nofollow" target="_blank">Async.js</a> exist to try and curb the problem. Async adds a thin layer of functions on top of your code, but can greatly reduce the complexity by avoiding callback nesting.</p><span>
+
+</span><p>Many helper methods exist in Async that can be used in different situations, like <a href="https://github.com/caolan/async#seriestasks-callback" rel="nofollow" target="_blank">series</a>, <a href="https://github.com/caolan/async#parallel" rel="nofollow" target="_blank">parallel</a>, <a href="https://github.com/caolan/async#waterfall" rel="nofollow" target="_blank">waterfall</a>, etc. Each function has a specific use-case, so take some time to learn which one will help in which situations.</p><span>
+
+</span><p>As good as Async is, like anything, its not perfect. Its very easy to get carried away by combining series, parallel, forever, etc, at which point you're right back to where you started with messy code. Be careful not to prematurely optimize. Just because a few async tasks can be run in parallel doesn't always mean they should. In reality, since Node is only single-threaded, running tasks in parallel on using Async has little to no performance gain.</p><span>
+
+</span><p>The code from above can be simplified using Async's waterfall:</p><span>
+
+</span><pre><code class="language-javascript">var fs = require('fs');  
+var async = require('async');
+
+var myFile = '/tmp/test';
+
+async.waterfall([  
+    function(callback) {
+        fs.readFile(myFile, 'utf8', callback);
+    },
+    function(txt, callback) {
+        txt = txt + '\nAppended something!';
+        fs.writeFile(myFile, txt, callback);
+    }
+], function (err, result) {
+    if(err) return console.log(err);
+    console.log('Appended text!');
+});
+</code></pre><span>
+
+</span><h3 id="promises">Promises</h3><span>
+
+</span><p>Although Promises can take a bit to grasp, in my opinion they are one of the more important concepts you can learn in JavaScript. During development of one of my <a href="https://polymetrics.io/">SaaS apps</a>, I ended up rewriting the entire codebase using Promises. Not only did it reduce the number of lines of code drastically, but it made the logical flow of the code much easier to follow.</p><span>
+
+</span><p>Here is an example using the very fast and very popular Promise library, <a href="https://github.com/petkaantonov/bluebird" rel="nofollow" target="_blank">Bluebird</a>:</p><span>
+
+</span><pre><code class="language-javascript">var Promise = require('bluebird');  
+var fs = require('fs');  
+Promise.promisifyAll(fs);
+
+var myFile = '/tmp/test';  
+fs.readFileAsync(myFile, 'utf8').then(function(txt) {  
+    txt = txt + '\nAppended something!';
+    fs.writeFile(myFile, txt);
+}).then(function() {
+    console.log('Appended text!');
+}).catch(function(err) {
+    console.log(err);
+});
+</code></pre><span>
+
+</span><p>Notice how this solution is not only shorter than the previous solutions, but it is easier to read as well (although, admittedly, Promise-style code can take some getting used to). Take the time to learn and understand Promises, it'll be worth your time. However, Promises are definitely not the solution to all our problems in asynchronous programming, so don't assume by using them you will have a fast, clean, bug-free app. The key is knowing when they'll be useful to you.</p><span>
+
+</span><p>A few Promise libraries you should check out are <a href="https://github.com/kriskowal/q" rel="nofollow" target="_blank">Q</a>, <a href="https://github.com/petkaantonov/bluebird" rel="nofollow" target="_blank">Bluebird</a>, or the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" rel="nofollow" target="_blank">built-in Promises</a> if you're using ES6.</p><span>
+
+</span><h2 id="conclusion">Conclusion</h2><span>
+
+</span><p>Avoid such common problems as callback hell isn't easy, so don't expect to end your frustrations right away. We all get caught in it. Just try to slow down and take some time to think about the structure of your code. Like anything, practice makes perfect.</p><span>
+
+</span><p><em>Have you run in to callback hell? If so, how do you get around it? Tell us in the comments!</em></p><span>
+					</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,50 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>document.write()ing some Zeptos</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>document.write()ing some Zeptos</h1>
+            <div class="post"><p>Sometimes debugging broken websites is tricky. If you're lucky you'll get yelled at by a console full of errors, other times you just need to poke around a bit and see what sticks. <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1015725">Bug 1015725</a> is one of those instances: a bug about the sub-menus of a burger menu not expanding when touched on wired.com's mobile site.</p><span>
+
+</span><p>Our resident JavaScript archeologist <a href="https://twitter.com/hallvord">Hallvord</a> pointed out that the menu items were opened by a <code>tap()</code> method, which means they were probably using <a href="http://jquery.com/download/">Zepto.js</a>. But the weird thing is <code>window.Zepto</code> is undefined in Firefox for Android yet alive and kicking in Chrome Mobile. But web compat bugs sometimes boil down to different files being sent to different user agents (like <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=946737">this old medium.com bug</a>)—so that was my next line of investigation.</p><span>
+
+</span><p>Another thing to remember when debugging broken things is viewing a page's source can be a little misleading if you're not paying attention (and apparently I never do). Inspecting the DOM in devtools is really inspecting a parsed DOM, vs. looking at the pre-parsed document source via a <code>view-source:</code> scheme (or whatever it's called) or right-clicking and selecting View Page Source, etc.</p><span>
+
+</span><p>Based on my <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1015725#c3">comment</a>, I had forgotten this distinction and thought Wired was sending one script to Chrome Mobile and not to Firefox for Android:</p><span>
+
+</span><blockquote>
+<p>Looking at the source, they're not serving us mobify.js? (see <a href="https://bug1015725.bugzilla.mozilla.org/attachment.cgi?id=8430267">screenshot</a>)</p>
+</blockquote><span>
+
+</span><p>What I didn't know, but Hallvord did, was that Mobify.js uses <code>document.write()</code> to re-write the entire content of a site with a mobile-ified version of a site (or something like that). And naturally it turns out that Gecko and Blink/WebKit have different behavior with respect to keeping references to script after <code>document.write()</code> overwrites the entire document.</p><span>
+
+</span><p>Here's a <a href="https://miketaylr.com/bzla/docwrite.html">test page</a> that shows us that any global references before <code>document.write()</code> replaces a document do not survive in Firefox/Presto Opera/(maybe IE?), but do survive in Chrome/Safari.</p><span>
+
+</span><p>So with Zepto defined before the call to <code>document.write()</code> to moblify the site, Blink/WebKit browsers can call Zepto's <code>tap()</code> method and get some sweet expanding hamburger helper sub-menu action. But nobody else can.</p><span>
+
+</span><p>But what does the <a href="http://www.whatwg.org/specs/web-apps/current-work/#dom-document-open">HTML Standard</a> say? As far as I can tell, when <code>document.open()</code> is called (and <code>document.write()</code> will implicitly call <code>open()</code>), step 15 of the <code>document.open()</code> algorithm says, </p><span>
+
+</span><blockquote>
+<p>Replace the Document's singleton objects with new instances of those objects. (This includes in particular the Window, Location, History, ApplicationCache, and Navigator, objects, the various BarProp objects, the two Storage objects, the various HTMLCollection objects, and objects defined by other specifications, like Selection...</p>
+</blockquote><span>
+
+</span><p>There's also a Note that says,</p><span>
+
+</span><blockquote>
+<p>The new Window object has a new <a href="http://www.whatwg.org/specs/web-apps/current-work/#script-settings-object">script settings object</a>.</p>
+</blockquote><span>
+
+</span><p>When you get a new script settings object, you're supposed to get a new global object. That seems to mean that any <code>window.Zepto</code>s you had hanging on your old global object should now be <code>undefined</code>. (And caitp from #whatwg found this <a href="https://code.google.com/p/chromium/issues/detail?id=149785">Chromium bug</a> which seems to confirm that reading.)</p><span>
+
+</span><p>So the takeway lesson from this bug is: don't rely on global variables surviving <code>document.write()</code> if you expect your app to work in more than a single browser engine because all the serious VC investors are super passionate about a cross-browser mobile web. But you already knew that.</p><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

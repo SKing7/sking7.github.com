@@ -1,0 +1,207 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Push Notifications on the Web - Google Chrome</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Push Notifications on the Web - Google Chrome</h1>
+            <article>
+        <header>
+            
+        </header>
+        <p>A while ago I built a fun side project on <a href="https://github.com/deanhume/typography">Github</a> to keep a collection of typography links and tools that caught my eye. There are a number of people that follow the project on Github, but every time I make a change or add a new link, I normally update anyone that is interested via social media. </p>
+
+<p align="center"><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Typography/web-fonts-mobile.jpg" alt="deanhume.github.io/typography - Push Notifications "></p>
+
+<p>The problem is that people who are interested in the project may not necessarily follow me on Github or social media and miss out on the updates.  Fortunately, the good news is that since the release of <a href="http://blog.chromium.org/2015/03/chrome-42-beta-push-notifications_12.html">Chrome 42</a>, we have had the ability to send notification updates to users in the browser. It's a great way to keep users updated and notified even when they aren't browsing of your site. <a href="https://developers.google.com/web/updates/2015/03/push-notificatons-on-the-open-web?hl=en">Push Notification API</a> to the rescue!</p>
+
+<p align="center"><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Push-Notifications/notification-message.png" alt="Notification Message"></p>
+
+<p>In order to begin using the Push Notification API in Chrome, there are three parts to the equation. Firstly, you need a Service Worker that will subscribe a user and receive notification messages, then you need to create a project using <a href="https://developers.google.com/cloud-messaging/">Google's Cloud Messaging</a> (GCM) to send the notification messages, and finally you need a web app manifest file in order to link GCM and Chrome.</p>
+
+<p>In this article I am going to run through a basic example and show you how you can send Push Notifications to users on your website using Chrome's Push Notification API. </p>
+
+<h2>Registering the Service Worker</h2>
+
+<p>Don't worry if you have never used Service Workers before, the example we are going to run through is simple enough to follow along with no previous experience.  However, if you'd like a brief introduction, I recommend reading the <a href="http://www.html5rocks.com/en/tutorials/service-worker/introduction/">following article on HTML5 Rocks</a> which covers the basics of Service Workers.</p>
+
+<p>In order to get started, you will need to create a JavaScript file that we'll use as our Service Worker. I've rather originally called mine 'service-worker.js'. Next, we need to register the Service Worker and subscribe the user to push messaging with the following code.</p>
+
+<script src="https://gist.github.com/deanhume/2f04d6b1b6316fc97c52.js"></script>
+
+<p>In the code above, we are doing a simple check to see if the browser supports Service Workers, and if so, we then register and install it. Once we have successfully installed the Service Worker, we then need to subscribe to Push Notifications. To subscribe, we have to call the subscribe() method on the PushManager object, which you access through the ServiceWorkerRegistration object. </p>
+
+<p>You may notice that there in the code above, there is a piece of code marked "TODO". This is because in order to know which users to send messages to, we need to keep track of their unique subscription ID. The unique ID is available on the subscription object. This functionality isn't automatically handled for you and you will need to keep track of this server side. Then, when you send out a message to all subscribed users, you use the unique subscriptions IDs accordingly. I won't cover the server side implementation of this, as it will be unique to your stack, but generally it should involve a POST request with the subscription ID. We will use this subscription ID to send a test message later on in this example. </p>
+
+<h2>Google Cloud Messaging</h2>
+
+<p>Now that we have registered the Service Worker and created the code to subscribe to Push Messages, we need to create the service to send messages to the client front end. <a href="https://developers.google.com/cloud-messaging/">Google's Cloud Messaging</a> is a great way  to handle the sending and delivery of push messages.  It is really easy to set up and you can get a project up and running in no time. Head over to <a href="https://console.developers.google.com/project">console.developers.google.com</a>  and create a new project. Once you have created your project, you need to enable the Cloud Messaging service. In the menu, navigate to <strong>APIs &amp; Auth</strong>, and then select <strong>APIs</strong>.</p>
+
+<p align="center"><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Push-Notifications/push-notifications-auth.png" alt="Push Notifications Auth"></p>
+
+<p>Next, select Cloud Messaging for Android and enable the service.</p>
+
+<p align="center"><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Push-Notifications/cloud-messaging-for-android.png" alt="Google Cloud Messaging"></p>
+
+<p>Before we start sending messages, we need to enable access to the API. In the menu, navigate to <strong>APIs &amp; Auth</strong>, and then select <strong>Credentials</strong>. Next, create a new Public API access key.</p>
+
+<p align="center"><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Push-Notifications/push-notifications-api-key.png" alt="Push Notifications Credentials"></p>
+
+<p>Choose <em>Browser Key</em> and ignore the whitelisted IPs unless you specifically want to restrict this to certain IP Addresses. You will need to copy the API key that you have just created as we are going to use it in our manifest file. </p>
+
+<p>Finally, we'll need to grab the Project ID so that we can link Chrome and Google Cloud Messaging.  Using the menu, navigate to <strong>Overview</strong> and copy the Project ID.</p>
+
+<p align="center"><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Push-Notifications/cloud-messaging-project-number.png" alt="Google Cloud Messaging Project ID"></p>
+
+<p>We are going to use this Project ID in the next step.</p>
+
+<h2>Creating a Manifest File</h2>
+
+<p>Now that we have our Project ID, we need to create a manifest file in order to link Chrome to Google Cloud Messaging.  A manifest file is a simple JSON file that contains the configuration and settings for the Push Notifications.  The code below gives you a basic idea of what a manifest file might look like.</p>
+
+<script src="https://gist.github.com/deanhume/7f758143e6c60d2f740f.js"></script>
+
+<p>In the manifest file above, you’ll need to swap out the <em>gcm_sender_id</em> with the Project ID that we copied from the Google Developer Console in the previous step. Next, we need to reference the manifest file in your HTML with the following tag in the HEAD of your page.</p>
+
+<p><em>&lt;link rel="manifest" href="manifest.json"&gt;</em></p>
+
+<p>I've called mine manifest.json, but you can name yours however you prefer, as long as you reference it in your HTML.</p>
+
+<h2>Responding to messages</h2>
+
+<p>So far we've registered the Service Worker, subscribed the user to push messaging, created a project to send push messages, and created a manifest file to link Chrome to GCM. All that we need to do next, is handle any incoming push messages in our Service Worker. </p>
+
+<p>The following code listens to any incoming push events from the server.</p>
+
+ <script src="https://gist.github.com/deanhume/f551c2b765401f32bd2f.js"></script>
+
+<p>In order to give the notification message a bit of context, I've added an icon and a body message to the notification. Once we've sent a notification to the user, we can then decide if we want to redirect them to our site when they click the message. The code below listens to a <em>notification click</em> event and redirects the user to the website.</p>
+
+<script src="https://gist.github.com/deanhume/c0d29d40e0c77dfbab8f.js"></script>
+
+<p>That's it! Your site is now ready to receive push notifications. Before we start testing this functionality, let's take a step backwards and put everything together.  We started off by registering the Service Worker in the <em>service-worker.js</em> file. We then subscribed the user to push messaging and created a project using Google Cloud Messaging to send the push messages. We then created a manifest file to link Chrome to the GCM project. Finally, we added code to handle incoming notification messages and respond accordingly when they are clicked.</p>
+
+<h2>HTTPS by Default</h2>
+
+<p>It is worth noting that Service Workers require secure origins to ensure that the script is from the intended origin and hasn’t come about from a man-in-the-middle attack. This means that you will need to use HTTPS on live site, although you can use localhost during development.</p>
+
+<p align="center"><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Push-Notifications/push-notifications.png" alt="Push Notifications"></p>
+
+<p>If you are looking for a quick way to test this in a live environment, I recommend setting up <a href="https://pages.github.com/">Github Pages</a> and hosting your project on Github.  It comes with a default SSL certificate and allows you to simply navigate to your project URL using HTTPS.</p>
+
+<h2>Sending Test Messages</h2>
+
+<p>There are a number of ways that you can send messages from the cloud using Google's Cloud Messaging. In order to fire off a message, you need to send a POST request and include the API key and unique subscription IDs from each user. The GCM page has a <a href="https://developers.google.com/cloud-messaging/">list of guides</a> and walkthroughs to get you started. </p>
+
+<p>If you are looking to send a quick test email and verify that your code is working, I recommend using a simple cURL message. If you've never used cURL before, it is an open source command line tool and library for transferring data easily and quickly. Regardless of whether you are on Windows or Mac, you can download for free it over at <a href="http://curl.haxx.se/">curl.haxx.se</a>.</p>
+
+<p>In order to send a simple test message using cURL, use the following syntax.</p>
+
+<p><em>curl --header "Authorization: key=<api key="">" --header "Content-Type:application/json" https://android.googleapis.com/gcm/send -d "{\"registration_ids\":[\"<subscriptionid>\"]}" --insecure</subscriptionid></api></em></p>
+
+<p>Once, that is fired off successfully, you should notice a notification message appear in your browser.</p>
+
+<p><img src="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Push-Notifications/notification-message.png" alt="Notification Message"></p>
+
+<p>Taadaaa! You are now sending push messages using the Notification API.</p>
+
+<h2>What's next?</h2>
+
+<p>If you'd like to see a live working version of this code, please head over to <a href="https://deanhume.github.io/typography">deanhume.github.io/typography</a> using Chrome to find out more. </p>
+
+<p>As an API, push messaging is relatively new and is constantly improving. While this article covered Chrome, <a href="http://caniuse.com/#search=notifications">support</a> for Push Notifications is also available in <a href="https://developer.mozilla.org/en-US/docs/Web/API/Simple_Push_API">Firefox</a>, <a href="https://developer.apple.com/notifications/safari-push-notifications/">Safari</a>, <a href="http://blogs.opera.com/desktop/2014/08/opera-developer-25-supports-web-notifications/">Opera</a> and Android.</p>
+
+<p>For further reading, I recommend checking out the following articles:</p>
+
+<p><a href="http://updates.html5rocks.com/2015/03/push-notificatons-on-the-open-web">HTML5 Rocks - Push Notifications on the Open Web</a></p>
+
+<p><a href="https://developers.google.com/cloud-messaging/chrome/client">Google's Cloud Messaging</a></p>
+
+        
+        <br><h2>Comments</h2>
+                <p>
+                    <strong>
+                        Luis - 8/6/2015
+                    </strong>
+                    <br>Interesting article.
+
+I'm a little unclear as to where service-worker-push.js and service-worker-notification.js live in the example code.
+
+Is self a variable referencing something from the service-worker.js  script?
+
+                </p>
+                <p>
+                    <strong>
+                        Jagadeesh - 8/7/2015
+                    </strong>
+                    <br>Interesting info. Thanks much for sharing it.
+                </p>
+                <p>
+                    <strong>
+                        czxczc - 8/8/2015
+                    </strong>
+                    <br>zxczxczc
+                </p>
+                <p>
+                    <strong>
+                        Me - 8/8/2015
+                    </strong>
+                    <br>When do I get a notification? Only when i am in your site? How can i unsubscribe? Couldnt find an Option in chrome.
+                </p>
+                <p>
+                    <strong>
+                        aadad - 8/10/2015
+                    </strong>
+                    <br>adawd
+                </p>
+                <p>
+                    <strong>
+                        Cristian - 8/13/2015
+                    </strong>
+                    <br>Interesting article, i'd love to see a screencast where you show how to make this thing from scratch.
+                </p>
+                <p>
+                    <strong>
+                        Anders - 8/13/2015
+                    </strong>
+                    <br>Great article but it's stuff like this that breaks the web.
+                </p>
+                <p>
+                    <strong>
+                        Raymond Camden - 8/13/2015
+                    </strong>
+                    <br>@Anders: How exactly does this "break" the web? His code will not throw an error in unsupported browsers.
+                </p>
+                <p>
+                    <strong>
+                        RyderSkerst1 - 8/14/2015
+                    </strong>
+                    <br>nice Article Responding to messages code are very help full.
+
+thank you so much.....
+                </p>
+                <p>
+                    <strong>
+                        RyderSkerst1 - 8/17/2015
+                    </strong>
+                    <br>Great article. thank you so much
+
+                </p>
+                <p>
+                    <strong>
+                        jpmedley - 8/20/2015
+                    </strong>
+                    <br>Here's a few Chrome45 updates: (1) subscriptionId was deprecated and its value rolled into the endpoint. (2) gcm_user_visible_only has been deprecated and replaced by passing {userVisibleOnly: true } to the subscribe() function.
+                </p>
+        <!-- Make a comment -->
+         <hr><p id="toggle">Add your comment</p>
+    </article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

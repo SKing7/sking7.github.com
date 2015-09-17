@@ -1,0 +1,251 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Tail call optimization in ECMAScript 6</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Tail call optimization in ECMAScript 6</h1>
+            <div class="post-body entry-content"><span>
+</span><p>ECMAScript 6 offers <em>tail call optimization</em>, where you can make some function calls without growing the call stack. This blog post explains how that works and what benefits it brings.</p><span>
+</span><a name="more"></a><span>
+
+
+
+</span><h3 id="what_is_tail_call_optimization%3F" class="countheads">What is tail call optimization?</h3><p>To understand what tail call optimization (TCO) is, we will examine the following piece of code. I’ll first explain how it is executed without TCO and then with TCO.</p><span>
+</span><pre class="javascript">    function id(x) {
+        return x; // (A)
+    }
+    function f(a) {
+        let b = a + 1;
+        return id(b); // (B)
+    }
+    console.log(f(2)); // (C)
+</pre><span>
+
+
+</span><h4 id="normal_execution">Normal execution</h4><p>Let’s assume there is a JavaScript engine that manages function calls by storing local variables and return addresses on a stack. How would such an engine execute the code?</p><span>
+</span><p><strong>Step 1.</strong> Initially, there are only the global variables <code>id</code> and <code>f</code> on the stack.</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://4.bp.blogspot.com/-o-Q862fkL8Y/VZJ5q5UQHuI/AAAAAAAABIw/9ynuWs9RI2s/s1600/stack_frames_1.jpg" imageanchor="1"><img border="0" src="http://4.bp.blogspot.com/-o-Q862fkL8Y/VZJ5q5UQHuI/AAAAAAAABIw/9ynuWs9RI2s/s1600/stack_frames_1.jpg"></a></div><span>
+</span><span>
+</span><p>The block of stack entries encodes the state (local variables, including parameters) of the current scope and is called a <em>stack frame</em>.</p><span>
+</span><p><strong>Step 2.</strong> In line C, <code>f()</code> is called: First, the location to return to is saved on the stack. Then <code>f</code>’s parameters are allocated and execution jumps to its body. The stack now looks as follows.</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://1.bp.blogspot.com/-3iQnb5cbZ-M/VZJ5q1RZyNI/AAAAAAAABI0/0nO5j7kKnKQ/s1600/stack_frames_2.jpg" imageanchor="1"><img border="0" src="http://1.bp.blogspot.com/-3iQnb5cbZ-M/VZJ5q1RZyNI/AAAAAAAABI0/0nO5j7kKnKQ/s1600/stack_frames_2.jpg"></a></div><span>
+</span><span>
+</span><p>There are now two frames on the stack: One for the global scope (bottom) and one for <code>f()</code> (top). <code>f</code>’s stack frame includes the return address, line C.</p><span>
+</span><p><strong>Step 3.</strong> <code>id()</code> is called in line B. Again, a stack frame is created that contains the return address and <code>id</code>’s parameter.</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://4.bp.blogspot.com/-hnHFx8yImQw/VZJ5rW5XJyI/AAAAAAAABI8/fNjrEgBgWlQ/s1600/stack_frames_3.jpg" imageanchor="1"><img border="0" src="http://4.bp.blogspot.com/-hnHFx8yImQw/VZJ5rW5XJyI/AAAAAAAABI8/fNjrEgBgWlQ/s1600/stack_frames_3.jpg"></a></div><span>
+</span><span>
+</span><p><strong>Step 4.</strong> In line A, the result <code>x</code> is returned. <code>id</code>’s stack frame is removed and execution jumps to the return address, line B. (There are several ways in which returning a value could be handled. Two common solutions are to leave the result on a stack or to hand it over in a register. I ignore this part of execution here.)</p><span>
+</span><p>The stack now looks as follows:</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://1.bp.blogspot.com/-3iQnb5cbZ-M/VZJ5q1RZyNI/AAAAAAAABI0/0nO5j7kKnKQ/s1600/stack_frames_2.jpg" imageanchor="1"><img border="0" src="http://1.bp.blogspot.com/-3iQnb5cbZ-M/VZJ5q1RZyNI/AAAAAAAABI0/0nO5j7kKnKQ/s1600/stack_frames_2.jpg"></a></div><span>
+</span><span>
+</span><p><strong>Step 5.</strong> In line B, the value that was returned by <code>id</code> is returned to <code>f</code>’s caller. Again, the topmost stack frame is removed and execution jumps to the return address, line C.</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://4.bp.blogspot.com/-o-Q862fkL8Y/VZJ5q5UQHuI/AAAAAAAABIw/9ynuWs9RI2s/s1600/stack_frames_1.jpg" imageanchor="1"><img border="0" src="http://4.bp.blogspot.com/-o-Q862fkL8Y/VZJ5q5UQHuI/AAAAAAAABIw/9ynuWs9RI2s/s1600/stack_frames_1.jpg"></a></div><span>
+</span><span>
+</span><p><strong>Step 6.</strong> Line C receives the value <code>3</code> and logs it.</p><span>
+
+
+</span><h4 id="tail_call_optimization">Tail call optimization</h4><pre class="javascript">    function id(x) {
+        return x; // (A)
+    }
+    function f(a) {
+        let b = a + 1;
+        return id(b); // (B)
+    }
+    console.log(f(2)); // (C)
+</pre><span>
+</span><p>If you look at the previous section then there is one step that is unnecessary – step 5. All that happens in line B is that the value returned by <code>id()</code> is passed on to line C. Ideally, <code>id()</code> could do that itself and the intermediate step could be skipped.</p><span>
+</span><p>We can make this happen by implementing the function call in line B differently. Before the call happens, the stack looks as follows.</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://1.bp.blogspot.com/-3iQnb5cbZ-M/VZJ5q1RZyNI/AAAAAAAABI0/0nO5j7kKnKQ/s1600/stack_frames_2.jpg" imageanchor="1"><img border="0" src="http://1.bp.blogspot.com/-3iQnb5cbZ-M/VZJ5q1RZyNI/AAAAAAAABI0/0nO5j7kKnKQ/s1600/stack_frames_2.jpg"></a></div><span>
+</span><span>
+</span><p>If we examine the call we see that it is the very last action in <code>f()</code>. Once <code>id()</code> is done, the only remaining action performed by <code>f()</code> is to pass <code>id</code>’s result to <code>f</code>’s caller. Therefore, <code>f</code>’s variables are not needed, anymore and its stack frame can be removed before making the call. The return address given to <code>id()</code> is <code>f</code>’s return address, line C. During the execution of <code>id()</code>, the stack looks like this:</p><span>
+
+
+</span><div class="separator"><span>
+</span><a href="http://4.bp.blogspot.com/-5A7wdXF9iiE/VZJ5q8ImSKI/AAAAAAAABI4/soyxT7WBQ-s/s1600/stack_frames_2_tco.jpg" imageanchor="1"><img border="0" src="http://4.bp.blogspot.com/-5A7wdXF9iiE/VZJ5q8ImSKI/AAAAAAAABI4/soyxT7WBQ-s/s1600/stack_frames_2_tco.jpg"></a></div><span>
+</span><span>
+</span><p>Then <code>id()</code> returns the value <code>3</code>. You could say that it returns that value for <code>f()</code>, because it transports it to <code>f</code>’s caller, line C.</p><span>
+</span><p>Let’s review: The function call in line B is a tail call. Such a call can be done with zero stack growth. To find out whether a function call is a tail call, we must check whether it is in a <em>tail position</em> (i.e., the last action in a function). How that is done is explained in the next section.</p><span>
+
+
+</span><h3 id="checking_whether_a_function_call_is_in_a_tail_position">Checking whether a function call is in a tail position</h3><p>We have just learned that tail calls are function calls that can be executed more efficiently. But what counts as a tail call?</p><span>
+</span><p>First, the way in which you call a function does not matter. The following calls can all be optimized if they appear in a tail position:</p><span>
+</span><ul>
+<li>Function call: <code>func(···)</code></li>
+<li>Dispatched method call: <code>obj.method(···)</code></li>
+<li>Direct method call via <code>call()</code>: <code>func.call(···)</code></li>
+<li>Direct method call via <code>apply()</code>: <code>func.apply(···)</code></li>
+</ul><span>
+
+
+</span><h4 id="tail_calls_in_expressions">Tail calls in expressions</h4><p>Arrow functions can have expressions as bodies. For tail call optimization, we therefore have to figure out where function calls are in tail positions in expressions. Only the following expressions can contain tail calls:</p><span>
+</span><ul>
+<li>The conditional operator (<code>? :</code>)</li>
+<li>The logical Or operator (<code>||</code>)</li>
+<li>The logical And operator (<code>&amp;&amp;</code>)</li>
+<li>The comma operator (<code>,</code>)</li>
+</ul><span>
+</span><p>Let’s look at an example for each one of them.</p><span>
+</span><h5 id="the_conditional_operator_%28%3F_%3A%29">The conditional operator (<code>? :</code>)</h5><pre class="javascript">    const a = x =&gt; x ? f() : g();
+</pre><span>
+</span><p>Both <code>f()</code> and <code>g()</code> are in tail position.</p><span>
+</span><h5 id="the_logical_or_operator_%28%7C%7C%29">The logical Or operator (<code>||</code>)</h5><pre class="javascript">    const a = () =&gt; f() || g();
+</pre><span>
+</span><p><code>f()</code> is not in a tail position, but <code>g()</code> is in a tail position. To see why, take a look at the following code, which is equivalent to the previous code:</p><span>
+</span><pre class="javascript">    const a = () =&gt; {
+        let fResult = f(); // not a tail call
+        if (fResult) {
+            return fResult;
+        } else {
+            return g(); // tail call
+        }
+    };
+</pre><span>
+</span><p>The result of the logical Or operator depends on the result of <code>f()</code>, which is why that function call is not in a tail position (the caller does something with it other than returning it). However, <code>g()</code> is in a tail position.</p><span>
+</span><h5 id="the_logical_and_operator">The logical And operator</h5><pre class="javascript">    const a = () =&gt; f() &amp;&amp; g();
+</pre><span>
+</span><p><code>f()</code> is not in a tail position, but <code>g()</code> is in a tail position. To see why, take a look at the following code, which is equivalent to the previous code:</p><span>
+</span><pre class="javascript">    const a = () =&gt; {
+        let fResult = f(); // not a tail call
+        if (!fResult) {
+            return fResult;
+        } else {
+            return g(); // tail call
+        }
+    };
+</pre><span>
+</span><p>The result of the logical And operator depends on the result of <code>f()</code>, which is why that function call is not in a tail position (the caller does something with it other than returning it). However, <code>g()</code> is in a tail position.</p><span>
+</span><h5 id="the_comma_operator_%28%29">The comma operator (<code>,</code>)</h5><pre class="javascript">    const a = () =&gt; (f() , g());
+</pre><span>
+</span><p><code>f()</code> is not in a tail position, but <code>g()</code> is in a tail position. To see why, take a look at the following code, which is equivalent to the previous code:</p><span>
+</span><pre class="javascript">    const a = () =&gt; {
+        f();
+        return g();
+    }
+</pre><span>
+
+
+</span><h4 id="tail_calls_in_statements">Tail calls in statements</h4><p>For statements, the following rules apply.</p><span>
+</span><p>Only these compound statements can contain tail calls:</p><span>
+</span><ul>
+<li>Blocks (as delimited by <code>{}</code>, with or without a label)</li>
+<li><code>if</code>: in either the “then” clause or the “else” clause.</li>
+<li><code>do-while</code>, <code>while</code>, <code>for</code>: in their bodies.</li>
+<li><code>switch</code>: in its body.</li>
+<li><code>try-catch</code>: only in the <code>catch</code> clause. The <code>try</code> clause has the <code>catch</code> clause as a context that can’t be optimized away.</li>
+<li><code>try-finally</code>, <code>try-catch-finally</code>: only in the <code>finally</code> clause, which is a context of the other clauses that can’t be optimized away.</li>
+</ul><span>
+</span><p>Of all the atomic (non-compound) statements, only <code>return</code> can contain a tail call. All other statements have context that can’t be optimized away. The following statement contains a tail call if <code>expr</code> contains a tail call.</p><span>
+</span><pre class="javascript">    return «expr»;
+</pre><span>
+
+
+</span><h4 id="tail_call_optimization_can_only_be_made_in_strict_mode">Tail call optimization can only be made in strict mode</h4><p>In non-strict mode, most engines have the following two properties that allow you to examine the call stack:</p><span>
+</span><ul>
+<li><code>func.arguments</code>: contains the arguments of the most recent invocation of <code>func</code>.</li>
+<li><code>func.caller</code>: refers to the function that most recently called <code>func</code>.</li>
+</ul><span>
+</span><p>With tail call optimization, these properties don’t work, because the information that they rely on may have been removed. Therefore, strict mode forbids these properties (<a href="http://www.ecma-international.org/ecma-262/6.0/#sec-addrestrictedfunctionproperties">as described in the language specification</a>) and tail call optimization only works in strict mode.</p><span>
+
+
+</span><h4 id="pitfall%3A_solo_function_calls_are_never_in_tail_position">Pitfall: solo function calls are never in tail position</h4><p>The function call <code>bar()</code> in the following code is not in tail position:</p><span>
+</span><pre class="javascript">    function foo() {
+        bar(); // this is not a tail call in JS
+    }
+</pre><span>
+</span><p>The reason is that the last action of <code>foo()</code> is not the function call <code>bar()</code>, it is (implicitly) returning <code>undefined</code>. In other words, <code>foo()</code> behaves like this:</p><span>
+</span><pre class="javascript">    function foo() {
+        bar();
+        return undefined;
+    }
+</pre><span>
+</span><p>Callers can rely on <code>foo()</code> always returning <code>undefined</code>. If <code>bar()</code> were to return a result for <code>foo()</code>, due to tail call optimization, then that would change <code>foo</code>’s behavior.</p><span>
+</span><p>Therefore, if we want <code>bar()</code> to be a tail call, we have to change <code>foo()</code> as follows.</p><span>
+</span><pre class="javascript">    function foo() {
+        return bar(); // tail call
+    }
+</pre><span>
+
+
+</span><h3 id="tail-recursive_functions">Tail-recursive functions</h3><p>A function is <em>tail-recursive</em> if the main recursive calls it makes are in tail positions.</p><span>
+</span><p>For example, the following function is not tail recursive, because the main recursive call in line A is not in a tail position:</p><span>
+</span><pre class="javascript">    function factorial(x) {
+        if (x &lt;= 0) {
+            return 1;
+        } else {
+            return x * factorial(x-1); // (A)
+        }
+    }
+</pre><span>
+</span><p><code>factorial()</code> can be implemented via a tail-recursive helper function <code>facRec()</code>. The main recursive call in line A is in a tail position.</p><span>
+</span><pre class="javascript">    function factorial(n) {
+        return facRec(n, 1);
+    }
+    function facRec(x, acc) {
+        if (x &lt;= 1) {
+            return acc;
+        } else {
+            return facRec(x-1, x*acc); // (A)
+        }
+    }
+</pre><span>
+</span><p>That is, some non-tail-recursive functions can be transformed into tail-recursive functions.</p><span>
+
+
+</span><h4 id="tail-recursive_loops">Tail-recursive loops</h4><p>Tail call optimization makes it possible to implement loops via recursion without growing the stack. The following are two examples.</p><span>
+</span><h5 id="foreach%28%29"><code>forEach()</code></h5><pre class="javascript">    function forEach(arr, callback, start = 0) {
+        if (0 &lt;= start &amp;&amp; start &lt; arr.length) {
+            callback(arr[start], start, arr);
+            return forEach(arr, callback, start+1); // tail call
+        }
+    }
+    forEach(['a', 'b'], (elem, i) =&gt; console.log(`${i}. ${elem}`));
+    
+    // Output:
+    // 0. a
+    // 1. b
+</pre><span>
+</span><h5 id="findindex%28%29"><code>findIndex()</code></h5><pre class="javascript">    function findIndex(arr, predicate, start = 0) {
+        if (0 &lt;= start &amp;&amp; start &lt; arr.length) {
+            if (predicate(arr[start])) {
+                return start;
+            }
+            return findIndex(arr, predicate, start+1); // tail call
+        }
+    }
+    findIndex(['a', 'b'], x =&gt; x === 'b'); // 1
+</pre><span>
+
+
+
+
+
+</span><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

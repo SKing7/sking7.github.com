@@ -1,0 +1,111 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Script Error JavaScript Forensics</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Script Error JavaScript Forensics</h1>
+            <div class="entry-content"><span>
+		</span><p>“Script Error”: The arch nemesis of JavaScript error monitoring. &nbsp;As soon as you start monitoring client-side problems, it emerges. It cloaks the true nature of your front-end errors behind its veil of obscurity.</p><span>
+</span><p>You’ll need to deal with it if you want a comprehensive front-end error tracking solution.</p><span>
+</span><h1>Analysis</h1><span>
+</span><p><code>Script Error</code> is a symptom of a <a href="http://en.wikipedia.org/wiki/Same-origin_policy">Same-Origin Policy</a> violation in the browser.</p><span>
+</span><blockquote><p>The same-origin policy restricts how a document or script loaded from one origin can interact with a resource from another origin. Same-origin Policy is used as a means to prevent some of the Cross-site Request Forgery attacks.</p>
+
+</blockquote><span>
+</span><p>When your web application loads a JavaScript file from another origin, that script is subject to the restrictions of the Same-Origin Policy. The restrictions include error obfuscation when exposing the error to the global listeners: <code>window.onerror</code> and <code>window.addEventListener('error')</code>.</p><span>
+</span><p>This browser policy aims to prevent information leaking between domains that could allow Cross-Site Request Forgery attacks. The policy is enforced in <b>all relevant browsers</b>, including all versions of Chrome, Firefox, Safari, Opera, and Internet Explorer.</p><span>
+</span><aside>An <strong>origin</strong> is defined as the same protocol, hostname, and port. Internet Explorer does not consider port in origin. Scripts included from a CDN or third-party will have a different origin.</aside><span>
+</span><p>For example, let’s say your application records errors from <code>window.onerror</code> and loads a CDN-hosted AngularJS. Whenever an error is emitted from Angular, the error will be recorded as simply <code>Script Error</code> with no mention of the original message, the angular.js file, or the stack trace.</p><span>
+</span><p>Consider how <a href="http://trac.webkit.org/browser/branches/chromium/648/Source/WebCore/dom/ScriptExecutionContext.cpp?rev=77122#L301">Chrome</a> exposes a JavaScript Error. When an error occurs, it evaluates the security origin of the file. If it violates the policy, the error is simply overwritten with empty values.</p><span>
+</span><pre class="prettyprint lang-c">bool ScriptExecutionContext::dispatchErrorEvent(
+  const String&amp; errorMessage, 
+  int lineNumber, 
+  const String&amp; sourceURL) {
+  ...
+  if (securityOrigin()-&gt;canRequest(targetUrl)) {
+    message = errorMessage;
+    line = lineNumber;
+    sourceName = sourceURL;
+  } else {
+    message = "Script error.";
+    sourceName = String();
+    line = 0;
+  }
+  ...
+  RefPtr&lt;ErrorEvent&gt; errorEvent = ErrorEvent::create(message, sourceName, line);
+  target-&gt;dispatchEvent(errorEvent);
+  ...
+}
+</pre><span>
+</span><span>
+</span><p>Even when a JavaScript error is obfuscated by the Same-Origin Policy, Chrome’s debugger will display the original error information. Therefore, you may not be aware that errors are being obfuscated until you begin monitoring them.</p><span>
+</span><aside>TrackJS detects errors deeper in the browser than the global listener alone. Get better error information and <a href="https://my.trackjs.com/signup?utm_medium=blog&amp;utm_content=script-error">fix more bugs with TrackJS</a> today.</aside><span>
+</span><p>You may encounter <code>Script Error</code> if you load at least one JavaScript asset from another domain, such as a CDN or third-party. Note that the script may be loaded by JavaScript at runtime, so you’ll need to check the network requests in the debugger to be sure.</p><span>
+</span><h1>Solution</h1><span>
+</span><p>We can side-step the Same-Origin Policy using <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#cors-enabled-fetch">Cross-Origin Resource Sharing</a> (CORS). CORS is most commonly used to address a different violation in the Same-Origin Policy: allowing cross-domain AJAX calls against external API’s. It can also be used to load JavaScript assets exempt from error obfuscation.</p><span>
+</span><p>Each server, CDN, or vendor that you load JavaScript assets from needs to serve the request with the CORS headers:</p><span>
+</span><pre class="prettyprint">Access-Control-Allow-Origin: YOUR_DOMAIN | *
+</pre><span>
+</span><p>The wildcard <code>*</code> can be used instead of a domain if you want to allow the file to be loaded from anywhere. There are <a href="https://github.com/h5bp/server-configs">fantastic</a>&nbsp;<a href="http://enable-cors.org/server.html">resources</a> on how to configure your webserver to add these headers, and most CDNs and vendors will have a mechanism to configure or request them.</p><span>
+</span><p>From your web application, you can tell the browser to load CORS JavaScript files with the <code>crossorigin</code> attribute:</p><span>
+</span><pre class="prettyprint">&lt;script src=”thirdparty.com/script.js” crossorigin&gt;&lt;/script&gt;
+</pre><span>
+</span><p>By default the asset will be requested anonymously. If you want to use CORS authentication, you may also <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#cors-enabled-fetch">specify credentials on how to load the asset</a>.</p><span>
+</span><aside class="caution">Caution: If you attempt to load a JavaScript file with CORS and the server does not provide the header on the response, the <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#cors-enabled-fetch">script will fail to load entirely</a>. This also can happen if <a href="https://trackjs.com/blog/crossorigin-scripts-and-corporate-proxies/">Corporate Proxies meddle</a> with asset loading requests.</aside><span>
+</span><p>Loading assets with CORS is supported in most modern browsers. However, the lack of Internet Explorer support is concerning–especially because of the prevalence of IE-only bugs we tend to encounter.</p><span>
+</span><table class="table">
+<thead>
+<tr>
+<th>Browser</th>
+<th>Versions</th>
+<th>CORS Loading Support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chrome</td>
+<td>30+</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Firefox</td>
+<td>13+</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Safari</td>
+<td>7+</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Opera</td>
+<td>12.5+</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Internet Explorer</td>
+<td>N/A</td>
+<td><strong>No</strong></td>
+</tr>
+<tr>
+<td>Microsoft Edge</td>
+<td>N/A</td>
+<td><strong>?</strong></td>
+</tr>
+</tbody>
+</table><span>
+</span><span>
+</span><p>CORS loading is definitely worthwhile for the extra context you’ll gather from most browsers. From unsupported browsers, it’s still helpful to listen for <code>Script Error</code> so you know the specific browsers, pages, and users having problems.</p><span>
+</span><p>Of course if you just don’t care, you should <a href="https://docs.trackjs.com/Examples/Ignoring_Errors">ignore them</a> and reduce the noise.</p><span>
+</span><p>TrackJS captures better information about JavaScript errors, even in Internet Explorer. It has deeper DOM inspection to capture more error information and the events that led the user to problems. <a href="https://my.trackjs.com/signup?utm_medium=blog&amp;utm_content=script-error">Get started with a free trial</a> today and fix more bugs.</p><span>
+			</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

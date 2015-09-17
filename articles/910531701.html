@@ -1,0 +1,61 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Automating critical CSS without blocking rendering</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Automating critical CSS without blocking rendering</h1>
+            <div class="field-body"><span>
+    </span><p>This week let’s talk about the critical rendering path and how to avoid <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css?hl=en">render-blocking CSS</a>. That is, CSS which can prevent the browser rendering any processed content until the <abbr title="CSS Object Model">CSSOM</abbr> has been fully&nbsp;constructed.</p><span>
+</span><p>There are many articles and <a href="https://speakerdeck.com/patrickhamann/css-and-the-critical-path-cssconfeu-september-2014">presentations</a> about inlining critical CSS, so I won’t walk through the process step-by-step. Filament Group has provided a <a href="http://www.filamentgroup.com/lab/performance-rwd.html">clear, comprehensive how-to on making <abbr title="Responsive Web Design">RWD</abbr> fast</a>, which includes an excellent explanation of critical CSS. Once you’re comfortable creating your own inline CSS to appease the PageSpeed gods, I want to bring up an important issue to watch out for: <strong>inline CSS that blocks rendering</strong>.</p><span>
+</span><h2>Inline but&nbsp;blocking</h2><span>
+</span><p>What?! you must be asking. Isn’t inline CSS faster because there’s no external request for the styles? That is correct for the most part. Still, it’s possible for the CSS to block rendering <strong>if it contains external requests</strong>. The following demo page contains nothing but a few paragraphs and inline CSS. Weighing in at 3.3<abbr title="kilobytes">KB</abbr> I’d expect it to load in the first packet response. Chances are if you load it on a mobile device, the page will be white for about 5 seconds before rendering the&nbsp;page:</p><span>
+</span><p><a class="green button" href="http://fourword.fourkitchens.com/examples/critical-css-blocking/">Demo of critical CSS that blocks&nbsp;rendering</a></p><span>
+</span><p>This might not be a problem if you’re <a href="https://css-tricks.com/authoring-critical-fold-css/">manually authoring critical CSS</a>. But not everyone uses that approach, which can be somewhat time-consuming. That’s why folks are often using tools like <a href="https://www.npmjs.com/package/critical">critical</a> or <a href="https://www.npmjs.com/package/grunt-critical">grunt-critical</a> to automatically generate the CSS. Not only can they test multiple viewport sizes to calculate the styles, but they can even inline it for you! I prefer these tools because they’re pretty darn convenient, but they also have the potential to cause&nbsp;trouble.</p><span>
+</span><h2>Automatic isn’t always&nbsp;perfect</h2><span>
+</span><p>The advantage we get by automating tasks is enormous. For some tasks, like concatenation, you could say it’s downright foolish to do by hand what a computer can do a million times as fast. We can safely hand the task off to the computer and actually expect it to be done better and faster than a human&nbsp;can.</p><span>
+</span><p>Producing CSS for the critical rendering path, on the other hand, is a matter of balancing several important factors. A computer can’t always make the best decision. Do you optimize for a mobile viewport, a desktop-sized viewport, or try to find a “sweet spot” that works for both? How “complete” do you want the first render to look? All of these questions have to be answered within a budget of just a few KB of&nbsp;CSS.</p><span>
+</span><p>For example, if you are applying a web font to your page titles, and it is above the fold. The tool will probably identify the <code>@font-face</code> rule and include it in your critical CSS. But that creates an external request! Same for background images and icon fonts, all commonly used near the top of a web page to enhance logos, titles, menus and so&nbsp;forth.</p><span>
+</span><p>The makers of these tools are aware of the risks. In fact, Critical has an open <a href="https://github.com/addyosmani/critical/issues/58">GitHub issue requesting excludes by file/selector</a>. But for now it’s up to your team to be vigilant and ensure that the CSS is actually&nbsp;non-blocking.</p><span>
+</span><p><em><strong>Update 2015-06-12:</strong> the issue noted above has now been resolved! In the latest version of <code>critical</code> you are able to filter out blocks and properties of your choosing. Thanks to <a href="https://github.com/bezoerb">Ben Zörb</a> for his work on this&nbsp;issue.</em></p><span>
+</span><h2>Test your&nbsp;work</h2><span>
+</span><p>Alright so here we are. We have great tools that automate a tricky task, and for the most part they get it right. But when they get it wrong, it’s high impact. We know exactly what will cause problems, which sounds like a perfect situation to implement a&nbsp;test!</p><span>
+</span><blockquote><p><strong>To avoid shipping inline styles with external requests, use a test to check CSS for known properties that block&nbsp;rendering.</strong></p>
+</blockquote><span>
+</span><pre><code class="language-bash">#!/bin/bash
+
+# The commands look for 'font-face' or 'url' within the
+# critical CSS. Both properties will cause the browser
+# to make an HTTP request, but since the critical CSS is
+# inline, it should avoid making external requests.
+#
+# External requests within CSS defeat the purpose of
+# inlining in your HTML since they incur the same type
+# of network delay that external CSS would cause.
+
+FACE=`grep -c 'font-face' path/to/critical.css`
+URL=`grep -c 'url(' path/to/critical.css`
+
+if [ "$FACE" == "0" ] &amp;&amp; [ "$URL" == "0" ]; then
+  echo "Critical: ✔︎ Yay! The generated CSS makes zero external requests."
+  exit 0
+else
+  TOTAL=$(($FACE + $URL))
+  echo "Critical: ✘ Rats! The generated CSS makes $TOTAL external requests."
+  exit $TOTAL
+fi</code></pre><p>When the test fails, you can go in and manually tweak your styles, removing the bits that cause delays. This script is just to demonstrate the concept, and is extremely simple. It only tests for two strings, <code>font-face</code> and <code>url</code>. Depending on your CSS, the test might have to be more complex. For instance, a <code>url()</code> containing a data URI is not a problem, and should pass. Or you might want to check for <code>@import</code>. If you have other good testing suggestions, leave them in the&nbsp;comments!</p><span>
+</span><p>Finally, for team-wide coverage add this test as a pre-commit hook in your <abbr title="Version control system">VCS</abbr> so people who work with CSS will have to verify the changes before merging or&nbsp;shipping.</p><span>
+</span><h2>Want to learn&nbsp;more?</h2><span>
+</span><p>Check out our open source repository of frontend performance training materials, which includes this test amongst many&nbsp;others!</p><span>
+</span><p><a class="green button" href="https://github.com/fourkitchens/frontend-perf">View webperf training&nbsp;materials</a></p><span>
+</span><p><em>Credit and thanks go to <a href="https://twitter.com/addyosmani">Addy Osmani</a> for fact-checking this&nbsp;post.</em></p><span>
+  </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

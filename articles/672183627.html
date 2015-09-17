@@ -1,0 +1,108 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Hardware + CSS Pixels in the Age of Retina Display</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Hardware + CSS Pixels in the Age of Retina Display</h1>
+            <div class="entry-content"><span>
+		</span><p>High-density displays such as Apple’s Retina display are great for end-users, allowing you to view content at resolutions that approach print quality. But they’ve also created complications for web designers, beginning with the definition of what constitutes a “pixel.”</p><span>
+</span><h2>Pixel Practice in Web Design: The “Why?” Behind Virtual Pixels</h2><span>
+</span><p>Suppose your web design calls for a box to be 200 pixels wide. If you display the site on an iPad and put it under a microscope, you’ll see that the box actually measures 400 pixels across. Why? Because when you specify pixel sizes, you’re using “<a title="css " href="http://www.mydesignshop.com/html-css-for-visual-designers-t0128/?lid=EPhwbl062114/" target="_blank">CSS</a> pixels” (sometimes referred to as “virtual pixels”). It’s a unit of measurement—defined by the W3C—that’s distinct from the actual hardware pixels in the display.</p><span>
+</span><p>The reasoning behind this should be clear. If you define a box as being 200 <a title="flock of pixels" href="http://www.printmag.com/featured/a-flock-of-pixels-the-80s-design-comeback/" target="_blank">pixels</a> wide, you want it to look roughly the same whether it’s viewed on a standard display or a high-density one. You don’t want it to look like a postage stamp, which is what would happen on <a title="ipad app design book" href="http://www.mydesignshop.com/ipad-app-design-manual/?lid=EPhwbl062114" target="_blank">recent iPad</a> models with their 264-ppi displays.</p><span>
+</span><div id="attachment_145753" class="wp-caption aligncenter"><a href="http://www.shutterstock.com/"><img class="wp-image-145753 size-full" src="http://www.howdesign.com/wp-content/uploads/CSS_pixels_628.jpg" alt="CSS_pixels_628; retina display" width="628" height="391"></a><p class="wp-caption-text">Courtesy of Shutterstock.com</p></div><span>
+</span><p>On a standard-resolution display, like the ones on most desktop and laptop computers, CSS <a title="flock of pixels article" href="http://www.printmag.com/featured/a-flock-of-pixels-the-80s-design-comeback/" target="_blank">pixels </a>and hardware pixels are the same. High-density displays use a multiplier—the pixel ratio—to determine how many hardware pixels constitute a single CSS pixel. The pixel ratio on recent-generation iPads (iPad 3 or later) is 2: Two iPad pixels equal one CSS pixel.</p><span>
+</span><h2>Becoming Pixel Perfect: How Retina Display Changes the Game</h2><span>
+</span><p><strong>Let’s compare the newer Retina displays with the ones on the original iPad:</strong></p><span>
+</span><table>
+<tbody>
+<tr>
+<td width="131"></td>
+<td width="131">iPad (1st/2nd gen.)</td>
+<td width="144">iPad with Retina Display</td>
+</tr>
+<tr>
+<td width="131">Diagonal measure</td>
+<td width="131">9.7 in</td>
+<td width="144">9.7 in</td>
+</tr>
+<tr>
+<td width="131">Pixel density</td>
+<td width="131">132ppi</td>
+<td width="144">264ppi</td>
+</tr>
+<tr>
+<td width="131">Hardware pixels</td>
+<td width="131">1024 x 768</td>
+<td width="144">2048 x 1536</td>
+</tr>
+<tr>
+<td width="131">CSS pixels</td>
+<td width="131">1024 x 768</td>
+<td width="144">1024 x 768</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>Even though the newer iPads have twice the resolution, they have the same number of <a title="css for visual designers" href="http://www.mydesignshop.com/html-css-for-visual-designers-t0128?source=igodigital" target="_blank">CSS pixels</a><a href="http://www.howdesign.com/wp-content/uploads/BrianWood_July2013.jpg"><img class="aligncenter size-full wp-image-141763" src="http://www.howdesign.com/wp-content/uploads/BrianWood_July2013.jpg" alt="BrianWood_July2013" width="150" height="149"></a>. So if your CSS specifies a font size of 18px for a heading, it still looks like a heading on the newer iPads, but with sharper text because it’s doubling the number of hardware pixels.</p><span>
+</span><p><strong>The same kinds of comparisons apply when we’re talking about iPhones:</strong></p><span>
+</span><table>
+<tbody>
+<tr>
+<td width="118"></td>
+<td width="115">iPhone 3GS</td>
+<td width="126">iPhone 4/4S</td>
+<td width="120">iPhone 5</td>
+</tr>
+<tr>
+<td width="118">Diagonal measure</td>
+<td width="115">3.5 in</td>
+<td width="126">3.5 in</td>
+<td width="120">4 in</td>
+</tr>
+<tr>
+<td width="118">Pixel density</td>
+<td width="115">163ppi</td>
+<td width="126">326ppi</td>
+<td width="120">326ppi</td>
+</tr>
+<tr>
+<td width="118">Hardware pixels</td>
+<td width="115">320×480</td>
+<td width="126">640×960</td>
+<td width="120">640×1136</td>
+</tr>
+<tr>
+<td width="118">CSS pixels</td>
+<td width="115">320×480</td>
+<td width="126">320×480</td>
+<td width="120">320×568</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>The W3C has a complicated formula to determine the <a title="W3 pixel ratio" href="http://www.w3.org/TR/CSS2/syndata.html#length-units" target="_blank">pixel ratio</a>&nbsp;based on display resolution, average viewing distance and viewing angle. Viewing distance plays a part because pixels appear to be larger when the display is closer to your eye. An image that seems crisp when seen at a distance might look pixelated when viewed up close. (A billboard you pass on the way to work could be printed at just 15 dpi.)</p><span>
+</span><p>The iPad’s resolution is roughly three times that of a standard PC display, so based on pixel density alone, the ratio would be closer to 3. But it’s meant to be held about 15 inches away versus 28 inches for the typical laptop or desktop PC, hence the pixel ratio of 2.</p><span>
+</span><p>Fortunately, you don’t have to think about the math. The hardware vendor ultimately sets the pixel ratio, and to find it for a given device, you can look it up on various websites, including <a title="pixel density " href="http://en.wikipedia.org/wiki/List_of_displays_by_pixel_density" target="_blank">Wikipedia</a>.</p><span>
+</span><div id="attachment_145768" class="wp-caption alignleft"><a href="http://www.shutterstock.com/"><img class="wp-image-145768 size-large" src="http://www.howdesign.com/wp-content/uploads/pixels-219x274.jpg" alt="pixels; retina display" width="219" height="274"></a><p class="wp-caption-text">Courtesy of Shutterstock.com</p></div><span>
+</span><p>Apple devices have nice, whole-number pixel ratios, but many Android devices have pixel ratios of 1.5. Smartphones with small displays and HD resolution might have a pixel ratio of 3.</p><span>
+</span><p>You may be thinking, “Phew, I really don’t have to worry about screen resolutions after all,” and this is true—unless of course you’re building a responsive web design and you want to optimize your site for a Retina display. In that case, you’ll add a CSS Media Query that looks like this:</p><span>
+</span><p>@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)</p><span>
+</span><p>You’d generally do this so you can serve high-resolution images to these devices, a topic I discuss in length in<a title="responsive images" href="http://www.howdesign.com/web-design-resources-technology/responsive-images/" target="_blank">&nbsp;another article</a>. As I mentioned in that piece, the current schemes for enabling responsive images are rather cumbersome, but forthcoming enhancements to HTML should make it easier.</p><span>
+</span><p>As you can see, the query includes two media properties: &lt;min-resolution&gt; and &lt;-webkit-min-device-pixel-ratio&gt;. That’s because WebKit-based browsers such as Safari have trouble handling &lt;min-resolution&gt;, so you need to add the browser-specific property. <span class="Apple-style-span">You can find additional details in <a title="mozilla " href="https://developer.mozilla.org/en-US/docs/Web/CSS/resolution#Browser_compatibility" target="_blank">Mozilla’s developer documentation</a></span>.</p><span>
+</span><p><strong>Now consider this query:</strong></p><span>
+</span><p>@media only screen and (min-device-width: 768px) and (max-device-width: 1024px)</p><span>
+</span><p>Absent references to pixel density, it will target CSS styles to any iPad, with or without a Retina display, because it’s referring to CSS pixels, and in those terms the two are the same.</p><span>
+</span><hr><span>
+</span><p><em><strong><a href="http://www.howdesign.com/wp-content/uploads/BrianWood_July2013.jpg"><img class="alignleft wp-image-141763 size-full" src="http://www.howdesign.com/wp-content/uploads/BrianWood_July2013.jpg" alt="BrianWood_July2013" width="150" height="149"></a>Want more interactive stimulation?</strong> Don’t miss your chance to hear from the industry’s best at the <strong><a title="HIDC" href="http://www.howinteractiveconference.com/" target="_blank">HOW Interactive Design Conference</a></strong>. Coming to a city near you this fall!&nbsp;</em></p><span>
+</span><p><em>Find out what it means to produce <strong><a title="HOW U" href="http://www.howdesignuniversity.com/?s=Cutting+Edge+Web+Design&amp;submit=" target="_blank">Cutting Edge Web Design</a></strong> with one of our most popular instructors, <a title="Brian Wood" href="http://www.howdesignuniversity.com/design-workshop-instructors/brian-wood/" target="_blank"><strong>Brian Wood!</strong></a> Register today.&nbsp;</em></p><span>
+</span><span>
+		</span><!-- sharethis --><span>
+	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

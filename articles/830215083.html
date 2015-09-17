@@ -1,0 +1,118 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>React server side rendering</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>React server side rendering</h1>
+            <div id="main_content" role="main"><h2 class="page-title">React server-side rendering</h2><span> </span><ul id="sharebar"><li><script>(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="//connect.facebook.net/en_US/all.js#xfbml=1";fjs.parentNode.insertBefore(js,fjs);}(document,'script','facebook-jssdk'));</script><fb:like send="false" layout="box_count" width="55" show_faces="false"></fb:like></li><li><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></li><li></li><li><script src="//platform.linkedin.com/in.js" type="text/javascript"></script><script type="IN/Share" data-counter="top"></script></li></ul><ul id="sharebarx"><li><fb:like send="false" layout="button_count" width="60" show_faces="false"></fb:like></li><li></li><li><script type="text/javascript">(function(){var po=document.createElement('script');po.type='text/javascript';po.async=true;po.src='https://apis.google.com/js/plusone.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(po,s);})();</script></li><li><script type="IN/Share" data-counter="right"></script></li></ul><p>As already explained in the <a href="http://devangelist.de/react-js/" title="Introduction to React.js">introduction to React</a>, React views can be rendered on the server as well as on the client. Due to the virtual DOM this isn’t even especially complex. However it becomes a bit more difficult once the state between the client and server needs to be synchronized.</p><h2>Why server-side rendering?</h2><p>Rendering of React views directly on the server has several advantages:</p><ul><li> If the HTML is pre-rendered the browser’s performance increases as the browser has to do less work putting everything back together. In addition the HTML page can be cached by a CDN (content delivery network) and doesn’t have to be recreated on every call.</li><li>Search engines cannot (won’t) interpret JavaScript, but only HTML code. Currently the only correct way is to render all search-engine relevant information on the server.</li></ul><h2>Rendering static markup</h2><p>The <code>renderToStaticMarkup</code> method receives a <strong>react component</strong> and returns the HTML as a String. This can be rendered with a simple template engine like Handlebars:</p><pre class="brush: xml; title: ; notranslate" title="">&lt;div&gt;{{{ markup }}}&lt;/div&gt;
+</pre><h2>Reactive components</h2><p>It is nice that components can be rendered on the server, but in most cases this is not enough. The complete interaction like <strong>event-bindings or prop and state changes</strong> are missing.</p><p>These components can only be integrated after React is aware that there are also components on the client-side.</p><p>The <code>renderToString</code> method also returns HTML as a string, but compared to the static variant this method also enables client-side interaction.</p><p>The classic example of a incremental counter:</p><pre class="brush: jscript; title: ; notranslate" title="">var Counter = React.createClass({
+    getInitialState: function() {
+        return {
+            count: this.props.initialCount
+        };
+    },
+
+    _increment: function() {
+        this.setState({ count: this.state.count + 1 });
+    },
+
+    render: function() {
+        return &lt;span onClick={this._increment}&gt;
+            {this.state.count}
+        &lt;/span&gt;;
+    }
+});
+</pre><p>This component can be rendered on the server as follows:</p><pre class="brush: jscript; title: ; notranslate" title="">var React = require('react');
+var Counter = React.createFactory(require("./counter"));
+var http = require('http');
+
+var counterHtml = React.renderToString(
+    Counter({ initialCount: 3 })
+);
+
+http.createServer(function(req, res) {
+  if (req.url == '/') {
+    res.send('&lt;div id="container"&gt;' + counterHtml + '&lt;/div&gt;');
+  }
+}).listen(3000);
+</pre><p>If the website is visited via <em>http://localhost:3000/</em> the browser shows the initially set number 3.</p><p>After a click on the span-element, which is supposed to trigger the click event, nothing happens. And there is an easy explanation: React does not know this component on the client yet and therefore is unable to bind event-handlers or conduct re-renderings.</p><p>The component must also be created in the browser in order to react to click-events:</p><pre class="brush: jscript; title: ; notranslate" title="">var Counter = React.createFactory(require("./counter"));
+React.render(Counter({ initialCount: 3 }), document.getElementById("container"))
+</pre><p>For this example we assume that React.js as well as the component have already been loaded in the browser.</p><p>This example contains a bit of magic: If the component is loaded with the same props as on the server it does not re-render. React recognizes that the DOM has not changed, but could change in the future and performs all necessary steps for binding the events.</p><p>If components aren’t re-rendered this has a positive impact on performance.</p><h2>Synchronizing props</h2><p>The principle behind props is easy: The client needs to pass on the props to the server:</p><pre class="brush: jscript; title: ; notranslate" title="">// server.js
+// ...
+var props = { initialCount: 3 };
+var counterHtml = React.renderToString(
+    Counter(props)
+);
+// ...
+  res.send(
+      '&lt;div id="container"&gt;' + counterHtml + '&lt;/div&gt;' +
+      '&lt;script&gt;' +
+        'var Counter = React.createFactory(require("./counter"));' +
+        'React.render(Counter(' + safeStringify(props) + '), document.getElementById("container"))' +
+      '&lt;/script&gt;'
+  );
+</pre><p>Note: The <a href="https://github.com/mhart/react-server-example/blob/master/server.js#L99" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://github.com']);" title="Safe Stringify Function">safeStringify</a> function enables the safe embedding of JSON into a JavaScript tag.<br>In line 5 the props <code>{ initialCount: 3 }</code> are passed onto the server-component. In line 12 it is passed on to the client.</p><p>The propos can also be placed in a separate script tag:</p><pre class="brush: jscript; title: ; notranslate" title="">&lt;script id="props" type="application/json"&gt;
+    {{{ theProps }}}
+&lt;/script&gt;
+&lt;script&gt;
+    var props = JSON.parse(document.getElementById("props").innerHTML);
+    // ...
+&lt;/script&gt;
+</pre><p>Since the second script tag is now completely independent it can be placed directly in counter.jsx:</p><pre class="brush: jscript; title: ; notranslate" title="">if (typeof window !== 'undefined') {
+    var props = JSON.parse(document.getElementById("props").innerHTML);
+    React.render(Counter(props), document.getElementById("container"));
+}
+</pre><p>A little step further and we can place props directly in the render-method of the component:</p><pre class="brush: jscript; title: ; notranslate" title="">render: function() {
+    var json = safeStringify(this.props);
+    var propStore = &lt;script type="application/json"
+        id="someId"
+        dangerouslySetInnerHTML={{__html: json}}&gt;
+    &lt;/script&gt;;
+
+    return &lt;div onClick={this._increment}&gt;
+        {propStore}
+        {this.state.count}
+    &lt;/div&gt;;
+}
+</pre><p>Putting the props into the render-method is not particularly beautiful, but has the advantage that all code responsible for server-side rendering is located in the React component itself.</p><h2>Components into the browser</h2><p>Other than React, also the browser needs to know the React components. In order not to load every component discretely tools like <a href="http://devangelist.de/browserify-nodejs-module-browser/" title="Node Modules with Browserify">Browserify</a> create complete bundles. Let’s go back to the (very rudimentary) <a href="https://github.com/mhart/react-server-example/blob/master/server.js" onclick="javascript:_gaq.push(['_trackEvent','download','http://github.com/mhart/react-server-example/blob/master/server.js']);" title="React Server Side Example">example</a>:</p><pre class="brush: jscript; title: ; notranslate" title="">http.createServer(function(req, res) {
+  if (req.url == '/') {
+    // ...
+  } else if (req.url == '/bundle.js') {
+    res.setHeader('Content-Type', 'text/javascript')
+    browserify()
+      .require('./counter.js', {expose: 'counter'})
+      .transform({global: true}, literalify.configure({react: 'window.React'}))
+      .bundle()
+      .pipe(res)
+  }
+</pre><h2>How does React synchronize props internally?</h2><p>A component that has been rendered on the server via <code>renderToString</code> contains a data-react-checksum attribute.</p><pre class="brush: xml; title: ; notranslate" title="">&lt;div data-reactid=".pxv0hfgr28" data-react-checksum="85249504"&gt;
+  4
+&lt;/div&gt;
+</pre><p>A short look into the React source code (<a href="https://github.com/facebook/react/blob/fd3f8e70e2aad999b02e6583e55f16da3aaec469/src/browser/server/ReactServerRendering.js#L28" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://github.com']);" title="renderToString">ReactServerRendering.js</a>) shows what happens in the background:</p><pre class="brush: jscript; highlight: [6]; title: ; notranslate" title="">function renderToString(component) {
+    ...
+    return transaction.perform(function() {
+      var componentInstance = instantiateReactComponent(element, null);
+      var markup = componentInstance.mountComponent(id, transaction, emptyObject);
+      return ReactMarkupChecksum.addChecksumToMarkup(markup);
+    }, null);
+    ...
+}
+</pre><p>The <code>addChecksumToMarkup</code> function creates a Adler-32 Checksum of the HTML markup of the component and attaches it to the component which has been rendered on the server.</p><p>If this component is subsequently rendered on the client, the <code>canReuseMarkup</code> (<a href="https://github.com/facebook/react/blob/5d3b12bb3bd6a092cf00ede07b8255a8399c2e58/src/browser/server/ReactMarkupChecksum.js#L36" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://github.com']);" title="React Markup Checksum">ReactMarkupChecksum.js</a>) function tests for a re-rendering:</p><pre class="brush: jscript; title: ; notranslate" title="">canReuseMarkup: function(markup, element) {
+    var existingChecksum = element.getAttribute(
+        ReactMarkupChecksum.CHECKSUM_ATTR_NAME
+    );
+    existingChecksum = existingChecksum &amp;&amp; parseInt(existingChecksum, 10);
+    var markupChecksum = adler32(markup);
+    return markupChecksum === existingChecksum;
+}
+</pre><h2>Conclusion</h2><p>The example only shows how it can work – not necessarily how it has to be done.</p><p>There are more elegant ways to synchronize the server with the client, like <a href="https://github.com/yahoo/fluxible-app" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://github.com']);" title="Fluxible App">fluxible-app</a> (dehydration/rehydration). This way the methods dehydrate and rehydrate generate snapshots from the server-side state and send it to the browser.</p><p>Shared code between client and server brings a lot of advantages and as long as search engines cannot index JavaScript rendered HTML, server-side rendering is the only way to go.</p><span> </span><span id="post-ratings-336" class="post-ratings" itemscope="" itemtype="http://schema.org/Product" data-nonce="63932d7d94"><span class="hreview-aggregate"> <span class="item"> <span class="fn">React server-side rendering</span>: <img id="rating_336_1" src="http://devangelist.de/en/wp-content/plugins/wp-postratings/images/stars_crystal/rating_on.gif" alt="1 Star" title="1 Star" onmouseover="current_rating(336, 1, '1 Star');" onmouseout="ratings_off(5, 0, 0);" onclick="rate_post();" onkeypress="rate_post();"><img id="rating_336_2" src="http://devangelist.de/en/wp-content/plugins/wp-postratings/images/stars_crystal/rating_on.gif" alt="2 Stars" title="2 Stars" onmouseover="current_rating(336, 2, '2 Stars');" onmouseout="ratings_off(5, 0, 0);" onclick="rate_post();" onkeypress="rate_post();"><img id="rating_336_3" src="http://devangelist.de/en/wp-content/plugins/wp-postratings/images/stars_crystal/rating_on.gif" alt="3 Stars" title="3 Stars" onmouseover="current_rating(336, 3, '3 Stars');" onmouseout="ratings_off(5, 0, 0);" onclick="rate_post();" onkeypress="rate_post();"><img id="rating_336_4" src="http://devangelist.de/en/wp-content/plugins/wp-postratings/images/stars_crystal/rating_on.gif" alt="4 Stars" title="4 Stars" onmouseover="current_rating(336, 4, '4 Stars');" onmouseout="ratings_off(5, 0, 0);" onclick="rate_post();" onkeypress="rate_post();"><img id="rating_336_5" src="http://devangelist.de/en/wp-content/plugins/wp-postratings/images/stars_crystal/rating_on.gif" alt="5 Stars" title="5 Stars" onmouseover="current_rating(336, 5, '5 Stars');" onmouseout="ratings_off(5, 0, 0);" onclick="rate_post();" onkeypress="rate_post();"> </span> <span class="rating"> <span class="average"><b>5.00</b></span> out of <span class="best">5</span>, <span class="votes">2</span> votes. </span> </span><meta itemprop="name" content="React server-side rendering"><meta itemprop="description" content="As already explained in the introduction to React, React views can be rendered on the server as well as on the client. Due to the virtual DOM this isn’t even especially complex. However it becomes a b..."><meta itemprop="url" content="http://devangelist.de/en/react-server-side-rendering/"></span><span> </span><span id="post-ratings-336-loading" class="post-ratings-loading"><img src="http://devangelist.de/en/wp-content/plugins/wp-postratings/images/loading.gif" width="16" height="16" alt="Loading ..." title="Loading ..." class="post-ratings-image">&nbsp;Loading ...</span><div class="wp-biographia-container-none"><div class="wp-biographia-pic"><img alt="" src="http://1.gravatar.com/avatar/3e5e355ab57af333967fc009867a67f2?s=100&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D100&amp;r=G" class="wp-biographia-avatar avatar-100 photo" height="100" width="100"></div><div class="wp-biographia-text"><h3>About the Author</h3><p><a href="http://devangelist.de/en/about-me" title="About Roberto Bez">Roberto Bez</a> is a passionate Webdeveloper and TechLead at HolidayCheck. For Roberto development is not only work or a job, but a great motivation and a new challange every day. Everything new and geeky, from new web-technologies to all kind of databases – he tries to introduce it in the daily development.</p></div></div><hr class="hr-row-divider"></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

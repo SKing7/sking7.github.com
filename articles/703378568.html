@@ -1,0 +1,539 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>CSP and transducers in JavaScript</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>CSP and transducers in JavaScript</h1>
+            <div class="post"><span>
+</span><p>Learning <a href="http://clojure.org/" title="Clojure">Clojure</a> has introduced me to some really fascinating ideas. I really believe in the importance of <a href="http://phuu.net/2012/10/01/try-something-new.html" title="Try Something New">trying new things</a>, so I've been playing with two of them — an old idea and a new one: the <a href="http://clojure.com/blog/2013/06/28/clojure-core-async-channels.html" title="Clojure core.async Channels">Clojure/core.async interpretation</a> of C. Hoare's <a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes" title="Communicating Sequential Processes">Communicating Sequential Processes</a> (CSP), and Rich Hickey's <a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming" title="TRANSDUCERS ARE COMING">transducers</a>, coming soon to a Clojure near you.</p><span>
+</span><p>Hopefully, this post will serve two purposes: to solidify these ideas in my mind by explaining them, and — by proxy — help someone else to understand. To weed out mistakes and weaknesses in my own thinking I'm pretty explicit each small conceptual step, particularly when it comes to transducers. It's a long one, but hopefully useful!</p><span>
+</span><p><strong>tl;dr</strong> — <a href="https://github.com/phuu/csp" title="phuu/csp">There's code on GitHub</a>.</p><span>
+</span><p>First, a quick introduction to the mass of prior work here...</p><span>
+</span><h3>CSP?</h3><span>
+</span><p><a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes" title="Communicating Sequential Processes">CSP</a> is a formalised way to describe communication in concurrent systems. If that's sounds a little dry, it's because it is — but like many a snore-inducing concept, when hurled at problems in the real world things get a whole lot more interesting. A bit like yoghurt.</p><span>
+</span><h3>core.async?</h3><span>
+</span><p>Just over a year ago an implementation of CSP called <a href="https://github.com/clojure/core.async" title="core.async">core.async</a> was released to the Clojure community, offering "facilities for async programming and communication." It introduced <a href="http://clojure.com/blog/2013/06/28/clojure-core-async-channels.html" title="Clojure core.async Channels">channels</a>, a <a href="http://www.youtube.com/watch?v=rI8tNMsozo0" title="Simplicity Matters — Rich Hickey">simple</a> way to coordinate <a href="http://en.wikipedia.org/wiki/Actor_model" title="The Actor model">entities</a> in a <a href="http://www.youtube.com/watch?v=ROor6_NGIWU" title="The Language of the System — Rich Hickey">system</a>. The library is compile-target agnostic so it can also be used from <a href="https://github.com/clojure/clojurescript" title="ClojureScript">ClojureScript</a>.</p><span>
+</span><h3>Transducers?</h3><span>
+</span><p>The most recent development in this epic saga (spanning almost <a href="https://assets.cs.ncl.ac.uk/seminars/224.pdf" title="Communicating Sequential Processes — C. A. R. Hoare">40 years</a> of computing history!) are <a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming" title="TRANSDUCERS ARE COMING">transducers</a>, a "powerful and composable way to build algorithmic transformations". Again dry but very powerful in use — and very hard for me to understand!</p><span>
+</span><p>Talks about <a href="http://www.youtube.com/watch?v=AhxcGGeh5ho" title="core.async — David Nolen">how these concepts tie together</a> fascinated me, and I've been <a href="https://github.com/phuu/om-do" title="phuu/om-do">toying with the ideas</a> using <a href="https://github.com/clojure/clojurescript" title="ClojureScript">ClojureScript</a> and <a href="https://github.com/swannodette" title="David Nolen (swannodette)">David Nolen</a>'s excellent <a href="https://github.com/swannodette/om" title="swannodette/om">Om</a> framework. In addition, these ideas tie closely with Twitter's <a href="https://flightjs.github.io/" title="Twitter Flight">Flight framework</a> on which I work.</p><span>
+</span><p>However I've never felt truly comfortable with what's going on under the hood, and since the best way to learn anything is to <em>do it yourself</em>, I've been experimenting!</p><span>
+</span><p>Oh, and just quickly — I'm not going to spend very much time on <em>why</em> you might want this stuff. Many of the links above will help.</p><span>
+</span><h3>What's the problem?</h3><span>
+</span><p>There's a whole stack of ideas that combine to make channels and transducers valuable, but I'll pick just one: <em>events are a bad primitive for data flow</em>. They require distribution of mutable state around your code, and it's not idiomatic or pleasant to flow data through events:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">pubsub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'users:response'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">users</span>
+        <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="o">!</span><span class="nx">user</span><span class="p">.</span><span class="nx">muted</span><span class="p">;</span>
+        <span class="p">})</span>
+        <span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">pubsub</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'posts:request'</span><span class="p">,</span> <span class="p">{</span>
+                <span class="nx">user</span><span class="o">:</span> <span class="nx">user</span><span class="p">.</span><span class="nx">id</span>
+            <span class="p">});</span>
+        <span class="p">})</span>
+    <span class="p">})</span>
+<span class="p">});</span>
+
+<span class="nx">pubsub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'posts:response'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">});</span>
+
+<span class="nx">pubsub</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'users:request'</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>Events are fine for one-shot notifications, but break down when you want to coordinate data from a number of sources. Event handlers tend to not be very reusable or composable.</p><span>
+</span><p>core.async's channels offer an alternative that is ideal for flow control, reuse and composability.</p><span>
+</span><blockquote>
+<p>I'll leave it to David Nolen to <a href="http://www.youtube.com/watch?v=AhxcGGeh5ho" title="core.async — David Nolen">show you why</a>.</p>
+</blockquote><span>
+</span><h3>Channels in JavaScript</h3><span>
+</span><p>The first step was to implement the core.async primitive — channels — and their fundamental operations: <code>put</code> and <code>take</code>.</p><span>
+</span><p>Channels are pretty simple: they support producers and consumers that <code>put</code> values to, and <code>take</code> values from, the channel. The default behaviour is "one-in, one-out" — a <code>take</code> from the channel will give you only the least-recently <code>put</code> value, and you have to explicitly <code>take</code> again to get the next value. They're like queues.</p><span>
+</span><p>It's immediately obvious that this decouples the producer and consumer – they each only have to know about the channel to communicate, and it's many-to-many: multiple producers can <code>put</code> values for multiple consumers to <code>take</code>.</p><span>
+</span><p>I'm not going to detail <a href="https://github.com/phuu/csp/blob/master/lib/channel.js" title="phuu/csp/lib/channel.js">the exact implementation</a> here, but making a new channel is as simple as asking for one: <code>var c = chan()</code>.</p><span>
+</span><p>You can try channels out in this JS Bin:</p><span>
+</span><p><a class="jsbin-embed" href="http://jsbin.com/bajenu/3/embed?js,console">JS Bin</a></p><span>
+</span><blockquote>
+<p>If you get errors, make sure to click 'Run'.</p>
+</blockquote><span>
+</span><p>Stuck for ideas? Try:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="o">&gt;</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">chan</span><span class="p">()</span>
+<span class="p">...</span>
+<span class="o">&gt;</span> <span class="nx">chan</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="p">...</span>
+<span class="o">&gt;</span> <span class="nx">chan</span><span class="p">.</span><span class="nx">take</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">console</span><span class="p">,</span> <span class="s1">'got: '</span><span class="p">))</span>
+<span class="nx">got</span><span class="o">:</span> <span class="mi">10</span>
+<span class="p">...</span>
+<span class="o">&gt;</span> <span class="nx">chan</span><span class="p">.</span><span class="nx">take</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">console</span><span class="p">,</span> <span class="s1">'got: '</span><span class="p">))</span>
+<span class="p">...</span>
+<span class="o">&gt;</span> <span class="nx">chan</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="nx">got</span><span class="o">:</span> <span class="mi">20</span>
+<span class="p">...</span>
+</code></pre></div><span>
+</span><p><strong>Nice</strong>. I've <a href="https://github.com/phuu/csp/blob/master/lib/channel.js" title="phuu/csp/lib/channel.js">added a few upgrades</a>, but fundamentally things stay the same.</p><span>
+</span><blockquote>
+<p>By the way... these ideas are firmly rooted in functional programming, so I'm avoiding methods defined on objects where possible, instead preferring functions that operate on simple data structures.</p>
+</blockquote><span>
+</span><p>We have working channels!</p><span>
+</span><h3>Transducers in JS</h3><span>
+</span><p>Above, transducers were described as a "powerful and composable way to build algorithmic transformations." While enticing, this doesn't really tell us much. Rich Hickey's <a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming" title="TRANSDUCERS ARE COMING">blog post</a>, from which that quote is taken, expands somewhat but I still found them very hard to comprehend.</p><span>
+</span><blockquote>
+<p>In fact, understanding them meant spending hours frustratedly scribbling on a mirror with a whiteboard pen.</p>
+</blockquote><span>
+</span><p>To me, transducers are a generic and <em>composable</em> way to operate on a collection of values, producing a new value or new collection of new values. The word 'transducer' itself can be split into two parts that reflect this definition: 'transform' — to produce some value from another — and 'reducer' — to combine the values of a data structure to produce a new one.</p><span>
+</span><p>To understand transducers I built up to them from first principles by taking a concrete example and incrementally making it more generic, and that's what we're going to do now.</p><span>
+</span><p>We're aiming for a <strong>"composable way to build algorithmic transformations."</strong></p><span>
+</span><p>I hope you're excited.</p><span>
+</span><p><img src="http://media.giphy.com/media/LvaswPm6IHn44/giphy.gif" alt="popcorn" title="Popcorn"></p><span>
+</span><h3>From the bottom to the top...</h3><span>
+</span><p>First, we have to realise that many array (or other collection) operations like <code>map</code>, <code>filter</code> and <code>reverse</code> can be defined in terms of a <code>reduce</code>.</p><span>
+</span><p>To start with, here's an example that maps over an array to increment all its values:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">input</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">})</span> <span class="c1">// =&gt; [2,3,4,5]</span>
+</code></pre></div><span>
+</span><p>Pretty simple. Note that two things are implicit here:</p><span>
+</span><ul>
+<li>The return value is built up from a new, empty array.</li>
+<li>Each value returned is added to the end of the new array as you would do manually using JavaScript's <code>concat</code>.</li>
+</ul><span>
+</span><p>With this in mind, we can convert the example to use <code>.reduce</code>:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">},</span> <span class="p">[])</span> <span class="c1">// =&gt; [2,3,4,5]</span>
+</code></pre></div><span>
+</span><hr><span>
+</span><p>To get around JavaScript's unfortunate Array <code>concat</code> behaviour, I've redefined it to a function called <code>concat</code> that adds a single value to an array:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="nx">b</span><span class="p">]);</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><hr><span>
+</span><blockquote>
+<p>By the way, we're about to get into higher-order function territory. If that makes you queasy, it might be time to <a href="http://shop.oreilly.com/product/0636920028857.do" title="Functional JavaScript — Michael Fogus">do some reading</a> and come back later!</p>
+</blockquote><span>
+</span><p>Our increment-map-using-reduce example isn't very generic, but we can make it more so by wrapping it up in a function that takes an array to be incremented:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">mapWithIncr</span><span class="p">(</span><span class="nx">collection</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">},</span> <span class="p">[]);</span>
+<span class="p">}</span>
+
+<span class="nx">mapWithIncrement</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span> <span class="c1">// =&gt; [2,3,4,5]</span>
+</code></pre></div><span>
+</span><p>This can be taken a step further by passing the transformation as a function. We'll make one called <code>inc</code>:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">inc</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>Using this with any collection requires another higher-order function, <code>map</code>, that combines the transform and the collection.</p><span>
+</span><p>This is where things start to get interesting: this function contains the <em>essence</em> of what it means to <code>map</code> — we <em>reduce</em> one collection to another by <em>transforming</em> the values and <em>concatenating</em> the results together.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">map</span><span class="p">(</span><span class="nx">transform</span><span class="p">,</span> <span class="nx">collection</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">transform</span><span class="p">(</span><span class="nx">input</span><span class="p">));</span>
+    <span class="p">},</span> <span class="p">[]);</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>In use, it looks like this:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">map</span><span class="p">(</span><span class="nx">inc</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span> <span class="c1">// =&gt; [2,3,4,5]</span>
+</code></pre></div><span>
+</span><p>Very nice.</p><span>
+</span><h3>Algorithmic transformations</h3><span>
+</span><p>So what's the next abstraction in our chain? It's perhaps worth restating the goal: a "composable way to build algorithmic transformations." There's two key phrases there: "algorithmic transformations" and "composable". We'll deal with them in that order.</p><span>
+</span><p><code>map</code>, defined above, is a kind of algorithmic transformation. Another I mentioned earlier is <code>filter</code>, so let's define that in same way we did for <code>map</code>.</p><span>
+</span><blockquote>
+<p>Filter better fits the word "reduce" because it can actually produce fewer values than it was given.</p>
+</blockquote><span>
+</span><p>We're going to quickly jump from a concrete example, through the <code>reduce</code> version, to a generic <code>filter</code> function that defines the <em>essence</em> of what it means to <code>filter</code>.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Basic filter</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">input</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">})</span> <span class="c1">// =&gt; [3,4]</span>
+
+<span class="c1">// Filter with reduce</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nx">input</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="o">?</span>
+            <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="o">:</span>
+            <span class="nx">result</span>
+    <span class="p">);</span>
+<span class="p">},</span> <span class="p">[])</span> <span class="c1">// =&gt; [3,4]</span>
+
+<span class="c1">// Transform (called the predicate)</span>
+<span class="kd">function</span> <span class="nx">greaterThanTwo</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">x</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// And finally, filter as function</span>
+<span class="kd">function</span> <span class="nx">filter</span><span class="p">(</span><span class="nx">predicate</span><span class="p">,</span> <span class="nx">collection</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nx">predicate</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="o">?</span>
+                <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="o">:</span>
+                <span class="nx">result</span>
+        <span class="p">);</span>
+    <span class="p">},</span> <span class="p">[])</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>In use, it looks like this:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">filter</span><span class="p">(</span><span class="nx">greaterThanTwo</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span> <span class="c1">// =&gt; [3,4]</span>
+</code></pre></div><span>
+</span><h3>Composable</h3><span>
+</span><p>Now we can construct a couple of different algorithmic transformations, we're missing "composable" bit from that original definition. We should fix that.</p><span>
+</span><p>How does composability apply to the algorithmic transformations we've already defined — <code>map</code> and <code>filter</code>? There are two ways to combine these transformations:</p><span>
+</span><ul>
+<li>Perform the first transformation on the whole collection before moving on to the second.</li>
+<li>Perform all transformations on the first element of the collection before moving on to the second.</li>
+</ul><span>
+</span><p>We can already do the former:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">filter</span><span class="p">(</span><span class="nx">greaterThanTwo</span><span class="p">,</span> <span class="nx">map</span><span class="p">(</span><span class="nx">inc</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span> <span class="c1">// =&gt; [3,4,5]</span>
+</code></pre></div><span>
+</span><p>We can even use <code>compose</code>:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">incrementAndFilter</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span>
+    <span class="nx">filter</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">greaterThanTwo</span><span class="p">),</span>
+    <span class="nx">map</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">inc</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nx">incrementAndFilter</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span> <span class="c1">// =&gt; [3,4,5]</span>
+</code></pre></div><span>
+</span><hr><span>
+</span><p><code>compose</code> is a function that combines functions:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">compose</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">g</span><span class="p">)(</span><span class="mi">10</span><span class="p">)</span> <span class="o">===</span> <span class="nx">f</span><span class="p">(</span><span class="nx">g</span><span class="p">(</span><span class="mi">10</span><span class="p">));</span>
+</code></pre></div><span>
+</span><hr><span>
+</span><p>However, this has a number of issues:</p><span>
+</span><ul>
+<li>It cannot be parallelised.</li>
+<li>It cannot be done lazily.</li>
+<li>The operations are tied very closely to input and output data structure.</li>
+</ul><span>
+</span><p>The converse is true for the latter way of combining the transformations, and so is the much more desirable end result.</p><span>
+</span><blockquote>
+<p>For a discussion of why this is the case, look into the <a href="http://en.wikipedia.org/wiki/Fork%E2%80%93join_model" title="Fork-join model">fork-join model</a>.</p>
+</blockquote><span>
+</span><p>Frankly, I found this extremely difficult; I just couldn't understand <em>how</em> they could be composed generically.</p><span>
+</span><p>Time to dig deeper, and talk about reducing functions.</p><span>
+</span><h3>Reducing functions</h3><span>
+</span><p>A reducing function is any function that can be passed to <code>reduce</code>. They have the form: <code>(something, input) -&gt; something</code>. They're the inner-most function in the <code>map</code> and <code>filter</code> examples.</p><span>
+</span><p>These are the things we need to be composing, but right now they are hidden away in <code>map</code> and <code>filter</code>.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">map</span><span class="p">(</span><span class="nx">transform</span><span class="p">,</span> <span class="nx">collection</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+        <span class="c1">// Reducing function!</span>
+        <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">transform</span><span class="p">(</span><span class="nx">input</span><span class="p">));</span>
+        <span class="p">},</span>
+        <span class="p">[]</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">filter</span><span class="p">(</span><span class="nx">predicate</span><span class="p">,</span> <span class="nx">collection</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+        <span class="c1">// Reducing function!</span>
+        <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="nx">predicate</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="o">?</span>
+                    <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="o">:</span>
+                    <span class="nx">result</span>
+            <span class="p">);</span>
+        <span class="p">},</span>
+        <span class="p">[]</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>To get at the reducing functions, we need to make <code>map</code> and <code>filter</code> more generic by extracting the pieces they have in common:</p><span>
+</span><ul>
+<li>Use of collection.reduce</li>
+<li>The 'seed' value is an empty array</li>
+<li>The <code>concat</code> operation performed on <code>result</code> and the <code>input</code> (<code>transform</code>-ed or not)</li>
+</ul><span>
+</span><hr><span>
+</span><p>First, let's pull out the use of <code>collection.reduce</code> and the seed value. Instead we can <em>produce reducing functions</em> and pass them to <code>.reduce</code>:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">mapper</span><span class="p">(</span><span class="nx">transform</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">transform</span><span class="p">(</span><span class="nx">input</span><span class="p">));</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">filterer</span><span class="p">(</span><span class="nx">predicate</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nx">predicate</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="o">?</span>
+                <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="o">:</span>
+                <span class="nx">result</span>
+        <span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">mapper</span><span class="p">(</span><span class="nx">inc</span><span class="p">),</span> <span class="p">[])</span> <span class="c1">// =&gt; [2,3,4,5]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">filterer</span><span class="p">(</span><span class="nx">greaterThanTwo</span><span class="p">),</span> <span class="p">[])</span> <span class="c1">// =&gt; [3,4]</span>
+</code></pre></div><span>
+</span><p>Nice! We're getting closer but we still cannot compose two or more reducing functions. The last piece of shared functionality is the key: the <code>concat</code> operation performed on <code>result</code> and the <code>input</code>.</p><span>
+</span><p>Remember we said that reducing functions have the form <code>(something, input) -&gt; something</code>? Well, concat is just one such function:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="nx">b</span><span class="p">]);</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>That means there's actually two reducing functions:</p><span>
+</span><ul>
+<li>One that defines the job (mapping, filtering, reversing...)</li>
+<li>Another that, within the job, combines the existing <code>result</code> with the <code>input</code></li>
+</ul><span>
+</span><p>So far we have only used <code>concat</code> for the latter, but who says we have to? Could we use <em>another, completely different reducing function</em> – like, say, one produced from <code>mapper</code>?</p><span>
+</span><p>Yes, we could.</p><span>
+</span><hr><span>
+</span><p>To build up to composing our reducing functions we'll start with a very explicit example, rewriting <code>filterer</code> to use <code>mapper</code> to combine the <code>result</code> with the <code>input</code>, and explore how the data flows around.</p><span>
+</span><p>Before we do that, we need a new function: <code>identity</code>. It simply returns whatever it is given:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">identity</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">x</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">mapper</span><span class="p">(</span><span class="nx">identity</span><span class="p">),</span> <span class="p">[])</span> <span class="c1">// =&gt; [1,2,3,4]</span>
+</code></pre></div><span>
+</span><p>We can rewrite filter to use <code>mapper</code> quite easily:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">lessThanThree</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">x</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">mapper</span><span class="p">(</span><span class="nx">transform</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">concat</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">transform</span><span class="p">(</span><span class="nx">input</span><span class="p">));</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">filterer</span><span class="p">(</span><span class="nx">predicate</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nx">predicate</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="o">?</span>
+                <span class="nx">mapper</span><span class="p">(</span><span class="nx">identity</span><span class="p">)(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="o">:</span>
+                <span class="nx">result</span>
+        <span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">filterer</span><span class="p">(</span><span class="nx">lessThanThree</span><span class="p">),</span> <span class="p">[])</span> <span class="c1">// =&gt; [1,2]</span>
+</code></pre></div><span>
+</span><p>To see how this works, let's step through it:</p><span>
+</span><ol>
+<li><code>filterer(lessThanThree)</code> produces a reducing function which is passed to <code>.reduce</code>.</li>
+<li>The reducing function is passed <code>result</code> — currently <code>[]</code> — and the first <code>input</code> — <code>1</code>.</li>
+<li>The <code>predicate</code> is called and returns <code>true</code>, so the first expression in the ternary is evaluated.</li>
+<li><code>mapper(identity)</code> returns a reducing function, then called with <code>[]</code> and <code>1</code>.
+<ol>
+<li>The reducing function's <code>transform</code> function — <code>identity</code> — is called, returning the same input it was given.</li>
+<li>The input is <code>concat</code>-ed onto the <code>result</code> and returned.</li>
+</ol></li>
+<li>The new result — now <code>[1]</code> — is returned, and so the <code>reduce</code> cycle continues.</li>
+</ol><span>
+</span><blockquote>
+<p>I'd recommend running this code and looking for yourself!</p>
+</blockquote><span>
+</span><p>What has this gained us? Well, now we can see that a reducing function can make use of another reducing function – it doesn't have to be <code>concat</code>!</p><span>
+</span><p>In fact, if we altered <code>filterer</code> to use <code>mapper(inc)</code>, we'd get:</p><span>
+</span><div class="highlight"><pre><code class="language-text" data-lang="text">[1,2,3,4].reduce(filterer(lessThanThree), []) // =&gt; [2,3]
+</code></pre></div><span>
+</span><hr><span>
+</span><p>This is starting to feel a lot like composable algorithmic transformation, but we don't want to be manually writing composed functions – we want to use <code>compose</code>!</p><span>
+</span><p>If we pull out the inner reducing function (the combiner), we make reducing functions that express the essence of their job without being tied to any particular way of combining their arguments.</p><span>
+</span><p>We'll change the names again to express the nature of what's going on here:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">mapping</span><span class="p">(</span><span class="nx">transform</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">reduce</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">reduce</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">transform</span><span class="p">(</span><span class="nx">input</span><span class="p">));</span>
+        <span class="p">};</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">filtering</span><span class="p">(</span><span class="nx">predicate</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">reduce</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="nx">predicate</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="o">?</span>
+                    <span class="nx">reduce</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="o">:</span>
+                    <span class="nx">result</span>
+            <span class="p">);</span>
+        <span class="p">};</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>Those new inner functions – the ones that take a <code>reduce</code> function — are <strong>transducers</strong>. They encapsulate some reducing behaviour without caring about the nature of the <code>result</code> data structure.</p><span>
+</span><p>In fact, we've offloaded the responsibility of combining the transformed <code>input</code> with the <code>result</code> to the <em>user</em> of the transducer, rather than expressing it within the reducing function. This means we can reduce generically into any data structure!</p><span>
+</span><p>Let's see this in use by creating that filtering-and-incrementing transducer again:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">filterLessThanThreeAndIncrement</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span>
+    <span class="nx">filtering</span><span class="p">(</span><span class="nx">lessThanThree</span><span class="p">),</span>
+    <span class="nx">mapping</span><span class="p">(</span><span class="nx">inc</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">filterLessThanThreeAndIncrement</span><span class="p">(</span><span class="nx">concat</span><span class="p">),</span> <span class="p">[])</span> <span class="c1">// =&gt; [2,3]</span>
+</code></pre></div><span>
+</span><p>Wow. Notice:</p><span>
+</span><ul>
+<li>We only specify the seed data structure once, when we use the transducer.</li>
+<li>We only tell the transducers how to combine their <code>input</code> with the <code>result</code> once (in this case, with <code>concat</code>), by passing it to the <code>filterLessThanThreeAndIncrement</code> transducer.</li>
+</ul><span>
+</span><p>To prove that this works, let's turn it into an object with the resulting values as keys <em>without altering the reducing functions</em>.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">filterLessThanThreeAndIncrement</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">result</span><span class="p">[</span><span class="nx">input</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+<span class="p">}),</span> <span class="p">{})</span> <span class="c1">// =&gt; { 2: true, 3: true }</span>
+</code></pre></div><span>
+</span><p><img src="http://media2.giphy.com/media/elDpPAkoxtnmE/giphy.gif" alt="Woo!" title="Woop!"></p><span>
+</span><hr><span>
+</span><p>Let's try it with some more complex data. Say we have some <code>posts</code>:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">posts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">'Agatha'</span><span class="p">,</span>  <span class="nx">text</span><span class="o">:</span> <span class="s1">'just setting up my pstr'</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">'Bert'</span><span class="p">,</span>    <span class="nx">text</span><span class="o">:</span> <span class="s1">'Ed Balls'</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">'Agatha'</span><span class="p">,</span>  <span class="nx">text</span><span class="o">:</span> <span class="s1">'@Bert fancy a thumb war?'</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">'Charles'</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="s1">'#subtweet'</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">'Bert'</span><span class="p">,</span>    <span class="nx">text</span><span class="o">:</span> <span class="s1">'Ed Balls'</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">'Agatha'</span><span class="p">,</span>  <span class="nx">text</span><span class="o">:</span> <span class="s1">'@Bert m('</span> <span class="p">}</span>
+<span class="p">];</span>
+</code></pre></div><span>
+</span><p>Let's pull out who's talked to who and build a graph-like data structure.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">graph</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">result</span><span class="p">[</span><span class="nx">input</span><span class="p">.</span><span class="nx">from</span><span class="p">]</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="nx">input</span><span class="p">.</span><span class="nx">from</span><span class="p">]</span> <span class="o">||</span> <span class="p">[];</span>
+    <span class="nx">result</span><span class="p">[</span><span class="nx">input</span><span class="p">.</span><span class="nx">from</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">to</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">extractMentions</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span>
+    <span class="c1">// Find mentions</span>
+    <span class="nx">filtering</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">post</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">post</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^@/</span><span class="p">);</span>
+    <span class="p">}),</span>
+    <span class="c1">// Build object with {from, to} keys</span>
+    <span class="nx">mapping</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">post</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="nx">from</span><span class="o">:</span> <span class="nx">post</span><span class="p">.</span><span class="nx">author</span><span class="p">,</span>
+            <span class="nx">to</span><span class="o">:</span> <span class="nx">post</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^@/</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+        <span class="p">};</span>
+    <span class="p">})</span>
+<span class="p">);</span>
+
+<span class="nx">posts</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">extractMentions</span><span class="p">(</span><span class="nx">graph</span><span class="p">),</span> <span class="p">{})</span> <span class="cm">/* =&gt;</span>
+<span class="cm">    { Agatha:  ['Bert', 'Charles'],</span>
+<span class="cm">      Bert:    ['Agatha'],</span>
+<span class="cm">      Charles: ['Bert'] } */</span>
+</code></pre></div><span>
+</span><h3>Applying transducers to channels</h3><span>
+</span><p>Now we have all the parts of a "composable way to build algorithmic transformations" we can start applying them to any data pipeline – so let's try channels. Again, I'm not going to show you the <a href="https://github.com/phuu/csp/blob/master/lib/channel.js" title="phuu/csp/lib/channel.js">channel-level implementation</a>, just some usage examples.</p><span>
+</span><p>We're going to listen for DOM events and put them into a channel that filters only those that occur on even x &amp; y positions and maps them into a triple of <code>[type, x, y]</code>.</p><span>
+</span><p>First, two additions to our function library:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Put DOM events into the supplied a channel</span>
+<span class="kd">function</span> <span class="nx">listen</span><span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">elem</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">chan</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">even</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><span>
+</span><p>Now let's create a channel, and pass it a transducer. The transducer will be used to reduce the data that comes down the channel.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">chan</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="c1">// Fixed buffer size (only one event allowed)</span>
+    <span class="nx">compose</span><span class="p">(</span>
+        <span class="c1">// Only events with even x &amp; y</span>
+        <span class="nx">filtering</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="nx">even</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+                <span class="nx">even</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span><span class="p">)</span>
+            <span class="p">);</span>
+        <span class="p">}),</span>
+        <span class="c1">// e -&gt; [type, x, y]</span>
+        <span class="nx">mapping</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span><span class="p">];</span>
+        <span class="p">})</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</code></pre></div><span>
+</span><p>Next we'll hook-up the events and the channel:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">listen</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">'mousemove'</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
+</code></pre></div><span>
+</span><p>And, finally, <code>take</code> in a recursive loop:</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">(</span><span class="kd">function</span> <span class="nx">recur</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">chan</span><span class="p">.</span><span class="nx">take</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'got'</span><span class="p">,</span> <span class="nx">v</span><span class="p">);</span>
+        <span class="nx">recur</span><span class="p">()</span>
+    <span class="p">});</span>
+<span class="p">}());</span>
+</code></pre></div><span>
+</span><p>Running this code, you should see lots of events in your console – but only those with even x &amp; y positions:</p><span>
+</span><div class="highlight"><pre><code class="language-text" data-lang="text">&gt; got ["mousemove", 230, 156]
+&gt; got ["mousemove", 232, 158]
+&gt; got ["mousemove", 232, 160]
+&gt; got ["mousemove", 234, 162]
+</code></pre></div><span>
+</span><h3>Stateful transducers</h3><span>
+</span><p>Finally, let's take a look at a stateful transducer, building a <code>gateFilter</code> to detect "dragging" using <code>mousedown</code> and <code>mouseup</code> event, and a <code>keyFilter</code> that matches against a property of the channel data.</p><span>
+</span><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">gateFilter</span><span class="p">(</span><span class="nx">opener</span><span class="p">,</span> <span class="nx">closer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">open</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">opener</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">open</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">closer</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">open</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">open</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">keyFilter</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">===</span> <span class="nx">value</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">chan</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span>
+    <span class="nx">compose</span><span class="p">(</span>
+        <span class="c1">// Only allow through when mouse has been down</span>
+        <span class="nx">filtering</span><span class="p">(</span><span class="nx">gateFilter</span><span class="p">(</span><span class="s1">'mousedown'</span><span class="p">,</span> <span class="s1">'mouseup'</span><span class="p">)),</span>
+        <span class="c1">// Filter by e.type === 'mousemove'</span>
+        <span class="nx">filtering</span><span class="p">(</span><span class="nx">keyFilter</span><span class="p">(</span><span class="s1">'type'</span><span class="p">,</span> <span class="s1">'mousemove'</span><span class="p">)),</span>
+        <span class="c1">// e -&gt; [type, x, y]</span>
+        <span class="nx">mapping</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span><span class="p">];</span>
+        <span class="p">})</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// Listen for relevant events</span>
+<span class="nx">listen</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">'mousemove'</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
+<span class="nx">listen</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">'mouseup'</span><span class="p">,</span>   <span class="nx">c</span><span class="p">);</span>
+<span class="nx">listen</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">'mousedown'</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
+
+<span class="c1">// Take in a loop</span>
+<span class="p">(</span><span class="kd">function</span> <span class="nx">recur</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">chan</span><span class="p">.</span><span class="nx">take</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'got'</span><span class="p">,</span> <span class="nx">v</span><span class="p">);</span>
+        <span class="nx">recur</span><span class="p">()</span>
+    <span class="p">});</span>
+<span class="p">}());</span>
+</code></pre></div><span>
+</span><p>Whew. Pretty cool, eh?</p><span>
+</span><h3>And finally...</h3><span>
+</span><p>I think there's a great deal of expressive power here, particularly in making it easy to reason about data flow in large application.</p><span>
+</span><p>My real goal is to explore <a href="http://en.wikipedia.org/wiki/Actor_model" title="The Actor model">the Actor model</a> as it relates to front-end engineering, particularly in preventing an explosion of complexity with increasing scale. It's the model <a href="https://flightjs.github.io/" title="Twitter Flight">Flight</a> uses, but I'm not wholly convinced events — while perfect for one-shot notifications — are the right primitive for coordinating behaviour and flow-control.</p><span>
+</span><p>The result of this work is <a href="https://github.com/phuu/csp" title="phuu/csp">on Github</a> so please do check that out, and <a href="http://phuu.net/cdn-cgi/l/email-protection#3e4a59485f4d5649514c4a567e59535f5752105d5153" title="Email me!">email</a> or <a href="https://twitter.com/phuunet" title="@phuunet">Tweet</a> me with feedback.</p><span>
+</span><p>Finally finally, a massive thank-you to <a href="https://twitter.com/sil" title="Stuart Langridge">Stuart</a> &amp; <a href="https://twitter.com/passy" title="Pascal Hartig">Passy</a> who gave me top-notch feedback on this article!</p><span>
+ 
+</span><script data-rocketsrc="http://static.jsbin.com/js/embed.js" type="text/rocketscript"></script><span>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
