@@ -44,7 +44,7 @@
     };
     self._onSearch = function(event) {
       if(event.type == 'keydown')
-        return setTimeout(callSearch, 200);
+        return setTimeout(callSearch, 100);
       callSearch();
     };
     self.destroy = function() {
