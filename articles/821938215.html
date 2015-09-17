@@ -1,0 +1,44 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The Ins and Outs of Token Based Authentication</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>The Ins and Outs of Token Based Authentication</h1>
+            <div class="tile-content"><span>
+</span><span>
+</span><h3>Stateless and Scalable</h3><span>
+</span><span>
+</span><p>Tokens stored on client side. Completely stateless, and ready to be scaled. Our load balancers are able to pass a user along to any of our servers since there is no state or session information anywhere.</p><span>
+</span><p>If we were to keep session information on a user that was logged in, this would require us to keep sending that user to the <em>same server that they logged in at</em> (called session affinity).</p><span>
+</span><p>This brings problems since, some users would be forced to the same server and this could bring about a spot of heavy traffic.</p><span>
+</span><p>Not to worry though! Those problems are gone with tokens since the token itself holds the data for that user.</p><span>
+</span><h3>Security</h3><span>
+</span><span>
+</span><p>The token, not a cookie, is sent on every request and since there is no cookie being sent, this helps to prevent CSRF attacks. Even if your specific implementation stores the token within a cookie on the client side, the cookie is merely a storage mechanism instead of an authentication one. There is no session based information to manipulate since we don’t have a session!</p><span>
+</span><p>The token also expires after a set amount of time, so a user will be required to login once again. This helps us stay secure. There is also the concept of <a href="https://tools.ietf.org/html/rfc7009">token revocation</a> that allows us to invalidate a specific token and even a group of tokens based on the same authorization grant.</p><span>
+</span><h3>Extensibility (Friend of A Friend and Permissions)</h3><span>
+</span><span>
+</span><p>Tokens will allow us to build applications that share permissions with another. For example, we have linked random social accounts to our major ones like Facebook or Twitter.</p><span>
+</span><p>When we login to Twitter through a service (let’s say Buffer), we are allowing Buffer to post to our Twitter stream.</p><span>
+</span><p>By using tokens, this is how we <strong>provide selective permissions to third-party applications</strong>. We could even build our own API and hand out special permission tokens if our users wanted to give access to their data to another application.</p><span>
+</span><h3>Multiple Platforms and Domains</h3><span>
+</span><p>We talked a bit about CORS earlier. When our application and service expands, we will need to be providing access to all sorts of devices and applications (since our app will most definitely become popular!).</p><span>
+</span><p>Having our API just serve data, we can also make the design choice to serve assets from a CDN. This eliminates the issues that CORS brings up after we set a quick header configuration for our application.</p><span>
+</span><pre><code class="language-javascript">
+Access-Control-Allow-Origin: *
+</code></pre><span>
+</span><p>Our data and resources are available to requests from any domain now <strong>as long as a user has a valid token</strong>.</p><span>
+</span><h3>Standards Based</h3><span>
+</span><p>When creating the token, you have a few options. We’ll be diving more into this topic when we secure an API in a follow-up article, but the standard to use would be <a href="https://scotch.io/tutorials/the-anatomy-of-a-json-web-token">JSON Web Tokens</a>.</p><span>
+</span><p>This handy debugger and library chart shows the support for JSON Web Tokens. You can see that it has a great amount of support across a variety of languages. This means you could actually switch out your authentication mechanism if you choose to do so in the future!</p><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

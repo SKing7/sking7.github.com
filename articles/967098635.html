@@ -1,0 +1,130 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Node.js Interview Questions and Answers</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+            <h1>Node.js Interview Questions and Answers</h1>
+            <section class="post-content">
+
+<p>There are two sides of the table: <em>you either <strong>want to hire</strong> Node.js developers</em> <strong>or</strong> <em>you want to <strong>get hired</strong> as a Node.js developer</em>. This list helps you navigate a bit in this space, giving you some questions to ask, and a list of questions you should know the answer to.</p>
+<p>Before jumping right into the questions I want to point out three really important things.</p>
+<p>First of all, these questions are just scratching the surface. It is <strong>never a good practice to judge someone just by questions like these</strong>, but it can give you an overview of the person's experience in Node.js. <strong>These type of questions do not give you the big picture of someone's mindset and thinking</strong>.</p>
+<p>Secondly, a <strong>real-life problem</strong> can show a lot more of a candidate's knowledge - we love to do pair programming with the people we hire.</p>
+<p>Thirdly, but most importantly: <strong>we are all humans, make your hiring process as welcoming as possible</strong>.</p>
+
+<ul>
+<li>What is an error-first callback?</li>
+<li>How can you avoid callback hells?</li>
+<li>How can you listen on port 80 with Node?</li>
+<li>What's the event loop?</li>
+<li>What tools can be used to assure consistent style?</li>
+<li>What's the difference between operational and programmer errors?</li>
+<li>Why npm shrinkwrap is useful?</li>
+<li>What's a stub? Name a use case.</li>
+<li>What's a test pyramid? How can you implement it when talking about HTTP APIs?</li>
+<li>What's your favourite HTTP framework and why?</li>
+</ul>
+<p><strong>Now let's see the answers!</strong></p>
+<h3 id="whatisanerrorfirstcallback">What is an error-first callback?</h3>
+<p>Error-first callbacks are used to pass errors and data. The first argument is always an error object that the programmer has to check if something went wrong. Additional arguments are used to pass data.</p>
+<pre><code>fs.readFile(filePath, function(err, data) {  
+  if (err) {
+    //handle the error
+  }
+  // use the data object
+});
+</code></pre>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>The answer for this question will get you some insight on whether the candidate has some basic knowledge on how async operations work in Node.</p>
+<h3 id="howcanyouavoidcallbackhells">How can you avoid callback hells?</h3>
+<p>To do so you have more options:</p>
+<ul>
+<li><strong>modularization</strong>: break callbacks into independent functions</li>
+<li>use <em>Promises</em></li>
+<li>use <code>yield</code> with <em>Generators</em> and/or <em>Promises</em></li>
+</ul>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>The answer for this question may vary a lot, depending on how up-to-date one is, how closely is she following the latest developments, be it ES6, ES7 or just a new control flow library.</p>
+<h3 id="howcanyoulistenonport80withnode">How can you listen on port 80 with Node?</h3>
+<p><strong>Trick question!</strong> You should not try to listen with Node on port 80 <em>(in Unix-like systems)</em> - to do so you would need superuser rights, but it is not a good idea to run your application with it.</p>
+<p>Still, if you want to have your Node.js application listen on port 80, here is what you can do. Run the application on any port above 1024, then put a reverse proxy like <a href="http://nginx.org/">nginx</a> in front of it.</p>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>This question helps you to find out whether the one you are talking to has any experience operating Node applications.</p>
+<h3 id="whatstheeventloop">What's the event loop?</h3>
+<p><em>TL;DR:</em></p>
+<blockquote>
+<p>It is a magical place filled with unicorns and rainbows - <a href="https://twitter.com/trevnorris">Trevor Norris</a></p>
+</blockquote>
+<p>Node.js runs using a single thread, at least from a Node.js developer's point of view. Under the hood Node.js uses many threads through libuv.</p>
+<p>Every I/O requires a callback - once they are done they are pushed onto the event loop for execution. If you need a more detailed explanation, I suggest viewing this video:</p>
+
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>This will give you an insight on how deep someone's knowledge on Node is, if she/he knows what libuv is.</p>
+<h3 id="whattoolscanbeusedtoassureconsistentstyle">What tools can be used to assure consistent style?</h3>
+<p>You have plenty of options to do so:</p>
+
+<p>These tools are really helpful when developing code in teams, to enforce a given style guide and to catch common errors using static analysis.</p>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>With this you will have some idea if the one you are talking to has any experience on how large scale JavaScript applications should be developed.</p>
+<h3 id="whatsthedifferencebetweenoperationalandprogrammererrors">What's the difference between operational and programmer errors?</h3>
+<p>Operation errors are not bugs, but problems with the system, like <em>request timeout</em> or <em>hardware failure</em>.</p>
+<p>On the other hand programmer errors are actual bugs.</p>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>As this question has little to do with Node, you can get a more general idea on the candidate's level.</p>
+<h3 id="whynpmshrinkwrapisuseful">Why npm shrinkwrap is useful?</h3>
+<blockquote>
+<p>This command locks down the versions of a package's dependencies so that you can control exactly which versions of each dependency will be used when your package is installed. - <a href="https://docs.npmjs.com/cli/shrinkwrap">npmjs.com</a></p>
+</blockquote>
+<p>It is useful when you are deploying your Node.js applications - with it you can be sure which versions of your dependencies are going to be deployed.</p>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>This questions helps to get a deeper understanding on the candidate's knowledge of both the npm cli and Node.js operational best practices.</p>
+<h3 id="whatsastubnameausecase">What's a stub? Name a use case.</h3>
+<p>Stubs are functions/programs that simulate the behaviours of components/modules. Stubs provide canned answers to function calls made during test cases. Also, you can assert on with what these stubs were called.</p>
+<p>A use-case can be a file read, when you do not want to read an actual file:</p>
+<pre><code>var fs = require('fs');
+
+var readFileStub = sinon.stub(fs, 'readFile', function (path, cb) {  
+  return cb(null, 'filecontent');
+});
+
+expect(readFileStub).to.be.called;  
+readFileStub.restore();  
+</code></pre>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>This question helps to get some clue on one's testing knowledge - if she/he don't know what stubs are you can ask how she/he does unit testing. </p>
+<h3 id="whatsatestpyramidhowcanyouimplementitwhentalkingabouthttpapis">What's a test pyramid? How can you implement it when talking about HTTP APIs?</h3>
+<p>A test pyramid describes that when writings test cases there should be a lot more low-level unit tests than high level end-to-end tests.</p>
+<p>When talking about HTTP APIs, it may come down to this:</p>
+<ul>
+<li>a lot of low-level unit tests for your models </li>
+<li>less integration tests, where your test how your models interact with each other</li>
+<li>a lot less acceptance tests, where you test the actual HTTP endpoints</li>
+</ul>
+<h5 id="howdoesthisquestionhelp"><em>How does this question help?</em></h5>
+<p>How experienced your candidate in testing? This question will tell a lot about that, especially if she/he can go into the details of each level, and for each level what kind of tools can be used.</p>
+<h3 id="whatsyourfavouritehttpframeworkandwhy">What's your favourite HTTP framework and why?</h3>
+<p>There is no right answer for this. The goal here is to understand how deeply one knows the framework she/he uses, if can reason about it, knows the pros, cons.</p>
+<h3 id="thingsthatworkbetterthanthesequestions">Things that work better than these questions</h3>
+<p>As you may already guessed, we are not huge fans of these type of questions. Instead we do believe in <strong>small, real-life problems</strong>, solved together. During these you will get a <strong>very good understanding of how one thinks</strong>. But not just that. You will know if she/he <strong>is a good fit for your team</strong>, as you have to solve something together. </p>
+<p>When we are hiring <em>(and we are always hiring)</em> we usually look for a combination of the following:</p>
+<ul>
+<li>cultural fit
+<ul><li>transparency</li>
+<li>self-improvement</li>
+<li>bias towards clarity</li>
+<li>do things smarter than harder</li></ul></li>
+<li>skill and expertise</li>
+</ul>
+<p><strong>Spending as little as half a day with your possible next co-worker is worth more than a thousand questions.</strong></p>
+<p><em>Do you have an interesting hiring story with Node.js? Please share your story in the comments below!</em> </p>
+</section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
