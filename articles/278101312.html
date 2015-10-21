@@ -1,0 +1,85 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Shallow and retained sizes</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Shallow and retained sizes</h1>
+                <div id="yk_help_content_cell"><span>
+</span><span>
+
+  </span><p>
+    YourKit Java Profiler is capable of measuring <i>shallow</i> and <i>retained</i> sizes of objects.
+  </p><span>
+
+  </span><p>
+    <b>Shallow size</b> of an object is the amount of memory allocated to store the object itself, not taking into account the referenced
+    objects. Shallow size of a regular (non-array) object depends on the number and types of
+    its fields. Shallow size of an array depends on the array length and the type of its elements (objects, primitive types).
+    Shallow size of a set of objects represents the sum of shallow sizes of all objects in the set.
+  </p><span>
+
+  </span><p>
+    <b>Retained size</b> of an object is its shallow size plus the shallow sizes of the objects that are accessible,
+    directly or indirectly, <b>only</b> from this object. In other words, the retained size represents the
+    amount of memory that will be freed by the garbage collector when this object is collected.
+  </p><span>
+
+  </span><p>
+    To better understand the notion of the <b>retained size</b>, let us look at the following examples:
+  </p><span>
+
+  </span><p>
+    In order to measure the retained sizes, all objects in memory are treated as nodes of a graph where its edges represent references from objects to objects.
+    There are also special nodes - <i>GC root</i> objects, which will not be collected by <i>Garbage Collector</i> at the time of measuring
+    (read more about <a href="https://www.yourkit.com/docs/java/help/gc_roots.jsp">GC roots</a>).
+  </p><span>
+
+  </span><p>
+  The pictures below show the same set of objects, but with varying internal references.
+  </p><span>
+  </span><table width="100%">
+    <tbody><tr valign="top">
+      <td align="left"><p><b>Figure 1:</b></p></td>
+      <td align="left"><p><b>Figure 2:</b></p></td>
+    </tr>
+    <tr valign="bottom">
+      <td><img alt="" src="https://www.yourkit.com/docs/java/help/retained_objects.gif"></td>
+      <td><img alt="" src="https://www.yourkit.com/docs/java/help/retained_objects_2.gif"></td>
+    </tr>
+  </tbody></table><span>
+  </span><p>
+  Let us consider <i>obj1</i>.<br>As you can see, in both pictures we have highlighted all of the objects that are directly or indirectly accessed <b>only</b> by <i>obj1</i>.
+  If you look at Figure 1, you will see that <i>obj3</i> is not highlighted,
+  because it is also referenced by a <i>GC root</i> object. On Figure 2, however, it is already included into
+  the retained set, unlike <i>obj5</i>, which is still referenced by <i>GC root</i>.
+  </p><span>
+  </span><p>
+  Thus, the retained size of <i>obj1</i> will represent the following respective values:
+  </p><span>
+  </span><ul>
+    <li>For Figure 1: the sum of shallow sizes of <i>obj1</i>, <i>obj2</i> and <i>obj4</i></li>
+    <li>For Figure 2: the sum of shallow sizes of <i>obj1</i>, <i>obj2</i>, <i>obj3</i> and <i>obj4</i></li>
+  </ul><span>
+  </span><p>
+    Looking at <i>obj2</i>, however, we see that its retained size in the above cases will be:
+  </p><span>
+  </span><ul>
+    <li>For Figure 1: the sum of shallow sizes of <i>obj2</i> and <i>obj4</i></li>
+    <li>For Figure 2: the sum of shallow sizes of <i>obj2</i>, <i>obj3</i> and <i>obj4</i></li>
+  </ul><span>
+  </span><p>
+    In general, retained size is an integral measure, which helps to understand the structure (clustering) of memory
+    and the dependencies between object subgraphs, as well as find potential roots of those subgraphs.
+  </p><span>
+</span><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

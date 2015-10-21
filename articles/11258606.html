@@ -1,0 +1,32 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Flushing the Document Early</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Flushing the Document Early</h1>
+                <div id="post-386" class="post-386 post type-post status-publish format-standard hentry category-books category-efws category-performance tag-chunked-encoding tag-even-faster-web-sites tag-flushing tag-web-performance"><span>
+        	            	</span><span>
+            
+			</span><!-- .entry-meta --><span>
+
+			</span><p><em>This post is based on a chapter from <a href="http://www.amazon.com/gp/product/0596522304?ie=UTF8&amp;tag=stevsoud-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0596522304"><span>Even Faster Web Sites</span></a>, the follow-up to <a href="http://www.amazon.com/dp/0596529309?tag=stevsoud-20&amp;camp=14573&amp;creative=327641&amp;linkCode=as1&amp;creativeASIN=0596529309&amp;adid=1S1KP4EV129EN37422C0&amp;"><span>High Performance Web Sites</span></a>. </em><em>Posts in this series include: <a href="http://www.stevesouders.com/blog/2009/04/23/even-faster-web-sites/">chapters and contributing authors</a>, <a href="http://www.stevesouders.com/blog/2008/05/14/split-the-initial-payload/">Splitting the Initial Payload</a>, <a href="http://www.stevesouders.com/blog/2009/04/27/loading-scripts-without-blocking/">Loading Scripts Without Blocking</a>, <a href="http://www.stevesouders.com/blog/2008/12/27/coupling-async-scripts/">Coupling Asynchronous Scripts</a>, <a href="http://www.stevesouders.com/blog/2009/05/06/positioning-inline-scripts/">Positioning Inline Scripts</a>, <a href="http://www.stevesouders.com/blog/2009/05/12/sharding-dominant-domains/">Sharding Dominant Domains</a>, <a href="http://www.stevesouders.com/blog/2009/05/18/flushing-the-document-early/">Flushing the Document Early</a>, </em><em><a href="http://www.stevesouders.com/blog/2009/06/03/using-iframes-sparingly">Using Iframes Sparingly</a>, and <a href="http://www.stevesouders.com/blog/2009/06/18/simplifying-css-selectors/">Simplifying CSS Selectors</a>.</em></p><span>
+</span><span>
+</span><p><em></em>The Performance Golden Rule reminds us that for most web sites, 80-90% of the load time is on the front end. However, for some pages, the time it takes the back end to generate the HTML document is more than 10-20% of the overall page load time. Even if the HTML document is generated quickly on the back end, it may still take a long time before it’s received by the browser for users in remote locations or with slow connections. While the HTML document is being generated on the back end and sent over the wire, the browser is waiting idly. What a waste! Instead of letting the browser sit there doing nothing, web developers can use flushing to jumpstart page loading even before the HTML document response is fully received.</p><span>
+</span><p><em>Flushing</em> is when the server sends the initial part of the HTML document to the client before the entire response is ready. All major browsers start parsing the partial response. When done correctly, flushing results in a page that loads and feels faster. The key is choosing the right point at which to flush the partial HTML document response. The flush should occur <em>before</em> the expensive parts of the back end work, such as database queries and web service calls. But the flush should occur <em>after</em> the initial response has enough content to keep the browser busy. The part of the HTML document that is flushed should contain some resources as well as some visible content. If resources (e.g., stylesheets, external scripts, and images) are included, the browser gets an early start on its download work. If some visible content is included, the user receives feedback sooner that the page is loading.</p><span>
+</span><p>Most HTML templating languages, including PHP, Perl, Python, and Ruby, contain a “flush” function. Getting flushing to work can be tricky. Problems arise when output is buffered, chunked encoding is disabled, proxies or anti-virus software interfere, or the flushed response is too small. Scanning the comments in <a href="http://www.php.net/flush">PHP’s flush documentation</a> shows that it can be hard to get all the details correct. Perhaps that’s why most of the U.S. top 10 sites don’t flush the document early. One that does is Google Search.</p><span>
+</span><div><img title="Google Search flushing early" src="http://stevesouders.com/efws/images/1204-flush-google-search-waterfall.gif" alt="Google Search flushing early" width="353" height="82" border="1"><strong>Google Search flushing early</strong><span>
+</span></div><span>
+</span><p>The HTTP waterfall chart for Google Search shows the benefits of flushing the document early. While the HTML document response (the first bar) is still being received, the browser has already started downloading one of the images used in the page, <a href="http://www.google.com/images/nav_logo4.png">nav_logo4.png</a> (the second bar). By flushing the document early, you make your pages start downloading resources and rendering content more quickly. This is a benefit that all users will appreciate, especially those with slow Internet connections and high latency.</p><span>
+            
+            			
+		</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

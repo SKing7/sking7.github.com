@@ -1,0 +1,69 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>See Raw Headers with Netcat</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>See Raw Headers with Netcat</h1>
+                <div class="content"><p>  
+
+
+Getting response headers is easy: run <tt>curl -D- -o/dev/null -sS
+[url]</tt> or load the site in a browser with the networking tab open.
+Getting request headers is harder, because webservers don't have a way
+to dump this exactly as they received it.  Yes, you can set them to
+log specific headers, but logging all headers exactly as they came over
+the wire isn't something I see in nginx or apache.  Netcat can help
+here.  Start it up on some unused port:
+
+
+</p><pre>    nc -lp 8070
+</pre><span>
+
+Now make the thing you're debugging visit </span><tt>yoursite:8070</tt><span>.
+Netcat will print out what headers you got:
+
+</span><pre>    GET / HTTP/1.1
+    Host: www.jefftk.com:8070
+    Referer: http://www.jefftk.com/...
+    Accept-Encoding: gzip,deflate
+    Cache-Control: no-store, no-cache
+    Accept-Language: en-US
+    Connection: Keep-alive
+    Accept: */*
+    Accept-Encoding: gzip,deflate
+    ...
+</pre><span>
+
+See the duplicate </span><tt>Accept-Encoding</tt><span> header?  It turned out that
+A was adding an extra encoding header which then made B disable
+gzip. [1] Once I had the raw headers as sent it was pretty clear what
+the problem was.
+
+</span><p>
+
+(Because the problem was a duplicated header I'm glad I didn't go with
+a higher level tool that might have masked that problem by storing
+headers in hashtable or something.)
+
+</p><p>
+<br>[1] Sniffing the traffic would have been ideal, but I wasn't in a position
+to get in between them.
+
+  
+
+
+
+</p><p>Comment on <a href="https://plus.google.com/103013777355236494008/posts/M9hwUKxTu2U">google plus</a>, <a href="https://www.facebook.com/jefftk/posts/752085712082">facebook</a> or write jeff@jefftk.com.
+</p><span>  </span><hr><span>
+</span><span>  </span><script type="text/javascript">if(window.parent==window){var _gaq=_gaq||[];_gaq.push(['_setAccount','UA-27645543-1']);_gaq.push(['_setDomainName','www.jefftk.com']);_gaq.push(['_setAllowLinker',true]);_gaq.push(['_trackPageview']);(function(){var ga=document.createElement('script');ga.type='text/javascript';ga.async=true;ga.src='http://www.google-analytics.com/ga.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);})();}</script><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

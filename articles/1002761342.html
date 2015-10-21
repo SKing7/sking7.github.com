@@ -1,0 +1,86 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Announcing an Early Alpha Patch for HTTP/2</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Announcing an Early Alpha Patch for HTTP/2</h1>
+                <div class="entry-content blog-post"><span>
+		</span><p><strong>Note: </strong><em><span class="s1">Since publishing this blog post we’ve added support for HTTP/2 in <a href="https://www.nginx.com/blog/nginx-1-9-5/">NGINX 1.9.5</a> and <a href="https://www.nginx.com/blog/http2-r7">NGINX Plus R7</a>.</span></em></p><span>
+</span><p>Today, we are pleased to share the first version of an <a target="_blank" href="http://nginx.org/patches/http2/">early alpha-level patch</a> that enables HTTP/2 support in NGINX. This patch can be applied to NGINX version 1.9.0 or later. We welcome your feedback&nbsp;–&nbsp;please send it to the <a href="http://mailman.nginx.org/mailman/listinfo/nginx-devel">nginx-devel</a> mailing list. We plan to fully support the HTTP/2 protocol in our open source <a target="_blank" href="http://nginx.org/en">NGINX</a> and commercial <a href="https://www.nginx.com/products/">NGINX Plus</a> products later this year.</p><span>
+</span><p>Because the patch is at an early alpha level of quality, it is not suitable for production environments. If you are eager to benefit from HTTP/2 features at a production site, NGINX version&nbsp;1.5.10 and later fully supports the <span><a target="_blank" href="http://nginx.org/en/docs/http/ngx_http_spdy_module.html">SPDY/3.1 protocol</a></span>. As the predecessor to HTTP/2, SPDY provides the same performance improvements as HTTP/2 and is widely supported across browsers.</p><span>
+</span><h2>How NGINX Supports HTTP/2</h2><span>
+</span><p>HTTP/2 is new, which means there is quite a bit of fear and misunderstanding around it. One of the biggest fears is that supporting HTTP/2 requires rearchitecting the entire application. That fear, and many of the others around HTTP/2, are unfounded. With NGINX, HTTP/2 can be supported with very little change to application architecture.</p><span>
+</span><p>NGINX acts as an “HTTP/2 gateway” to ease the transition to the new protocol. On the front end, NGINX talks HTTP/2 to client web browsers that support it, and on the back end it talks HTTP/1.x (or FastCGI, uwsgi, SCGI) just as before. In between, NGINX translates between HTTP/2 and HTTP/1.x (or FastCGI, etc). This means that servers and applications proxied by NGINX will be unaffected by the move to HTTP/2, and don’t really even need to know that their clients are using HTTP/2. The only configuration change you need to make to your existing HTTPS setup is adding <code>http2</code> to existing <code>listen</code> directives (the <code>ssl</code> parameter is also required):</p><span>
+</span><pre><code>listen 443 <strong>ssl http2</strong> default_server;</code></pre><span>
+</span><p>As of June 2015, <a target="_blank" href="http://caniuse.com/#feat=http2">over 50%</a> of users run web browsers that support HTTP/2. The adoption of HTTP/2 by web browsers is strong and will continue to increase over time. To support both HTTP/1.x and HTTP/2 side by side, NGINX implements the Application Layer Protocol Negotiation (<a target="_blank" href="https://tools.ietf.org/html/rfc7301">ALPN</a>) extension to TLS. When a web browser connects to a server, it sends a list of the protocols it supports. If <code>h2</code> is in the list, NGINX uses HTTP/2 for that connection. If the browser doesn’t implement ALPN or doesn’t include <code>h2</code> in its list of supported protocols, NGINX falls back to HTTP/1.x.</p><span>
+</span><p>As you might be aware, there are a number of HTTP/1.x optimizations that are now <a target="_blank" href="https://docs.google.com/presentation/d/1r7QXGYOLCh4fcUq0jDdDwKJWNqWK1o4xMtYpKZCJYjM/present?slide=id.p19">“anti-patterns” with HTTP/2</a>. Optimizations such as image spriting, concatenation, inlining, and domain sharding that helped performance with HTTP/1.x are no longer needed with HTTP/2. You can adopt HTTP/2 even if you use these optimizations, but we recommend that you remove them eventually to maximize performance with HTTP/2.</p><span>
+</span><h2>Installing the HTTP/2 Patch</h2><span>
+</span><ol>
+<li><a target="_blank" href="https://openssl.org/source/">Install OpenSSL 1.0.2 or later</a>. This is required to support the ALPN extension to TLS that our HTTP/2 implementation uses.</li>
+<li>Download and unpack the <a target="_blank" href="http://nginx.org/download/nginx-1.9.3.tar.gz">source code for NGINX 1.9.0 or later</a>, if necessary.
+<pre><code class="terminal"># <strong>wget http://nginx.org/download/nginx-1.9.3.tar.gz</strong>
+# <strong>tar zxvf nginx-1.9.3.tar.gz</strong>
+# <strong>cd nginx-1.9.3</strong></code></pre>
+</li>
+<li>Download the <a target="_blank" href="http://nginx.org/patches/http2/patch.http2.txt">patch</a>.
+<pre><code class="terminal"># <strong>wget http://nginx.org/patches/http2/patch.http2.txt</strong></code></pre>
+</li>
+<li>Do a dry run to make sure the patch will be applied cleanly.
+<pre><code class="terminal"># <strong>patch -p1 --dry-run &lt; patch.http2.txt</strong></code></pre>
+<p>If no errors are reported, apply the patch.</p>
+<pre><code class="terminal"># <strong>patch -p1 &lt; patch.http2.txt</strong></code></pre>
+</li>
+<li>Recompile NGINX, including the following options along with the others you normally include.
+<ul>
+<li>If you are building NGINX with OpenSSL from source and statically linking to it:
+<pre><code class="terminal"># <strong>./configure --with-http_ssl_module</strong> \
+              <strong>--with-http_v2_module</strong> \
+              <strong>--with-debug</strong> \
+              <strong>--with-openssl=/path/to/openssl-1.0.2</strong> \
+              ...</code></pre>
+</li>
+<li>If OpenSSL is installed as an optional library (as on Mac OS X, for example):
+<pre><code class="terminal"># <strong>./configure --with-http_ssl_module</strong> \
+              <strong>--with-http_v2_module</strong> \
+              <strong>--with-debug</strong> \
+              <strong>--with-cc-opt="-I/opt/local/include"</strong> \
+              <strong>--with-ld-opt="-L/opt/local/lib"</strong> \
+              ...</code></pre>
+</li>
+</ul>
+</li>
+<li>Build NGINX.
+<pre><code class="terminal"># <strong>make</strong></code></pre>
+</li>
+</ol><span>
+</span><h2>Configuring NGINX</h2><span>
+</span><p>To enable HTTP/2 support, simply add the <code>ssl</code> and <code>http2</code> parameters to existing <code>listen</code> directives:</p><span>
+</span><pre><code>server {
+    listen 443 <strong>ssl http2</strong> default_server;
+
+    ssl_certificate &nbsp;&nbsp;&nbsp;&nbsp;server.crt;
+    ssl_certificate_key server.key;
+    ...
+}</code></pre><span>
+</span><p><strong>Note</strong>: The <code>ssl</code> parameter is required. At the time of this writing HTTP/2 is not supported without SSL encryption by browsers.</p><span>
+</span><p>A good way to verify that HTTP/2 translation is working is the <a target="_blank" href="https://chrome.google.com/webstore/detail/http2-and-spdy-indicator/mpbpobfflnpcgagjijhmgnchggcjblin?hl=en">HTTP/2 and SPDY indicator</a> plug-in for Google Chrome. The same plug-in is also <a target="_blank" href="https://addons.mozilla.org/en-us/firefox/addon/spdy-indicator/">available for Firefox</a>.</p><span>
+</span><h2>Caveats</h2><span>
+</span><p>As with any early release software, there are a few caveats:</p><span>
+</span><ul>
+<li>It is important to note that the patch is at an early alpha level of quality and should not be used in production. We are still actively working on bringing our HTTP/2 implementation to production quality. We would very much appreciate your help in achieving NGINX Inc.’s standards for reliability and performance by testing this alpha in nonproduction environments and sending feedback to the <a href="http://mailman.nginx.org/mailman/listinfo/nginx-devel">nginx-devel</a> mailing list.</li>
+<li>HTTP/2’s ‘Server Push’ feature is not supported in this patch and will not be supported in the first production-ready release of the HTTP/2 implementation. This feature might appear in a future NGINX release.</li>
+<li>Applying this patch removes the SPDY module from the NGINX codebase and replaces it with the HTTP/2 module. After applying this patch, you can no longer configure NGINX to use SPDY. This will also be the case for the production-ready release of the HTTP/2 implementation in both NGINX and NGINX&nbsp;Plus. <a target="_blank" href="http://blog.chromium.org/2015/02/hello-http2-goodbye-spdy-http-is_9.html">SPDY is being deprecated</a> by Google in early 2016, so there is no need to support both.</li>
+</ul><span>
+</span><h2>Special Thanks</h2><span>
+</span><p>NGINX, Inc. would like to thank <a target="_blank" href="http://dropbox.com/">Dropbox</a> and <a target="_blank" href="http://automattic.com/">Automattic</a>, who are heavy users of our software and graciously cosponsored the development of our HTTP/2 implementation. Their contributions have helped accelerate our ability to bring this software to you, and we hope you are able to support them in turn.</p><span>
+	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,46 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>memory - JavaScript object size - Stack Overflow</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>memory - JavaScript object size - Stack Overflow</h1>
+                <div class="post-text" itemprop="text"><span>
+</span><p>This is a hacky method, but i tried it twice with different numbers and it seems to be consistent.</p><span>
+
+</span><p>What you can do is to try and allocate a <em>huge</em> number of objects, like one or two million objects of the kind you want. Put the objects in an array to prevent the garbage collector from releasing them (note that this will add a slight memory overhead because of the array, but i hope this shouldn't matter and besides if you are going to worry about objects being in memory, you store them somewhere). Add an alert before and after the allocation and in each alert check how much memory the Firefox process is taking. Before you open the page with the test, make sure you have a fresh Firefox instance. Open the page, note the memory usage after the "before" alert is shown. Close the alert, wait for the memory to be allocated. Subtract the new memory from the older and divide it by the amount of allocations. Example:</p><span>
+
+</span><pre><code>function Marks()
+{
+  this.maxMarks = 100;
+}
+
+function Student()
+{
+  this.firstName = "firstName";
+  this.lastName = "lastName";
+  this.marks = new Marks();
+}
+
+var manyObjects = new Array();
+alert('before');
+for (var i=0; i&lt;2000000; i++)
+    manyObjects[i] = new Student();
+alert('after');
+</code></pre><span>
+
+</span><p>I tried this in my computer and the process had 48352K of memory when the "before" alert was shown. After the allocation, Firefox had 440236K of memory. For 2million allocations, this is about 200 bytes for each object.</p><span>
+
+</span><p>I tried it again with 1million allocations and the result was similar: 196 bytes per object (i suppose the extra data in 2mill was used for Array).</p><span>
+
+</span><p>So, here is a hacky method that might help you. JavaScript doesn't provide a "sizeof" method for a reason: each JavaScript implementaion is different. In Google Chrome for example the same page uses about 66 bytes for each object (judging from the task manager at least).</p><span>
+    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

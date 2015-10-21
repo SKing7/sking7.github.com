@@ -1,0 +1,110 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The Command Line API for Fun and Profit</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>The Command Line API for Fun and Profit</h1>
+                <div class="ArticleCopy language-javascript"><span>
+    </span><style type="text/css">
+  p.tip {
+    background-color: rgba(128,128,128,0.05);
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 15px 20px;
+    border-left: 10px solid rgba(128,128,128,0.075);
+  }
+</style><span>
+</span><p>The <a href="https://developers.google.com/web/tools/javascript/command-line/command-line-reference">Command Line API</a> is a collection of aliases, convenience functions, and shortcuts to interact with your web page right from within the JavaScript console. In this article, we will have a look at some of those helpers and how you can leverage them for a better developing and debugging experience.</p><span>
+</span><p class="tip">You can access your browser’s JavaScript console in a variety of ways. Usually pressing <em>F12</em> and clicking the <em>Console</em> tab works best.</p><span>
+</span><p>Before we dive in, let me ask you a little quiz question: Do you know what it takes to visualize the outline of your CSS layout in the browser?</p><span>
+</span><p><em>Exactly 108 bytes</em>.</p><span>
+</span><pre><code>[].forEach.call($$("*"),function(a){a.style.outline="1px solid #"+(~~(Math.random()*(1&lt;&lt;24))).toString(16)})
+</code></pre><span>
+</span><p>A <em>tweet-sized debugger</em> as Addy Osmani, the creator of <a href="https://gist.github.com/addyosmani/fd3999ea7fce242756b1">this smart one-liner</a>, put it. Go ahead and try it out right now. Just copy the line and paste it into the JavaScript console of your favorite developer tools, like <a href="https://developer.chrome.com/devtools/docs/commandline-api">Chrome’s DevTools</a>, <a href="https://getfirebug.com/wiki/index.php/Command_Line_API">Firefox’s Firebug</a>, <a href="http://www.opera.com/dragonfly/documentation/console/">Opera’s Dragonfly</a>, <a href="https://developer.apple.com/library/mac/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/Console/Console.html">Safari’s Web Inspector</a>, or even <a href="https://msdn.microsoft.com/en-us/library/gg589530">IE’s F12 tools</a> (although IE only supports the <code>$</code> family and the <code>console</code> object).</p><span>
+</span><p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2015/09/1443186009command_line_api-outline-1024x573.png" alt="Using the Command Line API to outline every DOM element with CSS" width="1024" height="573" class="aligncenter size-large wp-image-115812"></p><span>
+</span><p>While the creation of the color hex value is impressive, I want to draw your attention to the peculiar <code>$$</code>. This is an alias for <code>document.querySelectorAll</code> and one of many clever bits in the Command Line API. Let’s see what else the API has to offer.</p><span>
+</span><p class="tip">The Command Line API is only accessible in the JavaScript console. You cannot make the API available to your scripts on the page. On the bright side, this gives you the unique opportunity to try all the code snippets in the remainder of this article right here in the browser window. Simply open your JavaScript console and experiment.</p><span>
+</span><h2 id="exploring-the-dom">Exploring the DOM</h2><span>
+</span><span>
+</span><p>If you are familiar with the jQuery library you can probably guess what <code>$</code> does. As an alias for <code>document.querySelector</code> it returns a reference to the first DOM element matching the given CSS selector.</p><span>
+</span><p>Let’s see how we can use this in the famous <a href="http://orteil.dashnet.org/cookieclicker/">Cookie Clicker game</a>. In case you never stumbled upon this monotonous but weirdly addictive game: You basically click on a big cookie to produce more of those baked goods and buy all sorts of cookie-baking devices. These then produce even more cookies… you get the picture.</p><span>
+</span><p>Now, wouldn’t it be great if we could give our hand and mouse a break and let the console take care of the cookie clicking? With a little bit of JavaScript and our new friend <code>$</code> this can be achieved in a neat one-liner:</p><span>
+</span><pre><code>setInterval(function() { $("#bigCookie").click(); }, 10);
+</code></pre><span>
+</span><p>As entertaining as this is, there are also scenarios where the DOM selecting functions of the Command Line API are of actual value. You already learned about the power of <code>$$</code> in the introduction of this article. As an alias for <code>document.querySelectorAll</code> it returns an array of all the DOM elements that match the given CSS selector.</p><span>
+</span><p>For example, we can use this function to extract all the image sources of a web site:</p><span>
+</span><pre><code>var pics = $$("img");
+for (pic in pics) {
+  console.log(pics[pic].src);
+}
+</code></pre><span>
+</span><p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2015/09/1443186022command_line_api-dom-1024x588.png" alt="Using the Command Line API to scrape all image sources from an Instagram page" width="1024" height="588" class="aligncenter size-large wp-image-115814"></p><span>
+</span><p>If you are looking for a specific element and want to examine it closer, use <code>inspect</code>. <code>inspect(document.body)</code>, for example, will bring you directly to the body element in the <em>Elements</em> tab of your developer tools. (<code>inspect</code> also works if you pass a JavaScript function to it — it will take you to the <em>Sources</em> panel.)</p><span>
+</span><h2 id="keeping-track-of-objects">Keeping Track of Objects</h2><span>
+</span><p>When I was trying to grasp JavaScript’s prototypal inheritance, I had a little friend in the console: <code>dir</code> called on an object this method presents you a listing of all the object’s properties, including for example <code>prototype</code> and <code>_proto_</code>. This is only one of many scenarios where <code>dir</code> comes in handy. I find it relieving to have a shortcut to all my object’s properties.</p><span>
+</span><p>If you are only interested in the direct properties of your objects (i.e. properties not inherited from the prototype chain), you can use <code>keys</code> and <code>values</code> to get an array containing the names and the associated values, respectively. Try it out:</p><span>
+</span><pre><code>var a = {
+  "one": 1,
+  "two": 2,
+  "three": 3
+}
+
+&gt; keys(a)
+  ["one", "two", "three"]
+
+&gt; values(a)
+  [1, 2, 3]
+</code></pre><span>
+</span><p>Since objects are the most basic and omnipresent data structure in JavaScript, I make quite heavy use of these functions to keep track of object state.</p><span>
+</span><h2 id="debugging-in-the-console">Debugging in the Console</h2><span>
+</span><p>Whenever something goes wrong with one of my web sites or apps, the first thing I do is check the console for error messages. I spend <em>a lot</em> of my developing time in the console. If you are no different, then you should be excited about functions like <code>debug</code> and <code>monitor</code>. Those are just two examples of mighty debugging tools that the Command Line API puts right at your fingertips. (Unfortunately, Safari’s Web Inspector does not support these two functions.)</p><span>
+</span><pre><code>debug(YourLibrary.someFunction)
+</code></pre><span>
+</span><p>This sets a breakpoint at the first line of the function <code>YourLibrary.someFunction</code> and every time it is called, the debugger opens. Since I practically live in the console, this is a much faster alternative to skimming through the source code and setting the breakpoint manually, especially when you are working with minified code. To turn this behavior off you can simply call <code>undebug</code> on the same function.</p><span>
+</span><p>If you don’t want to invoke the debugger, but just get notified whenever a certain function is called and with what arguments, <code>monitor</code> is your friend.</p><span>
+</span><p>The following code in the console:</p><span>
+</span><pre><code>function square(n) {
+  return n*n;
+}
+monitor(square)
+</code></pre><span>
+</span><p>will for example notify you like this in Chrome once you call <code>square</code>:</p><span>
+</span><pre><code>&gt; square(5);
+  function square called with arguments: 5
+</code></pre><span>
+</span><p>Just call <code>unmonitor</code> on the same function to stop monitoring. Please note, that <code>monitor</code> in Firebug only works with functions inside the code of your page. Please see my <a href="http://stackoverflow.com/questions/32629332/no-logging-when-using-monitor-in-firebug">Stackoverflow question</a> for more information.</p><span>
+</span><p>The Command Line API has also got you covered when it comes to event debugging. <code>getEventListeners</code> returns an object with an array for each event type (like “<em>click</em>” or “<em>mousedown</em>”) that is registered on a specified object.</p><span>
+</span><pre><code>getEventListeners(document);
+</code></pre><span>
+</span><p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2015/09/1443186016command_line_api-events.png" alt="Using the Command Line API to get all event listeners registered on the document object" width="772" height="372" class="aligncenter size-full wp-image-115813"></p><span>
+</span><p>To take this a step further, you can also use <code>monitorEvents</code> to get feedback in the console whether specified events are actually fired. Go ahead and type this into the console:</p><span>
+</span><pre><code>monitorEvents(window, "resize");
+</code></pre><span>
+</span><p>Once you resize the browser window you will get feedback in the console and the <code>Event</code> object for further examination. Firebug adds a nice extra and even informs you which DOM elements under- or overflow the current viewport—extremely helpful for debugging responsive layouts.</p><span>
+</span><p>You can also specify multiple events or even choose from a list of event types:</p><span>
+</span><pre><code>monitorEvents(window, ["scroll", "mousedown"]);
+monitorEvents(document, "key");
+</code></pre><span>
+</span><p>Please see the <a href="https://developers.google.com/web/tools/javascript/command-line/command-line-reference#monitoreventsobject-events">Command Line API reference</a> at Google Developers for a complete list. By that time it may not come as a surprise that you can deactivate event monitoring with <code>unmonitorEvents</code>.</p><span>
+</span><h4 id="an-extra-treat-for-chrome-users">An Extra Treat for Chrome Users</h4><span>
+</span><p>Sooner or later the debugging functionality in the console will reveal some shortcomings, including:</p><span>
+</span><ul>
+<li><code>debug</code> and <code>monitor</code> don’t work on native methods</li>
+<li><code>monitorEvents</code> does not work for custom events</li>
+<li>Missing functionality, such as breaking on object property access</li>
+</ul><span>
+</span><p>Luckily, Amjad Masad has been addressing these points in his amazing Chrome extension <a href="https://chrome.google.com/webstore/detail/debug-utils/djailkkojeahmihdpcelmmobkpepmkcl">Debug Utils</a> (you can find the source <a href="https://github.com/amasad/debug_utils">on Github</a>).</p><span>
+</span><h2 id="so-how-will-you-use-the-command-line-api-today">So How Will You Use the Command Line API Today?</h2><span>
+</span><p>The Command Line API offers a whole bunch of helpful convenience functions for an ad hoc assessment of your web pages and apps. Especially inside my debugging workflow it soon replaced the whole <code>console.log</code> nightmare and became one of my favorite tools.</p><span>
+</span><p>The JavaScript console is a powerful tool that you can access right here, right now in every major browser. Are you using it? If so, what are your favorite tips and tricks?</p><span>
+  </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

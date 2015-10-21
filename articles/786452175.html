@@ -1,0 +1,97 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>How Google--and everyone else--gets Wi-Fi location data</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>How Google--and everyone else--gets Wi-Fi location data</h1>
+                <div class="storyBody" itemprop="articleBody" data-component="lazyloadImages" data-lazyload-images-options="{&quot;threshold&quot;:500}"><span>
+                                    
+        </span><div id="attachment_1667"><a href="http://www.zdnet.com/i/story/62/58/001664/world-map.jpg"><figure class="image  image-small shortcode-image"><span class="img "><img src="http://zdnet1.cbsistatic.com/hub/i/r/2014/10/03/5f684fb3-4b28-11e4-b6a0-d4ae52e95e57/resize/270x270/43076f29d235074da0be2d450b628e85/world-map.jpg" class="" alt="Before there was location services Google Maps... there were other maps." height="270" width="270"></span></figure></a><p>Before there were location services and Google Maps...</p></div><span>
+
+
+</span><p>When I wrote about <a href="http://www.zdnet.com/blog/networking/how-to-keep-your-wi-fi-location-out-of-google/1652">Google making it possible to opt-out of their Wi-Fi access point mapping program</a>, I made a mistake. I thought Google was still using its StreetView cars to pick up Wi-Fi locations. Nope, Eitan Bencuya, a Google spokesperson, tells me that Google no longer uses StreetView cars to collect location information. So, how does Google collect Wi-Fi location data? They use you.
+</p><span>
+
+</span><p>Or, to be more exact, they use your Android phone or tablet. But, it's not just Google. Apple and Microsoft do the same thing with their smartphones and tablets.
+</p><span>
+
+</span><p>I'd missed this, but earlier this year <a href="http://www.zdnet.com/blog/perlow/google-android-apple-iphone-geolocation-tracking-flap-disclosure-is-everything/16893">Apple, Google and other companies got into hot-water because they've been collecting location data from your devices</a> for some time now. These days, it seems, it's the only way any of the big companies pick up Wi-Fi location data.
+</p><span>
+
+</span><p>How it works, according to Google, is that the <a href="http://developer.android.com/guide/topics/location/obtaining-user-location.html">Android Location Services</a> periodically checks on your location using GPS, Cell-ID, and Wi-Fi to locate your device. When it does this, your Android phone will send back publicly broadcast Wi-Fi access points' Service set identifier (SSID) and Media Access Control (MAC) data. Again, this isn't just how Google does it; it's how everyone does it. It's Industry practice for location database vendors.
+</p><span>
+
+</span><p>Google tells me that the location checks are made periodically. You don't need to be using <a href="http://maps.google.com/">Google Maps</a>, <a href="http://www.google.com/mobile/latitude/">Latitude</a> or other geolocation-based application. It just happens.
+        </p><p>
+    <script>
+        window.console && console.log && console.log("ADS: queuing inpage-video-top-56278acb5f152 for display");
+        var cbsiGptDivIds = cbsiGptDivIds || [];
+        cbsiGptDivIds.push("inpage-video-top-56278acb5f152");
+    </script></p><span>
+
+
+
+</span><p>You can check on this yourself by going to your Android phone and then going to Settings/Location and check Google Location Services or Security/Use Wireless Network off and on. When you check it on you'll get a location consent agreement. This reads: "Allow Google's location service to collect anonymous location data. Collection will occur even when no applications are running."
+</p><span>
+
+</span><p>You don't have to use Google's Wi-Fi location service. You can elect to just use your device's built-in GPS, but the more data points your smartphone has to work with the more accurately it can fix your location and thus make location-based services more accurate and useful. In other words, if you use Wi-Fi on an Android device to help pin your position down though you'll also be contributing to creating Google's maps.
+</p><span>
+
+    </span><section class="sharethrough-top"><p>
+    <script>
+        window.console && console.log && console.log("ADS: queuing sharethrough-top-56278acb5f152 for display");
+        var cbsiGptDivIds = cbsiGptDivIds || [];
+        cbsiGptDivIds.push("sharethrough-top-56278acb5f152");
+    </script></p>
+
+    </section><p>If all that makes you feel a little queasy-what is Apple, Google, and Microsoft doing with this information--well each of them states that they're using the data anonymously. As Google's Director of Public Policy Alan Davidson said in a statement to the Senate judiciary subcommittee on privacy, technology and the law this May:
+</p><span>
+</span><blockquote>
+<p>While location-based services are already showing great value to users, Google recognizes the particular privacy concerns that come with the collection and storage of location information. That's why we don't collect any location information - any at all - through our location services on Android devices unless the user specifically chooses to share this information with Google. We also give users clear notice and control; the set-up process asks users if they would like to "allow Google's location service to collect anonymous location data."
+</p>
+
+<p>And even after opting in, we give users a way to easily turn off location sharing with Google at any time they wish. The location services in our Android operating system embody the transparency and control principles that we use to guide our privacy process.</p>
+</blockquote><span>
+</span><p>
+Still don't trust them? Well, you can always write your Congress-critter and ask them to support the <a href="http://wyden.senate.gov/newsroom/press/release/?id=0b8d693f-7cab-4ba4-aae6-42b66b1eef0e">GPS act</a>, which is meant to <a href="http://thomas.loc.gov/cgi-bin/query/z?c112:S.1212.IS:">set guidelines, legal procedures and protections on electronic devices and location tracking</a>. Specifically it states that the
+</p><span>
+</span><ul><li>Government must show probable cause and warrant to acquire geolocational information.</li>
+<li>The Act will apply to real-time tracking of person's current and past movements.</li>
+<li>Creates criminal penalties for using a device to track a person.</li>
+<li>Prohibits commercial service providers from sharing geolocation data with outside entities.</li>
+</ul><p>
+The GPS act still hasn't passed into law, but it's <a href="http://www.aclu.org/blog/tag/GPS%20Act">slowly drawing broader support</a>.
+</p><span>
+
+</span><p>In the meantime, if you're really that concerned about the possibility of your phone being tracked, then just don't use Wi-Fi or cellular services on your Android phone, or any other device, to help fix your location. On my Droid 2 phone with Android 2.3, the option to do this is Setting/Location &amp; Security settings/Standalone GPS services.
+</p><span>
+
+</span><p>As for me, I find the advantages of having knowing exactly where I am and where the hotel, restaurant, theater, or what-have you are in relationship to my location to be worth the vanishingly small chance that someone is tracking me with this data.
+</p><span>
+
+</span><p><strong>Related Stories:</strong>
+</p><span>
+
+</span><p><a href="http://www.zdnet.com/blog/networking/how-to-keep-your-wi-fi-location-out-of-google/1652">How to keep your Wi-Fi location out of Google</a>
+</p><span>
+
+</span><p><a href="http://www.zdnet.com/blog/btl/mobile-privacy-flap-take-two-starring-google-skyhook-gps-act/50745">Mobile privacy flap take two: Starring Google, Skyhook, GPS Act</a>
+</p><span>
+
+</span><p><a href="http://www.zdnet.com/blog/btl/google-defends-mobile-privacy-standards-at-senate-hearing/48575">Google defends mobile privacy standards at Senate hearing</a>
+</p><span>
+
+</span><p><a href="http://www.zdnet.com/blog/perlow/google-android-apple-iphone-geolocation-tracking-flap-disclosure-is-everything/16893">Google Android, Apple iPhone geolocation tracking flap: Disclosure is everything</a>
+</p><span>
+
+            </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
