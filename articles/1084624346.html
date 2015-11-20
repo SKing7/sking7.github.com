@@ -1,0 +1,130 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>7 Tips for Faster HTTP/2 Performance</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>7 Tips for Faster HTTP/2 Performance</h1>
+                <div class="entry-content blog-post"><span>
+		</span><p><em>View the recording of the well-attended NGINX webinar, <a href="https://www.nginx.com/resources/webinars/whats-new-in-http2/">What’s New in HTTP/2?</a></em></p><span>
+</span><p>The venerable HyperText Transfer Protocol, or <a href="https://www.nginx.com/resources/glossary/http/">HTTP</a>, standard has now been updated. The HTTP/2 standard was approved in May 2015 and is now being implemented in browsers and web servers (including <a href="https://www.nginx.com/blog/nginx-plus-r7-released/">NGINX Plus</a> and the <a href="https://www.nginx.com/blog/nginx-1-9-5/">open source NGINX software</a>). HTTP/2 is currently supported by nearly <a href="http://caniuse.com/#feat=http2">two-thirds</a> of all web browsers in use, and the proportion grows by several percentage points per month.</p><span>
+</span><p>HTTP/2 is built on Google’s SPDY protocol, and SPDY is still an option until support for it in Google’s Chrome browser ends <a href="http://blog.chromium.org/2015/02/hello-http2-goodbye-spdy-http-is_9.html" target="_blank">in early 2016</a>. NGINX was a pioneering supporter of SPDY and is now playing the same role with HTTP/2. We’ve published a detailed white paper (<a href="https://www.nginx.com/wp-content/uploads/2015/09/NGINX_HTTP2_White_Paper_v4.pdf" target="_blank">PDF</a>) to describe HTTP/2, show how it builds on SPDY, and demonstrate how to implement the new protocol.</p><span>
+</span><p>The key features of HTTP/2 are the same as SPDY:</p><span>
+</span><ul>
+<li>HTTP/2 is a binary, rather than text, protocol, making it more compact and efficient;</li>
+<li>It uses a single, multiplexed connection per domain, rather than multiple connections carrying one file each;</li>
+<li>Headers are compressed with the purpose-built HPACK protocol (rather than gzip, as in SPDY);</li>
+<li>HTTP/2 has a complex prioritization scheme to help browsers request the most-needed files first, which is fully supported in NGINX (SPDY had a simpler scheme.)</li>
+</ul><span>
+</span><p>Now you need to decide whether to move forward with HTTP/2 – and part of that is knowing how to get the most out of it. This blog post will guide you through the performance-related aspects of the decision-making and implementation process. Check out these 7 tips for HTTP/2 performance:</p><span>
+</span><ol>
+<li><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip1today">Decide if You Need HTTP/2 Today</a></li>
+<li><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip2terminate">Terminate HTTP/2 and TLS</a></li>
+<li><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip3spdy">Consider Starting with SPDY</a></li>
+<li><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip4optimizations">Identify HTTP/1.x Optimizations in Your Code</a></li>
+<li><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip5deploy">Implement HTTP/2 or SPDY</a></li>
+<li><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip6revise">Revise HTTP/1.x Optimizations</a></li>
+<li><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip7sharding">Implement Smart Sharding</a></li>
+</ol><span>
+</span><p><strong>Note</strong>: Neither SPDY nor HTTP/2 requires TLS, strictly speaking, but both are mainly beneficial when used with SSL/TLS, and browsers only support SPDY or HTTP/2 when SSL/TLS is in use.</p><span>
+</span><h1 id="tip1today">Tip 1. Decide if You Need HTTP/2 Today</h1><span>
+</span><p>Implementing HTTP/2 is easy, as our white paper describes (<a href="https://www.nginx.com/wp-content/uploads/2015/09/NGINX_HTTP2_White_Paper_v4.pdf" target="_blank">PDF</a>). However, HTTP/2 is not a magic bullet; it’s useful for some web applications, less so for others.</p><span>
+</span><p>Using HTTP/2 is likely to improve website performance if you’re using SSL/TLS (referred to as TLS from here on). But if you have not, you’ll need to add TLS support before you can use HTTP/2. In that case, expect the performance penalty from using TLS to be roughly offset by the performance benefit of using HTTP/2, but test whether this is really true for your site before making an implementation decision.</p><span>
+</span><p>Here are five key potential benefits of HTTP/2:</p><span>
+</span><ol>
+<li><strong>Uses a single connection per server</strong>. HTTP/2 uses one connection per server, instead of one connection per file request. This means much less need for time-consuming connection setup, which is especially beneficial with TLS, because TLS connections are particularly time-consuming to create.</li>
+<li><strong>Delivers faster TLS performance</strong>. HTTP/2 only needs one expensive TLS handshake, and multiplexing gets the most out of the single connection. HTTP/2 also compresses header data, and avoiding HTTP/1.x performance optimizations such as file concatenation lets caching work more efficiently.</li>
+<li><strong>Simplifies your web applications</strong>. With HTTP/2 you can move away from HTTP/1.x “optimizations” that make you, as the app developer – and the client device – work harder.</li>
+<li><strong>Great for mixed Web pages</strong>. HTTP/2 shines with traditional Web pages that mix HTML, CSS, JavaScript code, images, and limited multimedia. Browsers can prioritize file requests to make key parts of the page appear first and fast.</li>
+<li><strong>Supports greater security</strong>. By reducing the performance hit from TLS, HTTP/2 allows more web applications to use it, providing greater security for users.</li>
+</ol><span>
+</span><p><a href="https://www.nginx.com/wp-content/uploads/2015/10/HTTP2.png"><img class="aligncenter size-full wp-image-17186" src="https://www.nginx.com/wp-content/uploads/2015/10/HTTP2.png" alt="HTTP/2 with multiplexing diagram" width="975" height="480"></a></p><span>
+</span><p>And here are five corresponding downsides you’ll encounter:</p><span>
+</span><ol>
+<li><strong>Greater overhead for the single connection</strong>. The HPACK data-compression algorithm updates a look-up table at both ends. This makes the connection stateful and the single connection requires extra memory.</li>
+<li><strong>You might not need SSL</strong>. If your data doesn’t need protection, or it’s already protected by DRM or other encoding, TLS security probably doesn’t help you much.</li>
+<li><strong>HTTP/1.x optimizations hurt</strong>. HTTP/1.x optimizations actually hurt performance in browsers that support HTTP/2, and unwinding them is extra work for you.</li>
+<li><strong>Big downloads don’t benefit</strong>. If your web application mainly delivers large, downloadable files or media streams, you probably don’t want TLS, and multiplexing doesn’t provide any benefit when only one stream is in use.</li>
+<li><strong>Your customers may not care</strong>. Perhaps you believe your customers don’t care whether the cat videos they share on your site are protected with TLS and HTTP/2 – and you might be right.</li>
+</ol><span>
+</span><p>It all comes down to performance – and on that front, we have good news and bad news.</p><span>
+</span><p>The good news is that an initial, internal test we ran here at NGINX shows the result that theory would predict: for mixed-content web pages requested over connections with typical Internet latencies, HTTP/2 performs better than HTTP/1.x and HTTPS. The results fall into three groups depending on the connection’s typical round-trip time (RTT):</p><span>
+</span><ul>
+<li><strong>Very low RTTs (0-20ms)</strong>: There is virtually no difference between HTTP/1.x, HTTP/2, and HTTPS.</li>
+<li><strong>Typical Internet RTTs (30-250ms)</strong>: HTTP/2 is faster than HTTP/1.x, and both are faster than HTTPS. For US cities near one another, RTT is about 30 ms, and it’s about 70 ms from coast to coast (about 3000 miles). On the shortest route between Tokyo and London, RTT is about 240 ms.</li>
+<li><strong>High RTTs (300ms and up)</strong>: HTTP/1.x is faster than HTTP/2, which is faster than HTTPS.</li>
+</ul><span>
+</span><p><a href="https://www.nginx.com/wp-content/uploads/2015/10/1stpaint.png"><img class="aligncenter size-full wp-image-17181" src="https://www.nginx.com/wp-content/uploads/2015/10/1stpaint.png" alt="First painting graph for HTTP, HTTP/2, and HTTPS" width="975" height="519"></a></p><span>
+</span><p>The figure shows the time to first painting – that is, the time until the user first sees Web page content appear on their screen. This measurement is often considered critical to users’ perception of a web site’s responsiveness.</p><span>
+</span><p>For details of our testing, see the HTTP/2 <a href="https://www.youtube.com/watch?v=4OiyssTW4BA&amp;feature=youtu.be">presentation</a> from nginx.conf 2015.</p><span>
+</span><p>However, every web page is different, and indeed every user session is different. If you have streaming media or large downloadable files, or if you’ve scienced the, err, sugar out of your HTTP/1.x optimizations (with apologies to <em><a href="https://twitter.com/neiltyson/status/610997574808395777?lang=en" target="_blank">The Martian</a></em>), your results may be different, or even opposite.</p><span>
+</span><p>The bottom line is: you might find the cost-benefit trade-off to be unclear. If so, learn as much as you can, do performance testing on your own content, and then make a call. (For guidance, see the NGINX webinar, <a href="https://www.nginx.com/resources/webinars/whats-new-in-http2/">What’s New in HTTP/2?</a>.)</p><span>
+</span><h1 id="tip2terminate">Tip 2. Terminate HTTP/2 and TLS</h1><span>
+</span><p>Terminating a protocol means that clients connect to a proxy server using a desired protocol, such as TLS or HTTP/2. The proxy server then connects to application servers, database servers, and so on without necessarily using the same protocol, as shown in the figure.</p><span>
+</span><p><a href="https://www.nginx.com/wp-content/uploads/2015/10/terminate.png"><img class="aligncenter size-full wp-image-17176" src="https://www.nginx.com/wp-content/uploads/2015/10/terminate.png" alt="Terminate HTTP/2 and TLS with NGINX diagram" width="975" height="394"></a></p><span>
+</span><p>Using a separate server for termination means moving to a multi-server architecture. The servers may be separate physical servers, virtual servers, or virtual server instances in a cloud environment such as <a href="https://www.nginx.com/products/nginx-plus-aws/">AWS</a>. This is a step up in complexity compared to a single server, or even an application server/database server combination. But it affords many benefits and is virtually – no pun intended – a necessity for busy sites.</p><span>
+</span><p>Once a server or virtual server is placed in front of an existing setup, many things are possible. The new server offloads the job of client communications from the other servers, and it can be used for load balancing, static file caching, and other purposes. It becomes easy to add and replace application servers and other servers as needed.</p><span>
+</span><p>NGINX and NGINX Plus are often used for all of these purposes – terminating TLS and HTTP/2, load balancing, and more. The existing environment doesn’t need to be changed at all, except for “front-ending” it with the NGINX server.</p><span>
+</span><h1 id="tip3spdy">Tip 3. Consider Starting with SPDY</h1><span>
+</span><p>SPDY is the predecessor protocol to HTTP/2, and its overall performance is about the same. Because it’s been around for several years, more web browsers <a href="http://caniuse.com/#feat=spdy" target="_blank">support SPDY</a> than <a href="http://caniuse.com/#feat=http2" target="_blank">support HTTP/2</a>. However, at this writing, the gap is closing; about two-thirds of web browsers support HTTP/2, while about four out of five support SPDY.</p><span>
+</span><p>If you’re in a hurry to implement the new style of Web transport protocol, and you want to support the largest possible number of users today, you can start out by offering SPDY. Then, in early 2016, when SPDY support begins to be removed, you can switch over to HTTP/2 – a quick change, at least with NGINX. By that point more users will be on browsers that support HTTP/2, so you will have done the best thing for the largest number of your users during this transition.</p><span>
+</span><h1 id="tip4optimizations">Tip 4. Identify Your Use of HTTP/1.x Optimizations</h1><span>
+</span><p>Before you decide to implement HTTP/2, you need to identify how much of your code base is optimized for HTTP/1.x. There are four types of optimizations to look out for:</p><span>
+</span><ol>
+<li><strong>Domain sharding</strong>. You may have already put files in different domains to increase parallelism in file transfer to the web browser; content domain networks (CDNs) do this automatically. But it doesn’t help – and can hurt – performance under HTTP/2. You can use HTTP/2-savvy domain sharding (see <a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip7sharding">Tip 7</a>) to shard only for HTTP/1.x users.</li>
+<li><strong>Image sprites</strong>. Image sprites are agglomerations of images that download in a single file; separate code then retrieves images as they’re needed. The advantages of images sprites are less under HTTP/2, though you may still find them useful.</li>
+<li><strong>Concatenating code files</strong>. Similar to image sprites, code chunks that would normally be maintained and transferred as separate files are combined into one. The browser then finds and runs the needed code within the concatenated file as needed.</li>
+<li><strong>Inlining files</strong>. CSS code, JavaScript code, and even images are inserted directly into the HTML file. This means fewer file transfers, at the expense of a bloated HTML file for initial downloading.</li>
+</ol><span>
+</span><p>The last three types of optimizations all combine small files into larger ones to reduce new connections and initialization handshaking, which is especially expensive for TLS.</p><span>
+</span><p>The first optimization, domain sharding, does the opposite – forces more connections to be opened by involving additional domains in the picture. Together, these seemingly contradictory techniques can be fairly effective in increasing the performance of HTTP/1.x sites. However, they all take time, effort, and resources to design, implement, manage, and run.</p><span>
+</span><p>Before implementing HTTP/2, identify where these optimizations exist and how they are currently affecting application design and workflow in your organization, so you can then modify or undo them after the move to HTTP/2.</p><span>
+</span><h1 id="tip5deploy">Tip 5. Deploy HTTP/2 or SPDY</h1><span>
+</span><p>Actually deploying HTTP/2 or SPDY is not that hard. If you’re an NGINX user, you simply “turn on” the protocol in your NGINX configuration, as described here (<a href="https://www.nginx.com/wp-content/uploads/2015/09/NGINX_HTTP2_White_Paper_v4.pdf" target="_blank">PDF</a>) for HTTP/2. The browser and the server will then negotiate to choose a protocol, settling on HTTP/2 if the browser also supports it (and if TLS is in use).</p><span>
+</span><p>Once you implement HTTP/2 at the server level, users on browser versions that support HTTP/2 will have their sessions with your web app run on HTTP/2. Users on older browser versions will have their sessions run on HTTP/1.x, as shown in the figure. If and when you implement HTTP/2 or SPDY for a busy site, you’ll want to have processes in place to measure performance before and after, and reverse the change if it has significant negative impacts.</p><span>
+</span><p><a href="https://www.nginx.com/wp-content/uploads/2015/10/servers.png"><img class="aligncenter size-full wp-image-17171" src="https://www.nginx.com/wp-content/uploads/2015/10/servers.png" alt="HTTP/2 implemented at server level supports browsers for both HTTP/2 and HTTP/1.x" width="975" height="615"></a></p><span>
+</span><p><strong>Note</strong>: With HTTP/2 and its use of a single connection, some details of your NGINX configuration become more important. Review your NGINX configuration, with special attention to tuning and testing the settings of directives such as <code>output_buffers</code>, <code>proxy_buffers</code>, and <code>ssl_buffer_size</code>. See our <a href="https://www.nginx.com/resources/admin-guide/nginx-ssl-termination/">general configuration notes</a>, specific SSL tips (<a href="https://www.nginx.com/blog/nginx-ssl/">here</a> and <a href="https://www.nginx.com/blog/improve-seo-https-nginx/">here</a>), and our white paper on SSL performance with NGINX (<a href="https://www.nginx.com/wp-content/uploads/2014/07/NGINX-SSL-Performance.pdf">PDF</a>).</p><span>
+</span><p><strong>Note</strong>: The use of ciphers you use with HTTP/2 may require extra attention. The RFC for HTTP/2 has a <a href="https://tools.ietf.org/html/rfc7540#appendix-A">long list</a> of cipher suites to avoid, and you may prefer to configure the cipher list yourself. Consider tuning <code><a href="http://nginx.org/r/ssl_ciphers">ssl_ciphers</a></code> and enabling <code><a href="http://nginx.org/r/ssl_prefer_server_ciphers">ssl_prefer_server_ciphers on</a></code>, and testing the configuration with popular browser versions.  The <a href="https://www.ssllabs.com/ssltest/">Qualys SSL Server test</a> is an indicator for popular browsers, but (as of November 2015) <a href="https://lists.cert.at/pipermail/ach/2015-November/002009.html">it is not reliable for HTTP/2 handshakes</a>.</p><span>
+</span><h1 id="tip6revise">Tip 6. Revise HTTP/1.x Optimizations</h1><span>
+</span><p>Surprisingly, undoing or revising your HTTP/1.x optimizations is actually the most creative part of an HTTP/2 implementation. There are several issues to consider and many degrees of freedom as to what to do.</p><span>
+</span><p>Before you start making changes, consider whether users of older browsers will suffer from them. With that in mind, there are three broad strategies for undoing or revising HTTP/1.x optimizations:</p><span>
+</span><ul>
+<li><strong>Nothing to see here, folks</strong>. If you haven’t optimized your application(s) for HTTP/1.x, or you’ve made moderate changes that you’re comfortable keeping, then you have no work to do to support HTTP/2 in your app.</li>
+<li><strong>Mixed approach</strong>. You may decide to reduce file and data concatenation, but not eliminate them entirely. For instance, some image spriting for cohesive groups of small images might stay, whereas bulking up the initial HTML file with inlined data might go.</li>
+<li><strong>Complete reversal of HTTP/1.x optimizations</strong> (but see the domain sharding note in <a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/#tip7sharding">Tip 7</a>). You may want to get rid of these optimizations altogether.</li>
+</ul><span>
+</span><p>Caching is a bit of a wildcard. Theoretically, caching operates optimally where there is a plethora of small files. However, that’s a lot of file I/O. Some concatenation of closely related files may make sense, both for workflow and application performance. Carefully consider your own experience and what other developers share as they implement HTTP/2.</p><span>
+</span><h1 id="tip7sharding">Tip 7. Implement Smart Sharding</h1><span>
+</span><p>Domain sharding is perhaps the most extreme, and also possibly the most successful, HTTP/1.x optimization strategy. You can use a version of domain sharding that still improves performance for HTTP/1.x but is basically ignored, and beneficially so, for HTTP/2. (Which generally doesn’t benefit from domain sharding, because of the use of a single connection.)</p><span>
+</span><p>For HTTP/2-friendly sharding, make these two things happen:</p><span>
+</span><ul>
+<li>Make the domain names for sharded resources resolve to the same IP address.</li>
+<li>Make sure your certificate has a wildcard that makes it valid for all of the domain names used for sharding, or that you have an appropriate multidomain certificate.</li>
+</ul><span>
+</span><p>You can find details <a href="http://tools.ietf.org/html/rfc7540#section-9.1.1">here</a>.</p><span>
+</span><p>If these conditions are in place, sharding will happen for HTTP/1.x – the domains are different enough to trigger browsers to create additional sets of connections – and not for HTTP/2; the separate domains are treated as one domain, and a single connection can access all of them.</p><span>
+</span><h1>Conclusion</h1><span>
+</span><p>HTTP/2 and TLS are likely to improve your site performance and let users know that their interaction with your site is secure. Whether you’re first on your block to implement HTTP/2, or catching up to competitors, you can add HTTP/2 support quickly and well.</p><span>
+</span><p>Use these tips to help you achieve the highest HTTP/2 performance with the least ongoing effort, so you can put your focus on creating fast, effective, secure applications that are easy to maintain and run.</p><span>
+</span><h1>Resources</h1><span>
+</span><ul>
+<li>For the lowdown on HTTP/2, see the white paper from NGINX (<a href="https://www.nginx.com/wp-content/uploads/2015/09/NGINX_HTTP2_White_Paper_v4.pdf" target="_blank">PDF</a>).
+</li>
+<li>The <em>Can I use</em> website shows browser support for a wide range of front-end web technologies, including <a href="http://caniuse.com/#feat=spdy" target="_blank">SPDY</a> and <a href="http://caniuse.com/#feat=http2" target="_blank">HTTP/2</a>.
+</li>
+<li>For details of our testing, see the <a href="https://www.youtube.com/watch?v=4OiyssTW4BA&amp;feature=youtu.be" target="_blank">HTTP/2 presentation</a> from nginx.conf 2015.
+</li>
+<li>NGINX has a webinar, <a href="https://www.nginx.com/resources/webinars/whats-new-in-http2/">What’s New in HTTP/2?</a>, which describes key features and gives implementation advice.
+</li>
+<li>For an overview of NGINX performance tips, see our blog post, <a href="https://www.nginx.com/blog/10-tips-for-10x-application-performance/">10 Tips for 10x Application Performance</a>.</li>
+</ul><span>
+	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,166 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Using Git to Manage Todos · Jezen Thomas</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Using Git to Manage Todos · Jezen Thomas</h1>
+                <div class="about_pane"><span>
+  </span><a href="http://jezenthomas.com/" class="imglink"><img src="http://jezenthomas.com/img/testkid.jpg" alt="Jezen Thomas"></a><span>
+  </span><p>
+  Hi, I’m <a href="http://jezenthomas.com/about">Jezen Thomas</a>.
+  </p><span>
+  </span><p>
+  I’m a freelance software developer. I mostly write
+  about Vim, Unix, Ruby, and JavaScript.
+  </p><span>
+  </span><p>
+  
+  <script>
+  !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+  </script>
+  </p><span>
+</span></div><div class="post"><span>
+  </span><article>
+    
+    <p class="published">October 19, 2015</p>
+
+    <p>A common convention when writing software is to add <code>TODO</code> or <code>FIXME</code> comments
+directly to the codebase. These comments clearly mark bits of logic that are yet
+to be implemented or are in need of review.</p>
+
+<p>One problem with this approach is that it's easy to ignore these comments, and
+under the human pressures of deadlines and multi-tasking, the comments are
+forgotten about and are left to linger and rot. The number of <code>TODO</code> comments in
+the codebase grows over time, gradually becoming more intimidating, more
+unwieldy, and less useful.</p>
+
+<p>In order to coerce my colleagues (and myself) into taking better care of our
+heaving pile of <code>TODO</code> comments, I added a <em>post-commit hook</em> that runs <code>grep</code>
+across the directories we care about.</p>
+<div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="c">#!/bin/bash</span>
+
+<span class="nb">set</span> -e
+
+grep -InR <span class="s1">'TODO'</span> ./* <span class="se">\</span>
+  --exclude-dir<span class="o">=</span>node_modules <span class="se">\</span>
+  --exclude-dir<span class="o">=</span>public <span class="se">\</span>
+  --exclude-dir<span class="o">=</span>vendor <span class="se">\</span>
+  --exclude-dir<span class="o">=</span>compiled <span class="se">\</span>
+  --exclude-dir<span class="o">=</span>git-hooks
+
+<span class="nb">exit </span>0
+</code></pre></div>
+<p>The output gives me the following bits of information:</p>
+
+<ul>
+<li>The file path</li>
+<li>The line number where the TODO was found</li>
+<li>The TODO message</li>
+</ul>
+
+<p>This is a good start; at least everyone on the team will now see a list of all
+TODO items every time they push some commits. The problem now though, is that
+all of the TODO items are mixed together and it's difficult to know who is
+responsible for which item. We could introduce some convention where everyone
+adds their name to their TODO, but realistically people just wouldn't adhere to
+that.</p>
+
+<p>What's missing from my ideal output is the author of each TODO item. We can use
+<code>git log</code> to find the author of a commit, and using the <code>-L</code> flag the command
+will take a range of lines and a file path, both of which we find in our <code>grep</code>
+output. The approach then, is to iterate over our <code>grep</code> output, pull the file
+path and line number out of each search match, plug those into <code>git log</code> to find
+the author, and glue the pieces back together to build the output we need.</p>
+<div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="c">#!/bin/bash</span>
+
+<span class="nb">set</span> -e
+
+main<span class="o">()</span> <span class="o">{</span>
+  <span class="k">while</span> <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -r todo<span class="p">;</span> <span class="k">do</span>
+    <span class="nb">printf</span> <span class="s2">"%s\n"</span> <span class="s2">"$(file_path):$(line_number) $(line_author) $(message)"</span>
+  <span class="k">done</span> &lt; &lt;<span class="o">(</span>todo_list<span class="o">)</span>
+<span class="o">}</span>
+
+todo_list<span class="o">()</span> <span class="o">{</span>
+  grep -InR <span class="s1">'TODO'</span> ./* <span class="se">\</span>
+    --exclude-dir<span class="o">=</span>node_modules <span class="se">\</span>
+    --exclude-dir<span class="o">=</span>public <span class="se">\</span>
+    --exclude-dir<span class="o">=</span>vendor <span class="se">\</span>
+    --exclude-dir<span class="o">=</span>compiled <span class="se">\</span>
+    --exclude-dir<span class="o">=</span>git-hooks
+<span class="o">}</span>
+
+line_author<span class="o">()</span> <span class="o">{</span>
+  <span class="nv">LINE</span><span class="o">=</span><span class="k">$(</span>line_number <span class="s2">"$todo"</span><span class="k">)</span>
+  <span class="nv">FILE</span><span class="o">=</span><span class="k">$(</span>file_path <span class="s2">"$todo"</span><span class="k">)</span>
+  tput setaf 6
+  <span class="nb">printf</span> <span class="s2">"%s"</span> <span class="s2">"$(git log --pretty=format:"</span>%cN<span class="s2">" -s -L "</span><span class="nv">$LINE</span><span class="s2">","</span><span class="nv">$LINE</span><span class="s2">":"</span><span class="nv">$FILE</span><span class="s2">" | head -n 1)"</span>
+  tput sgr0
+<span class="o">}</span>
+
+file_path<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">printf</span> <span class="s2">"%s"</span> <span class="s2">"$todo"</span> <span class="p">|</span> cut -d<span class="s1">':'</span> -f 1
+<span class="o">}</span>
+
+line_number<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">printf</span> <span class="s2">"%s"</span> <span class="s2">"$todo"</span> <span class="p">|</span> cut -d<span class="s1">':'</span> -f 2
+<span class="o">}</span>
+
+message<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">printf</span> <span class="s2">"%s"</span> <span class="s2">"$todo"</span> <span class="p">|</span> cut -d<span class="s1">':'</span> -f <span class="m">3</span> <span class="p">|</span> xargs
+<span class="o">}</span>
+
+main
+
+<span class="nb">exit </span>0
+</code></pre></div>
+<p>I think this approach is probably <em>good enough</em>. Allowing a list of TODO items
+to grow like weeds is a human problem that can't exactly be solved elegantly
+with technology alone, but at least the problem is now far more visible to all
+of the developers on my team so they have chance at doing something about it.</p>
+
+<p>A few non-obvious technical considerations:</p>
+
+<ul>
+<li>I'm using <code>printf</code> instead of <code>echo</code> because it's more portable, and it also
+allows you to be explicit about where newline characters fall.</li>
+<li>The <code>tput</code> commands in the <code>line_author</code> function change the colour of the
+output. This makes the commit author's name stand out so they don't miss it.</li>
+<li>The <code>xargs</code> command tacked on to the end of the <code>message</code> function is there to
+strip leading and trailing whitespace. It's probably not the best way to do
+that.</li>
+</ul>
+
+
+    <p>
+      
+        <a href="http://jezenthomas.com/">« All articles</a>
+      
+    </p>
+
+    <div class="discussion"><span>
+      </span><span>
+      </span><p>
+      Have a question about this post or anything else?<br>Ask away <a href="https://twitter.com/jezenthomas" target="_blank">on Twitter</a>.
+      </p><span>
+    </span></div>
+  </article><span>
+
+  </span><p class="colophon">
+Written by <a href="http://jezenthomas.com/about">Jezen Thomas</a>, a freelance software developer
+spending most of his time writing software with Ruby and JavaScript. Follow him
+<a href="https://twitter.com/jezenthomas">on Twitter</a> or write him <a href="mailto:jezen@jezenthomas.com">an email</a>.
+</p><span>
+</span><span>
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

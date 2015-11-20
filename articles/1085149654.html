@@ -1,0 +1,352 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Pseudo-comments in CSS (Or, How Browsers Parse Styles)</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Pseudo-comments in CSS (Or, How Browsers Parse Styles)</h1>
+                <div class="ArticleCopy language-"><span>
+    </span><p>The CSS spec does not mention it, but you can mimic C-style and/or Unix-style line comments in CSS files (with some caveats). Others have written about them before (see in particular, SitePoint’s Web Foundations post covering <a href="http://www.sitepoint.com/web-foundations/css-comments/">CSS Comments</a>). The present post examines them in further detail.</p><span>
+</span><span>
+</span><p>CSS parsers, <a href="http://www.w3.org/TR/CSS2/syndata.html">per the spec</a>, officially bless one style for comments, the multi-line comment from C-style languages, which uses a start token, <code>/*</code>, and an end token, <code>*/</code>, as follows:</p><span>
+</span><pre><code class="language-css">/*
+  characters between, and including, the start and
+  end tokens are ignored by the parser,
+*/</code></pre><span>
+</span><p>And so a rule declaration in comments will be ignored:</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+  /*
+  background: white;
+  */
+}</code></pre><span>
+</span><p>A block declaration in comments will be ignored:</p><span>
+</span><pre><code class="language-css">/*
+body {
+  background: red;
+}
+*/</code></pre><span>
+</span><p>In each of those examples, we are using the comment syntax <em>intentionally</em> to instruct the parser to ignore the content.</p><span>
+</span><p>However, we can do that by accident, as with malformed declarations, such as</p><span>
+</span><pre><code class="language-css">body {
+  background: red    /* missing semi-colon */
+  background: blue;      
+}</code></pre><span>
+</span><p>In this example, <em>neither</em> background declaration is applied because of the missing semi-colon.  The parser scans for the <em>next</em> semi-colon, determines the entire two-line statement is malformed, and so ignores the entire lexed content. The same thing happens if we leave out the property value altogether:</p><span>
+</span><pre><code class="language-css">body {
+  background:
+  background: blue; /* this declaration is not applied */
+}</code></pre><span>
+</span><p>And <em>that</em> shows that we can use malformed declarations as…</p><span>
+</span><span>
+</span><p>We’ll refer to these as “pseudo-comments” because, properly speaking, these are not comments that terminate at an end-of-line character. Instead they work by malforming the input that follows them, even on subsequent lines. And this is due to the error handling process for <a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">Rule sets, declaration blocks, and selectors</a>:</p><span>
+</span><blockquote>
+<p>“the whole statement should be ignored if there is an error anywhere in the selector, even though the rest of the selector may look reasonable in CSS 2.1.”</p>
+</blockquote><span>
+</span><p>In the following example, taken from the spec, the second ruleset is ignored due to the presence of the invalid “&amp;” character in the selector:</p><span>
+</span><pre><code class="language-css">h1, h2 {color: green }
+h3, h4 &amp; h5 {color: red } /* &lt;= ignored */
+h6 {color: black }</code></pre><span>
+</span><p>Again, in the following, the second and third declarations are ignored due to the presence of extra characters in the background property name:</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+  xbackground: white;    /* property name is not recognized */
+  y background: blue;    /* property name is not well-formed */
+}</code></pre><span>
+</span><p>A quick tour around the English language keyboard shows the following special characters will act as single-line declaration comments:</p><span>
+</span><pre><code class="language-css">selector {
+  ~ property-name: ignored;
+  ` property-name: ignored;
+  ! property-name: ignored;
+  @ property-name: ignored;
+  # property-name: ignored;
+  $ property-name: ignored;
+  % property-name: ignored;
+  ^ property-name: ignored;
+  &amp; property-name: ignored;
+  * property-name: ignored;
+  _ property-name: ignored;
+  - property-name: ignored;
+  + property-name: ignored;
+  = property-name: ignored;
+  | property-name: ignored;
+  \ property-name: ignored;
+  : property-name: ignored;
+  &lt; property-name: ignored;
+  . property-name: ignored;
+  &gt; property-name: ignored;
+  , property-name: ignored;
+  ? property-name: ignored;
+  / property-name: ignored;
+}</code></pre><span>
+</span><p>Rather than use just any character, though, stick with C and Unix convention, and use either <code>#</code> or <code>//</code>:</p><span>
+</span><pre><code class="language-css">// background: ignored;
+  # background: ignored;</code></pre><span>
+</span><h2 id="semi-colons">Semi-colons</h2><span>
+</span><p>Semi-colons are the end tokens of rule declarations. Thus, they cannot “comment” text that follows them. In spec-speak, the parser treats a dangling semi-colon as a <em>malformed declaration</em> (a declaration missing a name, colon, or value).</p><span>
+</span><p>As shown earlier, when regular multi-line comments are malformed, that is, when start and end tokens are not balanced around a ruleset or declaration, the subsequent declaration or ruleset is ignored by the parser. The following will in effect “comment” out <em>both</em> background declarations because the parser will search for the next end-of-declaration token (the semi-colon) for the affected declaration:</p><span>
+</span><pre><code class="language-css">body {
+  background:
+  background: blue;      /* both lines ignored */
+}</code></pre><span>
+</span><p>That’s fixed by adding a semi-colon after the comment, before the next declaration (thus the background blue declaration will be applied):</p><span>
+</span><pre><code class="language-css">body {
+  background: ;          /* ignored */
+  background: blue;      /* processed */
+}</code></pre><span>
+</span><p>The effect is the same with a pseudo-comment on a line missing its semi-colon:</p><span>
+</span><pre><code class="language-css">body {
+  background: # red   /* ignored */
+  background: blue;   /* also ignored */
+}</code></pre><span>
+</span><p>and corrected by restoring the semi-colon:</p><span>
+</span><pre><code class="language-css">body {
+  background: # red;  /* ignored */
+  background: blue;   /* processed */
+}</code></pre><span>
+</span><h2 id="inline-vs-next-line-placement">Inline vs. next-line placement</h2><span>
+</span><p>This is where the “pseudo” enters into the term “pseudo-comment.”  It may be  reason enough not to call these “comments” at all as they break from the end-of-line convention of C or Unix-style line comments.</p><span>
+</span><p>A pseudo-comment placed on its own line will suppress a declaration on the next line. In the following, the background will be blue:</p><span>
+</span><pre><code class="language-css">body { 
+  //
+  background: white !important;  /* ignored */
+  background: blue;
+}</code></pre><span>
+</span><p>A pseudo-comment placed <em>after</em> a valid declaration on the same line will suppress a declaration on the <em>next</em> line. In the following, the background will be white rather than blue:</p><span>
+</span><pre><code class="language-css">body {
+  background: white; // next line is ignored... 
+  background: blue !important;
+}</code></pre><span>
+</span><p>Even a “minified” version of a CSS selector with an inline pseudo-comment will behave as a single-declaration comment. In the following, the first background declaration is ignored due to the presence of the comment token, <code>#</code>, recognized by the parser as terminating at the next semi-colon, and the second background declaration is recognized as well-formed and therefore applied (in this case, blue will be applied to the body background): </p><span>
+</span><pre><code class="language-css">body { // background: red !important; background: blue; }</code></pre><span>
+</span><h2 id="selectors">Selectors</h2><span>
+</span><p>The same rule-based behavior applies to selectors.</p><span>
+</span><p>An entire selector ruleset is ignored when the selector is preceded by a pseudo-comment, whether inline</p><span>
+</span><pre><code class="language-css">// body {
+  background: white !important;
+}</code></pre><span>
+</span><p>or next-line:</p><span>
+</span><pre><code class="language-css">//
+body {
+  background: white !important;
+}</code></pre><span>
+</span><span>
+</span><p>Pseudo-comments work by taking advantage of the spec’s <a href="http://www.w3.org/TR/CSS2/syndata.html#parsing-errors">Rules for handling parsing errors</a>. In effect, they work by exploiting their malformed-ness.</p><span>
+</span><h3 id="unknown-values">Unknown values</h3><span>
+</span><blockquote>
+<p>“User agents must ignore a declaration with an unknown property.”</p>
+</blockquote><span>
+</span><p>A declaration containing an unrecognized property name will not be evaluated, as, for example, the <code>comment</code> property in the following <code>body</code> ruleset:</p><span>
+</span><pre><code class="language-css">body {
+  comment: 'could be text or a value';
+}</code></pre><span>
+</span><h3 id="illegal-values">Illegal values</h3><span>
+</span><blockquote>
+<p>“User agents must ignore a declaration with an illegal value.”</p>
+</blockquote><span>
+</span><p>The <code>color</code> property defined below is ignored because the value is a <em>string</em> rather than a value or color keyword:</p><span>
+</span><pre><code class="language-css">body {
+  color: "red";
+}</code></pre><span>
+</span><h3 id="malformed-declarations-and-statements">Malformed declarations and statements</h3><span>
+</span><blockquote>
+<p>“User agents must handle unexpected tokens encountered while parsing a declaration [or statement] by reading until the end of the declaration [or statement], while observing the rules for matching pairs of (), [], {}, “”, and ”, and correctly handling escapes.”</p>
+</blockquote><span>
+</span><pre><code class="language-css">body {
+  -color: red;
+}</code></pre><span>
+</span><p>Declarations malformed by unmatched pairs of <code>()</code>, <code>[]</code>, <code>{}</code>, <code>""</code>, and <code>''</code> are more comprehensively ignored (and therefore more dangerous) than others. And the quoting characters <code>""</code>, and <code>''</code> are processed differently than the grouping characters <code>()</code>, <code>[]</code>, <code>{}</code>.</p><span>
+</span><h3 id="quoting-characters">Quoting characters</h3><span>
+</span><p>The <em>unpaired</em> apostrophe in the second declaration below will prevent the <em>subsequent</em> declaration in the ruleset from being processed (thus, the background will be red):</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+  'background: white;  /* ignored */
+  background: blue;    /* also ignored */
+}</code></pre><span>
+</span><p>However, a third declaration after the apostrophe <em>will</em> be processed (thus the background will be gold):</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+  'background: white;  /* ignored */
+  background: blue;    /* also ignored */
+  background: gold;    /* processed */
+}</code></pre><span>
+</span><p>In sum, you can’t terminate a single quoting character on its own line.</p><span>
+</span><h3 id="grouping-characters">Grouping characters</h3><span>
+</span><p>In general, grouping characters <code>()</code>, <code>[]</code>, <code>{}</code> should be <em>avoided</em> as pseudo-comments because they have more drastic effects in that they interfere more extensively with the parser’s block recognition rules, and so will “comment” out more than single declarations. For the sake of completeness, we’ll examine a few of these.</p><span>
+</span><p>For example, the appearance of <em>unmatched</em> starting group characters suppresses <em>all</em> subsequent declarations to the end of the <em>stylesheet</em> (not just the ruleset). This is true of commas, brackets, and braces.</p><span>
+</span><p>In the following, only the <code>background: red;</code> declaration is processed; all declarations and selectors after that <em>in the entire stylesheet</em> will be ignored:</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+
+  {  /* *every* declaration that follows will be ignored, 
+        including all subsequent selectors, to the 
+        end of the stylesheet. */
+
+  background: white;
+  color: aqua;
+  margin: 5px;
+
+  ...
+}</code></pre><span>
+</span><p>When grouping characters are <em>matched</em>, the grouped and subsequent ungrouped declarations in the <em>ruleset</em> will be suppressed. In the following, the background will be red, not gold:</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+
+  (
+  background: white;
+  background: blue;
+  background: fuchsia;
+  )
+
+  background: gold;
+}</code></pre><span>
+</span><p>A <em>closing</em> comma or bracket will suppress only the next declaration that appears. In the following, the background will be gold:</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+
+  ]
+  background: white;  
+  background: blue;
+}</code></pre><span>
+</span><p>A closing <em>brace</em>, <code>}</code>, however, will suppress all declarations to the end of the ruleset. In the following, the background will be red:</p><span>
+</span><pre><code class="language-css">body {
+  background: red;
+
+  }
+  background: white;
+  background: blue;
+}</code></pre><span>
+</span><h2 id="at-rules">At-rules</h2><span>
+</span><p>At-rules have two forms:</p><span>
+</span><ul>
+<li>a body declaration denoted by braces, <code>{ ... }</code> (such as <code>@media</code>),</li>
+<li>a rule declaration closed with a semi-colon <code>;</code> (such as <code>@charset</code>).</li>
+</ul><span>
+</span><p>Pseudo-comments on body-block at-rules behave the same as for selectors (i.e., the entire at-rule is ignored).</p><span>
+</span><h2 id="pseudo-comments-applied-to-at-rules-with-body-blocks">Pseudo-comments applied to at-rules with body blocks</h2><span>
+</span><p>For at-rules containing body blocks, such as <code>@keyframes</code>, <code>@media</code>, <code>@page</code>. and <code>@font-face</code>, the entire at-rule ruleset is ignored when the at-rule is preceded by a pseudo-comment, whether inline</p><span>
+</span><pre><code class="language-css">// @media (min-width: 0) {
+  body {
+    background: white !important;
+  }
+}</code></pre><span>
+</span><p>or next-line:</p><span>
+</span><pre><code class="language-css">//
+@media (min-width: 0) {
+  body {
+    background: white !important;
+  }
+}</code></pre><span>
+</span><h2 id="pseudo-comments-applied-to-at-rules-without-body-blocks">Pseudo-comments applied to at-rules without body blocks</h2><span>
+</span><p>At-rules without blocks, such as <code>@charset</code> and <code>@import</code>, provide a fascinating exception to inline pseudo-comment behavior.</p><span>
+</span><p>An at-rule with a pseudo-comment <em>after</em> the keyword will be ignored:</p><span>
+</span><pre><code class="language-css">/* the pseudo-comment before url()
+   suppresses the entire @import */
+@import // url('libs/normalize.css');</code></pre><span>
+</span><p>But a pseudo-comment that <em>precedes</em> an at-rule suppresses both the import <em>and</em> the first rule or selector after the import. This is because the parser treats a pseudo-commented <code>@import</code> as a malformed statement, and looks for the next matching braces in order to complete the next ruleset. </p><span>
+</span><p>Thus, a pseudo-comment before one <code>@import</code> in a series of <code>@import</code> rules will suppress <em>all</em> subsequent <code>@import</code> rules <em>and</em> the first declaration or selector after the last import:</p><span>
+</span><pre><code class="language-css">// @import url('libs/normalize.css');
+
+/* NONE of these loads because previous statement is
+   processed as a malformed statement, and the parser
+  looks for the next matching braces. */
+@import url('libs/normalize.css');
+@import url('libs/example.css');
+@import url('libs/other.css');
+@import url('libs/more.css');
+@import url('libs/another.css');
+@import url('libs/yetmore.css');</code></pre><span>
+</span><p>The fix for this is surprisingly simple: just add an empty body block after the comment <code>@import</code></p><span>
+</span><pre><code class="language-css">// @import url('libs/normalize.css');
+
+{}  /* now, the next import will load */
+
+@import url('libs/normalize.css');</code></pre><span>
+</span><p>This is fun for debugging, but that behavior is peculiar enough that you should avoid the pseudo-comments approach to at-rules without body blocks, and use the multi-line syntax instead.</p><span>
+</span><h3 id="at-rules-and-unknown-at-keywords">At-rules and Unknown at-keywords</h3><span>
+</span><blockquote>
+<p>“User agents must ignore an invalid at-keyword together with everything following it, up to the end of the block that contains the invalid at-keyword, or up to and including the next semicolon (;), or up to and including the next block ({…}), whichever comes first”</p>
+</blockquote><span>
+</span><p>We can illustrate all that by using an unknown at-keyword, <code>@comment</code>, as a custom at-rule alternative to the multi-line syntax.  For example, the following at-rule is parsed to the closing brace, <code>}</code>, determined to be malformed, and then ignored:</p><span>
+</span><pre><code class="language-css">@comment { 
+  I'm not processed in any way.
+}</code></pre><span>
+</span><p>That looks harmless and readable at first, but due to the presence of the apostrophe in <code>I'm</code>, we’ve reintroduced the quoting character problem (i.e., you can’t terminate the single quoting character on its own line).  That means, a subsequent at-rule or selector will also be ignored if our custom <code>@comment</code>’s body is closed on its own line, because the rule’s <em>declaration</em> is malformed by the presence of the apostrophe in <code>I'm</code>:</p><span>
+</span><pre><code class="language-css">@comment { 
+  I'm not processed in any way. }
+
+body { background: blue; }   /* this whole block will not be processed either! */</code></pre><span>
+</span><p>That can be rescued with outer quotes, either inside the braces</p><span>
+</span><pre><code class="language-css">@comment { 
+  "I'm not processed in any way."  }  /* fixed */
+
+body { background: blue; }   /* this block will work */</code></pre><span>
+</span><p>Or by leaving off the braces and instead terminating the pseudo-comment with a semi-colon, either inline:</p><span>
+</span><pre><code class="language-css">@comment "I'm not processed in any way.";
+
+body { background: blue; }   /* this works */</code></pre><span>
+</span><p>or next-line </p><span>
+</span><pre><code class="language-css">@comment 
+"I'm not processed in any way.";
+
+body { background: blue; }   /* this works */</code></pre><span>
+</span><h2 id="pre-processors">Pre-processors</h2><span>
+</span><p>The various CSS pre-processors support similar multiline and single-line comments.</p><span>
+</span><h3 id="sass">Sass</h3><span>
+</span><blockquote>
+<p>Sass supports standard multiline CSS comments with /* */, as well as single-line comments with //. The multiline comments are preserved in the CSS output where possible, while the single-line comments are removed. </p>
+</blockquote><span>
+</span><p><a href="http://sass-lang.com/documentation/file.SASS_REFERENCE.html#comments">source</a></p><span>
+</span><p>Compressed mode will normally strip out all comments, unless the comment is preceded by <code>/*!</code>.</p><span>
+</span><p>However, you can use a <em>single-character</em> pseudo-comment, such as <code>#</code> and the output will contain the commented line.</p><span>
+</span><pre><code class="language-css">body {
+   # background: red; 
+}</code></pre><span>
+</span><h3 id="less">Less</h3><span>
+</span><blockquote>
+<p>Both block-style and inline comments may be used.</p>
+</blockquote><span>
+</span><p><a href="http://lesscss.org/features/#features-overview-feature-comments">source</a></p><span>
+</span><p>It is not clear (to me, at least) whether Less will suppress these comments or print them to the output. From StackOverflow posts, it appears Less will aggregate line-comments at block level.</p><span>
+</span><h3 id="stylus">Stylus</h3><span>
+</span><p>Stylus also supports multiline <code>/* */</code> and single-line comments <code>//</code>, but suppresses these from the output if the <code>compress</code> directive is enabled. If you always want multiline comments to print to the output, use <em>Multi-line buffered</em> comments.</p><span>
+</span><blockquote>
+<p>Multi-line comments which are not suppressed start with /*!. This tells Stylus to output the comment regardless of compression.</p>
+</blockquote><span>
+</span><pre><code class="language-css">/*!
+ * This will appear in the output.
+ */</code></pre><span>
+</span><p><a href="https://learnboost.github.io/stylus/docs/comments.html">source</a></p><span>
+</span><h2 id="best-practice">Best Practice</h2><span>
+</span><blockquote>
+<p>“Readability counts.” <br><cite><a href="https://www.python.org/dev/peps/pep-0020/">https://www.python.org/dev/peps/pep-0020/</a>‘&gt;Zen of Python</cite></p>
+</blockquote><span>
+</span><p>Comments can make obscure code more readable, but readability depends on more than one convention.  Pseudo-comments in CSS are less about readability than about playing against convention (aka, the parser).  </p><span>
+</span><p>If you find you need to use pseudo-comments:</p><span>
+</span><ul>
+<li>Stick to the C and Unix convention and use either <code>//</code> or <code>#</code> for the pseudo-comment delimiter.</li>
+<li>Place pseudo-comments on the same line before the item to be ignored.</li>
+<li>Use whitespace to separate the pseudo-comment delimiter from the intended rule ~ e.g. <code># background: ignored;</code>.</li>
+</ul><span>
+</span><p>Use pseudo-comments:</p><span>
+</span><ul>
+<li>Use pseudo-comments for <strong>debugging</strong>, notably when using an interactive CSS edit panel, such as Chris Pederick’s <a href="http://chrispederick.com/work/web-developer/">Web Developer extension</a> (chrome, firefox, opera).</li>
+<li>Use pseudo-comments to prevent <strong>individual</strong> declarations, selectors, or at-rules with bodies from being processed.</li>
+</ul><span>
+</span><p>Avoid pseudo-comments:</p><span>
+</span><ul>
+<li>Avoid pseudo-comments for use with textual descriptions and at-rules without bodies (e.g., @import) ~ use <em>multi-line</em> <code>/* ... */</code> comments instead.</li>
+<li>Avoid the quoting characters <code>'', ""</code> ~ they are hard for human eyes to scan and cannot be terminated on their own line.</li>
+<li>Avoid the grouping characters <code>(), [], {}</code> ~ they introduce more complicated scanning (and cannot be terminated on their own line).</li>
+<li>Avoid pseudo-comments in <strong>production</strong> code ~ though not “harmful”, they are merely extra bytes at that point.</li>
+</ul><span>
+  </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

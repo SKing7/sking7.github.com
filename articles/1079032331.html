@@ -1,0 +1,152 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Arrow This | getiblog</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Arrow This | getiblog</h1>
+                <div class="entry"><span>
+						
+						</span><p>One of the most vaunted features of ES6 is the new <code>=&gt;</code> arrow function syntax for abbreviated definitions of function expressions (aka “lambdas”). You hardly can’t find a blog post or conference talk or book about ES6 (or even tangentially related to it) that doesn’t lead with “<code>=&gt;</code> is the new <code>function</code>“.</p><span>
+</span><p>Arrow function syntax has even permeated standards and specification documents, almost as if it’s always been there and we’re just discovering it.</p><span>
+</span><p>Those who follow me know I’m not a fan of <code>=&gt;</code> syntax, for <a href="https://twitter.com/search?q=arrow%20from%3Agetify&amp;src=typd">a number of reasons</a>. But don’t worry, this blog post is <strong>not about why</strong> I don’t like it. If you <em>are</em> interested in that discussion, see <a href="https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20&amp;%20beyond/ch2.md#arrow-functions">Chapter 2, ‘Arrow Functions’</a> of my <a href="https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20&amp;%20beyond/README.md#you-dont-know-js-es6--beyond">YDKJS: ES6 &amp; Beyond</a> book.</p><span>
+</span><p>Here I want to clear up a little confusion around what exactly arrow functions do with <code>this</code>, <code>arguments</code>, etc. Actually, I have been guilty of not precisely explaining this topic in the past, and I want to clear the record. For example, here’s how <a href="https://github.com/getify/You-Dont-Know-JS/blob/master/this%20&amp;%20object%20prototypes/ch2.md#lexical-this">I first explained it</a> in YDKJS awhile back.</p><span>
+</span><h3 id="lexical-or-not">Lexical Or Not?</h3><span>
+</span><p>So here’s how I, and a lot of other people, describe arrow function <code>this</code> behavior: <strong>lexical <code>this</code></strong>.</p><span>
+</span><p>What do we mean by that?</p><span>
+</span><pre class="code">function foo() {
+   setTimeout( () =&gt; {
+      console.log("id:", this.id);
+   },100);
+}
+
+foo.call( { id: 42 } );
+// id: 42
+</pre><span>
+</span><p>The <code>=&gt;</code> arrow function here <em>appears to</em> bind its <code>this</code> to the parent function <code>foo()</code>‘s <code>this</code>. If that inner function had been a normal <code>function</code> (declaration or expression), its <code>this</code> would have been controlled by how <code>setTimeout(..)</code> chose to invoke the function. If you’re fuzzy on the rules that decide <code>this</code>-binding, check out <a href="https://github.com/getify/You-Dont-Know-JS/blob/master/this%20&amp;%20object%20prototypes/ch2.md#determining-this">Chapter 2, ‘Determining <code>this</code>‘</a> in my <a href="https://github.com/getify/You-Dont-Know-JS/blob/master/this%20&amp;%20object%20prototypes/README.md#you-dont-know-js-this--object-prototypes">YDKJS: this &amp; Object Prototypes</a> book.</p><span>
+</span><h4 id="lexical-variable-this">Lexical Variable <code>this</code></h4><span>
+</span><p>One common way of illustrating that observable <code>this</code> behavior is:</p><span>
+</span><pre class="code">function foo() {
+   var self = this;
+   setTimeout(function() {
+      console.log("id:", self.id);
+   },100);
+}
+
+foo.call( { id: 42 } );
+// id: 42
+</pre><span>
+</span><p><strong>Side note:</strong> The variable name <code>self</code> is an absolutely terrible, misleading name. It implies that <code>this</code> refers to the function it<em>self</em>. It almost never does. <code>var that = this</code> is similarly unhelpful in its semantics, especially when there are multiple scopes in play (<code>that1</code>, <code>that2</code>, …). If you want a good name, use <code>var context = this</code>, because that’s what <code>this</code> really is: a dynamic <em>context</em>.</p><span>
+</span><p>In that snippet, you can see that we don’t even use <code>this</code> inside the inner function. Instead, we fall back on a more predictable mechanism: <em>lexical variables</em>. We declare a variable <code>self</code> in the outer function, and then simply reference that variable in the inner function.</p><span>
+</span><p>That of course completely eliminates <code>this</code>-binding rules from the equation (for the inner function, that is), and instead just relies on lexical scoping rules, and indeed, closure.</p><span>
+</span><p>The end result appears to be the same as with <code>=&gt;</code> arrow functions. In other words, the (imprecise) implication here is that <code>=&gt;</code> arrow functions have a “lexical <code>this</code>” behavior by way of the lexical variable/closure mechanism.</p><span>
+</span><p>But… <strong>that’s not accurate.</strong></p><span>
+</span><p>Uh oh. My bad.</p><span>
+</span><h4 id="arrow-bound-this">Arrow-bound <code>this</code></h4><span>
+</span><p>Another way of illustrating the observed <code>this</code> behavior of <code>=&gt;</code> arrow functions is to think of the inner function as being hard-bound:</p><span>
+</span><pre class="code">function foo() {
+   setTimeout(function() {
+      console.log("id:", this.id);
+   }.bind(this),100);
+}
+
+foo.call( { id: 42 } );
+// id: 42
+</pre><span>
+</span><p>As you can see with <code>.bind(this)</code>, the inner function here is hard-bound to the <code>this</code> of the outer function, which means that no matter how <code>setTimeout(..)</code> chooses to invoke the function its given, that function will use the <code>this</code> that <code>foo()</code> uses.</p><span>
+</span><p>Yes, this version has the same observable behavior as the previous two snippets demonstrate. So, is it more accurate? Many people assume that’s <em>really</em> how <code>=&gt;</code> arrow functions work.</p><span>
+</span><p>Eh… <strong>nope.</strong></p><span>
+</span><p>Oops.</p><span>
+</span><h3 id="already-lexical">Already Lexical</h3><span>
+</span><p>I’m more embarrassed by my imprecise explanations, and tolerance of others’ explanations thereof, in the past because awhile back, TC39 regular Dave Herman (<a href="http://twitter.com/littlecalculist">@littlecalculist</a>) had explained this issue more carefully and accurately to me, and yet I’m guilty of not fully internalizing the meaning of his explanation.</p><span>
+</span><p>Dave said to me, essentially, “The ‘lexical <code>this</code>‘ phrase is troubling, because <code>this</code> has always been lexical.”</p><span>
+</span><p>Really? Hmm…</p><span>
+</span><p>He went on to say, “What <code>=&gt;</code> changes is not to make <code>this</code> lexical, but rather to <strong>not bind a <code>this</code> in it at all.</strong>”</p><span>
+</span><p>I didn’t catch back then the fullness of what he was saying. But I get it now.</p><span>
+</span><p>Normal functions declare their own <code>this</code>, using one of those aforementioned rules. <code>=&gt;</code> arrow functions don’t have a <code>this</code> at all.</p><span>
+</span><p><strong>Wait…</strong> How is that possible? I can certainly use a <code>this</code> inside a <code>=&gt;</code> arrow function. Of course you can. How? Since the <code>=&gt;</code> arrow function doesn’t have its own <code>this</code>, when you use <code>this</code>, normal lexical scoping rules are in play, and the reference is resolved to the nearest outer scope’s definition of <code>this</code>.</p><span>
+</span><p>Consider:</p><span>
+</span><pre class="code">function foo() {
+   return () =&gt; {
+      return () =&gt; {
+         return () =&gt; {
+            console.log("id:", this.id);
+         };
+      };
+   };
+}
+
+foo.call( { id: 42 } )()()();
+// id: 42
+</pre><span>
+</span><p>In that snippet, how many <code>this</code>-bindings do you think there are? Most would probably assume four, one for each function.</p><span>
+</span><p>More accurately, there’s <strong>just one</strong>, in the <code>foo()</code> function.</p><span>
+</span><p>The successively nested <code>=&gt;</code> functions don’t declare their own <code>this</code>, so that <code>this.id</code> reference simply resolves up the scope chain until it gets to <code>foo()</code>, the first place it finds an affirmative binding for a <code>this</code>.</p><span>
+</span><p>That’s exactly the same way that any other normal lexical variable would be treated!</p><span>
+</span><p>In other words, just as Dave said, <strong><code>this</code> was already lexical, and always is lexical.</strong> <code>=&gt;</code> doesn’t bind a <code>this</code> variable so the scope lookup just continues as it always normally would.</p><span>
+</span><h3 id="not-just-this">Not Just <code>this</code></h3><span>
+</span><p>The stakes at risk if you inaccurately explain the <code>=&gt;</code> behavior for <code>this</code> are that you end up thinking things like, “arrow functions are just syntax sugar for <code>function</code>…” They clearly are not. Nor are they sugar for <code>var self = this</code> or <code>.bind(this)</code>.</p><span>
+</span><p>Those inaccurate explanations are a classic example of <em>getting the right answer for the wrong reason</em>. Like back in Algebra class in high school, when you got the correct answer on a test but the teacher marked off points because you got the answer using incorrect techniques. <strong>How you get the answer matters!</strong></p><span>
+</span><p>Moreover, the accurate explanation — that <code>=&gt;</code> doesn’t bind its own <code>this</code>, allowing lexical scope resolution to take over — also explains another important fact of <code>=&gt;</code> arrow functions: they don’t just change how <code>this</code> works in inner functions.</p><span>
+</span><p>In fact, <code>=&gt;</code> arrow functions do not bind a <code>this</code>, <code>arguments</code>, <code>super</code> (ES6), or <code>new.target</code> (ES6).</p><span>
+</span><p>That’s right, in all four of those cases (plus probably more added in the future!), the <code>=&gt;</code> arrow functions don’t bind those variables locally, so any reference to them will lexically resolve up the scope chain to an outer scope.</p><span>
+</span><p>Consider:</p><span>
+</span><pre class="code">function foo() {
+   setTimeout( () =&gt; {
+      console.log("args:", arguments);
+   },100);
+}
+
+foo( 2, 4, 6, 8 );
+// args: [2, 4, 6, 8]
+</pre><span>
+</span><p>Do you see?</p><span>
+</span><p>In that snippet, <code>arguments</code> is not bound by <code>=&gt;</code>, so it resolves instead to the <code>arguments</code> of <code>foo(..)</code>. The same would be true of <code>super</code> and <code>new.target</code>.</p><span>
+</span><h4 id="why-this-matters">Why <code>this</code> Matters?</h4><span>
+</span><p><strong>Update:</strong> in comments and social media, many were asking why it really matters, since the <code>this</code> behaves the same way regardless of the theory or implementation.</p><span>
+</span><p>Did you know that <code>=&gt;</code> arrow functions cannot have their <code>this</code> binding hard-bound with <code>bind(..)</code>?</p><span>
+</span><p>Consider:</p><span>
+</span><pre class="code">function foo() {
+   return () =&gt; {
+      console.log("id:",this.id);
+   };
+}
+
+var arrowfn = foo.call( { id: 42 } );
+
+setTimeout( arrowfn.bind( { id: 100 } ), 100);
+// id: 42
+</pre><span>
+</span><p>So why doesn’t the <code>.bind({..})</code> work to produce <code>id: 100</code> output?</p><span>
+</span><p>If you have an incorrect understanding of <code>=&gt;</code> arrow’s <code>this</code>, you’ll have to invent explanations like, “the <code>this</code> is immutable.” <strong>Wrong.</strong></p><span>
+</span><p>The simple, correct answer is that since <code>=&gt;</code> has no <code>this</code>, of course <code>.bind(obj)</code> has nothing to operate on! Similarly, <code>=&gt;</code> arrows can’t be called with <code>new</code>. Since there’s no <code>this</code>, the <code>new</code> doesn’t have anything to bind.</p><span>
+</span><p>Understanding how <code>=&gt;</code> <em>actually</em> treats <code>this</code> matters, because it’s the only way to correctly explain other observable behaviors of <code>=&gt;</code>. Staying in the dark and then fumbling around for hacky explanations when you’re surprised — that’s a recipe for immature JS coding.</p><span>
+</span><h3 id="wrapping-up">Wrapping Up</h3><span>
+</span><p>Don’t settle for the convenient but inaccurate answer. Don’t settle for getting the right answer the wrong way.</p><span>
+</span><p>It matters how these things work. It matters what mental model you use, because that’s the mental model you’ll use to analyze and describe and debug other behaviors. If you’re off track in the beginning, you’ll only get further off track later.</p><span>
+</span><p>I wish I had listened more closely to Dave back then. I wish I hadn’t inaccurately explained <code>=&gt;</code> behaviors for <code>this</code>. I take it seriously to be correct about what I think, write, and teach about JS. I’ll be more careful in the future.</p><span>
+						
+												</span><span>
+						
+						</span><span>
+						
+						</span><span>
+						
+						
+</span><!-- You can start editing here. --><span>
+
+	</span><span>
+	
+	</span><span>
+						
+						</span><span>
+					</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

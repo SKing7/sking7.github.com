@@ -1,0 +1,260 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>How Our CSS Framework Helps Enforce Accessibility</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>How Our CSS Framework Helps Enforce Accessibility</h1>
+                <div class="entry-content"><span>
+			</span><span>
+</span><p><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Spot-the-Button.png"><img class="aligncenter wp-image-4491 size-full" src="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Spot-the-Button.png" alt="Screenshot of two visually identical 'Buy it Now' buttons" width="515" height="56"></a></p><span>
+</span><p>Spot the difference….You can’t! To a sighted user it appears we have two identical button elements.</p><span>
+</span><p>A user interface control&nbsp;not only needs to <em>look</em> like a certain control, it must be <em>described</em> as that control&nbsp;too. Take for example a button, one of&nbsp;the simplest of controls. There are many ways you can create something that looks like a button, but unless you use the actual button tag (or button role – more on roles later), it will not be described as a button.</p><span>
+</span><p>Why does it need to be described as a button? Users of AT&nbsp;(assistive technology), such as a screen reader, may not be able to see what the control&nbsp;looks like visually; therefore it is the job of the screen reader to describe it aurally. A&nbsp;screen reader, such as VoiceOver for Mac OSX and iOS, can do this job only if we, the developers, ensure the correct semantics&nbsp;are present in our HTML code.</p><span>
+</span><h2>Semantics</h2><span>
+</span><p>In the table below, compare and contrast the accessibility tree&nbsp;attributes for each element&nbsp; (hint: click each&nbsp;image to view at full size). VoiceOver uses the&nbsp;accessibility tree to convey&nbsp;to the user what it knows about the web page.&nbsp;You will see that for the fake button, there is nothing in the tree to identify the span element as a button. Quite simply, VoiceOver does not know this element is intended to be a button.</p><span>
+</span><table class=" aligncenter">
+<caption>Now spot the difference: this is how VoiceOver&nbsp;sees these two elements</caption>
+<tbody>
+<tr>
+<th>–</th>
+<th>‘REAL’ button</th>
+<th>‘FAKE’ button</th>
+</tr>
+<tr>
+<th>HTML</th>
+<td><code>&lt;button class="btn"&gt;Buy it Now&lt;/button&gt;</code></td>
+<td><code>&lt;span class="btn"&gt;Buy it Now&lt;/span&gt;</code></td>
+</tr>
+<tr>
+<th>ACCESSIBILITY TREE ATTRIBUTES</th>
+<td><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/10/Real-Button-Tree-Annotated.png"><img class="alignnone wp-image-4646 size-medium" src="http://www.ebaytechblog.com/wp-content/uploads/2015/10/Real-Button-Tree-Annotated-300x212.png" alt="Annotated accessibility tree of real button" width="300" height="212"></a></td>
+<td><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/10/Fake-Button-Tree-Annotated.png"><img class="alignnone wp-image-4648 size-medium" src="http://www.ebaytechblog.com/wp-content/uploads/2015/10/Fake-Button-Tree-Annotated-300x212.png" alt="Annotated accessibility tree of fake button" width="300" height="212"></a></td>
+</tr>
+<tr>
+<th>VOICEOVER</th>
+<td>“Buy it now, Button.”
+<p>“To click this button press CTRL-OPTION-SPACE.”</p></td>
+<td>“Buy it now.”</td>
+</tr>
+</tbody>
+</table><span>
+</span><p>Accessibility tree screenshots taken from&nbsp;Mac OSX Accessibility Inspector</p><span>
+</span><p>What’s also interesting is that if you look at the ‘Actions’ section of the tree, the real button has an ‘accessibilityPerformPress’ action, while the fake button does not. Armed with this information, VoiceOver can also describe how to interact with the element (e.g., press <code>CTRL-OPTION-SPACE</code>). No such information will be communicated for the fake button.</p><span>
+</span><p>We can safely say that this fake button is <strong>not</strong> accessible, because the AT&nbsp;doesn’t know <em>what</em> it is or&nbsp;<em>how</em> to interact with it. It appears our fake button is accessible only to people who can see the screen <em>and</em> use a mouse. Oh dear – this fake button has&nbsp;excluded a large number&nbsp;of our users from being able to buy items!</p><span>
+</span><h2>Swiss cheese</h2><span>
+</span><p>You might be wondering, “Who on earth would use a <code>span</code> or <code>div</code> tag for a button?”</p><span>
+</span><p>You might now also be thinking, “What on earth does Swiss cheese have to do with any of this?”</p><span>
+</span><p>In the Swiss cheese model&nbsp;of accident causation,&nbsp;risk of a threat becoming a reality is mitigated by differing layers and types of defenses that are “layered” behind each other.&nbsp;For example, we might use&nbsp;code&nbsp;linting, code reviews, accessibility checkers, and manual testing to help ensure&nbsp;that this button is properly described. We liken these separate layers to&nbsp;multiple slices of Swiss cheese, stacked side by side – hence the name.</p><span>
+</span><p><img class="aligncenter wp-image-4528 size-medium" src="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Swiss-Cheese-300x202.png" alt="Illustration of swiss cheese model" width="300" height="202"></p><span>
+</span><p>Is there anything cheese can’t do? Although many layers of defense lie between hazards and accidents, there are flaws in each layer that, if aligned, can allow the accident to occur.</p><span>
+</span><p>What if we could also write our CSS framework in a way that acts as another layer in our line of defense? Read on to find out how!</p><span>
+</span><h2>Enforcing roles</h2><span>
+</span><p>Continuing on from our previous ‘fake button’ example, let’s suppose the developer had created&nbsp;the following rules&nbsp;to make the span element appear visually like a button:</p><span>
+</span><pre>.btn {
+  background-color: #0654ba;
+  border-radius: 0.25em;
+  color: white;
+  padding: 0.25em 1em;
+}</pre><span>
+</span><p><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Button.png"><img class="aligncenter wp-image-4532 size-full" src="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Button.png" alt="Screenshot of fake 'Buy it Now' button" width="252" height="49"></a></p><span>
+</span><p>The&nbsp;dreaded fake button (although you still can’t tell, just by looking at it)</p><span>
+</span><p>What we have here is the proverbial cart before the horse. The developer has&nbsp;styled&nbsp;the element before describing its <em>purpose</em>.&nbsp;One way in which we can create the necessary description (the horse) is to require&nbsp;a&nbsp;<code>role</code> attribute.&nbsp;We’ll go into more detail on the <code>role</code> attribute later, but here’s the interesting bit – we can leverage attribute selectors and re-write our CSS like so:</p><span>
+</span><pre>[role=button].btn {
+  background-color: #0654ba;
+  border-radius: 0.25em;
+  color: white;
+  padding: 0.25em 1em;
+}</pre><span>
+</span><p><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Unstyled-Span.png"><img class="aligncenter" src="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Unstyled-Span.png" alt="Screenshot of unstyled 'Buy it Now' span element" width="80" height="24" border="0"></a></p><span>
+</span><p>Under the skin: our attribute selector has now exposed the fake button for the fraud that it is!</p><span>
+</span><p>Our selector now ensures that a button will visually appear like a button <strong>only </strong>if it has first been described as a button. You can almost think of this as TDD (test-driven development). If the HTML does not pass our ‘test’, the visual style will not be applied.</p><span>
+</span><h2>Implicit roles</h2><span>
+</span><p>It’s important to&nbsp;know&nbsp;that nearly all elements&nbsp;have a default&nbsp;<em>implicit</em>&nbsp;role, and these default&nbsp;roles do not need to be specified in the HTML&nbsp;– to do so would be redundant. No prizes for guessing what the default&nbsp;role of a button element is. Yes, it’s <code>button</code>!</p><span>
+</span><p>You might think that it&nbsp;was easy enough for us to convert a span into an accessible button using the button role, but in actual fact our work would not be finished there. Adding a role does <strong>not</strong> add behavior. A fully accessible button&nbsp;must be&nbsp;keyboard focusable and it must be invokable&nbsp;with SPACE and ENTER keys too. A button element gives this behavior for free; a span element – even with a role of <code>button</code> – does not, and we must implement its&nbsp;behavior by hand.</p><span>
+</span><p>So please, and&nbsp;I really can’t emphasize this strongly enough, do everybody a favor and <strong>always</strong> use an actual button element for buttons.</p><span>
+</span><p>The only real reason you might have for using the button role is when&nbsp;progressively enhancing a link into a button using JavaScript; for example, to make the link open an overlay instead of a new page – which&nbsp;is exactly what we do on eBay. As with spans and divs, allowing&nbsp;anchor tags for buttons does re-open&nbsp;the door to misuse and abuse (think ‘faux’ buttons); and though it is possible to enforce the correct usage with clever use of attribute selectors, it’s a little more convoluted and therefore beyond the scope of this post.</p><span>
+</span><p>Again, we can enforce this markup requirement&nbsp;by rewriting our CSS selector like so:</p><span>
+</span><pre>button.btn {
+  background-color: #0654ba;
+  border-radius: 0.25em;
+  color: white;
+  padding: 0.25em 1em;
+}</pre><span>
+</span><p><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Button.png"><img class="aligncenter wp-image-4532 size-full" src="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Button.png" alt="Screenshot of our final 'Buy it Now' button" width="252" height="49"></a></p><span>
+</span><p>Horse,&nbsp;cart, &amp; driver: the element&nbsp;now has the appearance, description, and interaction of a button</p><span>
+</span><p>Finally, no more <code>span</code> and <code>div</code> tags for buttons. Our CSS framework&nbsp;simply does not allow it.</p><span>
+</span><h2>Enforcing states</h2><span>
+</span><p>So far we’ve looked at a simple&nbsp;example of how CSS selectors can force&nbsp;developers to put the proper semantics in place – whether implicitly or explicitly. But what about state? If an element has state (a checked checkbox for example), it is not sufficient&nbsp;to describe only what the&nbsp;element is; we must also describe what state it is in.</p><span>
+</span><p>Developers often&nbsp;fall into exactly the same trap as before: they convey the state visually but not aurally.</p><span>
+</span><p>In&nbsp;the following code example, the developer has used a modifier class&nbsp;of&nbsp;<code>btn--disabled&nbsp;</code>in order to&nbsp;alter the opacity and background-color of the button:</p><span>
+</span><pre>button.btn--disabled {
+  background-color: #999;
+  opacity: 0.5;
+}</pre><span>
+</span><p><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Button-Disabled.png"><img class="aligncenter wp-image-4543 size-full" src="http://www.ebaytechblog.com/wp-content/uploads/2015/09/Buy-it-Now-Button-Disabled.png" alt="Screenshot of a button that appears visually disabled" width="254" height="52"></a></p><span>
+</span><p>Our&nbsp;‘ghosted out’ button appears visually disabled</p><span>
+</span><p>Modifier class is a <a href="https://en.bem.info/method/">BEM</a> (Block, Element, Modifier) concept. Throughout this article we will be using a variation of BEM in order to structure and distinguish our class names.</p><span>
+</span><p>You might be thinking that this isn’t really disabled. If so, you are quite right. This button will <strong>not</strong> be described as disabled <em>and</em> it will <strong>not</strong> behave as disabled.</p><span>
+</span><p>Again, you might be thinking, “Who actually does this kind of stuff?”, but fear not, our CSS selectors can again protect us from&nbsp;this manner of profanity:</p><span>
+</span><pre>button[disabled] {
+  background-color: #999;
+  opacity: 0.5;
+}</pre><span>
+</span><p>As you can see, the previous modifier class&nbsp;will no longer cut the mustard. It is removed from the selector entirely&nbsp;and the HTML <code>disabled</code> property takes its place. Only when this&nbsp;property is applied in the markup will the button be well and truly disabled for <strong>all</strong> users.</p><span>
+</span><span>
+</span><p>So far, none of this is particularly earth-shattering, I’m sure you agree, but it sets the stage nicely for moving onto more complex controls and widgets, where we must&nbsp;start delving deeper into the world of <a href="https://en.wikipedia.org/wiki/WAI-ARIA">WAI-ARIA</a> (commonly referred to as just ARIA for short).</p><span>
+</span><h2>ARIA</h2><span>
+</span><p>HTML gives us only a limited set of controls&nbsp;such as buttons, links, and the various form value inputs. What about menus, tabs, carousels, overlays, etc. – how do we describe those? Yes, you guessed it – ARIA comes to our rescue.</p><span>
+</span><p>ARIA gives us many more roles beyond a&nbsp;simple button,&nbsp;and these roles, in conjunction with a multitude of states and properties, open up a whole new set of desktop-like user interface controls and widgets for us to play with. Just make sure you read the instructions&nbsp;before diving in. You do read the instructions don’t you?</p><span>
+</span><p>Look out for more controls&nbsp;in HTML5, such as menu and dialog. In fact, you might be interested to know that both the menu and dialog tags started out life as ARIA roles before they were introduced as bona fide HTML elements. Don’t get too excited, though – neither have cross browser support at the time of this writing.</p><span>
+</span><p>In the next section we will look at an example of such a widget and demonstrate how we can use ARIA to influence the way&nbsp;we write CSS selectors in order to <strong>enforce</strong> accessible markup.</p><span>
+</span><h2>Tabs</h2><span>
+</span><p>A tabs widget allows the layered stacking of two or more content panels, whereby only one panel of content can be visible at any time. A list of clickable tabs allows the user to swap out the&nbsp;visible panel. This&nbsp;all happens on the client,&nbsp;<em>without</em> a full page reload (i.e., the client is stateful).&nbsp;By <em>decluttering</em> the user interface in this way we can say that a&nbsp;tabs widget follows the principle of <a href="https://en.wikipedia.org/wiki/Progressive_disclosure">progressive disclosure</a>.</p><span>
+</span><p><a href="http://www.ebaytechblog.com/wp-content/uploads/2015/10/eBay-Sign-In-Tabs.png"><img class="aligncenter wp-image-4589 size-medium" src="http://www.ebaytechblog.com/wp-content/uploads/2015/10/eBay-Sign-In-Tabs-300x263.png" alt="Screenshot of eBay's tabbed interface for sign-in or register " width="300" height="263"></a></p><span>
+</span><p>Using tabs, the user can switch between “Sign In” or “Register”&nbsp;without a full page reload.</p><span>
+</span><p>It is critical that our interface&nbsp;is not only <em>visually</em> identifiable as a tabs control (I’ve seen designs that struggle even to meet this criterion!), but also <em>aurally</em>. Without any tab-related HTML tags, how do&nbsp;we achieve this?</p><span>
+</span><h2>Faux tabs</h2><span>
+</span><p>A seasoned developer might set out initially to create the tabs&nbsp;as a list&nbsp;of clickable page anchors&nbsp;for the tabs, with&nbsp;a group of divs acting as anchor targets for the tab panels:</p><span>
+</span><pre>&lt;div class="tabs"&gt;
+&nbsp; &lt;ol&gt;
+&nbsp; &nbsp; &lt;li class="tabs__tab tabs__tab--selected"&gt;
+      &lt;a href="#sign-in"&gt;Sign in&lt;/a&gt;
+    &lt;/li&gt;
+&nbsp; &nbsp; &lt;li class="tabs__tab"&gt;
+      &lt;a href="#register"&gt;Register&lt;/a&gt;
+    &lt;/li&gt;
+&nbsp; &lt;/ol&gt;
+&nbsp; &lt;div&gt;
+&nbsp; &nbsp; &lt;div class="tabs__panel tabs__panel--active" id="sign-in"&gt;
+      &lt;!-- Sign in Content --&gt;
+    &lt;/div&gt;
+&nbsp; &nbsp; &lt;div class="tabs__panel" id="register"&gt;
+      &lt;!-- Register Content --&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre><span>
+</span><p>This is a perfectly reasonable approach to begin with. Page anchors&nbsp;are often well suited as the <em>starting</em> point for tabs, because in the case of JavaScript being unavailable they ensure at least&nbsp;some basic&nbsp;functionality when clicked (i.e., the browser will scroll to the content of the relevant panel). However, when JavaScript does become available, care must be taken to prevent the default link&nbsp;behavior&nbsp;so as to not interfere with tab semantics and behavior.&nbsp;Let me be very clear about this: links&nbsp;are <strong>not</strong> the same as tabs!</p><span>
+</span><p>This technique of making core content and functionality available pre-CSS and pre-JavaScript is&nbsp;called <a href="https://en.wikipedia.org/wiki/Progressive_enhancement">progressive enhancement</a>. Progressive enhancement&nbsp;is the safest and surest way to guard against the unknown (e.g., script timeout, script failure, scripting disabled) and to ensure your core experience&nbsp;remains backwards <strong>and</strong> forwards compatible in all&nbsp;HTML-capable browsers.</p><span>
+</span><p>We will assume that all layout-related styling is in place for the links&nbsp;(i.e., they are neatly spaced&nbsp;out horizontally), and that by&nbsp;default the visible state of all panels is&nbsp;hidden, with only the ‘active’ panel displayed. Let’s then suppose our developer chooses&nbsp;to visually&nbsp;convey the selected ‘tab’ state using only an underline (a veritable tour de force of minimalism, I know):</p><span>
+</span><pre>.tabs__tab {
+  text-decoration: none;
+}
+.tabs__tab--selected {
+  text-decoration: underline;
+}
+.tabs__panel {
+  display: none;
+}
+.tabs__panel--active {
+  display: block;
+}</pre><span>
+</span><p>It would now take only a small amount of JavaScript for our developer to turn this into a “functioning” tabs widget by preventing the default link&nbsp;action (i.e., prevent it navigating to the URL fragment) and toggling the ‘selected’ and ‘active’ modifier classes accordingly; and indeed our developer might be tempted to stop there.</p><span>
+</span><p>But&nbsp;although this control looks like a tabs widget, it will currently be described only as a list of links (scroll down to see the accessibility tree). No clues are given as to the dynamic, stateful nature of the widget. Screen reader users attempting to follow one of these links are going to be surprised when nothing happens after invoking&nbsp;the link, and equally surprised when no navigation occurs. They are left guessing as to what type of control they might be interacting with. Not a good experience.</p><span>
+</span><p>Let’s fix it&nbsp;so that if developers try to&nbsp;use our amazingly awesome CSS to style their tabs like ours (go on, admit it, you want that underline too), the styles will appear <strong>only </strong>if they have the correct accessible markup in place.</p><span>
+</span><h2>Real tabs</h2><span>
+</span><p>To achieve the correct markup for tabs, just as with our simple button example, we can&nbsp;replace class names with ARIA roles and states.</p><span>
+</span><p>Luckily, ARIA gives us a set of tab-related roles:</p><span>
+</span><span>
+</span><p>We can also&nbsp;leverage&nbsp;the following global ARIA states:</p><span>
+</span><ul>
+<li><code>aria-selected</code></li>
+<li><code>aria-hidden</code></li>
+<li><code>aria-controls</code></li>
+<li><code>aria-labelledby</code></li>
+</ul><span>
+</span><p>Whilst&nbsp;it would be entirely&nbsp;possible to continue on with our demonstration of&nbsp;progressive enhancement by&nbsp;applying the above roles and states to override our&nbsp;previous <em>link</em>-based markup, it does add some additional complexities which might&nbsp;distract us from the primary topic at hand. So, rather than getting bogged down in those details, let’s drop the progressive enhancement for now and pretend we live in a magical world where JavaScript is always on, is always available, and always works.</p><span>
+</span><p>Actually, to be honest, it’s not just a JavaScript issue.&nbsp;Some people would argue&nbsp;that by using list-based markup, we also provide for a reasonable&nbsp;semantic fallback in the cases where the tab &amp; tablist roles are not supported by the user’s browser &amp; AT combo.</p><span>
+</span><p>It will make most sense if we show you the new HTML first this time, rather than the CSS, and hopefully, without the cognitive clutter of the list and link tags, our end goal is now a little clearer. You will quickly see that the core DOM structure remains almost identical:</p><span>
+</span><pre>&lt;div class="tabs"&gt;
+&nbsp; &lt;div role="tablist"&gt;
+&nbsp; &nbsp; &lt;div role="tab" aria-selected="true" tabindex="0"&gt;
+      &lt;span&gt;Sign in&lt;/span&gt;
+    &lt;/div&gt;
+&nbsp; &nbsp; &lt;div role="tab" aria-selected="false" tabindex="-1"&gt;
+      &lt;span&gt;Register&lt;/span&gt;
+    &lt;/div&gt;
+&nbsp; &lt;/div&gt;
+&nbsp; &lt;div&gt;
+&nbsp; &nbsp; &lt;div role="tabpanel" id="sign-in" aria-hidden="false"&gt;
+      &lt;!-- Sign in Content --&gt;
+    &lt;/div&gt;
+&nbsp; &nbsp; &lt;div role="tabpanel" id="register" aria-hidden="true"&gt;
+      &lt;!-- Register Content --&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre><span>
+</span><p>With these new ARIA roles&nbsp;in place,&nbsp;our tabs <strong>will</strong>&nbsp;now actually be described as tabs by assistive technology. Likewise, when our JavaScript toggles the ARIA selected state, this state will also be conveyed to our users.</p><span>
+</span><p>Note that AT actually&nbsp;requires&nbsp;two additional&nbsp;ARIA properties that are not present in our markup:&nbsp;<code>aria-controls</code> (on the tabs) and <code>aria-labelledby</code> (on the tabpanels). These ARIA properties are not typically used as styling hooks on tabs,&nbsp;so we will leave them out for the sake of code brevity; but be sure to include them when building your own tabs widget!</p><span>
+</span><p>Okay, so we are nearing the end now, but first we must finish up&nbsp;our CSS. Our selectors&nbsp;must become a contract for the accessible HTML above. Where before we had classes for BEM blocks and elements, now we have ARIA roles. Where before we had classes for BEM modifiers, now we have ARIA states:</p><span>
+</span><pre>.tabs [role=tab][aria-selected=false][tabindex="-1"] {
+  text-decoration: none;
+}
+.tabs [role=tab][aria-selected=true][tabindex="0"] {
+  text-decoration: underline;
+}
+.tabs [role=tabpanel][aria-hidden=true] {
+  display: none;
+}
+.tabs [role=tabpanel][aria-hidden=false] {
+  display: block;
+}</pre><span>
+</span><p>Personally, I’m a big fan of BEM, but it’s nice where possible like this to be able to replace it with something a little more <em>real,&nbsp;</em>if you know what I mean.</p><span>
+</span><span>
+</span><p>One other rule&nbsp;we have enforced in our selectors is&nbsp;the <code>tabindex</code> attribute. Keyboard accessibility for tabs must be implemented in JavaScript using a roving tabindex technique; this is because the tabs in a tablist are selected using the arrow keys, not the tab key (the tab key is actually used to <em>exit</em> the list of tabs). While not strictly necessary to ensure the correct description is given, this selector helps ensure that the correct attribute values are in place for roving tabindex behavior. It’s up to you whether&nbsp;you want to go this far, into the realm of behavior-testing, in your own selectors.</p><span>
+</span><h2>Good behavior</h2><span>
+</span><p>We must always&nbsp;remember that correctly describing a UI&nbsp;control&nbsp;is only part of making it accessible. The user expectation is that it <em>behaves</em> like that control&nbsp;too. Therefore we must also ensure that the correct accessible behavior is in place.</p><span>
+</span><p>For example, a button must always be ‘clickable’ with <code>SPACE</code> and <code>ENTER</code> keys. Sadly, this kind of behavior is often the first thing to go missing when developers try rolling their own buttons using <code>span</code> or <code>div</code> tags.</p><span>
+</span><p>More complex controls&nbsp;such as tabs,&nbsp;menus, or autocomplete will typically require a more significant amount of JavaScript in order to make sure the control&nbsp;fully behaves according to&nbsp;its description.</p><span>
+</span><h2>Summary</h2><span>
+</span><p>We have seen that each layer of the web frontend has its own responsibilities in terms of creating accessible UI controls:</p><span>
+</span><ul>
+<li>HTML provides the aural description and some&nbsp;built-in behavior</li>
+<li>CSS provides the visual style and interaction clues</li>
+<li>JS provides any missing behavior not provided by ARIA&nbsp;or&nbsp;HTML</li>
+</ul><span>
+</span><p>HTML provides behavior, without the need for JavaScript, for&nbsp;built-in tags&nbsp;such as links, buttons, and form controls.</p><span>
+</span><p>For the purpose of this blog post, our&nbsp;focus has&nbsp;been primarily HTML and CSS. HTML is fundamental in laying solid foundations for accessible UI&nbsp;controls and widgets, and we have&nbsp;shown how those&nbsp;foundations can be <strong>enforced</strong> by use of CSS attribute selectors.</p><span>
+</span><p>So, the next time you find yourself creating a class name like ‘active’, ‘hidden’, ‘on’, or ‘off’ – stop and think instead how you might be able to leverage HTML properties or ARIA states in your selectors. Likewise, if you find yourself creating a class name like ‘btn’, ‘tab’, or ‘dialog’ – also stop and think about how you might be able to leverage an existing HTML tag or ARIA role.</p><span>
+</span><p>Thank you for reading. I hope you enjoyed it. If you are interested in more accessibility-related articles in future, be sure to leave a comment below!</p><span>
+</span><p>Finally, if you are interested in learning more about our CSS framework,&nbsp;watch this space for an upcoming announcement and further details.&nbsp;We are currently applying the finishing touches to the framework before releasing it&nbsp;as open source.</p><span>
+</span><h2>Appendix / bibliography</h2><span>
+</span><ul>
+<li>The Swiss Cheese Model:
+
+</li>
+<li>Finding out the default, implicit role of any HTML element:
+
+</li>
+<li>Full list of ARIA widget roles:
+
+</li>
+<li>Full list of ARIA widget&nbsp;states &amp; properties:
+
+</li>
+<li>Finding out how&nbsp;an ARIA widget is supposed to behave:
+
+</li>
+<li>Providing keyboard navigation for widgets (roving tabindexes and aria-activedescendant):
+
+</li>
+<li>Decluttering the user interface using&nbsp;progressive disclosure:
+
+</li>
+<li>Emphasizing the core content of your site using progressive enhancement:
+
+</li>
+<li>BEM methodology:
+
+</li>
+</ul><span>
+</span><span>					</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

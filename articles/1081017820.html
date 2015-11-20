@@ -1,0 +1,139 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>alinode(beta)</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>alinode(beta)</h1>
+                <section class="post-body">
+      <p>最近有小伙伴来问我，为什么这段代码不起作用？</p>
+<pre><code class="lang-javascript">var c = <span class="hljs-keyword">global</span>.console;
+
+<span class="hljs-keyword">global</span>.console = {
+  <span class="hljs-keyword">log</span>: function(<span class="hljs-keyword">text</span>) {
+    c.<span class="hljs-keyword">log</span>(<span class="hljs-string">'Foo: '</span> + <span class="hljs-keyword">text</span>);
+  }
+};
+
+console.<span class="hljs-keyword">log</span>(<span class="hljs-string">'bar'</span>);  
+</code></pre>
+<h3 id="node-js-global-">Node.js 中的 <code>global</code></h3>
+<p>Node.js 中存在一个全局对象 <code>global</code>（<a href="https://nodejs.org/api/globals.html#globals_global_objects">文档</a>），类似浏览器里的 <code>window</code>。挂载在上面的变量，可以被所有模块共享，并且站在作用域链的最顶端。</p>
+<pre><code class="lang-javascript">global.foo = <span class="hljs-number">1</span>;
+console.<span class="hljs-built_in">log</span>(foo);  
+
+bar = <span class="hljs-number">2</span>;
+console.<span class="hljs-built_in">log</span>(global.bar); 
+</code></pre>
+<h3 id="-global-console-">只读的 <code>global.console</code></h3>
+<p>Node.js 里，<code>console</code> 是<a href="https://github.com/nodejs/node/blob/v4.1.2/src/node.js#L180">这样</a>挂载到 <code>global</code> 上的：</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">global</span>.__defineGetter__(<span class="hljs-string">'console'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-keyword">return</span> NativeModule.<span class="hljs-keyword">require</span>(<span class="hljs-string">'console'</span>);
+});
+</code></pre>
+<p>这里用了 <code>Object.prototype.__defineGetter__()</code>（<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineGetter__">文档</a>），类似 ES5 里用 <code>Object.defineProperty()</code> 定义 getter。由于只定义了 getter，没有定义 setter，就会有只读的效果。</p>
+<h3 id="-console-node-js-">本地 <code>console</code> 与 Node.js 中的模块封装机制</h3>
+<p>但是，下面的代码如果保存在文件中运行，就能成功改变 <code>console</code> 了</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> c = global.console;
+
+<span class="hljs-keyword">var</span> <span class="hljs-built_in">console</span> = {
+  log: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">text</span>) </span>{
+    c.log(<span class="hljs-string">'Foo: '</span> + text);
+  }
+}
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'bar'</span>);  
+</code></pre>
+<p>这是因为 <code>src/node.js</code> 中<a href="https://github.com/nodejs/node/blob/v4.2.1/src/node.js#L942">实现了一个 wrapper</a>，读取的代码文件将会被<a href="https://github.com/nodejs/node/blob/v4.1.2/lib/module.js#L411">包装后再编译运行</a>。这个 wrapper 长这样：</p>
+<pre><code class="lang-javascript">NativeModule.wrapper = [
+  '(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(exports, require, module, __filename, __dirname)</span> {</span> ',
+  '\n});'
+];
+</code></pre>
+<p>在 Node.js 代码里所接触到的 <code>exports</code>，<code>require</code>，<code>module</code> 等，也都是从这个 wrapper 里传进来的。在此处示意图如下：</p>
+<pre><code> --------------------------------------------------------------------
+|<span class="hljs-string"> global.__defineGetter__('console', ....)                           </span>|
+|<span class="hljs-string">                                                                    </span>|
+|<span class="hljs-string">  ----------------------------------------------------------------  </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string"> (function (exports, require, module, __filename, __dirname) {  </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">                                                                </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">   ---------------------------------------------------------    </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">  </span>|<span class="hljs-string"> // test.js                                              </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">  </span>|<span class="hljs-string"> var console = {                                         </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">  </span>|<span class="hljs-string">   ...                                                   </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">  </span>|<span class="hljs-string">                                                         </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">  </span>|<span class="hljs-string">                                                         </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">  </span>|<span class="hljs-string">  }                                                      </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">   ---------------------------------------------------------    </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">                                                                </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string"> </span>|<span class="hljs-string">                                                                </span>|<span class="hljs-string"> </span>|
+|<span class="hljs-string">  ----------------------------------------------------------------  </span>|
+ --------------------------------------------------------------------
+</code></pre><p>这个 <code>console</code> 相当于 wrapper 里的一个本地变量，由于修改的并不是 <code>global.console</code>，因此就不会被 <code>global.console</code> 的只读性限制。并且在作用域查找的时候，会先于 <code>global.console</code> 被找到，所以上面的代码能够成功修改 <code>console</code>。注意这里使用了 <code>var</code> 来声明新的 <code>console</code>，所以能够作为本地变量。如果不用 <code>var</code>，直接声明，那么相当于修改 <code>global.console</code>，依然是徒劳的。</p>
+<h3 id="-repl-console-"><code>REPL</code> 中的 <code>console</code></h3>
+<p>但是，如果在命令行运行 <code>node</code> 打开 REPL，粘贴上面的代码，会发现 <code>console</code> 又不能被修改了，输出的还是 <code>bar</code>。这是为什么呢？</p>
+<p>REPL 中没有自己的上下文，与 <code>global</code> 是一起的（<a href="https://github.com/nodejs/node/blob/v0.12.7/lib/repl.js#L347">源代码</a>），这点与浏览器中的情形类似，即使用了 <code>var</code> 在全局声明对象后，还是会挂到 <code>global</code> 上。</p>
+<pre><code> ----------------------------------------------------------------
+|<span class="hljs-string"> global.__defineGetter__('console', ....)                       </span>|
+|<span class="hljs-string">                                                                </span>|
+|<span class="hljs-string">   ---------------------------------------------------------    </span>|
+|<span class="hljs-string">  </span>|<span class="hljs-string"> // REPL                                                 </span>|<span class="hljs-string">   </span>|
+|<span class="hljs-string">  </span>|<span class="hljs-string"> var console = {...}                                     </span>|<span class="hljs-string">   </span>|
+|<span class="hljs-string">   ---------------------------------------------------------    </span>|
+|<span class="hljs-string">                                                                </span>|
+|<span class="hljs-string">                                                                </span>|
+ ----------------------------------------------------------------
+</code></pre><p>Node.js 的 REPL 有一个选项 <code>useGlobal</code>，关掉它的话 <code>console</code> 将会直接用 <code>=</code> 放到全局上下文而不是设置 getter，这样它就不再只读了。开启一个自定义的 REPL 方法如下，将下面的代码存进一个文件：</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+
+repl.start({
+  useGlobal: <span class="hljs-literal">false</span>
+});
+</code></pre>
+<p>再用 Node 运行这个文件，就可以发现 <code>global.console</code> 可以被修改了，此时示意图如下：</p>
+<pre><code> ----------------------------------------------------------------
+|<span class="hljs-string"> global.console = ...                                           </span>|
+|<span class="hljs-string">                                                                </span>|
+|<span class="hljs-string">   ---------------------------------------------------------    </span>|
+|<span class="hljs-string">  </span>|<span class="hljs-string"> // REPL                                                 </span>|<span class="hljs-string">   </span>|
+|<span class="hljs-string">  </span>|<span class="hljs-string"> var console = {...}                                     </span>|<span class="hljs-string">   </span>|
+|<span class="hljs-string">   ---------------------------------------------------------    </span>|
+|<span class="hljs-string">                                                                </span>|
+|<span class="hljs-string">                                                                </span>|
+ ----------------------------------------------------------------
+</code></pre><p>在 <code>useGlobal</code> 为 <code>true</code> 时，查看 <code>global.console</code> 的 property descriptor，如下：</p>
+<pre><code class="lang-javascript">&gt; <span class="hljs-built_in">Object</span>.getOwnPropertyDescriptor(global, <span class="hljs-string">'console'</span>);
+{ <span class="hljs-keyword">get</span>: [<span class="hljs-built_in">Function</span>],
+  <span class="hljs-keyword">set</span>: <span class="hljs-literal">undefined</span>,
+  enumerable: <span class="hljs-literal">true</span>,
+  configurable: <span class="hljs-literal">true</span> }
+</code></pre>
+<p><code>useGlobal</code> 为 <code>false</code> 时如下：</p>
+<pre><code class="lang-javascript">&gt; Object.getOwnPropertyDescriptor(<span class="hljs-keyword">global</span>, 
+Object {
+  value:
+   Console {
+     <span class="hljs-built_in">log</span>: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ],
+     info: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ],
+     warn: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ],
+     <span class="hljs-built_in">error</span>: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ],
+     dir: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ],
+     time: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ],
+     timeEnd: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ],
+     trace: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound trace],
+     assert: [<span class="hljs-function"><span class="hljs-keyword">Function</span>:</span> bound ] },
+  writable: <span class="hljs-literal">true</span>,
+  enumerable: <span class="hljs-literal">true</span>,
+  configurable: <span class="hljs-literal">true</span> }
+</code></pre>
+
+    </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
