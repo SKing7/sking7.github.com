@@ -399,8 +399,6 @@ Small Device Styles
   }
 
   .inner {
-    min-width: 320px;
-    max-width: 480px;
   }
 
   #project_title {
@@ -457,6 +455,10 @@ h1 {
 }
 ul li {
     padding-left: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
 }
 .search-box {
     float: right;
@@ -472,6 +474,7 @@ ul li {
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
+    -webkit-appearance: none;
 }
 .inner {
     float: left;
