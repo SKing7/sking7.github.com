@@ -27,9 +27,9 @@
 
 
 /* eslint-disable quotes, comma-spacing */
-var PrecacheConfig = [];
+var PrecacheConfig = [["/css/article.css","864fadf60a4cb84eccf77f4ff1b25f96"],["/public/css/pygment_trac.css","a0f03ea7a7fd2ff5485ca86459a329c7"],["/public/css/stylesheet.css","79abe2af95eea49d9cfbbcb140f1849c"],["/public/images/bg_hr.png","3749fea9a2746cee92df9c413164274d"],["/public/images/blacktocat.png","e9bb868e6d0c2d4b6678482cd0a646eb"],["/public/images/icon_download.png","72dc4eb7f71ac5150b7ad26b7e595721"],["/public/images/sprite_download.png","2561902855a500748bbe044a74bf1d2d"],["/public/js/jets.js","085f69f48dfb26142f49812d41f994af"],["/public/js/service-worker.js","d41d8cd98f00b204e9800998ecf8427e"],["/public/js/sw.js","a31efb1bcb546706d589038053c0b0c9"],["/sw.js","ed73c4f54f2d24fd85894dd78ff4b698"],["/testcase/htmlhint.js","c6b41beae699c46a117f1e68bc9ebc58"],["/testcase/zoom.js","bc9ecd3bd50e566a50e50d73ed147cdf"]];
 /* eslint-enable quotes, comma-spacing */
-var CacheNamePrefix = 'sw-precache-v1-sw-precache-' + (self.registration ? self.registration.scope : '') + '-';
+var CacheNamePrefix = 'sw-precache-v1--' + (self.registration ? self.registration.scope : '') + '-';
 
 
 var IgnoreUrlParametersMatching = [/^utm_/];

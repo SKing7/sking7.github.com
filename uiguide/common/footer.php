@@ -1,2 +1,0 @@
-<?php
-    ScriptHelper::blkJsCore();
