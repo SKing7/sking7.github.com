@@ -1,9 +1,33 @@
+/**
+ * Copyright 2015 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// This generated service worker JavaScript will precache your site's resources.
+// The code needs to be saved in a .js file at the top-level of your site, and registered
+// from your pages in order to be used. See
+// https://github.com/googlechrome/sw-precache/blob/master/demo/app/js/service-worker-registration.js
+// for an example of how you can register this script and handle various service worker events.
+
+/* eslint-env worker, serviceworker */
+/* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren */
 'use strict';
 
 
 
 /* eslint-disable quotes, comma-spacing */
-var PrecacheConfig = [["/css/article.css","864fadf60a4cb84eccf77f4ff1b25f96"],["/index.html","5909b93b2faf9ab39df4d6479d6768d5"],["/public/css/pygment_trac.css","a0f03ea7a7fd2ff5485ca86459a329c7"],["/public/css/stylesheet.css","79abe2af95eea49d9cfbbcb140f1849c"],["/public/images/bg_hr.png","3749fea9a2746cee92df9c413164274d"],["/public/images/blacktocat.png","e9bb868e6d0c2d4b6678482cd0a646eb"],["/public/images/icon_download.png","72dc4eb7f71ac5150b7ad26b7e595721"],["/public/images/sprite_download.png","2561902855a500748bbe044a74bf1d2d"],["/public/js/jets.js","085f69f48dfb26142f49812d41f994af"],["/public/js/sw.js","a31efb1bcb546706d589038053c0b0c9"]];
+var PrecacheConfig = [["/css/article.css","864fadf60a4cb84eccf77f4ff1b25f96"],["/index.html","fa1a8b6e7fbf30a5a83585f0e8ea61c2"],["/public/css/pygment_trac.css","a0f03ea7a7fd2ff5485ca86459a329c7"],["/public/css/stylesheet.css","53b798e7a3a252035490fed484bdac69"],["/public/js/base.js","b5d9feab3afcb6a99372b6a5a955abd7"],["/public/js/jets.js","085f69f48dfb26142f49812d41f994af"],["/public/js/sw.js","a31efb1bcb546706d589038053c0b0c9"]];
 /* eslint-enable quotes, comma-spacing */
 var CacheNamePrefix = 'sw-precache-v1--' + (self.registration ? self.registration.scope : '') + '-';
 
