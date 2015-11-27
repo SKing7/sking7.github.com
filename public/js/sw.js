@@ -1,7 +1,7 @@
 // The files we want to cache
 var urlsToCache = [
   '/',
-  '/public/js/jet.js',
+  '/public/js/jets.js',
   '/public/css/stylesheet.css'
 ];
 var CACHE_NAME = 'sking7.github.io'
