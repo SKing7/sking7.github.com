@@ -8,6 +8,7 @@ var CACHE_NAME = 'sking7.github.io'
 
 // Set the callback for the install step
 self.addEventListener('install', function(event) {
+  console.log('installing');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
@@ -17,6 +18,7 @@ self.addEventListener('install', function(event) {
   );
 });
 self.addEventListener('fetch', function(event) {
+  console.log('fetching');
   event.respondWith(
     caches.match(event.request)
       .then(function(response) {
