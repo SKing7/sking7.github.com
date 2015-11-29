@@ -1,0 +1,29 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Performance insights with console.timeStamp</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Performance insights with console.timeStamp</h1>
+                <div class="dt-content"><span>
+	</span><img src="https://umaar.com/assets/images/dev-tips/console-timestamp-timeline.gif" alt="Get performance insights into your JS code with console.timeStamp"><span>
+	</span><p>Note: We already covered <a href="https://umaar.com/dev-tips/83-console-time/">console.time()</a>. Now we're going to look at <code>console.timeStamp()</code></p><span>
+</span><p>Increase your understanding of the Timeline Panel by annotating a recording with your own markers. You can add your own marker to a Timeline recording. To do this: run this code in the Console Panel while a recording is active in the Timeline panel.</p><span>
+</span><pre><code>console.timeStamp('My operation #1');
+</code></pre><p>If you inspect the Timeline recording details, you can see a 'record' (or 'marker') for the <code>console.timeStamp</code> call. If you include these calls before and after you perform expensive operations in your codebase, you can easily identify the significant records in a Timeline recording.</p><span>
+
+
+		</span><span>
+
+		
+</span><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

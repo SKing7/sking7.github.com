@@ -1,0 +1,543 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Node.js 启动方式：一道关于全局变量的题目引发的思考</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Node.js 启动方式：一道关于全局变量的题目引发的思考</h1>
+                <div class="entry"><span>
+
+        
+		</span><h2>原题</h2><span>
+</span><p>题目是这样的。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31306609272802" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">var a = 2;  
+function foo(){  
+    console.log(this.a);
+}
+
+foo();</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">a</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">2</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">foo</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-sy">(</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">a</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p><p><span class="crayon-e">foo</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0013 seconds] --><span>
+</span><span>
+</span><blockquote><p>上题由我们亲爱的<a href="http://f2e.souche.com/blog/author/wang-xing-long/">小龙</a>童鞋发现并在我们的 901 群里提问的。</p></blockquote><span>
+</span><h2>经过</h2><span>
+</span><p>然后有下面的小对话。</p><span>
+</span><blockquote><p>小龙：你们猜这个输出什么？</p>
+<p>弍纾：2</p>
+<p>力叔：2 啊</p>
+<p>死月·絲卡蕾特：2</p>
+<p>力叔：有什么问题么？</p>
+<p>小龙：输出 undefind。</p>
+<p>死月·絲卡蕾特：你确定？</p>
+<p>小龙：是不是我电脑坏了</p>
+<p>力叔：你确定？</p>
+<p>弍纾：你确定？</p>
+<p>小龙：为什么我 node 文件名跑出来的是 undefined？</p>
+<p>郑昱：-.- 一样阿。undefined</p></blockquote><span>
+</span><p>以上就是刚见到这个题目的时候群里的一个小讨论。</p><span>
+</span><h2>分析</h2><span>
+</span><p>后来我就觉得奇怪，既然小龙验证过了，说明他也不是随地大小便，无的放矢什么的。</p><span>
+</span><p>于是我也验证了一下，不过由于偷懒，没有跟他们一样写在文件里面，而是直接 node 开了个 REPL 来输入上述代码。</p><span>
+</span><blockquote><p>结果是 2！</p>
+<p>结果是 2！</p>
+<p>结果是 2！</p></blockquote><span>
+</span><p>于是这就出现了一个很奇怪的问题。</p><span>
+</span><p>尼玛为毛我是&nbsp;<code>2</code>&nbsp;他们俩是&nbsp;<code>undefined</code>&nbsp;啊！</p><span>
+</span><p>不过马上我就反应过来了——我们几个的环境不同，他们是&nbsp;<code>$ node foo.js</code>&nbsp;而我是直接 node 开了个 REPL，所以有一定的区别。</p><span>
+</span><p>而力叔本身就是前端大神，我估计是以 Chrome 的调试工具下为基础出的答案。</p><span>
+</span><h2 id="replvs">REPL vs 文件执行</h2><span>
+</span><p>其实上述的问题，需要解释的问题大概就是&nbsp;<code>a</code>&nbsp;到底挂在哪了。</p><span>
+</span><p>因为细细一想，在&nbsp;<code>function</code>&nbsp;当中，<code>this</code>&nbsp;指向的目标是&nbsp;<code>global</code>&nbsp;或者&nbsp;<code>window</code>。</p><span>
+</span><blockquote><p>还无法理解上面这句话的童鞋需要先补一下基础。</p></blockquote><span>
+</span><p>那么最终需要解释的就是&nbsp;<code>a</code>&nbsp;到底有没有挂在全局变量上面。</p><span>
+</span><p>这么一想就有点细思恐极的味道了——如果在 node 线上运行环境里面的源代码文件里面随便&nbsp;<code>var</code>&nbsp;一个变量就挂到了全局变量里面那是有多恐怖！</p><span>
+</span><p>于是就有些释然了。</p><span>
+</span><p>但究竟是上面原因导致 REPL 和文件执行方式不一样的呢？</p><span>
+</span><h3>全局对象的属性</h3><span>
+</span><p>首先是弍纾找出了阮老师 ES6 系列文章中的<a href="http://es6.ruanyifeng.com/#docs/let">全局对象属性</a>一节。</p><span>
+</span><blockquote><p>全局对象是最顶层的对象，在浏览器环境指的是 window 象，在 Node.js 指的是 global 对象。ES5 之中，全局对象的属性与全局变量是等价的。</p></blockquote><span>
+</span><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31313864082689" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">window.a = 1;  
+a // 1
+
+a = 2;  
+window.a // 2</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-v">a</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">a</span><span class="crayon-h"> </span><span class="crayon-c">// 1</span></p><p><span class="crayon-v">a</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">2</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-v">a</span><span class="crayon-h"> </span><span class="crayon-c">// 2</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0010 seconds] --><span>
+</span><span>
+</span><blockquote><p>上面代码中，全局对象的属性赋值与全局变量的赋值，是同一件事。（对于Node来说，这一条只对REPL环境适用，模块环境之中，全局变量必须显式声明成global对象的属性。）</p></blockquote><span>
+</span><p>有了阮老师的文章验证了这个猜想，我可以放心大胆继续看下去了。</p><span>
+</span><h3 id="repljs">repl.js</h3><span>
+</span><p>知道了上文的内容之后，感觉首要查看的就是 Node.js 源码中的&nbsp;<a href="https://github.com/nodejs/node/blob/master/lib/repl.js#L513">repl.js</a>&nbsp;了。</p><span>
+</span><p>先是结合了一下自己以前用自定义 REPL 的情况，一般的步骤先是获取 REPL 的上下文，然后在上下文里面贴上各种自己需要的东西。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31318685554647" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">var r = relp.start(" ➜ ");  
+var c = r.context;
+
+// 在 c 里面贴上各种上下文
+c.foo = bar;  
+// ...</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">r</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">relp</span><span class="crayon-sy">.</span><span class="crayon-e">start</span><span class="crayon-sy">(</span><span class="crayon-s">" ➜ "</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">c</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">r</span><span class="crayon-sy">.</span><span class="crayon-v">context</span><span class="crayon-sy">;</span></p><p><span class="crayon-c">// 在 c 里面贴上各种上下文</span></p><p><span class="crayon-v">c</span><span class="crayon-sy">.</span><span class="crayon-v">foo</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">bar</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-c">// ...</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0012 seconds] --><span>
+</span><span>
+</span><blockquote><p>关于自定义 REPL 的一些使用方式可以参考下老雷写的《<a href="https://cnodejs.org/topic/563735ed677332084c319d95">Node.js 定制 REPL 的妙用</a>》。</p></blockquote><span>
+</span><p>有了之前写 REPL 的经验，大致明白了 REPL 里面有个上下文的东西，那么在 repl.js 里面我们也找到了类似的代码。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f3131c665955127" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">REPLServer.prototype.createContext = function() {  
+  var context;
+  if (this.useGlobal) {
+    context = global;
+  } else {
+    context = vm.createContext();
+    for (var i in global) context[i] = global[i];
+    context.console = new Console(this.outputStream);
+    context.global = context;
+    context.global.global = context;
+  }
+
+  context.module = module;
+  context.require = require;
+
+  this.lines = [];
+  this.lines.level = [];
+
+  // make built-in modules available directly
+  // (loaded lazily)
+  exports._builtinLibs.forEach(function(name) {
+    Object.defineProperty(context, name, {
+      get: function() {
+        var lib = require(name);
+        context._ = context[name] = lib;
+        return lib;
+      },
+      // allow the creation of other globals with this name
+      set: function(val) {
+        delete context[name];
+        context[name] = val;
+      },
+      configurable: true
+    });
+  });
+
+  return context;
+};</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content"><p>1</p><p>2</p><p>3</p><p>4</p><p>5</p><p>6</p><p>7</p><p>8</p><p>9</p><p>10</p><p>11</p><p>12</p><p>13</p><p>14</p><p>15</p><p>16</p><p>17</p><p>18</p><p>19</p><p>20</p><p>21</p><p>22</p><p>23</p><p>24</p><p>25</p><p>26</p><p>27</p><p>28</p><p>29</p><p>30</p><p>31</p><p>32</p><p>33</p><p>34</p><p>35</p><p>36</p><p>37</p><p>38</p></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">REPLServer</span><span class="crayon-sy">.</span><span class="crayon-v">prototype</span><span class="crayon-sy">.</span><span class="crayon-v">createContext</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">context</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-st">if</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">useGlobal</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-m">global</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-h"> </span><span class="crayon-st">else</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">vm</span><span class="crayon-sy">.</span><span class="crayon-e">createContext</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-st">for</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-i">i</span><span class="crayon-h"> </span><span class="crayon-st">in</span><span class="crayon-h"> </span><span class="crayon-m">global</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-v">context</span><span class="crayon-sy">[</span><span class="crayon-v">i</span><span class="crayon-sy">]</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-m">global</span><span class="crayon-sy">[</span><span class="crayon-v">i</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-sy">.</span><span class="crayon-v">console</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-r">new</span><span class="crayon-h"> </span><span class="crayon-e">Console</span><span class="crayon-sy">(</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">outputStream</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-sy">.</span><span class="crayon-m">global</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">context</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-sy">.</span><span class="crayon-m">global</span><span class="crayon-sy">.</span><span class="crayon-m">global</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">context</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-sy">.</span><span class="crayon-v">module</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">module</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-sy">.</span><span class="crayon-v">require</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">require</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">lines</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-r">this</span><span class="crayon-sy">.</span><span class="crayon-v">lines</span><span class="crayon-sy">.</span><span class="crayon-v">level</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// make built-in modules available directly</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// (loaded lazily)</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">exports</span><span class="crayon-sy">.</span><span class="crayon-v">_builtinLibs</span><span class="crayon-sy">.</span><span class="crayon-st">forEach</span><span class="crayon-sy">(</span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-r">name</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">Object</span><span class="crayon-sy">.</span><span class="crayon-e">defineProperty</span><span class="crayon-sy">(</span><span class="crayon-v">context</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-r">name</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">get</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">lib</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-r">name</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-sy">.</span><span class="crayon-v">_</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">context</span><span class="crayon-sy">[</span><span class="crayon-r">name</span><span class="crayon-sy">]</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">lib</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-st">return</span><span class="crayon-h"> </span><span class="crayon-v">lib</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// allow the creation of other globals with this name</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">set</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-v">val</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">delete</span><span class="crayon-h"> </span><span class="crayon-v">context</span><span class="crayon-sy">[</span><span class="crayon-r">name</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">context</span><span class="crayon-sy">[</span><span class="crayon-r">name</span><span class="crayon-sy">]</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">val</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">configurable</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-t">true</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-st">return</span><span class="crayon-h"> </span><span class="crayon-v">context</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0071 seconds] --><span>
+</span><p>看到了关键字&nbsp;<code>vm</code>。我们暂时先不管&nbsp;<code>vm</code>，光从上面的代码可以看出，<code>context</code>&nbsp;要么等于&nbsp;<code>global</code>，要么就是把&nbsp;<code>global</code>&nbsp;上面的所有东西都粘过来。</p><span>
+</span><p>然后顺带着把必须的两个不在&nbsp;<code>global</code>&nbsp;里的两个东西&nbsp;<code>require</code>&nbsp;和&nbsp;<code>module</code>&nbsp;给弄过来。</p><span>
+</span><p>下面的东西就不需要那么关心了。</p><span>
+</span><h3 id="vm">VM</h3><span>
+</span><p>接下去我们来讲讲&nbsp;<code>vm</code>。</p><span>
+</span><p>VM 是 node 中的一个内置模块，可以在<a href="https://nodejs.org/dist/v4.2.2/docs/api/vm.html">文档</a>中看到说明和使用方法。</p><span>
+</span><p>大致就是将代码运行在一个沙箱之内，并且事先赋予其一些&nbsp;<code>global</code>&nbsp;变量。</p><span>
+</span><p>而真正起到上述&nbsp;<code>var</code>&nbsp;和&nbsp;<code>global</code>&nbsp;区别的就是这个&nbsp;<code>vm</code>&nbsp;了。</p><span>
+</span><p><code>vm</code>&nbsp;之中在根作用域（也就是最外层作用域）中使用&nbsp;<code>var</code>&nbsp;应该是跟在浏览器中一样，会把变量粘到&nbsp;<code>global</code>（浏览器中是&nbsp;<code>window</code>）中去。</p><span>
+</span><p>我们可以试试这样的代码：</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31322400855315" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">var vm = require('vm');  
+var localVar = 'initial value';
+
+vm.runInThisContext('var localVar = "vm";');  
+console.log('localVar: ', localVar);  
+console.log('global.localVar: ', global.localVar);</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">vm</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">'vm'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-e ">localVar</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-s">'initial value'</span><span class="crayon-sy">;</span></p><p><span class="crayon-v">vm</span><span class="crayon-sy">.</span><span class="crayon-e">runInThisContext</span><span class="crayon-sy">(</span><span class="crayon-s">'var localVar = "vm";'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-sy">(</span><span class="crayon-s">'localVar: '</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">localVar</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">console</span><span class="crayon-sy">.</span><span class="crayon-e">log</span><span class="crayon-sy">(</span><span class="crayon-s">'global.localVar: '</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-m">global</span><span class="crayon-sy">.</span><span class="crayon-v">localVar</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0017 seconds] --><span>
+</span><p>其输出结果是：</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31326071897942" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">localVar: initial value  
+global.localVar: vm</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">localVar</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-e">initial </span><span class="crayon-e">value&nbsp;&nbsp;</span></p><p><span class="crayon-m">global</span><span class="crayon-sy">.</span><span class="crayon-v">localVar</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">vm</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0006 seconds] --><span>
+</span><p>如文档中所说，<code>vm</code>&nbsp;的一系列函数中跑脚本都无法对当前的局部变量进行访问。各函数能访问自己的&nbsp;<code>global</code>，而&nbsp;<code>runInThisContext</code>&nbsp;的&nbsp;<code>global</code>&nbsp;与当前上下文的&nbsp;<code>global</code>&nbsp;是一样的，所以能访问当前的全局变量。</p><span>
+</span><p>所以出现上述结果也是理所当然的了。</p><span>
+</span><p>所以在&nbsp;<code>vm</code>&nbsp;中跑我们一开始抛出的问题，答案自然就是&nbsp;<code>2</code>&nbsp;了。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f3132b088951060" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">var vm = require("vm");  
+var sandbox = {  
+    console: console
+};
+
+vm.createContext(sandbox);  
+vm.runInContext("var a = 2;function foo(){console.log(this.a);}foo();", sandbox);</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">vm</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">"vm"</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">sandbox</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-i">console</span></p><p><span class="crayon-sy">}</span><span class="crayon-sy">;</span></p><p><span class="crayon-v">vm</span><span class="crayon-sy">.</span><span class="crayon-e">createContext</span><span class="crayon-sy">(</span><span class="crayon-v">sandbox</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">vm</span><span class="crayon-sy">.</span><span class="crayon-e">runInContext</span><span class="crayon-sy">(</span><span class="crayon-s">"var a = 2;function foo(){console.log(this.a);}foo();"</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">sandbox</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0014 seconds] --><span>
+</span><span>
+</span><h3 id="noderepl">Node REPL 启动的沙箱</h3><span>
+</span><p>最后我们再只需要验证一件事就能真相大白了。</p><span>
+</span><p>平时我们自定义一个&nbsp;<code>repl.js</code>&nbsp;然后执行&nbsp;<code>$ node repl.js</code>&nbsp;的话是会启动一个 REPL，而这个 REPL 会去调&nbsp;<code>vm</code>，所以会出现&nbsp;<code>2</code>&nbsp;的答案；或者我们自己在代码里面写一个&nbsp;<code>vm</code>&nbsp;然后跑之前的代码，也是理所当然出现&nbsp;<code>2</code>。</p><span>
+</span><p>那么我们就输入&nbsp;<code>$ node</code>&nbsp;来进入的 REPL 跟我们之前讲的 REPL 是不是同一个东西呢？</p><span>
+</span><p>如果是的话，一切就释然了。</p><span>
+</span><p>首先我们进入到 Node 的入口文件——C++ 的&nbsp;<code>int main()</code>。</p><span>
+</span><p>它在 Node.js 源码&nbsp;<a href="https://github.com/nodejs/node/blob/0966ab99966b7d3fbe4d7b93797fb299595fca72/src/node_main.cc#L45">src/node_main.cc</a>&nbsp;之中。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f3132f858522148" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">int main(int argc, char *argv[]) {  
+  setvbuf(stderr, NULL, _IOLBF, 1024);
+  return node::Start(argc, argv);
+}</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-e">main</span><span class="crayon-sy">(</span><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-v">argc</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-t">char</span><span class="crayon-h"> </span><span class="crayon-o">*</span><span class="crayon-v">argv</span><span class="crayon-sy">[</span><span class="crayon-sy">]</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-e">setvbuf</span><span class="crayon-sy">(</span><span class="crayon-v">stderr</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-t">NULL</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">_IOLBF</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">1024</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-st">return</span><span class="crayon-v"> node:</span><span class="crayon-o">:</span><span class="crayon-e">Start</span><span class="crayon-sy">(</span><span class="crayon-v">argc</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">argv</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0013 seconds] --><span>
+</span><p>就在主函数中执行了&nbsp;<code>node::Start</code>。而这个&nbsp;<code>node::Start</code>&nbsp;又存在&nbsp;<a href="https://github.com/nodejs/node/blob/0966ab99966b7d3fbe4d7b93797fb299595fca72/src/node.cc#L4109">src/node.cc</a>&nbsp;里面。</p><span>
+</span><p>然后在&nbsp;<code>node::Start</code>&nbsp;里面又调用&nbsp;<code>StartNodeInstance</code>，在这里面是&nbsp;<code>LoadEnvironment</code>&nbsp;函数。</p><span>
+</span><p>最后在&nbsp;<code>LoadEnvironment</code>&nbsp;中看到了几句关键的语句：</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31333611352074" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">Local&lt;String&gt; script_name = FIXED_ONE_BYTE_STRING(env-&gt;isolate(), "node.js");  
+Local&lt;Value&gt; f_value = ExecuteString(env, MainSource(env), script_name);
+
+//...
+
+Local&lt;Function&gt; f = Local&lt;Function&gt;::Cast(f_value);
+
+//...
+Local&lt;Object&gt; global = env-&gt;context()-&gt;Global();
+
+//...
+Local&lt;Value&gt; arg = env-&gt;process_object();  
+f-&gt;Call(global, 1, &amp;arg);</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">Local</span><span class="crayon-o">&lt;</span><span class="crayon-t">String</span><span class="crayon-o">&gt;</span><span class="crayon-h"> </span><span class="crayon-v">script_name</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-e">FIXED_ONE_BYTE_STRING</span><span class="crayon-sy">(</span><span class="crayon-v">env</span><span class="crayon-o">-&gt;</span><span class="crayon-e">isolate</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">"node.js"</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">Local</span><span class="crayon-o">&lt;</span><span class="crayon-v">Value</span><span class="crayon-o">&gt;</span><span class="crayon-h"> </span><span class="crayon-v">f_value</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-e">ExecuteString</span><span class="crayon-sy">(</span><span class="crayon-v">env</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-e">MainSource</span><span class="crayon-sy">(</span><span class="crayon-v">env</span><span class="crayon-sy">)</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">script_name</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-c">//...</span></p><p><span class="crayon-v">Local</span><span class="crayon-o">&lt;</span><span class="crayon-t">Function</span><span class="crayon-o">&gt;</span><span class="crayon-h"> </span><span class="crayon-v">f</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">Local</span><span class="crayon-o">&lt;</span><span class="crayon-t">Function</span><span class="crayon-o">&gt;</span><span class="crayon-o">::</span><span class="crayon-e">Cast</span><span class="crayon-sy">(</span><span class="crayon-v">f_value</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-c">//...</span></p><p><span class="crayon-v">Local</span><span class="crayon-o">&lt;</span><span class="crayon-t">Object</span><span class="crayon-o">&gt;</span><span class="crayon-h"> </span><span class="crayon-m">global</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">env</span><span class="crayon-o">-&gt;</span><span class="crayon-e">context</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-o">-&gt;</span><span class="crayon-m">Global</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-c">//...</span></p><p><span class="crayon-v">Local</span><span class="crayon-o">&lt;</span><span class="crayon-v">Value</span><span class="crayon-o">&gt;</span><span class="crayon-h"> </span><span class="crayon-v">arg</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">env</span><span class="crayon-o">-&gt;</span><span class="crayon-e">process_object</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">f</span><span class="crayon-o">-&gt;</span><span class="crayon-e">Call</span><span class="crayon-sy">(</span><span class="crayon-m">global</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-o">&amp;</span><span class="crayon-v">arg</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0031 seconds] --><span>
+</span><p>还有这么一段关键的注释。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31337431509715" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">// Now we call 'f' with the 'process' variable that we've built up with
+// all our bindings. Inside node.js we'll take care of assigning things to
+// their places.
+
+// We start the process this way in order to be more modular. Developers
+// who do not like how 'src/node.js' setups the module system but do like
+// Node's I/O bindings may want to replace 'f' with their own function.</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-c">// Now we call 'f' with the 'process' variable that we've built up with</span></p><p><span class="crayon-c">// all our bindings. Inside node.js we'll take care of assigning things to</span></p><p><span class="crayon-c">// their places.</span></p><p><span class="crayon-c">// We start the process this way in order to be more modular. Developers</span></p><p><span class="crayon-c">// who do not like how 'src/node.js' setups the module system but do like</span></p><p><span class="crayon-c">// Node's I/O bindings may want to replace 'f' with their own function.</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0006 seconds] --><span>
+</span><p>也就是说，启动&nbsp;<code>node</code>&nbsp;的时候，在做了一些准备之后是开始载入执行 src 文件夹下面的<a href="https://github.com/nodejs/node/blob/0966ab99966b7d3fbe4d7b93797fb299595fca72/src/node.js">node.js</a>&nbsp;文件。</p><span>
+</span><p>在&nbsp;<a href="https://github.com/nodejs/node/blob/0966ab99966b7d3fbe4d7b93797fb299595fca72/src/node.js#L92">92 行</a>附近有针对&nbsp;<code>$ node foo.js</code>&nbsp;和&nbsp;<code>$ node</code>&nbsp;的判断启动不同的逻辑。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f3133c898233016" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">  // ...
+} else if (process.argv[1]) {
+  // make process.argv[1] into a full path
+  var path = NativeModule.require('path');
+  process.argv[1] = path.resolve(process.argv[1]);
+
+  var Module = NativeModule.require('module');
+
+  // ...
+
+  startup.preloadModules();
+  if (global.v8debug &amp;&amp;
+      process.execArgv.some(function(arg) {
+        return arg.match(/^--debug-brk(=[0-9]*)?$/);
+      })) {
+    var debugTimeout = +process.env.NODE_DEBUG_TIMEOUT || 50;
+    setTimeout(Module.runMain, debugTimeout);
+  } else {
+    // Main entry point into most programs:
+    Module.runMain();
+  }
+} else {
+  var Module = NativeModule.require('module');
+
+  if (process._forceRepl || NativeModule.require('tty').isatty(0)) {
+    // REPL
+    var cliRepl = Module.requireRepl();
+    cliRepl.createInternalRepl(process.env, function(err, repl) {
+      // ...
+    });
+  } else {
+    // ...
+  }
+}</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content"><p>1</p><p>2</p><p>3</p><p>4</p><p>5</p><p>6</p><p>7</p><p>8</p><p>9</p><p>10</p><p>11</p><p>12</p><p>13</p><p>14</p><p>15</p><p>16</p><p>17</p><p>18</p><p>19</p><p>20</p><p>21</p><p>22</p><p>23</p><p>24</p><p>25</p><p>26</p><p>27</p><p>28</p><p>29</p><p>30</p><p>31</p><p>32</p><p>33</p><p>34</p></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-sy">}</span><span class="crayon-h"> </span><span class="crayon-st">else</span><span class="crayon-h"> </span><span class="crayon-st">if</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">argv</span><span class="crayon-sy">[</span><span class="crayon-cn">1</span><span class="crayon-sy">]</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// make process.argv[1] into a full path</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">path</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">NativeModule</span><span class="crayon-sy">.</span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">'path'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">argv</span><span class="crayon-sy">[</span><span class="crayon-cn">1</span><span class="crayon-sy">]</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">path</span><span class="crayon-sy">.</span><span class="crayon-e">resolve</span><span class="crayon-sy">(</span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">argv</span><span class="crayon-sy">[</span><span class="crayon-cn">1</span><span class="crayon-sy">]</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">Module</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">NativeModule</span><span class="crayon-sy">.</span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">'module'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">startup</span><span class="crayon-sy">.</span><span class="crayon-e">preloadModules</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-st">if</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-m">global</span><span class="crayon-sy">.</span><span class="crayon-v">v8debug</span><span class="crayon-h"> </span><span class="crayon-o">&amp;&amp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">execArgv</span><span class="crayon-sy">.</span><span class="crayon-e">some</span><span class="crayon-sy">(</span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-v">arg</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-st">return</span><span class="crayon-h"> </span><span class="crayon-v">arg</span><span class="crayon-sy">.</span><span class="crayon-e">match</span><span class="crayon-sy">(</span><span class="crayon-o">/</span><span class="crayon-o">^</span><span class="crayon-o">--</span><span class="crayon-v">debug</span><span class="crayon-o">-</span><span class="crayon-e">brk</span><span class="crayon-sy">(</span><span class="crayon-o">=</span><span class="crayon-sy">[</span><span class="crayon-cn">0</span><span class="crayon-o">-</span><span class="crayon-cn">9</span><span class="crayon-sy">]</span><span class="crayon-o">*</span><span class="crayon-sy">)</span><span class="crayon-sy">?</span><span class="crayon-sy">$</span><span class="crayon-o">/</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">debugTimeout</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">env</span><span class="crayon-sy">.</span><span class="crayon-v">NODE_DEBUG_TIMEOUT</span><span class="crayon-h"> </span><span class="crayon-o">||</span><span class="crayon-h"> </span><span class="crayon-cn">50</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-r">setTimeout</span><span class="crayon-sy">(</span><span class="crayon-v">Module</span><span class="crayon-sy">.</span><span class="crayon-v">runMain</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">debugTimeout</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-h"> </span><span class="crayon-st">else</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// Main entry point into most programs:</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">Module</span><span class="crayon-sy">.</span><span class="crayon-e">runMain</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span></p><p><span class="crayon-sy">}</span><span class="crayon-h"> </span><span class="crayon-st">else</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">Module</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">NativeModule</span><span class="crayon-sy">.</span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">'module'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-st">if</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">_forceRepl</span><span class="crayon-h"> </span><span class="crayon-o">||</span><span class="crayon-h"> </span><span class="crayon-v">NativeModule</span><span class="crayon-sy">.</span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">'tty'</span><span class="crayon-sy">)</span><span class="crayon-sy">.</span><span class="crayon-e">isatty</span><span class="crayon-sy">(</span><span class="crayon-cn">0</span><span class="crayon-sy">)</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// REPL</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">cliRepl</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">Module</span><span class="crayon-sy">.</span><span class="crayon-e">requireRepl</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">cliRepl</span><span class="crayon-sy">.</span><span class="crayon-e">createInternalRepl</span><span class="crayon-sy">(</span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">env</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-v">err</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">repl</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-h"> </span><span class="crayon-st">else</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0065 seconds] --><span>
+</span><p>在上述节选代码的第一个&nbsp;<code>else if</code>&nbsp;中，就是对&nbsp;<code>$ node foo.js</code>&nbsp;这种情况进行处理了，再做完各种初始化之后，使用&nbsp;<code>Module.runMain();</code>&nbsp;来运行入口代码。</p><span>
+</span><p>第二个&nbsp;<code>else if</code>&nbsp;里面就是&nbsp;<code>$ node</code>&nbsp;这种情况了。</p><span>
+</span><p>我们在终端中打开&nbsp;<code>$ node</code>&nbsp;的时候，TTY 通常是关连着的，所以&nbsp;<code>require('tty').isatty(0)</code>为&nbsp;<code>true</code>，也就是说会进到条件分支并且执行里面的&nbsp;<code>cliRepl</code>&nbsp;相关代码。</p><span>
+</span><p>我们进入到&nbsp;<a href="https://github.com/nodejs/node/blob/0966ab99966b7d3fbe4d7b93797fb299595fca72/lib/module.js#L490">lib/module.js</a>&nbsp;看看这个&nbsp;<code>Module.requireRepl</code>&nbsp;是什么东西。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31341040980159" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">Module.requireRepl = function() {  
+  return Module._load('internal/repl', '.');
+}</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">Module</span><span class="crayon-sy">.</span><span class="crayon-v">requireRepl</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-st">return</span><span class="crayon-h"> </span><span class="crayon-v">Module</span><span class="crayon-sy">.</span><span class="crayon-e">_load</span><span class="crayon-sy">(</span><span class="crayon-s">'internal/repl'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">'.'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0009 seconds] --><span>
+</span><p>所以我们还是得转入&nbsp;<a href="https://github.com/nodejs/node/blob/0966ab99966b7d3fbe4d7b93797fb299595fca72/lib/internal/repl.js#L23">lib/internal/repl.js</a>&nbsp;来一探究竟。</p><span>
+</span><p>上面在&nbsp;<code>node.js</code>&nbsp;里面我们看到它执行了这个&nbsp;<code>cliRepl</code>&nbsp;的&nbsp;<code>createInternalRepl</code>&nbsp;函数，它的实现大概是这样的：</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31345938150505" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">function createRepl(env, opts, cb) {  
+  // ...
+
+  opts = opts || {
+    ignoreUndefined: false,
+    terminal: process.stdout.isTTY,
+    useGlobal: true
+  };
+
+  // ...
+
+  opts.replMode = {
+    'strict': REPL.REPL_MODE_STRICT,
+    'sloppy': REPL.REPL_MODE_SLOPPY,
+    'magic': REPL.REPL_MODE_MAGIC
+  }[String(env.NODE_REPL_MODE).toLowerCase().trim()];
+
+  // ...
+
+  const repl = REPL.start(opts);
+
+  // ...
+}</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content"><p>1</p><p>2</p><p>3</p><p>4</p><p>5</p><p>6</p><p>7</p><p>8</p><p>9</p><p>10</p><p>11</p><p>12</p><p>13</p><p>14</p><p>15</p><p>16</p><p>17</p><p>18</p><p>19</p><p>20</p><p>21</p><p>22</p><p>23</p></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">createRepl</span><span class="crayon-sy">(</span><span class="crayon-v">env</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">opts</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">cb</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">opts</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">opts</span><span class="crayon-h"> </span><span class="crayon-o">||</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">ignoreUndefined</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-t">false</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">terminal</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">process</span><span class="crayon-sy">.</span><span class="crayon-v">stdout</span><span class="crayon-sy">.</span><span class="crayon-v">isTTY</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">useGlobal</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-t">true</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">opts</span><span class="crayon-sy">.</span><span class="crayon-v">replMode</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-s">'strict'</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">REPL</span><span class="crayon-sy">.</span><span class="crayon-v">REPL_MODE_STRICT</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-s">'sloppy'</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">REPL</span><span class="crayon-sy">.</span><span class="crayon-v">REPL_MODE_SLOPPY</span><span class="crayon-sy">,</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-s">'magic'</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">REPL</span><span class="crayon-sy">.</span><span class="crayon-v">REPL_MODE</span><span class="crayon-sy">_</span>MAGIC</p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-sy">}</span><span class="crayon-sy">[</span><span class="crayon-t">String</span><span class="crayon-sy">(</span><span class="crayon-v">env</span><span class="crayon-sy">.</span><span class="crayon-v">NODE_REPL_MODE</span><span class="crayon-sy">)</span><span class="crayon-sy">.</span><span class="crayon-e">toLowerCase</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">.</span><span class="crayon-e">trim</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">]</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-m">const</span><span class="crayon-h"> </span><span class="crayon-v">repl</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">REPL</span><span class="crayon-sy">.</span><span class="crayon-e">start</span><span class="crayon-sy">(</span><span class="crayon-v">opts</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// ...</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0033 seconds] --><span>
+</span><p>转头一看这个 lib/internal/repl.js 顶端的模块引入，赫然看到一句话：</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f31349060532967" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">const REPL = require('repl');</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-m">const</span><span class="crayon-h"> </span><span class="crayon-v">REPL</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">'repl'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0006 seconds] --><span>
+</span><p>真相大白。</p><span>
+</span><h2>小结</h2><span>
+</span><p>最后再梳理一遍。</p><span>
+</span><p>在于 Node.js 的&nbsp;<code>vm</code>&nbsp;里面，顶级作用域下的&nbsp;<code>var</code>&nbsp;会把变量贴到&nbsp;<code>global</code>&nbsp;下面。而 REPL 使用了&nbsp;<code>vm</code>。然后&nbsp;<code>$ node</code>&nbsp;进入的一个模式就是一个特定参数下面启动的一个&nbsp;<code>REPL</code>。</p><span>
+</span><p>所以我们一开始提出的问题里面在&nbsp;<code>$ node foo.js</code>&nbsp;模式下执行是&nbsp;<code>undefined</code>，因为不在全局变量上，但是启用&nbsp;<code>$ node</code>&nbsp;这种 REPL 模式的时候得到的结果是&nbsp;<code>2</code>。</p><span>
+</span><h2>番外</h2><span>
+</span><blockquote><p>小龙：我用 node test.js 跑出来是&nbsp;<code>a: undefined</code>；那我应该怎么修改“环境”，来让他跑出：<code>a: 2</code>&nbsp;呢？</p></blockquote><span>
+</span><p>于是有了上面写的那段代码。</p><!-- Crayon Syntax Highlighter v2.7.1 --><span>
+
+		</span><div id="crayon-565a251f3134d153536878" class="crayon-syntax crayon-theme-github crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-always"><span>
+		
+			</span><span>
+			</span><span>
+			</span><p><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly="">var vm = require("vm");  
+var sandbox = {  
+    console: console
+};
+
+vm.createContext(sandbox);  
+vm.runInContext("var a = 2;function foo(){console.log(this.a);}foo();", sandbox);</textarea></p><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">vm</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-e">require</span><span class="crayon-sy">(</span><span class="crayon-s">"vm"</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-t">var</span><span class="crayon-h"> </span><span class="crayon-v">sandbox</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">console</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-i">console</span></p><p><span class="crayon-sy">}</span><span class="crayon-sy">;</span></p><p><span class="crayon-v">vm</span><span class="crayon-sy">.</span><span class="crayon-e">createContext</span><span class="crayon-sy">(</span><span class="crayon-v">sandbox</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span></p><p><span class="crayon-v">vm</span><span class="crayon-sy">.</span><span class="crayon-e">runInContext</span><span class="crayon-sy">(</span><span class="crayon-s">"var a = 2;function foo(){console.log(this.a);}foo();"</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">sandbox</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0014 seconds] --><span>
+</span><span>
+
+        
+        
+    </span><span>
+
+
+
+
+        </span><!-- BEGIN #author-bio --><span>
+
+
+</span><!-- END #author-bio --><span>
+	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
