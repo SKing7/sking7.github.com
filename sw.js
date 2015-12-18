@@ -27,7 +27,7 @@
 
 
 /* eslint-disable quotes, comma-spacing */
-var PrecacheConfig = [["/css/article.css","864fadf60a4cb84eccf77f4ff1b25f96"],["/index.html","fa1a8b6e7fbf30a5a83585f0e8ea61c2"],["/public/css/pygment_trac.css","a0f03ea7a7fd2ff5485ca86459a329c7"],["/public/css/stylesheet.css","53b798e7a3a252035490fed484bdac69"],["/public/js/base.js","b5d9feab3afcb6a99372b6a5a955abd7"],["/public/js/jets.js","085f69f48dfb26142f49812d41f994af"],["/public/js/sw.js","a31efb1bcb546706d589038053c0b0c9"]];
+var PrecacheConfig = [["/css/article.css","864fadf60a4cb84eccf77f4ff1b25f96"],["/index.html","faf21fa5d70ecdd15bfd939388a61d95"],["/public/css/pygment_trac.css","a0f03ea7a7fd2ff5485ca86459a329c7"],["/public/css/stylesheet.css","53b798e7a3a252035490fed484bdac69"],["/public/js/base.js","b5d9feab3afcb6a99372b6a5a955abd7"],["/public/js/jets.js","085f69f48dfb26142f49812d41f994af"],["/public/js/sw.js","a31efb1bcb546706d589038053c0b0c9"]];
 /* eslint-enable quotes, comma-spacing */
 var CacheNamePrefix = 'sw-precache-v1--' + (self.registration ? self.registration.scope : '') + '-';
 
