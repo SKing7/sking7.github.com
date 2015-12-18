@@ -1,0 +1,2 @@
+#~/dev/gulpfile
+gulp sw
