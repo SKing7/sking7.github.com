@@ -1,0 +1,300 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>How to export a JavaScript module</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>How to export a JavaScript module</h1>
+                <main><p>Few days ago I wrote a tweet that surprised many developers not fully aware on how <a href="http://wiki.commonjs.org/wiki/Modules/1.1.1">CommonJS</a> modules work. The same tweet also gave birth to some usual discussion about anti-patterns, confusion, what why and how …</p><script async="" src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p>When people talk about isomorphic, or better “universal JS”, they usually refer to code that runs on both node.js and the browser. There are at least 7 others major engines in the server-side and micro-controller scenario, and these might or might not have a CommonJS built-in modules system:</p><ul><li><a href="http://openjdk.java.net/projects/nashorn/">Nashorn</a>, the JavaScript for the JVM which has functions to load files without implementing CommonJS</li><li><a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Introduction_to_the_JavaScript_shell">SpiderMonkey</a>, which is very popular in some linux distro, used as example extensively as <code>js17</code> or <code>js24</code> dependency in <a href="https://www.gnome.org/">GNOME</a></li><li><a href="http://trac.webkit.org/wiki/JavaScriptCore">JSC</a>, the WebKit JavaScript Core, usable as well on OSX like any other command line tool</li><li><a href="https://wiki.gnome.org/action/show/Projects/Gjs?action=show&amp;redirect=Gjs">GJS</a>, JavaScript Gtk3 Bindings for GNOME, the PythonGtk3 exact equivalent in JavaScript, a SpiderMonkey based runtime with its own module system (explained leter on)</li><li>the <a href="https://github.com/espruino/Espruino">Espruino</a> JavaScript interpreter, a very actively developed engine targeting embedded devices with as little as 128kB Flash and 8kB RAM</li><li><a href="http://duktape.org/">Duktape</a>, an embeddable JS engine <a href="https://github.com/svaarala/duktape/blob/master/doc/modules.rst">that follows CommonJS modules</a></li><li><a href="http://kinoma.com/develop/documentation/overview/#kinomajs-overview-documents-and-files-programs-and-modules">KinomaJS</a>, also based on CommonJS, claiming to be the engine than more than any other fulfill the ES2015 specifications</li></ul><p>Ultimately, we have old and modern browsers, where there’s no CommonJS support but, in most updated cases, an explicit <code>export</code> based syntax which is not compatible with CommonJS.</p><p>Have you ever wondered what all these JavaScript engines have in common since about ever?</p><h3 class="t-all scroll-target" id="the-top-level-this-context">The top level <code>this</code> context</h3><p>If an engine doesn’t implement CommonJS <code>module</code> and <code>exports</code>, the only way to attach a property, a method, or an utility, is using <code>this</code>.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line">method = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{  };</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">this</span>.method = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{  };</span></code></pre><p>If you think using <code>this</code> inside a module is confusing, think again ‘cause in JavaScript there shouldn’t ever be confusion about the execution context. In a module system there are only 3 possible cases for the <code>this</code> reference:</p><ul><li>the <strong>context used to export</strong>, since in a module system there’s no way you want/expect to pollute the global scope and context defining a property to <code>this</code>. In CommonJS environments such node.js, Duktape, KinomaJS, or others, the <code>exports</code> reference is exactly the <code>this</code> context indeed.</li><li>the <strong>global context</strong>, meaning the code is running in a non CommonJS based environment, yet it is capable to somehow export its functionality instead of throwing or breaking. <code>this.EventEmitter = function () { ... };</code> would export <code>EventEmitter</code> in the global context and make it available from that time on everywhere. Simply defining <code>var EventEmitter = function () {};</code> won’t be as portable because the module cannot be used on CommonJS systems.</li><li><strong>undefined</strong> if used directly as ES2015 module, since each module is virtually evaluated under a <code>"use strict"</code> closure without an explicit execution context. This is actually a good thing because CommonJS modules are not compatible with ES6/ES2015 modules. Latter one need to use the very specific syntax such <code>export EventEmitter = function () {};</code> which would brake in every non ES2015 capable engine. Failing early is crucial so that we are sure the ES2015 code needs to be transpiled or our module needs to be modified in order to use explicitly the new syntax.</li></ul><p>The good news about ES2015 modules, is that we could bring CommonJS in there with ease, finally making our modules truly portable cross environments. The counter bad news is that it’s not possible, without a transpiler, to bring ES2015 modules to CommonJS based environments.</p><p>As of today, CommonJS is the most de-facto standard when it comes to modules and modules related tools.</p><p>As explained in the Duktape documentation, whenever we require a module its content will be executed within a closure in the following way:</p><pre><code class="lang-js hljs js"><span class="line"><span class="hljs-keyword">var</span> exports = {};</span>
+<span class="line"><span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = {</span>
+<span class="line"><i> </i><i> </i>exports: exports, </span>
+<span class="line"><i> </i><i> </i>id: <span class="hljs-string">'package/lib'</span></span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line">F.call(exports,     </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">require</span>,     </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>exports,     </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">module</span>);     </span></code></pre><p>It’s that simple: whenever we need to export a property, a method, an utility, or a class, we can either use <code>this</code> or simply the <code>exports</code> object. In some developer opinion, using <code>exports</code> somehow implicitly flags the module as CommonJS compatible, and I kinda agree the explicit intent works quite well and is very welcome.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"></span>
+<span class="line">exports.PI = <span class="hljs-number">3.14</span>;</span>
+<span class="line">exports.abs = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">n</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">return</span> (n | <span class="hljs-number">0</span>) * (n &lt;  <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : <span class="hljs-number">1</span>);</span>
+<span class="line">};</span>
+<span class="line">exports.max = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line">};</span></code></pre><p>The only reason we might need to access the <code>exports</code> property trough the <code>module</code> reference is actually to fully overwrite the export, allowing us to export directly a function or any other object.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"><span class="hljs-built_in">module</span>.exports = {</span>
+<span class="line"><i> </i><i> </i>PI: <span class="hljs-number">3.14</span>,</span>
+<span class="line"><i> </i><i> </i>abs: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">n</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> (n | <span class="hljs-number">0</span>) * (n &lt;  <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : <span class="hljs-number">1</span>);</span>
+<span class="line"><i> </i><i> </i>},</span>
+<span class="line"><i> </i><i> </i>max: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i>}</span>
+<span class="line">};</span></code></pre><p>If your habit is to pass through the module in order to export anything like in <code>module.exports.foo = "bar"</code>, you might reconsider your verbosity and do directly <code>exports.foo = "bar"</code> instead, which is the exact equivalent action.</p><p>Bear in mind, if your habit is to overwrite the default <code>exports</code> object you still need to do that through the <code>module.exports = {...};</code> way ‘cause reassigning the <code>exports = {}</code> won’t actually work.</p><p>There is another de-facto standard in most common CLI oriented JS environments, the <code>load(fileName)</code> function. Not so difficult to imagine, the <code>load</code> function simply find synchronously a file and execute its content in a top level global context.</p><p>It’s basically the equivalent of a <code>&lt;script src="module.js"&gt;&lt;/script&gt;</code> on the web, there’s no guard about global scope/context pollution, so whatever is there, will be somehow “exported”.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = <span class="hljs-string">"module.js"</span>;</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">this</span>.method = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">return</span> <span class="hljs-string">'Hi, I am the load("'</span> + <span class="hljs-built_in">module</span> + <span class="hljs-string">'") result'</span>;</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line">load(<span class="hljs-string">'module.js'</span>);</span>
+<span class="line"></span>
+<span class="line"><span class="hljs-built_in">module</span>;   </span>
+<span class="line">method(); </span></code></pre><p>Accordingly, if we’d like to use <code>load</code> in order to bring in modules, we might consider writing them in the following way:</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"></span>
+<span class="line">(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">exports</span>) </span>{<span class="hljs-string">'use strict'</span>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = <span class="hljs-string">"module.js"</span>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i>exports.method = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> <span class="hljs-string">'Hi, I am the load("'</span> + <span class="hljs-built_in">module</span> + <span class="hljs-string">'") result'</span>;</span>
+<span class="line"><i> </i><i> </i>};</span>
+<span class="line">}(<span class="hljs-keyword">this</span>));</span></code></pre><p>It is not by accident that I’ve called the inline invoked function parameter <code>exports</code> because that module will be automatically compatible with any CommonJS based environment too.</p><p>When developers like JS simplicity but are not fully familiar with the JavaScript world, things like GJS happen. Please don’t get me wrong, I’ve written <a href="http://archibold.io/">my ArchLinux and GNOME based operating system</a> updater via GJS and I think it’s an amazing project, however, the fact the API uses Python naming convention, instead of a JS one, and the fact <a href="http://stackoverflow.com/questions/10093102/how-to-set-a-including-path-in-the-gjs-code/14078345#14078345">you apparently need to throw errors in order to know in which file you are running</a>, make this environment quite hostile for regular client/server JS developers.</p><p>On top of that, there is a NON-CommonJS like module system which basically creates a Proxy object per each imported module so that you don’t accidentally pollute the global context, you actually pollute the module itself with undesired exports.</p><p>Every demo I’ve seen, even directly from the source, apparently doesn’t care about undesired exports per module, and there’s not a single word about that in the <a href="https://wiki.gnome.org/Projects/Gjs/StyleGuide#Imports">related documentation</a>. I’m kinda new to GJS so I don’t feel that confident about filing bugs, but the TL;DR version of its weird behavior is the following.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = <span class="hljs-string">"module.js"</span>;</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">this</span>.method = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">return</span> <span class="hljs-string">'Hi, I am the imports.'</span> + <span class="hljs-built_in">module</span> + <span class="hljs-string">' result'</span>;</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line">imports.searchPath.push(<span class="hljs-string">'.'</span>);</span>
+<span class="line"></span>
+<span class="line">print(imports.module.method());</span>
+<span class="line"></span>
+<span class="line">print(imports.module.module);</span>
+<span class="line"></span></code></pre><p>The problem is that every GJS module imports Gtk and other modules, so that every module accidentally exports every single constant or variable defined within them. While this is practically not such huge issue, unless you are creating a module introspection library that will be inevitably full of false-positives, I think is a very dirty approach to modules in general.</p><p>Playing around with GJS code and modules, I’ve found this approach way cleaner and superior than every module I’ve read so far.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"><span class="hljs-keyword">const</span> {</span>
+<span class="line"><i> </i><i> </i>methodA,</span>
+<span class="line"><i> </i><i> </i>propertyB,</span>
+<span class="line"><i> </i><i> </i>methodC</span>
+<span class="line">} = (<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">var</span> Gtk = imports.gi.Gtk;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">return</span> {</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>methodA: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{ Gtk.init(<span class="hljs-literal">null</span>, <span class="hljs-number">0</span>); },</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>propertyB: <span class="hljs-number">12345</span>,</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>methodC: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{ Gtk.main(); }</span>
+<span class="line"><i> </i><i> </i>};</span>
+<span class="line">}());</span></code></pre><p>No accidental module pollution, a clean way to group the export, a closure to import or do whatever we need in there. Anyway, this is a very specific GJS issue I hope they will solve or put a word in the documentation soon.</p><p>Alternatively, the same approach used with Nashorn and others would also work quite well, granting compatibility with CommonJS.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line">(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">exports</span>) </span>{<span class="hljs-string">'use strict'</span>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = <span class="hljs-string">"module.js"</span>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i>exports.method = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> <span class="hljs-string">'Hi, I am the load("'</span> + <span class="hljs-built_in">module</span> + <span class="hljs-string">'") result'</span>;</span>
+<span class="line"><i> </i><i> </i>};</span>
+<span class="line">}(<span class="hljs-keyword">this</span>));</span></code></pre><p>As we can see, once again using <code>this</code> to export wins in terms of portability.</p><p>Having to deal with all these different ways to import/export modules is a real mess.</p><p>Having an incompatible ES2015 specification that doesn’t work in engines already based on CommonJS surely doesn’t help neither.</p><p>I personally wish “<em>ES.future</em>“ will bring in CommonJS too, beside current <code>export</code> syntax, so that every environment can finally converge without breaking current modules ecosystem.</p><p>Meanwhile, we can at least normalize the CommonJS approach pretty much everywhere. How? Using <code>this</code> to export at least one and one only utility: the <code>require</code> one! Please note this is a simplified script for this post purpose only.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line">(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">context</span>) </span>{<span class="hljs-string">'use strict'</span>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">if</span> (<span class="hljs-string">'require'</span> <span class="hljs-keyword">in</span> context) <span class="hljs-keyword">return</span>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">var</span></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>cache = <span class="hljs-built_in">Object</span>.create(<span class="hljs-literal">null</span>),</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>executeAndCache = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">var</span></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>exports = {},</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">module</span> = {exports: exports, id: file}</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">Function</span>(     </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-string">'require'</span>,  </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-string">'exports'</span>,  </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-string">'module'</span>,   </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>read(file)  </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>).call(</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>exports,    </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">require</span>,    </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>exports,    </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">module</span>      </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>cache[file] = <span class="hljs-built_in">module</span>.exports;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> cache[file];</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>},</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>read =  (context.java &amp;&amp;      </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> java.lang.String(</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>java.nio.file.Files.readAllBytes(</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>java.nio.file.Paths.get(file)</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>)</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>}) ||</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>context.readFile ||   </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>context.read     ||   </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>(<span class="hljs-keyword">typeof</span> imports === <span class="hljs-string">'object'</span> &amp;&amp;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">file</span>)</span>{       </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> imports.gi.GLib.file_get_contents(file)[<span class="hljs-number">1</span>];</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>}) ||</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{     </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">var</span> xhr = <span class="hljs-keyword">new</span> XMLHttpRequest;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>xhr.open(<span class="hljs-string">'GET'</span>, file, <span class="hljs-literal">false</span>);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>xhr.send(<span class="hljs-literal">null</span>);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> xhr.responseText;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>}</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i>context.require = <span class="hljs-built_in">require</span>;</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">require</span>(<span class="hljs-params">file</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">if</span> (file.slice(-<span class="hljs-number">3</span>) !== <span class="hljs-string">'.js'</span>) file += <span class="hljs-string">'.js'</span>;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">return</span> cache[file] || executeAndCache(file);</span>
+<span class="line"><i> </i><i> </i>}</span>
+<span class="line"></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"><i> </i><i> </i></span>
+<span class="line"></span>
+<span class="line">}(<span class="hljs-keyword">this</span>)); </span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i></span></code></pre><p>All we need to do in non-CommonJS environments is to import or load such file at the very beginning.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"><span class="hljs-keyword">this</span>.method = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">return</span> <span class="hljs-string">'Hi, I am require("'</span> + <span class="hljs-built_in">module</span>.id + <span class="hljs-string">'").method()'</span>;</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line">load(<span class="hljs-string">'require.js'</span>);</span>
+<span class="line"><span class="hljs-built_in">require</span>(<span class="hljs-string">'./module'</span>).method();</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line">imports.searchPath.push(<span class="hljs-string">'.'</span>);</span>
+<span class="line"><span class="hljs-keyword">var</span> <span class="hljs-built_in">require</span> = imports.require.require;</span>
+<span class="line"></span>
+<span class="line">print(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./module'</span>).method());</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-built_in">require</span>(<span class="hljs-string">'./module'</span>).method()</span>
+<span class="line"></span></code></pre><p>Good, we can now use any <a href="https://www.npmjs.com/">npm</a> module that is based on JS and not node.js specific tasks!</p><p>While we all dream about one/universal JS, there are many differences between a trusted environment, the server, and a non trusted one, which is usually the browser. In the latter case, the network status is also a major concern, and blocking while loading, as opposite of bundling all modules, doesn’t seem like a good idea, unless done in an intra-net environment or to quickly prototype some project.</p><p>Accordingly, the only reasonable way to load modules in a CommonJS way on browsers would be running main applications within an async function or, generally speaking, a generator.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"><span class="hljs-keyword">var</span> cache = <span class="hljs-built_in">Object</span>.create(<span class="hljs-literal">null</span>);</span>
+<span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadInCache</span>(<span class="hljs-params">file</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">return</span> (cache[file] = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res, rej</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">var</span> xhr = <span class="hljs-keyword">new</span> XMLHttpRequest;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>xhr.open(<span class="hljs-string">'GET'</span>, file, <span class="hljs-literal">true</span>);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>xhr.send(<span class="hljs-literal">null</span>);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>xhr.onerror = rej;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>xhr.onload = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">var</span></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>exports = {},</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">module</span> = {exports: exports, id: file}</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>;</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-keyword">try</span> {</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">Function</span>(</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-string">'require'</span>, <span class="hljs-string">'exports'</span>, <span class="hljs-string">'module'</span>,</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>xhr.responseText</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>).call(</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>exports,</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">require</span>, exports, <span class="hljs-built_in">module</span></span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>res(<span class="hljs-built_in">module</span>.exports);</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><i> </i><i> </i>} <span class="hljs-keyword">catch</span>(o_O) { rej(o_O); }</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>};</span>
+<span class="line"><i> </i><i> </i>}));</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">require</span>(<span class="hljs-params">file</span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">if</span> (file.slice(-<span class="hljs-number">3</span>) !== <span class="hljs-string">'.js'</span>) file += <span class="hljs-string">'.js'</span>;</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">return</span> cache[file] || loadInCache(file);</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-built_in">require</span>;</span></code></pre><p>At this point, everything we need to import in a non blocking way should be in place. The only missing bit is a generator handler like the classic <code>async</code> one, as <a href="https://www.promisejs.org/generators/#both">shown and described in this page</a>.</p><pre><code class="lang-js hljs js"><span class="line"></span>
+<span class="line"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">from</span> <span class="hljs-string">'async'</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">from</span> <span class="hljs-string">'require'</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> *(<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = <span class="hljs-keyword">yield</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">'./module'</span>);</span>
+<span class="line"><i> </i><i> </i>alert(<span class="hljs-built_in">module</span>.method());</span>
+<span class="line">});</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> *(<span class="hljs-params"></span>) </span>{</span>
+<span class="line"><i> </i><i> </i><span class="hljs-keyword">let</span> [</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>moduleA,</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>moduleB,</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i>moduleC</span>
+<span class="line"><i> </i><i> </i>] = <span class="hljs-keyword">yield</span> <span class="hljs-built_in">Promise</span>.all([</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">require</span>(<span class="hljs-string">'./moduleA'</span>),</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">require</span>(<span class="hljs-string">'./moduleB'</span>),</span>
+<span class="line"><i> </i><i> </i><i> </i><i> </i><span class="hljs-built_in">require</span>(<span class="hljs-string">'./moduleC'</span>)</span>
+<span class="line"><i> </i><i> </i>]);</span>
+<span class="line">});</span></code></pre><p>We have now the ability to use <code>npm</code> modules even through most updated browsers and in a non blocking way … cool uh?</p><p>As we’ve seen, the most de-facto cross environment way to export a library is through the <code>this</code> reference, but having a common way to define modules through an <code>exports</code> reference in every environment is definitively a better option and we should probably go for it.</p><p>The <code>npm</code> registry in this case becomes virtually the source for any sort of JavaScript based project, and we could start publishing even Desktop based Applications and UIs via GJS and Gtk3 based JavaScript modules … and that would be absolutely marvelous!</p></main>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

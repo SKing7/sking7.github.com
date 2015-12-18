@@ -1,0 +1,52 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Math.random() and 32-bit precision</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Math.random() and 32-bit precision</h1>
+                <article class="post-content">
+    <p>Last week, Mike Malone, CTO of <a href="https://betable.com/">Betable</a>, wrote a very insightful and informative <a href="https://medium.com/@betable/tifu-by-using-math-random-f1c308c4fd9d">article</a> on Math.random() and PRNGs in general. Mike pointed out V8/Chrome used a pretty bad algorithm to generate random numbers and, since this week, V8 uses a better algorithm.</p>
+
+<p>The article also mentioned the RNG we use in Firefox (it was copied from Java a long time ago) should be improved as well. I fully agree with this. In fact, the past days I've been <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=322529">working on</a> upgrading Math.random() in SpiderMonkey to XorShift128+, see <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=322529">bug 322529</a>. We think XorShift128+ is a good choice: we already had a copy of the RNG in our repository, it's fast (even faster than our current algorithm!), and it passes BigCrush (the most complete RNG test available).</p>
+
+<p>While working on this, I looked at a number of different RNGs and noticed Safari/WebKit <a href="https://github.com/WebKit/webkit/blob/67985c34ffc405f69995e8a35f9c38618625c403/Source/WTF/wtf/WeakRandom.h#L104">uses GameRand</a>. It's extremely fast but <strong>very</strong> weak. (Update Dec 1: WebKit is now <a href="https://bugs.webkit.org/show_bug.cgi?id=151641">also using</a> XorShift128+, so this doesn't apply to newer Safari/WebKit versions.)</p>
+
+<p>Most interesting to me, though, was that, like the previous V8 RNG, it has only 32 bits of precision: it generates a 32-bit unsigned integer and then divides that by <code>UINT_MAX + 1</code>. This means the result of the RNG is always one of about 4.2 billion different numbers, instead of 9007199 billion (2^53). In other words, it can generate 0.00005% of all numbers an ideal RNG can generate.</p>
+
+<p>I wrote a <a href="http://jandemooij.nl/test/random-precision.htm">small testcase</a> to visualize this. It generates random numbers and plots all numbers smaller than 0.00000131072.</p>
+
+<p>Here's the output I got in Firefox (old algorithm) after generating 115 billion numbers:</p>
+
+<p><img src="http://jandemooij.nl/img/rand-firefox-old.png" alt=""></p>
+
+<p>And a Firefox build with XorShift128+:</p>
+
+<p><img src="http://jandemooij.nl/img/rand-firefox-new.png" alt=""></p>
+
+<p>In Chrome (before Math.random was fixed):</p>
+
+<p><img src="http://jandemooij.nl/img/rand-chrome.png" alt=""></p>
+
+<p>And in Safari:</p>
+
+<p><img src="http://jandemooij.nl/img/rand-safari.png" alt=""></p>
+
+<p>These pics clearly show the difference in precision.</p>
+
+<h3>Conclusion</h3>
+
+<p>Safari and older Chrome versions both generate random numbers with only 32 bits of precision. This issue has been fixed in Chrome, but Safari's RNG should probably be fixed as well. Even if we ignore its suboptimal precision, the algorithm is still extremely weak.</p>
+
+<p>Math.random() is not a <a href="https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator">cryptographically-secure PRNG</a> and should never be used for anything security-related, but, as Mike argued, there are a lot of much better (and still very fast) RNGs to choose from.</p>
+
+  </article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

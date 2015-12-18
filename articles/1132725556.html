@@ -1,0 +1,131 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>手机百度移动适配切图解决方案介绍</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>手机百度移动适配切图解决方案介绍</h1>
+                <div class="article-entry" itemprop="articleBody"><span>
+      
+        </span><p>我们知道移动开发上面有个设备像素比：<code>window.devicePixelRatio</code>，现在在开发页面的时候，一定会在<code>head</code>中添加个<code>viewport</code>的<code>meta</code>类似下面的代码：</p><span>
+</span><pre><code class="html">&lt;meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"&gt;
+</code></pre><span>
+</span><p>但是随着手机屏幕越来越大，于是页面会遇见下面的问题，手机屏幕越大，右边留白越多，字体越小也不清晰，影响体验：</p><span>
+</span><p><img src="http://js8.in/slide/assets/flexible/5.png" alt="iPhone5页面"><br><img src="http://js8.in/slide/assets/flexible/6plus.png" alt="iPhone6 Plus页面"></p><span>
+</span><h2 id="介绍下REM">介绍下REM</h2><p>rem是以<code>document.documentElement</code>（即<code>&lt;html&gt;</code>标签）的<code>font-size</code>为基准的，举例说明：</p><span>
+</span><ul>
+<li>html的font-size：10px</li>
+<li>那么1rem = 10px</li>
+</ul><span>
+</span><h2 id="手百Rem切图方案">手百Rem切图方案</h2><p>为了切图方便，我们手百使用了Rem切图，首先类似淘宝的flexible方案，会在页面head中引入一个<code>flexible.js</code>。</p><span>
+</span><a id="more"></a><span>
+</span><p>为了计算方便，我们将<code>documentElement</code>的font-size设置为页面宽度的10%，代码如下：</p><span>
+</span><pre><code class="js">var docEl = document.documentElement;
+var width = docEl.getBoundingClientRect().width;
+var rem = width / 10;
+docEl.style.fontSize = rem + 'px';
+</code></pre><span>
+</span><p>同时配合js获取dpr动态设置的viewport。切图布局的时候，需要计算rem，为了方便我们使用sass写了一个<code>rem</code>函数和mixin：</p><span>
+</span><pre><code class="sass">$rem-baseline: 75px !default;
+@function rem-convert($to, $values...) {
+  $result: ();
+  $separator: rem-separator($values);
+
+  @each $value in $values {
+    @if type-of($value) == "number" and unit($value) == ""{
+        $value: $value * 1px;
+    }
+    @if type-of($value) == "number" and unit($value) == "rem" and $to == "px" {
+      $result: append($result, $value / 1rem * $rem-baseline, $separator);
+    } @else if type-of($value) == "number" and unit($value) == "px" and $to == "rem" {
+      $result: append($result, $value / ($rem-baseline / 1rem), $separator);
+    } @else if type-of($value) == "list" {
+      $result: append($result, rem-convert($to, $value...), $separator);
+    } @else {
+      $result: append($result, $value, $separator);
+    }
+  }
+
+  @return $result;
+}
+
+@function rem($values...) {
+  @if $rem-px-only {
+    @return rem-convert(px, $values...);
+  } @else {
+    @return rem-convert(rem, $values...);
+  }
+}
+
+@mixin rem($properties, $values...) {
+  @if type-of($properties) == "map" {
+    @each $property in map-keys($properties) {
+      @include rem($property, map-get($properties, $property));
+    }
+  } @else {
+    @each $property in $properties {
+      @if $rem-fallback or $rem-px-only {
+        #{$property}: rem-convert(px, $values...);
+      }
+      @if not $rem-px-only {
+        #{$property}: rem-convert(rem, $values...);
+      }
+    }
+  }
+}
+//
+.demo{
+    height: rem(300px);
+    @include rem(padding, 10px 20px);
+}
+</code></pre><span>
+</span><p>sass变量 <code>$rem-baseline</code> 是基准值，以设计图宽度/10为准，这样设计后，就可以直接用视觉稿的尺寸大小切图了。</p><span>
+</span><h3 id="举个例子">举个例子</h3><p>720px的视觉稿中有个360x360的div。</p><span>
+</span><h4 id="普通切图">普通切图</h4><p>使用普通方法切页面，设置：</p><span>
+</span><pre><code class="html">&lt;meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"&gt;
+</code></pre><span>
+</span><p>这样采用iPhone5为基准手机切图，需要计算：<code>需要切图的图层width/(视觉稿width/基准手机设备宽度)</code> 即：<code>360/(720/320)=160px</code></p><span>
+</span><h4 id="Rem切图">Rem切图</h4><ul>
+<li>设置<code>$rem-baseline</code>为720/10，即72px</li>
+<li>使用rem进行计算：<code>width: rem(360px)</code></li>
+</ul><span>
+</span><p><strong>算一算</strong></p><span>
+</span><ol>
+<li>html字体：1rem=640px/10=64px</li>
+<li>viewport：scale = 1/dpr = 0.5</li>
+<li>css的宽：360px/72px = 5rem</li>
+<li>5rem <em> 64px </em> 0.5 = 160px</li>
+</ol><span>
+</span><h2 id="字体问题">字体问题</h2><p>字体的大小是根据<code>&lt;body&gt;</code>标签的<code>font-size</code>，为了计算方便，<code>$font-baseline</code>设置为<code>12px</code>，所以需要根据不同的设备像素比设置不同的<code>font-size</code>，然后配合sass的mixin <code>fontsize</code>设置字体大小</p><span>
+</span><pre><code class="sass">[data-dpr="1"] body{
+    font-size: $font-baseline;
+}
+[data-dpr="2"] body{
+    font-size: $font-baseline * 2;
+}
+[data-dpr="2.5"] body{
+    font-size: $font-baseline * 2.5;
+}
+[data-dpr="2.75"] body{
+    font-size: $font-baseline * 2.75;
+}
+[data-dpr="3"] body{
+    font-size: $font-baseline * 3;
+}
+.demo{
+    @include fontsize(24px);
+}
+</code></pre><span>
+</span><h2 id="总结">总结</h2><p>关于设备上面的切图就说到这里，想了解更多，看下我之前的内部分享：<a href="http://js8.in/slide/flexible.htm">移动适配切图方案</a></p><span>
+
+      
+    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

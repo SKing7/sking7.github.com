@@ -1,0 +1,538 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Performance Calendar</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Performance Calendar</h1>
+                <div class="entry unit"><p><a href="http://www.w3.org/TR/user-timing/">UserTiming</a> is a modern browser performance API that gives developers the ability the mark important events (timestamps) and measure durations (timestamp deltas) in their web apps.  For an in-depth overview of how UserTiming works, you can see my article <a href="http://nicj.net/usertiming-in-practice/">UserTiming in Practice</a> or read <a href="https://speedcurve.com/blog/user-timing-and-custom-metrics/">Steve Souders’ excellent post</a> with several examples for how to use UserTiming to measure your app.</p><span>
+</span><p>UserTiming is very simple to use.  Let’s do a brief review.  If you want to mark an important event, just call <code>window.performance.mark(markName)</code>:</p><span>
+</span><pre>// log the beginning of our task
+performance.mark("start");
+</pre><span>
+</span><p>You can call <code>.mark()</code> as many times as you want, with whatever <code>markName</code> you want.  You can repeat the same <code>markName</code> as well.</p><span>
+</span><p>The data is stored in the <a href="http://www.w3.org/TR/performance-timeline/">PerformanceTimeline</a>.  You query the PerformanceTimeline via methods like <code>performance.getEntriesByName(markName)</code>:</p><span>
+</span><pre>// get the data back
+var entry = performance.getEntriesByName("start");
+// -&gt; {"name": "start", "entryType": "mark", "startTime": 1, "duration": 0}
+</pre><span>
+</span><p>Pretty simple right?  Again, see <a href="https://speedcurve.com/blog/user-timing-and-custom-metrics/">Steve’s article</a> for some great use cases.</p><span>
+</span><p>So let’s imagine you’re sold on using UserTiming.  You start instrumenting you website, placing marks and measures throughout the life-cycle of your app.  Now what?</p><span>
+</span><p>The data isn’t useful unless you’re looking at it.  On your own machine, you can query the PerformanceTimeline and see marks and measures in the <a href="http://nicj.net/usertiming-in-practice/">browser developer tools</a>. There are also <a href="http://soasta.com/mpulse">third</a> <a href="https://speedcurve.com/">party</a> <a href="http://webpagetest.org/">services</a> that give you a view of your UserTiming data.</p><span>
+</span><p>What if you want to gather the data yourself?  What if you’re interested in trending different marks or measures in your own analytics tools?</p><span>
+</span><p>The easy approach is to simply fetch all of the marks and measures via <code>performance.getEntriesByType()</code>, stringify the JSON, and XHR it back to your stats engine.</p><span>
+</span><p>But how big is that data?</p><span>
+</span><p>Let’s look at some example data — this was captured from a website I was browsing:</p><span>
+</span><pre>{"duration":0,"entryType":"mark","name":"mark_perceived_load","startTime":1675.636999996641},
+{"duration":0,"entryType":"mark","name":"mark_before_flex_bottom","startTime":1772.8529999985767},
+{"duration":0,"entryType":"mark","name":"mark_after_flex_bottom","startTime":1986.944999996922},
+{"duration":0,"entryType":"mark","name":"mark_js_load","startTime":2079.4459999997343},
+{"duration":0,"entryType":"mark","name":"mark_before_deferred_js","startTime":2152.8769999968063},
+{"duration":0,"entryType":"mark","name":"mark_after_deferred_js","startTime":2181.611999996676},
+{"duration":0,"entryType":"mark","name":"mark_site_init","startTime":2289.4089999972493}]
+</pre><span>
+</span><p>That’s 657 bytes for just 7 marks.  What if you want to log dozens, hundreds, or even thousands of important events on your page?  What if you have a Single Page App, where the user can generate many events over the lifetime of their session?</p><span>
+</span><p>Clearly, we can do better.  The signal : noise ratio of stringified JSON isn’t that good.  As a performance-conscientious developer, we should strive to minimize our visitor’s upstream bandwidth usage when sending our analytics packets.</p><span>
+</span><p>Let’s see what we can do.</p><span>
+</span><h2>The Goal</h2><span>
+</span><p>Our goal is to reduce the size of an array of marks and measures down to a data structure that’s as small as possible so that we’re only left with a minimal payload that can be quickly beacon’d to a server for aggregate analysis.</p><span>
+</span><p>For a similar domain-specific compression technique for <a href="http://nicj.net/resourcetiming-in-practice/">ResourceTiming</a> data, please see my post on <a href="http://nicj.net/compressing-resourcetiming/">Compressing ResourceTiming</a>.  The techniques we will discuss for UserTiming will build on some of the same things we can do for ResourceTiming data.</p><span>
+</span><p>An additional goal is that we’re going to stick with techniques where the resulting compressed data doesn’t expand from <a href="https://en.wikipedia.org/wiki/Query_string#URL_encoding">URL encoding</a> if used in a query-string parameter.  This makes it easy to just tack on the data to an existing analytics or <a href="https://en.wikipedia.org/wiki/Real_user_monitoring">Real-User-Monitoring (RUM)</a> beacon.</p><span>
+</span><h2>The Approach</h2><span>
+</span><p>There are two main areas of our data-structure that we can compress.  Let’s take a single measure as an example:</p><span>
+</span><pre>{  
+    "name":      "measureName",
+    "entryType": "measure",
+    "startTime": 2289.4089999972493,
+    "duration":  100.12314141 
+}
+</pre><span>
+</span><p>What data is important here?  Each mark and measure has 4 attributes:</p><span>
+</span><ol>
+<li>Its name</li>
+<li>Whether it’s a mark or a measure</li>
+<li>Its start time</li>
+<li>Its duration (for marks, this is 0)</li>
+</ol><span>
+</span><p>I’m going to suggest we can break these down into two main areas: The <em>object</em> and its <em>payload</em>.  The <em>object</em> is simply the mark or measure’s name.  The <em>payload</em> is its start time, and if its a measure, it’s duration.  A duration implies that the object is a measure, so we don’t need to track that attribute independently.</p><span>
+</span><p>Essentially, we can break up our UserTiming data into a key-value pair.  Grouping by the mark or measure name let’s us play some interesting games, so the name will be the key.  The value (payload) will be the list of start times and durations for each mark or measure name.</p><span>
+</span><p>First, we’ll compress the payload (all of the timestamps and durations).  Then, we can compress the list of objects.</p><span>
+</span><p>So, let’s start out by compressing the timestamps!</p><span>
+</span><h2>Compressing the Timestamps</h2><span>
+</span><p>The first thing we want to compress for each mark or measure are its timestamps.</p><span>
+</span><p>To begin with, <code>startTime</code> and <code>duration</code> are in millisecond resolution, with microseconds in the fraction.  Most people probably don’t need microsecond resolution, and it adds a ton of byte size to the payload.  A <code>startTime</code> of <code>2289.4089999972493</code> can probably be compressed down to just 2,289 milliseconds without sacrificing much accuracy.</p><span>
+</span><p>So let’s say we have 3 marks to begin with:</p><span>
+</span><pre>{"duration":0,"entryType":"mark","name":"mark1","startTime":100},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":150},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":500}
+</pre><span>
+</span><p>Grouping by mark name, we can reduce this structure to an array of start times for each mark:</p><span>
+</span><pre>{ "mark1": [100, 150, 500] }
+</pre><span>
+</span><p>One of the truths of UserTiming is that when you fetch the entries via <code>performance.getEntries()</code>, they are in sorted order.</p><span>
+</span><p>Let’s use this to our advantage, by offsetting each timestamp by the one in front of it.  For example, the <code>150</code> timestamp is only 50ms away from the <code>100</code> timestamp before it, so its value can be instead set to <code>50</code>. <code>500</code> is 350ms away from <code>150</code>, so it gets set to <code>350</code>.  We end up with smaller integers this way, which will make compression easier later:</p><span>
+</span><pre>{ "mark1": [100, 50, 350] }
+</pre><span>
+</span><p>How can we compress the numbers further?  Remember, one goal is to make the resulting data transmit easier on a URL (query string), so we mostly want to use the ASCII alpha-numeric set of characters.</p><span>
+</span><p>One really easy way of reducing the number of bytes taken by a number in JavaScript is using <a href="https://en.wikipedia.org/wiki/Senary#Base_36_as_senary_compression">Base-36</a> encoding.  In other words, <code>0=0</code>, <code>10=a</code>, <code>35=z</code>.  Even better, JavaScript has this built-in to <code>Integer.toString(36)</code>:</p><span>
+</span><pre>(35).toString(36)          == "z" (saves 1 character)
+(99999999999).toString(36) == "19xtf1tr" (saves 3 characters)
+</pre><span>
+</span><p>Once we Base-36 encode all of our offset timestamps, we’re left with a smaller number of characters:</p><span>
+</span><pre>{ "mark1": ["2s", "1e", "9q"] }
+</pre><span>
+</span><p>Now that we have these timestamps offsets in Base-36, we can combine (join) them into a single string so they’re easily transmitted.  We should avoid using the comma character (<code>,</code>), as it is one of the reserved characters of the URI spec (<a href="http://tools.ietf.org/html/rfc3986">RFC 3986</a>), so it will be escaped to <code>%2C</code>.</p><span>
+</span><p>The list of non-URI-encoded characters is pretty small:</p><span>
+</span><p><code>[0-9a-zA-Z]</code> <code>$</code> <code>-</code> <code>_</code> <code>.</code> <code>+</code> <code>!</code> <code>*</code> <code>'</code> <code>(</code> <code>)</code></p><span>
+</span><p>The period (<code>.</code>) looks a lot like a comma, so let’s go with that.  Applying a simple <code>Array.join(".")</code>, we get:</p><span>
+</span><pre>{ "mark1": "2s.1e.9q" }
+</pre><span>
+</span><p>So we’re really starting to reduce the byte size of these timestamps.  But wait, there’s more we can do!</p><span>
+</span><p>Let’s say we have some timestamps that came in at a semi-regular interval:</p><span>
+</span><pre>{"duration":0,"entryType":"mark","name":"mark1","startTime":100},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":200},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":300}
+</pre><span>
+</span><p>Compressed down, we get:</p><span>
+</span><pre>{ "mark1": "2s.2s.2s" }
+</pre><span>
+</span><p>Why should we repeat ourselves?</p><span>
+</span><p>Let’s use one of the other non-URI-encoded characters, the asterisk (<code>*</code>), to note when a timestamp offset repeats itself:</p><span>
+</span><ul>
+<li>A single <code>*</code> means it repeated twice</li>
+<li><code>*[n]</code> means it repeated n times.</li>
+</ul><span>
+</span><p>So the above timestamps can be compressed further to:</p><span>
+</span><pre>{ "mark1": "2s*3" }
+</pre><span>
+</span><p>Obviously, this compression depends on the application’s characteristics, but periodic marks can be seen in the wild.</p><span>
+</span><h3>Durations</h3><span>
+</span><p>What about measures?  Measures have the additional data component of a <code>duration</code>.  For marks these are always <code>0</code> (you’re just logging a point in time), but durations are another millisecond attribute.</p><span>
+</span><p>We can adapt our previous string to include durations, if available.  We can even mix marks and measures of the same name and not get confused later.</p><span>
+</span><p>Let’s use this data set as an example.  One mark and two measures (sharing the same name):</p><span>
+</span><pre>{"duration":0,"entryType":"mark","name":"foo","startTime":100},
+{"duration":100,"entryType":"measure","name":"foo","startTime":150},
+{"duration":200,"entryType":"measure","name":"foo","startTime":500}
+</pre><span>
+</span><p>Instead of an array of Base36-encoded offset timestamps, we need to include a duration, if available.  Picking another non-URI-encoded character, the under-bar (<code>_</code>), we can easily “tack” this information on to the end of each <code>startTime</code>.</p><span>
+</span><p>For example, with a <code>startTime</code> of <code>150</code> (<code>1e</code> in Base-36) and a duration of <code>100</code> (<code>2s</code> in Base-36), we get a simple string of <code>1e_2s</code>.</p><span>
+</span><p>Combining the above marks and measures, we get:</p><span>
+</span><pre>{ "foo": "2s.1e_2s.9q_5k" }
+</pre><span>
+</span><p>Later, when we’re decoding this, we haven’t lost track of the fact that there are both marks and measures intermixed here, since only measures have durations.</p><span>
+</span><p>Going back to our original example:</p><span>
+</span><pre>[{"duration":0,"entryType":"mark","name":"mark1","startTime":100},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":150},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":500}]
+</pre><span>
+</span><p>Let’s compare that JSON string to how we’ve compressed it (still in JSON form, which isn’t very URI-friendly):</p><span>
+</span><pre>{"mark1":"2s.1e.9q"}
+</pre><span>
+</span><p>198 bytes originally versus 21 bytes with just the above techniques, or about 10% of the original size.</p><span>
+</span><p>Not bad so far.</p><span>
+</span><h2>Compressing the Array</h2><span>
+</span><p>Most sites won’t have just a single mark or measure name that they want to transmit.  Most sites using UserTiming will have many different mark/measure names and values.</p><span>
+</span><p>We’ve compressed the actual timestamps to a pretty small (URI-friendly) value, but what happens when we need to transmit an array of different marks/measures and their respective timestamps?</p><span>
+</span><p>Let’s pretend there are 3 marks and 3 measures on the page, each with one timestamp.  After applying timestamp compression, we’re left with:</p><span>
+</span><pre>{
+    "mark1": "2s",
+    "mark2": "5k",
+    "mark3": "8c",
+    "measure1": "2s_2s",
+    "measure2": "5k_5k",
+    "measure3": "8c_8c"
+}
+</pre><span>
+</span><p>There are several ways we can compress this data to a format suitable for URL transmission.  Let’s explore.</p><span>
+</span><h3>Using an Array</h3><span>
+</span><p>Remember, JSON is not URI friendly, mostly due to curly braces (<code>{ }</code>), quotes (<code>"</code>) and colons (<code>:</code>) having to be escaped.</p><span>
+</span><p>Even in a minified JSON form:</p><span>
+</span><pre>{"mark1":"2s","mark2":"5k","mark3":"8c","measure1
+":"2s_2s","measure2":"5k_5k","measure3":"8c_8c"}
+(98 bytes)
+</pre><span>
+</span><p>This is what it looks like after URI encoding:</p><span>
+</span><pre>%7B%22mark1%22%3A%222s%22%2C%22mark2%22%3A%225k%2
+2%2C%22mark3%22%3A%228c%22%2C%22measure1%22%3A%22
+2s_2s%22%2C%22measure2%22%3A%225k_5k%22%2C%22meas
+ure3%22%3A%228c_8c%22%7D
+(174 bytes)
+</pre><span>
+</span><p>Gah!  That’s almost 77% overhead.</p><span>
+</span><p>Since we have a list of known keys (names) and values, we could instead change this object into an “array” where we’re not using <code>{ } " :</code> characters to delimit things.</p><span>
+</span><p>Let’s use another URI-friendly character, the tilde (<code>~</code>), to separate each.  Here’s what the format could look like:</p><span>
+</span><pre>[name1]~[timestamp1]~[name2]~[timestamp2]~[...]
+</pre><span>
+</span><p>Using our data:</p><span>
+</span><pre>mark1~2s~mark2~5k~mark3~8c~measure1~2s_2s~measure
+2~5k_5k~measure3~8c_8c~
+(73 bytes)
+</pre><span>
+</span><p>Note that this depends on your names not including a tilde, or, you can pre-escape tildes in names to <code>%7E</code>.</p><span>
+</span><h3>Using an Optimized Trie</h3><span>
+</span><p>That’s one way of compressing the data.  In some cases, we can do better, especially if your names look similar.</p><span>
+</span><p>One great technique we used in <a href="https://github.com/nicjansma/resourcetiming-compression.js">compressing ResourceTiming</a> data is an <a href="http://en.wikipedia.org/wiki/Trie">optimized Trie</a>.  Essentially, you can compress strings anytime one is a prefix of another.</p><span>
+</span><p>In our example above, <code>mark1</code>, <code>mark2</code> and <code>mark3</code> are perfect candidates, since they all have a stem of <code>"mark"</code>.  In optimized Trie form, our above data would look something closer to:</p><span>
+</span><pre>{
+    "mark": {
+        "1": "2s",
+        "2": "5k",
+        "3": "8c"
+    },
+    "measure": {
+        "1": "2s_2s",
+        "2": "5k_5k",
+        "3": "8c_8c"
+    }
+}
+</pre><span>
+</span><p>Minified, this is 13% smaller than the original non-Trie data:</p><span>
+</span><pre>{"mark":{"1":"2s","2":"5k","3":"8c"},"measure":{"
+1":"2s_2s","2":"5k_5k","3":"8c_8c"}}
+(86 bytes)
+</pre><span>
+</span><p>However, this is not as easily compressible into a tilde-separated array, since it’s no longer a flat data structure.</p><span>
+</span><p>There’s actually a great way to compress this JSON data for URL-transmission, called <a href="https://github.com/Sage/jsurl">JSURL</a>.  Basically, the JSURL replaces all non-URI-friendly characters with a better URI-friendly representation.  Here’s what the above JSON looks like regular URI-encoded:</p><span>
+</span><pre>%7B%22mark%22%3A%7B%221%22%3A%222s%22%2C%222%22%3
+A%225k%22%2C%223%22%3A%228c%22%7D%2C%22measure%22
+%3A%7B%22%0A1%22%3A%222s_2s%22%2C%222%22%3A%225k_
+5k%22%2C%223%22%3A%228c_8c%22%7D%7D
+(185 bytes)
+</pre><span>
+</span><p>Versus <a href="https://github.com/Sage/jsurl">JSURL</a> encoded:</p><span>
+</span><pre>~(m~(ark~(1~'2s~2~'5k~3~'8c)~easure~(1~'2s_2s~2~'
+5k_5k~3~'8c_8c)))
+(67 bytes)
+</pre><span>
+</span><p>This JSURL encoding of an optimized Trie reduces the bytes size by 10% versus a tilde-separated array.</p><span>
+</span><h3>Using a Map</h3><span>
+</span><p>Finally, if you know what your mark / measure names will be ahead of time, you may not need to transmit the actual names at all.  If the set of your names is finite, and could maintain a map of name : index pairs, and only have to transmit the indexed value for each name.</p><span>
+</span><p>Using the 3 marks and measures from before:</p><span>
+</span><pre>{
+    "mark1": "2s",
+    "mark2": "5k",
+    "mark3": "8c",
+    "measure1": "2s_2s",
+    "measure2": "5k_5k",
+    "measure3": "8c_8c"
+}
+</pre><span>
+</span><p>What if we simply mapped these names to numbers 0-5:</p><span>
+</span><pre>{
+    "mark1": 0,
+    "mark2": 1,
+    "mark3": 2,
+    "measure1": 3,
+    "measure2": 4,
+    "measure3": 5
+}
+</pre><span>
+</span><p>Since we no longer have to compress names via a Trie, we can go back to an optimized array.  And since the size of the index is relatively small (values 0-35 fit into a single character), we can save some room by not having a dedicated character (<code>~</code>) that separates each index and value (timestamps).</p><span>
+</span><p>Taking the above example, we can have each name fit into a string in this format:</p><span>
+</span><pre>[index1][timestamp1]~[index2][timestamp2]~[...]
+</pre><span>
+</span><p>Using our data:</p><span>
+</span><pre>02s~15k~28c~32s_2s~45k_5k~58c_8c
+(32 bytes)
+</pre><span>
+</span><p>This structure is less than half the size of the optimized Trie (JSURL encoded).</p><span>
+</span><p>If you have over 36 mapped name : index pairs, we can still accommodate them in this structure.  Remember, at value 36 (the 37th value from 0), <code>(36).toString(36) == 10</code>, taking two characters.  We can’t just use an index of two characters, since our assumption above is that the index is only a single character.</p><span>
+</span><p>One way of dealing with this is by adding a special encoding if the index is over a certain value.  We’ll <em>optimize</em> the structure to assume you’re only going to use 36 values, but, if you have over 36, we can accommodate that as well.  For example, let’s use one of the final non-URI-encoded characters we have left over, the dash (<code>-</code>):</p><span>
+</span><p>If the first character of an item in the array is:</p><span>
+</span><ul>
+<li><code>0-z</code> (index values 0 – 35), that is the index value</li>
+<li><code>-</code>, the next two characters are the index (plus 36)</li>
+</ul><span>
+</span><p>Thus, the value 0 is encoded as <code>0</code>, 35 is encoded as <code>z</code>, 36 is encoded as <code>-00</code>, and 1331 is encoded as <code>-zz</code>.  This gives us a total of 1331 mapped values we can use, all using a single or 3 characters.</p><span>
+</span><p>So, given compressed values of:</p><span>
+</span><pre>{
+    "mark1": "2s",
+    "mark2": "5k",
+    "mark3": "8c"
+}
+</pre><span>
+</span><p>And a mapping of:</p><span>
+</span><pre>{
+    "mark1": 36,
+    "mark2": 37,
+    "mark3": 1331
+}
+</pre><span>
+</span><p>You could compress this as:</p><span>
+</span><pre>-002s~-015k~-zz8c
+</pre><span>
+</span><p>We now have 3 different ways of compressing our array of marks and measures.</p><span>
+</span><p>We can even swap between them, depending on which compresses the best each time we gather UserTiming data.</p><span>
+</span><h2>Test Cases</h2><span>
+</span><p>So how do these techniques apply to some real-world (and concocted) data?</p><span>
+</span><p>I navigated around the Alexa Top 50 (by traffic) websites, to see who’s using UserTiming (not many).  I gathered any examples I could, and created some of my own test cases as well.  With this, I currently have a corpus of 20 real and fake UserTiming examples.</p><span>
+</span><p>Let’s first compare <code>JSON.stringify()</code> of our UserTiming data versus the culmination of all of the techniques above:</p><span>
+</span><pre>+------------------------------+
+¦ Test    ¦ JSON ¦ UTC ¦ UTC % ¦
++---------+------+-----+-------¦
+¦ 01.json ¦ 415  ¦ 66  ¦ 16%   ¦
++---------+------+-----+-------¦
+¦ 02.json ¦ 196  ¦ 11  ¦ 6%    ¦
++---------+------+-----+-------¦
+¦ 03.json ¦ 521  ¦ 18  ¦ 3%    ¦
++---------+------+-----+-------¦
+¦ 04.json ¦ 217  ¦ 36  ¦ 17%   ¦
++---------+------+-----+-------¦
+¦ 05.json ¦ 364  ¦ 66  ¦ 18%   ¦
++---------+------+-----+-------¦
+¦ 06.json ¦ 334  ¦ 43  ¦ 13%   ¦
++---------+------+-----+-------¦
+¦ 07.json ¦ 460  ¦ 43  ¦ 9%    ¦
++---------+------+-----+-------¦
+¦ 08.json ¦ 91   ¦ 20  ¦ 22%   ¦
++---------+------+-----+-------¦
+¦ 09.json ¦ 749  ¦ 63  ¦ 8%    ¦
++---------+------+-----+-------¦
+¦ 10.json ¦ 103  ¦ 32  ¦ 31%   ¦
++---------+------+-----+-------¦
+¦ 11.json ¦ 231  ¦ 20  ¦ 9%    ¦
++---------+------+-----+-------¦
+¦ 12.json ¦ 232  ¦ 19  ¦ 8%    ¦
++---------+------+-----+-------¦
+¦ 13.json ¦ 172  ¦ 34  ¦ 20%   ¦
++---------+------+-----+-------¦
+¦ 14.json ¦ 658  ¦ 145 ¦ 22%   ¦
++---------+------+-----+-------¦
+¦ 15.json ¦ 89   ¦ 48  ¦ 54%   ¦
++---------+------+-----+-------¦
+¦ 16.json ¦ 415  ¦ 33  ¦ 8%    ¦
++---------+------+-----+-------¦
+¦ 17.json ¦ 196  ¦ 18  ¦ 9%    ¦
++---------+------+-----+-------¦
+¦ 18.json ¦ 196  ¦ 8   ¦ 4%    ¦
++---------+------+-----+-------¦
+¦ 19.json ¦ 228  ¦ 50  ¦ 22%   ¦
++---------+------+-----+-------¦
+¦ 20.json ¦ 651  ¦ 38  ¦ 6%    ¦
++---------+------+-----+-------¦
+¦ Total   ¦ 6518 ¦ 811 ¦ 12%   ¦
++------------------------------+
+
+Key:
+* JSON      = JSON.stringify(UserTiming).length (bytes)
+* UTC       = Applying UserTimingCompression (bytes)
+* UTC %     = UTC bytes / JSON bytes
+</pre><span>
+</span><p>Pretty good, right?  On average, we shrink the data down to about 12% of its original size.</p><span>
+</span><p>In addition, the resulting data is now URL-friendly.</p><span>
+</span><h2>UserTiming-Compression.js</h2><span>
+</span><p><code>usertiming-compression.js</code> (and its companion, <code>usertiming-decompression.js</code>) are open-source JavaScript modules (<code>UserTimingCompression</code> and <code>UserTimingDecompression</code>) that apply all of the techniques above.</p><span>
+</span><p>They are available on Github at <a href="https://github.com/nicjansma/usertiming-compression.js">github.com/nicjansma/usertiming-compression.js</a>.</p><span>
+</span><p>These scripts are meant to provide an easy, drop-in way of compressing your UserTiming data.  They compress UserTiming via one of the methods listed above, depending on which way compresses best.</p><span>
+</span><p>If you have intimate knowledge of your UserTiming marks, measures and how they’re organized, you could probably construct an even more optimized data structure for capturing and transmitting your UserTiming data.  You could also trim the scripts to only use the compression technique that works best for you.</p><span>
+</span><h2>Versus Gzip / Deflate</h2><span>
+</span><p>Wait, why did we go through all of this mumbo-jumbo when there are already great ways of compression data?  Why not just gzip the stringified JSON?</p><span>
+</span><p>That’s one approach.  One challenge is there isn’t native support for gzip in JavaScript.  Thankfully, you can use one of the excellent open-source libraries like <a href="https://github.com/nodeca/pako">pako</a>.</p><span>
+</span><p>Let’s compare the UserTimingCompression techniques to gzipping the raw UserTiming JSON:</p><span>
+</span><pre>+----------------------------------------------------+
+¦ Test    ¦ JSON ¦ UTC ¦ UTC % ¦ JSON.gz ¦ JSON.gz % ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 01.json ¦ 415  ¦ 66  ¦ 16%   ¦ 114     ¦ 27%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 02.json ¦ 196  ¦ 11  ¦ 6%    ¦ 74      ¦ 38%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 03.json ¦ 521  ¦ 18  ¦ 3%    ¦ 79      ¦ 15%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 04.json ¦ 217  ¦ 36  ¦ 17%   ¦ 92      ¦ 42%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 05.json ¦ 364  ¦ 66  ¦ 18%   ¦ 102     ¦ 28%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 06.json ¦ 334  ¦ 43  ¦ 13%   ¦ 96      ¦ 29%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 07.json ¦ 460  ¦ 43  ¦ 9%    ¦ 158     ¦ 34%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 08.json ¦ 91   ¦ 20  ¦ 22%   ¦ 88      ¦ 97%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 09.json ¦ 749  ¦ 63  ¦ 8%    ¦ 195     ¦ 26%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 10.json ¦ 103  ¦ 32  ¦ 31%   ¦ 102     ¦ 99%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 11.json ¦ 231  ¦ 20  ¦ 9%    ¦ 120     ¦ 52%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 12.json ¦ 232  ¦ 19  ¦ 8%    ¦ 123     ¦ 53%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 13.json ¦ 172  ¦ 34  ¦ 20%   ¦ 112     ¦ 65%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 14.json ¦ 658  ¦ 145 ¦ 22%   ¦ 217     ¦ 33%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 15.json ¦ 89   ¦ 48  ¦ 54%   ¦ 91      ¦ 102%      ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 16.json ¦ 415  ¦ 33  ¦ 8%    ¦ 114     ¦ 27%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 17.json ¦ 196  ¦ 18  ¦ 9%    ¦ 81      ¦ 41%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 18.json ¦ 196  ¦ 8   ¦ 4%    ¦ 74      ¦ 38%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 19.json ¦ 228  ¦ 50  ¦ 22%   ¦ 103     ¦ 45%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ 20.json ¦ 651  ¦ 38  ¦ 6%    ¦ 115     ¦ 18%       ¦
++---------+------+-----+-------+---------+-----------¦
+¦ Total   ¦ 6518 ¦ 811 ¦ 12%   ¦ 2250    ¦ 35%       ¦
++----------------------------------------------------+
+
+Key:
+* JSON      = JSON.stringify(UserTiming).length (bytes)
+* UTC       = Applying UserTimingCompression (bytes)
+* UTC %     = UTC bytes / JSON bytes
+* JSON.gz   = gzip(JSON.stringify(UserTiming)).length
+* JSON.gz % = JSON.gz bytes / JSON bytes
+</pre><span>
+</span><p>As you can see, gzip does a pretty good job of compressing raw JSON (stringified) – on average, reducing the size of to 35% of the original.  However, UserTimingCompression does a much better job, reducing to 12% of overall size.</p><span>
+</span><p>What if instead of gzipping the UserTiming JSON, we gzip the minified timestamp map?  For example, instead of:</p><span>
+</span><pre>[{"duration":0,"entryType":"mark","name":"mark1","startTime":100},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":150},
+{"duration":0,"entryType":"mark","name":"mark1","startTime":500}]
+</pre><span>
+</span><p>What if we gzipped the output of compressing the timestamps?</p><span>
+</span><pre>{"mark1":"2s.1e.9q"}
+</pre><span>
+</span><p>Here are the results:</p><span>
+</span><pre>+-----------------------------------+
+¦ Test    ¦ UTC ¦ UTC.gz ¦ UTC.gz % ¦
++---------+-----+--------+----------¦
+¦ 01.json ¦ 66  ¦ 62     ¦ 94%      ¦
++---------+-----+--------+----------¦
+¦ 02.json ¦ 11  ¦ 24     ¦ 218%     ¦
++---------+-----+--------+----------¦
+¦ 03.json ¦ 18  ¦ 28     ¦ 156%     ¦
++---------+-----+--------+----------¦
+¦ 04.json ¦ 36  ¦ 46     ¦ 128%     ¦
++---------+-----+--------+----------¦
+¦ 05.json ¦ 66  ¦ 58     ¦ 88%      ¦
++---------+-----+--------+----------¦
+¦ 06.json ¦ 43  ¦ 43     ¦ 100%     ¦
++---------+-----+--------+----------¦
+¦ 07.json ¦ 43  ¦ 60     ¦ 140%     ¦
++---------+-----+--------+----------¦
+¦ 08.json ¦ 20  ¦ 33     ¦ 165%     ¦
++---------+-----+--------+----------¦
+¦ 09.json ¦ 63  ¦ 76     ¦ 121%     ¦
++---------+-----+--------+----------¦
+¦ 10.json ¦ 32  ¦ 45     ¦ 141%     ¦
++---------+-----+--------+----------¦
+¦ 11.json ¦ 20  ¦ 37     ¦ 185%     ¦
++---------+-----+--------+----------¦
+¦ 12.json ¦ 19  ¦ 35     ¦ 184%     ¦
++---------+-----+--------+----------¦
+¦ 13.json ¦ 34  ¦ 40     ¦ 118%     ¦
++---------+-----+--------+----------¦
+¦ 14.json ¦ 145 ¦ 112    ¦ 77%      ¦
++---------+-----+--------+----------¦
+¦ 15.json ¦ 48  ¦ 45     ¦ 94%      ¦
++---------+-----+--------+----------¦
+¦ 16.json ¦ 33  ¦ 50     ¦ 152%     ¦
++---------+-----+--------+----------¦
+¦ 17.json ¦ 18  ¦ 37     ¦ 206%     ¦
++---------+-----+--------+----------¦
+¦ 18.json ¦ 8   ¦ 23     ¦ 288%     ¦
++---------+-----+--------+----------¦
+¦ 19.json ¦ 50  ¦ 53     ¦ 106%     ¦
++---------+-----+--------+----------¦
+¦ 20.json ¦ 38  ¦ 51     ¦ 134%     ¦
++---------+-----+--------+----------¦
+¦ Total   ¦ 811 ¦ 958    ¦ 118%     ¦
++-----------------------------------+
+
+Key:
+* UTC     = Applying full UserTimingCompression (bytes)
+* TS.gz   = gzip(UTC timestamp compression).length
+* TS.gz % = TS.gz bytes / UTC bytes
+</pre><span>
+</span><p>Even with pre-applying the timestamp compression and gzipping the result, gzip doesn’t beat the full UserTimingCompression techniques.  Here, in general, gzip is 18% larger than UserTimingCompression.  There are a few cases where gzip is better, notably in test cases with a lot of repeating strings.</p><span>
+</span><p>Additionally, applying gzip requires your app include a JavaScript gzip library, like pako — whose deflate code is currently around <a href="https://github.com/nodeca/pako/blob/master/dist/pako_deflate.min.js">26.3 KB minified</a>.  usertiming-compression.js is much smaller, at only <a href="https://github.com/nicjansma/usertiming-compression.js/tree/master/dist/usertiming-compression.js">3.9 KB</a> minified.</p><span>
+</span><p>Finally, if you’re using gzip compression, you can’t just stick the gzip data into a Query String, as <a href="https://en.wikipedia.org/wiki/Query_string#URL_encoding">URL encoding</a> will increase its size tremendously.</p><span>
+</span><p>If you’re already using gzip to compress data, it’s a decent choice, but applying some domain-specific knowledge about our data-structures give us better compression in most cases.</p><span>
+</span><h2>Versus MessagePack</h2><span>
+</span><p><a href="http://msgpack.org/">MessagePack</a> is another interesting choice for compressing data.  In fact, its motto is “<em>It’s like JSON. but fast and small.</em>“.  I like MessagePack and use it for other projects.  MessagePack is an efficient binary serialization format that takes JSON input and distills it down to a minimal form.  It works with <em>any</em> JSON data structure, and is very portable.</p><span>
+</span><p>How does MessagePack compare to the UserTiming compression techniques?</p><span>
+</span><p>MessagePack only compresses the original UserTiming JSON to 72% of its original size.  Great for a general compression library, but not nearly as good as UserTimingCompression can do.  Notably, this is because MessagePack is retaining the JSON strings (e.g. <code>startTime</code>, <code>duration</code>, etc) for each UserTiming object:</p><span>
+</span><pre>+--------------------------------------------------------+
+¦         ¦ JSON ¦ UTC ¦ UTC % ¦ JSON.pack ¦ JSON.pack % ¦
++---------+------+-----+-------+-----------+-------------¦
+¦ Total   ¦ 6518 ¦ 811 ¦ 12%   ¦ 4718      ¦ 72%         ¦
++--------------------------------------------------------+
+
+Key:
+* UTC         = Applying UserTimingCompression (bytes)
+* UTC %       = UTC bytes / JSON bytes
+* JSON.pack   = MsgPack(JSON.stringify(UserTiming)).length
+* JSON.pack % = TS.pack bytes / UTC bytes
+</pre><span>
+</span><p>What if we just MessagePack the compressed timestamps? (e.g. <code>{"mark1":"2s.1e.9q", ...}</code>)</p><span>
+</span><pre>+---------------------------------------+
+¦ Test    ¦ UTC ¦ TS.pack  ¦ TS.pack %  ¦
++---------+-----+----------+------------¦
+¦ 01.json ¦ 66  ¦ 73       ¦ 111%       ¦
++---------+-----+----------+------------¦
+¦ 02.json ¦ 11  ¦ 12       ¦ 109%       ¦
++---------+-----+----------+------------¦
+¦ 03.json ¦ 18  ¦ 19       ¦ 106%       ¦
++---------+-----+----------+------------¦
+¦ 04.json ¦ 36  ¦ 43       ¦ 119%       ¦
++---------+-----+----------+------------¦
+¦ 05.json ¦ 66  ¦ 76       ¦ 115%       ¦
++---------+-----+----------+------------¦
+¦ 06.json ¦ 43  ¦ 44       ¦ 102%       ¦
++---------+-----+----------+------------¦
+¦ 07.json ¦ 43  ¦ 43       ¦ 100%       ¦
++---------+-----+----------+------------¦
+¦ 08.json ¦ 20  ¦ 21       ¦ 105%       ¦
++---------+-----+----------+------------¦
+¦ 09.json ¦ 63  ¦ 63       ¦ 100%       ¦
++---------+-----+----------+------------¦
+¦ 10.json ¦ 32  ¦ 33       ¦ 103%       ¦
++---------+-----+----------+------------¦
+¦ 11.json ¦ 20  ¦ 21       ¦ 105%       ¦
++---------+-----+----------+------------¦
+¦ 12.json ¦ 19  ¦ 20       ¦ 105%       ¦
++---------+-----+----------+------------¦
+¦ 13.json ¦ 34  ¦ 33       ¦ 97%        ¦
++---------+-----+----------+------------¦
+¦ 14.json ¦ 145 ¦ 171      ¦ 118%       ¦
++---------+-----+----------+------------¦
+¦ 15.json ¦ 48  ¦ 31       ¦ 65%        ¦
++---------+-----+----------+------------¦
+¦ 16.json ¦ 33  ¦ 40       ¦ 121%       ¦
++---------+-----+----------+------------¦
+¦ 17.json ¦ 18  ¦ 21       ¦ 117%       ¦
++---------+-----+----------+------------¦
+¦ 18.json ¦ 8   ¦ 11       ¦ 138%       ¦
++---------+-----+----------+------------¦
+¦ 19.json ¦ 50  ¦ 52       ¦ 104%       ¦
++---------+-----+----------+------------¦
+¦ 20.json ¦ 38  ¦ 40       ¦ 105%       ¦
++---------+-----+----------+------------¦
+¦ Total   ¦ 811 ¦ 867      ¦ 107%       ¦
++---------------------------------------+
+
+Key:
+* UTC       = Applying full UserTimingCompression (bytes)
+* TS.pack   = MsgPack(UTC timestamp compression).length
+* TS.pack % = TS.pack bytes / UTC bytes
+</pre><span>
+</span><p>For our 20 test cases, MessagePack is about 7% larger than the UserTiming compression techniques.</p><span>
+</span><p>Like using a JavaScript module for gzip, the most popular MessagePack JavaScript modules are pretty hefty, at <a href="https://github.com/msgpack/msgpack-javascript/blob/master/msgpack.js">29.2 KB</a>, <a href="https://github.com/kawanet/msgpack-lite/blob/master/dist/msgpack.min.js">36.9 KB</a>, and <a href="https://github.com/mcollina/msgpack5/blob/master/dist/msgpack5.min.js">104 KB</a>.  Compare this to only <a href="https://github.com/nicjansma/usertiming-compression.js/tree/master/dist/usertiming-compression.js">3.9 KB</a> minified for usertiming-compression.js.</p><span>
+</span><p>Basically, if you have good domain-specific knowledge of your data-structures, you can often compress better than a general-case minimizer like gzip or MessagePack.</p><span>
+</span><h2>Conclusion</h2><span>
+</span><p>It’s fun taking a data-structure you want to work with and compressing it down as much as possible.</p><span>
+</span><p>UserTiming is a great (and under-utilized) browser API that I hope to see get adopted more.  If you’re already using UserTiming, you might have already solved the issue of how to capture, transmit and store these datapoints.  If not, I hope these techniques and tools will help you on your way towards using the API.</p><span>
+</span><p>Do you have ideas for how to compress this data down even further?  Let me know!</p><span>
+</span><p><a href="https://github.com/nicjansma/usertiming-compression.js">usertiming-decompression.js</a> (and usertiming-decompression.js) are available on <a href="https://github.com/nicjansma/usertiming-compression.js">Github</a>.</p><span>
+</span><h3>Resources</h3><span>
+</span><span>
+</span><blockquote><p>This article was originally published on <a href="http://nicj.net/compressing-usertiming/">Nic’s blog</a></p></blockquote><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,84 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Capturing 5xx Errors with a Debug Server</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Capturing 5xx Errors with a Debug Server</h1>
+                <div class="entry-content blog-post"><span>
+		</span><h3><em>If a <code>5<em>xx</em></code> happens and no one is around to see it, is it still an error?</em></h3><span>
+</span><figure id="attachment_18951" class="wp-caption aligncenter"><img src="https://www.nginx.com/wp-content/uploads/2015/11/5xx-blog-fallen-tree.jpg" alt="Photo by Tony Moorey (CC)" width="1024" height="768" class="size-full wp-image-18951"><figcaption class="wp-caption-text">Photo by <a target="_blank" href="https://www.flickr.com/photos/tonymoorey/145103384/in/photolist-aDruLP-aDvmKo-apTwQh-25ozRP-fo1h9Y-a9pVFg-hBHcpE-zeBrmo-dPGbu-a1DmmF-dt8yjR-oyMYx6-8LPNLx-A9d1Zh-72VxLv-oJgKNh-3KTMMR-qyTBE-8Ub1Ub-zCV1iH-t71Fh-hM6fkk-6XcXRn-aVtU9x-pvJHXy-cJLW2Q-hBH9cg-8NQhDV-7dmmcN-sBSLr-4v36Ed-Abg5M8-AcpUbR-72Vwj6-zTPmcZ-3LaCoH-aDvmMs-e5CvED-aDruPi-aDvmPm-aDvmHY-5QdxqY-7a9iFH-dwgWyK-76y9VH-8MG4Bb-oJMdKT-aw9GRK-aLqdUe-dnwV9s">Tony Moorey</a> (CC)</figcaption></figure><span>
+</span><p>No matter how rigorously or how long you test your software, there’s nothing like the production environment to uncover bugs. Whether it’s caused by a weird race condition that happens only under the unpredictable concurrency patterns of live traffic, or an input validation blow-up for data you could never imagine a user typing, “throwing a <code>500</code>” is a big deal.</p><span>
+</span><p>HTTP <code>5<em>xx</em></code> error messages are highly visible to your users, highly embarrassing for the business, and can lead to reputational damage in a very short space of time. Furthermore, debugging them in your production environment can be extremely difficult. For starters, the sheer volume of log data can make the job of isolating a problematic session like searching for a needle in a haystack. And even when you have collated logs from all components, you may still not have enough data to understand the problem.</p><span>
+</span><p>When using NGINX as a reverse proxy or load balancer for your application, there are a number of features that can assist you with debugging in a production environment. In this blog post we will describe a specific use of the <code>error_page</code> directive as we explore a typical reverse proxy application infrastructure, with a twist.</p><span>
+</span><h2>Introducing the Debug Server</h2><span>
+</span><p>The twist is that we’re going to set up a special application server&nbsp;–&nbsp;we’ll call it the Debug Server&nbsp;–&nbsp;and feed it only requests that have caused errors on a regular application server. We’re taking advantage of how NGINX can detect <code>5<em>xx</em></code> errors coming back from an upstream application server and retry the responsible requests with a different upstream group, in our case the one containing the Debug Server. This means that Debug Server will only receive requests that have already produced errors, so its log files contain only erroneous events, ready for investigation. This reduces the scope of your needle search from a haystack to merely a handful of needles.</p><span>
+</span><p>Unlike the main application servers, the Debug Server does not have to be built for performance. Therefore you can enable all of the available logging and diagnostic tools at your disposal, such as:</p><span>
+</span><ul>
+<li>Running your application in debug mode, with full stack trace enabled</li>
+<li>Debug logging of application servers</li>
+<li>Application profiling, so that interprocess timeouts can be identified</li>
+<li>Logging of server resource usage</li>
+</ul><span>
+</span><p>Debugging tools like these are usually reserved for a development environment, because production environments are tuned for performance. However, as the Debug Server only ever receives erroneous requests, you can safely enable debug mode on as many components as possible.</p><span>
+</span><p>Here’s what our application infrastructure looks like.</p><span>
+</span><p><img src="https://www.nginx.com/wp-content/uploads/2015/11/debug-server-5xx-errors-e1448303642707.png" alt="The Debug Server captures 5xx errors generated on other application servers" width="450" height="523" class="aligncenter size-full wp-image-19011"></p><span>
+</span><p>Ideally, the provisioning and configuration of the Debug Server is identical to the application servers, but there are also benefits from building the Debug Server as a virtual machine so that it can be cloned and copied for offline analysis. However, this does carry the risk that the server could be overwhelmed if a significant problem produces a sudden spike of <code>5<em>xx</em></code> errors. With NGINX&nbsp;Plus you can protect the Debug Server from such spikes by including the <code><a target="_blank" href="http://nginx.org/en/docs/http/ngx_http_upstream_module.html#max_conns">max_conns</a></code> parameter on the <code>server</code> directive to limit the number of concurrent connections sent to it (see the sample configuration below).</p><span>
+</span><p>Furthermore, because the Debug Server is not as heavily loaded as the main application servers, not everything that generates a <code>5<em>xx</em></code> on an application server will cause one on the Debug Server. Such situations may suggest that you are reaching the scaling limits of the main application servers and that resource exhaustion rather than a software bug is responsible. Regardless of the root cause, such situations improve the user experience by saving them from a <code>5<em>xx</em></code> error.</p><span>
+</span><h2>Configuration</h2><span>
+</span><p>The following sample NGINX configuration shows how we can configure the Debug Server to receive requests that have already generated a <code>5<em>xx</em></code> error on a main application server.</p><span>
+</span><pre><code>upstream app_server {
+    server 172.16.0.1 max_fails=1 fail_timeout=10;
+    server 172.16.0.2 max_fails=1 fail_timeout=10;
+    server 172.16.0.3 max_fails=1 fail_timeout=10;
+}
+ 
+upstream debug_server {
+    server 172.16.0.9 max_fails=1 fail_timeout=30 max_conns=20;
+}
+
+server {
+    listen *:80;
+    location / {
+        proxy_pass http://app_server;
+        proxy_intercept_errors on;
+        <strong>error_page</strong> 500 503 504 = @debug;
+    }
+ 
+    location @debug {
+        proxy_pass http://debug_server;
+        access_log /var/log/nginx/access_debug_server.log <strong>detailed</strong>;
+        error_log  /var/log/nginx/error_debug_server.log;
+    }
+}</code></pre><span>
+</span><p>The first thing we do is specify the addresses of our application servers in the <code><a target="_blank" href="http://nginx.org/en/docs/http/ngx_http_upstream_module.html#upstream">upstream</a>&nbsp;app_server</code> block. Then we specify the single address of our Debug Server in the <code>upstream&nbsp;debug_server</code> block. Notice that we set <code>max_fails</code> to <code>1</code> to ensure that we send errors to the Debug Server immediately. We also set the <code>fail_timeout</code> parameter to 30&nbsp;seconds (instead of the default 10&nbsp;seconds) to give the Debug Server more time to process requests before failing.</p><span>
+</span><p>The first <code><a target="_blank" href="http://nginx.org/r/location">location</a></code> block configures a simple reverse proxy, using the <code><a target="_blank" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass">proxy_pass</a></code> directive to load balance requests across the application servers in our <strong>app_server</strong> upstream group (we don’t specify a load-balancing algorithm, so the default Round Robin algorithm is used). The <code><a target="_blank" href="http://nginx.org/r/proxy_intercept_errors">proxy_intercept_errors</a></code> directive means that any response with HTTP code <code>300</code> or greater is handled by the <code><a target="_blank" href="http://nginx.org/r/error_page">error_page</a></code> directive. In our configuration we are intercepting only <code>500</code>, <code>503</code>, and <code>504</code> errors, and passing them to the <strong>@debug</strong> location. Any other response codes, such as <code>404</code>s, are sent back to the client unmodified.</p><span>
+</span><p>The <code>location&nbsp;@debug</code> block does two things. First, it proxies all requests to the <strong>debug_server</strong> upstream group, which of course contains our special Debug Server. Second, it writes duplicate log entries into separate access and error log files. By isolating messages generated for erroneous requests on the application servers from regular access messages, you can more easily correlate the errors with those generated on the Debug Server itself.</p><span>
+</span><p>Note that the <code><a target="_blank" href="http://nginx.org/r/access_log">access_log</a></code> directive references a special log format, called <strong>detailed</strong>. We define the format by including the following <code><a target="_blank" href="http://nginx.org/r/log_format">log_format</a></code> directive in the top-level <code>http</code> context.</p><span>
+</span><pre><code>
+log_format detailed '$remote_addr - $remote_user [$time_local] '
+                    '"$request" $status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" <strong>$request_length $request_time</strong> '
+                    '<strong>$upstream_response_length $upstream_response_time</strong> '
+                    '<strong>$upstream_status</strong>';</code></pre><span>
+</span><p>The <strong>detailed</strong> format extends the default <strong>combined</strong> format with a further five variables which provide more information about the requests forwarded to the Debug Server and its responses.</p><span>
+</span><ul>
+<li><code>$request_length</code>&nbsp;–&nbsp;Total size of the request, including header and body, in bytes</li>
+<li><code>$request_time</code>&nbsp;–&nbsp;Request processing time, in milliseconds</li>
+<li><code>$upstream_response_length</code>&nbsp;–&nbsp;Length of the response obtained from the Debug Server, in bytes</li>
+<li><code>$upstream_response_time</code>&nbsp;–&nbsp;Time spent receiving the response from the Debug Server, in milliseconds</li>
+<li><code>$upstream_status</code>&nbsp;–&nbsp;Status code of the response from the Debug Server</li>
+</ul><span>
+</span><p>These additional fields in the log are very helpful in detecting both malformed and long-running requests. The latter may point to timeouts within the application or other interprocess communication problems.</p><span>
+</span><h2>Conclusion</h2><span>
+</span><p>Throwing a <code>500</code> is a big deal. Whether you’re running a DevOps model, experimenting with continuous delivery, or simply wanting to mitigate the risk of a big bang upgrade, NGINX provides you with the tools that can help you react better to issues in the wild.</p><span>
+	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

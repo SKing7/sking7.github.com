@@ -1,0 +1,78 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Performance Calendar</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Performance Calendar</h1>
+                <div class="entry unit"><p>If you are building a website today there’s a good chance that you rely on 3rd party libraries to provide you with extra functionality. Tracking scripts, A/B testing and adverts are just a few of the many reasons why you would want to use a 3rd party library. The problem is that if the library that you use is hosted on another server, you risk creating a <a href="https://en.wikipedia.org/wiki/Single_point_of_failure">single point of failure</a> (SPOF). If for any reason the server that is hosting these libraries goes down, or is slow to respond, your site will unfortunately be affected by this.  For example, have a look at the video below.</p><span>
+</span><span>
+</span><p>This video is a recording showing what happened when you experience a <a href="http://deanhume.com/home/blogpost/frontend-single-point-of-failure/85">SPOF</a>. On the left of the video it shows the page without it being blocked by external scripts, and on the right of the video it shows the same page being affected by a SPOF. Notice the difference in load times! Even if you have a highly optimized site, it can take considerably longer to load your site because it will be blocked while it waits for the external resource to download. <a href="http://www.stevesouders.com/blog/2010/06/01/frontend-spof/">SPOF</a> has been previously written about on the <a href="http://calendar.perfplanet.com/2012/spofcheck-fighting-frontend-spof-at-its-root/">Performance Calendar</a>, and it’s a problem that continues to plague us as developers.</p><span>
+</span><p>Fortunately, we can use the power of <a href="http://www.html5rocks.com/en/tutorials/service-worker/introduction/">Service Workers</a> to reduce the risk associated with 3rd party libraries. Using Service Workers, we can force a resource to timeout if it takes too long to download. If you aren’t familiar with Service Workers, they are JavaScript Workers that run in the background, separate from a web page, and they open the door to features which don’t need a web page or user interaction. In this post, we will be using a feature of Service Workers that will allow us to intercept network requests and if they take longer than expected, we will be able to respond accordingly.</p><span>
+</span><p>Imagine the following scenario – I have a simple web page and I am loading the Angular library from the Google CDN. If for any reason the Google CDN takes longer to load than expected, I can respond appropriately instead of blocking the load of my entire page. In order to get started with Service Workers, you’ll need to update your HTML file to reference a Service Worker file. </p><span>
+</span><pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+ &lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;title&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body&gt;
+    &lt;script&gt;
+        // Register the service worker
+        if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./spof.js').then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(function(err) {
+            // registration failed :(
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        }
+    &lt;/script&gt;
+  &lt;script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre><span>
+</span><p>In the code above, I am first checking if the browser supports Service Workers and if it does, I am registering a file named <code>spof.js</code>. You’ll also notice that at the bottom of the page I’ve included a reference to Angular hosted on the Google CDN. This is merely an example JavaScript file, you could use any JavaScript files.</p><span>
+</span><p>Next, we need to create a JavaScript file called <code>spof.js</code> that will contain the code for the Service Worker.</p><span>
+</span><pre>function timeout(delay) {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function(){
+          resolve(new Response('', {
+              status: 408,
+              statusText: 'Request timed out.'
+          }));
+        }, delay);
+    });
+}
+
+self.addEventListener('fetch', function(event) {
+    // Only fetch JavaScript files for now
+    if (/\.js$/.test(event.request.url)) {
+      event.respondWith(Promise.race([timeout(2000), fetch(event.request.url)]));
+    } else {
+      event.respondWith(fetch(event.request));
+    }
+});
+</pre><span>
+</span><p>The code above is pretty straightforward. I am adding an event listener to intercept any outgoing fetch requests. Next, I’m checking to see if the file is a JavaScript file – in your case this could be any file that is hosted on a 3rd party server. Then I am using an <a href="https://www.promisejs.org/">ES6 Promise race condition</a> to determine if the fetch request is quicker than a set timeout period of 2 seconds (2000 milliseconds). The Promise race condition will then determine which of the functions finished first. If the request took longer than 2 seconds, we return a 408 response. However, if we downloaded the file before the 2 seconds, we simply return the successful resource. I’ve chosen 2 seconds as a timeout, but you could use any amount of time that you deemed appropriate.</p><span>
+</span><p>That’s it! We can now easily test this in action. I find one of the best ways to do this is to use the built in throttling functionality in Google Chrome to simulate a slower network connection. Fire up your Developer Tools in Google Chrome and head over to the network tab. From there, check “<em>disable cache</em>” and choose an option for throttling from the drop down. In order to test, I chose from the presets – <strong>GPRS 50KB</strong>.</p><span>
+</span><p><img src="https://raw.githubusercontent.com/deanhume/Service-Workers-Fetch-Timeout/master/article-images/chrome-developer-tools-throttling.jpg" alt="Chrome Developer Tools - Throttling" title=""></p><span>
+</span><p>If you refresh the web page and view the network requests, you’ll be able to see the Service Worker kick in.</p><span>
+</span><p><img src="https://raw.githubusercontent.com/deanhume/Service-Workers-Fetch-Timeout/master/article-images/service-workers-spof.jpg" alt="SPOF - Service Workers" title=""></p><span>
+</span><p>In this case it returns a 408 HTTP response, but it we remove the throttling and it returns in a time faster than 2 seconds, we will see a successful 200 HTTP response. </p><span>
+</span><p>It’s worth noting that Service Workers require HTTPS in order to work. Service Workers are equipped with some pretty powerful features that could be used for man-in-the-middle attacks, which is why they require HTTPS in order to work. If you’d like to test this example out while in development, Service Workers are designed to work over <em>localhost</em>. It’s also worth noting that in order for this functionality to work, the Service Worker will need to be installed first, which means that this functionality will only work for subsequent visits to your site and not first time visits.</p><span>
+</span><p>That said, using Service Workers to reduce SPOF can be a useful way to ensure that your site is available and isn’t at the mercy of 3rd party servers. As with any new browser technology, not every browser currently supports <a href="http://caniuse.com/#feat=serviceworkers">Service Workers</a>.  However, the best thing about them is that if your browser doesn’t support them,  you will still have a normal website as the functionality won’t kick in. As <a href="http://www.brucelawson.co.uk/2015/progressive-web-apps-ready-for-primetime/">Bruce Lawson</a> puts it: “<em>It’s perfect progressive enhancement.</em>“</p><span>
+</span><p>If you’d like to play around with the code in this post, I’ve created a repo on <a href="https://github.com/deanhume/Service-Workers-Fetch-Timeout">Github</a>.  There is a demo version of this example that you can use to test over at <a href="https://deanhume.github.io/Service-Workers-Fetch-Timeout/">deanhume.github.io/Service-Workers-Fetch-Timeout</a>. Fire up your developer tools as above and you’ll be able to see the code in action.</p><span>
+</span><p>It would be great to see this functionality rolled out across more websites as it can be an easy way to reduce SPOF. If you’d like to learn more about <a href="http://www.html5rocks.com/en/tutorials/service-worker/introduction/">Service Workers</a>, I recommend heading over to the <a href="https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md">repo on Github</a>. The example in this article could even be extended further to include caching. Jake Archibald wrote a really helpful article called the <a href="https://jakearchibald.com/2014/offline-cookbook/">Offline Cookbook</a>, which is a great guide to caching using Service Workers. Finally, I recommend taking a look at the <a href="https://serviceworke.rs/">Service Worker Cookbook</a> created by the team at Mozilla for more useful Service Worker tips and tricks!</p><span>
+</span><p>If you have the time, it is definitely worth watching Patrick Hamann’s talk entitled <a href="https://vimeo.com/145328373">Embracing the network</a> where the initial inspiration for this post came from.</p><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
