@@ -34,7 +34,6 @@ input[readonly] {
     display: block;
 }
 header.nav {
-  height: 54px;
   margin: 0 -15px;
   padding: 0 15px;
   background: #333;
@@ -44,4 +43,5 @@ header.nav h1 {
   margin: 0;
   padding: 15px; 
   font-size: 16px;
+  line-height: 20px;
 }

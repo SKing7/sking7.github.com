@@ -22,13 +22,20 @@
       <div class="panel-heading">文件上传</div>
       <div class="panel-body">
         <form method="POST" enctype="multipart/form-data" action="">
-          <div class="input-group">
-            <span class="input-group-btn">
-              <span class="btn btn-primary btn-file">
-                选择文件<input type="file" name="uploadFile" multiple>
-              </span>
-            </span>
-            <input type="text" class="form-control" readonly>
+          <div class="row">
+            <div class="col-xs-8">
+              <div class="input-group">
+                <span class="input-group-btn">
+                  <span class="btn btn-default btn-file">
+                    选择文件<input type="file" name="uploadFile" multiple>
+                  </span>
+                </span>
+                <input type="text" class="form-control" readonly>
+              </div>
+            </div>
+            <div class="col-xs-4">
+              <button type="button" class="btn btn-primary">开始上传</button>
+            </div>
           </div>
         </form>
       </div>
@@ -84,7 +91,7 @@
       <div class="panel-body">
         <div class="row form-group">
           <div class="col-xs-8">
-            <input type="text" class="form-control" readonly>
+            <input type="text" class="form-control" name="recover-file">
           </div>
           <div class="col-xs-4">
             <button class="btn btn-primary">恢复</span>
