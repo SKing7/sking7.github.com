@@ -1,9 +1,15 @@
+html, body {
+  background: #f1f1f1;
+}
 .mt-10 {
   margin-top: 10px;
 }
 input[readonly] {
   background-color: white !important;
   cursor: text !important;
+}
+.mr-5 {
+  margin-right: 5px;
 }
 .mt-15 {
   margin-top: 15px;
@@ -26,4 +32,16 @@ input[readonly] {
     background: white;
     cursor: inherit;
     display: block;
+}
+header.nav {
+  height: 54px;
+  margin: 0 -15px;
+  padding: 0 15px;
+  background: #333;
+  color: #fff;
+}
+header.nav h1 {
+  margin: 0;
+  padding: 15px; 
+  font-size: 16px;
 }
