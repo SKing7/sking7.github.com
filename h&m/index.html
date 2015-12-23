@@ -1,0 +1,86 @@
+<!Doctype html>
+<html xmlns=http://www.w3.org/1999/xhtml>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/highcharts/lib/highcharts.js"></script>
+<script src="bower_components/highcharts/lib/modules/map.js"></script>
+<script src="bower_components/highcharts/lib/modules/data.js"></script>
+
+<div id="container" style="height: 500px; max-width: 500px; margin: 0 auto"></div>
+<script>
+$.ajax({
+  url: "http://203.130.42.237/get/?url=ht_201512__navigation_index_",
+  crossDomain: true
+}).done(function(data) {
+
+  $('#container').highcharts({
+
+    data: {
+      csv: data
+    },
+
+    chart: {
+      type: 'heatmap',
+    },
+
+
+    title: {
+      text: 'Timing Heatmap based on daily',
+      align: 'left'
+    },
+
+    subtitle: {
+      text: 'Temperature variation by day',
+      align: 'left'
+    },
+    yAxis: {
+      labels: {
+        format: '{value}(00ms)'
+      },
+      minPadding: 0,
+      maxPadding: 0,
+      startOnTick: false,
+      endOnTick: false,
+      tickWidth: 1,
+      min: 1,
+      max: 50
+    },
+
+    xAxis: {
+      labels: {
+        format: '2015-12-{value}'
+      },
+      tickPixelInterval: 60,
+      min: 10,
+      max: 22
+    },
+
+
+    colorAxis: {
+      stops: [
+        [0, '#cdf0ec'],
+        [0.25, '#f6f2b5'],
+        [0.5, '#f9dd94'],
+        [0.75, '#f9a534'],
+        [0.9, '#f1553f'],
+      ],
+      min: 0
+    },
+
+    series: [{
+      borderWidth: 0,
+      //colsize: 24 * 36e5, // one day
+      tooltip: {
+        headerFormat: 'Temperature<br/>',
+        pointFormat: '时间区间: {point.y}00ms 日期:2015-12-{point.x}: <b>{point.value}%占比</b>'
+      }
+    }]
+
+  });
+})
+</script>
+</body>
+</html>
