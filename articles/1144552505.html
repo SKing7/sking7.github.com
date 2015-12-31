@@ -1,0 +1,69 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>A new approach to Function.prototype.bind</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>A new approach to Function.prototype.bind</h1>
+                <section class="post-content"><p>The performance and compatibility of <a href="http://tc39.github.io/ecma262/#sec-function.prototype.bind">Function.prototype.bind</a> and the resulting bound
+ function objects has traditionally always been an issue in <a href="https://developers.google.com/v8">V8</a> (and thereby in <a href="https://www.chromium.org/">Chromium</a>
+ based browsers and <a href="https://nodejs.org/">Node.js</a> driven servers).</p>
+
+<p>Consider the following simple test driver, which defines a (non-trivial) test function <code>foo</code> and creates two bound functions <code>foo1</code> and <code>foo2</code>
+based on it, which both bind the receiver and the first argument to some primitive.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="s2">"use strict"</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span> <span class="o">+</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span> <span class="o">+</span> <span class="nx">z</span> <span class="p">}</span>
+<span class="kd">var</span> <span class="nx">foo1</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">foo2</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="kd">function</span> <span class="nx">test</span><span class="p">()</span> <span class="p">{</span>  <span class="c1">// Performance test.</span>
+  <span class="kd">var</span> <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kr">const</span> <span class="nx">limit</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">y</span> <span class="o">&lt;</span> <span class="nx">limit</span><span class="p">;</span> <span class="o">++</span><span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">z</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">z</span> <span class="o">&lt;</span> <span class="nx">limit</span><span class="p">;</span> <span class="o">++</span><span class="nx">z</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">sum</span> <span class="o">+=</span> <span class="nx">foo1</span><span class="p">(</span><span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">)</span> <span class="o">+</span> <span class="nx">foo2</span><span class="p">(</span><span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">sum</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="nx">test</span><span class="p">();</span> <span class="c1">// Warmup first.</span>
+<span class="kd">var</span> <span class="nx">startTime</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="nx">test</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">endTime</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+<span class="nx">print</span><span class="p">(</span><span class="s2">"Time: "</span> <span class="o">+</span> <span class="p">(</span><span class="nx">endTime</span> <span class="o">-</span> <span class="nx">startTime</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"ms."</span><span class="p">);</span></code></pre></div>
+
+<p>Now running this program with V8 tip-of-tree as of today requires a whopping 12,078ms to execute the test loop on a HP z620 work station running
+Ubuntu 14.04. Looking at the performance profile, almost all the time is spend in the
+<a href="https://github.com/v8/v8/blob/fc23b4949850e68a0877e3426c438ce0f710613d/src/js/v8natives.js#L1239"><code>boundFunction</code></a> builtin (and the associated
+helper runtime functions) that acts as a trampoline for bound functions. Looking closely into that function, we see that on every possible [[Call]]
+path through the function (the [[Construct]] path uses the <code>%NewObjectFromBound</code> C++ builtin), we bailout to C++ at least twice, once into
+<code>%BoundFunctionGetBindings</code>, which returns a new Array with the bound target function, the bound this and the bound arguments, and once into
+<code>%Apply</code>, which calls back into JavaScript to execute the actual target function with the actual parameters.</p>
+
+<p>Calling into C++ is certainly not fast in V8, but calling back from C++ into JavaScript is very expensive. Also building one or two temporary
+Arrays on every invocation of a bound function is not cheap, and can cause unnecessary GC traffic. So, there’s a lot of room for improvement
+here. I’ve been working on a new approach to implement <a href="http://tc39.github.io/ecma262/#sec-bound-function-exotic-objects">Bound Function Exotic Objects</a>
+in V8 for a few months now, as part of a bigger project to fully support objects with [[Call]] and [[Construct]] internal methods that are not
+ECMAScript Function objects, i.e. to support <a href="http://tc39.github.io/ecma262/#sec-proxy-objects">Proxy Objects</a>. After a lot of yak shaving,
+I now reached a point where I’m close to landing my new <a href="https://crrev.com/1542963002">baseline implementation for Function.prototype.bind</a>.</p>
+
+<p>Running the test program above with my patch requires 239ms for the test loop, which is already a <strong>50x improvement</strong>. There’s still some
+more cleanup to be done in order to land the patch (i.e. some API functions seem to require additional work to deal properly with the new
+representation of bound function objects), but the baseline results are already very promising. Once the baseline implementation is stabilized,
+we can start looking into optimizing bound functions, i.e. enable inlining of bound functions - which should boost this particular case to
+<strong>100x improvement</strong> - and properly collecting and dealing with bound function type feedback.</p>
+
+<p>I hope that this will in particular help web sites and web apps using <a href="https://facebook.github.io/react">React</a>, because React makes heavy
+use of <a href="http://tc39.github.io/ecma262/#sec-function.prototype.bind">Function.prototype.bind</a>. But for React we will also need to look into
+the performance of Function.prototype.bind itself and not only the throughput of bound functions, in order to reduce latency and startup
+time.</p>
+</section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,67 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Adactio: Journal</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Adactio: Journal</h1>
+                <div class="e-content"><span>
+</span><p>I like CSS pseudo-classes. They come in handy for adding little enhancements to interfaces based on interaction.</p><span>
+
+</span><p>Take the form-related pseudo-classes, for example: <code>:valid</code>, <code>:invalid</code>, <code>:required</code>, <code>:in-range</code>, and <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes">many more</a>.</p><span>
+
+</span><p>Let’s say I want to adjust the appearance of an element based on whether it has been filled in correctly. I might have an <code>input</code> element like this:</p><span>
+
+</span><pre><code>&lt;input type="email" required&gt;
+</code></pre><span>
+
+</span><p>Then I can write some CSS to put green border on it once it meets the minimum requirements for validity:</p><span>
+
+</span><pre><code>input:valid {
+  border: 1px solid green;
+}
+</code></pre><span>
+
+</span><p>That works, but somewhat annoyingly, the appearance will change <em>while</em> the user is still typing in the field (as soon as the user types an @ symbol, the border goes green). That can be distracting, or downright annoying.</p><span>
+
+</span><p>I only want to display the green border when the input is valid <em>and</em> the field is not focused. Luckily for me, those last two words (“not focused”) map nicely to some more pseudo-classes: <code>not</code> and <code>focus</code>:</p><span>
+
+</span><pre><code>input:not(:focus):valid {
+  border: 1px solid green;
+}
+</code></pre><span>
+
+</span><p>If I want to get really fancy, I could display an icon next to form fields that have been filled in. But to do that, I’d need more than a pseudo-<em>class</em>; I’d need a pseudo-<em>element</em>, like <code>:after</code></p><span>
+
+</span><pre><code>input:not(:focus):valid::after {
+  content: '✓';
+}
+</code></pre><span>
+
+</span><p>…except that won’t work. It turns out that you can’t add generated content to <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Replaced_element">replaced elements</a> like form fields. I’d have to add a regular element into my markup, like this:</p><span>
+
+</span><pre><code>&lt;input type="email" required&gt;
+&lt;span&gt;&lt;/span&gt;
+</code></pre><span>
+
+</span><p>So I could style it with:</p><span>
+
+</span><pre><code>input:not(:focus):valid + span::after {
+  content: '✓';
+}
+</code></pre><span>
+
+</span><p>But that feels icky.</p><span>
+
+</span><p><strong>Update</strong>: See <a href="http://codepen.io/HugoGiraudel/pen/b3274eb0bf93bed79afeafd30b7a33f1">this clever flexbox technique</a> by Hugo Giraudel for a potential solution.</p><span>
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
