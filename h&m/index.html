@@ -12,7 +12,7 @@
 <div id="container" style="height: 450px; max-width: 450px; margin: 0 auto"></div>
 <script>
 $.ajax({
-  url: "http://203.130.42.237/get/?url=ht_201512__navigation_index_",
+  url: "http://140.205.177.57/get/?url=ht_201512__navigation_index_",
   crossDomain: true
 }).done(function(data) {
 
@@ -38,7 +38,7 @@ $.ajax({
     },
     yAxis: {
       labels: {
-        format: '{value}(00ms)'
+        format: '{value}'
       },
       minPadding: 0,
       maxPadding: 0,
@@ -46,15 +46,15 @@ $.ajax({
       endOnTick: false,
       tickWidth: 1,
       min: 1,
-      max: 40
+      max: 30
     },
 
     xAxis: {
       labels: {
         format: '2015-12-{value}'
       },
-      tickPixelInterval: 10,
-      min: 10,
+      tickPixelInterval: 50,
+      min: 1,
       max: 31
     },
 
