@@ -1,0 +1,112 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Instant Web Application</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Instant Web Application</h1>
+                <div class="article-entry" itemprop="articleBody"><span>
+      
+        </span><ul>
+<li>Instant TodoMVC <a href="https://instant-todo.herokuapp.com/" target="_blank" rel="external">demo</a> (please use Chrome Desktop for now!), <a href="https://github.com/bahmutov/instant-vdom-todo" target="_blank" rel="external">source</a></li>
+<li>Uses <a href="https://github.com/bahmutov/bottle-service" target="_blank" rel="external">bottle-service</a> library to implement self-rewriting</li>
+</ul><span>
+</span><p>Open your favorite web application, even a simple <a href="http://todomvc.com/" target="_blank" rel="external">TodoMVC</a> would work.
+Let it load. Change some data, for example add a new item to the list. Now reload the page.
+What happens? The page goes blank, then some initial markup appears. Then all of the sudden,
+everything shifts - the application's code took over, rewriting the page's tree structure,
+forcing the browser to render the loaded data. Here is one example: the screen recording
+of Angular2 TodoMVC application where I add items and reload the page.</p><span>
+</span><span>
+
+</span><p>Before someone starts Angular-bashing, here is the screen recording of a React application,
+showing exactly the same problem</p><span>
+</span><span>
+
+</span><p>The <a href="http://todomvc.com/examples/vanillajs/" target="_blank" rel="external">vanilla JavaScript</a> implementation has a better
+experience in my view, because only part of the page is updated (the items list), 
+while the top stays static</p><span>
+</span><span>
+
+</span><p>Every application in the list suffers from the same problem - during the page reload there
+is a time gap between the initial page load and the application rendering the "right" HTML.
+Some libraries are faster (<a href="http://todomvc.com/examples/mithril/#/" target="_blank" rel="external">Mithril</a> is great!), some
+are slower, but none approaches the server-side rendering for smooth user experience.</p><span>
+</span><p>In server-side rendering, the page is rendered in the complete form on the server, thus when it
+arrives the user sees the right layout instantly. The web application can then take over,
+"hydrating" the static page. Some frameworks make such hydration simple, some might use
+my tiny <a href="https://github.com/bahmutov/hydrate-app" target="_blank" rel="external">hydration utility</a>.</p><span>
+</span><p>The larger question I want to answer is this:</p><span>
+</span><blockquote>
+<p>Can we recreate the same "instant" page loading experience in our web application
+without the server-side rendering?</p>
+</blockquote><span>
+</span><h2 id="instant-web-applications">Instant web applications</h2><p>Before we proceed, here is a screen recording of my TodoMVC implementation. You can try the
+live demo at <a href="https://instant-todo.herokuapp.com/" target="_blank" rel="external">instant-todo.herokuapp.com</a>.
+There is no server, but it does require a modern 
+<a href="http://caniuse.com/#feat=serviceworkers" target="_blank" rel="external">browser supporting ServiceWorkers</a></p><span>
+</span><span>
+
+</span><p>Notice several things this web app has</p><span>
+</span><ul>
+<li>Absolutely no flicker at page load. Only some small CSS effects (like check marks) appear once
+the web application takes over (I am using the <a href="https://github.com/Matt-Esch/virtual-dom" target="_blank" rel="external">virtual-dom</a> library).</li>
+<li>The state (the todo items) is stored in the <code>localStorage</code>, while the snapshot
+of the last rendered HTML is stored inside the ServiceWorker.</li>
+<li>Every time the state changes, and the application has rendered itself, it sends the command
+to the ServiceWorker to store the serialized HTML text</li>
+<li>When the browser requests the page again on reload, the ServiceWorker <em>updates the fetched page</em>
+with the HTML text.</li>
+</ul><span>
+</span><p>This "instant" technology is called <a href="https://github.com/bahmutov/bottle-service" target="_blank" rel="external">bottle-service</a>; 
+it is web framework-agnostic and should work with any library: Virtual-Dom,
+Angular, React, etc. The communication with the ServiceWorker part only has 1 API method, called
+<code>refill</code>. The application should call <code>refill</code> <em>after</em> the page has been rendered to save the
+snapshot. </p><span>
+</span><p>Here is the application code that runs on every change to the data, you can
+see the full source in 
+<a href="https://github.com/bahmutov/instant-vdom-todo/blob/master/src/app.js#L41" target="_blank" rel="external">src/app.js</a></p><span>
+</span><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">renderApp</span>(<span class="params"></span>) </span>{ ... }</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">saveApp</span>(<span class="params"></span>) </span>{</span><br><span class="line">  localStorage.setItem(todosStorageLabel, <span class="built_in">JSON</span>.stringify(Todos.items))</span><br><span class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>{</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    bottleService.refill(appLabel, <span class="string">'app'</span>)</span><br><span class="line">  }, <span class="number">0</span>);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">renderApp()</span><br><span class="line">saveApp()</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>The method <code>refill()</code> is very simple - it just grabs the rendered HTML and sends it
+to the service worker to be stored. See its full code in 
+<a href="https://github.com/bahmutov/bottle-service/blob/master/src/bottle.js#L77" target="_blank" rel="external">bottle.js</a></p><span>
+</span><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">refill</span> (<span class="params">applicationName, id</span>) </span>{</span><br><span class="line">  <span class="keyword">var</span> el = <span class="built_in">document</span>.getElementById(id)</span><br><span class="line">  <span class="keyword">var</span> html = el.innerHTML</span><br><span class="line">  send({</span><br><span class="line">    cmd: <span class="string">'refill'</span>,</span><br><span class="line">    html: html,</span><br><span class="line">    name: applicationName,</span><br><span class="line">    id: id</span><br><span class="line">  })</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>Let us look how the page's source is updated during the reload. This is the code
+inside the <a href="https://github.com/bahmutov/bottle-service/blob/master/src/bottle-service.js#L45" target="_blank" rel="external">bottle-service service worker</a>. Assume that HTML snapshot has been sent from the app
+at some point using <code>bottleService.refill()</code> and is available</p><span>
+</span><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">self.addEventListener(<span class="string">'fetch'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>{</span><br><span class="line">  </span><br><span class="line">  event.respondWith(</span><br><span class="line">    fetch(event.request)</span><br><span class="line">      .then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>{</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">var</span> copy = response.clone()</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> copy.text().then(<span class="function"><span class="keyword">function</span> (<span class="params">html</span>) </span>{</span><br><span class="line">          </span><br><span class="line">          </span><br><span class="line">          <span class="keyword">var</span> updatedHtml = update(html, ...)</span><br><span class="line">          <span class="keyword">var</span> responseOptions = {</span><br><span class="line">            status: <span class="number">200</span>,</span><br><span class="line">            headers: {</span><br><span class="line">              <span class="string">'Content-Type'</span>: <span class="string">'text/html charset=UTF-8'</span></span><br><span class="line">            }</span><br><span class="line">          }</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">new</span> Response(updatedHtml, responseOptions)</span><br><span class="line">        })</span><br><span class="line">      })</span><br><span class="line">  )</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>You can even play with the <code>bottle-service</code> features using the demo
+at <a href="https://bottle-service.herokuapp.com/" target="_blank" rel="external">bottle-service.herokuapp.com</a> where you can
+create new DOM nodes, print the HTML cached inside the ServiceWorker and clear the cached
+HTML.</p><span>
+</span><h2 id="conclusion">Conclusion</h2><p>In a sense, we have removed the need to render the application server-side (with its problems,
+framework compatability, etc) and instead are using the best page rendering engine - the browser
+itself. Every time the state changes, the application needs to store both the state and the
+rendered HTML snapshot. The state can be stored inside the page, even inside the <code>localStorage</code>,
+while the HTML snapshot is sent to the ServiceWorker code where it will be available
+on page reload.</p><span>
+</span><p>During page load, the ServiceWorker code is responsible for inserting the HTML snapshot into the
+fetched page, producing the complete page that the browser will see and render. 
+Then the web application can take over. Of course, there is a delay between the page load and
+the instant it becomes it fully responsive application - but at least this is better than
+hiding the page behind the loading screens, or sudden violent page layout shifts.</p><span>
+</span><h2 id="ideas-for-further-research-and-experimentation">Ideas for further research and experimentation</h2><p>How much code does one need to load in order to make the first static page appear
+functional? Do you need the full framework + application code? Or can you just attach a couple of
+event listeners that will queue up all user commands to be executed once the application
+is fully loaded?</p><span>
+</span><p>I want to explore dividing the library + web code into a tiny "above-the-fold" code fragment +
+the rest. We then can store the "above-the-fold" code together with the HTML snapshot in the 
+ServiceWorker, loading it right away, making the application appear and respond 
+to the user "instantly".</p><span>
+
+      
+    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

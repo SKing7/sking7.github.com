@@ -1,0 +1,223 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Preparing for ECMAScript 6: Proxies</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Preparing for ECMAScript 6: Proxies</h1>
+                <div class="ArticleCopy language-javascript"><span>
+    </span><p>In computing terms, a proxy sits between you and the thing you are communicating with. The term is most often applied to a proxy server — a device between the web browser (Chrome, Firefox, Safari, Edge etc.) and the web server (Apache, NGINX, IIS etc.) where a page is located. The proxy server can modify requests and responses. For example, it can increase efficiency by caching regularly-accessed assets and serving them to multiple users.</p><span>
+</span><p>ES6 proxies sit between your code and an object. A proxy allows you to perform meta-programming operations such as intercepting a call to inspect or change an object’s property.</p><span>
+</span><p>The following terminology is used in relation to ES6 proxies:</p><span>
+</span><span>
+</span><p><strong>target</strong><br>The original object the proxy will virtualize. This could be a JavaScript object such as the jQuery library or native objects such as arrays or even another proxies.</p><span>
+</span><p><strong>handler</strong><br>An object which implements the proxy’s behavior using…</p><span>
+</span><p><strong>traps</strong><br>Functions defined in the handler which provide access to the target when specific properties or methods are called.</p><span>
+</span><p>It’s best explained with a simple example. We’ll create a target object named <code>target</code> which has three properties:</p><span>
+</span><pre><code class="language-">var target = {
+  a: 1,
+  b: 2,
+  c: 3
+};</code></pre><span>
+</span><p>We’ll now create a handler object which intercepts all get operations. This returns the target’s property when it’s available or 42 otherwise:</p><span>
+</span><pre><code class="language-">var handler = {
+
+  get: function(target, name) {
+    return (
+      name in target ? target[name] : 42
+    );
+  }
+
+};</code></pre><span>
+</span><p>We now create a new Proxy by passing the target and handler objects. Our code can interact with the proxy rather than accessing the <code>target</code> object directly:</p><span>
+</span><pre><code class="language-">var proxy = new Proxy(target, handler);
+
+console.log(proxy.a);  // 1
+console.log(proxy.b);  // 2
+console.log(proxy.c);  // 3
+console.log(proxy.meaningOfLife);  // 42</code></pre><span>
+</span><p>Let’s expand the proxy handler further so it only permits single-character properties from <code>a</code> to <code>z</code> to be set:</p><span>
+</span><pre><code class="language-">var handler = {
+
+  get: function(target, name) {
+    return (name in target ? target[name] : 42);
+  },
+
+  set: function(target, prop, value) {
+    if (prop.length == 1 &amp;&amp; prop &gt;= 'a' &amp;&amp; prop &lt;= 'z') {
+      target[prop] = value;
+      return true;
+    }
+    else {
+      throw new ReferenceError(prop + ' cannot be set');
+      return false;
+    }
+  }
+
+};
+
+var proxy = new Proxy(target, handler);
+
+proxy.a = 10;
+proxy.b = 20;
+proxy.ABC = 30;
+// Exception: ReferenceError: ABC cannot be set</code></pre><span>
+</span><h2>Proxy Trap Types</h2><span>
+</span><p>We’ve seen the <code>get</code> and <code>set</code> in action which are likely to be the most useful traps. However, there are several other trap types you can use to supplement proxy handler code:</p><span>
+</span><ul>
+<li>
+<strong>construct(target, argList)</strong><br>Traps the creation of a new object with the <code>new</code> operator.
+</li>
+<li>
+<strong>get(target, property)</strong><br>Traps <code>Object.get()</code> and must return the property’s value.
+</li>
+<li>
+<strong>set(target, property, value)</strong><br>Traps <code>Object.set()</code> and must set the property value. Return <code>true</code> if successful. In strict mode, returning <code>false</code> will throw a TypeError exception.
+</li>
+<li>
+<strong>deleteProperty(target, property)</strong><br>Traps a <code>delete</code> operation on an objects property. Must return either <code>true</code> or <code>false</code>.
+</li>
+<li>
+<strong>apply(target, thisArg, argList)</strong><br>Traps object function calls.
+</li>
+<li>
+<strong>has(target, property)</strong><br>Traps <code>in</code> operators and must return either <code>true</code> or <code>false</code>.
+</li>
+<li>
+<strong>enumerate(target)</strong><br>Traps <code>for ... in</code> statements and must return an iterator object.
+</li>
+<li>
+<strong>ownKeys(target)</strong><br>Traps <code>Object.getOwnPropertyNames()</code> and must return an enumerable object.
+</li>
+<li>
+<strong>getPrototypeOf(target)</strong><br>Traps <code>Object.getPrototypeOf()</code> and must return the prototype’s object or null.
+</li>
+<li>
+<strong>setPrototypeOf(target, prototype)</strong><br>Traps <code>Object.setPrototypeOf()</code> to set the prototype object — no value is returned.
+</li>
+<li>
+<strong>isExtensible(target)</strong><br>Traps <code>Object.isExtensible()</code> which determines whether an object can have new properties added. Must return either <code>true</code> or <code>false</code>.
+</li>
+<li>
+<strong>preventExtensions(target)</strong><br>Traps <code>Object.preventExtensions()</code> which prevents new properties from being added to an object. Must return either <code>true</code> or <code>false</code>.
+</li>
+<li>
+<strong>getOwnPropertyDescriptor(target, property)</strong><br>Traps <code>Object.getOwnPropertyDescriptor()</code> which returns undefined or a property descriptor object with attributes for <code>value</code>, <code>writable</code>, <code>get</code>, <code>set</code>, <code>configurable</code> and <code>enumerable</code>.
+</li>
+<li>
+<strong>defineProperty(target, property, descriptor)</strong><br>Traps <code>Object.defineProperty()</code> which defines or modifies an object property. Must return <code>true</code> if the target property was successfully defined or <code>false</code> if not.
+</li>
+</ul><span>
+</span><h2>Proxy Example 1: Profiling</h2><span>
+</span><p>Proxies allow you to create generic wrappers for any object without having to change the code within the target objects themselves.</p><span>
+</span><p>In this example we’ll create a profiling proxy which counts the number of times a property is accessed. First, we require a <code>makeProfiler</code> factory function which returns the Proxy object and retains the count state:</p><span>
+</span><pre><code class="language-">// create a profiling Proxy
+function makeProfiler(target) {
+
+  var
+    count = {},
+    handler = {
+
+      get: function(target, name) {
+
+        if (name in target) {
+          count[name] = (count[name] || 0) + 1;
+          return target[name];
+        }
+
+      }
+
+    };
+
+  return {
+    proxy: new Proxy(target, handler),
+    count: count
+  }
+
+};</code></pre><span>
+</span><p>We can now apply this proxy wrapper to any object or another proxy, e.g.</p><span>
+</span><pre><code class="language-">var myObject = {
+  h: 'Hello',
+  w: 'World'
+};
+
+// create a myObject proxy
+var pObj = makeProfiler(myObject);
+
+// access properties
+console.log(pObj.proxy.h); // Hello
+console.log(pObj.proxy.h); // Hello
+console.log(pObj.proxy.w); // World
+console.log(pObj.count.h); // 2
+console.log(pObj.count.w); // 1</code></pre><span>
+</span><p>While this is a trivial example, imagine the effort involved if you had to perform property access counts in several different objects without using proxies.</p><span>
+</span><h2>Proxy Example 2: Two-Way Data Binding</h2><span>
+</span><p>Data binding synchronizes objects. It’s typically used in JavaScript MVC libraries to update an internal object when the DOM changes and vice versa.</p><span>
+</span><p>Presume we have an input field with an id of <code>inputname</code>:</p><span>
+</span><pre><code class="language-markup">&lt;input type="text" id="inputname" value="" /&gt;</code></pre><span>
+</span><p>We also have a JavaScript object named <code>myUser</code> with an <code>id</code> property which references this input:</p><span>
+</span><pre><code class="language-">// internal state for #inputname field
+var myUser = {
+  id: 'inputname',
+  name: ''
+};</code></pre><span>
+</span><p>Our first objective is to update <code>myUser.name</code> when a user changes the input value. This can be achieved with an <code>onchange</code> event handler on the field:</p><span>
+</span><pre><code class="language-">inputChange(myUser);
+
+// bind input to object
+function inputChange(myObject) {
+
+	if (!myObject || !myObject.id) return;
+
+	var input = document.getElementById(myObject.id);
+	input.addEventListener('onchange', function(e) {
+		myObject.name = input.value;
+	});
+}</code></pre><span>
+</span><p>Our next objective is to update the input field when we modify <code>myUser.name</code> within JavaScript code. This is not as simple but proxies offer a solution:</p><span>
+</span><pre><code class="language-">// proxy handler
+var inputHandler = {
+
+  set: function(target, prop, newValue) {
+
+    if (prop == 'name' &amp;&amp; target.id) {
+
+      // update object property
+      target[prop] = newValue;
+
+      // update input field value
+      document.getElementById(target.id).value = newValue;
+
+      return true;
+    }
+    else return false;
+
+  }
+
+}
+
+// create proxy
+var myUserProxy = new Proxy(myUser, inputHandler);
+
+// set a new name
+myUserProxy.name = 'Craig';
+console.log(myUserProxy.name); // Craig
+console.log(document.getElementById('inputname').value); // Craig</code></pre><span>
+</span><p>This is not be the most efficient data-binding option but proxies allow you to alter the behavior of many existing objects without changing their code.</p><span>
+</span><h2>Further Examples</h2><span>
+</span><p>Hemanth.HM’s article <a href="http://h3manth.com/new/blog/2013/negative-array-index-in-javascript/">Negative Array Index in JavaScript</a> suggests using proxies to implement negative array indexes, e.g. <code>arr[-1]</code> returns the last element, <code>arr[-2]</code> returns the second-to-last element, etc.</p><span>
+</span><p>Nicholas C. Zakas’ article <a href="https://www.nczonline.net/blog/2014/04/29/creating-type-safe-properties-with-ecmascript-6-proxies/">Creating type-safe properties with ECMAScript 6 proxies</a> illustrates how proxies can be used to implement type safety by validating new values. In the example above, we could verify <code>myUserProxy.name</code> was always set to a string and throw and error otherwise.</p><span>
+</span><h2>Proxy Support</h2><span>
+</span><p>The power of proxies may not be immediately obvious but they offer powerful meta-programming opportunities. Brendan Eich, the creator of JavaScript, thinks <a href="https://www.youtube.com/watch?v=sClk6aB_CPk">Proxies are Awesome</a>!</p><span>
+</span><p>As of end 2015, basic proxy support is implemented in Edge and Firefox 18+ although not all traps can be used. Experimental support is available in Node 4.0+ if you run Node with the <code>--harmony-proxies</code> flag but use it at your own risk.</p><span>
+</span><p>Unfortunately, it’s not possible to polyfill or transpile ES6 proxy code using tools such as <a href="https://babeljs.io/">Babel</a> because they’re powerful and have no ES5 equivalent. A little more waiting may be necessary.</p><span>
+  </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
