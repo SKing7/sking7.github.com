@@ -1,0 +1,61 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The "Average Page" is a myth</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>The "Average Page" is a myth</h1>
+                <div id="post" class="content" itemscope="" itemtype="http://schema.org/Article"><span>
+</span><span>
+</span><p class="byline">By <a href="https://www.igvita.com/" rel="author" itemprop="author">Ilya Grigorik</a> on <b itemprop="datePublished" datetime="2016-01-12">January 12, 2016</b></p><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xnormal-distribution.png.pagespeed.ic.aIgkuzb6KEqfAAKGkPyZ.png" class="left" width="265" height="167">As anyone and everyone in the web performance community will tell you, the size of the average page is continuously getting bigger: more JavaScript, more image and video bytes, growing use of web fonts, and so on. In fact, as of December 2015, the <a href="http://httparchive.org/">HTTP Archive</a> shows that the average desktop site weighs in at <a href="http://httparchive.org/trends.php?s=All&amp;minlabel=Jan+1+2015&amp;maxlabel=Dec+15+2015">2227KB</a>, and mobile is up to <a href="http://mobile.httparchive.org/trends.php?s=All&amp;minlabel=Jan+1+2015&amp;maxlabel=Dec+15+2015">1253KB</a>.</p><span>
+</span><p><strong>Except, what is an "average page", exactly?</strong> Intuitively, it is a page that is representative of the web at large, in its payload size, distribution of bytes between different content types, etc. More technically, it is a <a href="https://en.wikipedia.org/wiki/Central_tendency">measure of central tendency</a> of the underlying distribution - e.g. for a normal distribution the average is the central peak, with 50% values greater and 50% values smaller than its value. Which, of course, begs the question: what is the shape and type of the distribution for transferred bytes and does it match this model? Let's plot the histogram and the <a href="http://www.epixanalytics.com/modelassist/CrystalBall/Model_Assist.htm#Presenting_results/Cumulatve_plots/Cumulative_probability_plots.htm">CDF plots</a>...</p><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xdesktop-distribution.png.pagespeed.ic.ygmJIjc6KaD6A1HsGpqG.png" class="center"></p><span>
+</span><ul>
+<li>The x-axis shows that we have outliers weighing in at 30MB+.</li>
+<li>The quantile values are 25th: 699KB, 50th (median): 1445KB, 75th: 2697KB.</li>
+<li>The CDF plot shows that 90%+ of the pages are under 5000KB.</li>
+</ul><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xmobile-distribution.png.pagespeed.ic.Rlmnh7syTXc83OAI-eOA.png" class="center"></p><span>
+</span><ul>
+<li>The x-axis shows that we have outliers weighing in at 10MB+.</li>
+<li>The quantile values are 25th: 403KB, 50th (median): 888KB, 75th: 1668KB.</li>
+<li>The CDF plot shows that 90%+ of the pages are under 3000KB.</li>
+</ul><span>
+</span><p><strong>Let's start with the obvious: the transfer size is not normally distributed, and there is no meaningful "central value" and talking about the mean is meaningless, if not deceiving</strong> - see "<a href="https://introductorystats.wordpress.com/2011/09/04/when-bill-gates-walks-into-a-bar/">Bill Gates walks into a bar...</a>". We need a much richer and nuanced language and statistics to capture what's going on here, and an even richer set of tools and methods to analyze how these values change over time. The "average page" is a myth.</p><span>
+</span><p>I've been as guilty as anyone in (ab)using averages when talking about this data: they're easy to get and simple to communicate. Except, they're also meaningless in this context. My 2016 resolution is to kick this habit. Join me.</p><span>
+</span><h2>Page weight as of December 2015</h2><span>
+</span><p>Coming up with a small set of descriptive statistics for a dataset is hard, and attempting to reduce a dataset as rich as HTTP Archive down to a single one is an act of folly. Instead, we need to visualize the data and start asking questions.</p><span>
+</span><p><strong>For example, why are some pages so heavy?</strong> A <a href="http://bigqueri.es/t/what-is-the-root-cause-of-outliers-by-page-weight/661">cursory look shows</a> that the heaviest ~3% by page weight, both for desktop (&gt;7374KB) and mobile (&gt;4048KB), are often due to large (and/or heavy) number of images. Emphasis on <em>often</em>, because a deeper look at the most popular content types shows outliers in each and every category. For example, plotting the CDFs for desktop pages yields:</p><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xdesktop-cdfs.png.pagespeed.ic.uZa6T0rv79S7iBmAWnkC.png" class="center"></p><span>
+</span><p>We have pages that fetch tens of megabytes of HTML, images, video, and fonts, as well as high single-digit megabytes of JavaScript and CSS. Each of these "obese" outliers is worth digging into, but we'll leave that for a separate investigation. Let's compare this data to the mobile dataset.</p><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xmobile-cdfs.png.pagespeed.ic.kKigSoI4mHobdFrDcT9C.png" class="center"></p><span>
+</span><p>Lots of outliers as well, but the tails for mobile pages are not nearly as long. This alone explains much of the dramatic "average page" difference (desktop: 2227KB, mobile: 1253KB) — averages are easily skewed by a few large numbers. <strong>Focusing on the average leads us to believe that mobile pages are significantly "lighter", whereas in reality all we can say so far is that the desktop distribution has a longer tail with much heavier pages.</strong></p><span>
+</span><p>To get a better sense for the difference in distributions between the desktop and mobile pages, let's exclude the heaviest 3% that compress all of our graphs and zoom in on the [0, 97%] interval:</p><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xmobile-desktop-cdf-2015.png.pagespeed.ic.eEtJTDnOEeT0uxiINIHB.png" class="center"></p><span>
+</span><p>Mobile pages do appear to consume fewer bytes. For example, a 1000KB budget would allow the client to fetch fully ~38% of desktop pages vs. 54% of mobile pages. However, while the savings for mobile pages are present for all content types, the absolute differences for most of them are not drastic. Most of the total byte difference is explained by fewer image bytes. <strong>Structurally, mobile pages are not dramatically different from desktop pages.</strong></p><span>
+</span><h2>Changes in page weight over time</h2><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xmobile-desktop-cdf-2014-2015.png.pagespeed.ic.Qd3LIWhRxVFpXoHjT_DQ.png" class="center"></p><span>
+</span><p>Comparing the CDFs against the year prior shows that the transfers sizes for most content types have increased for both the desktop and mobile pages. However, there are some unexpected and interesting results as well:</p><span>
+</span><ul>
+<li><strong>The amount of shipped HTML bytes has decreased!</strong></li>
+<li><strong>2015-mobile and 2014-desktop distributions tend to overlap.</strong></li>
+</ul><span>
+</span><p>In terms of bytes fetched, for everything but images, mobile pages are a year behind their desktop counterparts? Intuitively, this makes sense, just because we're working with a smaller screen doesn't mean the required functionality is less, or less complex.</p><span>
+</span><h2>Take the data out for a spin...</h2><span>
+</span><p><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/posts/16/xdatalab-workbook.png.pagespeed.ic.pMYzfJEazuwhF59cqcpX.png" class="center"></p><span>
+</span><p>My goal here is to raise questions, not to provide answers; this is a very shallow analysis of a very rich dataset. For a deeper and a more hands-on look at this data, take a look at <a href="https://github.com/igrigorik/httparchive/blob/master/datalab/histograms.ipynb">my Datalab workbook</a>. Better, clone it, <a href="https://cloud.google.com/datalab/">run your own analysis</a>, and <a href="http://bigqueri.es/">share</a> your results! If we want to talk about the trends, outliers, and their causes on the web, then we need to understand this data at a much deeper level.</p><span>
+</span><div class="author-callout"><span>
+</span><img src="https://1-ps.googleusercontent.com/sk/bYSmB63yuhjL_l7bPRuu4R3ENi/www.igvita.com/images/35x35xigrigorik-small.png.pagespeed.ic.ttRUFidpSQFeey2eSwws.jpg" alt="Ilya Grigorik" height="35px" width="35px"><strong>Ilya Grigorik</strong><span> is a web performance engineer at Google, co-chair of the W3C Web Performance working group, and author of High Performance Browser Networking (O'Reilly) book — follow on </span><a href="https://twitter.com/igrigorik">Twitter</a><span>, </span><a href="https://plus.google.com/+IlyaGrigorik">Google+</a><span>.
+</span></div><span>
+</span><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
