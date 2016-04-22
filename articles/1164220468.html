@@ -1,0 +1,147 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>JavaScript needs the compile step (on install)</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>JavaScript needs the compile step (on install)</h1>
+                <div class="article-entry" itemprop="articleBody"><span>
+      
+        </span><p>Update: read the second post <a href="https://glebbahmutov.com/blog/precompiled-javascript/">Precompiled JavaScript</a> after this one.</p><span>
+</span><p>We all pretend that JavaScript is unique because it does not require a build or compile step
+on the client. Yet, this is patently untrue. At the minimum, one has to admit the native bindings
+compilation step during NPM module install. At the maximum, one has to admit that 
+<em>every library requires building to the least common denominator, which is ES5</em>.
+Despite having the evolving standards and wide support for most of them 
+(see <a href="http://kangax.github.io/compat-table/es6/" target="_blank" rel="external">this table</a>), the module's author has NO
+idea what JavaScript features a particular client installation has. Does a particular version of
+client's NodeJS have Promises or not? Does it support the arrow functions and the spread operator?
+Without 100% NodeJS v5 adoption (and seems the world is still stuck at Node 0.10) 
+we have to transpile our concise, elegant and performant ES6/ES7 code to ES5.</p><span>
+</span><p>Even worse, NodeJS 5 does NOT support all the features of ES6 standard. Even when using
+the <code>--harmony</code> flag 
+(as I recommend doing in <a href="https://glebbahmutov.com/blog/use-some-es6-in-cli-apps/">Use some ES6 in CLI apps</a>),
+some of the best parts are unavailable: module import and export, default parameters, etc.</p><span>
+</span><p>The same situation (or worse) is when the JavaScript runs in the browser. The variety
+of engines is good for the industry, but bad for the module's author. </p><span>
+</span><p>Is there something we can do to write ES6/7 today and be able to run the original code
+without mangling it to death using transpilers?</p><span>
+</span><h2 id="an-example-solution">An example solution</h2><p>Let us start with an example. Imagine I have the following source code</p><span>
+</span><figure class="highlight stylus"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">package<span class="class">.json</span></span><br><span class="line">    src/</span><br><span class="line">        main<span class="class">.js</span></span><br><span class="line">        calc.js</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>We are using ES6 syntax in both source files: import and export, arrow function,
+even template literals</p><span>
+</span><figure class="highlight js"><figcaption><span>calc.js</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> add = (a, b) =&gt; a + b</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> sub = (a, b) =&gt; a - b</span><br></pre></td></tr></tbody></table></figure><span>
+</span><figure class="highlight js"><figcaption><span>main.js</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { add } <span class="keyword">from</span> <span class="string">'./calc'</span></span><br><span class="line">const a = 10</span><br><span class="line">const b = 2</span><br><span class="line">const sum = add(a, b)</span><br><span class="line">console.log(`${a} + ${b} = ${sum}<span class="string">`)</span></span><br></pre></td></tr></tbody></table></figure><span>
+</span><h2 id="step-1-roll-it-up">Step 1 - Roll it up</h2><p>Let us transform all our individual ES6 modules into a single bundle. We can use an
+excellent tool <a href="http://rollupjs.org/" target="_blank" rel="external">rollup</a>. The beauty of this tool (and the ES6 standard 
+that allows it to work) is that ES6 <code>import / export</code> statements can be traced statically, 
+unlike the CommonJS code that uses the <code>require</code> calls (see the presentation 
+<a href="http://benjamn.github.io/empirenode-2015/" target="_blank" rel="external">The Importance of import and export</a> by Ben Newman).</p><span>
+</span><pre><code> <span class="literal">-</span><span class="literal">-</span> <span class="string">.</span> <span class="literal">-</span><span class="literal">-</span>  <span class="string">.</span>
+</code></pre><p>We just created a combined bundle inside the <code>dist</code> folder</p><span>
+</span><figure class="highlight js"><figcaption><span>dist/bundle.js</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> add = (a, b) =&gt; a + b                                        </span><br><span class="line"><span class="keyword">const</span> a = <span class="number">10</span></span><br><span class="line"><span class="keyword">const</span> b = <span class="number">2</span></span><br><span class="line"><span class="keyword">const</span> sum = add(a, b)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">`<span class="subst">${a}</span> + <span class="subst">${b}</span> = <span class="subst">${sum}</span>`</span>)</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>Notice the "tree-shaking" benefit in Rollup and ES6 modules - the tool has determined that
+the exported <code>sub</code> function inside <code>calc.js</code> is never used, and is dropped from the bundle.</p><span>
+</span><h2 id="step-2-determine-es6-features-used">Step 2 - Determine ES6 features used</h2><p>We have eliminated the <code>import</code> and <code>export</code> calls because we just bundled all our code
+into a single file. What about the rest of the ES6 features?
+We know that we have used arrow functions, <code>const</code> keyword and template literals.
+Keeping manually the list of the features is hard, especially as parts of the code
+are "shaken" off the tree during the bundling. </p><span>
+</span><p>Fortunately, there is a tool that can inspect a source file and give us a list of
+the features: <a href="https://github.com/getify/es-feature-tests" target="_blank" rel="external">es-feature-tests</a>.
+We simple run the tool after rolling the bundle and save the list of features.</p><span>
+</span><pre><code>  <span class="literal">-</span><span class="literal">-</span><span class="literal">-</span> <span class="literal">-</span><span class="literal">-</span>
+ <span class="literal">-</span><span class="literal">-</span><span class="string">.</span> <span class="literal">-</span><span class="literal">-</span> &gt; <span class="literal">-</span><span class="string">.</span>
+</code></pre><p>In our case this has generated the following JSON file</p><span>
+</span><figure class="highlight json"><figcaption><span>dist/es6-features.json</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">"letConst"</span>,<span class="string">"templateString"</span>,<span class="string">"arrow"</span>]</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>When you publish your module to NPM you can only publish these two files: <code>dist/bundle.js</code>
+and <code>dist/es6-features.json</code>! 
+See <a href="https://glebbahmutov.com/blog/smaller-published-NPM-modules/">Smaller published NPM modules</a> 
+how to include only the certain files in your package.</p><span>
+</span><h2 id="step-3-compiling-bundle-on-install">Step 3 - Compiling bundle (on install)</h2><p>Steps 1 (bundling) and 2 (determining the ES6 features used) run on the build machine.
+Now we need to run a step <em>on the client's machine</em>. This step takes the ES6 bundle and will
+produce a compiled bundle the user will run. Our goal is to inspect the client's environment,
+determine the supported features (and the missing ones), and then transpile the bundle
+but only the missing features. Thus if a feature like function arrows is present, we will
+keep the original code. If a feature, like the template literals, is missing, we will use
+a specific Babel plugin to replace each instance with its ES5 equivalent.</p><span>
+</span><p>Here is the outline of the code, you can find the full source in the repo
+<a href="https://github.com/bahmutov/compiled" target="_blank" rel="external">bahmutov/compiled</a></p><span>
+</span><figure class="highlight js"><figcaption><span>transpile.js</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> es6features = <span class="built_in">require</span>(<span class="string">'./dist/es6-features'</span>)</span><br><span class="line"><span class="keyword">var</span> es6support = <span class="built_in">require</span>(<span class="string">'es-feature-tests'</span>)</span><br><span class="line">es6support(<span class="string">'all'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">es6present</span>) </span>{</span><br><span class="line">    transpile(es6present, es6features, <span class="string">'dist/bundle.js'</span>, <span class="string">'dist/compiled.js'</span>)</span><br><span class="line">});</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">transpile</span> (<span class="params">supportedFeatures, neededFeatures, inputFilename, outputFilename</span>) </span>{</span><br><span class="line">  <span class="keyword">var</span> babelMapping = {</span><br><span class="line">    letConst: <span class="string">'transform-es2015-block-scoping'</span>,</span><br><span class="line">    templateString: <span class="string">'transform-es2015-template-literals'</span>,</span><br><span class="line">    arrow: <span class="string">'transform-es2015-arrow-functions'</span>,</span><br><span class="line">    ...</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">var</span> plugins = []</span><br><span class="line">  neededFeatures.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">feature</span>) </span>{</span><br><span class="line">    <span class="keyword">if</span> (!supportedFeatures[feature]) {</span><br><span class="line">      plugins = plugins.concat(babelMapping[feature]) </span><br><span class="line">    }</span><br><span class="line">  })</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'need plugins'</span>, plugins)</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">var</span> babel = <span class="built_in">require</span>(<span class="string">'babel-core'</span>)</span><br><span class="line">  <span class="keyword">var</span> options = { plugins: plugins }</span><br><span class="line">  babel.transformFile(filename, options, <span class="function"><span class="keyword">function</span> (<span class="params">err, result</span>) </span>{</span><br><span class="line">    <span class="keyword">if</span> (err) { <span class="keyword">throw</span> err }</span><br><span class="line">    <span class="built_in">require</span>(<span class="string">'fs'</span>).writeFileSync(outFilename, result.code, <span class="string">'utf-8'</span>)</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'saved file'</span>, outFilename)</span><br><span class="line">  })</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>We need to run this script when the client runs <code>npm install &lt;my module&gt;</code>.
+For demo purposes I am printing the node version before running the command.</p><span>
+</span><figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    "<span class="attribute">scripts</span>": <span class="value">{</span><br><span class="line">        "<span class="attribute">postinstall</span>": <span class="value"><span class="string">"echo \"Running transpile for `node --version`\" &amp;&amp; node transpile.js"</span></span><br><span class="line">    </span>}</span><br><span class="line"></span>}</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>Whenever we run <code>npm install</code>, the script kicks off and the Babel transpiler
+creates a bundle that is exactly supported by the user's NodeJS version.</p><span>
+</span><h2 id="step-4-the-main-file">Step 4 - the main file</h2><p>There is a lot of discussions around the JavaScript community how to specify <em>two</em> main files
+per bundle. One for ES5 loaders (<code>main</code>) and another one for ES6 loaders 
+(<code>main:es6</code> or <code>main:next</code>?), the discussion is still open.</p><span>
+</span><p>For our bundle, I set the <code>main</code> script to point at the compiled bundle, which is built on
+install</p><span>
+</span><figure class="highlight json"><figcaption><span>package.json</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    "<span class="attribute">main</span>": <span class="value"><span class="string">"dist/compiled.js"</span></span><br><span class="line"></span>}</span><br></pre></td></tr></tbody></table></figure><span>
+</span><h2 id="demo">Demo</h2><p>I am using the default code inside <a href="https://github.com/bahmutov/compiled/releases/tag/v1.0.0" target="_blank" rel="external">bahmutov/compiled</a> at tag <code>1.1.0</code>.</p><span>
+</span><h3 id="node-012-and-below">Node 0.12 and below</h3><p>First, let us install a module using Node 0.12</p><span>
+</span><figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ nvm <span class="operator"><span class="keyword">use</span> <span class="number">0.12</span></span><br><span class="line"><span class="keyword">Now</span> <span class="keyword">using</span> node v0<span class="number">.12</span><span class="number">.9</span> (npm v2<span class="number">.14</span><span class="number">.9</span>)</span><br><span class="line">$ npm <span class="keyword">i</span></span><br><span class="line"></span><br><span class="line">&gt; <span class="keyword">compiled</span>@ postinstall /<span class="keyword">Users</span>/kensho/git/<span class="keyword">compiled</span></span><br><span class="line">&gt; echo <span class="string">"Running transpile for `node --version`"</span> &amp;&amp; node transpile.js</span><br><span class="line"></span><br><span class="line">Running transpile <span class="keyword">for</span> v0<span class="number">.12</span><span class="number">.9</span></span><br><span class="line">need es6 features [ <span class="string">'letConst'</span>, <span class="string">'templateString'</span>, <span class="string">'arrow'</span> ]</span><br><span class="line">need plugins [ <span class="string">'transform-es2015-block-scoping'</span>,</span><br><span class="line">  <span class="string">'transform-es2015-template-literals'</span>,</span><br><span class="line">  <span class="string">'transform-es2015-arrow-functions'</span> ]</span><br><span class="line">saved <span class="keyword">file</span> ./dist/<span class="keyword">compiled</span>.js</span></span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>The compiled file has all ES6 features transpiled (because none of the needed ES6 features
+were found)</p><span>
+</span><figure class="highlight js"><figcaption><span>dist/compiled.js</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> add = <span class="function"><span class="keyword">function</span> (<span class="params">a, b</span>) </span>{</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">}; </span><br><span class="line"><span class="keyword">var</span> a = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">var</span> sum = add(a, b);</span><br><span class="line"><span class="built_in">console</span>.log(a + <span class="string">" + "</span> + b + <span class="string">" = "</span> + sum);</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>Because the <code>main</code> property in <code>package.json</code> points at this <code>dist/compiled.js</code> bundle,
+we can run it simply by executing <code>node .</code> command</p><span>
+</span><figure class="highlight crmsh"></figure><span>
+</span><p>Our code, written in ES6 and distributed as an ES6 bundle works fine on Node 0.12.
+Even better: the same code can be installed and ran on Node 0.10 and even 0.8!</p><span>
+</span><h3 id="node-4-and-above">Node 4 and above</h3><p>Second, let us try a modern NodeJS engine, like v4.</p><span>
+</span><figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ nvm <span class="operator"><span class="keyword">use</span> <span class="number">4</span></span><br><span class="line"><span class="keyword">Now</span> <span class="keyword">using</span> node v4<span class="number">.2</span><span class="number">.2</span> (npm v3<span class="number">.5</span><span class="number">.0</span>)</span><br><span class="line">$ npm <span class="keyword">i</span></span><br><span class="line">&gt; <span class="keyword">compiled</span>@ postinstall /<span class="keyword">Users</span>/kensho/git/<span class="keyword">compiled</span></span><br><span class="line">&gt; echo <span class="string">"Running transpile for `node --version`"</span> &amp;&amp; node transpile.js</span><br><span class="line"></span><br><span class="line">Running transpile <span class="keyword">for</span> v4<span class="number">.2</span><span class="number">.2</span></span><br><span class="line">need es6 features [ <span class="string">'letConst'</span>, <span class="string">'templateString'</span>, <span class="string">'arrow'</span> ]</span><br><span class="line">need plugins []</span><br><span class="line">saved <span class="keyword">file</span> ./dist/<span class="keyword">compiled</span>.js</span></span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>Notice that the compilation step did NOT need to transpile anything - all the ES6 features
+we used in our code are supported by the environment. The code is the original ES6 bundle</p><span>
+</span><figure class="highlight js"><figcaption><span>dist/compiled.js</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> add = (a, b) =&gt; a + b;</span><br><span class="line"><span class="keyword">const</span> a = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">const</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">const</span> sum = add(a, b);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">`<span class="subst">${ a }</span> + <span class="subst">${ b }</span> = <span class="subst">${ sum }</span>`</span>);</span><br></pre></td></tr></tbody></table></figure><span>
+</span><p>Still runs as expected</p><span>
+</span><figure class="highlight crmsh"></figure><span>
+</span><p><strong>note</strong> I have moved this example to its own repo for clarity. 
+See <a href="https://github.com/bahmutov/compiled-example" target="_blank" rel="external">bahmutov/compiled-example</a> - this repo
+even includes using 3rd party library (a method from Lodash).</p><span>
+</span><h2 id="conclusion">Conclusion</h2><p>I plan to build a (yet another) CLI build tool based on repo 
+<a href="https://github.com/bahmutov/compiled" target="_blank" rel="external">bahmutov/compiled</a>. It will have just two commands -
+build and compile. The <code>build</code> command will run on the author's machine (or better on CI server),
+and the <code>compile</code> command will run on the client's machine during <code>postinstall</code> step.</p><span>
+</span><p>This way I will finally be able to use ES6 when writing code, avoid unnecessary transpiling
+if I use Node 4/5, yet be able to support older Node versions.</p><span>
+</span><p>There are lots of open questions. I encourage everyone interested to 
+<a href="https://github.com/bahmutov/compiled/issues" target="_blank" rel="external">open an issue</a> and start the discussion.</p><span>
+</span><h2 id="frequently-asked-questions">Frequently Asked Questions</h2><p>Q: Do you have examples?</p><span>
+</span><p>A: Simple example in <a href="https://github.com/bahmutov/compiled-example" target="_blank" rel="external">bahmutov/compiled-example</a>.
+   <a href="https://github.com/bahmutov/left-behind" target="_blank" rel="external">bahmutov/left-behind</a> is a larger example with 
+   main and bin bundles.</p><span>
+</span><p>Q: Is this compatible with every Nodejs / NPM version?</p><span>
+</span><p>A: No. Babel does not run on Node &lt; 0.11, and NPM 2 messes up installing babel plugin 
+   dependencies (for no good reason, as far as I can tell). Thus I recommend Node &gt;= 0.11
+   and NPM 3.</p><span>
+</span><p>Q: Is this for bundling all your code, including the 3rd party dependencies?</p><span>
+</span><p>A: So far it seems so, but I don't know how this will affect CLI applications vs libraries.
+Rollup is smart enough to determine which modules are 3rd party, and includes these using
+the standard <code>require</code> calls. Thus only your own code will be in the bundle.</p><span>
+</span><p>Q: Does this increase the size of the module because the Babel transformation
+is included with the production dependencies?</p><span>
+</span><p>A: Yes, unfortunately we need to include Babel and plugins in order to transpile
+on the <em>user's machine</em>.</p><span>
+</span><p>Q: What about ES7 and beyong features? What about JSX, etc?</p><span>
+</span><p>A: I am using "ES6 Feature Tests" to determine if the environment supports necessary
+features. Same tool is also used to determine the necessary features in my application.
+We can always find or write more feature tests to add additional support.</p><span>
+</span><p>Q: How do I go back to the original source code?</p><span>
+</span><p>A: Both Rollup and Babel support source maps. I expect that we can trace any location
+inside the <code>dist/compiled.js</code> back to the <code>dist/bundle.js</code> back to the original source line.</p><span>
+</span><p>I have implemented targeted transpiling for browsers supporting ServiceWorker in
+<a href="https://github.com/bahmutov/babel-service" target="_blank" rel="external">babel-service</a>.</p><span>
+
+      
+    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

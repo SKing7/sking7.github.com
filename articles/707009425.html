@@ -1,0 +1,40 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>TCP中的MSS解读 - Forum - Huawei Enterprise Business Forum</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>TCP中的MSS解读 - Forum - Huawei Enterprise Business Forum</h1>
+                <div class="defaultpost"><span>
+			          	</span><h3>TCP中的MSS解读					  		<span class="f12">
+			                   																																							</span>
+						</h3><span>
+						
+												
+						</span><div class="restore_C gut_style img_resize" rel="content"><span>
+							</span><span>
+</span><p>
+	MSS 是TCP选项中最经常出现，也是最早出现的选项。MSS选项占4byte。MSS是每一个TCP报文段中数据字段的最大长度，注意：只是数据部分的字段，不包括TCP的头部。TCP在三次握手中，每一方都会通告其期望收到的MSS（MSS只出现在SYN数据包中）如果一方不接受另一方的MSS值则定位默认值536byte。<br>MSS值太小或太大都是不合适。太小，例如MSS值只有1byte，那么为了传输这1byte数据，至少要消耗20字节IP头部+20字节TCP头部=40byte，这还不包括其二层头部所需要的开销，显然这种数据传输效率是很低的。MSS过大，导致数据包可以封装很大，那么在IP传输中分片的可能性就会增大，接受方在处理分片包所消耗的资源和处理时间都会增大，如果分片在传输中还发生了重传，那么其网络开销也会增大。因此合理的MSS是至关重要的。MSS的合理值应为保证数据包不分片的最大值。对于以太网MSS可以达到1460byte.<br>不MSS相似的在IP层也有一个类似的概念---MTU（Maximum Transfer Unit）下图可以清晰翻译MSS不MTU 的关系：<img class="placeholderimg" src="http://support.huawei.com/ecommunity/public/images/loading.gif"><img alt="" class="lazy lazyimg" src="http://support.huawei.com/ecommunity/public/images/transparent_1x1.gif" data-original="/ecommunity/showimage-10046027-10000035-6fb84a4a7338f2861a3402bf9fdecf4d.jpg" width="578" height="153"> 
+</p><span>
+MTU=MSS+TCP Header+IP Header.
+</span><span>						</span></div><span>
+						</span><!-- 投票位 --><span>
+						</span><span>
+												</span><span>
+				  				          			</span><p>
+		          				<i>[  Last edited by z00206179  2013-04-22 09:30:25 Edit ]</i>
+		          			</p><span>
+				  						  								
+												
+				
+		          		</span><span>
+		        	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

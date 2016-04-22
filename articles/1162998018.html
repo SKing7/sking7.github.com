@@ -1,0 +1,181 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Understanding Garbage Collection and Memory in Node.js</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Understanding Garbage Collection and Memory in Node.js</h1>
+                <summery class="article__summery colxs100">
+                      <p><em>This article was originally published on <a href="http://apmblog.dynatrace.com/2015/11/04/understanding-garbage-collection-and-hunting-memory-leaks-in-node-js/">About:Performance</a> by <a href="https://twitter.com/dkhan">Daniel Khan</a>. With his kind permission, we’re sharing it here for Codeship readers.</em></p>
+<p>Whenever there is bad press coverage of Node.js, it is (typically) related to performance problems. This does not mean that Node.js is more prone to problems than other technologies — the user must simply be aware of certain things about how Node.js works.</p>
+<p>While this technology has a rather flat learning curve, the machinery that keeps Node.js ticking is quite complex, and you must understand it to preemptively avoid performance pitfalls. And if things go wrong, you need to know how to fix things fast.</p>
+
+
+<p>In this post, I’ll cover how Node.js manages memory and how to trace down memory-related problems. Unlike platforms like PHP, Node.js applications are long-running processes. While this has lots of positive implications such as allowing database connections to be set up once and then reused for all requests, this may also cause problems.</p>
+<p>But first, let’s cover some Node.js basics.</p>
+<h3>Node.js is a C++ program controlled via V8 JavaScript</h3>
+<p><a href="https://developers.google.com/v8/">Google V8</a> is a JavaScript engine initially created for Google Chrome, but it can also be used as a standalone. This makes it the perfect fit for Node.js, and it is the only part of the platform that actually “understands” JavaScript.</p>
+<p>V8 compiles JavaScript down to native code and executes it. During execution, it manages the allocation and freeing of memory as needed. This means that if we talk about memory management in Node.js we actually always talk about V8.</p>
+<p>Please read on <a href="https://developers.google.com/v8/get_started">here</a> for a simple example on how to use V8 from a C++ perspective.</p>
+<h3>V8’s memory scheme</h3>
+<p>A running program is always represented through some space allocated in memory. This space is called <em>Resident Set</em>. V8 uses a scheme similar to the Java Virtual Machine and divides the memory into segments:</p>
+<ul>
+<li>Code: the actual code being executed</li>
+<li>Stack: contains all value types (primitives like integer or Boolean) with pointers referencing objects on the heap and pointers defining the control flow of the program</li>
+<li>Heap: a memory segment dedicated to storing reference types like objects, strings, and closures</li>
+</ul>
+<div id="attachment_2939" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/Memory-scheme.png" alt="V8 memory scheme" width="599" height="592" class="size-full wp-image-2939" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/Memory-scheme-300x296.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/Memory-scheme.png 599w" sizes="(max-width: 599px) 100vw, 599px"><p class="wp-caption-text">V8 memory scheme</p></div>
+<p>Within Node.js, the current memory usage can easily be queried by calling <a href="https://nodejs.org/api/process.html#process_process_memoryusage"><code>process.memoryUsage()</code></a>. This function will return an object containing:</p>
+<ul>
+<li>Resident set size</li>
+<li>Total size of the heap</li>
+<li>Heap actually used</li>
+</ul>
+<p>We can use this function to record the memory usage over time to create a graph that perfectly shows how V8’s memory handling actually works.</p>
+<div id="attachment_2940" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/NodeJS-memory-usage-over-time.png" alt="Node.js memory usage over time" width="599" height="307" class="size-full wp-image-2940" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/NodeJS-memory-usage-over-time-300x154.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/NodeJS-memory-usage-over-time.png 599w" sizes="(max-width: 599px) 100vw, 599px"><p class="wp-caption-text">Node.js memory usage over time</p></div>
+<p>We see that the used heap graph is highly volatile but always stays within certain boundaries to keep the median consumption constant. The mechanism that allocates and frees heap memory is called <em>garbage collection</em>.</p>
+<h3>Enter garbage collection</h3>
+<p>Every program that consumes memory requires a mechanism for reserving and freeing space. In C and C++, this is accomplished by <code>malloc()</code> and <code>free()</code> as the example below shows.</p>
+<pre class="line-numbers"><code class="language-bash">char * buffer;
+buffer = (char*) malloc (42);
+
+// Do something with buffer
+
+free (buffer);</code></pre>
+<p>We see that the programmer is responsible for freeing heap memory that is no longer required. If a program allocates memory that is never freed, the heap will constantly grow until the usable memory is exhausted, causing the program to crash. We call this a <em>memory leak</em>.</p>
+
+
+<p>As we already learned, in Node.js, JavaScript is compiled to native code by V8. The resulting native data structures don’t have much to do with their original representation and are solely managed by V8.</p>
+<p>This means that we cannot actively allocate or deallocate memory in JavaScript. V8 uses a well-known mechanism called garbage collection to address this problem.</p>
+<p>The theory behind garbage collection is quite simple: If a memory segment is not referenced from anywhere, we can assume that it is not used and, therefore, can be freed. However, retrieving and maintaining this information is quite complex as there may be chained references and indirections that form a complex graph structure.</p>
+<div id="attachment_2941" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/A-heap-graph.png" alt="A heap graph; only if there are no more references to the red object can it be discarded." width="599" height="327" class="size-full wp-image-2941" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/A-heap-graph-300x164.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/A-heap-graph.png 599w" sizes="(max-width: 599px) 100vw, 599px"><p class="wp-caption-text">A heap graph; only if there are no more references to the red object can it be discarded.</p></div>
+<p>Garbage collection is a rather costly process because it interrupts the execution of an application, which naturally impacts its performance. To remedy this situation, V8 uses two types of garbage collection:</p>
+<ul>
+<li>Scavenge: fast but incomplete</li>
+<li>Mark-Sweep: relatively slow but frees all non-referenced memory</li>
+</ul>
+<p>For an excellent blog post containing in-depth information about garbage collection in V8, please <a href="http://jayconrod.com/posts/55/a-tour-of-v8-garbage-collection">click here</a>.</p>
+
+
+<p>Revisiting the data we collected from <code>process.memoryUsage()</code>, we can now easily identify the different garbage collection types — the saw-tooth pattern is created by Scavenge runs, and the downward jumps indicate Mark-Sweep operations.</p>
+<p>By using the native module <a href="https://github.com/bretcope/node-gc-profiler">node-gc-profiler</a>, we can gather even more information about garbage collection runs. The module subscribes to garbage collection events fired by V8 and exposes them to JavaScript. The object returned indicates the type of garbage collection and the duration.</p>
+<p>Again, we can easily graph this to gain a better understanding on how things work.</p>
+<div id="attachment_2942" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/Duration-and-frequency-of-GC-runs.png" alt="Duration and frequency of GC runs" width="599" height="271" class="size-full wp-image-2942" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/Duration-and-frequency-of-GC-runs-300x136.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/Duration-and-frequency-of-GC-runs.png 599w" sizes="(max-width: 599px) 100vw, 599px"><p class="wp-caption-text">Duration and frequency of GC runs</p></div>
+<p>We can see that Scavenge Compact runs at a much higher frequency than Mark-Sweep. Depending on the complexity of an application, the durations will vary. Interestingly the above chart also shows frequent, very short, Mark-Sweep runs, the function of which I have yet to determine.</p>
+<h3>When things go wrong</h3>
+<p>So if garbage collection cleans up the memory, why do you have to care at all? In fact, it is still possible — and easy — to introduce memory leaks that suddenly appear in your logs.</p>
+<div id="attachment_2943" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/Exception-caused-by-memory-leak.png" alt="Exception caused by memory leak" width="600" height="278" class="size-full wp-image-2943" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/Exception-caused-by-memory-leak-300x139.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/Exception-caused-by-memory-leak.png 600w" sizes="(max-width: 600px) 100vw, 600px"><p class="wp-caption-text">Exception caused by memory leak</p></div>
+<p>Employing our previously introduced charting, we can even watch the memory piling up!</p>
+<div id="attachment_2944" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/Memory-leak-in-progress.png" alt="Memory leak in progress" width="599" height="307" class="size-full wp-image-2944" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/Memory-leak-in-progress-300x154.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/Memory-leak-in-progress.png 599w" sizes="(max-width: 599px) 100vw, 599px"><p class="wp-caption-text">Memory leak in progress</p></div>
+<p>Garbage collection tries its best to free memory, but for every run, we see that consumption after a garbage collection run is constantly climbing, which is a clear indication of a leak.</p>
+<p>While these metrics are apparently a great starting point for anomaly detection, let’s review how to build a leak first before discussing how to trace it down.</p>
+<p><span class="hs-cta-wrapper" id="hs-cta-wrapper-11903a5d-dfb4-42f2-9dea-9a60171225ca"><span class="hs-cta-node hs-cta-11903a5d-dfb4-42f2-9dea-9a60171225ca" id="hs-cta-11903a5d-dfb4-42f2-9dea-9a60171225ca"></span> <script type="text/javascript"> hbspt.cta.load(1169977, '11903a5d-dfb4-42f2-9dea-9a60171225ca'); </script> </span></p>
+<h3>Building a leak</h3>
+<p>Some leaks are obvious — like storing data in process-global variables, an example of which would be storing the IP of every visiting user in an array. Others are more subtle like the famous <a href="https://www.joyent.com/blog/walmart-node-js-memory-leak">Walmart memory leak</a> that was caused by <a href="https://github.com/nodejs/node-v0.x-archive/commit/16934d9210546bf19d4af8d98652aa5d636ce693">a tiny missing statement</a> within Node.js core code, and which took weeks to track down.</p>
+<p>I won’t cover core code errors here. Instead, let’s just look at a difficult to track leak you can easily introduce into your own JavaScript code that I found on <a href="http://info.meteor.com/blog/an-interesting-kind-of-javascript-memory-leak">Meteor’s blog</a>.</p>
+<div id="attachment_2945" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/Introducing-a-leak-into-your-JavaScript.png" alt="Introducing a leak into your own JavaScript code" width="600" height="370" class="size-full wp-image-2945" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/Introducing-a-leak-into-your-JavaScript-300x185.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/Introducing-a-leak-into-your-JavaScript.png 600w" sizes="(max-width: 600px) 100vw, 600px"><p class="wp-caption-text">Introducing a leak into your own JavaScript code</p></div>
+<p>This looks okay at first glance. We could think that <code>theThing</code> get’s overwritten with every invocation of <code>replaceThing()</code>. The problem is that <code>someMethod</code> has its enclosing scope as context. This means that <code>unused()</code> is known within <code>someMethod()</code> and even if <code>unused()</code> is never invocated, it prevents the garbage collector from freeing <code>originalThing</code>.</p>
+<p>There are simply too many indirections to follow. This is not a bug in your code, but it will cause a memory leak that is difficult to track down.</p>
+<p>Wouldn’t it be great if we could have a look into our heap to see what’s currently in there? Fortunately, we can! V8 provides a way to dump the current heap, and V8-profiler exposes this functionality to JavaScript.</p>
+<pre class="line-numbers"><code class="language-javascript">/**
+ * Simple userland heapdump generator using v8-profiler
+ * Usage: require('[path_to]/HeapDump').init('datadir')
+ *
+ * @module HeapDump
+ * @type {exports}
+ */
+
+var fs = require('fs');
+var profiler = require('v8-profiler');
+var _datadir = null;
+var nextMBThreshold = 0;
+
+
+/**
+ * Init and scheule heap dump runs
+ *
+ * @param datadir Folder to save the data to
+ */
+module.exports.init = function (datadir) {
+    _datadir = datadir;
+    setInterval(tickHeapDump, 500);
+};
+
+/**
+ * Schedule a heapdump by the end of next tick
+ */
+function tickHeapDump() {
+    setImmediate(function () {
+        heapDump();
+    });
+}
+
+/**
+ * Creates a heap dump if the currently memory threshold is exceeded
+ */
+function heapDump() {
+    var memMB = process.memoryUsage().rss / 1048576;
+
+    console.log(memMB + '&gt;' + nextMBThreshold);
+
+    if (memMB &gt; nextMBThreshold) {
+        console.log('Current memory usage: %j', process.memoryUsage());
+        nextMBThreshold += 50;
+        var snap = profiler.takeSnapshot('profile');
+        saveHeapSnapshot(snap, _datadir);
+    }
+}
+
+/**
+ * Saves a given snapshot
+ *
+ * @param snapshot Snapshot object
+ * @param datadir Location to save to
+ */
+function saveHeapSnapshot(snapshot, datadir) {
+    var buffer = '';
+    var stamp = Date.now();
+    snapshot.serialize(
+        function iterator(data, length) {
+            buffer += data;
+        }, function complete() {
+
+            var name = stamp + '.heapsnapshot';
+            fs.writeFile(datadir + '/' + name , buffer, function () {
+                console.log('Heap snapshot written to ' + name);
+            });
+        }
+    );
+}</code></pre>
+<p>This simple module creates heap dump files if memory usage is constantly rising. Yes, there are more sophisticated approaches to detect anomalies, but for our purpose, this should be sufficient.</p>
+<p>If there is a memory leak, you may end up with a significant number of such files. You should monitor this closely and add some alerting capabilities to that module. The same heap dump functionality is also provided within Chrome and, fortunately, you can use Chrome developer tools to analyze the dumps V8-profiler.</p>
+<div id="attachment_2947" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/Chrome-developer-tools.png" alt="Chrome developer tools" width="600" height="392" class="size-full wp-image-2947" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/Chrome-developer-tools-300x196.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/Chrome-developer-tools.png 600w" sizes="(max-width: 600px) 100vw, 600px"><p class="wp-caption-text">Chrome developer tools</p></div>
+<p>One heap dump may not help you because it won’t show you how the heap develops over time. That’s why Chrome developer tools allow you to compare different memory profiles.</p>
+<p>By comparing two dumps, we get delta values that indicate which structures grew between two dumps as seen below.</p>
+<div id="attachment_2946" class="wp-caption aligncenter"><img src="http://blog.codeship.com/wp-content/uploads/2016/01/Heap-dump-comparison-showing-a-leak.png" alt="Heap dump comparison showing our leak" width="600" height="397" class="size-full wp-image-2946" srcset="https://blog.codeship.com/wp-content/uploads/2016/01/Heap-dump-comparison-showing-a-leak-300x199.png 300w, https://blog.codeship.com/wp-content/uploads/2016/01/Heap-dump-comparison-showing-a-leak.png 600w" sizes="(max-width: 600px) 100vw, 600px"><p class="wp-caption-text">Heap dump comparison showing ou leak</p></div>
+<p>And here we have our problem. A variable called <code>longStr</code> contains a string of asterisks and is referenced by <code>originalThing</code>, which is referenced by some method, which is referenced by… well, you get the point. There is a long path of nested references and closure contexts that prevent <code>longStr</code> from being freed anytime soon.</p>
+<p>Although this example leads to obvious results, the process is always the same:</p>
+<ol>
+<li>Create heap dumps with some time and a fair amount of memory allocation in between.</li>
+<li>Compare a few dumps to find out what’s growing.</li>
+</ol>
+<h3>Wrap up</h3>
+<p>As we have seen, garbage collection is a complex process, and even valid code can cause memory leaks. By using the out-of-the-box functionality provided by V8 plus Chrome developer tools, it’s possible to obtain insights that help us trace down the root cause of the leaks. If you build such functionality into your application, you have everything necessary to fix a problem when it occurs.</p>
+
+
+<p>But one question remains: How can we fix this leak? This answer is simple — just add <code>theThing = null;</code> at the end of the function, and your day is saved.</p>
+<p>To see the big picture, including which transactions are passing through your node application, you may want to use <a href="http://www.dynatrace.com/en/index.html">Dynatrace</a>. We provide a Node.js agent which will, in conjunction with the various other technologies supported, help you to understand your application as a whole. This blog post is part of my ongoing research on instrumenting Node.js, and some of the tools introduced here are already in our product or will be incorporated into it soon. You can start monitoring your Node.JS environment right away with <a href="https://ruxit.com/nodejs-monitoring/">Dynatrace Ruxit</a>.</p>
+<p>Please feel free to contact me anytime if you have questions about my blog posts or how to instrument node.</p>
+
+
+            
+                  </summery>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,64 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Use `rem` for Global Sizing; Use `em` for Local Sizing</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Use `rem` for Global Sizing; Use `em` for Local Sizing</h1>
+                <article id="post-239011" role="main" class="instapaper_body h-entry e-content">
+
+          
+
+        <p><a href="http://clagnut.com/blog/2384/">Richard Rutter’s guide</a> for setting the <code>font-size</code> of an element is interesting: he argues that we should use both <code>em</code> and <code>rem</code> units depending on the relationship it might have with other elements on the page:</p>
+<blockquote>
+<p>Take the example of a pull quote containing two short paragraphs. The spacing between the paragraphs will depend on the size of the paragraph text, so you could feasibly set that spacing in either rems or ems. Should you decide during your design process that the pull quote should be set a bit larger, then the spacing between the paragraphs must also be increased. Therefore the paragraph spacing is directly related to the paragraph text size and therefore be considered local sizing within a component. Hence you should use ems in this case.</p>
+</blockquote>
+
+<p>This compliments <a href="https://css-tricks.com/rems-ems/">the method that Chris described</a> a couple of years ago:</p>
+<blockquote>
+<p>So here’s my idea: you still keep <code>px</code> size adjustments at the document level so you can make easy/efficient sweeping size changes. But then each module on the page has a font-size set in <code>rem</code>. Actual text elements (h1, h2, p, li, whatever), if you size them at all, are sized in <code>em</code>, and thus become relative to the module.</p>
+</blockquote>
+<p>Breaking that up a bit: first we’d set the <code>font-size</code> of the document element with <code>px</code>: </p>
+<pre rel="SCSS"><code class="language-scss">html {
+  font-size: 16px;
+    
+  @media screen and (min-width: 900px) {
+    font-size: 18px;
+  }
+    
+  @media screen and (min-width: 1200px) {
+    font-size: 20px;
+  }
+}</code></pre>
+<p>Next up we’d style all our little textual elements, such as paragraphs, headings or blockquotes, with <code>em</code>s. This is because they share a relationship with one another:</p>
+<pre rel="SCSS"><code class="language-scss">h2 { 
+  font-size: 2em;
+}
+
+pre {
+  font-size: 0.8em;
+}</code></pre>
+<p>And finally we style the modules that those bits of text sit inside with <code>rem</code>s, so we can easily adjust all of the text within them: </p>
+<pre rel="SCSS"><code class="language-scss">.module {
+  font-size: 1.1rem;
+}
+
+.another-module {
+  font-size: 1.3rem;
+}</code></pre>
+<p>...which ends up working something like this in practice: </p>
+<p data-height="450" data-theme-id="1" data-slug-hash="tvheK" data-default-tab="result" data-user="chriscoyier" class="codepen">See the Pen <a href="http://codepen.io/chriscoyier/pen/tvheK/">Em AND Rem</a> by Chris Coyier (<a href="http://codepen.io/chriscoyier">@chriscoyier</a>) on <a href="http://codepen.io/">CodePen</a>.</p>
+<p>What do we accomplish by doing this? Why can’t we just stick to <code>rem</code> or <code>em</code> to keep things simple? Well, with this method, each module instantly becomes compartmentalised and easier to style for the future. But also we can quickly adjust the <code>font-size</code> of every module without having to change large portions of the codebase. If we notice that the <code>font-size</code> of the whole website needs to be bumped up then just need to change a single value.</p>
+<p><code>em</code> and <code>rem</code> values are useful for two different jobs, and if we utilise them in the way in which they were designed then our work can become a bit more maintainable and flexible.</p>
+
+        
+      </article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

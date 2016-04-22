@@ -1,0 +1,239 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Webpack + Angular的组件化实践</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Webpack + Angular的组件化实践</h1>
+                <div class="article fmt article__content" data-id="1190000003915443" data-licence=""><span>
+                    
+</span><p>最近写复旦二手平台的时候开始尝试用一直推崇了很久的组件化。经过一番抉择之后选择了 webpack + angular 的组合。所以在这里分享一下具体的实践流程。</p><span>
+</span><hr><span>
+</span><h1>Webpack</h1><span>
+</span><p>Webpack是目前比较流行的前端打包工具，它同时支持AMD、CMD两种模块写法，也原生支持npm或者bower安装的模块。它还能给css、scss、less、coffeescript、es6、图片、html以及诸如jade、ejs的模板打包。</p><span>
+</span><p><strong>所以有什么卵用呢？</strong></p><span>
+</span><p>简单地说就是，</p><span>
+</span><p>1、原来你需要在<code>&lt;script&gt;</code>中引入angular或者其他的npm模块（有些npm模块甚至没有提供可以直接在浏览器端引用的js文件），现在只需要：</p><span>
+</span><pre><code>npm install angular</code></pre><span>
+</span><p>然后在app.js中：</p><span>
+</span><pre><code class="js">angular = require('angular');
+var app = angular.module('myApp',[]);</code></pre><span>
+</span><p>然后执行</p><span>
+</span><pre><code>webpack app.js bundle.js</code></pre><span>
+</span><p>webpack会自动分析依赖，然后编译，这样<code>bundle.js</code>就是你想要的东西了。</p><span>
+</span><p>2、组件化的时候你要在页面中引入一大堆东西，比如这样：</p><span>
+</span><pre><code class="html">&lt;!--index.html--&gt;
+&lt;script type="text/javascript" src="header.js"&gt;
+&lt;script type="text/javascript" src="tab.js"&gt;
+&lt;script type="text/javascript" src="waterfoo.js"&gt;
+&lt;link rel="stylesheet" type="text/css" href="header.css"&gt;
+&lt;link rel="stylesheet" type="text/css" href="tab.css"&gt;
+&lt;link rel="stylesheet" type="text/css" href="waterfoo.css"&gt;
+</code></pre><span>
+</span><p>当然你可能不会用如此傻的方式引入组件，但如果用了webpack之后只需要这样：</p><span>
+</span><pre><code class="js">//index-bundle.js
+require('header.js');
+require('header.scss');
+require('tab.js');
+require('tab.scss');
+require('waterfoo.js');
+require('waterfoo.scss');</code></pre><span>
+</span><p>然后在index.html中引入打包好的js即可（没错连scss都给你打包好了/w\ 它甚至还能把图片打包成base64，然后替换所有url）：</p><span>
+</span><pre><code class="html">&lt;!--index.html--&gt;
+&lt;script type="text/javascript" src="bundle.js"&gt;</code></pre><span>
+</span><p>上面只是最基础的用法，所以有些人可能要吐槽这不是browserify也能干么/w\ 可以看看这篇文章[《用webpack来取代browserify》<br>](<a href="http://segmentfault.com/a/1190000002490637)">http://segmentfault.com/a/1190000002490637)</a>，以及webpack还有很多酷炫的功能这里就不再赘述。</p><span>
+</span><hr><span>
+</span><h1>项目实践流程</h1><span>
+</span><p>回到正题吧，复旦二手平台这个项目更像是多页面的网站而不是单页面的web应用，所以我决定尝试用node去写一个渲染层（个人感觉Koajs目前还不太成熟，所以选用了Express4.0），这样后台写JAVA的同学就只需要给我提供数据API就行了，把数据库接口化。</p><span>
+</span><p>渲染引擎用的是jade，而angular的角色更像是一个页面的“控制器”，控制由jade生成的页面，而不是去自行加载html自行渲染（说白了就是放弃了用angular渲染页面）。</p><span>
+</span><h2>Webpack和Angular的结合</h2><span>
+</span><p>Angular自带了Module以及Directive机制，但Angular1.x版本下，我觉得这些机制不太适合做这种多页面网站的组件化，而且也违背了选用jade渲染的初衷。</p><span>
+</span><p>Angular自己有自己独特的依赖注入以及模块声明方式，看起来似乎和Webpack是水火不容的，但事实上他们完全可以融合。只需要多几行代码：</p><span>
+</span><p>主文件app.js大概长这样：</p><span>
+</span><pre><code class="js">var angular = require('angular');
+var starkAPP = angular.module('starkAPP', [
+]);
+module.exports = starkAPP;
+</code></pre><span>
+</span><p>注意到我们在这里把starkAPP作为模块的接口暴露出去，然后我们就可以这样写controller：</p><span>
+</span><pre><code class="js">//someController.js
+var starkAPP = require('./app.js');
+starkAPP.controller('someController', ['$scope', function($scope) {
+    //...
+}])</code></pre><span>
+</span><p>运行一下<code>webpack someController.js bundle.js </code>即生成了一个可以使用的bundle.js。</p><span>
+</span><p>当然如果你有一堆controller、directive、service，最好用个<code>main.js</code>全部声明一下依赖：</p><span>
+</span><pre><code class="js">//main.js
+require('./Controller1');
+require('./Controller2');
+require('./Controller3');
+require('./Service');
+require('./Directive');</code></pre><span>
+</span><h2>目录结构设计</h2><span>
+</span><p>这里我只放了浏览器端的文件结构，整个的项目结构可以看<a href="https://github.com/starkwang/FDSHM">这里</a></p><span>
+</span><pre><code>|package.json 存放npm相关的配置
+
+|gulpfile.js gulp的配置文件
+
+|webpack.config.js 存放webpack相关的配置
+
+|build 存放构建完毕的资源文件
+
+|node_modules 不解释了= =
+
+|src 源代码
+
+    └── components 组件
+    
+         ├── angular angular组件，比如各种directive、service
+    
+         ├── base 需要全站引入的组件，比如reset.css
+    
+         └── header 头部组件
+         
+              ├── header.jade
+
+             ├── header.scss
+             
+             └── header.js
+             
+     └── pages 页面定义文件
+     
+         └──  index 首页配置文件
+         
+              ├── index.js
+              
+              └── index.scss
+              
+     └── template 提供给node渲染的jade模板
+     
+          └── index.jade 首页模板</code></pre><span>
+</span><p>看文件结构绝对是云里雾里的，下面详细说明：</p><span>
+</span><p><strong>1、首先这是首页的模板<code>index.jade</code></strong></p><span>
+</span><pre><code class="jade">html(ng-app="starkAPP")
+    head
+        link(rel='stylesheet',href='/static/css/index.css')
+        script(type='text/javascript',src='/static/js/index.bundle.js')
+    body(ng-view)
+        include ../components/header/header.jade</code></pre><span>
+</span><p>注意到我们引入了header的jade，以及两个文件<code>index.css</code>和<code>index.bundle.js</code></p><span>
+</span><p><strong>2、<code>index.css</code>是啥？</strong></p><span>
+</span><p>它是<code>pages/index/</code>里面的<code>index.scss</code>编译成的：</p><span>
+</span><pre><code class="scss">// pages/index/index.scss
+@import '../../components/header/header';
+@import '../../components/base/base';</code></pre><span>
+</span><p>注意到我们在这里引入了header.scss</p><span>
+</span><p><strong>3、<code>index.bundle.js</code>是啥？</strong></p><span>
+</span><p>它是<code>pages/index/</code>里面的<code>index.js</code>经过webpack打包成的东西</p><span>
+</span><pre><code class="js">// pages/index/index/js
+require('../../components/angular/app.js');
+require('../../components/header/header.js');
+</code></pre><span>
+</span><p>我们在这里引入了angular以及<code>header.js</code></p><span>
+</span><p><strong>总之，pages下面放的就是各个页面的组件依赖文件</strong></p><span>
+</span><p>比如我的首页index依赖了一个组件header，那么我需要在<code>index.js</code>和<code>index.scss</code>中声明我依赖了<code>header.js</code>以及<code>header.scss</code></p><span>
+</span><p>其实用webpack打包的话，只需要一个定义文件就可以同时打包js和scss，但我还不太确定webpack打包scss这种方法是否成熟。</p><span>
+</span><h2>项目构建</h2><span>
+</span><p>自动构建工具我选择了gulp全家桶，简单地说就是读取<code>src/pages/[page-name]</code>下面所有的js、scss文件，把他们编译到对应的<code>build/[page-name]</code>下面，并且监听文件变化以便热替换。</p><span>
+</span><p>这是我的<code>gulpfile.js</code>:</p><span>
+</span><pre><code class="js">var gulp = require('gulp');
+var sass = require('gulp-sass'),
+    autoprefixer = require('gulp-autoprefixer'),
+    minifycss = require('gulp-minify-css'),
+    uglify = require('gulp-uglify'),
+    clean = require('gulp-clean'),
+    webpack = require('gulp-webpack');
+var webpackConfig = require('./webpack.config');
+gulp.task('default', ['clean', 'watch', 'sass:watch', 'sass', 'webpack']);
+
+gulp.task('sass:watch', function() {
+    gulp.watch('src/pages/*/*.scss', ['sass']);
+    gulp.watch('src/components/*/*.scss', ['sass']);
+});
+gulp.task('sass', function() {
+    gulp.src(['src/pages/**/*.scss'])
+        .pipe(sass.sync().on('error', sass.logError))
+        .pipe(minifycss())
+        .pipe(gulp.dest('build/pages'));
+});
+gulp.task('clean', function() {
+    return gulp.src(['build/pages'], {
+            read: false
+        })
+        .pipe(clean());
+});
+gulp.task("webpack", function() {
+    return gulp
+        .src('./')
+        .pipe(webpack(webpackConfig))
+        //.pipe(uglify())
+        .pipe(gulp.dest('./build/pages'));
+});
+gulp.task('watch', function() {
+    gulp.watch('src/components/*/*.js', ['webpack']);
+    gulp.watch('src/pages/*/*.js', ['webpack']);
+});
+</code></pre><span>
+</span><p>以及简化后的<code>webpack.config.js</code>：</p><span>
+</span><pre><code>module.exports = {
+    entry: {
+        'index/index': './src/pages/index/index.js'
+    },
+    output: {
+        filename: '[name].bundle.js'
+    }
+};
+</code></pre><span>
+</span><h2>怎么写一个组件？</h2><span>
+</span><p><strong>比如现在我们要写一个waterfoo（瀑布流）组件</strong></p><span>
+</span><p>首先我们在<code>src/components/</code>下面新建一个文件夹<code>waterfoo </code>，然后建立</p><span>
+</span><ul>
+<li><p>waterfoo.jade</p></li>
+<li><p>waterfoo.scss</p></li>
+<li><p>waterfoo.js</p></li>
+</ul><span>
+</span><p>分别对应waterfoo组件的模板、样式、以及行为，当然waterfoo组件完全可以依赖其他更低层级组件，只需要在相应的文件中声明依赖即可。</p><span>
+</span><h2>怎么在页面中加入组件？</h2><span>
+</span><p><strong>比如现在我们要把waterfoo（瀑布流）组件加到首页index中</strong></p><span>
+</span><p>首先在<code>src/template/index.jade</code>中引入模板：</p><span>
+</span><pre><code class="jade">include ../components/waterfoo/waterfoo.jade</code></pre><span>
+</span><p>然后在<code>src/pages/index/</code>下面的<code>index.js</code>、<code>index.scss</code>配置依赖：</p><span>
+</span><pre><code class="js">//index.js
+require('../../components/waterfoo/waterfoo');</code></pre><span>
+</span><pre><code class="scss">//index.scss
+@import '../../components/waterfoo/waterfoo';</code></pre><span>
+</span><h2>有更优雅更傻瓜的方法吗？</h2><span>
+</span><p>当然有，未来的期望是用webpack把js和scss一起打包，并且把<code>template</code>和<code>pages</code>文件夹合并（具体配置express渲染路径的方法我还在探索），大概就是这样的效果：</p><span>
+</span><p><code>src/pages/index/</code>下面放着首页的配置文件：</p><span>
+</span><ul>
+<li><p>index.jade</p></li>
+<li><p>index-config.js</p></li>
+<li><p>index.scss （一些非组件的样式）</p></li>
+</ul><span>
+</span><p><strong>index.jade</strong>是模板</p><span>
+</span><pre><code class="jade">html(ng-app="starkAPP")
+   head
+       script(type='text/javascript',src='/static/js/index.bundle.js')
+   body(ng-view)
+       include ../components/header/header.jade</code></pre><span>
+</span><p><strong>index-config.js</strong>声明依赖的组件</p><span>
+</span><pre><code class="js">require('../../components/angular/app.js');
+require('../../components/header/header.js');
+require('../../components/header/header.scss');
+require('../../components/waterfoo/waterfoo.js');
+require('../../components/waterfoo/waterfoo.scss');
+require('./index.scss');</code></pre><span>
+</span><p>-------</p><span>
+</span><h1>最后</h1><span>
+</span><p>这个项目的源码在<a href="https://github.com/starkwang/FDSHM">Github · starkwang/FDSHM</a>，FDSHM是Fudan Secondhand Market的缩写/w\，现在还在慢慢地写组件中，争取这学期上线吧……（缺人啊QAQ）</p><span>
+
+                </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

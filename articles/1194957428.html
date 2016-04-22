@@ -1,0 +1,124 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Aerotwist - The Anatomy of a Frame</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Aerotwist - The Anatomy of a Frame</h1>
+                <div class="left column"><span>
+
+</span><p><strong>Caveat: this is a Blink / Chrome view of the world. Most of the main thread tasks are “shared” in some form by all vendors, like layout or style calcs, but this overall architecture may not be.</strong></p><span>
+
+</span><h2 id="a-picture-speaks-a-thousand-words">A picture speaks a thousand words</h2><span>
+
+</span><p>It really does, so let’s start with one of those:</p><span>
+
+</span><figure>
+  <a href="https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.zip"><img src="https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.svg" alt="The process of getting pixels to screen."></a>
+  <figcaption>The full-fat process of getting pixels to screen.</figcaption>
+</figure><span>
+
+</span><p class="livedemo mid"><a href="https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.zip">Download the diagram</a></p><span>
+
+</span><h2 id="processes">Processes</h2><span>
+
+</span><p>That’s a lot of content in a small space, so let’s define things a little more. It can be helpful to have the diagram above alongside these definitions, so maybe <a href="https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.svg" target="_blank">fire that up image next to this post</a> or, for retro-old-skool points you could, you know, print it out. Sorry. Forget I mentioned it… Sorry.</p><span>
+
+</span><p>Let’s start with the processes:</p><span>
+
+</span><ul>
+  <li><strong>Renderer Process</strong>. The surrounding container for a tab. It contains multiple threads that, together, are responsible for various aspects of getting your page on screen. These threads are the <em>Compositor</em>, <em>Tile Worker</em>, and <em>Main</em> threads.</li>
+  <li><strong>GPU Process</strong>. This is the single process that serves all tabs and the surrounding browser process. As frames are committed the GPU process will upload any tiles and other data (like quad vertices and matrices) to the GPU for actually pushing pixels to screen. The GPU Process contains a single thread, called the GPU Thread that actually does the work.</li>
+</ul><span>
+
+</span><h2 id="renderer-process-threads">Renderer Process Threads.</h2><span>
+
+</span><p>Now let’s look at the threads in the Renderer Process.</p><span>
+
+</span><blockquote>
+  <p>In many ways you should consider the Compositor Thread as the “big boss”. While it doesn’t run the JavaScript, Layout, Paint or any of that, it’s the thread that is wholly responsible for initiating main thread work, and then shipping frames to screen.</p>
+</blockquote><span>
+
+</span><ul>
+  <li><strong>Compositor Thread</strong>. This is the first thread to be informed about the vsync event (which is how the OS tells the browser to make a new frame). It will also receive any input events. The compositor thread will, if it can, avoid going to the main thread and will try and convert input (like – say – scroll flings) to movement on screen. It will do this by updating layer positions and committing frames via the GPU Thread to the GPU directly. If it can’t do that because of input event handlers, or other visual work, then the Main thread will be required.</li>
+  <li><strong>Main Thread</strong>. This is where the browser executes the tasks we all know and love: JavaScript, styles, layout and paint. (That will change in the future under <a href="https://surma.link/things/houdini-intro/">Houdini</a>, where we will be able to run some code in the Compositor Thread.) This thread wins the award for “most likely to cause jank”, largely because of the fact that so much runs here.</li>
+  <li><strong>Compositor Tile Worker(s)</strong>. One or more workers that are spawned by the Compositor Thread to handle the Rasterization tasks. We’ll talk about that a bit more in a moment.</li>
+</ul><span>
+
+</span><p>In many ways you should consider the Compositor Thread as the “big boss”. While it doesn’t run the JavaScript, Layout, Paint or any of that, it’s the thread that is wholly responsible for initiating main thread work, and then shipping frames to screen. If it doesn’t have to wait on input event handlers, it can ship frames while waiting for the Main thread to complete its work.</p><span>
+
+</span><p>You can also imagine <strong>Service Workers</strong> and <strong>Web Workers</strong> living in this process, though I’m leaving them out to because it makes things way more complicated.</p><span>
+
+</span><h2 id="the-flow-of-things">The flow of things.</h2><span>
+
+</span><figure>
+  <a href="https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.zip"><img src="https://aerotwist.com/static/blog/the-anatomy-of-a-frame/main-thread.svg" alt="The main thread in all its glory."></a>
+  <figcaption>The main thread in all its glory.</figcaption>
+</figure><span>
+
+</span><p>Let’s step through the flow, from vsync to pixels, and talk about how things work out in the “full-fat” version of events. It’s worth remembering that a browser <em>need not execute all of these steps</em>, depending on what’s necessary. For example, if there’s no new HTML to parse, then Parse HTML won’t fire. In fact, oftentimes <a href="https://developers.google.com/web/fundamentals/performance/rendering/#the-pixel-pipeline">the best way to improve performance</a> is simply to remove the need for parts of the flow to be fired!</p><span>
+
+</span><p>It’s also worth noting those red arrows just under styles and layout that seem to point towards <code>requestAnimationFrame</code>. It’s perfectly possible to trigger both by accident in your code. This is called Forced Synchronous Layout (or Styles, depending), and it’s often bad for performance.</p><span>
+
+</span><blockquote>
+  <p>oftentimes the best way to improve performance is simply to remove the need for parts of the flow to be fired!</p>
+</blockquote><span>
+
+</span><ol>
+  <li><strong>Frame Start</strong>. Vsync is fired, a frame starts.</li>
+  <li><strong>Input event handlers</strong>. Input data is passed from the compositor thread to any input event handlers on the main thread. All input event handlers (<code>touchmove</code>, <code>scroll</code>, <code>click</code>) should fire first, once per frame, but that’s not necessarily the case; a scheduler makes best-effort attempts, the success of which varies between Operating Systems. There’s also some latency between the user interaction and the event making its way to the main thread to be handled.</li>
+  <li><strong><code>requestAnimationFrame</code></strong>. This is the ideal place to make visual updates to the screen, since you have fresh input data, and it’s as close to vsync as you’re going to get. Other visual tasks, like style calculations, are due to come <em>after</em> this task, so it’s ideally placed to mutate elements. If you mutate – say – 100 classes, this won’t result in 100 style calculations; they will be batched up and handled later. The only caveat is that you don’t query any computed styles or layout properties (like <code>el.style.backgroundImage</code> or <code>el.style.offsetWidth</code>). If you <em>do</em> you’ll bring recalc styles, layout, or both, forward, causing <a href="https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing?hl=en#avoid-layout-thrashing">forced synchronous layouts or, worse, layout thrashing</a>.</li>
+  <li><strong>Parse HTML</strong>. Any newly added HTML is processed, and DOM elements created. You’re likely to see a lot more of this during page load or after operations like <code>appendChild</code>.</li>
+  <li><strong>Recalc Styles</strong>. Styles are computed for anything that’s newly added or mutated. This may be the whole tree, or it can be scoped down, depending on what changed. Changing classes on the body can be far-reaching, for example, but it’s worth noting that browsers are already very smart about automatically limiting the scope of style calculations.</li>
+  <li><strong>Layout</strong>. The calculation of geometric information (where and what size each element has) for every visible element. It’s normally done for the entire document, often making the computational cost proportional to the DOM size.</li>
+  <li><strong>Update Layer Tree</strong>. The process of creating the stacking contexts and depth sorting elements.</li>
+  <li><strong>Paint</strong>: This is the first of a two part process: painting is the recording of draw calls (fill a rectangle here, write text there) for any elements that are new or have changed visually. The second part is <em>Rasterization</em> (see below), where the draw calls are executed, and textures get filled in. This part is the recording of draw calls, and is typically far faster than rasterization, but both parts are often collectively referred to as “painting”.</li>
+  <li><strong>Composite</strong>: the layer and tile information is calculated and passed back to the compositor thread for it to deal with. This will account for, amongst other things, things like <code>will-change</code>, overlapping elements, and any hardware accelerated canvases.</li>
+  <li><strong>Raster Scheduled</strong> and <strong>Rasterize</strong>: The draw calls recorded in the Paint task are now executed. This is done in <em>Compositor Tile Workers</em>, the number of which depends on the platform and device capabilities. For example, on Android you typically find one worker, on desktop you can sometimes find four. The rasterization is done in terms of layers, each of which is made up of tiles.</li>
+  <li><strong>Frame End</strong>: With the tiles for the various layers all rasterized, any new tiles are committed, along with input data (which may have been changed in the event handlers), to the GPU Thread.</li>
+  <li><strong>Frame Ships</strong>: Last, but by no means least, the tiles are uploaded to the GPU by the GPU Thread. The GPU, using quads and matrices (all the usual GL goodness) will draw the tiles to the screen.</li>
+</ol><span>
+
+</span><h3 id="bonus-round">Bonus round</h3><span>
+
+</span><ul>
+  <li><strong>requestIdleCallback</strong>: if there’s any time Main Thread left at the end of a frame then <code>requestIdleCallback</code> can fire. This is a great opportunity to do non-essential work, like beaconing analytics data. If you’re new to <code>requestIdleCallback</code> have <a href="https://developers.google.com/web/updates/2015/08/using-requestidlecallback?hl=en">a primer for it on Google Developers</a> that gives a bit more of a breakdown.</li>
+</ul><span>
+
+</span><h2 id="layers-and-layers">Layers and layers</h2><span>
+
+</span><p>There are two versions of depth sorting that crop up in the workflow.</p><span>
+
+</span><p>Firstly, there’s the Stacking Contexts, like if you have two absolutely positioned divs that overlap. <strong>Update Layer Tree</strong> is the part of the process that ensures that <code>z-index</code> and the like is heeded.</p><span>
+
+</span><p>Secondly, there’s the Compositor Layers, which is later in the process, and applies more to the idea of painted elements. An element can be promoted to a Compositor Layer with the null transform hack, or <code>will-change: transform</code>, which can then be transformed around the place cheaply (good for animation!). But the browser may also have to create additional Compositor Layers to preserve the depth order specified by z-index and the like if there are overlapping elements. Fun stuff!</p><span>
+
+</span><h2 id="riffing-on-a-theme">Riffing on a theme</h2><span>
+
+</span><p>Virtually all of the process outlined above <em>is done on the CPU</em>. Only the last part, where tiles are uploaded and moved, is done on the GPU.</p><span>
+
+</span><p>On Android, however, the pixel flow is a little different when it comes to Rasterization: the GPU is used far more. Instead of Compositor Tile Workers doing the rasterization, the draw calls are executed as GL commands on the GPU in shaders.</p><span>
+
+</span><p>This is known as <strong>GPU Rasterization</strong>, and it’s one way to reduce the cost of paint. You can find out if your page is GPU rasterized by enabling the FPS Meter in Chrome DevTools:</p><span>
+
+</span><figure>
+  <img src="https://aerotwist.com/static/blog/the-anatomy-of-a-frame/fps-meter.jpg" alt="The FPS meter indicating GPU Rasterization is in use.">
+  <figcaption>The FPS meter indicating GPU Rasterization is in use.</figcaption>
+</figure><span>
+
+</span><h2 id="other-resources">Other resources</h2><span>
+
+</span><p>There’s a ton of other stuff that you might want to dive into, like how to avoid work on the Main Thread, or how this stuff works at a deeper level. Hopefully these will help you out:</p><span>
+
+</span><span>
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
