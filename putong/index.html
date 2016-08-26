@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta name="description" content="The HTML5 Herald">
+        <meta name="author" content="SitePoint">
+        <meta name="viewport" content="initial-scale=1, width=device-width, maximum-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="vendor/normalize.css?v=1.0">
+        <link rel="stylesheet" href="css/index.css?v=1.0">
+    </head>
+    <body>
+        <div class="content-wrapper">
+            <div class="left-content">
+                <div class="log-wrapper">
+                    <div class="inline-block v-top">
+                        <img src="images/logo.jpg" width="80" height="80"/>
+                    </div>
+                    <div class="inline-block ml10 v-top">
+                        <h2 class="mb15">噗通</h2>
+                        <div class="subtitle">手办爱好者的家</div>
+                    </div>
+                </div>
+                <div class="text-wrapper">
+                    <p>国内最大的手办爱好者社区
+                    <p>种草吃土舔小人
+                    <p>噗通带你探索手办的耻辱play
+                </div>
+                <div class="code-wrapper clearfix">
+                    <div class="ios-wrapper fl">
+                        <img src="images/ios.jpg" width="120"/>
+                        <p class="text-des mt10">iOS下载</p>
+                    </div>
+                    <div class="android-wrapper fr">
+                        <img src="images/android.jpg" width="120"/>
+                        <p class="text-des mt10">Android下载</p>
+                    </div>
+                </div>
+            </div>
+            <div class="right-content">
+                <div class="banner">
+                    <ul>
+                        <li><img src="images/1n.jpg" width="260"></li>
+                        <li><img src="images/2n.jpg" width="260"></li>
+                        <li><img src="images/3n.jpg" width="260"></li>
+                        <li><img src="images/4n.jpg" width="260"></li>
+                        <li><img src="images/5n.jpg" width="260"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script src="vendor/jquery-3.1.0.min.js"></script>
+        <script src="vendor/unslider.js"></script>
+        <script>
+            $(function() {
+                $('.banner').unslider();
+            });
+        </script>
+    </body>
+</html>
