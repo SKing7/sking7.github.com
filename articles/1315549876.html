@@ -1,0 +1,212 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>When 'not' to use arrow functions</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>When 'not' to use arrow functions</h1>
+                <section class="post-content">
+          <p>It is a pleasure to see the evolution of the programming language you code every day. Learning from mistakes, searching for better implementation, creating new features is what makes the progress from version to version.  </p>
+
+<p>This is happening to JavaScript these years, when <a href="http://www.ecma-international.org/ecma-262/6.0/">ECMAScript 6</a> brings the language to a new level of usability: arrow functions, classes and <a href="https://github.com/lukehoban/es6features#introduction">much more</a>. And this is great!  </p>
+
+<p>One of the most valuable new feature is the arrow function. There are plenty of good articles that describe its context transparency and short syntax. If you're new to ES6, take a start from <a href="https://strongloop.com/strongblog/an-introduction-to-javascript-es6-arrow-functions/">reading about it</a>.  </p>
+
+<p>But every medal has two sides. Often new features introduce some confusion, one of which is the arrow functions misguided utilization.   </p>
+
+<p>This article guides through scenarios where you should bypass the arrow function in favor of good old <a href="https://developer.mozilla.org/en/docs/web/JavaScript/Reference/Operators/function">functions expressions</a> or newer <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions">shorthand method syntax</a>. And take precautions with shortening, because it can affect the code readability.</p>
+
+
+
+<p>In JavaScript the method is a function stored in a property of an object. When calling the method, <code>this</code> becomes the object that method belongs to.  </p>
+
+<h4 id="1aobjectliteral">1a. Object literal</h4>
+
+<p>Since arrow function has a short syntax, it's inviting to use it for a method definition. Let's take a try:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var calculate = {  
+  array: [1, 2, 3],
+  sum: () =&gt; {
+    console.log(this === window); // =&gt; true
+    return this.array.reduce((result, item) =&gt; result + item);
+  }
+};
+console.log(this === window); // =&gt; true  
+// Throws "TypeError: Cannot read property 'reduce' of undefined"
+calculate.sum();  
+</code></pre>
+
+<p><code>calculate.sum</code> method is defined with an arrow function. But on invocation <code>calculate.sum()</code> throws a <code>TypeError</code>, because <code>this.array</code> is evaluated to <code>undefined</code>. <br>When invoking the method <code>sum()</code> on the <code>calculate</code> object, the context still remains <code>window</code>. It happens because the arrow function binds the context lexically with the <code>window</code> object. <br>Executing <code>this.array</code> is equivalent to <code>window.array</code>, which is <code>undefined</code>.</p>
+
+<p>The solution is to use a function expression or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions">shorthand syntax</a> for method definition (available in ECMAScript 6). In such case <code>this</code> is determined by the invocation, but not by the enclosing context. Let's see the fixed version:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var calculate = {  
+  array: [1, 2, 3],
+  sum() {
+    console.log(this === calculate); // =&gt; true
+    return this.array.reduce((result, item) =&gt; result + item);
+  }
+};
+calculate.sum(); // =&gt; 6  
+</code></pre>
+
+<p>Because <code>sum</code> is a regular function, <code>this</code> on invocation of <code>calculate.sum()</code> is the <code>calculate</code> object. <code>this.array</code> is the array reference, therefore the sum of elements is calculated correctly: <code>6</code>.</p>
+
+<h4 id="1bobjectprototype">1b. Object prototype</h4>
+
+<p>The same rule applies when defining methods on a <code>prototype</code> object. <br>Instead of using an arrow function for defining <code>sayCatName</code> method, which brings an incorrect context <code>window</code>:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">function MyCat(name) {  
+  this.catName = name;
+}
+MyCat.prototype.sayCatName = () =&gt; {  
+  console.log(this === window); // =&gt; true
+  return this.catName;
+};
+var cat = new MyCat('Mew');  
+cat.sayCatName(); // =&gt; undefined  
+</code></pre>
+
+<p>use the <em>old school</em> function expression:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">function MyCat(name) {  
+  this.catName = name;
+}
+MyCat.prototype.sayCatName = function() {  
+  console.log(this === cat); // =&gt; true
+  return this.catName;
+};
+var cat = new MyCat('Mew');  
+cat.sayCatName(); // =&gt; 'Mew'  
+</code></pre>
+
+<p><code>sayCatName</code> regular function is changing the context to <code>cat</code> object when called as a method: <code>cat.sayCatName()</code>.</p>
+
+<h4 id="2callbackfunctionswithdynamiccontext">2. Callback functions with dynamic context</h4>
+
+<p><code>this</code> in JavaScript is a powerful feature. It allows to change the context depending on the way a function is called. Frequently the context is the target object on which invocation happens, making the code more <em>natural</em>. It says like "something is happening with this object".</p>
+
+<p>However the arrow function binds the context statically on declaration and is not possible to make it dynamic. It's the other side of the medal in a situation when lexical <code>this</code> is not necessary.</p>
+
+<p>Attaching event listeners to DOM elements is a common task in client side programming. An event triggers the handler function with <code>this</code> as the target element. Handy usage of the dynamic context.  </p>
+
+<p>The following example is trying to use an arrow function for such a handler:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var button = document.getElementById('myButton');  
+button.addEventListener('click', () =&gt; {  
+  console.log(this === window); // =&gt; true
+  this.innerHTML = 'Clicked button';
+});
+</code></pre>
+
+<p><code>this</code> is <code>window</code> in an arrow function that is defined in the global context. When a click event happens, browser tries to invoke the handler function with <code>button</code> context, but arrow function does not change its pre-defined context. <br><code>this.innerHTML</code> is equivalent to <code>window.innerHTML</code> and has no sense.</p>
+
+<p>You have to apply a function expression, which allows to change <code>this</code> depending on the target element:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var button = document.getElementById('myButton');  
+button.addEventListener('click', function() {  
+  console.log(this === button); // =&gt; true
+  this.innerHTML = 'Clicked button';
+});
+</code></pre>
+
+<p>When user clicks the button, <code>this</code> in the handler function is <code>button</code>. Thus <code>this.innerHTML = 'Clicked button'</code> modifies correctly the button text to reflect clicked status.</p>
+
+<h4 id="3invokingconstructors">3. Invoking constructors</h4>
+
+<p><code>this</code> in a construction invocation is the newly created object. When executing <code>new MyFunction()</code>, the context of the constructor <code>MyFunction</code> is a new object: <code>this instanceof MyFunction === true</code>.</p>
+
+<p>Notice that an arrow function cannot be used as a constructor. JavaScript implicitly prevents from doing that by throwing an exception. <br>Anyway <code>this</code> is setup from the enclosing context and is not the newly created object. In other words, an arrow function constructor invocation doesn't make much sense and is ambiguous. <br>Let's see what happens if however trying to:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var Message = (text) =&gt; {  
+  this.text = text;
+};
+// Throws "TypeError: Message is not a constructor"
+var helloMessage = new Message('Hello World!');  
+</code></pre>
+
+<p>Executing <code>new Message('Hello World!')</code>, where <code>Message</code> is an arrow function, JavaScript throws a <code>TypeError</code> that <code>Message</code> cannot be used as a constructor.  </p>
+
+<p>I consider an efficient practice that ECMAScript 6 fails with verbose error messages in such situations. Contrary to <em>fail silently</em> specific to previous JavaScript versions.</p>
+
+<p>The above example is fixed using a <a href="https://developer.mozilla.org/en/docs/web/JavaScript/Reference/Operators/function">function expression</a>, which is the correct way (including the <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/function">function declaration</a>) to create constructors:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var Message = function(text) {  
+  this.text = text;
+};
+var helloMessage = new Message('Hello World!');  
+console.log(helloMessage.text); // =&gt; 'Hello World!'  
+</code></pre>
+
+<h4 id="4tooshortsyntax">4. Too short syntax</h4>
+
+<p>The arrow function has a nice property of omitting the arguments parenthesis <code>()</code>, block curly brackets <code>{}</code> and <code>return</code> if the function body has one statement. This helps in writing very short functions.</p>
+
+<p>My university professor of programming gives students an interesting task: write the shortest function that counts the string length in C language. This is a good approach to study and explore a new language.  </p>
+
+<p>Nevertheless in real world applications the code is read by many developers. The shortest syntax is not always appropriate to help your colleague understand the function on the fly.  </p>
+
+<p>At some level the compressed function becomes difficult to read, so try not to get into passion. Let's see an example:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">let multiply = (a, b) =&gt; b === undefined ? b =&gt; a * b : a * b;  
+let double = multiply(2);  
+double(3);      // =&gt; 6  
+multiply(2, 3); // =&gt; 6  
+</code></pre>
+
+<p><code>multiply</code> returns the multiplication result of two numbers or a closure tied with first parameter for later multiplication. <br>The function works nice and looks short. But it may be tough to understand what it does from a first look.  </p>
+
+<p>To make it more readable, it is possible to restore the optional curly braces and <code>return</code> statement from the arrow function or use a regular function: </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">function multiply(a, b) {  
+  if (b === undefined) {
+    return function(b) {
+      return a * b;
+    }
+  }
+  return a * b;
+}
+let double = multiply(2);  
+double(3);      // =&gt; 6  
+multiply(2, 3); // =&gt; 6  
+</code></pre>
+
+<p>It is good to find a balance between short and verbose to make your JavaScript straightforward.</p>
+
+<h4 id="5conclusion">5. Conclusion</h4>
+
+<p>Without doubt the arrow function is a great addition. When used correctly it brings simplicity in places where earlier you had to use <code>.bind()</code> or trying to catch the context. It also makes the code lighter.  </p>
+
+<p>Advantages in some situations brings disadvantages in others. You can't use an arrow function when a dynamic context is required: defining methods, create objects with constructors, get the target from <code>this</code> when handling events.</p>
+
+<p><strong>Check also these popular posts:</strong> <br><a href="http://rainsoft.io/gentle-explanation-of-this-in-javascript/">Gentle explanation of 'this' keyword in JavaScript</a> <br><a href="http://rainsoft.io/javascript-hoisting-in-details/">JavaScript variables hoisting in details</a> <br><a href="http://rainsoft.io/the-legend-of-javascript-equality-operator/">The legend of JavaScript equality operator</a>  </p>
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

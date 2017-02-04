@@ -1,0 +1,111 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The Anatomy of a JSON Web Token</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>The Anatomy of a JSON Web Token</h1>
+                <div class="content"><span>
+</span><h2>Introduction</h2><span>
+</span><p>The API model has been used a great amount recently in applications. This has come about because applications can’t just rely on their own data anymore, for a project to fully see its potential, it must be able to have third-party applications, intermingle with other applications, and have its data easily accessilbe by developers.</p><span>
+</span><p>Think of how Facebook provides an API to grab its data (as long as you are authenticated of course). Facebook also allows third-party applications and other services to access its data. This is all done through an API.</p><span>
+</span><p>Now when we talk about building our own APIs, there’s always going to be the topic of <strong>how to secure our own API</strong>. We’ve talked a bit on <a href="https://scotch.io/tutorials/the-ins-and-outs-of-token-based-authentication">token based authentication</a>, and built our own <a href="https://scotch.io/tutorials/javascript/build-a-restful-api-using-node-and-express-4">RESTful Node.js API</a>.</p><span>
+</span><p>Today we’ll be looking at a standard (JSON Web Tokens) and how to create them. </p><span>
+</span><h2>What are JSON Web Tokens?</h2><span>
+</span><p>JSON Web Tokens (JWT), pronounced “jot”, are a standard since the information they carry is transmitted via JSON. We can read more about the <a href="http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html">draft</a>, but that explanation isn’t the most pretty to look at.</p><span>
+</span><p><strong>JSON Web Tokens work across different programming languages</strong>: JWTs work in .NET, Python, Node.js, Java, PHP, Ruby, Go, JavaScript, and Haskell. So you can see that these can be used in many different scenarios.</p><span>
+</span><p><strong>JWTs are self-contained</strong>: They will carry all the information necessary within itself. This means that a JWT will be able to transmit basic information about itself, a payload (usually user information), and a signature.</p><span>
+</span><p><strong>JWTs can be passed around easily</strong>: Since JWTs are self-contained, they are perfectly used inside an HTTP header when authenticating an API. You can also pass it through the URL.</p><span>
+</span><h2>What does a JWT look like?</h2><span>
+</span><p>A JWT is easy to identify. It is three strings separated by <code>.</code></p><span>
+</span><p>For example:</p><span>
+</span><pre><code class="language-javascript">
+aaaaaaaaaa.bbbbbbbbbbb.cccccccccccc
+</code></pre><span>
+</span><p>Let’s break down the <strong>3 parts</strong> and see what each contains.</p><span>
+</span><h2>Breaking Down a JSON Web Token</h2><span>
+</span><p>Since there are 3 parts separated by a <code>.</code>, each section is created differently. We have the 3 parts which are:</p><span>
+</span><span>
+</span><span>
+</span><span>
+</span><h2>Header</h2><span>
+</span><p>The header carries 2 parts:</p><span>
+</span><ul>
+<li>declaring the type, which is <code>JWT</code></li>
+<li>the hashing algorithm to use (<code>HMAC SHA256</code> in this case)</li>
+</ul><span>
+</span><p>Here’s an example:</p><span>
+</span><pre><code class="language-javascript">{
+  "typ": "JWT",
+  "alg": "HS256"
+}
+</code></pre><span>
+</span><p>Now once this is <code>base64encode</code>, we have the first part of our JSON web token!</p><span>
+</span><pre><code class="language-javascript">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</code></pre><span>
+</span><h2>Payload</h2><span>
+</span><p>The payload will carry the bulk of our JWT, also called the <a href="http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#RegisteredClaimName">JWT Claims</a>. This is where we will put the information that we want to transmit and other information about our token.</p><span>
+</span><p>There are multiple claims that we can provide. This includes registered claim names, public claim names, and private claim names.</p><span>
+</span><h3>Registered Claims</h3><span>
+</span><p>Claims that are not mandatory whose names are reserved for us. These include:</p><span>
+</span><ul>
+<li><code>iss</code>: The issuer of the token </li>
+<li><code>sub</code>: The subject of the token</li>
+<li><code>aud</code>: The audience of the token</li>
+<li><code>exp</code>: This will probably be the registered claim most often used. This will define the expiration in NumericDate value. The expiration MUST be after the current date/time. </li>
+<li><code>nbf</code>: Defines the time before which the JWT MUST NOT be accepted for processing</li>
+<li><code>iat</code>: The time the JWT was issued. Can be used to determine the age of the JWT</li>
+<li><code>jti</code>: Unique identifier for the JWT. Can be used to prevent the JWT from being replayed. This is helpful for a one time use token.</li>
+</ul><span>
+</span><h3>Public Claims</h3><span>
+</span><p>These are the claims that we create ourselves like user name, information, and other important information.</p><span>
+</span><h3>Private Claims</h3><span>
+</span><p>A producer and consumer may agree to use claim names that are private. These are subject to collision, so use them with caution.</p><span>
+</span><h2>Example Payload</h2><span>
+</span><p>Our example payload has two registered claims (<code>iss</code>, and <code>exp</code>) and two public claims (<code>name</code>, <code>admin</code>).</p><span>
+</span><pre><code class="language-javascript">{
+  "iss": "scotch.io",
+  "exp": 1300819380,
+  "name": "Chris Sevilleja",
+  "admin": true
+}
+</code></pre><span>
+</span><p>This will encode to:</p><span>
+</span><pre><code class="language-javascript">eyJpc3MiOiJzY290Y2guaW8iLCJleHAiOjEzMDA4MTkzODAsIm5hbWUiOiJDaHJpcyBTZXZpbGxlamEiLCJhZG1pbiI6dHJ1ZX0</code></pre><span>
+</span><p>That will be the second part of our JSON Web Token.</p><span>
+</span><h2>Signature</h2><span>
+</span><p>The third and final part of our JSON Web Token is going to be the signature. This signature is made up of a hash of the following components:</p><span>
+</span><ul>
+<li>the header</li>
+<li>the payload</li>
+<li>secret</li>
+</ul><span>
+</span><p>This is how we get the third part of the JWT:</p><span>
+</span><pre><code class="language-javascript">
+var encodedString = base64UrlEncode(header) + "." + base64UrlEncode(payload);
+
+HMACSHA256(encodedString, 'secret');
+</code></pre><span>
+</span><p>The secret is the signature held by the server. This is the way that our server will be able to verify existing tokens and sign new ones.</p><span>
+</span><p>This gives us the final part of our JWT.</p><span>
+</span><pre><code class="language-javascript">
+03f329983b86f7d9a9f5fef85305880101d5e302afafa20154d094b229f75773
+</code></pre><span>
+</span><p>Now we have our full JSON Web Token:</p><span>
+</span><pre><code class="language-javascript">
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzY290Y2guaW8iLCJleHAiOjEzMDA4MTkzODAsIm5hbWUiOiJDaHJpcyBTZXZpbGxlamEiLCJhZG1pbiI6dHJ1ZX0.03f329983b86f7d9a9f5fef85305880101d5e302afafa20154d094b229f75773
+</code></pre><span>
+</span><p><a href="https://auth0.com/">Auth0</a> has created a <a href="http://jwt.io/">great site</a> to go through and test out how JWTs are made. You can see as you change the content on the fly, you are able to see the JWT get updated immediately. Auth0 provides great tools and they also maintain the <a href="https://github.com/auth0/node-jsonwebtoken">jsonwebtoken</a> Node package to handle creating and verifying JWTs in Node.</p><span>
+</span><h2>Conclusion</h2><span>
+</span><p>The JSON Web Token standard can be used across multiple languages and is quickly and easily interchangeable.</p><span>
+</span><p>You can use the token in a URL, POST parameter, or an HTTP header. The versatility of the JSON Web Token let’s us authenticate an API quickly and easily by passing information through the token.</p><span>
+</span><p>For a full code example on how to authenticate a Node API using JWTs, check out our book: <a href="https://leanpub.com/mean-machine">MEAN Machine</a>.</p><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

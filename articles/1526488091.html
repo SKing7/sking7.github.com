@@ -1,0 +1,132 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>滴滴国际化项目 Android 端演进</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>滴滴国际化项目 Android 端演进</h1>
+                <div class="entry-content post_content"><span>
+		</span><p>这是今年下半年我在 CSDN 举办的移动开发者大会上的分享，前几天朋友问起才想起来没在博客上同步。记录下分享的重点。</p><span>
+</span><span>
+</span><p>目前大家用滴滴 App 在美国是可以打车的，对的，不用下载新的 App，现在的滴滴 App 在美国打开就会自动显示海外打车页面。<br>国际化在技术上有一定的特殊性，主要包括：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/didi-internationalization-android-project-share.png?x24892" alt="滴滴国际化 Android 项目演进分享"></p><span>
+</span><h4>(1) 地图</h4><span>
+</span><p>地图作为滴滴客户端重要的支持及基础，而目前我们的友商都没有海外的路网数据，国际化我们需要接入新的国外地图提供商。</p><span>
+</span><span>
+</span><h4>(2) 对接不同的运力</h4><span>
+</span><p>目前滴滴国际化是与海外投资的伙伴进行合作，比如美国打车跟 Lyft 合作。</p><span>
+</span><span>
+</span><h4>(3) 漫游网络</h4><span>
+</span><p>目前国际化的主要用户场景还是国内用户出国打车，这时用户是用国内手机和运营商海外漫游接入网络。<br>以上的三个特殊性决定着我们需要在技术上的差异，下面的分享也围绕地图模块、漫游网络、多业务接入项目演进进行分享。</p><span>
+</span><span>
+</span><h3>1. 地图</h3><span>
+</span><p>这块主要包括两大问题：(1) 地图选型，(2) 地图切换</p><span>
+</span><h4>1.1 地图选型</h4><span>
+</span><p>滴滴是个重度依赖地图的 App，而目前我们的友商及大部分国内地图提供商都没有海外的路网数据。<br>我们前期针对的场景是国内用户海外打车，Google Map 依赖 Google Play Service，国内手机几乎都没有这个 Service，即便安装了 Google Play Service 部分手机也无法运行，另外即便都有了，漫游网络也不能访问 Google Map，所以最靠谱的 Google Map 一开始便被排除。</p><span>
+</span><span>
+</span><p>另外国内有些 App 在海外用了 Google Map，不过是通过中转下发地图切片的方式完成的，我们对地图各方面的要求都很高，所以也不合适。</p><span>
+</span><span>
+</span><p>这些都要求我们去找一个合适的国外地图。<br><strong>(1) 海外地图选型考察点</strong><br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/ditu-feature.jpg?x24892" alt="海外地图选型考察点"><br>我们对地图强依赖，有些定制需求，如：很多 Marker 并且添加后需要修改、画圆并可以动态调整半径等等</p><span>
+</span><span>
+</span><p>国外可用地图数据源主要有 OpenStreetMap、Here、Tomtom，OpenStreetMap 是个开源的地图数据源，类似维基百科的模式，所以数据很全很新，甚至超过 Google Map，但不可避免会有些脏数据，前期的话我们主要是针对大城市，OpenStreetMap 的数据可以满足我们的需求。</p><span>
+</span><span>
+</span><p>因为涉及到异地跨时区沟通，所以我们希望技术支持力度够大。</p><span>
+</span><span>
+</span><p>性能包括地图启动时间、渲染速度、前端响应速度、后端响应速度。</p><span>
+</span><span>
+</span><p>在开始国际化前，当时滴滴的安装包就已经很大了，基本是国内主流 App 之首(当然现在滴滴 App 已经挺小了)，所以我们希望新的地图够小。</p><span>
+</span><span>
+</span><p><strong>(2) 海外地图全面对比</strong><br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/foreign-map-compare.jpg?x24892" alt="海外地图全面对比图"><br>这次我们调研了 Mapbox、Nutiteq、Here、Tomtom、Bing 共五款海外地图。其中<br>Bing 没有 Android 版；<br>Tomtom 有很古老的 Android 版，但功能过于简单，文档又几乎没有；<br>Here SDK 高达 40M，与他们沟通后，精简也只能到 25M，这个大小对我们是绝对接受不了的；<br>所以我们重点集成和测试的是 Mapbox 和 Nutiteq 这两家地图供应商。</p><span>
+</span><span>
+</span><p>Mapbox 和 Nutiteq 的功能和性能都满足我们需求，地图数据源也都是以 OSM(OpenStreetMap) 为主。<br>Mapbox 的 API 设计和国内地图类似，都是向 Google Map 靠拢，所以上手简单，并且整个 SDK 都是开源的，地图的样式也更美观些，而 Nutiteq 的地图底层设计比较独特，API 用法很不寻常，这也给我们接入带来了很大的麻烦。</p><span>
+</span><span>
+</span><p>Mapbox 有众多的 Web 用户，包括访问量都不低的 Foursquare、Pinterest 等，但 Android 端用户并不多；Nutiteq 的 Android 用户多些，但整体量也不是很大，不过我们并没有更好的选择，而且前期我们的量也不会很大，所以他们都在可接受范围内。</p><span>
+</span><span>
+</span><p>综合下来看的话，我们是更倾向于 Mapbox，不过 Mapbox 只能通过 GitHub Issues 和邮件反馈问题，反应很慢；Nutiteq 可以 Skype 沟通，效率很高。为了保险起见，Mapbox 和 Nutiteq 都做了全面接入和测试，最终证明这样是有用的。</p><span>
+</span><span>
+</span><p>跟多数 App 一样，为了使得包更小，我们的主工程配置了 abiFilter “armeabi”，仅打 armabi 的 so，而 Mapbox 的 armeabi so 无法跑在 armv7 机器上，前期集成测试我们通过修改 Gradle 脚本在编译时 copy so 的方式让测试通过，而 Mapbox 一直不愿意改，国内市场又不支持 Google 的 Apk Splits 机制，所以最终放弃 Mapbox 而选择 Nutiteq。<br>后话：Mapbox 最新版已经解决了这个问题，而且国内有相关的市场人员，沟通起来也顺畅多了。</p><span>
+</span><span>
+</span><h4>1.2 地图切换</h4><span>
+</span><p>用不了 Google Map 带来一个要求，我们选择的地图必须支持多国家，并且在设计时要支持以后不同地图任意切换。是的，即地图和 App 弱依赖。针对这个问题我们设计了地图隔离层。<br><strong>总体设计</strong>如下：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/map-overdesign.jpg?x24892" alt="地图标准层设计"><br>上图第二层 MapSDK 是地图的标准 API 层，App 只与此层打交道，标准层的 API 设计以 Google Map API 为标准。<br>第三层 Adapter 层是具体地图到标准 API 的适配实现层。每个地图都有个 Adapter，负责将地图 API 转换成标准 API。</p><span>
+</span><span>
+</span><p>将原来的 App 与三方地图直接依赖改为 App 依赖表示标准 API 的 MapSDK 层，由 MapSDK 通过具体的 Adapter 调用三方 SDK，这样地图切换只需要替换依赖的 Adapter 即可，其他地方无需改动。</p><span>
+</span><span>
+</span><p>新的设计后<strong>编译依赖关系</strong>如下：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/map-dependencies.jpg?x24892" alt="地图标准层设计"><br>App 依赖 Map Adapter，Map Adapter 依赖我们的 MapSDK 和三方的 Map SDK。<br>当我们需要更换三方地图 SDK 时，仅需更换对应的 Map Adapter 即可。对于 Android，build.gradle 中更换依赖即可。</p><span>
+</span><span>
+</span><h4>1.3 新的地图模块设计的好处</h4><span>
+</span><p><strong>(1) 解耦，切换成本低</strong><br>这个上面已经介绍，再也不会因为换了地图牵一发而动全身。<br><strong>(2) 学习成本低</strong><br>业务开发人员只需要熟悉标准 MapSDK API 即可，不用了解其他地图的具体使用，时间成本降低。<br><strong>(3) 通用</strong><br>适用于所有 App，以后新增 App，可直接使用之前成型的 Adapter。</p><span>
+</span><span>
+</span><h4>1.4 地图切换实现的注意事项</h4><span>
+</span><p><strong>(1) 所有 API 适配</strong><br>理论上 MapSDK 应为地图所有 API 最大集，实际可以根据情况先去做所需功能的定义和适配。</p><span>
+</span><span>
+</span><p><strong>(2) 标尺</strong><br>需要统一标尺，如缩放尺度、相同坐标系等。</p><span>
+</span><span>
+</span><p><strong>(3) 未支持 API 处理</strong><br>因为标准层的 MapSDK 是地图功能最大集，所以不可避免某些三方地图不支持 MapSDK 定义的功能。比如根据一组点缩放这个功能，其对应的 Adapter 在实现这个功能时如果是 Debug 模式则抛异常，Release 模式则空实现。</p><span>
+</span><span>
+</span><p>还有如 MapSDK 的 API 规范前面已经介绍过以 Google Map API 为标准。另 Adapter 有具体的开发规范要求。</p><span>
+</span><span>
+</span><h3>2. 漫游网络</h3><span>
+</span><p>前面介绍过我们初期针对的是国内用户海外打车场景，这时用户是用国内手机和运营商海外漫游接入网络，所以需要针对网络访问进行优化。<br>一般漫游网络流程如下图：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/roaming-network.jpg?x24892" alt="海外漫游网络访问流程图"><br>用户由海外运营商接入国内运营商，再通过公网(有墙)访问 Web。我们的服务器部署在 AWS 上，用户海外漫游打车网络流程如下图：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/dache-roaming-network.jpg?x24892" alt="用户海外漫游网络打车访问流程图"><br>由于公网访问 AWS 非常慢，我们添加了海外专线，优化后用户海外漫游打车网络流程如下图：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/dache-roaming-network-optimization.jpg?x24892" alt="用户海外漫游网络打车访问优化后流程图"><br>用户先访问到国内的中转服务器，中转服务器再通过海外专线访问 AWS。</p><span>
+</span><span>
+</span><p>这个过程中客户端要做的工作包括：<br>(1) 拉取中转服务器域名列表<br>(2) 使用中转服务器域名列表中域名访问，出错则用原始域名降级重试<br>(3) 定时及推送更新域名列表<br>这里域名顺序由服务端自己负载均衡，返回的中转服务器域名列表是中转服务器域名还是直接海外域名也由服务器决定。</p><span>
+</span><span>
+</span><h3>3. Android 项目演进</h3><span>
+</span><h4>3.1 原有模式</h4><span>
+</span><p>之前国际化业务的工程是很简单的方式，所有业务、组件、工具放在一起，根据具体包名划分：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/project-simple.jpg?x24892" alt="Android 项目分包设计"><br>这个在早期问题不大，并且开发起来快速方便，但随着更多业务接入，如我们前面说过的新的国家运力接入，问题就日益明显，包括：<br><strong>(1) 组件之间耦合</strong><br>虽然已经划分包名，但依然可以互相调用，组件间依赖关系不清，甚至有循环依赖。<br><strong>(2) 添加新业务不便</strong><br><strong>(3) 开发问题</strong><br>规模越来越大致提交冲突可能性变大。</p><span>
+</span><span>
+</span><h4>3.2 SDK 工程提取</h4><span>
+</span><p>将原工程整体拆分为业务工程和 SDK 工程，单业务工程直接依赖 SDK，可独立开发、独立运行、独立打包。如下：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/android-project-sdk.jpg?x24892" alt="Android 项目抽离 SDK 工程设计"><br>这样在接入新的业务后，总体项目结构如下图：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/android-multi-business-one-sdk.jpg?x24892" alt="Android 项目多业务共用 SDK 工程设计"><br>每个业务作为单独工程，共用组件、工具、业务统一到 SDK 层中。<br>集成工程负责集成 Lyft、Ola、GrabTaxi 项目，所有业务项目提供 AAR，由集成工程整体打包对外发布。</p><span>
+</span><span>
+</span><h4>3.3 SDK 工程组件化拆分</h4><span>
+</span><p>为了解决组件之间耦合，防止后续问题加剧，同时方便协同开发和更好的复用，将 SDK 工程组件化拆分如下：<br><img src="http://www.trinea.cn/wp-content/uploads/2016/12/android-sdk-component.jpg?x24892" alt="Android 项目组件化拆分设计"><br>SDK 整体拆分为 Business Library 和 Util Library 两大部分，主要依据是是否可以独立于我们业务，他们间不允许反向依赖。每个部分包含若干组件，每个组件都以 Module 形式存在。</p><span>
+</span><span>
+</span><p>Business Library 为通用业务层，包含通用业务组件，如平滑移动、上车点、定位、地理信息、打点、网络封装。<br>其中 CommonBusiness 存放暂时通用、但尚不足以作为一个单独组件的公共业务，以后可能独立出来，注意包名规范方便未来独立。</p><span>
+</span><span>
+</span><p>Util Library 为工具库，大致分为 View 和 Util，DidiSDK 为滴滴 App 整体通用组件包，包含通用的图片缓存、网络请求、基础登陆组件等等。</p><span>
+</span><span>
+</span><h4>3.4 SDK 组件化拆分后依赖关系图</h4><span>
+</span><p><img src="http://www.trinea.cn/wp-content/uploads/2016/12/android-component-denpendencies-graph.jpg?x24892" alt="Android 项目组件化后依赖图"><br>通过上图我们可以发现即便只是 Business Library 层，组件也根据依赖关系划分为明显的上下层。</p><span>
+</span><span>
+</span><h4>3.5 SDK 组件化划分事项</h4><span>
+</span><p><strong>(1) 单一及开闭原则</strong><br>每个模块只代表一个功能模块或一个公共业务，对于个性化或定制功能以接口形式对外开放。<br>PS：目前 CommonBusiness 模块暂时作为国际化 SDK 整体集成打包的模块，即国际化 SDK 项目中的 sdk Module，后续当其中某个公共业务足够成为一个模块时可继续拆分出来。</p><span>
+</span><span>
+</span><p><strong>(2) 拆分粒度</strong><br>项目的演进是不断进行的，没必要将每个细小组件都拆分出来，这样不仅增加了项目的复杂度，同时也会影响编译时间。<br>先根据实际需要拆分必要的组件，太小暂不足以独立的组件可以在以后不断进行的重构中根据需要拆分。如上面的 CommonBusiness 模块，当然需要保持一定的规范方便以后拆分。</p><span>
+</span><span>
+</span><p><strong>(3) 依赖关系</strong><br>通过依赖图整理依赖关系，防止重复依赖，同时看出沉淀关系。<br>1. Util Library 不能反向依赖 Business Library；<br>2. Business Library 除了基础部分，如 Net、Geo、EventTrack 外，其他部分尽量不要相互依赖；<br>3. Business Library 中 Net、Geo、EventTrack 不允许反向依赖其他模块。</p><span>
+</span><span>
+</span><p><strong>(4) 开发规范</strong><br>为了保证扩展性及方便以后继续拆分：<br>1. 所有业务包名以 com.didi.{xx}.sdk.{businessName} 开头；<br>2. CommonUtil 模块中所有工具包名以 com.didi.{xx}.sdk.util.{utilName} 开头；<br>3. CommonView 模块中所有 View 包名以 com.didi.{xx}.sdk.view.{viewName} 开头；</p><span>
+</span><span>
+</span><p><strong>(5) 组件间通信</strong><br>放弃原来造成耦合严重的 EventBus，改用原生的通信方式，包括原生 (startActivityForResult) 、内部广播、回调等。</p><span>
+</span><span>
+</span><h4>3.6 SDK 组件化项目整体设计图</h4><span>
+</span><p><img src="http://www.trinea.cn/wp-content/uploads/2016/12/android-project-overall-design-graph.jpg?x24892" alt="Android 项目组件化后整体设计图"><br>其中虚线部分为 SDK 层。</p><span>
+</span><span>
+</span><h4>3.7 组件化拆分后的好处</h4><span>
+</span><p>(1) 组件间解耦<br>(2) 业务并行开发、测试<br>(3) 组件单独测试</p><span>
+</span><span>
+</span><p>有任何问题欢迎给我留言，觉得有用顺手去给我们点个赞吧。</p><span>
+
+</span><!-- Quick Adsense WordPress Plugin: http://quicksense.net/ --><span>
+</span><div><span>
+</span><p>随手点点下面广告，支持我维护本站吧</p><span>
+</span><script async="" src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?x24892"></script><span>
+</span><!-- TrineaCn文章底部 --><span>
+</span><ins class="adsbygoogle" data-ad-client="ca-pub-7076762249726724" data-ad-slot="9302016025"></ins><span>
+</span><script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script><span>
+</span><div class="ad-div"><span>
+</span><p class="ad-title"><span class="color-red font-bold">Android 高薪内推</span><strong>(年薪 40w+，另加股票期权)</strong></p><span>
+</span><span>
+</span></div><span>
+</span></div><span>
+
+</span><span>			</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

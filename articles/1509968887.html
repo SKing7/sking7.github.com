@@ -1,0 +1,137 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Saving the internet 2000 terabytes a day: fixing Font Awesome's fonts – Pixelambacht</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Saving the internet 2000 terabytes a day: fixing Font Awesome's fonts – Pixelambacht</h1>
+                <article class="post">
+    
+    
+
+    <!-- # Saving the internet 7 terabyte per day: fixing Font Awesome's fonts -->
+
+<p>Font Awesome, the most ubiquitous icon font on the web, just succesfully finished <a href="https://www.kickstarter.com/projects/232193852/font-awesome-5">a Kickstarter campaign</a> flushing <em>a million dollars</em> towards its creators to revamp the icon set. With a clear signal that Font Awesome isn’t going away anytime soon, let’s take a look at the technical integrity of its fonts.</p>
+
+<p>As you might be aware, there’s — ehrm — <em>discussion</em> about whether icon fonts are a nasty hack, or a viable solution for icons. Although I got my opinions on that, today I’m here to look at how clean and optimised one of the most popular fonts of the internet is.</p>
+
+<p>The question I started out with is:</p>
+
+<blockquote>
+  <p>Can Font Awesome’s fonts be better?</p>
+</blockquote>
+
+<p>Spoiler alert! The answer is:</p>
+
+<blockquote>
+  <p>Yep.</p>
+</blockquote>
+
+<p>With <a href="https://articles.fortawesome.com/how-font-awesome-5-became-kickstarters-most-funded-software-project-4a63c035e84#.oc5ahc88b">Font Awesome being used on 73 million websites now</a>, every byte matters. And there’s quite a few things we can do to trim the fat on Font Awesome’s fonts. Let’s go through them:</p>
+
+<h2 id="thing-zero-using-otf-instead-of-ttf">Thing zero: using OTF instead of TTF</h2>
+
+<p>Looking at <a href="https://github.com/FortAwesome/Font-Awesome/tree/master/fonts">their Github</a>, it looks like Font Awesome provides an OTF file for “desktop use” and a TTF for web use. The WOFF and WOFF2 files (as well as the legacy EOT and SVG) are derived from this TTF.</p>
+
+<p>This is kinda weird, since <a href="http://blog.typekit.com/2010/12/02/the-benefits-of-opentypecff-over-truetype/">TTF results in bigger files than OTF</a>, and there’s no reason why you couldn’t use that OTF on the web.</p>
+
+<p>So step zero would be to simply ditch the 162kB TTF file and use the 132kB OTF, and generate the other webfonts from it. Unfortunately the OTF version of Font Awesome is a little outdated and is missing some icons, so I had to work with the TTF for the remainder of this article.</p>
+
+<p><em>Potential savings: 30 kilobytes!</em></p>
+
+<h2 id="thing-one-reducing-the-unitsperem">Thing one: reducing the unitsPerEm</h2>
+
+<p>This is the real reason I wanted to jump into this experiment. During <a href="https://pixelambacht.nl/2016/blackout/">previous adventures in font deconstruction</a> I got to play with the <em>unitsPerEm</em> value. In short, this value determines the coarseness of the grid the characters are drawn on. Common values in regular fonts are 1000 and 2048. When a font with a <em>unitsPerEm</em> of 2048 gets rendered with <code>font-size:16px</code>, it means that one pixel is rendered from a 128×128 grid (2048 / 16 = 128). That’s a lot of detail to render a single pixel of a character! Obviously, most of that detail gets lost at that size, but could become visible when printed as a headline or in high DPI print.</p>
+
+<p>But here’s the <a href="https://www.microsoft.com/typography/OTSPEC/glyf.htm">part from the spec</a> that caught my interest: coordinates can be stored as a <em>short</em> (16 bits) or a <em>byte</em> (8 bits). This means that this contour with eight coordinates:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">contour</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"1000"</span> <span class="na">y</span><span class="o">=</span><span class="s">"750"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"1000"</span> <span class="na">y</span><span class="o">=</span><span class="s">"500"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"500"</span> <span class="na">y</span><span class="o">=</span><span class="s">"500"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"500"</span> <span class="na">y</span><span class="o">=</span><span class="s">"750"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">contour</span><span class="p">&gt;</span></code></pre></figure>
+
+<p>needs eight shorts (or sixteen bytes) to store the x and y coordinates. But this would take only eight bytes:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">contour</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"100"</span> <span class="na">y</span><span class="o">=</span><span class="s">"75"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"100"</span> <span class="na">y</span><span class="o">=</span><span class="s">"50"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"50"</span> <span class="na">y</span><span class="o">=</span><span class="s">"50"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+  <span class="p">&lt;</span><span class="nt">pt</span> <span class="na">x</span><span class="o">=</span><span class="s">"50"</span> <span class="na">y</span><span class="o">=</span><span class="s">"75"</span> <span class="na">on</span><span class="o">=</span><span class="s">"1"</span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">contour</span><span class="p">&gt;</span></code></pre></figure>
+
+<p>All values below 255 fit in a byte. And with that, we saved eight bytes on this super small contour (part of a glyph shape).</p>
+
+<p>A font like Font Awesome has about 100.000 coordinates for all glyphs combined, resulting in a potential savings of 100kB!</p>
+
+<p>The caveat here is of course that the grid gets coarser. For a sophisticated typeface this will most likely be undesirable: detail gets lost and font won’t look as good on very large sizes. But for a relatively simple, geometric font like an icon font, a <em>unitsPerEm</em> value of, say, 256 should be more than sufficient.</p>
+
+<p>So, long story short: the original <em>unitsPerEm</em> of Font Awesome’s fonts is 1792. That’s a bit of overkill, so let’s bring it down to 256. This brings the size down from 165548 bytes to 150508, saving 15kB!</p>
+
+<figure class="large-content-width">
+  <img src="https://pixelambacht.nl/img/font-awesome-fixed/fa-unitsperem.gif" alt="Sample of the Font Awesome icon set animating between 256 and 1792 unitsPerEm">
+  <figcaption>
+    Sample of the Font Awesome icon set animating between 256 and 1792 unitsPerEm. Screenshots taken in Chrome on OSX.
+  </figcaption>
+</figure>
+
+<p>But did we lose any detail? Judge for yourself: this is an image with absurdly large icons, jumping from 1792 to 256 <em>unitsPerEm.</em> If you look closely you’ll be able to see some differences, but at regular icon sizes, you won’t see any difference at all!</p>
+
+<p><em>Savings: 15 kilobytes!</em></p>
+
+<h2 id="thing-two-removing-useless-cruft">Thing two: removing useless cruft</h2>
+
+<p>Next, let’s get rid of some stuff we don’t need. The tools that generate the Font Awesome fonts stick some extra stuff in those files we can do without. There’s a super handy tool called pyftsubset (part of <a href="https://github.com/fonttools/fonttools">TTX/FontTools</a>), which can subset and optimise fonts. Out of the box it’ll do all “safe” optimisations — lossless stuff like removing legacy tables or pruning unused stuff from tables.</p>
+
+<p>Running our font through it reduces the font down from 150508 to 141376 bytes, saving another 9kB. Not super much, but since it was all dead weight anyway I say good riddance.</p>
+
+<p><em>Savings: 9 kilobytes!</em></p>
+
+<h2 id="thing-three-generating-super-compressed-woff-and-woff2">Thing three: generating super compressed WOFF and WOFF2</h2>
+
+<p>We’ve been working with the TTF version of the font until now. As a webfont, this is pretty useless: only some old Android devices need TTF or OTF fonts. Most browsers will want the WOFF or WOFF2 files. Let’s compress our TTF and see how small these get.</p>
+
+<p>The original WOFF is 98024 bytes. Our new one, compressed with the superior <a href="https://github.com/bramstein/sfnt2woff-zopfli">Zopfli</a> compression, is just 71632. That’s 26kB saved — a pretty big deal!</p>
+
+<p>How about the WOFF2? We go from 77160 to 59000 bytes — 18kB saved. Sweet!</p>
+
+<p><em>Savings on the WOFF: 26 kilobytes!</em><br><em>Savings on the WOFF2: 18 kilobytes!</em></p>
+
+<h2 id="thing-four-subsetting">Thing four: subsetting!</h2>
+
+<p>I originally left this out, but obviously the best way to optimise glyphs is to leave them out altogether. If you’re just using a handful of icons, there’s no need to drag along all of Font Awesome’s 675 icons. Getting a build script to go through your HTML and see which icons you use, and subset the font accordingly, would be a great way to cut the font size down enormously.</p>
+
+<p><em>Potential savings: super much!</em></p>
+
+<h2 id="the-final-count">The final count</h2>
+
+<p>If each day 73 million websites serve the Font Awesome WOFF to an average of a thousand visitors who don’t have these fonts in the browser’s cache, at a 26kB savings on the WOFF, we’ve saved…</p>
+
+<blockquote>
+  <p>73,000,000 sites × 1,000 visitors × 26 kilobytes = 1,898 terabytes</p>
+</blockquote>
+
+<p>…almost 2000 frigging terabytes (technically 2 frigging petabytes) of useless, pointless bloat! Gadzooks!</p>
+
+<p>You can download the optimised files from my <a href="https://github.com/RoelN/Font-Awesome/tree/master/fonts">Font Awesome fork!</a></p>
+
+<h2 id="but-should-we-do-this">But should we <em>do</em> this?</h2>
+
+<p>Optimising font files? Oh heck, yes! Granted, trimming the fat like this isn’t as useful as other optimisations like reducing HTTP requests, optimising images or being careful with the JavaScript libraries you include. But still — downloading a pointless 26kB just to chuck it in the bin is a waste of bandwidth. If they’re sticking to icon fonts instead of SVG, Font Awesome better make their font files <em>awesome</em> too.</p>
+
+<p>And for the question “should we even use icon fonts?” I’m going to steer clear of that discussion for now, but I’ll say this: if you’re <em>going</em> to do it, do it as optimised as possible!</p>
+
+
+
+    
+</article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

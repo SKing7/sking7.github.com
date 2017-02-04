@@ -1,0 +1,55 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Font style matcher</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Font style matcher</h1>
+                <div class="container"><span>
+    </span><span>
+    </span><p>
+      If you're using a web font, you're bound to see a flash of unstyled text (or FOUC),
+      between the initial render of your websafe font and the webfont that you've chosen.
+      This usually results in a jarring shift in layout, due to
+      sizing discrepancies between the two fonts. To minimize this
+      discrepancy, you can try to match the fallback font and the intended webfont’s
+      x-heights and widths <a href="http://helenvholmes.com/writing/type-is-your-right">[1]</a>.
+      This tool helps you do <b><i>exactly</i></b> that.
+    </p><span>
+    </span><br><span>
+    </span><span>
+
+    </span><span>
+    </span><p>In the default example, Merriweather is taller and wider than Georgia, so if you
+      bump Georgia's <b>font size</b> up to 18px, and its <b>letter spacing</b> to 0.1px
+      you'll get a pretty close match!</p><span>
+
+    </span><p>
+      <label><input type="checkbox" id="useColours">Use different colours for each font</label><br><label><input type="checkbox" id="simulateFout">See layout shift due to FOUC</label>
+    </p><span>
+
+    </span><br><span>
+    </span><div class="output"><span>
+      </span><p>The fox jumped over the lazy dog, the scoundrel.
+        <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p><span>
+      </span><p>The fox jumped over the lazy dog, the scoundrel.
+        <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p><span>
+    </span></div><span>
+
+    </span><footer>
+      made with ✨ by <a href="https://twitter.com/notwaldorf">monica</a>. inspired
+        by <a href="https://twitter.com/helenvholmes">helen's</a> blog <a href="http://helenvholmes.com/writing/type-is-your-right">post</a>.
+        find this on <a href="https://github.com/notwaldorf/font-style-matcher">github</a>
+    </footer><span>
+  </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

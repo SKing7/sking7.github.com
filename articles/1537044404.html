@@ -1,0 +1,100 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>HPACK: HTTP/2 里的沉默杀手（新特性）</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>HPACK: HTTP/2 里的沉默杀手（新特性）</h1>
+                <div class="markdown-html language-javascript" id="article-text"><span>
+
+
+      
+      </span><p>如果你已经<a href="https://www.cloudflare.com/website-optimization/http2/">使用过 HTTP/2</a>，你很可能意识到使用它将会获得显而易见的性能提升，这是由于 HTTP/2 的新特性，例如流复用、明确的流依赖以及<a href="https://blog.cloudflare.com/announcing-support-for-http-2-server-push-2/">服务器推送</a>。</p><span>
+</span><p>然而，HTTP/2 里有一个重要的特性是被严重忽略的，那就是 HPACK 头部压缩。目前，nginx、边际网络以及 CDN 的实现都在使用这个技术，但它们都没有完整的实现 HPACK。我们已经在 nginx 里完整实现了 Huffman 编码的 HPACK，并且它放置于 nginx 的 <a href="http://mailman.nginx.org/pipermail/nginx-devel/2015-December/007682.html">upstreamed</a> 中使用。(译者注：nginx 主要可以分为三个部分：handler、filter 和 upstream，其中 upstream 主要用于网络数据的接收、处理和转发)</p><span>
+</span><p><img src="http://p0.qhimg.com/t01ee7a054d48d8ffd8.jpg" alt=""></p><span>
+</span><p><a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a> <a href="https://www.flickr.com/photos/conchur/6129093355/in/photolist-akBcVn-6eEtUq-d9Xi2T-c8MwzA-mGVr3z-aVezji-mGVxov-acMJmz-6nvbCJ-6a6DGQ-5uwrr9-rRtCCp-acMKsk-cKeuXY-9F6N13-9GSuHh-acMDBk-cJYes5-cijtcj-akFua9-cK1iqS-fiAHkE-acMCDt-cJZ9Fq-5qtfNv-cJWFiw-e4pfTd-6fzyLV-8RNMTo-p7jJLQ-524dkf-dw52qG-mVDttF-duUbYU-dvXt3Z-c8NkYG-6e6K2S-duKJjZ-5DbaqV-duBiR3-dvGTsM-dvLst4-dvPfJ1-ezYL1J-7f1cMC-bqi5WN-5MMGkV-9F3C7c-eWASXx-cJXsW9">图片</a>来自于 <a href="https://www.flickr.com/photos/conchur/">Conor Lawless</a></p><span>
+</span><p>这篇文章会对 HPACK 的发展原因，以及它所带来的隐藏带宽和潜在利益进行概述。</p><span>
+</span><h3 id="-">背景</h3><span>
+</span><p>正如你可能知道的，一个常规的 HTTPS 连接实际上是一个在多层模型里的对数个连接的包装。通常你所关注的最基础连接是 TCP 连接(传输层)，在这之上的 TLS 连接(传输层和应用层的混合)，最后则是 HTTP 连接(应用层)。</p><span>
+</span><p>在过去，HTTP 压缩主要是使用在 TLS 层里的 gzip。因为 TLS 层处于较低层次，无法识别传输数据的类型，所以 headers 和 body 会被粗暴地混合在一起压缩。</p><span>
+</span><p>接着，一种新的头部压缩专用算法出现了——SPDY。尽管 SPDY 里的预置字典是为头部特殊设计的，但它使用的仍然是 DEFLATE 算法，其中包括动态 Huffman 编码以及字符串匹配。</p><span>
+</span><p>不幸的是，因为 DEFLATE 算法使用的是落后的字符串匹配以及动态 Huffman 编码，攻击者可以从压缩头部里提取密钥认证 cookies，从而很容易进行犯罪行为。攻击者还可以控制部分请求头部，并且通过修改部分请求来找回整个 cookie 以及观察到在压缩情况下请求改变的总大小。</p><span>
+</span><p>大多数边际网络，包括 Cloudflare（译者注：美国一家云计算公司），由于犯罪原因都禁止了头部压缩，直到 HTTP/2 的来临。</p><span>
+</span><h3 id="hpack">HPACK</h3><span>
+</span><p>HTTP/2 支持一种叫 HPACK 的新的头部压缩专用算法。HPACK 被开发成具有类似心理犯罪的攻击性，因此被认为可以被安全的使用。</p><span>
+</span><p>HPACK 对犯罪是有弹性的，因为它不使用像 DEFLATE 一样使用了部分落后的字符串匹配以及动态 Huffman 编码的方法。相反，它使用以下这三种压缩方法：</p><span>
+</span><ul>
+<li><p>静态字典：一个有着 61 个通用头部字段，并且部分字段是有预定义值的<a href="https://http2.github.io/http2-spec/compression.html#static.table.definition">预定义字典</a>。</p>
+</li>
+<li><p>动态字典：在连接中，一系列实际的头部会被添加进去。因为字典有限制大小，所以当新项被增加，旧项会被去除。</p>
+</li>
+<li><p>Huffman 编码： 一种可以被用来对任何字符串：键或者值（译者注：下文 name 对应键，value 对应值），进行编码的<a href="https://http2.github.io/http2-spec/compression.html#huffman.code">静态 Huffman 编码</a>。这种编码方式是专门为 HTTP 响应或者响应头部设计的——ASCII 里的数字和小写字母可以编码地更短，最短可以编码为 5 个比特（bits）。因此最高压缩比可以达到 8:5 (也就是最多可以降低 37.5%)。</p>
+</li>
+</ul><span>
+</span><h4 id="hpack-">HPACK 流</h4><span>
+</span><p>如果 HPACK 需要为<strong>键：值</strong>格式的头部编码，首先它会去查看静态和动态的字典。如果<strong>键：值</strong>是完整存在的，就简单把从字典里引用该项。这通常会消耗一个字节，最多两个字节就足够了！整个头部就被编码为一个字节!这是多么疯狂的事情？</p><span>
+</span><p>因为许多头部是重复的，所以这个策略有着非常高的成功率。举个例子，在这个案例中，头部里的<strong>:authority:www.cloudflare.com</strong> 或者某些时候的大体积的 <strong>cookie</strong> 通常都是“惯犯”（译者注：意为经常出现）。</p><span>
+</span><p>当 HPACK 在字典里无法匹配到一个完整的头部，它会尝试去寻找一个有相同<strong>键</strong>的头部。大多数常用的头部都会列在静态表里，例如：<strong>content-encoding</strong>, <strong>cookie</strong>, <strong>etag</strong>。剩下的可能是重复的头部，会存在于动态表里。例如，Coludflare 给每个响应都加了一个独特的 <strong>cf-ray</strong> 头部，同时这个字段的值永远不会相同，但是键可以被复用！</p><span>
+</span><p>如果这个键被找到，在大多数情况下可以被压缩到一个或者两个字节，否则这个键会被原编码或者使用 Huffman 算法进行编码：最少需要两个字节。头部的值同样适用这种策略。</p><span>
+</span><p>我们发现仅仅是使用 Huffman 编码就可以节省 30% 的头部大小。</p><span>
+</span><p>在 DEFLATE 算法下是有可能通过渐进的方式获得某个头部的值，这很容易进行犯罪。尽管 HPACK 也需要做字符串匹配，但是对于攻击者来说，如果想找出某个头部的值，他们就必须要猜出所有头部的值。</p><span>
+</span><h4 id="-">请求头部</h4><span>
+</span><p>相对 HTTP 的响应头部，HPACK 带来的优势对于请求头部更具有意义。这是因为请求头部有更多重复，所以可以获得更好的压缩。举个例子，以下是在 Chrome 下我们的博客发出的两个请求：</p><span>
+</span><h6 id="-1-">请求 #1：</h6><span>
+</span><p><img src="http://p0.qhimg.com/t01a1f327193223363f.png" alt="Request-1"></p><span>
+</span><p>我用红色标记的头部将会使用静态字典进行压缩。这三项（<strong>:method:GET</strong>, <strong>:path:/</strong> and <strong>:scheme:https</strong>）总是出现在静态字典里，所以都会被编码为一个字节。接着另外一些头部的键出现在静态字典里（<strong>:authority</strong>, <strong>accept</strong>, <strong>accept-encoding</strong>, <strong>accept-language</strong>, <strong>cookie</strong> 和 <strong>user-agent</strong> ），它们同样被压缩为一个字节。</p><span>
+</span><p>另外，绿色标记部分会使用 Huffman 编码。</p><span>
+</span><p>没有匹配到的头部会被插入到动态字典给接下来的请求使用。</p><span>
+</span><p>我们来看看接下来这个请求：</p><span>
+</span><h6 id="-2-">请求 #2：</h6><span>
+</span><p><img src="http://p0.qhimg.com/t01c5a40f0d43ace28a.png" alt="Request-2"></p><span>
+</span><p>这里我用蓝色标识的编码项，表示这些项是从动态字典里匹配到的。显而易见，在头部里的大多数项都是重复。在这个案例里，有两项完全（键和值）出现在静态字典里，以及有五项因重复出现而记录在动态字典，同时这意味他们可以每个都可以被编码至一个或者两个字节。<strong>cookie</strong> 有 330 个字节，<strong>user-agent</strong> 有 130 个字节。一共430 个字节被编码为 4 个字节，99% 的压缩率！</p><span>
+</span><p>对于所有重复请求，只有三个短字符串是会被 Huffman 编码的。</p><span>
+</span><p>这是 Cloudflare 边际网络六小时周期下的入口头部流量呈现：</p><span>
+</span><p><img src="http://p0.qhimg.com/t01a82bf129b8b56dd3.png" alt="alt"></p><span>
+</span><p>入口头部流量在整个入口流量里可以提供大量的节省空间，我们可以看见对于入口头部平均会有 76% 的压缩：</p><span>
+</span><p><img src="http://p0.qhimg.com/t018c45cb5d4f13a169.png" alt="alt"></p><span>
+</span><p>我们可以清楚的看见整个入口流量在 HPACK 的作用下节省了 53%！</p><span>
+</span><p>今时今日，我们处理 HTTP/1 和 HTTP/2 的数量仍然是超过 HTTPS 的，但是 HTTP/2 的 入口流浪仅仅只是 HTTP/1 的一半。</p><span>
+</span><h3 id="-">响应头部</h3><span>
+</span><p>对于响应头部（出口流量），HPACK 带来的收益相对较少，但是仍然是非常可观的：</p><span>
+</span><h6 id="-1-">响应 #1：</h6><span>
+</span><p><img src="http://p0.qhimg.com/t011127f74a84da75b8.png" alt="Response-1"></p><span>
+</span><p>第一个响应大部分头部是被 Huffman 编码的，一些字段的键是从静态字典匹配到的。</p><span>
+</span><h6 id="-2-">响应 #2：</h6><span>
+</span><p><img src="http://p0.qhimg.com/t017eccdc373b9f27e1.png" alt="Response-2"></p><span>
+</span><p>同样的，蓝色部分为从动态字典匹配，红色为静态字典匹配，绿色则是由 Huffman 编码的字符串。</p><span>
+</span><p>在第二个响应里，很可能会完全匹配到十二个头部里的七个。剩下的五个中的四个头部的键可以被全部匹配到，以及六个字符串（译者注：五个头部键值共有十个字符串，六个字符串包括一个键和五个值）将会使用 Huffman 编码进行有效编码。</p><span>
+</span><p>尽管两个 <strong>expires</strong> 头部的键是完全相同的，但他们因为不能完全匹配上（译者注：值未匹配上），所以它们只可以用 Huffman 编码进行压缩。</p><span>
+</span><p>随着请求越多，动态表会不断增长，那么更多头部会被匹配到，压缩比率就会更高。</p><span>
+</span><p>以下是 Cloudflare 边际网络里出口头部流量的呈现：</p><span>
+</span><p><img src="http://p0.qhimg.com/t01ea09585080268870.png" alt="alt"></p><span>
+</span><p>平均情况下，出口头部压缩率为 69%，然而在整个出口流量的节省就不是如此的明显了：</p><span>
+</span><p><img src="http://p0.qhimg.com/t01871beb84f8089a89.png" alt="alt"></p><span>
+</span><p>我们很难用肉眼去确定节省了多少，但是整个出口 HTTP/2 流量确实节省了 1.4% 左右。尽管看上去不是很多，但在大多数案例里它节省的流量仍然比使用<a href="https://blog.cloudflare.com/results-experimenting-brotli/">增加数据压缩比</a>的方法更多。</p><span>
+</span><h3 id="-hpack">测试 HPACK</h3><span>
+</span><p>如果你已经安装了 nghttps，你可以用一个叫 h2load 的工具测试你的网站里 HPACK 的压缩效率。</p><span>
+</span><p>例如：</p><span>
+</span><pre><code>h2load https://blog.cloudflare.com | tail -6 |head -1  
+traffic: 18.27KB (18708) total, 538B (538) headers (space savings 27.98%), 17.65KB (18076) data
+</code></pre><p>我们可以看见头部节省了 27.98% 的空间。但这只是单独一个请求，大多数收益是由于 Huffman 编码而生成的。如果网站需要利用 HPACK 所有压缩能力去测试，我们需要使用两个请求，例如：</p><span>
+</span><pre><code>h2load https://blog.cloudflare.com -n 2 | tail -6 |head -1  
+traffic: 36.01KB (36873) total, 582B (582) headers (space savings 61.15%), 35.30KB (36152) data
+</code></pre><p>如果两个相同的请求可以节省 50% 甚至更多，那么这就很可能使用了 HPACK 的全部能力。</p><span>
+</span><p>请留意接下来这个请求：</p><span>
+</span><pre><code>h2load https://blog.cloudflare.com -n 4 | tail -6 |head -1  
+traffic: 71.46KB (73170) total, 637B (637) headers (space savings 78.68%), 70.61KB (72304) data
+</code></pre><h3 id="-">结论</h3><span>
+</span><p>通过为 HTTP 响应实现 HPACK 压缩，我们可以看见出口带宽的显著下降。Cloudflare 的 HTTP/2 客户已经在使用 HPACK，他们已经在享受着 HPACK 带来的更快、更小的响应。</p><span>
+      
+      
+      </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

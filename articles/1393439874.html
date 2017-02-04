@@ -1,0 +1,113 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Stop Cross-Site Timing Attacks with SameSite cookies</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Stop Cross-Site Timing Attacks with SameSite cookies</h1>
+                <div id="post" class="content" itemscope="" itemtype="http://schema.org/Article"><span>
+  </span><span>
+  </span><p class="byline">By <a href="https://www.igvita.com/" rel="author" itemprop="author">Ilya Grigorik</a> on <b itemprop="datePublished" datetime="2016-08-26">August 26, 2016</b></p><span>
+
+  </span><p><img src="https://www.igvita.com/posts/16/xpassive-attack.png.pagespeed.ic.0MGTpw8-5n.png" class="left"> Let's say we have a client that can initiate a network request for any URL on the web but the response is opaque and cannot be inspected. <strong>What could we learn about the client or the response?</strong> As it turns out, armed with a bit of patience and rudimentary statistics, "a lot".</p><span>
+
+</span><p>For example, the duration of the fetch is a combination of network time of the request reaching the server, server processing time, and network time of the response. Each and every one of these steps "leaks" information both about the client and the server.</p><span>
+
+</span><p>For example, if the total duration is very small (say, &lt;10ms) then we can reasonably intuit that we might be talking to a local cache, which means that the client has previously fetched this resource. Alternatively, if the duration is slightly higher (say, &lt;50ms) then we can reasonably guess that the client is on a low-latency network (e.g. fast 4G or WiFi). We can also append random data to the URL to make it unique and rule out the various HTTP caches along the way. From there, we can try making more requests to the server and observe how the fetch duration changes to infer change in server processing times and/or larger responses being sent to the client.</p><span>
+
+</span><p>If we're really crafty, we can also use the properties of the network transport like CWND induced roundtrips in TCP (see <a href="https://hpbn.co/building-blocks-of-tcp/#slow-start">TCP Slow Start</a>), and other quirks of local network configuration, as additional signals to infer properties (e.g. size) of the response—see <a href="https://media.blackhat.com/eu-13/briefings/Beery/bh-eu-13-a-perfect-crime-beery-wp.pdf">TIME</a>, <a href="https://www.blackhat.com/docs/us-16/materials/us-16-VanGoethem-HEIST-HTTP-Encrypted-Information-Can-Be-Stolen-Through-TCP-Windows-wp.pdf">HEIST</a> attacks. If the response is compressed and also happens to reflect submitted data, then there is also the possibility of using a <a href="https://en.wikipedia.org/wiki/Oracle_attack">compression oracle attack</a> (see <a href="https://en.wikipedia.org/wiki/BREACH_(security_exploit)">BREACH</a>) to extract data from the response.</p><span>
+
+</span><p>In theory, the client could try to stymie such attacks by making all operations take constant time, but realistically that's neither a practical nor an acceptable solution due to the user experience and performance implications of such strategy. Injecting random delays doesn't fare much better, as it carries similar implications.</p><span>
+
+
+</span><h2>"Networking thermodynamics"</h2><span>
+
+</span><p>Each and every step in the fetch process—from the client generating the request and putting on the wire, the network hops to the server, the server processing time, response properties, and the network hops back to the client—"leaks" information about the properties of the client, network, server, and the response. This is not a bug; it's a fact of life. Borrowing an explanation from our physicist friends: <strong>putting a system to work amounts to extracting energy from it, which we can then measure and interrogate to learn facts about said system.</strong></p><span>
+
+</span><p>Eyes glazing over yet? The practical implication is that <strong>if the necessary server precautions are missing, the use of the above techniques can reveal private information about you and your relationship to that server</strong> - e.g. login status, group affiliation, <a href="https://labs.tom.vg/browser-based-timing-attacks/">and more</a>. This requires a bit more explanation…</p><span>
+
+</span><h2>The dangers of credentialed cross-origin "no-cors" requests</h2><span>
+
+</span><p>The fact that we can use side-channel information, such as the duration of a fetch, to extract information about the response is not, by itself, all that useful. After all, if I give you a URL you can just use your own HTTP client to fetch it and inspect the bytes on the wire. However, what does make it dangerous is if you can co-opt my client (my browser) to make an authenticated request on my behalf and inspect the (opaque) response that contains my private content. Then, even if you can't access the response directly, you can observe any of the aforementioned properties of the fetch and extract private information about my client and the response. Let's make it concrete…</p><span>
+
+</span><ol>
+<li>I like to visit <code>kittens.com</code> on which I have an account to pin my favorite images:
+
+<ul>
+<li>The authentication mechanism is a login form with all the necessary precautions (CSRF tokens, etc).</li>
+<li>Once authenticated, the server sets an HTTP cookie scoped to <code>kittens.com</code> with a private token that is used to authenticate me on future visits.</li>
+</ul>
+</li>
+<li>Someone else entices me to visit <code>shady.com</code> to view more pictures of kittens...
+
+<ul>
+<li>While I'm indulging in kitten pictures on <code>shady.com</code>, the page issues background requests on my behalf to <code>kittens.com</code> with the goal of attempting to learn something about my status on said site.</li>
+</ul>
+</li>
+</ol><span>
+
+
+</span><p><strong>How does <code>shady.com</code> make a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Requests_with_credentials">credentialed request</a>?</strong> A simple image element is sufficient:</p><span>
+
+</span><div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"https://kittens.com/favorites"</span> <span class="na">alt=</span><span class="s">"Yay authenticated kittens!"</span><span class="nt">&gt;</span>
+
+<span class="c">&lt;!-- Image element is not the only mechanism with this behavior, others</span>
+<span class="c">     include script, object, video, etc. Also, there is JavaScript... --&gt;</span>
+
+<span class="nt">&lt;script&gt;</span>
+  <span class="kd">var</span> <span class="nx">img</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Image</span><span class="p">();</span>
+  <span class="nx">img</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="s2">"https://kittens.com/favorites"</span>
+<span class="nt">&lt;/script&gt;</span></code></pre></div><span>
+
+
+</span><p>The browser processes the image element, initializes a request for <code>https://kittens.com/favorites</code>, attaches my HTTP cookies associated with <code>kittens.com</code>, and dispatched the request. The target server (<code>kittens.com</code>) sees a valid authentication cookie and dutifully sends back the HTML response containing my favorite kittens. Of course, the image tag will choke on the HTML and will fire an error callback, but that doesn't matter, because even though we can't inspect the response, we can still learn a lot by observing the timing of the authenticated request-response flow.</p><span>
+
+</span><p>With the benefit of a few decades of experience under our belt, and if we were rebuilding the web platform from scratch, we probably wouldn't allow such <code>"no-cors"</code> authenticated requests without <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS">explicit CORS opt-in from the server</a>, just as we do today for <code>XMLHttpRequest</code> and <a href="https://fetch.spec.whatwg.org/">Fetch API</a>. Alas, that would be a major breaking change, so that's off the table. However, not all is lost either, because <strong><code>kittens.com</code> can deploy additional logic to protect itself, and its users, against such cross-origin attacks.</strong></p><span>
+
+</span><div class="callout"><span>
+  In this article we're focusing on cross-site timing attacks: why they exist and how to mitigate them. However, note that this is a subclass of the larger </span><a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet">Cross-Site Request Forgery</a><span> (CSRF) type of attacks, which can wreck havoc on your site and your users data. The good news is, the mitigations are the same.
+</span></div><span>
+
+
+</span><h2>Declare your cookies as "same-site"</h2><span>
+
+</span><p>The core issue is that the browser attaches target origin's cookies on <code>"no-cors"</code> requests regardless of the origin that initiates the request. In theory, the target origin could look at the <code>Referrer</code> header, but the attacker could hide the initiating origin—e.g. via <a href="https://www.w3.org/TR/referrer-policy/#referrer-policy-no-referrer">no-referrer policy</a>. Similarly, the <code>Origin</code> header is only sent on CORS requests, so that won't help either. However, <a href="https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00">SameSite cookies</a> give us the exact behavior we want:</p><span>
+
+</span><blockquote cite="draft-ietf-httpbis-cookie-same-site-00">
+Here, we update [RFC6265] with a simple mitigation strategy that allows servers to declare certain cookies as "same-site", meaning they should not be attached to "cross-site" requests…
+<p>Note that the mechanism outlined here is backwards compatible with the existing cookie syntax.  Servers may serve these cookies to all user agents; those that do not support the "SameSite" attribute will simply store a cookie which is attached to all relevant requests, just as they do today.</p>
+</blockquote><span>
+
+
+</span><p><strong>SameSite cookies have two modes: "strict" and "lax".</strong> In strict mode, the cookies are not sent in top-level navigations, which offers strong protection but requires some <a href="https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00#section-5.2">additional deployment considerations</a>. In lax mode, cookies are sent for top-level navigations-e.g. navigations initiated by <code>&lt;a&gt;</code> elements, <code>window.open()</code>, <code>&lt;link rel=prerender&gt;</code>), which offers <a href="https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00#section-4.1.1">reasonable protection</a>. Do read the IETF spec, it provides good guidance.</p><span>
+
+</span><div class="highlight"><pre><code class="language-html" data-lang="html">200 OK HTTP/1.1
+...
+Set-Cookie: SID=31d4d96e407aad42; SameSite=Strict</code></pre></div><span>
+
+
+</span><p>Using our example above, if <code>kittens.com</code> set the <code>SameSite</code> flag on its authentication cookie, then the image request initiated by <code>shady.com</code> would not contain the authentication cookie due to mismatch of the initiating origin and the origin that set the cookie and would result in a generic unauthenticated response—e.g. a redirect to a login page. If you're <code>kittens.com</code>, enabling SameSite cookies should be a no-brainer.</p><span>
+
+</span><p>More generally, <strong>if your site or service does not intentionally provide cross-origin resources (e.g. embeddable widgets, site plugins, etc.), then you should use SameSite cookies as your default.</strong></p><span>
+
+</span><hr><span>
+
+
+</span><p>SameSite cookies are <a href="https://www.chromestatus.com/feature/4672634709082112">supported in Chrome (since M51)</a> and Opera 39, and are <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=795346">under consideration in Firefox</a>. Let's hope the other browsers will be fast followers. Last but not least, it's worth noting that you also can, as a user, <a href="http://www.howtogeek.com/241006/how-to-block-third-party-cookies-in-every-web-browser/">block third party cookies</a> in your browser to protect yourself from this type of cross-origin attack.</p><span>
+
+
+  </span><div class="author-callout"><span>
+    </span><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAjACMDASIAAhEBAxEB/8QAGgAAAwADAQAAAAAAAAAAAAAAAAcIAgQGA//EACsQAAIBAwIFAwMFAAAAAAAAAAECAwAEEQUSBgcTITEiQVEIYaEUI1OBkf/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCcCPXTG5TcoNb5iWM99aTJZ2cUhTryAncR5CqPNcTpdlJqmq2em2oQT3c6QR7jgbnYKMn4yarvlldazy14Sh0FeGJtQuoJH6zxTqsbkuRlSe58e4BoEPxnyB4j4esrjUI9QtJYYRuKAtubHxkdv9pTR9TLJKhSRGKsCPcVXfOTmPKwk0Sz4bvHuv0iz3W6VSIlckADGd3jz2qRv3ZNXvuqpjZpclT7H3oMtn3orY6C/wAq0UHotw0VzFPblopI3Do/uGByDVmckOYt7xlwdc3t/Bbm8huenPFbpuOAFwwVicE5/BqL5fVjewwBTv8ApXnEK68lpdIt3timRG7ghSwII899woOk5v6ve6LzI1fUZbK0mtpdGKjdH2UoPSxOT3yQMD5qach5pbiRz1ZW3t2pj/UFqur6zxC1umjw2AjU9aWKdperg58kDA+3zSyiuQ8ccE8XSuCM5bsHHyKDI+exorPY3xRQa6sWOSc13XIW5nt+a+lxwSvGs5ljlAPZ16bHB/sCiigbfFFjaX1xfPdwiVgjgFie2FYj8ipJmlkn1ed5XLsHIBPsB4FFFBurc3CDaszgDwM0UUUH/9k=" alt="Ilya Grigorik"><strong>Ilya Grigorik</strong><span> is a web performance engineer at Google, co-chair of the W3C Web Performance working group, and author of High Performance Browser Networking (O'Reilly) book — follow on </span><a href="https://twitter.com/igrigorik">Twitter</a><span>, </span><a href="https://plus.google.com/+IlyaGrigorik">Google+</a><span>.
+  </span></div><span>
+
+  </span><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

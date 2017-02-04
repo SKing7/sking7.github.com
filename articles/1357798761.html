@@ -1,0 +1,389 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Why object literals in JavaScript are cool</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Why object literals in JavaScript are cool</h1>
+                <section class="post-content">
+          <p>Before <a href="https://rainsoft.io/why-object-literals-in-javascript-are-cool/www.ecma-international.org/ecma-262/6.0/">ECMAScript 2015</a> object literals  (also named object initializers) in JavaScript were quite elementary. It was possible to define 2 types of properties:</p>
+
+<ul>
+<li>Pairs of property names and related values <code>{ name1: value1 }</code></li>
+<li><a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/get">Getters</a> <code>{ get name(){..} }</code> and <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/set">setters</a> <code>{ set name(val){..} }</code> for computed property values</li>
+</ul>
+
+<p>Sadly, the object literal possibilities match into a single example:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var myObject = {  
+  myString: 'value 1',
+  get myNumber() {
+    return this._myNumber;
+  },
+  set myNumber(value) {
+    this._myNumber = Number(value);
+  }
+};
+myObject.myString; // =&gt; 'value 1'  
+myObject.myNumber = '15';  
+myObject.myNumber; // =&gt; 15  
+</code></pre>
+
+<p>JavaScript is a <a href="https://en.wikipedia.org/wiki/Prototype-based_programming">prototype based language</a>, so everything is an object. It is a must that language to provide easy constructs when it comes to objects creation, configuration and accessing prototypes.  </p>
+
+<p>It's a common task to define an object and setup it's prototype. I always felt that setting up the prototype should be allowed directly in the object literal, using a single statement.  </p>
+
+<p>Unfortunately the limitations of the literal didn't allow to achieve that with a straightforward solution. You had to use <code>Object.create()</code> in combination with the object literal to setup the prototype: </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var myProto = {  
+  propertyExists: function(name) {
+    return name in this;    
+  }
+};
+var myNumbers = Object.create(myProto);  
+myNumbers['array'] = [1, 6, 7];  
+myNumbers.propertyExists('array');      // =&gt; true  
+myNumbers.propertyExists('collection'); // =&gt; false  
+</code></pre>
+
+<p>In my opinion, it's an uncomfortable solution. JavaScript is prototype based, why so much pain to create objects from a prototype?  </p>
+
+<p>Fortunately the language is changing. Many things that were relatively frustrating in JavaScript are solved step by step.  </p>
+
+<p>This article demonstrates how ES2015 solves the problems described above and improves the object literal with additional goodies: </p>
+
+<ul>
+<li>Setup the prototype on object construction</li>
+<li>Shorthand method declarations</li>
+<li>Make <code>super</code> calls</li>
+<li>Computed property names</li>
+</ul>
+
+<p>Also let's look in the future and meet the new proposals (<a href="https://github.com/sebmarkbage/ecmascript-rest-spread#status-of-this-proposal">at stage 2</a>): rest and spread properties of an object.  </p>
+
+<div><span>  
+</span><img src="https://rainsoft.io/content/images/2016/08/ES2015-object-literal.jpg" alt="Infographic"><span>
+</span></div>
+
+<h3 id="1setuptheprototypeonobjectconstruction">1. Setup the prototype on object construction</h3>
+
+<p>As you know already, one option to access the prototype of an existing object is applying the getter property <code>__proto__</code>:  </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var myObject = {  
+  name: 'Hello World!'
+};
+myObject.__proto__;                         // =&gt; {}  
+myObject.__proto__.isPrototypeOf(myObject); // =&gt; true  
+</code></pre>
+
+<p><code>myObject.__proto__</code> returns the prototype object of <code>myObject</code>.  </p>
+
+<p>Notice that the usage of <code>object.__proto__</code> as a getter/setter is not recommended. Alternatives <code>Object.getPrototypeOf()</code> and <code>Object.setPrototypeOf()</code> should be considered instead.  </p>
+
+<p>The good part is that <a href="http://www.ecma-international.org/ecma-262/6.0/#sec-__proto__-property-names-in-object-initializers">ES2015 allows to use</a> the literal <code>__proto__</code> as the property name to setup the prototype right in the object literal  <code>{ __proto__: protoObject }</code>.  </p>
+
+<p>Let's use <code>__proto__</code> property for an object initialization, and improve the bitter situation that was described in the introduction:  </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var myProto = {  
+  propertyExists: function(name) {
+    return name in this;    
+  }
+};
+var myNumbers = {  
+  __proto__: myProto,
+  array: [1, 6, 7]
+};
+myNumbers.propertyExists('array');      // =&gt; true  
+myNumbers.propertyExists('collection'); // =&gt; false  
+</code></pre>
+
+<p><code>myNumbers</code> object is created with the prototype <code>myProto</code> using a special property name <code>__proto__</code>. <br>The object is created in a single statement, without additional functions like <code>Object.create()</code>.  </p>
+
+<p>As seen, coding with <code>__proto__</code> is simple. I always prefer simple and obvious solutions.  </p>
+
+<p>A bit out of theme. I consider an oddity that simple and flexible solutions require a big amount of work and design. If a solution is simple, you may consider that it was easy to design it. However it's vice versa: </p>
+
+<ul>
+<li>To make it simple and straightforward is complicated</li>
+<li>To make it complex and hard to understand is easy</li>
+</ul>
+
+<p>If something looks too complex or not comfortable to use, probably it wasn't considered enough. <br>What is your opinion about simplicity? (feel free to write a comment below)</p>
+
+<h4 id="21specialcasesof__proto__usage">2.1 Special cases of <code>__proto__</code> usage</h4>
+
+<p>Even if <code>__proto__</code> seems simple, there are some particular scenarios that you should be aware of.  </p>
+
+<div><span>  
+</span><img src="https://rainsoft.io/content/images/2016/07/Proto-restrictions--1-.jpg" alt="Infographic"><span>
+</span></div>
+
+<p>It is allowed to use <code>__proto__</code> <strong>only once</strong> in the object literal. On duplication JavaScript throws an error:  </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var object = {  
+  __proto__: {
+    toString: function() {
+      return '[object Numbers]'
+    }
+  },
+  numbers: [1, 5, 89],
+  __proto__: {
+    toString: function() {
+      return '[object ArrayOfNumbers]'
+    }
+  }
+};
+</code></pre>
+
+<p>
+The object literal in the example is using two times  <code>__proto__</code> property, which is not allowed. An error <code>SyntaxError: Duplicate __proto__ fields are not allowed in object literals</code> is thrown in this situation.  </p>
+
+<p>JavaScript constraints to use only an object or <code>null</code> as a value for <code>__proto__</code> property. Any attempt to use primitive types (strings, numbers, booleans) or <code>undefined</code> is simply ignored and does not change object's prototype. <br>Let's see this limitation in an example: </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var objUndefined = {  
+  __proto__: undefined
+};
+Object.getPrototypeOf(objUndefined); // =&gt; {}  
+var objNumber = {  
+  __proto__: 15
+};
+Object.getPrototypeOf(objNumber);    // =&gt; {}  
+</code></pre>
+
+<p>The object literals are using <code>undefined</code> and number <code>15</code> to setup <code>__proto__</code> value. Because only an object or <code>null</code> are allowed to be prototypes, <code>objUndefined</code> and <code>objNumber</code> still have their default prototypes: plain JavaScript objects <code>{}</code>. The <code>__proto__</code> value is ignored.  </p>
+
+<p>Of course, it would be weird to attempt to use primitive types to setup object's prototype. The constraint applied here is expected.  </p>
+
+<p>Also be careful when the object literal has a computed property name that evaluates to <code>'__proto__'</code> string: <code>{ ['__proto__']: protoObj }</code>. The property created such way does not change object's prototype, but simply creates an owned property with the key <code>'__proto__'</code>.</p>
+
+<h3 id="2shorthandmethoddefinition">2. Shorthand method definition</h3>
+
+<p>It is possible to use a shorter syntax to declare methods in object literals, in a way that <code>function</code> keyword and <code>:</code> colon to be omitted. This is named shorthand method definition. </p>
+
+<p>Let's define some methods using the new short form:  </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var collection = {  
+  items: [],
+  add(item) {
+    this.items.push(item);
+  },
+  get(index) {
+    return this.items[index];
+  }
+};
+collection.add(15);  
+collection.add(3);  
+collection.get(0); // =&gt; 15  
+</code></pre>
+
+<p><code>add()</code> and <code>get()</code> are methods defined in <code>collection</code> using a short form.  </p>
+
+<p>A nice benefit is that methods declared this way are named functions, which is useful for debugging purposes.  Executing <code>collection.add.name</code> from previous example returns the function name <code>'add'</code>.</p>
+
+<h3 id="3makesupercalls">3. Make <code>super</code> calls</h3>
+
+<p>An interesting improvement is the ability to use <code>super</code> keyword as way to access inherited properties from the prototype chain. Take a look at the following example:  </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var calc = {  
+  numbers: null,
+  sumElements () {
+    return this.numbers.reduce(function(a, b) {
+      return a + b;
+    });
+  }
+};
+var numbers = {  
+  __proto__: calc,
+  numbers: [4, 6, 7],
+  sumElements() {
+    // Verify if numbers is not null or empty
+    if (this.numbers == null || this.numbers.length === 0) {
+      return 0;
+    } 
+    return super.sumElements();
+  }
+};
+numbers.sumElements(); // =&gt; 17  
+</code></pre>
+
+<p><code>calc</code> is the prototype of <code>numbers</code> object. In the method <code>sumElements</code> of the <code>numbers</code> it is possible to access the methods from the prototype using <code>super</code> keyword: <code>super.sumElements()</code>. <br>This is a method override.  </p>
+
+<p>Eventually <code>super</code> is a shortcut to access the inherited properties from the prototype chain of the object. </p>
+
+<p>In the previous example you may try to call the prototype directly executing <code>calc.sumElements()</code>. However <code>super.sumElements()</code> is a correct option because it accesses the prototype chain of the object. And makes sure that <code>sumElements()</code> method from the prototype accesses correctly the array using <code>this.numbers</code>. <br><code>super</code> presence clearly suggests that inherited properties are about to be used.  </p>
+
+<h4 id="31superusagerestriction">3.1 <code>super</code> usage restriction</h4>
+
+<p><code>super</code> can be used <strong>only inside the shorthand method definition</strong> in an object literal.  </p>
+
+<p>If trying to access it from a normal method declaration <code>{ name: function() {} }</code>, JavaScript throws an error:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var calc = {  
+  numbers: null,
+  sumElements () {
+    return this.numbers.reduce(function(a, b) {
+      return a + b;
+    });
+  }
+};
+var numbers = {  
+  __proto__: calc,
+  numbers: [4, 6, 7],
+  sumElements: function() {
+    // Verify if numbers is not null or empty
+    if (this.numbers == null || this.numbers.length === 0) {
+      return 0;
+    } 
+    return super.sumElements();
+  }
+};
+// Throws SyntaxError: 'super' keyword unexpected here
+numbers.sumElements();  
+</code></pre>
+
+<p>The method <code>sumElements</code> is defined as a property: <code>sumElements: function() {...}</code>. Because <code>super</code> requires to be used only inside shorthand methods, calling it in such situation throws <code>SyntaxError: 'super' keyword unexpected here</code>.</p>
+
+<p>This restriction does not affect much the way object literals are declared. Mostly is preferable to use shorthand method definitions because of a shorter syntax.  </p>
+
+<h3 id="4computedpropertynames">4. Computed property names</h3>
+
+<p>Before ES2015, the property names in object initializers were literals, mostly static strings.  To create a property with calculated name, you had to use property accessors:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">function prefix(prefStr, name) {  
+   return prefStr + '_' + name;
+}
+var object = {};  
+object[prefix('number', 'pi')] = 3.14;  
+object[prefix('bool', 'false')] = false;  
+object; // =&gt; { number_pi: 3.14, bool_false: false }  
+</code></pre>
+
+<p>Certainly, this way to define properties is by far pleasant.</p>
+
+<p>Computed property names solves the problem elegantly. <br>When evaluating the property name from an expression, place the code into square brackets <code>{[expression]: value}</code>. The expression evaluation result becomes the property name. </p>
+
+<p>I really like the syntax: short and simple.   </p>
+
+<p>Let's improve the above example:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">function prefix(prefStr, name) {  
+   return prefStr + '_' + name;
+}
+var object = {  
+  [prefix('number', 'pi')]: 3.14,
+  [prefix('bool', 'false')]: false
+};
+object; // =&gt; { number_pi: 3.14, bool_false: false }  
+</code></pre>
+
+<p><code>[prefix('number', 'pi')]</code> sets the property name by evaluating <code>prefix('number', 'pi')</code> expression, which is <code>'number_pi'</code>. <br>Correspondingly <code>[prefix('bool', 'false')]</code> sets the second property name to <code>'bool_false'</code>.  </p>
+
+<h4 id="41symbolaspropertyname">4.1 <code>Symbol</code> as property name</h4>
+
+<p><a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbols</a> also can be used as computed property names. Just make sure to include them in brackets: <code>{ [Symbol('name')]: 'Prop value' }</code>.</p>
+
+<p>For example, let's use the special property <code>Symbol.iterator</code> and iterate over the own property names of an object. Check the following example:  </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var object = {  
+   number1: 14,
+   number2: 15,
+   string1: 'hello',
+   string2: 'world',
+   [Symbol.iterator]: function *() {
+     var own = Object.getOwnPropertyNames(this),
+       prop;
+     while(prop = own.pop()) {
+       yield prop;
+     }
+   }
+}
+[...object]; // =&gt; ['number1', 'number2', 'string1', 'string2']
+</code></pre>
+
+<p><code>[Symbol.iterator]: function *() { }</code> defines a property that is used to iterate over owned properties of the object. The spread operator <code>[...object]</code> uses the  iterator and returns the list of owned properties.  </p>
+
+<h3 id="5alookintothefuturerestandspreadproperties">5. A look into the future: rest and spread properties</h3>
+
+<p><a href="https://github.com/sebmarkbage/ecmascript-rest-spread">Rest and spread properties</a> of the object literal are a proposal in draft (stage 2), which makes them a candidate for a new JavaScript version.  </p>
+
+<p>They are an equivalent of <a href="https://rainsoft.io/how-three-dots-changed-javascript/#4improvedarraymanipulation">the spread and rest operator</a> already available for arrays in ECMAScript 2015.  </p>
+
+<p><a href="https://github.com/sebmarkbage/ecmascript-rest-spread/blob/master/Rest.md">Rest properties</a> allows to collect the properties from an object that are left after a destructuring assignment. <br>The following example collects the remaining properties after destructuring <code>object</code>: </p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var object = {  
+  propA: 1,
+  propB: 2,
+  propC: 3
+};
+let {propA, ...restObject} = object;  
+propA;      // =&gt; 1  
+restObject; // =&gt; { propB: 2, propC: 3 }  
+</code></pre>
+
+<p><a href="https://github.com/sebmarkbage/ecmascript-rest-spread/blob/master/Spread.md">Spread properties</a> allows to copy into an object literal the owned properties from a source object. 
+In this example the object literal collects into <code>object</code> additional properties from <code>source</code> object:</p>
+
+  
+
+<pre><code class="language-javascript language-javascript">var source = {  
+  propB: 2,
+  propC: 3
+};
+var object = {  
+  propA: 1,
+  ...source
+}
+object; // =&gt; { propA: 1, propB: 2, propC: 3 }  
+</code></pre>
+
+<h3 id="6inconclusion">6. In conclusion</h3>
+
+<p>JavaScript is making big steps.  </p>
+
+<p>Even a relatively small construct as object literal was considerable improved in ECMAScript 2015. And a bunch of new features are in draft proposal.  </p>
+
+<p>You can setup the object's prototype directly from the initiliazer using <code>__proto__</code> property name. Which is easier than dealing with <code>Object.create()</code>.  </p>
+
+<p>Notice that <code>__proto__</code> is a part of the <a href="http://www.ecma-international.org/ecma-262/6.0/#sec-additional-ecmascript-features-for-web-browsers">annex B</a> of the ES2015 standard, which usage is discouraged. This annex implementation is required for browsers, but optional for other environments. <br>NodeJS 4, 5 and 6 however support this feature.  </p>
+
+<p>The method declaration has now a shorter form, so you don't have to type <code>function</code> keyword. And inside shorthand method it's possible to use <code>super</code> keyword, which allows easy access to inherited properties from the prototype chain of the object.  </p>
+
+<p>If a property name is calculated on runtime, now you can use computed property names <code>[expression]</code> to initialize objects.</p>
+
+<p>Indeed, object literals are now cool! <br><em>What do you think about that? Feel free to write a comment below.</em></p>
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

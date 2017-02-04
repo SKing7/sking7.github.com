@@ -1,0 +1,412 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>深入浅出React（四）：虚拟DOM Diff算法解析</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>深入浅出React（四）：虚拟DOM Diff算法解析</h1>
+                <div class="text_info text_info_article"><span>
+		
+		
+			
+	       	</span><p>React中最神奇的部分莫过于虚拟DOM，以及其高效的Diff算法。这让我们可以无需担心性能问题而”毫无顾忌”的随时“刷新”整个页面，由虚拟DOM来确保只对界面上真正变化的部分进行实际的DOM操作。React在这一部分已经做到足够透明，在实际开发中我们基本无需关心虚拟DOM是如何运作的。然而，作为有态度的程序员，我们总是对技术背后的原理充满着好奇。理解其运行机制不仅有助于更好的理解React组件的生命周期，而且对于进一步优化React程序也会有很大帮助。</p><span>
+
+</span><h2>什么是DOM Diff算法</h2><span>
+
+</span><p>Web界面由DOM树来构成，当其中某一部分发生变化时，其实就是对应的某个DOM节点发生了变化。在React中，构建UI界面的思路是由当前状态决定界面。前后两个状态就对应两套界面，然后由React来比较两个界面的区别，这就需要对DOM树进行Diff算法分析。</p><span>
+
+</span><p>即给定任意两棵树，找到最少的转换步骤。但是<a href="http://grfia.dlsi.ua.es/ml/algorithms/references/editsurvey_bille.pdf">标准的的Diff算法</a>复杂度需要O(n^3)，这显然无法满足性能要求。要达到每次界面都可以整体刷新界面的目的，势必需要对算法进行优化。这看上去非常有难度，然而Facebook工程师却做到了，他们结合Web界面的特点做出了两个简单的假设，使得Diff算法复杂度直接降低到O(n)</p><span>
+
+</span><ol>
+	<li>两个相同组件产生类似的DOM结构，不同的组件产生不同的DOM结构；</li>
+	<li>对于同一层次的一组子节点，它们可以通过唯一的id进行区分。</li>
+</ol><span>
+
+
+			</span><span>
+	        
+	            
+
+
+
+
+
+
+
+</span><script type="text/javascript">
+	var uriMapping = "articles";
+	var languageUri = "";
+	var showVcr = "false";
+	var fillWithVcr = "false";
+	var sponsorshipsJson = "{&quot;links&quot;:[{&quot;alive&quot;:true,&quot;active&quot;:true,&quot;target&quot;:&quot;http://2017.qconbeijing.com/presentation/3216?utm_source=infoq&amp;amp;utm_medium=vcrbox&quot;,&quot;trackable&quot;:true,&quot;redirectable&quot;:true,&quot;style&quot;:&quot;PDF&quot;,&quot;text&quot;:&quot;美团千亿规模下的服务治理挑战与实践&quot;,&quot;styleName&quot;:&quot;pdf&quot;,&quot;id&quot;:15475},{&quot;alive&quot;:true,&quot;active&quot;:true,&quot;target&quot;:&quot;http://2017.qconbeijing.com/presentation/3223?utm_source=infoq&amp;utm_medium=vcrbox&quot;,&quot;trackable&quot;:true,&quot;redirectable&quot;:true,&quot;style&quot;:&quot;PDF&quot;,&quot;text&quot;:&quot;Google 为什么要把 20 亿行代码放到一个仓库中？&quot;,&quot;styleName&quot;:&quot;pdf&quot;,&quot;id&quot;:15476},{&quot;alive&quot;:true,&quot;active&quot;:true,&quot;target&quot;:&quot;http://2017.qconbeijing.com/presentation/3232?utm_source=infoq&amp;utm_medium=vcrbox&quot;,&quot;trackable&quot;:true,&quot;redirectable&quot;:true,&quot;style&quot;:&quot;PDF&quot;,&quot;text&quot;:&quot;淘宝上云高可用架构实践&quot;,&quot;styleName&quot;:&quot;pdf&quot;,&quot;id&quot;:15477},{&quot;alive&quot;:true,&quot;active&quot;:true,&quot;target&quot;:&quot;http://2017.qconbeijing.com/presentation/3233?utm_source=infoq&amp;utm_medium=vcrbox&quot;,&quot;trackable&quot;:true,&quot;redirectable&quot;:true,&quot;style&quot;:&quot;PDF&quot;,&quot;text&quot;:&quot;百度万人研发团队 Git 工具链架构演进&quot;,&quot;styleName&quot;:&quot;pdf&quot;,&quot;id&quot;:15478},{&quot;alive&quot;:true,&quot;active&quot;:true,&quot;target&quot;:&quot;http://2017.qconbeijing.com/presentation/3210?utm_source=infoq&amp;utm_medium=vcrbox&quot;,&quot;trackable&quot;:true,&quot;redirectable&quot;:true,&quot;style&quot;:&quot;PDF&quot;,&quot;text&quot;:&quot;人人车供应链系统技术智能化实践之路&quot;,&quot;styleName&quot;:&quot;pdf&quot;,&quot;id&quot;:15479}]}";
+	var sponsoredLinks = $.parseJSON($("<div/>").html(sponsorshipsJson).text()).links;
+    var numberOfSponsoredVcrIds = sponsoredLinks != null ? sponsoredLinks.length : 0;
+
+	var maxItems = 5 - numberOfSponsoredVcrIds;
+
+	var interval2 = setInterval(function() {
+		if (window.vcrsLoaded) {
+			clearInterval(interval2);
+			if(showVcr || fillWithVcr) {
+			    if(fillWithVcr) {
+                    for(var index in window.vcrList) {
+                        if(VCR.isVcrSponsored(sponsoredLinks, window.vcrList[index])) {
+                            VCR.addIdstoExcludeList(window.vcrList[index]);
+						}
+					}
+				}
+                var vcrs = VCR.getByTopicsAndCommunities(window.vcrList, topicIds, communityIds, maxItems, false, null);
+				if(vcrs != null && vcrs.length > 0) {
+					VCR.addToExcludedList(vcrs);
+					var $widget = jQuery('.related_sponsors');
+					getCommonElements(vcrs, uriMapping, languageUri, "EMBEDDED");
+					$widget.css("display", "block");
+				}
+			}
+			window.contentVcrFinished = true;
+		}
+	}, 200);
+
+</script><span>
+
+
+ 
+
+</span><span>
+	        
+	        </span><p>算法上的优化是React整个界面Render的基础，事实也证明这两个假设是合理而精确的，保证了整体界面构建的性能。</p><span>
+
+</span><h2>不同节点类型的比较</h2><span>
+
+</span><p>为了在树之间进行比较，我们首先要能够比较两个节点，在React中即比较两个虚拟DOM节点，当两个节点不同时，应该如何处理。这分为两种情况：（1）节点类型不同 ，（2）节点类型相同，但是属性不同。本节先看第一种情况。</p><span>
+
+</span><p>当在树中的同一位置前后输出了不同类型的节点，React直接删除前面的节点，然后创建并插入新的节点。假设我们在树的同一位置前后两次输出不同类型的节点。</p><span>
+
+
+	        
+	        
+	            </span><span>
+	        
+	       	</span><pre>renderA: &lt;div /&gt;
+renderB: &lt;span /&gt;
+=&gt; [removeNode &lt;div /&gt;], [insertNode &lt;span /&gt;]</pre><span>
+
+</span><p>当一个节点从div变成span时，简单的直接删除div节点，并插入一个新的span节点。这符合我们对真实DOM操作的理解。</p><span>
+
+</span><p>需要注意的是，删除节点意味着彻底销毁该节点，而不是再后续的比较中再去看是否有另外一个节点等同于该删除的节点。如果该删除的节点之下有子节点，那么这些子节点也会被完全删除，它们也不会用于后面的比较。这也是算法复杂能够降低到O（n）的原因。</p><span>
+
+</span><p>上面提到的是对虚拟DOM节点的操作，而同样的逻辑也被用在React组件的比较，例如：</p><span>
+
+</span><pre>renderA: &lt;Header /&gt;
+renderB: &lt;Content /&gt;
+=&gt; [removeNode &lt;Header /&gt;], [insertNode &lt;Content /&gt;]</pre><span>
+
+</span><p>当React在同一个位置遇到不同的组件时，也是简单的销毁第一个组件，而把新创建的组件加上去。这正是应用了第一个假设，不同的组件一般会产生不一样的DOM结构，与其浪费时间去比较它们基本上不会等价的DOM结构，还不如完全创建一个新的组件加上去。</p><span>
+
+</span><p>由这一React对不同类型的节点的处理逻辑我们很容易得到推论，那就是React的DOM Diff算法实际上只会对树进行逐层比较，如下所述。</p><span>
+
+</span><h2>逐层进行节点比较</h2><span>
+
+</span><p>提到树，相信大多数同学立刻想到的是二叉树，遍历，最短路径等复杂的数据结构算法。而在React中，树的算法其实非常简单，那就是两棵树只会对同一层次的节点进行比较。如下图所示：</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909000.png" width="550"></p><span>
+
+</span><p>React只会对相同颜色方框内的DOM节点进行比较，即同一个父节点下的所有子节点。当发现节点已经不存在，则该节点及其子节点会被完全删除掉，不会用于进一步的比较。这样只需要对树进行一次遍历，便能完成整个DOM树的比较。</p><span>
+
+</span><p>例如，考虑有下面的DOM结构转换：</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909001.png" width="550"></p><span>
+
+</span><p>A节点被整个移动到D节点下，直观的考虑DOM Diff操作应该是</p><span>
+
+</span><pre>A.parent.remove(A); 
+D.append(A);</pre><span>
+
+</span><p>但因为React只会简单的考虑同层节点的位置变换，对于不同层的节点，只有简单的创建和删除。当根节点发现子节点中A不见了，就会直接销毁A；而当D发现自己多了一个子节点A，则会创建一个新的A作为子节点。因此对于这种结构的转变的实际操作是：</p><span>
+
+</span><pre>A.destroy();
+A = new A();
+A.append(new B());
+A.append(new C());
+D.append(A);</pre><span>
+
+</span><p>可以看到，以A为根节点的树被整个重新创建。</p><span>
+
+</span><p>虽然看上去这样的算法有些“简陋”，但是其基于的是第一个假设：两个不同组件一般产生不一样的DOM结构。根据<a href="http://facebook.github.io/react/docs/reconciliation.html">React官方博客</a>，这一假设至今为止没有导致严重的性能问题。这当然也给我们一个提示，在实现自己的组件时，保持稳定的DOM结构会有助于性能的提升。例如，我们有时可以通过CSS隐藏或显示某些节点，而不是真的移除或添加DOM节点。</p><span>
+
+</span><h2>由DOM Diff算法理解组件的生命周期</h2><span>
+
+</span><p>在<a href="http://www.infoq.com/cn/articles/react-jsx-and-component">上一篇文章</a>中介绍了React组件的生命周期，其中的每个阶段其实都是和DOM Diff算法息息相关的。例如以下几个方法：</p><span>
+
+</span><ul>
+	<li>constructor: 构造函数，组件被创建时执行；</li>
+	<li>componentDidMount: 当组件添加到DOM树之后执行；</li>
+	<li>componentWillUnmount: 当组件从DOM树中移除之后执行，在React中可以认为组件被销毁；</li>
+	<li>componentDidUpdate: 当组件更新时执行。</li>
+</ul><span>
+
+</span><p>为了演示组件生命周期和DOM Diff算法的关系，笔者创建了一个示例：<a href="https://supnate.github.io/react-dom-diff/index.html">https://supnate.github.io/react-dom-diff/index.html</a> ，大家可以直接访问试用。这时当DOM树进行如下转变时，即从“shape1”转变到“shape2”时。我们来观察这几个方法的执行情况：</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909002.png" width="550"></p><span>
+
+</span><p>浏览器开发工具控制台输出如下结果：</p><span>
+
+</span><pre>C will unmount.
+C is created.
+B is updated.
+A is updated.
+C did mount.
+D is updated.
+R is updated.</pre><span>
+
+</span><p>可以看到，C节点是完全重建后再添加到D节点之下，而不是将其“移动”过去。如果大家有兴趣，也可以fork示例代码：<a href="https://github.com/supante/react-dom-diff">https://github.com/supnate/react-dom-diff</a><a href="https://github.com/supnate/react-dom-diff"> </a>。从而可以自己添加其它树结构，试验它们之间是如何转换的。</p><span>
+
+</span><h2>相同类型节点的比较</h2><span>
+
+</span><p>第二种节点的比较是相同类型的节点，算法就相对简单而容易理解。React会对属性进行重设从而实现节点的转换。例如：</p><span>
+
+</span><pre>renderA: &lt;div id="before" /&gt;
+renderB: &lt;div id="after" /&gt;
+=&gt; [replaceAttribute id "after"]</pre><span>
+
+</span><p>虚拟DOM的style属性稍有不同，其值并不是一个简单字符串而必须为一个对象，因此转换过程如下：</p><span>
+
+</span><pre>renderA: &lt;div style={{color: 'red'}} /&gt;
+renderB: &lt;div style={{fontWeight: 'bold'}} /&gt;
+=&gt; [removeStyle color], [addStyle font-weight 'bold']</pre><span>
+
+</span><h2>列表节点的比较</h2><span>
+
+</span><p>上面介绍了对于不在同一层的节点的比较，即使它们完全一样，也会销毁并重新创建。那么当它们在同一层时，又是如何处理的呢？这就涉及到列表节点的Diff算法。相信很多使用React的同学大多遇到过这样的警告：</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909003.png" width="550"></p><span>
+
+</span><p>这是React在遇到列表时却又找不到key时提示的警告。虽然无视这条警告大部分界面也会正确工作，但这通常意味着潜在的性能问题。因为React觉得自己可能无法高效的去更新这个列表。</p><span>
+
+</span><p>列表节点的操作通常包括添加、删除和排序。例如下图，我们需要往B和C直接插入节点F，在jQuery中我们可能会直接使用$(B).after(F)来实现。而在React中，我们只会告诉React新的界面应该是A-B-F-C-D-E，由Diff算法完成更新界面。</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909004.png" width="550"></p><span>
+
+</span><p>这时如果每个节点都没有唯一的标识，React无法识别每一个节点，那么更新过程会很低效，即，将C更新成F，D更新成C，E更新成D，最后再插入一个E节点。效果如下图所示：</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909005.png" width="550"></p><span>
+
+</span><p>可以看到，React会逐个对节点进行更新，转换到目标节点。而最后插入新的节点E，涉及到的DOM操作非常多。而如果给每个节点唯一的标识（key），那么React能够找到正确的位置去插入新的节点，入下图所示：</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909006.png" width="550"></p><span>
+
+</span><p>对于列表节点顺序的调整其实也类似于插入或删除，下面结合示例代码我们看下其转换的过程。仍然使用前面提到的示例：<a href="https://supnate.github.io/react-dom-diff/index.html">https://supnate.github.io/react-dom-diff/index.html</a> ，我们将树的形态从shape5转换到shape6：</p><span>
+
+</span><p><img _href="img://null" _p="true" src="http://cdn1.infoqstatic.com/statics_s2_20170202-0440/resource/articles/react-dom-diff/zh/resources/0909007.png" width="550"></p><span>
+
+</span><p>即将同一层的节点位置进行调整。如果未提供key，那么React认为B和C之后的对应位置组件类型不同，因此完全删除后重建，控制台输出如下：</p><span>
+
+</span><pre>B will unmount.
+C will unmount.
+C is created.
+B is created.
+C did mount.
+B did mount.
+A is updated.
+R is updated.</pre><span>
+
+</span><p>而如果提供了key，如下面的代码：</p><span>
+
+</span><pre>shape5: function() {
+  return (
+    &lt;Root&gt;
+      &lt;A&gt;
+        &lt;B key="B" /&gt;
+        &lt;C key="C" /&gt;
+      &lt;/A&gt;
+    &lt;/Root&gt;
+  );
+},
+
+shape6: function() {
+  return (
+    &lt;Root&gt;
+      &lt;A&gt;
+        &lt;C key="C" /&gt;
+        &lt;B key="B" /&gt;
+      &lt;/A&gt;
+    &lt;/Root&gt;
+  );
+},</pre><span>
+
+</span><p>那么控制台输出如下：</p><span>
+
+</span><pre>C is updated.
+B is updated.
+A is updated.
+R is updated.</pre><span>
+
+</span><p>可以看到，对于列表节点提供唯一的key属性可以帮助React定位到正确的节点进行比较，从而大幅减少DOM操作次数，提高了性能。</p><span>
+
+</span><h2>&nbsp;</h2><span>
+
+</span><h2>小结</h2><span>
+
+</span><p>本文分析了React的DOM Diff算法究竟是如何工作的，其复杂度控制在了O（n），这让我们考虑UI时可以完全基于状态来每次render整个界面而无需担心性能问题，简化了UI开发的复杂度。而算法优化的基础是文章开头提到的两个假设，以及React的UI基于组件这样的一个机制。理解虚拟DOM Diff算法不仅能够帮助我们理解组件的生命周期，而且也对我们实现自定义组件时如何进一步优化性能具有指导意义。</p><span>
+
+</span><hr><span>
+</span><p>感谢<a href="http://www.infoq.com/cn/author/徐川">徐川</a>对本文的审校。</p><span>
+
+</span><p>给InfoQ中文站投稿或者参与内容翻译工作，请邮件至<a href="mailto:editors@cn.infoq.com">editors@cn.infoq.com</a>。也欢迎大家通过新浪微博（<a href="http://www.weibo.com/infoqchina">@InfoQ</a>，<a href="http://weibo.com/u/1451714913">@丁晓昀</a>），微信（微信号：<a href="http://weixin.sogou.com/gzh?openid=oIWsFt0HnZ93MfLi3pW2ggVJFRxY">InfoQChina</a>）关注我们，并与我们的编辑和其他读者朋友交流（欢迎加入InfoQ读者交流群<a href="http://shang.qq.com/wpa/qunwpa?idkey=cc82a73d7522f0090aa3cbb6a8f4bdafa8b82177f481014c976a8740d927997a" target="_blank"><img _href="img://group.png" _p="true" align="middle" alt="InfoQ好读者" border="0" src="http://pub.idqqimg.com/wpa/images/group.png" title="InfoQ好读者"></a>）。</p><span>
+
+	       	
+       	
+		</span><span>
+		
+
+
+
+
+
+
+
+
+</span><span>
+		</span><span>
+      
+		
+		
+		
+			
+			
+			
+
+
+
+
+
+
+
+
+</span><span>
+
+
+</span><script type="text/javascript">
+    $.ajax({
+        url: "/api/recommendationlinks.action",
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        type: 'POST',
+        data: {"topicIds": "4333,4730,2982,2602", "title": "深入浅出React（四）：虚拟DOM Diff算法解析", "contentPath": "/articles/react-dom-diff", "language": "zh"},
+        success: displayRelatedEditorial,
+        async: false
+    });
+    
+    function displayRelatedEditorial(data) {
+        var trackingCode = "?utm_source=infoq&utm_medium=related_content_link&utm_campaign=relatedContent_articles_clk";
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                if (i === 5) {
+                    break;
+                }
+                var link = $('<h3 title="" class="' + data[i].contentType + '">\n\
+                                    <a title="" href="' + data[i].url + trackingCode +
+                        '">' + data[i].title + '</a></h3>');
+                $('#editorial_links').append(link);
+            }
+            $('.gray_section_related > .related_editorial.recommended').css('display', 'block');
+        }
+    }
+</script><span> 
+
+
+</span><script type="text/javascript">
+    
+        $(function() {
+        	var grayBox = $('.gray_section_related');
+            var recommendedColumn = $('.gray_section_related > .related_editorial.recommended');
+            var recommendedExists = $(recommendedColumn).css('display') === 'block';
+            var researchRow = $('.related_research');
+            var researchExists = $(researchRow).css('display') === 'block';
+
+            if (recommendedExists || researchExists) {
+                $('.related_sponsors.relEdRelRes').show(); // show the big related box
+            }
+
+            // in case all three available, leave now
+            if (recommendedExists) {
+            	$(grayBox).show(); // show the gray box for vcr and recommendations
+                return;
+            }
+        });
+</script><span>
+</span><span>
+		
+		
+
+		</span><span>
+				
+		
+		
+			
+		
+
+
+
+
+
+
+</span><script type="text/javascript">
+
+    var JSi18n = JSi18n || {}; // define only if not already defined
+    JSi18n.re='Re:';
+    JSi18n.errorSubject='Please enter a subject.';
+    JSi18n.errorBody='You can not post a blank message. Please type your message and try again.';
+    JSi18n.errorInvalidLinks='您的回复中包含无效的链接，请检查后重试';
+    JSi18n.stopWatchText='Stop Watching Thread';
+    JSi18n.startWatchText='Watch Thread';
+    JSi18n.timeExpiredMessage='已超出允许的5分钟编辑时长，我们为给您带来的不便深表抱歉。';
+    JSi18n.repostButtonFormat='重新发送 ($m 剩余)';
+    JSi18n.timeExpiredButton='超时';
+    JSi18n.sessionExpiredMessage='您的会话已超时，请登录后重新提交';
+    JSi18n.editLinkFormat='编辑 ($m 分钟剩余)';
+    JSi18n.enter_subject='请输入主题';
+    JSi18n.enter_message='信息';
+    JSi18n.content_datetime_format='yyyy年M月d日';
+
+var forumID=1;
+var threadID=45784;
+var ctxPath= '';
+var postAddress= ctxPath + '/forum/post!post.action?language=' + 'zh';
+var repostAddress= ctxPath + '/forum/repost.action?language=' + 'zh';
+var postAddWatches= ctxPath + '/forum/watches!add.action';
+var postRemoveWatches= ctxPath + '/forum/watches!remove.action';
+var threadWatched=false;
+var forumNotificationDefault=true;
+var commentEditPeriod=5;
+</script><span>
+
+</span><script type="text/javascript" src="/dwr/interface/ForumNotifications.js"></script><span>
+</span><script type="text/javascript" src="http://cdn2.infoqstatic.com/statics_s2_20170202-0440/scripts/ui/jquery.autosize.js"></script><span>
+</span><script type="text/javascript" src="http://cdn3.infoqstatic.com/statics_s2_20170202-0440/scripts/date.js"></script><span>
+
+    </span><span>
+    </span><span>
+
+    </span><span>
+
+    </span><!-- overlay --><span>
+    </span><span>
+    </span><!-- reply box --><span>
+    </span><span>
+    </span><!-- edit comment box --><span>
+    </span><span>
+    </span><!-- notification popup --><span>
+    </span><span>
+    </span><span>
+	</span><span>
+
+	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

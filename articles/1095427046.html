@@ -1,0 +1,122 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>[译]使用HTTP/2提升性能的7个建议</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>[译]使用HTTP/2提升性能的7个建议</h1>
+                <div class="callout"><span> </span><blockquote>
+<p><a href="https://www.nginx.com/blog/7-tips-for-faster-http2-performance/">https://www.nginx.com/blog/7-tips-for-faster-http2-performance/</a></p>
+</blockquote><span>
+</span><p>历史悠久的超文本传输协议，即<a href="https://www.nginx.com/resources/glossary/http/">HTTP</a>标准，最近版本升级了。HTTP/2在2015年5月被批准，目前已经在很多Web浏览器和服务器中得到实现（包括<a href="https://www.nginx.com/blog/nginx-plus-r7-released/">NGINX Plus</a>和<a href="https://www.nginx.com/blog/nginx-1-9-5/">开源NGINX</a>）。大约有<a href="http://caniuse.com/#feat=http2">三分之二</a>的浏览器已经支持HTTP/2，而且这个比例每月都在增加。</p><span>
+</span><p>HTTP/2构建在Google SPDY协议基础之上，Chrome将在<a href="http://blog.chromium.org/2015/02/hello-http2-goodbye-spdy-http-is_9.html">2016年年初</a>停止对后者的支持。NGINX是最早支持SPDY的，如今同样率先支持了HTTP/2。为此，我们还发布了详尽的白皮书（<a href="https://www.nginx.com/wp-content/uploads/2015/09/NGINX_HTTP2_White_Paper_v4.pdf">PDF</a>），介绍了HTTP/2以及它如何基于SPDY构建，并展示了如何实现这个新协议。</p><span>
+</span><p>HTTP/2的重要特性完全源自SPDY。</p><span>
+</span><ul>
+<li>HTTP/2是二进制（而文本）协议，因此更简洁高效；</li>
+<li>它针对每个域只使用一个多路复用的连接，而不是每个文件一个连接；</li>
+<li>首部使用特制的HPACK协议（而非SPDY中使用的gzip）压缩；</li>
+<li>HTTP/2设计了复杂的优先级排定规则，帮助浏览器首先请求最急需的文件，而NGINX已经支持（SPDY的方案要简单一些）。</li>
+</ul><span>
+</span><p>现在，你需要决定是否迁移到HTTP/2，而其中关键是知道如何最大限度地利用它。这篇文章会带你了解从性能角度考虑为什么要做这个决定，以及如何实现。接下来我们要逐一讨论关于HTTP/2性能的7个小建议。</p><span>
+</span><ol>
+<li><a href="https://www.w3ctech.com/topic/1563#tip1today">现在是否需要迁移到HTTP/2</a></li>
+<li><a href="https://www.w3ctech.com/topic/1563#tip2terminate">终止HTTP/2和TLS</a></li>
+<li><a href="https://www.w3ctech.com/topic/1563#tip3spdy">考虑从SPDY开始</a></li>
+<li><a href="https://www.w3ctech.com/topic/1563#tip4optimizations">找出为HTTP/1.x优化的代码</a></li>
+<li><a href="https://www.w3ctech.com/topic/1563#tip5deploy">部署HTTP/2或SPDY</a></li>
+<li><a href="https://www.w3ctech.com/topic/1563#tip6revise">再谈HTTP/1.x优化</a></li>
+<li><a href="https://www.w3ctech.com/topic/1563#tip7sharding">实现智能分域</a></li>
+</ol><span>
+</span><p><strong>注意</strong>：严格来讲，SPDY和HTTP/2都不需要TLS，但它们在使用SSL/TLS的时候用处最大，而且浏览器只在使用SSL/TLS时才支持SPDY或HTTP/2。</p><span>
+</span><span>
+</span><p>实现HTTP/2很简单，看看我们的白皮书就明白了（<a href="https://www.nginx.com/wp-content/uploads/2015/09/NGINX_HTTP2_White_Paper_v4.pdf">PDF</a>）。不过，HTTP/2并不是万能的银弹，它只对某些Web应用有用，对另外一些则没那么有用。</p><span>
+</span><p>如果你使用SSL/TLS（以后简称TLS），那么HTTP/2可以提升网站性能。如果你没有，那在使用HTTP/2之前要先支持TLS。这时候，使用TLS的性能损耗大致可以被使用HTTP/2的性能提升抵销。不过还是建议你在实际应用之前先测试一下。</p><span>
+</span><p>HTTP/2有五大优势。</p><span>
+</span><ol>
+<li><strong>每个服务器只用一个连接</strong>。HTTP/2对每个服务器只使用一个连接，而不是每个文件一个连接。这样，就省掉了多次建立连接的时间，这个时间对TLS尤其明显，因为TLS连接费时间。</li>
+<li><strong>加速TLS交付</strong>。HTTP/2只需一次耗时的TLS握手，并且通过一个连接上的多路利用实现最佳性能。HTTP/2还会压缩首部数据，省掉HTTP/1.x时代所需的一些优化工作，比如拼接文件，从而提高缓存利用率。</li>
+<li><strong>简化Web应用</strong>。使用HTTP/2可以让Web开发者省很多事，因为不用再做那些针对HTTP/1.x的优化工作了。</li>
+<li><strong>适合内容混杂的页面</strong>。HTTP/2特别适合混合了HTML、CSS、JavaScript、图片和有限多媒体的传统页面。浏览器可以优先安排那些重要的文件请求，让页面的关键部分先出现，快出现。</li>
+<li><strong>更安全</strong>。通过减少TLS的性能损失，可以让更多应用使用TLS，从而让用户信息更安全。</li>
+</ol><span>
+</span><p><img src="https://www.nginx.com/wp-content/uploads/2015/10/HTTP2.png" alt="HTTP/2 with multiplexing diagram"></p><span>
+</span><p><strong>HTTP/2的多路复用示意图</strong></p><span>
+</span><p>相应地，HTTP/2也有五个不足之处。</p><span>
+</span><ol>
+<li><strong>单连接开销比较大</strong>。HPACK数据压缩算法会更新两端的查找表。这样可以让连接有状态，而破坏状态就意味着要重建查找表，另外单连接占用内存较多。</li>
+<li><strong>你可能不需要SSL</strong>。如果你的数据不需要保护，或者已经使用DRM或其他编码进行保护了，那么TLS的安全性对你可能无所谓。</li>
+<li><strong>需要抛弃针对HTTP/1.x的优化</strong>。HTTP/1.x优化在支持HTTP/2的浏览器中会影响性能，因此可能需要花时间把它们推倒重来。</li>
+<li><strong>对下载大文件不利</strong>。如果你的应用主要提供大文件下载或者流媒体播放，那可能不想用TLS，而且在只有一个流的情况下，多路复用也体现不出什么优势。</li>
+<li><strong>你的客户也许不在乎</strong>。你的客户很可能不在乎他分享的自家猫咪的视频是否受到TLS和HTTP/2的保护。</li>
+</ol><span>
+</span><p>总之，一切要看性能。这方面，有好消息也有坏消息。</p><span>
+</span><p>好消息是我们在内部对NGINX做过测试，结果从理论上能够得到印证：对于要通过典型网络延迟请求的混合内容网页，HTTP/2的性能好于HTTP/1.x和HTTPS。基于连接的RTT，结果可以分三种情况。</p><span>
+</span><ul>
+<li><strong>很低的RTT（0-20ms）</strong>：HTTP/1.x、HTTP/2和HTTPS基本无差别。</li>
+<li><strong>典型网络RTT（30-250ms）</strong>：HTTP/2比HTTP/1.x快，而且它们都比HTTPS快。美国两个相邻城市间的RTT约为30 ms，而东西海岸间（约3000英里）则约为70 ms。东京到伦敦间最短路径的RTT大约240 ms。</li>
+<li><strong>高RTT（300ms及以上）</strong>：HTTP/1.x比HTTP/2快，后者又比HTTPS快。</li>
+</ul><span>
+</span><p><img src="https://www.nginx.com/wp-content/uploads/2015/10/1stpaint.png" alt="First painting graph for HTTP, HTTP/2, and HTTPS"></p><span>
+</span><p>这张图显示了首次渲染的时间，也就是用户第一次在自己屏幕上看到网页内容的时间。这个时间一般认为关系到用户对网站响应速度的感知。</p><span>
+</span><p>要想了解我们测试的更多内容，请看这个<a href="https://www.youtube.com/watch?v=4OiyssTW4BA&amp;feature=youtu.be">HTTP/2的介绍视频</a>，来源是nginx.conf 2015。</p><span>
+</span><p>然而，每个网页都不相同，实际上每个用户的会话也不一样。如果你托管流媒体或提供大文件下载，那你的决定可能不一样，甚至相反。</p><span>
+</span><p>你最终可能发现投入产出比并不明显。如果是这样，那你得多学习一下，针对自己的内容多做一些测试，然后咱们可以聊一聊。（想找点资料？可以看看NGINX网络研讨：<a href="https://www.nginx.com/resources/webinars/whats-new-in-http2/">What’s New in HTTP/2?</a>）。 </p><span>
+</span><h1 id="-http-2-tls">建议二：终止HTTP/2和TLS</h1><span>
+</span><p>终止协议意味着客户端使用期望的协议连接代理服务器，比如TLS或HTTP/2，然后代理服务器再去连接应用服务器、数据库服务器等，但不需要使用相同的协议，如下图所示。</p><span>
+</span><p><img src="https://www.nginx.com/wp-content/uploads/2015/10/terminate.png" alt="Terminate HTTP/2 and TLS with NGINX diagram"></p><span>
+</span><p>使用独立的服务器终止协议意味着使用多服务器架构。多服务器可能是多个物理服务器、多个虚拟服务器，或者<a href="https://www.nginx.com/products/nginx-plus-aws/">AWS</a>这样的云环境中的多个虚拟服务器实例。多服务器就比单服务器复杂，或者比应用服务器/数据库服务器的组合复杂。不过，多服务器架构有很多好处，而且很多流量大的网站也必须用这种架构。</p><span>
+</span><p>配置了服务器或者虚拟服务器之后，很多事情都成为可能。新服务器可以分担其他服务器的负载，可用于负载平衡、静态文件缓存和其他用途。另外，也可以让添加和替换应用服务器或其他服务器更容易。</p><span>
+</span><p>NGINX和NGINX Plus经常被用来终止TLS和HTTP/2协议、负载平衡。已有环境不必改动，除非要把NGINX服务器挪到前端。</p><span>
+</span><h1 id="-spdy-">建议三：考虑从SPDY开始</h1><span>
+</span><p>SPDY是HTTP/2的上一代，总体性能相同。因为它已经出现好几年了，所以有很多浏览器<a href="http://caniuse.com/#feat=spdy">支持SPDY</a>却<a href="http://caniuse.com/#feat=http2">不支持HTTP/2</a>。不过，在本文写作时，这个支持上的差距正在缩小。具体来说，有三分之二的浏览器支持HTTP/2，而有五分之四的浏览器支持SPDY。</p><span>
+</span><p>如果你着急采用新的Web传输协议，又想尽可能覆盖更多用户，可以先从SPDY开始。然后到2016年初，即谷歌不再支持SPDY的时候，再切换到HTTP/2，很简单，至少在NGINX中如此。那时候，更多用户会拥有支持HTTP/2的浏览器，而你已经为其中大部分用户提供了很好的性能。</p><span>
+</span><h1 id="-http-1-x-">建议四：找出为HTTP/1.x优化的代码</h1><span>
+</span><p>在决定采用HTTP/2之前，首先得知道你的代码有哪些是针对HTTP/1.x优化过的。大概有四方面的优化。</p><span>
+</span><ol>
+<li><strong>分域存储</strong>。为了实现并行请求文件，你可能把文件分散到了不同的域里，CDN会自动这么做。但分域存储会影响HTTP/2的性能，建议使用HTTP/2友好的分域存储（<a href="https://www.w3ctech.com/topic/1563#tip7sharding">建议七</a>），只针对HTTP/1.x用户分域。</li>
+<li><strong>雪碧图</strong>。雪碧图把很多图片拼成一个文件，然后通过代码按需取得每个图片。雪碧图在HTTP/2的环境下没太大用处，但还是有点用的。</li>
+<li><strong>拼接的代码文件</strong>。与使用雪碧图的原因类似，很多独立的文件也会被弄成一个，然后浏览器再从其中找到并运行需要的文件。</li>
+<li><strong>插入行内的文件</strong>。CSS代码、JavaScript代码，甚至图片等被直接插到HTML文件中的内容。这样可以减少文件传输，代价是初始HTML文件较大。</li>
+</ol><span>
+</span><p>后面三种优化都涉及把小文件塞进一个较大的文件里，目的是减少新建连接的初始化和握手，这些操作对TLS而言非常费时间。</p><span>
+</span><p>第一种优化即分域存储恰恰相反，强制打开多个连接，目的是并行地从不同的域获取文件。这两种看似矛盾的技术对于HTTP/1.x下的站点却十分有效。然而，要用好这两种技术，必须投入大量时间、精力和资源，用于实现、管理和运维。</p><span>
+</span><p>在采用HTTP/2之前，需要找出应用了这些优化的代码，分析一下它们会不会影响你的应用设计和工作流程。这样在迁移到HTTP/2之后，就可以着手改造它们，甚至撤销某些优化。</p><span>
+</span><h1 id="-http-2-spdy">建议五：部署HTTP/2或SPDY</h1><span>
+</span><p>事实上，部署HTTP/2或SPDY并不难。如果你使用NGINX，只要在配置文件中启动相应的协议就可以了，参见这里了解如何启用HTTP/2（<a href="https://www.nginx.com/wp-content/uploads/2015/09/NGINX_HTTP2_White_Paper_v4.pdf">PDF</a>）。浏览器和服务器会协商采用什么协议，如果浏览器支持HTTP/2（而且也在使用TLS），就会使用HTTP/2。</p><span>
+</span><p>配置完服务器后，使用支持HTTP/2浏览器的用户就会基于HTTP/2运行你的应用，而使用旧版本浏览器的用户则会继续使用HTTP/1.x运行你的应用，如下图所示。如果你的网站流量非常大，那么应该监测改变前后的性能，对于性能降低的情况，可能就得撤销更改。</p><span>
+</span><p><img src="https://www.nginx.com/wp-content/uploads/2015/10/servers.png" alt="HTTP/2 implemented at server level supports browsers for both HTTP/2 and HTTP/1.x"></p><span>
+</span><p><strong>注意</strong>：使用HTTP/2及其单连接之后，NGINX某些配置的重要性会很明显，特别要注意的是<code>output_buffers</code>、<code>proxy_buffers</code>和<code>ssl_buffer_size</code>等指令，多测试一下。参见<a href="https://www.nginx.com/resources/admin-guide/nginx-ssl-termination/">general configuration notes</a>，特定的SSL建议（<a href="https://www.nginx.com/blog/nginx-ssl/">在这里</a> and <a href="https://www.nginx.com/blog/improve-seo-https-nginx/">here</a>），以及NGINX关于SSL性能的白皮书（<a href="https://www.nginx.com/wp-content/uploads/2014/07/NGINX-SSL-Performance.pdf">PDF</a>）。</p><span>
+</span><p><strong>注意</strong>：使用HTTP/2传输密文要格外注意。HTTP/2的RFC中有一个<a href="https://tools.ietf.org/html/rfc7540#appendix-A">长长的列表</a>，列出了要避免的加密套件。建议你自己也搞一个表格，启用<code>ssl_buffer_size</code>，然后在所有常用的浏览器版本下测试你想用的加密套件。</p><span>
+</span><h1 id="-http-1-x-">建议六：再谈HTTP/1.x优化</h1><span>
+</span><p>你说奇怪不，撤销和修改针对HTTP/1.x优化的代码居然是实现HTTP/2最有创意的部分。这里面有几个问题要注意，因为很多事怎么做都是可以的。</p><span>
+</span><p>在开始运作之前，必须考虑旧版本浏览器用户是否好过。之后，可以采取三个策略撤销和修改HTTP/1.x的优化。</p><span>
+</span><ul>
+<li><strong>什么也不用做</strong>。假如你并没有针对HTTP/1.x做过优化，或者只做过少量优化，那么你几乎什么也不用做，就可以直接迁移到HTTP/2。</li>
+<li><strong>有选择地去做</strong>。第二种情况是减少合并某些文件，而不是完全不合并。比如，牵扯到很多场景的雪碧图就不用动，而被塞得满满的HTML可能就要分离出来一些。</li>
+<li><strong>完全撤销HTTP/1.x优化</strong>（不过请先参考<a href="https://www.w3ctech.com/topic/1563#tip7sharding">建议七</a>中关于分域存储的建议）。可以不再做以前做过的任何优化。</li>
+</ul><span>
+</span><p>缓存还是普适的。理论上，缓存操作非常适合小文件特别多的情况。但是，小文件多也意味着文件I/O多。因此一些相近文件的合并还是必要的，一方面要考虑工作流程，另一方面要考虑应用性能。建议多关注一下其他人在过渡到HTTP/2过程中的一些经验。 </p><span>
+</span><h1 id="-">建议七：实现智能分域</h1><span>
+</span><p>分域存储可能是最极端但也最成功的HTTP/1.x优化策略。它能够提升HTTP/1.x下的应用性能，但在HTTP/2之下，其性能提升可以忽略不讲（因为只有一个连接。)</p><span>
+</span><p>对HTTP/2友好的分域，要保证以下两点。</p><span>
+</span><ul>
+<li>让多个域名解析到同一个IP。</li>
+<li>确保证书包含通配符，以便所有分域名都可以使用，适当的多域证书当然也可以。</li>
+</ul><span>
+</span><p>具体细节，请参考<a href="http://tools.ietf.org/html/rfc7540#section-9.1.1">这里</a>。</p><span>
+</span><p>有了这些保障，分域还会继续对HTTP/1.x有效，即域名仍然可以触发浏览器创建更多连接，但对HTTP/2则无效，因为这些域名会被看成同一个域，一个连接就可以访问所有域名了。</p><span>
+</span><h1 id="-">小结</h1><span>
+</span><p>HTTP/2和TLS组合可以提升你的站点性能，并且让用户觉得你的网站很安全。无论你是率先在自己的应用里实现HTTP/2，还是要赶超竞争对手，都可以又快又好地实现对HTTP/2的支持。</p><span>
+</span><p>希望这篇文章能让你以最少的努力获得最大的HTTP/2性能收益，而且从此你可以把注意力集中到编写更快、更有效、更安全的应用上，让自己的应用更容易维护和运维。</p><span>
+</span><h1 id="-">参考资源</h1><span>
+</span><span>
+ </span><div id="wx-qrcode" class="wx_qrcode_box"><img src="https://img.w3ctech.com/qrcode_for_gh_229345f1b408_258.jpg" alt="w3ctech微信" class="weixin_qrcode"><p>扫码关注w3ctech微信公众号</p></div></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

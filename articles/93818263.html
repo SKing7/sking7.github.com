@@ -1,0 +1,74 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The Principles of Good Programming</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>The Principles of Good Programming</h1>
+                <p>
+<span class="sts">Heron-Centric: Ruminations of a Language Designer</span><br><span class="ts">The Principles of Good Programming</span><br><span class="as">by Christopher Diggins</span><br><span class="pd">July 24, 2011</span><br></p><p>Today's post is a lightly edited repost from <a class="reference" href="http://area.autodesk.com/blogs/chris/the_principle_of_good_programming">my blog at The Area</a>, a web-site dedicated to users of Autodesk media and entertainment products. I came up with this list of principles to help with a recent C# training I gave, and I thought that members of the Artima.com community could appreciate these principles and have some interesting insights to share.</p><div class="section"><span>
+</span><span>
+</span><p>The principles of good programming are closely related to principles of good design and engineering. The following programming principles have helped me over the years become a better programmer, and I believe can help any developer become more efficient and to produce code which is easier to maintain and that has fewer defects.</p><span>
+</span><p><strong>DRY - Don’t repeat yourself</strong> - This is probably the single most fundamental tenet in programming is to avoid repetition. Many programming constructs exist solely for that purpose (e.g. loops, functions, classes, and more). As soon as you start repeating yourself (e.g. a long expression, a series of statements, same concept) create a new abstraction.
+<a class="reference" href="http://en.wikipedia.org/wiki/Don%27t_repeat_yourself">http://en.wikipedia.org/wiki/Don%27t_repeat_yourself</a></p><span>
+</span><p><strong>Abstraction Principle</strong> - Related to DRY is the abstraction principle “Each significant piece of functionality in a program should be implemented in just one place in the source code.”
+<a class="reference" href="http://en.wikipedia.org/wiki/Abstraction_principle_(programming">http://en.wikipedia.org/wiki/Abstraction_principle_(programming</a>)</p><span>
+</span><p><strong>KISS (Keep it simple, stupid!)</strong> - Simplicity (and avoiding complexity) should always be a key goal. Simple code takes less time to write, has fewer bugs, and is easier to modify.
+<a class="reference" href="http://en.wikipedia.org/wiki/KISS_principle">http://en.wikipedia.org/wiki/KISS_principle</a></p><span>
+</span><p><strong>Avoid Creating a YAGNI (You aren’t going to need it)</strong> - You should try not to add functionality until you need it.
+<a class="reference" href="http://en.wikipedia.org/wiki/YAGNI">http://en.wikipedia.org/wiki/YAGNI</a></p><span>
+</span><p><strong>Do the simplest thing that could possibly work</strong> - A good question to ask one’s self when programming is “What is the simplest thing that could possibly work?” This helps keep us on the path towards simplicity in the design.
+<a class="reference" href="http://c2.com/xp/DoTheSimplestThingThatCouldPossiblyWork.html">http://c2.com/xp/DoTheSimplestThingThatCouldPossiblyWork.html</a></p><span>
+</span><p><strong>Don’t make me think</strong> - This is actually the title of a book by Steve Krug on web usability that is also relevant in programming. The point is that code should be easily read and understood with a minimum of effort required. If code requires too much thinking from an observer to understand, then it can probably stand to be simplified
+<a class="reference" href="http://www.sensible.com/dmmt.html">http://www.sensible.com/dmmt.html</a></p><span>
+</span><p><strong>Open/Closed Principle</strong> - Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification. In other words, don't write classes that people can modify, write classes that people can extend.
+<a class="reference" href="http://en.wikipedia.org/wiki/Open_Closed_Principle">http://en.wikipedia.org/wiki/Open_Closed_Principle</a></p><span>
+</span><p><strong>Write Code for the Maintainer</strong> - Almost any code that is worth writing is worth maintaining in the future, either by you or by someone else. The future you who has to maintain code often remembers as much of the code, as a complete stranger, so you might as well always write for someone else. A memorable way to remember this is “Always code as if the person who ends up maintaining your code is a violent psychopath who knows where you live.”
+<a class="reference" href="http://c2.com/cgi/wiki?CodeForTheMaintainer">http://c2.com/cgi/wiki?CodeForTheMaintainer</a></p><span>
+</span><p><strong>Principle of least astonishment</strong> - The principle of least astonishment is usually referenced in regards to the user interface, but the same principle applies to written code. Code should surprise the reader as little as possible. The means following standard conventions, code should do what the comments and name suggest, and potentially surprising side effects should be avoided as much as possible.
+<a class="reference" href="http://en.wikipedia.org/wiki/Principle_of_least_astonishment">http://en.wikipedia.org/wiki/Principle_of_least_astonishment</a></p><span>
+</span><p><strong>Single Responsibility Principle</strong> - A component of code (e.g. class or function) should perform a single well defined task.
+<a class="reference" href="http://en.wikipedia.org/wiki/Single_responsibility_principle">http://en.wikipedia.org/wiki/Single_responsibility_principle</a></p><span>
+</span><p><strong>Minimize Coupling</strong> - Any section of code (code block, function, class, etc) should minimize the dependencies on other areas of code. This is achieved by using shared variables as little as possible. “Low coupling is often a sign of a well-structured computer system and a good design, and when combined with high cohesion, supports the general goals of high readability and maintainability”
+<a class="reference" href="http://en.wikipedia.org/wiki/Coupling_(computer_programming">http://en.wikipedia.org/wiki/Coupling_(computer_programming</a>)</p><span>
+</span><p><strong>Maximize Cohesion</strong> - Code that has similar functionality should be found within the same component.
+<a class="reference" href="http://en.wikipedia.org/wiki/Cohesion_(computer_science">http://en.wikipedia.org/wiki/Cohesion_(computer_science</a>)</p><span>
+</span><p><strong>Hide Implementation Details</strong> - Hiding implementation details allows change to the implementation of a code component while minimally affecting any other modules that use that component.
+<a class="reference" href="http://en.wikipedia.org/wiki/Information_Hiding">http://en.wikipedia.org/wiki/Information_Hiding</a></p><span>
+</span><p><strong>Law of Demeter</strong> - Code components should only communicate with their direct relations (e.g. classes that they inherit from, objects that they contain, objects passed by argument, etc.)
+<a class="reference" href="http://en.wikipedia.org/wiki/Law_of_Demeter">http://en.wikipedia.org/wiki/Law_of_Demeter</a></p><span>
+</span><p><strong>Avoid Premature Optimization</strong> - Don’t even think about optimization unless your code is working, but slower than you want. Only then should you start thinking about optimizing, and then only with the aid of empirical data. "We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil" - Donald Knuth.
+<a class="reference" href="http://en.wikipedia.org/wiki/Program_optimization">http://en.wikipedia.org/wiki/Program_optimization</a></p><span>
+</span><p><strong>Code Reuse is Good</strong> - Not very pithy, but as good a principle as any other. Reusing code improves code reliability and decrease development time.
+<a class="reference" href="http://en.wikipedia.org/wiki/Code_reuse">http://en.wikipedia.org/wiki/Code_reuse</a></p><span>
+</span><p><strong>Separation of Concerns</strong> - Different areas of functionality should be managed by distinct and minimally overlapping modules of code.
+<a class="reference" href="http://en.wikipedia.org/wiki/Separation_of_concerns">http://en.wikipedia.org/wiki/Separation_of_concerns</a></p><span>
+</span><p><strong>Embrace Change</strong> - This is the subtitle of a book by Kent Beck, and is also considered a tenet of extreme programming and the agile methodology in general. Many other principles are based on the concept that you should expect and welcome change. In fact very old software engineering principles like minimizing coupling are related directly to the requirement of making code easier to change. Whether or not you are an extreme programming practitioner, this approach to writing code just makes sense.
+<a class="reference" href="http://www.amazon.com/gp/product/0321278658">http://www.amazon.com/gp/product/0321278658</a></p><span>
+</span></div><p>
+Have an opinion?
+
+
+Readers have already posted
+
+<a href="http://www.artima.com/forums/flat.jsp?forum=106&amp;thread=331531">25
+
+comments</a>
+about this weblog entry. Why not
+
+<a href="http://www.artima.com/forums/post.jsp?forum=106&amp;thread=331531&amp;reply=true">add yours</a>?
+
+
+</p><p>
+If you'd like to be notified whenever Christopher Diggins adds a new entry to <a href="http://www.artima.com/weblogs/index.jsp?blogger=cdiggins">his weblog</a>, subscribe to his <a href="http://www.artima.com/weblogs/feeds/bloggers/cdiggins.rss">RSS feed</a>.
+
+</p><table><tbody><tr valign="bottom"><td><img src="http://www.artima.com/images/christopherdiggins.jpg" align="right"></td><td>Christopher Diggins is a software developer and freelance writer. Christopher loves programming, but is eternally frustrated by the shortcomings of modern programming languages. As would any reasonable person in his shoes, he decided to quit his day job to write his own ( <a href="http://www.heron-language.com/">www.heron-language.com</a> ). Christopher is the co-author of the <a href="http://www.cpp-cookbook.com/">C++ Cookbook</a> from O'Reilly. Christopher can be reached through his home page at  <a href="http://www.cdiggins.com/">www.cdiggins.com</a>.</td></tr></tbody></table><p>This weblog entry is Copyright © 2011 Christopher Diggins. All rights reserved.</p>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

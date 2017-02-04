@@ -1,0 +1,75 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Ways You Need To Tell The Browser How To Optimize</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Ways You Need To Tell The Browser How To Optimize</h1>
+                <article id="post-241915" role="main" class="instapaper_body h-entry e-content">
+
+          <p>In the past few years, there has been a number of front end features in which the performance onus has shifted from browser to developer. Rather than the presumed "browsers will get faster at running my code", there is a little more "I need to change the way I code for browsers to get faster."</p>
+
+<h3>will-change</h3>
+<p><a href="https://www.w3.org/TR/css-will-change/">Spec</a>:</p>
+<blockquote><p>allows an author to inform the UA ahead of time of what kinds of changes they are likely to make to an element. This allows the UA to optimize how they handle the element ahead of time, performing potentially-expensive work preparing for an animation before the animation actually begins.</p></blockquote>
+<p>In other words, in addition to using animations and transforms, tell the browser what you are going to change within those animations and transforms. </p>
+<pre rel="CSS"><code class="language-css">.element {
+  will-change: transform;
+}
+.element:hover {
+  transform: rotateY(180deg);
+}</code></pre>
+<p>Sara Soueidan has <a href="https://dev.opera.com/articles/css-will-change-property/">a more in-depth article</a> and we have <a href="https://css-tricks.com/almanac/properties/w/will-change/">an almanac reference</a>.</p>
+<h3>contain</h3>
+<p><a href="https://drafts.csswg.org/css-containment-3/#contain-property">Spec</a>:</p>
+<blockquote><p>The contain property allows an author to indicate that an element and its contents are, as much as possible, independent of the rest of the document tree. This allows user agents to utilize much stronger optimizations when rendering a page using contain properly, and allows authors to be confident that their page won’t accidentally fall into a slow code path due to an innocuous change.</p></blockquote>
+<p>In other words, if you know certain things about an element and its descendants, you should tell the browser so it can optimize around those things. For example... <code>contain: size;</code> - "This ensures that the containing element can be laid out without needing to examine its descendants."</p>
+<p>Example:</p>
+<pre rel="HTML"><code class="language-markup">&lt;section class='message'&gt;
+  Lol, check out this dog: images.example.com/jsK3jkl
+&lt;/section&gt;
+&lt;section class='message'&gt;
+  I had a ham sandwich today. #goodtimes
+&lt;/section&gt;
+&lt;section class='message'&gt;
+  I have political opinions that you need to hear!
+&lt;/section&gt;</code></pre>
+<pre rel="CSS"><code class="language-css">.message {
+  contain: strict;
+}</code></pre>
+<p>Michael Scharnagl recently <a href="https://justmarkup.com/log/2016/04/css-containment/">wrote a post on this</a>:</p>
+<blockquote><p>Much like an iframe, this boundary establishes a new layout root, ensuring that DOM changes in the sub-tree never trigger reflows in the parent document.</p></blockquote>
+<h3>Responsive Images</h3>
+<p>Perhaps the most visible of these "you tell the browser what's up" scenarios is responsive images, and particularly the sizes attribute. </p>
+<p><a href="http://w3c.github.io/html/semantics-embedded-content.html#element-attrdef-img-sizes">Spec</a>:</p>
+<blockquote><p>The user agent will calculate the effective pixel density of each image from the specified w descriptors and the specified rendered size in the sizes attribute. It can then choose any of the given resources depending on the user’s screen’s pixel density, zoom level, and possibly other factors such as the user’s network conditions.</p></blockquote>
+<p>Here's an example from the spec, where you're giving the browser as much as you can to work with:</p>
+<pre rel="HTML"><code class="language-markup">&lt;img 
+  sizes="(max-width: 30em) 100vw, (max-width: 50em) 50vw, calc(33vw - 100px)"
+  srcset="swing-200.jpg 200w, swing-400.jpg 400w, swing-800.jpg 800w, swing-1600.jpg 1600w"
+src="swing-400.jpg" 
+  alt="Kettlebell Swing"
+&gt;</code></pre>
+<p>Which says...</p>
+<ul>
+<li>If the browser window is narrower than <code>30em</code>, I'll be displaying the image at <code>100vw</code> wide.</li>
+<li>If the browser window is between <code>30em</code> and <code>50em</code>, I'll be displaying the image at <code>50vw</code> wide.</li>
+<li>Otherwise (if it's even bigger), I'll be displaying the image at <code>calc(33vw - 100px)</code> wide.</li>
+</ul>
+<p>Which then needs to match up with <em>what you actually do</em> in the CSS. Hopefully it's fairly accurate, so the browser optimizations match up with reality. </p>
+<h3>A Brave New World</h3>
+<p>I mention these things not because I think you need to run out and start using all this immediately. More to spotlight the (if I may) <em>trend</em>, in front end performance-related features in which the browsers ask more of authors. </p>
+<p>I think the browser vendors and spec authors would say: "You want performance. There is only so much we can do. There are certain things we can't know, but you do know. We'll do our best without them, but if you tell us about them we can do much more."</p>
+<p>What say you?</p>
+
+          
+        </article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

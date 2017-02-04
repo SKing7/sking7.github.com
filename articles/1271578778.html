@@ -1,0 +1,60 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Refactoring Legacy CSS</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Refactoring Legacy CSS</h1>
+                <article class="foundry-article--content js-foundry-article--content reading-style--full-article">
+
+                  <p>We’ve already learned all about <a href="http://seesparkbox.com/foundry/why_you_need_to_refactor_your_css">why you should refactor your CSS</a>, and it’s an easy practice to start when a project is new or small, but how do you refactor those old legacy projects that have been hacked together over the span of many years? It might sound like the thing nightmares are made of, but it doesn’t have to be.</p>
+
+<h2>Recognize When It’s Time to Refactor</h2>
+
+<p>The technologies and methodologies we use to build the web are constantly changing and evolving, and we’ve got to keep up by experimenting with new ways to build better, more organized websites. Finding the right method comes with a lot of trial and error. Sometimes when starting a project, you find a method that works well, but as the project grows, it can be difficult to maintain. That is when it’s a good time to start refactoring.</p>
+
+<p>I recently worked on an older project that organized SCSS by media query breakpoints. All styles for the smallest screen size lived in a partial called _smallest.scss, all styles for 600px screen sizes lived in a _600.scss partial, and so on. When it came time to redesign all the tables on the website, we had moved on to organize our stylesheets in a more <a href="https://www.toptal.com/designers/ux/getting-started-with-modular-front-end-development">modular</a> way. Trying to redesign the tables with the breakpoint partials in their current state would have been cumbersome, but treating the tables as a stand-alone module would make future edits and debugging much easier. That’s when we recognized it was time to refactor our legacy code and bring it up-to-date to our current standards.</p>
+
+<h2>Work in Small Chunks</h2>
+
+<p>It can be tempting to refactor everything all at once, and if you are working on a small project, that may be the best route. But if you are refactoring a large site with a lot of moving pieces, it is best to work in small, manageable chunks.</p>
+
+<p>For us, redesigning the tables was the perfect starting point for our refactoring. We were able to focus on one component on the site while still improving the entire code base. We combed the breakpoint partials and pulled out anything and everything that had to do with a table and created a new _tables.scss partial. We were still left with all the original breakpoint files, but they were starting to get smaller in size. At that point, we were able to focus on the original problem at hand, redesigning those tables, but the code was much less overwhelming because it all lives in one place.</p>
+
+<h2>Don’t Delete Things Just Yet</h2>
+
+<p>It can be tempting to start removing old code left and right, but don’t get delete happy just yet. Large websites can be full of surprises and hacky code, but that hacky code is usually there for a reason. It’s making something, somewhere work.</p>
+
+<p>Our large website was filled with pages with tables. Just when I thought I knew where they all were, another one would appear out of thin air. As tempting as it was to just update the styles and cross my fingers that nothing would break, it was safer to leave the old styles and create a new set of styles for the redesigned table. This gave me the option of updating tables as I came across them without the risk of breaking undiscovered tables. Eventually, with the help of a project-wide search, I was able to find all instances of the tables, but some of them weren’t included in the scope of this round of refactoring. By leaving the old set of styles in place until they were all updated, I was confident everything would continue to work until I was able to make all the updates, and only then could I finally delete the old code.</p>
+
+<h2>Documentation and Comments</h2>
+
+<p>Comments and documentation are everyone’s best friend. The goal of refactoring is to make the code better and easier to use by anyone who picks it up. Legacy code can be difficult to work with as it is, but legacy code with partially refactored code can be just as confusing, if not more.</p>
+
+<p>Our new table partial was filled with comments letting whoever worked on the project next know which code was being refactored out and what was there to stay. We also included documentation in the project’s README file that outlined the new code guidelines and naming conventions we were converting to. We wanted anyone to be able to pick up the project and understand what was going on.</p>
+
+<h3>Example README Documentation:</h3>
+
+<div id="gist33516566" class="gist"><span>    </span><div class="gist-file"><span>      </span><div class="gist-data"><span>        </span><div class="js-gist-file-update-container js-task-list-container file-box"><span>  </span><div id="file-refactoring_documentation-md" class="file"><span>      </span><div id="readme" class="readme blob instapaper_body"><span>    </span><article class="markdown-body entry-content" itemprop="text"><h2><a id="user-content-refactoring-stylesheets" class="anchor" href="https://seesparkbox.com/foundry/refactoring_legacy_css#refactoring-stylesheets" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Refactoring Stylesheets</h2><p>To make the stylesheets easier to maintain we will transition away from the current media query breakpoint organization and content based class names. This will be done gradually as we create/modify a feature.</p><ul><li>When working on an existing feature, refactor the CSS by pulling all current styles from mq breakpoint partials and creating new feature partials.<ul><li>If needed, create "sub-partials"<ul><li><code>_table.scss</code></li><li><code>_table-striped.scss</code></li></ul></li></ul></li><li>When creating/renaming classes:<ul><li>Don't delete old class names until it is safe to do so. Leave them in place and include new class names.</li><li>Avoid content based class names, use functional class names instead.</li><li>BEM naming methodology:<ul><li><strong>Block component</strong> <code>.table { }</code></li><li><strong>Modifier</strong> <code>.table--striped { }</code></li><li><strong>Child element</strong> <code>.table__cell { }</code></li></ul></li></ul></li></ul></article><span>  </span></div><span>  </span></div><span>  </span></div><span>      </span></div><span>      </span><span>    </span></div></div>
+
+
+<h2>Test and Commit Often</h2>
+
+<p>Anyone who has had a computer crash in the middle of working on something knows you should save often. Well, the same thing goes for commits. Don’t wait until you have modified 50 files and rebuilt entire components to make a commit. Just like you should refactor in small chunks, you should make commits in small chunks too. When is a good time to commit? Any time you make a change and test that it’s working, make a commit.</p>
+
+<p>On the surface, the table redesign seemed like it was only affecting one component when it actually affected an entire website. We had to make frequent commits so that at anytime, if something broke, we had a previous working state to go back to without losing a bunch of work in the process. After we removed the table styles from the old breakpoint partials and tested, we made a commit. After we added the new table styles and tested, we made a commit. After we updated and tested a table, we made a commit. If you hate the idea of all those small commits littering your history, you can always <a href="https://robots.thoughtbot.com/git-interactive-rebase-squash-amend-rewriting-history">go back</a> and <a href="https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase-i">squash</a> them together once you’re finished refactoring and everything has been tested.</p>
+
+<h2>Time Well Spent</h2>
+
+<p>Refactoring a large project with legacy code can be frustrating and overwhelming when getting started. You’ll invest a lot of extra time in the beginning just reorganizing existing code, and you might wonder if it’s worth your time and the client’s budget. But eventually, you will get to the point where editing your project isn’t a chore and making edits or enhancements will be much quicker than if you were still fighting with legacy code.</p>
+        
+      </article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,120 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>11 Simple npm Tricks That Will Knock Your Wombat Socks Off</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>11 Simple npm Tricks That Will Knock Your Wombat Socks Off</h1>
+                <div class="long-copy ns-hljs"><span>
+</span><span>
+</span><p>Using npm effectively can be difficult. There are a ton of features built-in, and it can be a daunting task to try to approach learning them.</p><span>
+</span><p>Personally, even learning and using just one of these tricks (<code>npm prune</code>, which is #4) saved me from getting rid of unused modules manually by deleting <code>node_modules</code> and re-installing <i>everything</i> with <code>npm install</code>. As you can probably imagine, that was insanely stressful.</p><span>
+</span><p>We've compiled this list of 11 simple-to-use npm tricks that will allow you to speed up development using npm, no matter what project you're working on.</p><span>
+</span><h2 id="1openapackageshomepage">1. Open a package’s homepage</h2><span>
+</span><p><strong>Run:</strong> <code>npm home $package</code></p><span>
+</span><p>Running the <code>home</code> command will open the homepage of the package you're running it against. Running against the <code>lodash</code> package will bring you to the Lodash website. This command can run without needing to have the package installed globally on your machine or within the current project.</p><span>
+</span><h2 id="2openpackagesgithubrepo">2. Open package’s GitHub repo</h2><span>
+</span><p><strong>Run:</strong> <code>npm repo $package</code></p><span>
+</span><p>Similar to <code>home</code>, the <code>repo</code> command will open the GitHub repository of the package you're running it against. Running against the <code>express</code> package will bring you to the official Express repo. Also like <code>home</code>, you don’t need to have the package installed.</p><span>
+</span><h2 id="3checkapackageforoutdateddependencies">3. Check a package for outdated dependencies</h2><span>
+</span><p><strong>Run:</strong> <code>npm outdated</code></p><span>
+</span><p>You can run the <code>outdated</code> command within a project, and it will check the npm registry to see if any of your packages are outdated. It will print out a list in your command line of the current version, the wanted version, and the latest version.</p><span>
+</span><p><img src="https://nodesource.com/media/2016/Aug/xScreen_Shot_2016_08_26_at_3_52_53_PM-1472242056432.png.pagespeed.ic.g3QVnk0sJc.png" alt="Running npm outdated on a Node project"></p><span>
+</span><h2 id="4checkforpackagesnotdeclaredinpackagejson">4. Check for packages not declared in package.json</h2><span>
+</span><p><strong>Run:</strong> <code>npm prune</code></p><span>
+</span><p>When you run <code>prune</code>, the npm CLI will run through your <code>package.json</code> and compare it to your project’s <code>/node_modules</code> directory. It will print a list of modules that aren’t in your <code>package.json</code>.</p><span>
+</span><p>The <code>npm prune</code> command then strips out those packages, and removes any you haven't manually added to <code>package.json</code> or that were <code>npm install</code>ed without using the <code>--save</code> flag.</p><span>
+</span><p><img src="https://nodesource.com/media/2016/Aug/xScreen_Shot_2016_08_26_at_3_54_00_PM-1472242073013.png.pagespeed.ic.R4qx1if8g_.png" alt="Running npm prune on a Node project"></p><span>
+</span><p><strong>Update:</strong> Thanks to <a href="https://twitter.com/EvanHahn">@EvanHahn</a> for noticing a personal config setting that made <code>npm prune</code> provide a slightly different result than the default <code>npm</code> would provide!</p><span>
+</span><h2 id="5lockdownyourdependenciesversions">5. Lock down your dependencies versions</h2><span>
+</span><p><strong>Run:</strong> <code>npm shrinkwrap</code></p><span>
+</span><p>Using <code>shrinkwrap</code> in your project generates an <code>npm-shrinkwrap.json</code> file. This allows you to pin the dependencies of your project to the specific version you’re currently using within your <code>node_modules</code> directory. When you run <code>npm install</code> and there is a <code>npm-shrinkwrap.json</code> present, it will override the listed dependencies and any semver ranges in <code>package.json</code>.</p><span>
+</span><p>If you need verified consistency across <code>package.json</code>, <code>npm-shrinkwrap.json</code> and <code>node_modules</code> for your project, you should consider using <a href="https://github.com/uber/npm-shrinkwrap">npm-shrinkwrap</a>.</p><span>
+</span><p><img src="https://nodesource.com/media/2016/Aug/xScreen_Shot_2016_08_26_at_3_54_36_PM-1472242098179.png.pagespeed.ic.RCTB_jXM4h.png" alt="Running npm shrinkwrap on a Node project"></p><span>
+</span><h2 id="6usenpmv3withnodejsv4lts">6. Use npm v3 with Node.js v4 LTS</h2><span>
+</span><p><strong>Run:</strong> <code>npm install -g npm@3</code></p><span>
+</span><p>Installing <code>npm@3</code> globally with npm will update your npm v2 to npm v3, including on the Node.js v4 LTS release (“Argon”) ships with the npm v2 LTS release. This will install the latest stable release of npm v3 within your v4 LTS runtime.</p><span>
+</span><h2 id="7allownpminstallgwithoutneedingsudo">7. Allow <code>npm install -g</code> without needing <code>sudo</code></h2><span>
+</span><p><strong>Run:</strong> <code>npm config set prefix $dir</code></p><span>
+</span><p>After running the command, where <code>$dir</code> is the directory you want npm to <i>install your global modules to</i>, you won’t need to use sudo to install modules globally anymore. The directory you use in the command becomes your global bin directory. </p><span>
+</span><p>The only caveat: you will need to make sure you <strong>adjust your user permissions</strong> for that directory with <code>chown -R $USER $dir</code> and you <strong>add</strong> <code>$dir/bin</code> to your PATH.</p><span>
+</span><h2 id="8changethedefaultsaveprefixforallyourprojects">8. Change the default save prefix for all your projects</h2><span>
+</span><p><strong>Run:</strong> <code>npm config set save-prefix="~"</code></p><span>
+</span><p>The tilde (<code>~</code>) is more conservative than what npm defaults to, the caret (<code>^</code>), when installing a new package with the <code>--save</code> or <code>--save-dev</code> flags. The tilde pins the dependency to the minor version, allowing patch releases to be installed with <code>npm update</code>. The caret pins the dependency to the major version, allowing minor releases to be installed with <code>npm update</code>.</p><span>
+</span><h2 id="9stripyourprojectsdevdependenciesforaproductionenvironment">9. Strip your project's <code>devDependencies</code> for a production environment</h2><span>
+</span><p>When your project is ready for production, make sure you install your packages with the added <code>--production</code> flag. The <code>--production</code> flag installs your <code>dependencies</code>, ignoring your <code>devDependencies</code>. This ensures that your development tooling and packages won’t go into the production environment.</p><span>
+</span><p>Additionally, you can set your <code>NODE_ENV</code> environment variable to <code>production</code> to ensure that your project’s <code>devDependencies</code> are never installed.</p><span>
+</span><h2 id="10becarefulwhenusingnpmignore">10. Be careful when using <code>.npmignore</code></h2><span>
+</span><p>If you haven't been using <code>.npmignore</code>, it defaults to <code>.gitignore</code> with a few additional sane defaults.</p><span>
+</span><p>What many don't realize that once you add a <code>.npmignore</code> file to your project the <code>.gitignore</code> rules are (ironically) ignored. The result is you will need to audit the two ignore files in sync to prevent sensitive leaks when publishing.</p><span>
+</span><h2 id="11automatenpminitwithdefaults">11. Automate <code>npm init</code> with defaults</h2><span>
+</span><p>When you run <code>npm init</code> in a new project, you’re able to go through and set up your <code>package.json</code>’s details. If you want to set defaults that <code>npm init</code> will always use, you can use the <code>config set</code> command, with some extra arguments:</p><span>
+</span><pre><code>npm config set init.author.name $name
+npm config set init.author.email $email
+</code></pre><span>
+</span><p>If, instead, you want to completely customize your init script, you can point to a self-made default init script by running </p><span>
+</span><pre><code>npm config set init-module ~/.npm-init.js`
+</code></pre><span>
+</span><p>Here’s a sample script that prompts for private settings and creates a GitHub repo if you want. Make sure you change the default GitHub username (<code>YOUR_GITHUB_USERNAME</code>) as the fallback for the GitHub username environment variable.</p><span>
+</span><pre><code class="language-js">var cp = require('child_process');
+var priv;
+
+var USER = process.env.GITHUB_USERNAME || 'YOUR_GITHUB_USERNAME';
+
+module.exports = {
+
+  name: prompt('name', basename || package.name),
+
+  version: '0.0.1',
+
+  private: prompt('private', 'true', function(val){
+    return priv = (typeof val === 'boolean') ? val : !!val.match('true')
+  }),
+
+  create: prompt('create github repo', 'yes', function(val){
+    val = val.indexOf('y') !== -1 ? true : false;
+
+    if(val){
+      console.log('enter github password:');
+      cp.execSync("curl -u '"+USER+"' https://api.github.com/user/repos -d " +
+        "'{\"name\": \""+basename+"\", \"private\": "+ ((priv) ? 'true' : 'false')  +"}' ");
+      cp.execSync('git remote add origin '+ 'https://github.com/'+USER+'/' + basename + '.git');
+    }
+
+    return undefined;
+  }),
+
+  main: prompt('entry point', 'index.js'),
+
+  repository: {
+    type: 'git',
+    url: 'git://github.com/'+USER+'/' + basename + '.git' },
+
+  bugs: { url: 'https://github.com/'+USER'/' + basename + '/issues' },
+
+  homepage: "https://github.com/"+USER+"/" + basename,
+
+  keywords: prompt(function (s) { return s.split(/\s+/) }),
+
+  license: 'MIT',
+
+  cleanup: function(cb){
+
+    cb(null, undefined)
+  }
+
+}
+</code></pre><span>
+</span><span>
+</span><span>
+</span><p>If you want to learn more about npm, Node.js, JavaScript, Docker, Kubernetes, Electron, and tons more, you should follow <a href="https://twitter.com/nodesource">@NodeSource</a> on Twitter. We're always around and would love to hear from you!</p><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

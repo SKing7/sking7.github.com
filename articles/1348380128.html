@@ -1,0 +1,161 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>解耦---Hybrid H5跨平台性思考</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>解耦---Hybrid H5跨平台性思考</h1>
+                <div class="rich_media_content " id="js_content"><span>
+                        
+
+                        
+                        
+                        </span><p>跨平台，是H5最重要的能力之一。而 Hybrid H5 因强依赖于具体 app，往往不具有跨平台性。这时，将强依赖关系解耦，即可恢复 H5 的跨平台能力。近期本人负责 手Q 红包打赏项目的前端开发，因项目涉及到多 app 跨平台兼容，对 hybrid H5 的跨平台性有了一定的感悟和思考。在这里做下总结分享，希望能对大家有所收获。</p><h3>Hybrid H5 跨平台性</h3><p>进入正题之前，先解释下本文主题的两个名词：</p><p>①Hybrid H5，即混合了原生能力的 H5。区别于纯粹 web 端的 H5，它可调用原生的能力，强依赖于具体原生 app，与原生共同构建整个 app 的 UI 层，是 app UI 层很好的灵活性补充。微信和 手Q 上的 H5 业务一般都属于 Hybrid H5 的范畴。</p><p>② 跨平台性，即一个 H5 页面可同时运行在多个平台上。可运行平台越多，跨平台性就越强。在如今移动互联网的发展大潮中，H5 能与体验更优的原生终端齐步并进，其跨平台性可谓功不可没。</p><p>因强依赖于具体 app，Hybrid H5 往往不具有跨平台性。</p><p>本文将从 Hybrid H5 与原生的通讯原理出发，逐步探讨如何通过解耦来恢复 Hybrid H5 的跨平台性。</p><h3>Hybrid H5 与原生的通讯原理</h3><p>原理图</p><p><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/tnZGrhTk4deVTqjUYhmmkukN7MnFS2VgicbeCOjibvxxWPWibwia9ff8R7VBIEQAKZVzMTBbNY1ic95XgcPNNUcP1ZQ/0?wx_fmt=png" data-ratio="0.17266187050359713" data-w=""><br></p><p>从原理图中，有<strong>4个关键点：</strong></p><p><strong>1个通讯媒介</strong>——原生自定义的通讯协议；</p><p>以及围绕着通讯媒介执行的<strong>3个通讯行为</strong>——触发、调用、回调。</p><p><strong>关键点详解</strong></p><p><strong>①通讯媒介——原生通讯协议</strong>：原生自定义的伪协议，一般会定义成与 http 协议类似的格式：</p><p>协议名://接口路径?参数1=XXX&amp;参数2=XXX&amp;参数3=XXX#callback</p><p>其中：</p><p>a、协议名：app 自定义的协议名，用于H5触发行为的监控捕获，如 手Q 使用的 jsbridge://；<br>b、接口路径：原生具体能力路径，不同原生能力路径不同；<br>c、参数1=XXX&amp;参数2=XXX&amp;参数3=XXX#callback：H5传参与回调方法标识；</p><p>根据通讯协议规范，即可针对不同的原生能力给H5提供不同的调用地址，如：</p><pre><code>jsbridge://method?a=2&amp;b=3#h5MethodTag</code></pre><p><strong>②通讯行为——触发：</strong>能被原生监听并捕获截拦的H5行为，都可以作为原生通讯协议的触发行为。</p><p>Hybrid H5 的这类行为有 console.log、alert、confirm、prompt、location.href 等。将原生协议内容通过其中的某一行为触发，即可被原生正确捕获并解析。如：</p><pre><code>location.href ='jsbridge://method?a=2&amp;b=3#h5MethodTag'</code></pre><p>H5调用后，原生终端会捕获到内容：jsbridge://method?a=2&amp;b=3#h5MethodTag</p><p><strong>③通讯行为——调用：</strong>原生终端根据 H5 传过来的内容，解析匹配后会路由到具体处理方法，执行原生能力逻辑。以 ios 为例（swift 语言），“调用”逻辑如下：</p><pre><code>func webView(webView: UIWebView, shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType) - Bool {
+ &nbsp; &nbsp;let url = request.URL //url
+ &nbsp; &nbsp;let scheme = url ? .scheme //协议名
+ &nbsp; &nbsp;let method = url ? .host //接口路径
+ &nbsp; &nbsp;let query = url ? .query //参数
+
+ &nbsp; &nbsp;if url != nil &amp;&amp; scheme == "jsbridge" {
+ &nbsp; &nbsp; &nbsp; &nbsp;/*根据method路由*/
+ &nbsp; &nbsp; &nbsp; &nbsp;switch method!{
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case "method":
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;self.method()
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case "openTenpayView":
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;self.openTenpayView()
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;...其他方法...
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;default:
+ &nbsp; &nbsp; &nbsp; &nbsp;}
+ &nbsp; &nbsp; &nbsp; &nbsp;return false
+ &nbsp; &nbsp;} else {
+ &nbsp; &nbsp; &nbsp; &nbsp;return true
+ &nbsp; &nbsp;}
+}</code></pre><p>原生终端根据捕获到的协议内容，进行解析获取，若伪协议为原生指定的伪协议（“jsbridge”），就会根据 method 内容和 query 参数进行路由操作，寻找具体的方法执行逻辑。否则，忽略处理，按照 webview 原有跳转逻辑处理。以第②步触发的伪协议内容为例，在本例“调用”代码中被原生捕获后，会路由执行逻辑：self.method();</p><p><strong>④通讯行为——回调：</strong>原生根据 H5 传过来的内容，捕获 js 回调函数方法名，在原生逻辑执行结束后，将执行结果带到回调函数中并执行 js 回调函数。通过在第③步“调用”执行完后，ios 会调用 js 回调函数 H5MethodTag：</p><pre><code>/*解析到H5的回调函数名为H5MethodTag(#号后内容)，回调执行js的方法*/
+webview.stringByEvaluatingJavaScriptFromString("H5MethodTag(data)") 
+</code></pre><p>通过以上4个关键点，即可做到 H5 与原生终端的相互通讯，完成H5对原生能力的调用。</p><h3>初次解耦：app 内跨平台——创建jsapi解耦通讯逻辑、封装平台差异</h3><p>由上述通讯原理了解到，Hybrid H5 直接调用定义好的原生通讯协议，即可完成通讯全过程。但这里有一个明显的问题，即 Hybrid H5 会强耦合于当前平台。不说跨 app 了，app 内跨平台(android/ios/wp)都会显示吃力。这里面有很多原因，其中一个较明显的原因在于，不同平台 app 开发团队通讯协议规范定义存在不一致。再者，H5 业务代码上满满的类似 jsonp 的协议调用，也并不好维护。</p><p>要达到 Hybrid H5 在 app 内跨平台，业界常见做法是 app 对外提供 jsapi。通过 jsapi 将各平台协议规范差异进行封装，解耦通讯逻辑，并以函数接口的方式提供给 Hybrid H5 调用。jsapi 接口一般会定义成如下格式：</p><pre><code>ns.method({
+ &nbsp; &nbsp;/*cfg参数对象*/
+}, function(data) {
+ &nbsp; &nbsp;/*回调*/
+})</code></pre><p><strong>原理图</strong></p><p><strong><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/tnZGrhTk4deVTqjUYhmmkukN7MnFS2VgBvodnguf9ZYLF1gWnUY8uZQfUumb3icZAgJicHQ0iaicaW1YvNT1ZZ5Fzw/0?wx_fmt=png" data-ratio="0.2517985611510791" data-w=""><br></strong></p><p><strong>原理核心：</strong>H5 与原生通讯之间增加一层 jsapi，jsapi 完成三大行为：api 接口创建、协议 url 组装、创建 iframe 发起伪协议请求；</p><p>因 手Q 的 jsapi 相对比较成熟，下面会以 手Q jsapi 中的核心源码进行分析。</p><p><strong>①api接口创建：</strong>js 函数接口封装、平台差异处理，方便H5函数调用</p><pre><code>mqq.build('mqq.tenpay.openTenpayView', {
+ &nbsp; &nbsp;iOS: function(options, callback) {
+ &nbsp; &nbsp; &nbsp; &nbsp;var callbackName = callback ? mqq.callback(callback) : null;
+ &nbsp; &nbsp; &nbsp; &nbsp;mqq.invokeClient('pay', 'openTenpayView', {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'params': options,
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'callback': callbackName
+ &nbsp; &nbsp; &nbsp; &nbsp;});
+ &nbsp; &nbsp;},
+ &nbsp; &nbsp;android: function(params, callback) {
+ &nbsp; &nbsp; &nbsp; &nbsp;mqq.invokeClient('pay', 'openTenpayView', JSON.stringify(params), callback);
+ &nbsp; &nbsp;},
+ &nbsp; &nbsp;supportInvoke: true,
+ &nbsp; &nbsp;support: {
+ &nbsp; &nbsp; &nbsp; &nbsp;iOS: '4.6.1',
+ &nbsp; &nbsp; &nbsp; &nbsp;android: '4.6.1'
+ &nbsp; &nbsp;}
+});</code></pre><p>mqq.build 方法为 api 接口创建方法。通过传入待创建的 jsapi 方法名（mqq.tenpay.openTenpayView）和不同平台(android/ios)的差异处理配置。最终会生成H5可调用方法：</p><pre><code>mqq.tenpay.openTenpayView({
+ &nbsp; &nbsp;/*data*/
+},function(ret){
+ &nbsp; &nbsp;/*callback*/
+})</code></pre><p><strong>②协议url组装：</strong>从接口到 url 协议的转换、回调处理，完成协议 url 创建</p><p>第①步中，不同平台差异处理都会调用 mqq.invokeClient 方法，该方法实际处理的就是原理图中与原生通讯的过程。我们先来看协议 url 组装的过程。</p><pre><code>/*生成回调索引*/
+sn = storeCallback(callback);
+/*协议路径组装*/
+url = 'jsbridge://' + encodeURIComponent(ns) + '/' + encodeURIComponent(method);
+/*参数组装*/
+argus.forEach(function(a, i) {
+ &nbsp; &nbsp;if (exports.isObject(a)) {
+ &nbsp; &nbsp;a = JSON.stringify(a);
+ &nbsp; &nbsp;}
+ &nbsp; &nbsp;if (i === 0) {
+ &nbsp; &nbsp; &nbsp; &nbsp;url += '?p=';
+ &nbsp; &nbsp;} else {
+ &nbsp; &nbsp; &nbsp; &nbsp;url += '&amp;p' + i + '=';
+ &nbsp; &nbsp;}
+ &nbsp; &nbsp;url += encodeURIComponent(String(a));
+});
+/*回调函数索引组装*/
+url += '#' + sn;
+/*链接调用*/
+result = openURL(url, ns, method);</code></pre><p>协议 url 组装的过程实际上是对传入参数按协议规范进行拼串的过程，其中包括匿名回调函数的回调索引创建、协议名&amp;协议路径拼串、传参循环遍历拼串。</p><p><strong>③创建 iframe 发起伪协议请求：</strong>请求触发</p><pre><code>/*创建隐藏iframe*/
+var iframe = document.createElement('iframe');
+iframe.style.cssText = 'display:none;width:0px;height:0px;';
+
+function failCallback() {
+ &nbsp; &nbsp;/*错误处理*/
+}
+/*iframe协议调用*/
+iframe.onload = failCallback;
+iframe.src = url;
+(document.body || document.documentElement).appendChild(iframe);
+
+/*删除iframe*/
+setTimeout(function() {
+ &nbsp; &nbsp;iframe &amp;&amp; iframe.parentNode &amp;&amp; iframe.parentNode.removeChild(iframe);
+}, 0);</code></pre><p>通过创建 iframe 来完成协议调用，并在调用结束后将 iframe 删除，即可在不影响原 H5 流程的情况下完成调用全过程。</p><h3>再次解耦：app 间跨平台—— jsapi 细化，封装 app 差异</h3><p>通过上述的解耦处理，Hybrid H5 已经可以在 app 内各平台运行了。但往往这种 jsapi 是 app 级提供的 jsapi（下面简称 app jsapi），app &nbsp;jsapi 并不会去兼容别的 app 的差异。而实际情况具体到某一 Hybrid H5，尤其是与 app 外部合作的 Hybrid H5，则并不仅仅只运行在一个 app上。比如信用卡还款业务，微信有，手Q 也有，功能都一样。这种情况就需要进一步的解耦，从业务侧再抽离一层 jsapi（下面简称 H5 jsapi）来处理 app 间的差异，而非每个 app 各自一套 H5。</p><p><strong>原理图</strong></p><p><strong><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/tnZGrhTk4deVTqjUYhmmkukN7MnFS2VgefY1GTvNO5wLKRgrM23uIGlVvg7ac3J7jWe9MOy9dC0NCicEU0MnxwA/0?wx_fmt=png" data-ratio="0.26258992805755393" data-w=""><br></strong></p><p><strong>原理核心：</strong>Hybrid H5 业务上增加多一层自维护的 H5 jsapi，H5 jsapi 完成两大行为：app jsapi 差异请求、app jsapi 差异封装。</p><p><strong>①app jsapi 差异请求：</strong>根据当前运行环境 app 请求具体的 app jsapi</p><p>下面以 Hybrid H5 需同时运行在手Q和空间独立版的 app jsapi 差异请求处理逻辑。</p><pre><code>&lt;script type="text/javascript" &gt;
+ &nbsp; &nbsp;(function() {
+ &nbsp; &nbsp; &nbsp; &nbsp;var ua = navigator.userAgent || "",
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;isQQ = ua.match(/QQ\/([\d\.]+)/),
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;isQzone = ua.match("Qzone");
+ &nbsp; &nbsp; &nbsp; &nbsp;if (isQQ) {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;document.write("&lt;script src='https://open.mobile.qq.com/sdk/qqapi.js?_bid=152'&gt;&lt;\x2Fscript&gt;");
+ &nbsp; &nbsp; &nbsp; &nbsp;} else if (isQzone) {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;document.write("&lt;script src='https://qzonestyle.gtimg.cn/qzone/phone/m/v4/widget/mobile/jsbridge.js'&gt;&lt;\x2Fscript&gt;");
+ &nbsp; &nbsp; &nbsp; &nbsp;} else {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;// 不是已兼容app，跳转到兼容app上运行
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;var currentHref = window.location.href;
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;/*跳转到手Q打开本页面*/
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;window.location.href = 'mqqapi://forward/url?url_prefix=' + btoa(currentHref) + '&amp;version=1&amp;src_type=web';
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;/*该页面支持自定义弹层*/
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;setTimeout(function() {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;var _tempBox = confirm('请在手机QQ中使用~');
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;if (_tempBox == true) {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;/*跳至手Q打开*/
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;window.location.href = 'mqqapi://forward/url?url_prefix=' + btoa(currentHref) + '&amp;version=1&amp;src_type=web';
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}, 0)
+ &nbsp; &nbsp; &nbsp; &nbsp;}
+ &nbsp; &nbsp;})()
+&lt;/script&gt;</code></pre><p>除了对需兼容的 app 进行差异请求外，还应对在不兼容的 app 运行时做跳转到主兼容 app 打开当前页面的逻辑处理，并做引导性提示，保障页面的完整可用性。</p><p><strong>②app jsapi 差异封装：</strong>根据当前具体运行的平台调用相应的 app jsapi 接口。H5 jsapi 的接口形式尽量与主运行 app 的 jsapi 保持一致</p><p>下面以打开 QQ 钱包原生页和原生页面跳转能力为例，做 app jsapi 的差异封装。</p><pre><code>var mod = {
+ &nbsp; &nbsp;...
+ &nbsp; &nbsp;openTenpayView: function(param, callback) {
+ &nbsp; &nbsp; &nbsp; &nbsp;if (isQQ) {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;var param = $.extend({
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;userId: $.getCookie('uin').replace(/^o0*/, '')
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}, param);
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;mqq.tenpay.openTenpayView(param, callback);
+ &nbsp; &nbsp; &nbsp; &nbsp;} else {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; /*调起手Q打开中转页jump.html，由中转页打开原生功能页*/
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;var targetHref = 'http://testhost.com/jump.html?go=' + param.viewTag + '&amp;_wv=' + (1 + 2 + 1024 + 2097152 + 33554432); //跳转url
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;/*跳到手Q*/
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;window.location.href = 'mqqapi://forward/url?url_prefix=' + btoa(targetHref) + '&amp;version=1&amp;src_type=web';
+ &nbsp; &nbsp; &nbsp; &nbsp;}
+ &nbsp; &nbsp;},
+ &nbsp; &nbsp;openUrl: function(paramObj) {
+ &nbsp; &nbsp; &nbsp; &nbsp;if (isQQ) {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;mqq.ui.openUrl({
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;url: paramObj.url,
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;target: 1
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;});
+ &nbsp; &nbsp; &nbsp; &nbsp;} else if (isQzone) {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;mqq.invoke("ui", "openUrl", {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;url: paramObj.url,
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;target: 1,
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;style: 1
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;});
+ &nbsp; &nbsp; &nbsp; &nbsp;} else {
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;/*兼容处理*/
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;location.href = paramObj.url
+ &nbsp; &nbsp; &nbsp; &nbsp;}
+ &nbsp; &nbsp;},
+ &nbsp; &nbsp;...其他接口...
+};
+return mod;</code></pre><p>调用 openTenpayView，页面能在 手Q 中正常调用，而在非 手Q 时则跳转回 手Q 打开处理；</p><p>调用 openUrl，对于 手Q 和空间独立版做相应的接口调用，而其他平台则直接使用 H5 的 location 跳转。</p><h3>总结</h3><p>H5 本质是具有跨平台性的。Hybrid H5 因混合了原生能力，强耦合于原生，不再具有跨平台性。要恢复其跨平台能力，关键在解耦，将其耦合于原生的部分解耦封装起来。</p><p>解耦是开发很重要的一项能力，Hybrid H5 跨平台性的回归正得益于解耦的处理。</p><p>因耦合而导致某项能力减弱的情况还有很多，比如 H5 的灵活性等等。遇到这种情况大家不妨也试试解耦，或许会收到意想不到的惊喜。</p><p><strong>如果您觉得我们的内容还不错，就请扫描二维码打赏作者并转发到朋友圈，和小伙伴一起分享吧~</strong><br><strong></strong></p><p><strong><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/tnZGrhTk4ddbaJam1zcJEuO1P6jQ7HuhUqKbryMe7SsgsR0LKBvicvibwdUIgYbsfdYItc5ribjqjk5z3vOsKMY4A/0?wx_fmt=jpeg" data-ratio="1.0033333333333334" data-w="300"><br></strong></p><hr><p><span><strong><strong>本文系腾讯Bugly独家内容，转载请在文章开头显眼处</strong></strong><strong><strong><strong><span><strong><span><strong>注明作者和出处“腾讯Bugly(http://bugly.qq.com)”</strong></span></strong></span></strong></strong></strong></span></p><p><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/tnZGrhTk4dfnJPg1t9fUnoJlGoJlMTu2ia4sQO8K5b7KLe68UQmNWKLTkc8EywuR8hf55wfXv8f4p5RKH4zAicZA/0?wx_fmt=png" data-ratio="0.5769230769230769" data-w="520"></p><span>
+                    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

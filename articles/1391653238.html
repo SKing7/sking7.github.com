@@ -1,0 +1,60 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The target="_blank" vulnerability by example</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>The target="_blank" vulnerability by example</h1>
+                <div class="body"><span>
+    </span><p><strong>Edit:</strong> Instagram has fixed this issue, presumably because of this article. Facebook and Twitter still have not. I used Instagram as the prime example, but the main takeaway is that the <code>target="_blank"</code> vulnerability is extremely common. The individual web developer should guard against it and the browsers should consider modifying this behavior.</p><span>
+
+</span><hr><span>
+
+</span><p>If you use the <code>target="_blank"</code> attribute on a link, and do not accompany it with a <code>rel="noopener"</code> attribute, you are leaving your users open to a very simple phishing attack. We run a script that takes advantage of this issue in order to notify users when they come from a site that has not protected them from the vulnerability.</p><span>
+</span><div class="highlight"><pre><span class="vg">if</span><span class="w"> </span><span class="p">(</span><span class="vg">window</span><span class="o">.</span><span class="vg">opener</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="vg">window</span><span class="o">.</span><span class="vg">opener</span><span class="o">.</span><span class="vg">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"https://dev.to/phishing?referrer="</span><span class="o">+</span><span class="vg">document</span><span class="o">.</span><span class="vg">referrer</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div><span>
+</span><p>I believe that the majority of websites do not deal with this issue properly, but I was surprised to find that <a href="https://instagram.com/thepracticaldev">Instagram.com</a> was one of them. We just recently started an <a href="https://www.instagram.com/thepracticaldev">Instagram account for @ThePracticalDev</a> and that is when we noticed the problem. If you click the <code>dev.to</code> link in our profile, and then go back to the original tab, you will see what I mean. Twitter also does not protect against this vulnerability on Safari, not Chrome or Firefox. They do not use <code>rel="noopener"</code> so it seems like the script they are using to accomplish this security is not working properly in Safari.</p><span>
+
+</span><p><strong>Edit:</strong> Because Instagram fixed the issue after this post went up I have changed the following example to Facebook Pages.</p><span>
+
+</span><h3>To clarify</h3><span>
+
+</span><ol>
+<li>Visit <a href="https://www.facebook.com/thepracticaldev/about/">The Practical Dev Facebook page</a>.</li>
+<li>Click the <code>dev.to</code> link in the profile. This opens a new tab or window.</li>
+<li>Observe that the original tab has migrated to <a href="https://dev.to/phishing">this page</a>.</li>
+</ol><span>
+
+</span><p><img src="https://res.cloudinary.com/practicaldev/image/fetch/s---8KJYT9x--/c_limit,f_auto,fl_progressive,q_auto,w_725/http://i.imgur.com/vc93vSS.png" alt="@ThePracticalDev Instagram Account"></p><span>
+
+</span><p>When a website uses <code>target="_blank"</code> on their links in order to open a new tab or window, that website gives the new page access to the existing window through the window.opener API, allowing it a few permissions. Some of these permissions are automatically negated by cross-domain restrictions, but window.location is fair game.</p><span>
+
+</span><h3>But wait, there's more</h3><span>
+
+</span><p>Not only is this an issue with phishing attacks, it is also a privacy concern because the newly opened website has <em>ongoing</em> access to the browsing location of the original tab. It can poll for this information and get the answer. Thankfully this behavior seems to fall under the cross-domain restrictions, so while I might gain access to certain ongoing information you might not expect me to know, there are sane restrictions that should likely apply to the entire spec.</p><span>
+
+</span><p><strong>Edit:</strong> When I first wrote this, I proposed a browser-spying scenario where a bad-actor could spy more thoroughly on a user's browsing history. I think that was inaccurate, so I modified the statement.</p><span>
+
+</span><p>In order to restrict the behavior <code>window.opener</code> access, the original page needs to add a <code>rel="noopener"</code> attribute to any link that has <code>target="_blank"</code>. However, Firefox does not support that tag, so you should actually use <code>rel="noopener noreferrer"</code> for full coverage. Some amount of prevention can be acheived through scripting, though, as observed with Twitter, this seems to fail on Safari.</p><span>
+</span><div class="highlight"><pre><span class="vg">var</span><span class="w"> </span><span class="vg">otherWindow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">window</span><span class="o">.</span><span class="vg">open</span><span class="p">();</span>
+<span class="vg">otherWindow</span><span class="o">.</span><span class="vg">opener</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">null</span><span class="p">;</span>
+<span class="vg">otherWindow</span><span class="o">.</span><span class="vg">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">url</span><span class="p">;</span>
+</pre></div><span>
+</span><p>This script suggestion came from <a href="https://mathiasbynens.github.io/rel-noopener/">a good article on the subject</a>.</p><span>
+
+</span><p>This issue is not well-known, and is totally underestimated. This has been <a href="http://lists.w3.org/Archives/Public/public-whatwg-archive/2015Jan/0002.html">brought up</a> in a Web Hypertext Application Technology Working Group mailing list. In my opinion, the risks of this browser behavior far outweigh the potential benefits. Either way, there are no excuses for Facebook and Instagram and Twitter to have overlooked this.</p><span>
+
+</span><p>I'll have more to say about this kind of thing in the future. Follow me (<a href="https://twitter.com/bendhalpern">@bendhalpern</a>) or <a href="https://twitter.com/thepracticaldev">@ThePracticalDev</a> on Twitter if you are interested.</p><span>
+
+  </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

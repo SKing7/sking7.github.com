@@ -1,0 +1,258 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The Importance of !important: Forcing Immutability in CSS – CSS Wizardry – CSS, OOCSS, front-end architecture, performance and more, by Harry Roberts</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>The Importance of !important: Forcing Immutability in CSS – CSS Wizardry – CSS, OOCSS, front-end architecture, performance and more, by Harry Roberts</h1>
+                <section class="layout__item  desk-three-fifths  s-post" data-ui-component="Main content" itemscope="" itemtype="http://schema.org/Article">
+
+            <time class="post__date" datetime="2016-05-08" itemprop="datePublished">8 May, 2016</time>
+
+            
+
+            <p class="hide">Written by <b itemprop="author">Harry Roberts</b> on <b itemprop="publisher">CSS Wizardry</b>.</p>
+
+            <p>There’s a piece of advice I give out to clients and workshop attendees that is
+often met with shock and horror:</p>
+
+<p><strong>I advise the use of <code class="highlighter-rouge">!important</code>.</strong></p>
+
+<p>For the most part, I’m glad that the initial reaction is disgust—<code class="highlighter-rouge">!important</code>
+usually <em>is</em> bad news—however, there’s a little more to it than that…</p>
+
+<p>As with most things, there are exceptional circumstances in which following the
+rules would actually be a pretty bad idea, and it’s usually context and
+discretion that inform our decision to break them.</p>
+
+<p>For example, in the UK, the speed limit is 70mph (unfortunately we do still use
+miles). You are not allowed to drive faster than 70mph. It’s illegal. You just
+can’t do it.</p>
+
+<p><em>However…</em> if your friend is dying in the back seat and you’re trying to get
+them to hospital before they bleed out everywhere, by all means, drive faster
+than 70mph!</p>
+
+<p>In 90% of situations, the rule is a good one. By and large, we’re much better
+off following it than not following it. But there will definitely be situations
+that fall outside of that 90%.</p>
+
+<p>Similarly, as we mature as developers, we need to recognise that the rules we
+live by will also have exceptions, given the correct circumstances.</p>
+
+<p>With age (or time, I guess) comes wisdom, so with that it mind I would always
+tell junior developers not to use <code class="highlighter-rouge">!important</code> at all. But, once developers
+start to grow and learn that things aren’t always that black and white, we can
+get a little more detailed and nuanced, and throw in some caveats.</p>
+
+<p>But before we look at the exceptions to the rule, let’s look at the rule
+itself.</p>
+
+<h2 id="never-use-important-in-anger">Never Use <code class="highlighter-rouge">!important</code> in Anger</h2>
+
+<p>Using <code class="highlighter-rouge">!important</code> reactively is the most heavy-handed, nuclear,
+<a href="https://www.youtube.com/watch?v=uMSV4OteqBE&amp;t=78s">all-the-way-up-to-11</a>
+option we have at our disposal. Using <code class="highlighter-rouge">!important</code> to get yourself out of a
+problem with some existing CSS is most certainly inadvisable. It will have
+knock-on effects whose only solution will be to use another <code class="highlighter-rouge">!important</code>, then
+another, then another, ad infinitum.</p>
+
+<p>Do not use <code class="highlighter-rouge">!important</code> reactively. Do not use <code class="highlighter-rouge">!important</code> to solve a
+specificity issue. Do not use <code class="highlighter-rouge">!important</code> in anger.</p>
+
+<h3 id="hacking-specificity">Hacking Specificity</h3>
+
+<p>If we do find ourselves in a situation where existing styles are overriding our
+current work, we have much safer methods of altering their specificity.</p>
+
+<p>If we need to bump the specificity of a single class up, we can chain it with
+itself (e.g. <code class="highlighter-rouge">.btn.btn {}</code>). If we need to bring the specificity of an ID down,
+we can rewrite it as an attribute selector (e.g. <code class="highlighter-rouge">[id="header"] {}</code>). You can
+read about that in much more detail in my <a href="http://csswizardry.com/2014/07/hacks-for-dealing-with-specificity/"><cite>Hacks for Dealing with
+Specificity</cite></a>
+article.</p>
+
+<p>Most of the time, there is no need to turn to an <code class="highlighter-rouge">!important</code>.</p>
+
+<p>Right. When can we use it?</p>
+
+<h2 id="forcing-immutability-with-important">Forcing Immutability with <code class="highlighter-rouge">!important</code></h2>
+
+<p>The idea of immutability is one that really fascinates and resonates with me.
+The idea that something can never be changed after it’s been created sounds
+amazing! How much more confidence would we have if we knew that something
+always looked and behaved the same no matter where we put it? I like that idea
+a lot!</p>
+
+<p>This is typically quite hard to achieve in CSS because it’s designed around an
+inheritance-based model which makes heavy use of mutations. But, there is a
+specific type of rule that can actually make great use of immutability, and do
+so very safely: utility classes.</p>
+
+<p>Utility classes are tiny little classes that carry out very specific, very
+explicit jobs. Classes like:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>.u-text-center { text-align: center; }
+
+.u-float-left { float: left; }
+
+.u-text-large { font-size: 48px; }
+</code></pre><span>
+</span></div>
+
+<p>They all begin with a <code class="highlighter-rouge">u-</code> in order to tell the next developer <a href="http://csswizardry.com/2015/03/more-transparent-ui-code-with-namespaces/">what their
+purpose
+is</a>,
+and they all carry out just one simple piece of styling.</p>
+
+<p>All of the declarations in the rulesets above are defined without an
+<code class="highlighter-rouge">!important</code> on them, but they really, really ought to be. Here’s why:</p>
+
+<p>By using a class like <code class="highlighter-rouge">u-text-center</code> in our HTML, we are making a definite,
+clear, unambiguous decision that we want some text to be centrally aligned.
+There is absolutely no question about that. However, the selector
+<code class="highlighter-rouge">.u-text-center {}</code> has a relatively low specificity, so there’s a chance that
+another selector could accidentally override it. Take the following HTML and
+CSS:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>.sub-content h2 {
+  ...
+  text-align: left;
+}
+
+.u-text-center {
+  text-align: center;
+}
+</code></pre><span>
+</span></div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;div class="sub-content"&gt;
+  &lt;h2 class="u-text-center"&gt;...&lt;/h2&gt;
+&lt;/div&gt;
+</code></pre><span>
+</span></div>
+
+<p>Unfortunately, we have a specificity mismatch here: <code class="highlighter-rouge">.sub-content h2 {}</code> has a
+higher specificity than <code class="highlighter-rouge">.u-text-center {}</code>, so the <code class="highlighter-rouge">h2</code> ends up being aligned
+left despite us explicitly telling it to be <code class="highlighter-rouge">text-align: center;</code>. This is also
+a mutation: <code class="highlighter-rouge">u-text-center</code> no longer aligns something centrally.</p>
+
+<p>This, in a nutshell, is why we should put <code class="highlighter-rouge">!important</code> on our utility styles.
+We want utilities to be immutable; there is no chance ever that we would apply
+a class of <code class="highlighter-rouge">u-text-center</code> and expect something <strong>not</strong> to end up with centred
+text.</p>
+
+<p><strong>Force utility classes to be immutable by applying <code class="highlighter-rouge">!important</code> to their
+declarations.</strong></p>
+
+<p>Of course, in a perfect world (whatever that is), we wouldn’t have a selector
+like <code class="highlighter-rouge">.sub-content h2 {}</code> even present in our CSS, but it’s inevitable that.</p>
+
+<ul>
+  <li>someone comes along and ends up writing a selector like that;</li>
+  <li>there was already a selector like that in some legacy part of the project.</li>
+</ul>
+
+<p>Resilient and defensive systems are not designed for the perfect world, they’re
+designed for the real world, and in the real world, people write sloppy CSS.
+Using <code class="highlighter-rouge">!important</code> to force immutability will safeguard us from collisions and
+conflicts that others may introduce.</p>
+
+
+
+<p>I suppose it would be wise to have a brief aside about the general use of
+utility classes in here.</p>
+
+<p>If we are <em>not</em> adhering to the
+<a href="http://tachyons.io/">Tachyons</a>/<a href="http://www.basscss.com/">Basscss</a>/<a href="http://acss.io/">Atomic
+CSS</a> style of functional CSS (which is a different topic
+entirely), we probably don’t want to be seeing too many utility classes in our
+HTML.</p>
+
+<p>If, instead, we’re taking a more modular and componentised approach to our CSS
+(which we <em>probably</em> are), most of our classes will be very topical, e.g.:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>.c-carousel {}
+
+.o-media__body {}
+
+.c-nav-primary {}
+
+.c-btn--large {}
+</code></pre><span>
+</span></div>
+
+<p>They will have a scope (a Block, in
+<a href="http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/">BEM</a>),
+and will be well encapsulated. The beauty of classes like this is that we can
+easily spot relationships in our HTML (something that’s much harder (nigh on
+impossible) with functional CSS), e.g.:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;blockquote class="o-media  c-testimonial"&gt;
+  &lt;img class="o-media__img c-testimonial__photo" ... /&gt;
+  &lt;p class="o-media__body c-testimonial__text"&gt;...&lt;/p&gt;
+&lt;/blockquote&gt;
+</code></pre><span>
+</span></div>
+
+<p>Here we can clearly see a relationship between two distinct and separate strands
+of styling.</p>
+
+<p>Let’s say, however, that one specific testimonial needs to have a much larger
+<code class="highlighter-rouge">margin-bottom</code> applied to it. It’s not a treatment that all testimonials
+need, and it only needs the larger <code class="highlighter-rouge">margin-bottom</code> when it’s in this exact part
+of the page. This is a very implementation-specific design change.</p>
+
+<p>Here we’d reach for a utility class:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;blockquote class="o-media
+                   c-testimonial
+                   u-margin-bottom-large"&gt;
+</code></pre><span>
+</span></div>
+
+<p>We use a utility here because the extra <code class="highlighter-rouge">margin-bottom</code> doesn’t have anything
+to do with the testimonial specifically; it’s a very context-sensitive and
+temporary treatment, so we didn’t ought to hard code that change into our
+testimonial’s CSS.</p>
+
+<p>On the flip side. If we have a style of testimonial that has a larger font
+size, and any testimonial anywhere on the site could adopt this variation, we
+would not use a utility. This is a non-temporary treatment that belongs
+specifically to the testimonial, so we should codify and encapsulate it using a
+BEM Modifier:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;blockquote class="o-media
+                   c-testimonial  c-testimonial--large"&gt;
+</code></pre><span>
+</span></div>
+
+<p>So, as a general rule:</p>
+
+<p><strong>If it’s permanent styling, formalise it and code it right into your CSS. If
+it’s short-term or one-off styling, use a utility class.</strong></p>
+
+<p>Utility classes are probably my ‘least favourite’ type of class because they
+are really only one step away from inline styles. Use them sparingly, and to
+target very temporary or implementation-specific changes.</p>
+
+
+            
+
+                <hr>
+
+                <p>
+                    <a href="https://csswizardry.com/services/" class="btn  btn--full">Did you enjoy this? <strong>Hire me!</strong></a>
+                </p>
+            
+
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

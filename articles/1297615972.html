@@ -1,0 +1,160 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>ECMAScript 6 Proper Tail Calls in WebKit</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>ECMAScript 6 Proper Tail Calls in WebKit</h1>
+                <div class="bodycopy"><span>
+                </span><p>Proper Tail Calls (PTC) is a new feature in the ECMAScript 6 language. This feature was added to facilitate recursive programming patterns, both for direct and indirect recursion. Various other design patterns can benefit from PTC as well, such as code that wraps some functionality where the wrapping code directly returns the result of what it wraps. Through the use of PTC, the amount of memory needed to run code is reduced. In deeply recursive code, PTC enables code to run that would otherwise throw a stack overflow exception.</p><span>
+</span><h2>What is a Proper Tail Call?</h2><span>
+</span><p>Typically when calling a function, stack space is allocated for the data associated with making a function call. This data includes the return address, prior stack pointer, arguments to the function, and space for the function’s local values. This space is called a stack frame. A call made to a function in <em>tail position</em> will reuse the stack space of the calling function. A function call is in tail position if the following criteria are met:</p><span>
+</span><ul>
+<li>The calling function is in <a href="https://tc39.github.io/ecma262/#sec-strict-mode-code">strict mode</a>.</li>
+<li>The calling function is either a normal function or an arrow function.</li>
+<li>The calling function is not a generator function.</li>
+<li>The return value of the called function is returned by the calling function.</li>
+</ul><span>
+</span><p>When a function call is in tail position, ECMAScript 6 mandates that such a call must reuse the stack space of its own frame instead of pushing another frame onto the call stack.  To emphasize, ECMAScript 6 requires that a call in tail position will reuse the caller’s stack space. The calling function’s frame is called a <em>tail deleted frame</em> as it is no longer on the stack once it makes a tail call. This means that the tail deleted function will not show up in a stack trace.  It is important to note that PTC differs from <a href="http://c2.com/cgi/wiki?TailCallOptimization">Tail Call Optimization</a>, which is a discretionary optimization that many optimizing compilers will make for various performance reasons.</p><span>
+</span><h2>Benefits of Proper Tail Calls</h2><span>
+</span><p>PTC was added to ECMAScript primarily to reuse stack space. The reuse of the stack memory allows for recursive and tail call coding patterns common to functional programming and other programming paradigms. Using PTC, a program could make an unbounded number of consecutive tail calls without unboundedly growing the stack.</p><span>
+</span><p>PTC provides other benefits as well. Programs that utilize PTC can see a reduced memory footprint because the garbage collector will be more likely to collect certain local objects. Programs that utilize PTC can also see an improvement in speed because there is less processing when returning from a tail called function.</p><span>
+</span><h3>Stack Space</h3><span>
+</span><p>Reduced stack usage can provide benefits in other ways as well. Modern computing devices incorporate <a href="https://en.wikipedia.org/wiki/Memory_hierarchy">tiered memory caches</a> to reduce latency in memory accesses. Although these caches are generous in size, they are still finite. Reducing stack usage through the use of PTC also reduces the amount of cache space needed, freeing up cache space for other memory accesses.</p><span>
+</span><h3>Locally Allocated Objects</h3><span>
+</span><p>Consider a function that allocates a local object, but that object is never made visible to other code. The only references to such a local object will be through a pointer in the function’s stack frame or in a register that the function is using. Should the JavaScript virtual machine need to garbage collect memory, it will find a reference to such a local object by scanning the stack and the contents of the CPU’s registers. If that function makes a call to another function and that call is not a tail call, then any local objects of the calling function will not be collected until the calling function itself returns. However, if a function makes a tail call to another function, all local objects of the calling function can be garbage collected because there are no more stack references to the object.</p><span>
+</span><h3>Returning from a Tail Called Function</h3><span>
+</span><p>Another benefit of PTC is that when a leaf function returns, it bypasses all intermediate tail called functions and returns directly to the first caller that didn’t make a tail call. This eliminates all of the return processing of those intermediate functions. The deeper the call chain of successive tail calls, the more performance benefit this provides. This works for both direct and mutual recursion.</p><span>
+</span><h2>Examples</h2><span>
+</span><p>There are many algorithms that are best written using recursion. Many of those algorithms naturally take advantage of PTC, while others may require some reworking. Consider writing a program to compute the <a href="https://en.wikipedia.org/wiki/Greatest_common_divisor">greatest common divisor (GCD)</a> function using <a href="https://en.wikipedia.org/wiki/Euclidean_algorithm">Euclid’s algorithm</a>. The translation of Euclid’s algorithm into a program that utilizes PTC is simple, elegant, and natural:</p><span>
+</span><pre><code class="javascript"><span class="string">"use strict"</span>;
+<span class="keyword type">function</span> <span class="identifier">gcd</span>(<span class="identifier">m</span>, <span class="identifier">n</span>)
+{
+    <span class="keyword control">if</span> (<span class="operator">!</span><span class="identifier">n</span>)
+        <span class="keyword control">return</span> <span class="identifier">m</span>;
+    <span class="keyword control">return</span> <span class="identifier">gcd</span>(<span class="identifier">n</span>, <span class="identifier">m</span> <span class="operator">%</span> <span class="identifier">n</span>);
+}
+</code></pre><span>
+</span><p>The natural translation of other recursive mathematical functions can lead to recursive calls that are not in tail position. For example, a program that computes <a href="https://en.wikipedia.org/wiki/Factorial">factorial (N!)</a> is commonly written as:</p><span>
+</span><pre><code class="javascript"><span class="string">"use strict"</span>;
+<span class="keyword type">function</span> <span class="identifier">factorial</span>(<span class="identifier">n</span>)
+{
+    <span class="keyword control">if</span> (<span class="operator">!</span><span class="identifier">n</span>)
+        <span class="keyword control">return</span> <span class="number">1</span>;
+    <span class="keyword control">return</span> <span class="identifier">n</span> <span class="operator">*</span> <span class="identifier">factorial</span>(<span class="identifier">n</span> <span class="operator">-</span> <span class="number">1</span>);
+}
+</code></pre><span>
+</span><p>In this function, the recursive call to <code>factorial()</code> is not in tail position because the return statement computes and returns the product of <code>n</code> and the result of the recursive call. As a reminder, to be in tail position, the return value of the called function must be the only thing returned by the calling function. With a little modification, we can rewrite <code>factorial</code> to utilize PTC as follows:</p><span>
+</span><pre><code class="javascript"><span class="string">"use strict"</span>;
+<span class="keyword type">function</span> <span class="identifier">factorial</span>(<span class="identifier">n</span>, <span class="identifier">partialFactorial</span> <span class="operator">=</span> <span class="number">1</span>)
+{
+    <span class="keyword control">if</span> (<span class="operator">!</span><span class="identifier">n</span>)
+        <span class="keyword control">return</span> <span class="identifier">partialFactorial</span>;
+    <span class="keyword control">return</span> <span class="identifier">factorial</span>(<span class="identifier">n</span> <span class="operator">-</span> <span class="number">1</span>, <span class="identifier">n</span> <span class="operator">*</span> <span class="identifier">partialFactorial</span>);
+}
+</code></pre><span>
+</span><p>This change puts the recursive call to factorial in tail position which allows the function to take advantage of PTC. The number of recursive calls and arithmetic operations is the same for both versions.</p><span>
+</span><p>This next example involves the functions <code>computeSquareRoot()</code>, <code>computePositiveSquareRoot()</code> and <code>iterativeSquareRoot()</code> which are used to calculate the square roots of numbers using <a href="https://en.wikipedia.org/wiki/Newton%27s_method">Newton’s Iterative method</a>:</p><span>
+</span><pre><code class="javascript"><span class="string">"use strict"</span>;
+<span class="keyword type">function</span> <span class="identifier">computeSquareRoot</span>(<span class="identifier">x</span>)
+{
+    <span class="keyword control">if</span> (<span class="operator">!</span><span class="identifier">x</span>)
+        <span class="keyword control">return</span> <span class="string">"0"</span>;
+
+    <span class="keyword type">let</span> <span class="identifier">imaginaryPart</span> <span class="operator">=</span> <span class="string">""</span>;
+    <span class="keyword control">if</span> (<span class="identifier">x</span> <span class="operator">&lt;</span> <span class="number">0</span>) {
+        <span class="identifier">x</span> <span class="operator">=</span> <span class="operator">-</span><span class="identifier">x</span>;
+        <span class="identifier">imaginaryPart</span> <span class="operator">=</span> <span class="string">"i"</span>;
+    }
+
+    <span class="keyword control">return</span> <span class="identifier">computePositiveSquareRoot</span>(<span class="identifier">x</span>).<span class="identifier">toString</span>() <span class="operator">+</span> <span class="identifier">imaginaryPart</span>;
+}
+
+<span class="keyword type">function</span> <span class="identifier">computePositiveSquareRoot</span>(<span class="identifier">x</span>)
+{
+    <span class="keyword type">let</span> <span class="identifier">targetEpsilon</span> <span class="operator">=</span> <span class="identifier">x</span> <span class="operator">/</span> <span class="number">10000000000</span>;
+    <span class="keyword control">return</span> <span class="identifier">iterativeSquareRoot</span>(<span class="identifier">x</span>, <span class="identifier">x</span> <span class="operator">/</span> <span class="number">2</span>, <span class="identifier">targetEpsilon</span>);
+}
+
+<span class="keyword type">function</span> <span class="identifier">iterativeSquareRoot</span>(<span class="identifier">x</span>, <span class="identifier">estimate</span>, <span class="identifier">targetEpsilon</span>)
+{
+    <span class="keyword type">let</span> <span class="identifier">newEstimate</span> <span class="operator">=</span> ((<span class="identifier">x</span> <span class="operator">/</span> <span class="identifier">estimate</span>) <span class="operator">+</span> <span class="identifier">estimate</span>) <span class="operator">/</span> <span class="number">2</span>;
+    <span class="keyword type">let</span> <span class="identifier">delta</span> <span class="operator">=</span> <span class="identifier">Math</span>.<span class="identifier">abs</span>(<span class="identifier">estimate</span> <span class="operator">-</span> <span class="identifier">newEstimate</span>);
+
+    <span class="keyword control">if</span> (<span class="identifier">delta</span> <span class="operator">&lt;</span><span class="operator">=</span> <span class="identifier">targetEpsilon</span>)
+        <span class="keyword control">return</span> <span class="identifier">newEstimate</span>;
+
+    <span class="keyword control">return</span> <span class="identifier">iterativeSquareRoot</span>(<span class="identifier">x</span>, <span class="identifier">newEstimate</span>, <span class="identifier">targetEpsilon</span>);
+}
+</code></pre><span>
+</span><p>The top function, <code>computeSquareRoot()</code>, determines if the result will be a real or imaginary number and then calls <code>computePositiveSquareRoot()</code>, which sets up the iterative square process and returns the result of <code>iterativeSquareRoot()</code>. The call to <code>computePositiveSquareRoot()</code> in <code>computeSquareRoot()</code> is not in tail position since additional processing is done on the result of the call. All other function calls are tail position.</p><span>
+</span><p>Suppose <code>computeSquareRoot()</code> is called with 99 as the argument. It will call <code>computePositiveSquareRoot(99)</code>, which will subsequently call <code>iterativeSquareRoot(99, ...)</code>. Using Web Inspector, we observed that <code>iterativeSquareRoot()</code> calls back to itself 6 times before returning a result. That result is returned directly back to computeSquareRoot, where it is converted to a string, saving the processing of 7 returns.</p><span>
+</span><p>This last example shows the type of functional programming that PTC enables:</p><span>
+</span><pre><code class="javascript"><span class="string">"use strict"</span>;
+<span class="keyword type">function</span> <span class="identifier">newList</span>(<span class="identifier">count</span>)
+{
+    <span class="keyword type">let</span> <span class="identifier">head</span> <span class="operator">=</span> { <span class="identifier">value</span><span class="operator">:</span> <span class="identifier">count</span>, <span class="identifier">next</span><span class="operator">:</span> <span class="keyword literal">null</span> };
+    <span class="keyword control">while</span> (<span class="operator">-</span><span class="operator">-</span><span class="identifier">count</span>)
+        <span class="identifier">head</span> <span class="operator">=</span> { <span class="identifier">value</span><span class="operator">:</span> <span class="identifier">count</span>, <span class="identifier">next</span><span class="operator">:</span> <span class="identifier">head</span> };
+    <span class="keyword control">return</span> <span class="identifier">head</span>;
+}
+
+<span class="keyword type">let</span> <span class="identifier">count</span> <span class="operator">=</span> <span class="number">100000</span>;
+<span class="keyword type">let</span> <span class="identifier">list</span> <span class="operator">=</span> <span class="identifier">newList</span>(<span class="identifier">count</span>);
+
+<span class="keyword type">function</span> <span class="identifier">contains</span>(<span class="identifier">list</span>, <span class="identifier">x</span>)
+{
+    <span class="keyword control">if</span> (<span class="operator">!</span><span class="identifier">list</span>)
+        <span class="keyword control">return</span> <span class="keyword literal">false</span>;
+    <span class="keyword control">if</span> (<span class="identifier">list</span>.<span class="identifier">value</span> <span class="operator">=</span><span class="operator">=</span> <span class="identifier">x</span>)
+        <span class="keyword control">return</span> <span class="keyword literal">true</span>;
+    <span class="keyword control">return</span> <span class="identifier">contains</span>(<span class="identifier">list</span>.<span class="identifier">next</span>, <span class="identifier">x</span>);
+}
+...
+
+<span class="keyword control">if</span> (<span class="identifier">contains</span>(<span class="identifier">list</span>, <span class="identifier">someValue</span>))
+   ...
+</code></pre><span>
+</span><p>The function <code>contains()</code> searches the list using tail recursion.  For a list the size of 100,000 elements given in this example, most browsers will run out of stack memory and throw an exception.  In strict mode, where <code>contains()</code> can take advantage of PTC, the program runs just fine.  It is also interesting to note that even with a list size small enough to allow this code to run without PTC, using PTC results in the code running 2.5x faster.</p><span>
+</span><h2>Things to Note</h2><span>
+</span><p>There are a couple subtle, but minor issues to be aware of when using PTC. Remember that PTC is only available in strict mode and only for calls made from tail position. The other notable change involves the generation of stack traces. There are some non-standard ECMAScript features in JavaScript that work differently in the presence of PTC. These include <code>Error.stack</code> and the <code>Console</code> object’s stack trace. For example, say a tail called function <code>gonnaThrowAnError()</code> throws an <code>Error</code> object; the function that catches that Error will not see the function that called <code>gonnaThrowAnError()</code> in the <code>Error</code> object’s stack trace. As a general rule, the <code>Console</code> object’s stack trace will not include a function that made a tail call to another function. We call such frames tail deleted frames because its as if they are deleted from the stack when making a call.</p><span>
+</span><h2>Debugging PTC with ShadowChicken</h2><span>
+</span><p>Because PTC places a strict resource guarantee on stack usage, JavaScriptCore cannot keep around information for all tail deleted frames. Keeping around any extra resources, no matter how small, for an unbounded number of tail deleted frames is not possible because it could use an unbounded amount of memory and eventually exhaust the memory limits of the program. Given that tail calls do not keep around any information in the program’s executing state, debugging tail calls can be challenging when using an interactive debugging tool. Without any added machinery, the debugger will not know if a tail call did or did not occur. Because we want to make debugging tail calls inside Web Inspector a great experience, we have implemented mechanisms inside JavaScriptCore to keep around a shadow stack that will display a finite number, currently 128, tail deleted frames. This allows us to both provide strict guarantees on memory usage and to provide users of PTC the benefit of seeing the most important stack frames in their program inside Web Inspector.</p><span>
+</span><p>We call our shadow stack implementation <em>ShadowChicken</em>. The name is an homage to the <a href="http://www.more-magic.net/posts/internals-gc.html">CHICKEN scheme interpreter</a>. <em>ShadowChicken</em> uses a logging mechanism for constructing its shadow stack. The log works as follows:</p><span>
+</span><ul>
+<li>On entry to a function, the function’s callee will log a <em>prologue</em> packet.</li>
+<li>When making a tail call, the caller will log a <em>tail</em> packet just before the tail call occurs.</li>
+<li>When an exception is thrown, <em>ShadowChicken</em> will log a <em>throw</em> packet.</li>
+</ul><span>
+</span><p>To construct the shadow stack, <em>ShadowChicken</em> takes two inputs:</p><span>
+</span><ol>
+<li>The log filled with a sequence of <em>prologue</em>, <em>tail</em>, and <em>throw</em> packets.</li>
+<li>The current top of the machine stack (note that the machine stack does not contain any frames that are tail deleted).</li>
+</ol><span>
+</span><p>Given these two inputs, <em>ShadowChicken</em> is able to construct a shadow stack that includes tail-deleted frames.  It will <a href="http://trac.webkit.org/browser/trunk/Source/JavaScriptCore/interpreter/_ShadowChicken_.cpp#L87">reconcile the machine stack with its log</a>. Because the log has <em>tail</em> packets for when tail calls occurred, it is able to use the log to insert tail-deleted stack frames into the shadow stack to represent frames that were only present on the machine stack before a tail call occurred. <em>ShadowChicken</em> uses a constant amount of memory on top of the memory your program already uses. The log is fixed in size. Whenever <em>ShadowChicken</em> runs out of space in the log, it will perform its reconciliation algorithm to update its internal data structure about the state of the shadow stack. The shadow stack will contain at most 128 tail deleted frames, a number we believe strikes a good balance between programs that intentionally take advantage of PTC and programs that just happen to use PTC without the explicit intention of doing so.</p><span>
+</span><h2>Hooking Up <em>ShadowChicken</em> to Web Inspector</h2><span>
+</span><p>Because JavaScriptCore has the machinery for constructing a shadow stack, Web Inspector can use JavaScriptCore’s shadow stack in its debugger. This allows users of Web Inspector to interact with tail deleted stack frames as if they are real stack frames that are on the current machine stack.</p><span>
+</span><p>Let’s see some interactions with Web Inspector and the iterative square root code to compute the square root of 99. After setting a breakpoint in <code>iterativeSquareRoot()</code> and invoking <code>computeSquareRoot(99)</code>, Web Inspector shows that we are paused, ready to return the result.</p><span>
+</span><figure class="widescreen mattewhite"><img src="https://webkit.org/wp-content/uploads/first.png" alt="Breakpoint with tail deleted frames in the stack."></figure><span>
+</span><p>Web Inspector not only shows  the frame we’re stopped in and the original caller, <code>computeSquareRoot()</code>, but also shows the seven tail deleted frames.  These are highlighted in the above image.  Tail deleted frames in Web Inspector show up with a gray <em>ƒ</em> icon to their left.  As the next image shows, the variables in tail deleted frames can be examined as if the frame were a normal frame.  The next image shows Web Inspector inspecting a tail deleted frame one level up from the leaf frame.</p><span>
+</span><figure class="widescreen mattewhite"><img src="https://webkit.org/wp-content/uploads/second.png" alt="Selecting a tail deleted frame."></figure><span>
+</span><p>In this image, the local variables (circled) can be examined.  The highlighted line in the program also shows where the tail deleted frame made a tail call from.</p><span>
+</span><p>The next image shows what happens when single stepping from the breakpoint.</p><span>
+</span><figure class="widescreen mattewhite"><img src="https://webkit.org/wp-content/uploads/third.png" alt="Returning from tail deleted frames."></figure><span>
+</span><p>With on click of the step into button, Web Inspector now shows that we have returned directly to where <code>computeSquareRoot()</code> made the first tail call.</p><span>
+</span><h2>Summary</h2><span>
+</span><p>WebKit has ECMAScript 6 Proper Tail Calls and web developers are encouraged to take advantage of them to design programs in ways that were not possible before.  Existing code can benefit as well.  Web Inspector makes developing and debugging with PTC straightforward and intuitive.</p><span>
+</span><p>The current <a href="https://webkit.org/blog/6210/release-notes-for-safari-technology-preview-4">Safari Technology Preview Release 4</a> has support for PTC. However, Web Inspector was only recently hooked up to work with <em>ShadowChicken</em> and therefore it is not in Safari Technology Preview Release 4. It is expected to be in the next Safari Technology Preview release. You can also try out <em>ShadowChicken</em> in Web Inspector by using a <a href="https://webkit.org/downloads/#nightly">WebKit Nightly build</a>.</p><span>
+</span><h2>Acknowledgements</h2><span>
+</span><p>This article was cowritten with Saam Barati from the JavaScriptCore team. We invite comments and feedback on WebKit’s PTC implementation. Feel free to get in touch with <a href="https://twitter.com/msaboff">@msaboff</a>, <a href="https://twitter.com/saambarati">@saambarati</a>, and <a href="https://twitter.com/jonathandavis">@jonathandavis</a> on Twitter.</p><span>
+
+                            </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

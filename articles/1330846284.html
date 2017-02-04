@@ -1,0 +1,196 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Three Real-World Uses for Mutation Observer</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Three Real-World Uses for Mutation Observer</h1>
+                <div class="blog-post-content markdown"><style>
+div[contenteditable] {
+    width: 43.75rem;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-shadow: 0 0 2px gray;
+}
+
+div[contenteditable] h1 {
+  line-height: 1.3;
+}
+</style><span>
+
+</span><p><a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver"><code>MutationObserver</code></a>
+is a lesser known JavaScript feature which allows you to detect when elements
+in a web page are inserted, changed or removed.  It is still relatively new,
+but it is supported by <a href="http://caniuse.com/#feat=mutationobserver">every modern
+browser</a>.</p><span>
+</span><p>The web is full of demos and tutorials of MutationObserver, but it’s pretty
+hard to find examples of it actually being used in practice.  Even a search of
+Github is almost all libraries and test cases.  We’ve had a couple occasions to
+use it at Eager however, which I now have the opportunity to share.</p><span>
+</span><h3 id="client-side-image-optimization">Client-side Image Optimization</h3><span>
+</span><p>Believe it or not, it’s actually possible to swap the src’s of img tags before
+the browser begins to load them.  We can use that to optimize our images
+without changing the HTML source of our page.  This code uses a
+<a href="https://github.com/asm-products/firesize">FireSize</a> service to handle the
+actual optimization.</p><span>
+</span><p>We start by setting up a <code>MutationObserver</code> which will call our <code>checkNode</code>
+function with any new nodes which are added to the DOM:</p><span>
+</span><pre><code class="lang-javascript">var observer = new MutationObserver(function(mutations){
+  for (var i=0; i &lt; mutations.length; i++){
+    for (var j=0; j &lt; mutations[i].addedNodes.length; j++){
+      checkNode(mutations[i].addedNodes[j]);
+    }
+  }
+});
+
+observer.observe(document.documentElement, {
+  childList: true,
+  subtree: true
+});
+</code></pre><span>
+</span><p>If we run this code early in the head of the page, it will call our <code>checkNode</code>
+function with each DOM node as the browser parses the page’s HTML.  This gives
+us the ability to check or mutate these nodes before they’ve ever been
+rendered.</p><span>
+</span><p>We can define our <code>checkNode</code> function to decide if this is an image for us to
+optimize.</p><span>
+</span><pre><code class="lang-javascript">checkNode = function(addedNode) {
+  if (addedNode.nodeType === 1 &amp;&amp; addedNode.tagName === 'IMG'){
+    addedNode.src = optimizeSrc(addedNode.src)
+  }
+}
+</code></pre><span>
+</span><p>Finally, we can define <code>optimizeSrc</code> to switch out our image’s src for an
+optimized one:</p><span>
+</span><pre><code class="lang-javascript">optimizeSrc = function(src) {
+  return "//firesize.com/" + src;
+}
+</code></pre><span>
+</span><p>For a complete implementation, take a look at our <a href="https://github.com/EagerApps/FireSize/blob/master/optimize.coffee">FireSize app source
+code</a>.</p><span>
+</span><h3 id="initializing-when-an-element-becomes-available-on-the-page">Initializing When An Element Becomes Available on the Page</h3><span>
+</span><p>It’s a common pattern to wait for <code>jQuery.ready</code> or <code>DOMContentLoaded</code> to
+initialize code which depends on elements on the page.  Those events don’t fire
+until the entire DOM has loaded however, meaning the page will start to be
+rendered before you have a chance to change or add to its content.</p><span>
+</span><p>Our pattern from the image optimization solution also works for detecting when
+any element becomes available, allowing you to initialize code which depends on
+that element at the exact first moment it’s possible.  We can redefine
+<code>checkNode</code> to instead check if our element matches an arbitrary selector:</p><span>
+</span><pre><code class="lang-javascript">checkNode = function(addedNode) {
+  if (addedNode.nodeType === 1){
+    if (addedNode.matches('.should-underline')){
+      SmartUnderline.init(addedNode);
+    }
+  }
+}
+</code></pre><span>
+</span><h3 id="managing-contenteditable-regions">Managing ContentEditable Regions</h3><span>
+</span><p>As you may know, the <code>contenteditable</code> attribute can be used to make any HTML
+element editable by the user.  For example:</p><span>
+</span><pre><code class="lang-html">&lt;div contenteditable&gt;
+  &lt;h1&gt;My awesome content!&lt;/h1&gt;
+  &lt;p&gt;You can edit this&lt;/p&gt;
+&lt;/div&gt;
+</code></pre><span>
+</span><p>Will produce this editable element:</p><span>
+</span><div contenteditable=""><span>
+  </span><h1>My awesome content!</h1><span>
+  </span><p>You can edit this</p><span>
+</span></div><span>
+
+</span><p>If you are truely building an editor, it’s common to want some control over
+what the user can enter.  You can use MutationObservers to prevent certain
+modifications, or take action when they occur.  For example, lets say we want
+some (very basic) support for ‘markdown-style’ links in our editable area.</p><span>
+</span><p>We begin with the standard MutationObserver binding, this time paying attention
+to changes in the <code>characterData</code> of our fields, and calling a function which
+we will later define called <code>replaceLinks</code>:</p><span>
+</span><pre><code class="lang-javascript">var observer = new MutationObserver(function(mutations){
+  for (var i=0; i &lt; mutations.length; i++){
+    replaceLinks(mutations[i].target);
+  }
+})
+
+observer.observe(document.querySelector('[contenteditable]'), {
+  characterData: true,
+  subtree: true
+})
+</code></pre><span>
+</span><p>The <code>replaceLinks</code> function itself uses a regular expression to find
+markdown-style links and swap them out for HTML links:</p><span>
+</span><pre><code class="lang-javascript">function replaceLinks(target){
+  // Replace markdown encoded links
+  // a la [Text](URL)
+  // with &lt;a href='URL'&gt;Text&lt;/a&gt;
+  var content = target.textContent.replace(
+    /(.*)\[([^\]]+)\]\(([^\]]+)\)(.*)/g,
+    "$1&lt;a href='$3'&gt;$2&lt;/a&gt;$4"
+  )
+
+  if (content !== target.textContent){
+    var newNode = document.createElement('template')
+    newNode.innerHTML = content
+    target.parentElement.replaceChild(newNode.content, target)
+  }
+}
+</code></pre><span>
+</span><p>This is, by necessity, a simplified example.  I know of at least one markdown
+editor which does try to do this, with pretty user-hostile consequences.
+Please don’t actually do this type of dynamic replacement of text without
+careful consideration.  You could, however, insert a new element to show a
+menu, or something similar.</p><span>
+</span><p>Here’s a full demo of the working code.  Try adding a <code>[markdown-style](link)</code>:</p><span>
+</span><div contenteditable="" id="content-example"><span>
+  </span><h1>My awesome content!</h1><span>
+  </span><p>You can edit this</p><span>
+</span></div><span>
+
+</span><script>
+  function replaceLinks(target){
+    // Replace markdown encoded links
+    // a la [Text](URL)
+    // with <a href='URL'>Text</a>
+    var content = target.textContent.replace(
+      /(.*)\[([^\]]+)\]\(([^\]]+)\)(.*)/g,
+      "$1<a href='$3'>$2</a>$4"
+    )
+
+    if (content !== target.textContent){
+      var newNode = document.createElement('template')
+      newNode.innerHTML = content
+      target.parentElement.replaceChild(newNode.content, target)
+    }
+  }
+
+  var observer = new MutationObserver(function(mutations){
+    for (var i=0; i < mutations.length; i++){
+      replaceLinks(mutations[i].target);
+    }
+  })
+
+  observer.observe(document.querySelector('#content-example'), {
+    characterData: true,
+    subtree: true
+  })
+</script><span>
+
+</span><hr><span>
+
+</span><p>Hopefully that gave you some ideas for how you might use <code>MutationObserver</code> in
+your future projects.  Our next post is going to be on the history of CSS
+and what (very interesting) alernatives were considered instead.  Subscribe
+below to be notified when it’s released.</p><span>
+</span><div class="blog-share-container"></div></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

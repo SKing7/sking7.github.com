@@ -1,0 +1,511 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>移动web适配利器-rem</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>移动web适配利器-rem</h1>
+                <div class="text"><span>
+        </span><h2>
+	前言<br></h2><span>
+</span><p>
+	提到rem，大家首先会想到的是em，px，pt这类的词语，大多数人眼中这些单位是用于设置字体的大小的，没错这的确是用来设置字体大小的，但是对于rem来说它可以用来做移动端的响应式适配哦。
+</p><span>
+</span><span>
+</span><h2>
+	兼容性<br></h2><span>
+</span><span>
+</span><p>
+	<img alt="" title="" src="http://7jpp2v.com1.z0.glb.clouddn.com/0a269f05e4fb51f561d060eb24e864b11458889628.png">
+</p><span>
+</span><p>
+	&nbsp;先看看兼容性，关于移动端
+</p><span>
+</span><p>
+	ios：6.1系统以上都支持
+</p><span>
+</span><p>
+	android：2.1系统以上都支持
+</p><span>
+</span><p>
+	大部分主流浏览器都支持，可以安心的往下看了。
+</p><span>
+</span><span>
+</span><h2>
+	rem设置字体大小<br></h2><span>
+</span><p>
+	rem是（font&nbsp;size&nbsp;of&nbsp;the&nbsp;root&nbsp;element），官方解释
+</p><span>
+</span><p>
+	<img title="" alt="" src="http://7jpp2v.com1.z0.glb.clouddn.com/QQ%E5%9B%BE%E7%89%8720160313181850.png">，
+</p><span>
+</span><p>
+	意思就是根据网页的根元素来设置字体大小，和em（font&nbsp;size&nbsp;of&nbsp;the&nbsp;element）的区别是，em是根据其父元素的字体大小来设置，而rem是根据网页的跟元素（html）来设置字体大小的，举一个简单的例子，
+</p><span>
+</span><p>
+	现在大部分浏览器IE9+，Firefox、Chrome、Safari、Opera&nbsp;，如果我们不修改相关的字体配置，都是默认显示font-size是16px即
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><span>
+</span><!-- [Format Time: 0.0015 seconds] --><span>
+</span><span>
+</span><span>
+</span><p>
+	那么如果我们想给一个P标签设置12px的字体大小那么用rem来写就是
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bba1025187875" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-e">p</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">font</span><span class="crayon-o">-</span><span class="crayon-v">size</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">0.75rem</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">//12÷16=0.75（rem）</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0004 seconds] --><span>
+</span><span>
+</span><span>
+</span><p>
+	基本上使用rem这个单位来设置字体大小基本上是这个套路，好处是假如用户自己修改了浏览器的默认字体大小，那么使用rem时就可以根据用户的调整的大小来显示了。 但是rem不仅可以适用于字体，同样可以用于width height margin这些样式的单位。下面来具体说一下
+</p><span>
+</span><span>
+</span><h2>
+	rem进行屏幕适配<br></h2><span>
+</span><p>
+	在讲rem屏幕适配之前，先说一下一般做移动端适配的方法，一般可以分为：&nbsp;
+</p><span>
+</span><p>
+	<strong>1</strong>&nbsp;简单一点的页面，一般高度直接设置成固定值，宽度一般撑满整个屏幕。
+</p><span>
+</span><p>
+	<strong>2</strong>&nbsp;稍复杂一些的是利用百分比设置元素的大小来进行适配，或者利用flex等css去设置一些需要定制的宽度。
+</p><span>
+</span><p>
+	<strong>3</strong>&nbsp;再复杂一些的响应式页面，需要利用css3的media query属性来进行适配，大致思路是根据屏幕不同大小，来设置对应的css样式。
+</p><span>
+</span><p>
+	上面的一些方法，其实也可以解决屏幕适配等问题，但是既然出来的rem这个新东西，也一定能兼顾到这些方面，下面具体使用rem：
+</p><span>
+</span><p>
+	<strong>rem适配</strong>
+</p><span>
+</span><p>
+	先看一个简单的例子：
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bba4214672718" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-sy">.</span><span class="crayon-i">con</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">width</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">10rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">height</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">10rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">background</span><span class="crayon-o">-</span><span class="crayon-v">color</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">red</span><span class="crayon-sy">;</span></p><p><span class="crayon-h"> </span><span class="crayon-sy">}</span></p><p><span class="crayon-o">&lt;</span><span class="crayon-e">div </span><span class="crayon-t">class</span><span class="crayon-o">=</span><span class="crayon-s">"con"</span><span class="crayon-o">&gt;</span></p><p><span class="crayon-o">&lt;</span><span class="crayon-o">/</span><span class="crayon-v">div</span><span class="crayon-o">&gt;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0008 seconds] --><span>
+</span><span>
+</span><p>
+	<img title="" alt="" src="http://7jpp2v.com1.z0.glb.clouddn.com/div.png">
+</p><span>
+</span><p>
+	这是一个div，宽度和高度都用rem来设置了，在浏览器里面是这样显示的， &nbsp;可以看到，在浏览器里面width和height分别是160px，正好是16px * 10,那么如果将html根元素的默认font-size修改一下呢？
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bba7032464909" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-e">html</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">font</span><span class="crayon-o">-</span><span class="crayon-v">size</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">17px</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p><p><span class="crayon-sy">.</span><span class="crayon-i">con</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">width</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">10rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">height</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">10rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">background</span><span class="crayon-o">-</span><span class="crayon-v">color</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">red</span><span class="crayon-sy">;</span></p><p><span class="crayon-h"> </span><span class="crayon-sy">}</span></p><p><span class="crayon-o">&lt;</span><span class="crayon-e">div </span><span class="crayon-t">class</span><span class="crayon-o">=</span><span class="crayon-s">"con"</span><span class="crayon-o">&gt;</span></p><p><span class="crayon-o">&lt;</span><span class="crayon-o">/</span><span class="crayon-v">div</span><span class="crayon-o">&gt;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0010 seconds] --><span>
+</span><span>
+</span><p>
+	再来看看结果：
+</p><span>
+</span><p>
+	<img title="" alt="" src="http://7jpp2v.com1.z0.glb.clouddn.com/div2.png">
+</p><span>
+</span><p>
+	这时width和height都是170px，这就说明了将rem应用与width和height时，同样适用rem的特性，根据根元素的font-size值来改变自身的值，由此我们应该可以联想到我们可以给html设定不同的值，从而达到我们css样式中的适配效果。
+</p><span>
+</span><p>
+	<strong>rem数值计算</strong>
+</p><span>
+</span><p>
+	如果利用rem来设置css的值，一般要通过一层计算才行，比如如果要设置一个长宽为100px的div，那么就需要计算出100px对应的rem值是 100 / 16 =6.25rem，这在我们写css中，其实算比较繁琐的一步操作了。
+</p><span>
+</span><p>
+	对于没有使用sass的工程：
+</p><span>
+</span><p>
+	为了方便起见，可以将html的font-size设置成100px，这样在写单位时，直接将数值除以100在加上rem的单位就可以了。
+</p><span>
+</span><p>
+	对于使用sass的工程：
+</p><span>
+</span><p>
+	前端构建中，完全可以利用scss来解决这个问题，例如我们可以写一个scss的function px2rem即：
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbb6812389578" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-sy">@</span><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">px2rem</span><span class="crayon-sy">(</span><span class="crayon-sy">$</span><span class="crayon-v">px</span><span class="crayon-sy">)</span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">$</span><span class="crayon-v">rem</span><span class="crayon-h"> </span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">37.5px</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">@</span><span class="crayon-st">return</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-sy">$</span><span class="crayon-v">px</span><span class="crayon-o">/</span><span class="crayon-sy">$</span><span class="crayon-v">rem</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-v">rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0007 seconds] --><span>
+</span><span>
+</span><p>
+	这样，当我们写具体数值的时候就可以写成：
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbb8189551144" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">height</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-e">px2rem</span><span class="crayon-sy">(</span><span class="crayon-cn">90px</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-v">width</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-e">px2rem</span><span class="crayon-sy">(</span><span class="crayon-cn">90px</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0004 seconds] --><span>
+</span><span>
+</span><p>
+	看到这里，你可能会发现一些不理解的地方，就是上面那个rem:37.5px是怎么来的，正常情况下不是默认的16px么，这个其实就是页面的基准值，和html的font-size有关。
+</p><span>
+</span><p>
+	<strong>rem基准值计算</strong>
+</p><span>
+</span><p>
+	关于rem的基准值，也就是上面那个37.5px其实是根据我们所拿到的视觉稿来决定的，主要有以下几点原因：
+</p><span>
+</span><p>
+	<strong>1</strong>&nbsp;由于我们所写出的页面是要在不同的屏幕大小设备上运行的
+</p><span>
+</span><p>
+	<strong>2</strong>&nbsp;所以我们在写样式的时候必须要先以一个确定的屏幕来作为参考，这个就由我们拿到的视觉稿来定
+</p><span>
+</span><p>
+	<strong>3</strong>&nbsp;假如我们拿到的视觉稿是以iphone6的屏幕为基准设计的
+</p><span>
+</span><p>
+	<strong>4</strong>&nbsp;iPhone6的屏幕大小是375px，
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbbb583394504" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">rem</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-v">innerWidth</span><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-o">/</span><span class="crayon-h"> </span><span class="crayon-cn">10</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0003 seconds] --><span>
+</span><span>
+</span><span>
+</span><p>
+	这样计算出来的rem基准值就是37.5（iphone6的视觉稿），这里为什么要除以10呢，其实这个值是随便定义的,因为不想让html的font-size太大，当然也可以选择不除，只要在后面动态js计算时保证一样的值就可以，在这里列举一下其他手机的
+</p><span>
+</span><p>
+	iphone3gs: 320px / 10 = 32px
+</p><span>
+</span><p>
+	iphone4/5: 320px &nbsp;/ 10 = 32px
+</p><span>
+</span><p>
+	iphone6: 375px &nbsp;/ 10 =37.5px
+</p><span>
+</span><p>
+	<strong>动态设置html的font-size</strong>
+</p><span>
+</span><p>
+	现在关键问题来了，我们该如何通过不同的屏幕去动态设置html的font-size呢，这里一般分为两种办法
+</p><span>
+</span><p>
+	<strong>1</strong>&nbsp;利用css的media query来设置即
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbbe539248287" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-sy">@</span><span class="crayon-e">media</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">min</span><span class="crayon-o">-</span><span class="crayon-v">device</span><span class="crayon-o">-</span><span class="crayon-v">width</span><span class="crayon-h"> </span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">375px</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-st">and</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-v">max</span><span class="crayon-o">-</span><span class="crayon-v">device</span><span class="crayon-o">-</span><span class="crayon-v">width</span><span class="crayon-h"> </span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">667px</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-st">and</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-o">-</span><span class="crayon-v">webkit</span><span class="crayon-o">-</span><span class="crayon-v">min</span><span class="crayon-o">-</span><span class="crayon-v">device</span><span class="crayon-o">-</span><span class="crayon-v">pixel</span><span class="crayon-o">-</span><span class="crayon-v">ratio</span><span class="crayon-h"> </span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">2</span><span class="crayon-sy">)</span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-e">html</span><span class="crayon-sy">{</span><span class="crayon-v">font</span><span class="crayon-o">-</span><span class="crayon-v">size</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">37.5px</span><span class="crayon-sy">;</span><span class="crayon-sy">}</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0011 seconds] --><span>
+</span><span>
+</span><span>
+</span><p>
+	<strong>2</strong>&nbsp;利用javascript来动态设置 根据我们之前算出的基准值，我们可以利用js动态算出当前屏幕所适配的font-size即：
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbc0124214594" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">document</span><span class="crayon-sy">.</span><span class="crayon-e">getElementsByTagName</span><span class="crayon-sy">(</span><span class="crayon-s">'html'</span><span class="crayon-sy">)</span><span class="crayon-sy">[</span><span class="crayon-cn">0</span><span class="crayon-sy">]</span><span class="crayon-sy">.</span><span class="crayon-v">style</span><span class="crayon-sy">.</span><span class="crayon-v">fontSize</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-v">innerWidth</span><span class="crayon-h"> </span><span class="crayon-o">/</span><span class="crayon-h"> </span><span class="crayon-cn">10</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">'px'</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0006 seconds] --><span>
+</span><span>
+</span><span>
+</span><p>
+	然后我们看一下之前那个demo展示的效果
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbc3816260070" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-sy">.</span><span class="crayon-i">con</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">width</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-e">px2rem</span><span class="crayon-sy">(</span><span class="crayon-cn">200px</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">height</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-e">px2rem</span><span class="crayon-sy">(</span><span class="crayon-cn">200px</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">background</span><span class="crayon-o">-</span><span class="crayon-v">color</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-v">red</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p><p><span class="crayon-o">&lt;</span><span class="crayon-e">div </span><span class="crayon-t">class</span><span class="crayon-o">=</span><span class="crayon-s">"con"</span><span class="crayon-o">&gt;</span></p><p><span class="crayon-o">&lt;</span><span class="crayon-o">/</span><span class="crayon-v">div</span><span class="crayon-o">&gt;</span></p><p><span class="crayon-v">document</span><span class="crayon-sy">.</span><span class="crayon-e">addEventListener</span><span class="crayon-sy">(</span><span class="crayon-s">'DOMContentLoaded'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-t">function</span><span class="crayon-sy">(</span><span class="crayon-v">e</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">document</span><span class="crayon-sy">.</span><span class="crayon-e">getElementsByTagName</span><span class="crayon-sy">(</span><span class="crayon-s">'html'</span><span class="crayon-sy">)</span><span class="crayon-sy">[</span><span class="crayon-cn">0</span><span class="crayon-sy">]</span><span class="crayon-sy">.</span><span class="crayon-v">style</span><span class="crayon-sy">.</span><span class="crayon-v">fontSize</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-v">window</span><span class="crayon-sy">.</span><span class="crayon-v">innerWidth</span><span class="crayon-h"> </span><span class="crayon-o">/</span><span class="crayon-h"> </span><span class="crayon-cn">10</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">'px'</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-t">false</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0018 seconds] --><span>
+</span><span>
+</span><span>
+</span><p>
+	iPhone6下，正常显示200px
+</p><span>
+</span><p>
+	<img title="" alt="" src="http://7jpp2v.com1.z0.glb.clouddn.com/div3.png">
+</p><span>
+</span><p>
+	在iphone4下，显示169px
+</p><span>
+</span><p>
+	<img title="" alt="" src="http://7jpp2v.com1.z0.glb.clouddn.com/div4.png">
+</p><span>
+</span><p>
+	由此可见我们可以通过设置不同的html基础值来达到在不同页面适配的目的，当然在使用js来设置时，需要绑定页面的resize事件来达到变化时更新html的font-size。
+</p><span>
+</span><span>
+</span><h2>
+	rem适配进阶<br></h2><span>
+</span><p>
+	我们知道，一般我们获取到的视觉稿大部分是iphone6的，所以我们看到的尺寸一般是双倍大小的，在使用rem之前，我们一般会自觉的将标注/2，其实这也并无道理，但是当我们配合rem使用时，完全可以按照视觉稿上的尺寸来设置。
+</p><span>
+</span><p>
+	<strong>1</strong>&nbsp;设计给的稿子双倍的原因是iphone6这种屏幕属于高清屏，也即是设备像素比(device pixel ratio)dpr比较大，所以显示的像素较为清晰。
+</p><span>
+</span><p>
+	<strong>2</strong>&nbsp;一般手机的dpr是1，iphone4，iphone5这种高清屏是2，iphone6s plus这种高清屏是3，可以通过js的window.devicePixelRatio获取到当前设备的dpr，所以iphone6给的视觉稿大小是（*2）750×1334了。
+</p><span>
+</span><p>
+	<strong>3</strong>&nbsp;拿到了dpr之后，我们就可以在viewport meta头里，取消让浏览器自动缩放页面，而自己去设置viewport的content例如（这里之所以要设置viewport是因为我们要实现border1px的效果，加入我给border设置了1px，在scale的影响下，高清屏中就会显示成0.5px的效果）
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbc6565338231" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">meta</span><span class="crayon-sy">.</span><span class="crayon-e">setAttribute</span><span class="crayon-sy">(</span><span class="crayon-s">'content'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">'initial-scale='</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-o">/</span><span class="crayon-v">dpr</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">', maximum-scale='</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-o">/</span><span class="crayon-v">dpr</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">', minimum-scale='</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-o">/</span><span class="crayon-v">dpr</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">', user-scalable=no'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0008 seconds] --><span>
+</span><span>
+</span><p>
+	&nbsp;4 设置完之后配合rem，修改
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbc9489757429" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-sy">@</span><span class="crayon-t">function</span><span class="crayon-h"> </span><span class="crayon-e">px2rem</span><span class="crayon-sy">(</span><span class="crayon-sy">$</span><span class="crayon-v">px</span><span class="crayon-sy">)</span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">$</span><span class="crayon-v">rem</span><span class="crayon-h"> </span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">75px</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-sy">@</span><span class="crayon-st">return</span><span class="crayon-h"> </span><span class="crayon-sy">(</span><span class="crayon-sy">$</span><span class="crayon-v">px</span><span class="crayon-o">/</span><span class="crayon-sy">$</span><span class="crayon-v">rem</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-v">rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0007 seconds] --><span>
+</span><span>
+</span><p>
+	&nbsp;双倍75，这样就可以完全按照视觉稿上的尺寸来了。不用在/2了，这样做的好处是：
+</p><span>
+</span><p>
+	<strong>1</strong>&nbsp;解决了图片高清问题。
+</p><span>
+</span><p>
+	<strong>2</strong>&nbsp;解决了border 1px问题（我们设置的1px，在iphone上，由于viewport的scale是0.5，所以就自然缩放成0.5px）
+</p><span>
+</span><p>
+	在iphone6下的例子：
+</p><span>
+</span><p>
+	我们使用动态设置viewport，在iphone6下，scale会被设置成1/2即0.5，其他手机是1/1即1.
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbcb654085016" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-v">meta</span><span class="crayon-sy">.</span><span class="crayon-e">setAttribute</span><span class="crayon-sy">(</span><span class="crayon-s">'content'</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-s">'initial-scale='</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-o">/</span><span class="crayon-v">dpr</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">', maximum-scale='</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-o">/</span><span class="crayon-v">dpr</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">', minimum-scale='</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-cn">1</span><span class="crayon-o">/</span><span class="crayon-v">dpr</span><span class="crayon-h"> </span><span class="crayon-o">+</span><span class="crayon-h"> </span><span class="crayon-s">', user-scalable=no'</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0008 seconds] --><span>
+</span><span>
+</span><p>
+	&nbsp;我们的css代码，注意这里设置了1px的边框
+</p><span>
+</span><!-- Crayon Syntax Highlighter v_2.7.2_beta --><span>
+
+		</span><div id="crayon-5895b0225bbce692795170" class="crayon-syntax crayon-theme-sublime-text crayon-font-courier-new crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover"><span>
+		
+			</span><span>
+			</span><div class="crayon-main"><span>
+				</span><table class="crayon-table">
+					<tbody><tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					
+				</td>
+						<td class="crayon-code"><div class="crayon-pre"><p><span class="crayon-sy">.</span><span class="crayon-i">con</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">margin</span><span class="crayon-o">-</span><span class="crayon-v">top</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">200px</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">width</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">5.3rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">height</span><span class="crayon-o">:</span><span class="crayon-h"> </span><span class="crayon-cn">5.3rem</span><span class="crayon-sy">;</span></p><p><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">border</span><span class="crayon-o">-</span><span class="crayon-v">top</span><span class="crayon-o">:</span><span class="crayon-cn">1px</span><span class="crayon-h"> </span><span class="crayon-v">solid</span><span class="crayon-h"> </span><span class="crayon-o">#</span><span class="crayon-cn">000</span><span class="crayon-sy">;</span></p><p><span class="crayon-h"> </span><span class="crayon-sy">}</span></p></div></td>
+					</tr>
+				</tbody></table><span>
+			</span></div><span>
+		</span></div><span>
+</span><!-- [Format Time: 0.0009 seconds] --><span>
+</span><span>
+</span><p>
+	&nbsp;在iphone6下的显示：
+</p><span>
+</span><p>
+	<img alt="" title="" src="http://7jpp2v.com1.z0.glb.clouddn.com/1459062170_41_w430_h247.png">
+</p><span>
+</span><p>
+	在android下的显示：
+</p><span>
+</span><p>
+	<img alt="" title="" src="http://7jpp2v.com1.z0.glb.clouddn.com/1459062178_38_w432_h376.png">
+</p><span>
+</span><h2>
+	&nbsp;<br></h2><span>
+</span><h2>
+	rem进行屏幕适配总结<br></h2><span>
+</span><p>
+	下面这个网址是针对rem来写的一个简单的demo页面，大家可以在不同的手机上看一下效果
+</p><span>
+</span><p>
+	<img title="" alt="" src="http://7jpp2v.com1.z0.glb.clouddn.com/democode.png">
+</p><span>
+</span><p>
+	但是rem也并不是万能的，下面也有一些场景是不适于使用rem的
+</p><span>
+</span><p>
+	<strong>1</strong>&nbsp;当用作图片或者一些不能缩放的展示时，必须要使用固定的px值，因为缩放可能会导致图片压缩变形等。
+</p><span>
+</span><p>
+	在列举几个使用rem的线上网站：
+</p><span>
+</span><p>
+	网易新闻：<a rel="nofollow" href="http://3g.163.com/touch/news/subchannel/all?version=v_standard" target="_blank">http://3g.163.com/touch/news/subchannel/all?version=v_standard</a>
+</p><span>
+</span><p>
+	聚划算：<a rel="nofollow" href="https://jhs.m.taobao.com/m/index.htm#!all" target="_blank">https://jhs.m.taobao.com/m/index.htm#!all</a>
+</p><span>
+</span><span>
+</span><span>
+</span><p>
+	参考资料：<a rel="nofollow" href="http://www.nihaoshijie.com.cn/index.php/archives/593">http://www.nihaoshijie.com.cn/index.php/archives/593</a>
+</p><span>
+</span><span>
+
+        </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

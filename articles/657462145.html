@@ -1,0 +1,362 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Best Practices for Node.js Development</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Best Practices for Node.js Development</h1>
+                <article class="js-autolink ">
+<p class="last-updated"><span class="icon-clock"></span>Last updated 26 May 2016</p>
+<div id="table-of-contents"><span>
+</span><h3>
+<span class="icon-list"></span>Table of Contents</h3><span>
+</span><ul>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#start-every-new-project-with-npm-init">Start every new project with npm init</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#use-a-smart-npmrc">Use a smart .npmrc</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#hop-on-the-es6-train">Hop on the ES6 train</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#stick-with-lowercase">Stick with lowercase</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#cluster-your-app">Cluster your app</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#be-environmentally-aware">Be environmentally aware</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#avoid-garbage">Avoid garbage</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#hook-things-up">Hook things up</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#only-git-the-important-bits">Only git the important bits</a></li>
+<li><a href="https://devcenter.heroku.com/articles/node-best-practices#simplify">Simplify</a></li>
+</ul><span>
+</span></div>
+<p>It’s easy to get lost in the huge JavaScript ecosystem.
+Successful teams follow guidelines to
+make the most of their time and keep their projects healthy.</p>
+
+<p>Here are ten habits that we recommend for happy Node.js hackers:</p>
+
+<div class="note"><span>
+</span><p>This material is a curated and maintained version of a <a href="http://blog.heroku.com/archives/2015/11/10/node-habits-2016">blog post</a> on the same topic.</p><span>
+</span></div>
+
+<h2 id="start-every-new-project-with-npm-init">Start every new project with npm init</h2>
+
+<p>Npm’s <code>init</code> command will scaffold out a valid package.json for your project,
+inferring common properties from the working directory.</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="prompt">$</span><span class="function"> mkdir my-awesome-app
+</span><span class="prompt">$</span><span class="function"> cd my-awesome-app
+</span><span class="prompt">$</span><span class="function"> npm init --yes
+</span></pre></div><span>
+</span></div>
+
+
+<p>I’m lazy, so I run it with the <code>--yes</code> flag and then open package.json to make changes.
+The first thing you should do is specify an ‘engines’ key
+with your current version of node (<code>node -v</code>):</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="key"><span class="delimiter">"</span><span class="content">engines</span><span class="delimiter">"</span></span>: {
+  <span class="key"><span class="delimiter">"</span><span class="content">node</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">6.2.0</span><span class="delimiter">"</span></span>
+}
+</pre></div><span>
+</span></div>
+
+
+<h2 id="use-a-smart-npmrc">Use a smart .npmrc</h2>
+
+<p>By default, npm doesn’t save installed dependencies to package.json
+(and you should always track your dependencies!).</p>
+
+<p>If you use the <code>--save</code> flag to auto-update package.json, npm
+installs the packages with a leading carat (^), putting your
+modules at risk of drifting to different versions.
+This is fine for module development, but not good for apps,
+where you want to keep consistent dependencies between all your environments.</p>
+
+<p>One solution is installing packages like this:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="prompt">$</span><span class="function"> npm install foobar --save --save-exact
+</span></pre></div><span>
+</span></div>
+
+
+<p>Even better, you can set these options in <code>~/.npmrc</code> to update your defaults:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="prompt">$</span><span class="function"> npm config set save=true
+</span><span class="prompt">$</span><span class="function"> npm config set save-exact=true
+</span><span class="prompt">$</span><span class="function"> cat ~/.npmrc
+</span></pre></div><span>
+</span></div>
+
+
+<p>Now, <code>npm install foobar</code> will automatically add <code>foobar</code> to package.json
+and your dependencies won’t drift between installs.</p>
+
+<p>You can lock down your dependencies further with <a href="https://docs.npmjs.com/cli/shrinkwrap">npm-shrinkwrap</a>. However, note that the shrinkwrap workflow can be counterintuitive, and shrinkwrap has several known issues in older versions of npm.</p>
+
+<h2 id="hop-on-the-es6-train">Hop on the ES6 train</h2>
+
+<p>Node 4+ packs <a href="https://nodejs.org/en/blog/release/v4.0.0/">an updated V8 engine</a>
+with several useful <a href="https://nodejs.org/en/docs/es6/">ES6 features</a>.
+Don’t be intimidated by some of the more complex stuff,
+you can learn it as you go. There are plenty of simple
+improvements for immediate gratification:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre>let user = users.find(u =&gt; u.id === ID);
+
+console.log(<span class="error">`</span>Hello, <span class="predefined">$</span>{ user.name }!<span class="error">`</span>);
+</pre></div><span>
+</span></div>
+
+
+<h2 id="stick-with-lowercase">Stick with lowercase</h2>
+
+<p>Some languages encourage filenames that match class names,
+like <code>MyClass</code> and 'MyClass.js’. Don’t do that in node.
+Instead, use lowercase files:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre>let MyClass = require(<span class="string"><span class="delimiter">'</span><span class="content">my-class</span><span class="delimiter">'</span></span>);
+</pre></div><span>
+</span></div>
+
+
+<p>Node.js is the rare example of a Linux-centric
+tool with great cross-platform support. While OSX
+and Windows will treat 'myclass.js’ and 'MyClass.js’ equivalently,
+Linux won’t. To write code that’s portable between platforms,
+you’ll need to exactly match <code>require</code> statements,
+<em>including capitalization.</em></p>
+
+<p>The easy way to get this right is to just stick with lowercase
+filenames for everything, eg 'my-class.js’.</p>
+
+<h2 id="cluster-your-app">Cluster your app</h2>
+
+<p>Since the node runtime is limited to a single CPU core and about 1.5 GB
+of memory, deploying a non-clustered node app on a large
+server is a huge waste of resources.</p>
+
+<p>To take advantage of multiple cores and memory beyond 1.5 GB,
+bake <a href="https://nodejs.org/api/cluster.html">Cluster support</a>
+into your app.
+Even if you’re only running a single process on small hardware
+today, Cluster gives you easy flexibility for the future.</p>
+
+<p>Testing is the best way to determine the ideal number of
+clustered processes for your app, but it’s good to start with the
+<a href="https://devcenter.heroku.com/articles/node-concurrency">reasonable defaults</a>
+offered by your platform, with a simple fallback, eg:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre>const CONCURRENCY = process.env.WEB_CONCURRENCY || <span class="integer">1</span>;
+</pre></div><span>
+</span></div>
+
+
+<p>Choose a
+<a href="https://www.npmjs.com/search?q=cluster">Cluster abstraction</a>
+to avoid reinventing the wheel of process management.
+If you’d like separate master and worker files, you can try
+<a href="https://www.npmjs.com/package/forky">forky</a>.
+If you prefer a single entrypoint file and function,
+take a look at <a href="https://www.npmjs.com/package/throng">throng</a>.</p>
+
+<h2 id="be-environmentally-aware">Be environmentally aware</h2>
+
+<p>Don’t litter your project with environment-specific config files!
+Instead, take advantage of <em>environment variables</em>.</p>
+
+<p>First, install <a href="https://github.com/strongloop/node-foreman">node-foreman</a>:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="prompt">$</span><span class="function"> npm install --save --save-exact foreman
+</span></pre></div><span>
+</span></div>
+
+
+<p>Next, create a <a href="https://devcenter.heroku.com/articles/procfile">Procfile</a> to specify your app’s process types:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre>web: bin/web
+worker: bin/worker
+</pre></div><span>
+</span></div>
+
+
+<p>Now you can start your app with the <code>nf</code> binary:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="string"><span class="delimiter">"</span><span class="content">scripts</span><span class="delimiter">"</span></span>: {
+  <span class="key"><span class="delimiter">"</span><span class="content">start</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">nf start</span><span class="delimiter">"</span></span>
+}
+</pre></div><span>
+</span></div>
+
+
+<p>To provide a local development environment, create a
+.gitignore’d <code>.env</code> file, which will be loaded by node-foreman:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre>DATABASE_URL='postgres://localhost/foobar'
+HTTP_TIMEOUT=10000
+</pre></div><span>
+</span></div>
+
+
+<p>Now, a single command (<code>npm start</code>) will spin up both
+a <code>web</code> process and a <code>worker</code> process in that environment.
+And, when you deploy your project, it will <a href="http://12factor.net/config">automatically adapt</a>
+to the variables on its new host.</p>
+
+<p>This is simpler and more flexible than 'config/abby-dev.js’,
+'config/brian-dev.js’, 'config/qa1.js’, 'config/qa2.js’, 'config/prod.js’, etc.</p>
+
+<h2 id="avoid-garbage">Avoid garbage</h2>
+
+<p>Node (V8) uses a lazy and greedy garbage collector.
+With its default limit of about 1.5 GB, it sometimes waits until it
+absolutely has to before reclaiming unused memory.
+If your memory usage is increasing, it might not be a leak -
+but rather <a href="https://github.com/nodejs/node/issues/3370#issuecomment-148108323">node’s usual lazy behavior</a>.</p>
+
+<p>To gain more control over your app’s garbage collector, you can
+provide flags to V8 in your <code>Procfile</code>:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre>web: node --optimize_for_size --max_old_space_size=920 --gc_interval=100 server.js
+</pre></div><span>
+</span></div>
+
+
+<p>This is especially important if your app is running
+in an environment with less than 1.5 GB of available memory.
+For example, if you’d like to tailor node to a 512 MB container, try:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre>web: node --optimize_for_size --max_old_space_size=460 --gc_interval=100 server.js
+</pre></div><span>
+</span></div>
+
+
+<h2 id="hook-things-up">Hook things up</h2>
+
+<p>Npm’s <a href="https://docs.npmjs.com/misc/scripts">lifecycle scripts</a>
+make great hooks for automation.
+If you need to run something before building your app,
+you can use the <code>preinstall</code> script.
+Need to build assets with grunt, gulp, browserify, or webpack?
+Do it in a <code>postinstall</code> script.</p>
+
+<p>In package.json:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="string"><span class="delimiter">"</span><span class="content">scripts</span><span class="delimiter">"</span></span>: {
+  <span class="key"><span class="delimiter">"</span><span class="content">postinstall</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">bower install &amp;&amp; grunt build</span><span class="delimiter">"</span></span>,
+  <span class="key"><span class="delimiter">"</span><span class="content">start</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">nf start</span><span class="delimiter">"</span></span>
+}
+</pre></div><span>
+</span></div>
+
+
+<p>You can also use environment variables to control these scripts:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="string"><span class="delimiter">"</span><span class="content">postinstall</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">if [ $BUILD_ASSETS ]; then npm run build-assets; fi</span><span class="delimiter">"</span></span>,
+<span class="key"><span class="delimiter">"</span><span class="content">build-assets</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">bower install &amp;&amp; grunt build</span><span class="delimiter">"</span></span>
+</pre></div><span>
+</span></div>
+
+
+<p>If your scripts start getting out of control, move them to files:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="string"><span class="delimiter">"</span><span class="content">postinstall</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">scripts/postinstall.sh</span><span class="delimiter">"</span></span>
+</pre></div><span>
+</span></div>
+
+
+<p>Scripts in package.json automatically have <code>./node_modules/.bin</code>
+added to their <code>PATH</code>, so you can execute binaries like
+<code>bower</code> or <code>webpack</code> directly.</p>
+
+
+
+<h2 id="only-git-the-important-bits">Only git the important bits</h2>
+
+<p>Most apps are composed of both necessary files and generated files.
+When using a source control system like git, you should avoid tracking anything that’s generated.</p>
+
+<p>For example, your node app probably has a <code>node_modules</code> directory for dependencies, which you should keep out of git.</p>
+
+<p>As long as each dependency is listed in package.json, anyone can create a working
+local copy of your app - including <code>node_modules</code> - by running <code>npm install</code>.</p>
+
+<p>Tracking generated files leads to unnecessary noise and bloat in your git history.
+Worse, since some dependencies are native and must be compiled,
+checking them in makes your app less portable because you’ll be
+providing builds from just a single, and possibly incorrect, architecture.</p>
+
+<p>For the same reason, you shouldn’t check in <code>bower_components</code> or the
+compiled assets from grunt builds.</p>
+
+<p>If you’ve accidentally checked in <code>node_modules</code> before, that’s okay.
+You can remove it like this:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="prompt">$</span><span class="function"> echo 'node_modules' &gt;&gt; .gitignore
+</span><span class="prompt">$</span><span class="function"> git rm -r --cached node_modules
+</span><span class="prompt">$</span><span class="function"> git commit -am 'ignore node_modules'
+</span></pre></div><span>
+</span></div>
+
+
+<p>I also ignore npm’s logs so they don’t clutter my code:</p>
+
+<div class="CodeRay"><span>
+  </span><div class="code"><pre><span class="prompt">$</span><span class="function"> echo 'npm-debug.log' &gt;&gt; .gitignore
+</span><span class="prompt">$</span><span class="function"> git commit -am 'ignore npm-debug'
+</span></pre></div><span>
+</span></div>
+
+
+<p>By ignoring these unnecessary files, your repositories will be smaller,
+your commits will be simpler, and you’ll avoid merge conflicts in
+the generated directories.</p>
+
+<h2 id="simplify">Simplify</h2>
+
+<p>Tech predictions are famously inaccurate, but I’ll make one here for the upcoming year.
+I predict that 2016 will be the year of <em>simplification</em> in JavaScript.</p>
+
+<p>A growing group of developers are simplifying their architectures already.
+Instead of monolithic MVCs with big frameworks, they’re
+<a href="https://medium.com/swlh/scaling-on-the-cheap-933e46944886#.2lvubkyhm">building apps with static frontends</a>,
+which can be served over CDN,
+with a Node.js API for dynamic data.</p>
+
+<p>We’re also beginning to see the drag that complex build systems put on our projects.
+The leading edge of developers are simplifying their builds -
+for instance, by using a 'vanilla’ build
+<a href="https://medium.com/@tarkus/you-might-not-need-gulp-js-89a0220487dd#.etiox78kw">without bower, gulp, or grunt</a>.</p>
+
+<p>Finally, we’ll simplify our code in 2016.
+Sometimes, this will come from removing features, as with
+<a href="https://www.youtube.com/watch?v=bo36MrBfTk4">Douglas Crockford’s “The Better Parts.”</a>
+Other times, this will come from adding features - like my favorite callback replacement,
+<a href="https://thomashunter.name/blog/the-long-road-to-asyncawait-in-javascript/">async-await</a>.
+Async-await isn’t yet available in Node,
+but you can use it today via the awesome
+<a href="http://babeljs.io/docs/usage/cli/#babel-node">BabelJS</a> project.</p>
+
+<p>Instead of seeing how many tools and frameworks you can cram in at once,
+try to simplify your work!</p>
+</article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

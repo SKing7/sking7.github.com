@@ -1,0 +1,91 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>User space 与 Kernel space</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>User space 与 Kernel space</h1>
+                <div class="asset-content entry-content" id="main-content"><span>
+
+                                    </span><!-- div class="asset-body" --><span>
+                                        </span><p>学习 Linux 时，经常可以看到两个词：User space（用户空间）和 Kernel space（内核空间）。</p><span>
+
+                                    </span><!-- /div --><span>
+
+
+                                    </span><!-- div id="more" class="asset-more" --><span>
+                                        </span><p>简单说，Kernel space 是 Linux 内核的运行空间，User space 是用户程序的运行空间。为了安全，它们是隔离的，即使用户的程序崩溃了，内核也不受影响。</p><span>
+
+</span><p><img src="http://www.ruanyifeng.com/blogimg/asset/2016/bg2016120201-2.png" alt="" title=""></p><span>
+
+</span><p>Kernel space 可以执行任意命令，调用系统的一切资源；User space 只能执行简单的运算，不能直接调用系统资源，必须通过系统接口（又称 system call），才能向内核发出指令。</p><span>
+
+</span><blockquote><pre><code class="language-clike">
+str = "my string" // 用户空间
+x = x + 2
+file.write(str) // 切换到内核空间
+
+y = x + 4 // 切换回用户空间
+</code></pre></blockquote><span>
+
+</span><p>上面代码中，第一行和第二行都是简单的赋值运算，在 User space 执行。第三行需要写入文件，就要切换到 Kernel space，因为用户不能直接写文件，必须通过内核安排。第四行又是赋值运算，就切换回 User space。</p><span>
+
+</span><p>查看 CPU 时间在 User space 与 Kernel Space 之间的分配情况，可以使用<code>top</code>命令。它的第三行输出就是 CPU 时间分配统计。</p><span>
+
+</span><p><img src="http://www.ruanyifeng.com/blogimg/asset/2016/bg2016120202.jpg" alt="" title=""></p><span>
+
+</span><p>这一行有 8 项统计指标。</p><span>
+
+</span><p><img src="http://www.ruanyifeng.com/blogimg/asset/2016/bg2016120203-1.png" alt="" title=""></p><span>
+
+</span><p>其中，第一项<code>24.8 us</code>（user 的缩写）就是 CPU 消耗在 User space 的时间百分比，第二项<code>0.5 sy</code>（system 的缩写）是消耗在 Kernel space 的时间百分比。</p><span>
+
+</span><p>随便也说一下其他 6 个指标的含义。</p><span>
+
+</span><blockquote>
+  <ul>
+<li><code>ni</code>：niceness 的缩写，CPU 消耗在 nice 进程（低优先级）的时间百分比</li>
+<li><code>id</code>：idle 的缩写，CPU 消耗在闲置进程的时间百分比，这个值越低，表示 CPU 越忙</li>
+<li><code>wa</code>：wait 的缩写，CPU 等待外部 I/O 的时间百分比，这段时间 CPU 不能干其他事，但是也没有执行运算，这个值太高就说明外部设备有问题</li>
+<li><code>hi</code>：hardware interrupt 的缩写，CPU 响应硬件中断请求的时间百分比</li>
+<li><code>si</code>：software interrupt 的缩写，CPU 响应软件中断请求的时间百分比</li>
+<li><code>st</code>：stole time 的缩写，该项指标只对虚拟机有效，表示分配给当前虚拟机的 CPU 时间之中，被同一台物理机上的其他虚拟机偷走的时间百分比</li>
+</ul>
+</blockquote><span>
+
+</span><p>如果想查看单个程序的耗时，一般使用<code>time</code>命令。</p><span>
+
+</span><p><img src="http://www.ruanyifeng.com/blogimg/asset/2016/bg2016120204.jpg" alt="" title=""></p><span>
+
+</span><p>程序名之前加上<code>time</code>命令，会在程序执行完毕以后，默认显示三行统计。</p><span>
+
+</span><blockquote>
+  <ul>
+<li><code>real</code>：程序从开始运行到结束的全部时间，这是用户能感知到的时间，包括 CPU 切换去执行其他任务的时间。</li>
+<li><code>user</code>：程序在 User space 执行的时间</li>
+<li><code>sys</code>：程序在 Kernel space 执行的时间</li>
+</ul>
+</blockquote><span>
+
+</span><p><code>user</code>和<code>sys</code>之和，一般情况下，应该小于<code>real</code>。但如果是多核 CPU，这两个指标反映的是所有 CPU 的总耗时，所以它们之和可能大于<code>real</code>。</p><span>
+
+</span><p>[参考链接]</p><span>
+
+</span><blockquote>
+  
+</blockquote><span>
+
+</span><p>（完）</p><span>
+
+                                    </span><!-- /div --><span>
+
+                                </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

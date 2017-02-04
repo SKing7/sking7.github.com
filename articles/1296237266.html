@@ -1,0 +1,146 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>CSS Ellipsis: How to Manage Multi-Line Ellipsis in Pure CSS</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>CSS Ellipsis: How to Manage Multi-Line Ellipsis in Pure CSS</h1>
+                <div><p>Properly cutting off multi-line text is a surprisingly hard thing to do
+well.</p><span>
+</span><ul>
+<li><code>overflow: hidden</code>&nbsp;provides no indication of the text cut off.</li>
+<li><code>text-overflow: ellipsis</code>&nbsp;works only on single line content.</li>
+<li>Various JavaScript solutions are fragile because they need explicit
+    relayout whenever the box width or content changes.</li>
+</ul><span>
+</span><p>We can do better with pure CSS and a little imagination.</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/ymHFh">
+    <img title="ellipsis_animation" src="http://dev.mobify.com/wp-content/uploads/2012/09/ellipsis_animation.gif" alt="">
+</a></p><span>
+</span><p>The image above is an animated GIF that shows the <a href="http://codepen.io/romanrudenko/pen/ymHFh">finished product&nbsp;of our CSS
+Ellipsis approach</a>. Note how the
+ellipsis appears and disappears when the window is made narrower or wider. There
+is no JavaScript listening to window resize events or controlling ellipsis
+element visibility.</p><span>
+</span><p>So what kind of magic is that?</p><span>
+
+
+</span><h3>CSS Ellipsis Implementation</h3><span>
+</span><p>The final CSS Ellipsis result demonstrated in the animated GIF above is
+gradually built from basic floats over 9 steps in the tutorial below. If
+you want to understand how the technique works, we recommend following
+the links and experimenting with code examples. This writeup will
+provide more of a high-level overview.</p><span>
+</span><p>Obviously, cutting the text off is the easy part. The hard part is
+getting an element to appear in the corner of overflowing container then
+having it disappear if the container is not overflowing. Since doing
+this second feat is difficult, we will start with the opposite – placing
+an element in the corner of the container when the container is too
+short.</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/wvxbd">
+    <img class="alignnone size-full wp-image-8931" title="01.idea" src="http://dev.mobify.com/wp-content/uploads/2012/09/01.idea_.png" alt="">
+</a></p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/wvxbd">01-idea</a>. Both text samples use fixed height "wrap" elements,
+containing three floats inside. The first "prop" float is the measuring
+stick against which the content is compared. When the "main" content is
+shorter or equal in height to "prop", the "end" element can roam free in
+the bottom right corner. When the "main" is longer than "prop", the
+"end" element is trapped under "prop".</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/zhweq">02-switchback</a>. Now, let's flip the scenario and make this work
+properly by showing the ellipsis element when the content is too long
+for the container. For demonstration reasons, we will create a new
+"realend" element within "end". The location of "realend" is defined
+relative to that of "end", so that when "end" is trapped in the corner,
+"realend" lands on the bottom right, and when "end" is free, "realend"
+is out of bounds.</p><span>
+</span><div class="codehilite"><pre><span class="p">.</span><span class="n">realend</span> <span class="p">{</span>
+    <span class="nl">position:</span> <span class="n">absolute</span><span class="p">;</span>
+    <span class="nl">width:</span> <span class="mi">100</span><span class="o">%</span><span class="p">;</span>
+    <span class="nl">top:</span> <span class="o">-</span><span class="mi">50</span><span class="n">px</span><span class="p">;</span>
+    <span class="nl">left:</span> <span class="mi">300</span><span class="n">px</span><span class="p">;</span>
+    <span class="p">...</span>
+</pre></div><span>
+
+
+</span><p>This is beginning to look like a proper text-overflow implementation,
+but all its plumbing is exposed and widths are fixed.</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/sKnmz"><img class="alignnone size-full wp-image-8932" title="03.relative" src="http://dev.mobify.com/wp-content/uploads/2012/09/03.switchback.gif" alt=""></a></p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/sKnmz">03-relative</a>. We make no visual changes in this step. However,
+we eliminate "end" and place "realend" in the right spot through the use
+of&nbsp;<code>position: relative</code> instead of <code>position: absolute</code>.
+<code>Position: relative</code> is perfect here because it shifts element for the
+purpose of rendering while maintaining its original place for the
+purpose of layout.</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/mIKgr">04-narrow</a>. It would be cumbersome to resize "prop" every time the
+size of "realend" ellipsis content changes. Instead, we shrink "prop"
+and prevent it from wasting space through the use of negative margins.
+Note how the negative margin trick on "realend" allows it to fit into 5
+pixels of "prop"-held space.</p><span>
+</span><div class="codehilite"><pre><span class="p">.</span><span class="n">realend</span> <span class="p">{</span>
+    <span class="nl">float:</span> <span class="n">right</span><span class="p">;</span>
+    <span class="nl">position:</span> <span class="n">relative</span><span class="p">;</span>
+    <span class="nl">top:</span> <span class="o">-</span><span class="mi">50</span><span class="n">px</span><span class="p">;</span>
+    <span class="nl">left:</span> <span class="mi">300</span><span class="n">px</span><span class="p">;</span>
+    <span class="nl">width:</span> <span class="mi">100</span><span class="n">px</span><span class="p">;</span>
+    <span class="n">margin</span><span class="o">-</span><span class="n">left</span><span class="o">:</span> <span class="o">-</span><span class="mi">100</span><span class="n">px</span><span class="p">;</span>
+    <span class="n">padding</span><span class="o">-</span><span class="n">right</span><span class="o">:</span> <span class="mi">5</span><span class="n">px</span><span class="p">;</span>
+    <span class="p">...</span>
+</pre></div><span>
+
+
+</span><p><a href="http://codepen.io/romanrudenko/pen/ntcBf">05-fluid</a>. In this step we switch container widths to percentages to
+enable them to scale along with viewport. This is relatively easy to do
+because a negative margin on "realend" compensates for its width and
+thus allows use of <code>left: 100%</code>.</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/ujfgr">06-sweep</a>. We replace our "prop" and "realend" elements with :before
+and :after generated content. This allows the markup structure to be
+simplified. Outer "wrap" element is renamed to "ellipsis".</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/frckp">07-overflow</a>. We apply overflow to hide inner workings of the layout.
+In addition, the wrapper element is expanded from 50% to 100% because we
+are no longer trying to demonstrate placement of the "realend" element
+when content text gets too short. Content length is increased to
+compensate.</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/ymHFh"><img class="alignnone size-full wp-image-8930" title="ellipsis_animation" src="http://dev.mobify.com/wp-content/uploads/2012/09/ellipsis_animation.gif" alt=""></a></p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/ymHFh">08-complete</a>. We change the content of the :after generated
+element to use an actual ellipsis and apply a transparent-to-white
+gradient background to hide any text it overlays. Debugging-specific
+properties, such as background highlighting and semi-transparency are
+now removed and we arrive at our final result.</p><span>
+</span><p><a href="http://codepen.io/romanrudenko/pen/bpeDF">09-readmore</a>. We gild the lily a bit by adding Read More text that
+appears either as part of overflowed text or part of content, but not
+both. We also overlay all the text with a display: block link. This is
+better than wrapping content with a link because blocky elements are not
+reliably contained inside links.</p><span>
+</span><h3>CSS Ellipsis Browser Support</h3><span>
+</span><p>So far we have tested on Safari 5.0, IE 9 (must be in standards mode),
+Opera 12 and Firefox 15.</p><span>
+</span><p>Older browsers will still work quite well, as the meat of the layout is
+in normal positioning, margin and padding properties. if your platform
+is older (e.g. Firefox 3.6, IE 8), you can use the method but redo the
+gradient as a standalone PNG image or DirectX filter.</p><span>
+</span><p>Generated content may also be a point of contention for older browsers
+but can be replaced with empty elements.</p><span>
+</span><h3>CSS Ellipsis Limitations</h3><span>
+</span><p>If you rely on a fade out effect, you will need a solid background under
+your text. You can also dodge this limitation by using a different
+appearance for the overflow indication element, such as a torn or folded
+corner or an inkblot.</p><span>
+</span><p>Since you will be cutting off multiline text with <code>overflow: hidden</code>,
+you need to get your math right to avoid cutting the last line in half.
+Pay attention to your vertical grid, and make sure that no matter how
+many lines your header(s) and paragraph(s) take, the last line lands in
+same spot at the bottom of overflowing container.</p><span>
+</span><h3>Download CSS Ellipsis</h3><span>
+</span><p><a href="https://www.mobify.com/wp-content/uploads/2012/09/css-ellipses.zip">Download the zip file for CSS Ellipsis</a>. The archive contains all the
+examples, as well as a Sass mixin version of code.</p><span>
+</span><p>If you build something impressive with this technique, please share a
+link with us in the comments below.</p></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

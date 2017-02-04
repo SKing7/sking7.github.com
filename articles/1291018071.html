@@ -1,0 +1,299 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Truly Fluid Typography With vh And vw Units – Smashing Magazine</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Truly Fluid Typography With vh And vw Units – Smashing Magazine</h1>
+                <article class="post-251451 post type-post status-publish format-standard has-post-thumbnail hentry category-coding category-mobile tag-css tag-responsive-web-design tag-typography" vocab="http://schema.org/" typeof="TechArticle">
+
+		
+
+			
+
+	
+	
+
+	<p>Embracing fluid typography might be easier than you think. It has wide browser support, is simple to implement and can be achieved without losing control over many important aspects of design.</p>
+<p>Unlike <a href="https://www.smashingmagazine.com/2015/06/responsive-typography-with-sass-maps/">responsive typography</a><sup class="po" id="note-1"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#1">1</a></sup>, which changes only at set breakpoints, <strong>fluid typography resizes smoothly</strong> to match any device width. It is an intuitive option for a web in which we have a practically infinite number of screen sizes to support. Yet, for some reason, it is still used far less than responsive techniques.</p>
+<p>This might be because typography is so deeply rooted in the centuries-old history of typesetting. The concept of having “fluid” anything is often at odds with this tradition. In print, dimensions have always been fixed, but they don’t need to be on the web. That’s why I think fluid typography is a perfect match for the web. It’s a different approach for a completely different medium.</p>
+<p>This doesn’t mean we need to throw out all conventions and everything we know about typography. We just need to <strong>learn how to apply the techniques we know</strong> in a slightly different way. Careful attention to detail will ensure we still have a perfectly crafted experience at all screen sizes.</p>
+<h3 id="getting-started-with-fluid-typography">Getting Started With Fluid Typography <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#getting-started-with-fluid-typography" aria-label="Link to section 'Getting Started With Fluid Typography'" class="sr hsl">Link</a></h3>
+<p>Viewport units are what make fluid typography on the web possible. Viewport units refer to a percentage of the browser’s viewport dimensions. For example, 1 viewport width (<code>vw</code>) is equal to 1% of the viewport’s width. The units differ from percentages because they are always relative to the viewport, whereas a percentage is relative to the element’s parent container.</p>
+<p>This means that, unlike all other unit types, viewport units are not in any way related to the base font size. This difference is significant and makes the units interesting and unique.</p>
+<p>Four viewport units are available to us:</p>
+<ul>
+<li><code>vw</code>: viewport width</li>
+<li><code>vh</code>: viewport height</li>
+<li><code>vmin</code>: the smaller value of the viewport’s width and height</li>
+<li><code>vmax</code>: the larger value of the viewport’s width and height</li>
+</ul>
+<p>The easiest way to start using fluid typography is to set the <code>font-size</code> on the <code>html</code> element to be a fluid unit:</p>
+<pre><code class="language-css">html { font-size: 2vw; }</code></pre>
+<p>In this example, we’ve set the root element to <code>2vw</code>. Therefore, we have changed the “root em.” Because all <code>em</code> and <code>rem</code> units are either directly or indirectly related to the root em, they will now also be fluid. For example:</p>
+<pre><code class="language-css">h1 { font-size: 2em; }</code></pre>
+<p>A heading size of <code>2em</code> is now equivalent to <code>4vw</code> because this is twice the current font size of <code>2vw</code>.</p>
+<p>Using viewport-relative units alone comes with some drawbacks. We don’t get precise control over the rate of scale; we don’t have min or max font sizes; and, just like pixels, a declaration might override the user’s font-size preferences. Luckily, there are ways to overcome all of these limitations.</p>
+<h3 id="controlling-viewport-units-to-get-minimum-and-maximum-font-sizes">Controlling Viewport Units To Get Minimum And Maximum Font Sizes <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#controlling-viewport-units-to-get-minimum-and-maximum-font-sizes" aria-label="Link to section 'Controlling Viewport Units To Get Minimum And Maximum Font Sizes'" class="sr hsl">Link</a></h3>
+<p>Sticking <code>2vw</code> on the <code>html</code> element, seeing that everything is fluid and calling it a day is easy, but it wouldn’t yield the best result. Viewport units are a blunt instrument and require some additional effort to get a workable result.</p>
+<p>Because viewport units are always relative to the viewport, on very small screens, you could end up with ridiculously small font sizes.</p>
+<figure class="aspect-ratio"></figure>
+<p>Ideally, we’d be able to set a minimum font size, but we don’t yet have <code>min-font-size</code> property in CSS. With a little lateral thinking, though, we can achieve the same result in a few different ways.</p>
+<p>First, we could use a <code>calc()</code> expression:</p>
+<pre><code class="language-css">html { font-size: calc(1em + 1vw); }</code></pre>
+<p>In this example, at a viewport width of 0, the <code>font-size</code> would be exactly <code>1em</code>. As the screen gets larger, the value of <code>1vw</code> would be added to the minimum font size of <code>1em</code>. But this technique is not always ideal; often we want to set a minimum font size at a screen size other than zero. We can handle this using media queries:</p>
+<pre><code class="language-css">@media screen and (min-width: 50em) {
+  html {
+    font-size: 2vw;
+  }
+}</code></pre>
+<p>In this example, the font size would become fluid once the viewport reaches a width of 50 ems. This works really well, but it usually means a jump between the fixed and fluid values. To eliminate this, we can work out the precise point at which the fluid value matches the fixed value and set a breakpoint at that viewport size.</p>
+<p>If the default font size is 16 pixels and if <code>2vw</code> is 2% of the viewport’s width, then the calculation for working out the breakpoint would be <code>16 ÷ (2 ÷ 100)</code>. This gives us 800 pixels.</p>
+<p>Because we want to use em units for our media queries, let’s convert the pixels to ems. We’ll divide 800 by 16 (or whatever the root em is equal to in pixels): <code>800 ÷ 16 = 50</code>. If you find it easier, we could do the calculation in ems: <code>1 ÷ (2 ÷ 100) = 50</code>. As you can see in the example above, by setting a font size of <code>2vw</code> and a breakpoint of <code>50em</code>, we get a seamless transition between the fixed and fluid values.</p>
+<p>We can use the same calculation to work out a maximum font size. If we wanted a maximum font size of 24 pixels, we could calculate like so: <code>24 ÷ (2 ÷ 100) = 1200px</code>. In ems, that would be: <code>1.5 ÷ (2 ÷ 100) = 75</code>. Then, above 75 ems, we would reset the font size to a fixed value.</p>
+<pre><code class="language-css">@media screen and (min-width: 75em) {
+  html {
+    font-size: 1.5em;
+  }
+}</code></pre>
+<p>These calculations are not difficult, but I find that a table helps us to visualize the <a href="https://www.smashingmagazine.com/2014/07/breakpoints-and-the-future-websites/">breakpoints</a><sup class="po" id="note-2"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#2">2</a></sup> and the rate at which fonts scale with different viewports units. The viewport unit values are across the top, and the device resolutions run down the left side of the table.</p>
+<table class="tablesaw" data-tablesaw-mode="swipe">
+<thead>
+<tr>
+<th data-tablesaw-priority="persist"></th>
+<th>1vw</th>
+<th>2vw</th>
+<th>3vw</th>
+<th>4vw</th>
+<th>5vw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>400px</strong></td>
+<td>4px</td>
+<td>8px</td>
+<td>12px</td>
+<td>16px</td>
+<td>20px</td>
+</tr>
+<tr>
+<td><strong>500px</strong></td>
+<td>5px</td>
+<td>10px</td>
+<td>15px</td>
+<td>20px</td>
+<td>25px</td>
+</tr>
+<tr>
+<td><strong>600px</strong></td>
+<td>6px</td>
+<td>12px</td>
+<td>18px</td>
+<td>24px</td>
+<td>30px</td>
+</tr>
+<tr>
+<td><strong>700px</strong></td>
+<td>7px</td>
+<td>14px</td>
+<td>21px</td>
+<td>28px</td>
+<td>35px</td>
+</tr>
+<tr>
+<td><strong>800px</strong></td>
+<td>8px</td>
+<td>16px</td>
+<td>24px</td>
+<td>32px</td>
+<td>40px</td>
+</tr>
+</tbody>
+</table>
+<p>Looking at this table, you can see that we have little control over the rate at which the viewport units change. Using viewport units alone, we are limited to the font sizes available in a single column of the table.</p>
+<section>
+
+</section>
+<h3 id="controlling-the-rate-of-scale">Controlling The Rate Of Scale <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#controlling-the-rate-of-scale" aria-label="Link to section 'Controlling The Rate Of Scale'" class="sr hsl">Link</a></h3>
+<p>If we wanted to choose a font size of 16 pixels at a screen resolution of 400 pixels and then transition to 24 pixels at a resolution of 800 pixels, we wouldn’t be able to — not without a breakpoint. As well, you might have noticed we have been calculating the breakpoints for the minimum and maximum font sizes, not choosing them.</p>
+<p>How do we get around these limitations? The answer is <a href="https://www.smashingmagazine.com/2015/12/getting-started-css-calc-techniques/">to use <code>calc()</code></a><sup class="po" id="note-3"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#3">3</a></sup>. Using <code>calc()</code> and viewport units together, we can get advanced fluid typography that scales perfectly between specific pixel values within a specific viewport range. We simply need to create a basic mathematical function.</p>
+<figure><a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/advanced-calc-800-opt.png"><img alt="Image of a function: calc(16px + (24 - 16) * (100vw - 400px) / (800 - 400))" src="https://www.smashingmagazine.com/wp-content/uploads/2016/05/advanced-calc-500-opt.png"></a><sup class="po" id="note-4"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#4">4</a></sup><br><figcaption>(<a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/advanced-calc-800-opt.png">View large version</a><sup class="po" id="note-5"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#5">5</a></sup>)</figcaption>
+</figure>
+<p>This function takes a value within a range and works out what the new value would be if applied to a different range. So, if we had the numbers 1 and 100 and a value of 50 and then applied this to a new range between 1 to 200, our new value would be 100. Both of these values remain right in the middle of the range.</p>
+<p>This is a common function for mapping values, and I’ve used it a lot when working with data in JavaScript. I was curious about the possibility of using functions with <code>calc()</code>, and when I noticed that this was a purely mathematical function, I knew that all I needed was a variable. That’s the key difference with viewports: The viewport’s size is variable. A value of <code>100vw</code> is the variable in this equation because the resolved value of <code>100vw</code> changes as the viewport’s size changes. With this initial idea, I took a while longer to get the function to work. The <code>calc()</code> function handles unit types in equations in very specific ways. If you are interested in this type of thing, I highly recommend reading the <a href="https://www.w3.org/TR/css3-values/">W3C’s specification on unit types and values</a><sup class="po" id="note-6"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#6">6</a></sup>; if nothing else, it will make for great conversation at your next dinner party.</p>
+<p>Though the calculation looks slightly complex, it is fairly simple. We choose the minimum and maximum font size and the screen sizes over which the font should scale and then plug them into the equation. We can use any unit type, including ems, rems or pixels. I’ve been using pixels for the examples in this article because they make it easier to understand the concepts, but I usually use rem units in my work. Whichever you choose, the only thing to remember is that you must use the same unit type for all values in the equation and you must strip the units, as shown in the example.</p>
+<p>If you don’t want to write this by hand, plenty of tools make it easier, including mixins for <a href="http://www.sassmeister.com/gist/7f22e44ace49b5124eec">Sass</a><sup class="po" id="note-24"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#24">24</a></sup><sup class="po" id="note-7"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#7">7</a></sup> and <a href="http://codepen.io/MadeByMike/pen/RWJyML">LESS</a><sup class="po" id="note-25"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#25">25</a></sup><sup class="po" id="note-8"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#8">8</a></sup> and a <a href="https://www.npmjs.com/package/postcss-responsive-type">PostCSS</a><sup class="po" id="note-26"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#26">26</a></sup><sup class="po" id="note-9"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#9">9</a></sup> plugin. However you roll, you’re covered!</p>
+<h3 id="maintaining-ideal-line-length">Maintaining Ideal Line Length <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#maintaining-ideal-line-length" aria-label="Link to section 'Maintaining Ideal Line Length'" class="sr hsl">Link</a></h3>
+<p>In his book <em>The Elements of Typographic Style</em>, Robert Bringhurst suggests that a comfortable line length is around 45 to 75 characters.</p>
+<blockquote>
+<p>Anything from 45 to 75 characters is widely regarded as a satisfactory length of line for a single-column page set in a serifed text face in a text size. The 66-character line (counting both letters and spaces) is widely regarded as ideal.</p>
+</blockquote>
+<p>The same rule can be directly applied to fluid typography, and, in many cases, achieving a consistent line length as the text scales is possible.</p>
+<p>In a responsive approach, in which we adjust the font size at set breakpoints, we will often also arbitrarily adjust the width of a container to maintain the right line length. However, with fluid typography, adjustment at specific breakpoints becomes unnecessary. Just set the size of the container to scale at the same rate as the font. We can use the <code>calc()</code> technique described above on the <code>width</code> property just as easily as we do on <code>font-size</code>. This makes it easy to maintain a perfect line length — and I have noticed my style sheets are far easier to read and maintain, too.</p>
+<p>Be aware that maintaining an ideal line length becomes impractical on very small screens. There comes a point when reducing the font size to maintain an “ideal” reading length will impair readability. We just have to accept this and set the container’s width to something sensible for mobile devices.</p>
+<h3 id="implementing-a-modular-scale">Implementing A Modular Scale <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#implementing-a-modular-scale" aria-label="Link to section 'Implementing A Modular Scale'" class="sr hsl">Link</a></h3>
+<p>A modular scale is a series of numbers that are harmoniously proportional to each other. This is best described visually:</p>
+<figure><a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/what-is-ms-800-opt.png"><img alt="Image of the senctence What is modular scale repeated six times but in different sizes" src="https://www.smashingmagazine.com/wp-content/uploads/2016/05/what-is-ms-500-opt.png"></a><sup class="po" id="note-10"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#10">10</a></sup><br><figcaption>Each heading is exactly 1.2 times bigger than the preceding heading. (<a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/what-is-ms-800-opt.png">View large version</a><sup class="po" id="note-11"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#11">11</a></sup>)</figcaption>
+</figure>
+<p>Different scales work better for different screen sizes.</p>
+<figure><a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/different-scales-800-opt.png"><img alt="Comparison of a modular scale on a smartphone in portrait and a desktop screen" src="https://www.smashingmagazine.com/wp-content/uploads/2016/05/different-scales-500-opt.png"></a><sup class="po" id="note-12"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#12">12</a></sup><br><figcaption>(<a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/different-scales-800-opt.png">View large version</a><sup class="po" id="note-13"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#13">13</a></sup>)</figcaption>
+</figure>
+<p>On a small screen, heading sizes should be more uniform; a large screen has room for greater variation. We can use the typographic techniques described above to fluidly transition between different modular scales. Simply pick a ratio for small screens and a different ratio for large screens, and then work out the minimum and maximum font sizes for each heading level.</p>
+<p>To calculate the modular scale, take the base font size and multiply it by the desired ratio to get larger numbers. For smaller numbers, divide. Repeat this process with subsequent results to get each required step in the scale.</p>
+<h4 id="larger">Larger <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#larger" aria-label="Link to section 'Larger'" class="sr hsl">Link</a></h4>
+<ul>
+<li>1em × 1.125em =  1.125em</li>
+<li>1.125em × 1.125em = 1.266em</li>
+<li>1.266em × 1.125em = 1.424em</li>
+<li>1.424em × 1.125em = 1.602em</li>
+</ul>
+<h4 id="smaller">Smaller <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#smaller" aria-label="Link to section 'Smaller'" class="sr hsl">Link</a></h4>
+<ul>
+<li>1em ÷ 1.125em = 0.889em</li>
+<li>0.889em ÷ 1.125em = 0.790em</li>
+<li>0.790em ÷ 1.125em = 0.702em</li>
+<li>0.702em ÷ 1.125em = 0.624em</li>
+</ul>
+<p>Let’s use 1.125 as our minimum scale and do the same calculations for 1.250 as our maximum scale. We’d then apply different steps in the scale to our heading levels.</p>
+<ul>
+<li>Minimum scale: 1.125</li>
+<li>Maximum scale: 1.250</li>
+</ul>
+<table class="tablesaw" data-tablesaw-mode="swipe">
+<thead>
+<tr>
+<th>Heading level</th>
+<th>Minimum font size</th>
+<th>Maximum font size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heading 1</td>
+<td>1.602em</td>
+<td>2.441em</td>
+</tr>
+<tr>
+<td>Heading 2</td>
+<td>1.424em</td>
+<td>1.953em</td>
+</tr>
+<tr>
+<td>Heading 3</td>
+<td>1.266em</td>
+<td>1.563em</td>
+</tr>
+<tr>
+<td>Heading 4</td>
+<td>1.125em</td>
+<td>1.250em</td>
+</tr>
+</tbody>
+</table>
+<p>I’ve set up an example of <a href="http://codepen.io/MadeByMike/pen/VvwqvW">fluid modular scale headings on Codepen</a><sup class="po" id="note-14"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#14">14</a></sup> for you to look at. You can read more about the significance of modular scales in Tim Brown’s article “<a href="http://alistapart.com/article/more-meaningful-typography">More Meaningful Typography</a><sup class="po" id="note-15"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#15">15</a></sup>.”</p>
+<p>If you need help choosing an appropriate scale, I recommend the websites <a href="http://type-scale.com/">Type Scale</a><sup class="po" id="note-16"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#16">16</a></sup> by Jeremy Church and <a href="http://www.modularscale.com/">Modular Scale</a><sup class="po" id="note-17"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#17">17</a></sup> by Tim Brown and Scott Kellum.</p>
+<h3 id="maintaining-vertical-rhythm">Maintaining Vertical Rhythm <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#maintaining-vertical-rhythm" aria-label="Link to section 'Maintaining Vertical Rhythm'" class="sr hsl">Link</a></h3>
+<p>Vertical rhythm has to do with maintaining consistent and proportional space between elements on the page. You can find out more about vertical rhythm in Espen Brunborg’s article “<a href="https://www.smashingmagazine.com/2012/12/css-baseline-the-good-the-bad-and-the-ugly/">CSS Baseline: The Good, the Bad and the Ugly</a><sup class="po" id="note-18"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#18">18</a></sup>.”</p>
+<p>To maintain vertical rhythm in our layout, we need to set the vertical spacing of each element as a proportion of our baseline measure. One thing many people find challenging with responsive typography is finding a vertical rhythm that works for both small and large screens. Typically, we might want different baseline measures for small and large screens, or we might want to use different proportions.</p>
+<p>With fluid typography, the baseline can be fluid, just like the font size. In fact, if we have already set the root element to a fluid value, we can use <code>em</code> or <code>rem</code> units, and we can use <code>calc()</code> to make this easy.</p>
+<p>Let’s say we make <code>1.5rem</code> our baseline. Let’s set the padding on the <code>body</code> element to a single unit of our baseline.</p>
+<pre><code class="language-css">body {
+  padding: 1.5rem;
+}</code></pre>
+<p>We’ll do the same for the line height and margins.</p>
+<pre><code class="language-css">p {
+  line-height: 1.5rem;
+  margin-bottom: 1.5rem;
+}</code></pre>
+<p>For heading elements, I want a different line height. However, I want the height of the line plus the margins to equal an increment of the baseline. This is where <code>calc()</code> helps.</p>
+<pre><code class="language-css">h1 {
+  font-size: 2rem;
+  line-height: 2rem;
+  margin-top: calc((1.5rem - 2rem) + 1.5rem);
+  margin-bottom: 1.5rem;
+}</code></pre>
+<p>In this example, the total height of the heading element plus the margins will be <code>3rem</code>, which is exactly twice the value of our baseline.</p>
+<p>I’ve created an <a href="http://codepen.io/MadeByMike/pen/0dbc9b82769c3e2a0cbfc3192bcaabd3?editors%3D0100">example of this technique</a><sup class="po" id="note-19"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#19">19</a></sup> using Sass variables so that you can play around with different baselines measures to see how it works.</p>
+<p>In the future, custom CSS properties will make this technique even more interesting. We will be able to use CSS variables in <code>calc()</code> expressions to change our baseline measure with media queries.</p>
+<h3 id="working-with-constraints">Working With Constraints <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#working-with-constraints" aria-label="Link to section 'Working With Constraints'" class="sr hsl">Link</a></h3>
+<p>Perhaps you want to implement fluid typography on a website that has existing layout constraints, or you have to work within a predefined layout in WordPress or Bootstrap. In this situation, the containers would likely not be fluid or, if they are, probably won’t change at the same rate as the font size.</p>
+<p>I recently helped to implement fluid typography for the Australian Government’s Department of Human Services. It’s a large website with challenging content, and we had to work with an existing design. I had two main concerns in implementing fluid typography on such a heavily trafficked website.</p>
+<p>First, how could I prevent the layout from breaking? In particular, I expected content in navigation containers to overflow when the text size changed at a different rate from the container. To my surprise, this wasn’t a problem.</p>
+<p>In fact, it turned out to be quite the opposite. Content now naturally adapted to fit containers, whereas previously it needed adjustment at certain breakpoints. Overall, the style sheet needed fewer media queries, and, for the most part, components needed far fewer style declarations.</p>
+<p>This was an unexpected benefit, and in many places we ditched the design treatment for tablets because the desktop presentation now worked on smaller screens.</p>
+<p>Below is an example of a navigation component that previously needed several adjustments at different screen sizes. While not perfect at small sizes, it holds together and remains functional, without breaking.</p>
+<figure><a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/component-example-full-opt.png"><img alt="A colorful navigation component adjusting to the viewport-width" src="https://www.smashingmagazine.com/wp-content/uploads/2016/05/component-example-500-opt.png"></a><sup class="po" id="note-20"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#20">20</a></sup><br><figcaption>(<a href="https://www.smashingmagazine.com/wp-content/uploads/2016/05/component-example-full-opt.png">View large version</a><sup class="po" id="note-21"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#21">21</a></sup>)</figcaption>
+</figure>
+<p>My second concern was that, because I had to work with some fixed widths, I knew I could not always achieve the ideal length of characters per line. Instead, I adjusted the font size to be within the ideal length on phones and tablets — where I think it matters most.</p>
+<p>I had to accept that, because the main container does not scale at the same rate as the text, some text would inevitably reflow when the browser is resized. This was a concern only because I did not want readers to lose their place when changing the device’s orientation. Because we could not avoid this, the only thing we could do was to test the impact on certain devices. With the choices we made, luckily the reflowing was hardly noticeable on mobile devices, and even on large tablets the impact was minimal.</p>
+<p>In the end, we were happy with the result. While we could do more to improve the typography, without a doubt we’ve improved the readability of the website. With the lessons learned from implementing fluid typography, the next iteration of the design will likely have a strong focus on typography and readability.</p>
+<h3 id="tips-for-implementing-fluid-typography-on-an-existing-website">Tips For Implementing Fluid Typography On An Existing Website <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#tips-for-implementing-fluid-typography-on-an-existing-website" aria-label="Link to section 'Tips For Implementing Fluid Typography On An Existing Website'" class="sr hsl">Link</a></h3>
+<ul>
+<li>Carefully choose the rate of scale and the minimum and maximum font sizes that work best with your design.</li>
+<li>Use em units for font sizes. If you need to turn off fluid typography in a particular container, such as the navigation, set the font size of the container to a fixed value. Em values in this container will then be relative to the fixed value.</li>
+<li>Similarly, if you need to, you can set fluid typography only for certain containers. If you set the font size of a particular container to be a fluid value, then all em values in the container will become fluid.</li>
+<li>Reflowing text is not necessarily a bad thing if it only happens when the browser is resized or the device’s orientation changes.</li>
+<li>Maintaining a perfect line length might be impossible. Aim for an ideal line length on mobile and tablet first.</li>
+</ul>
+<h3 id="browser-support-and-bugs">Browser Support And Bugs <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#browser-support-and-bugs" aria-label="Link to section 'Browser Support And Bugs'" class="sr hsl">Link</a></h3>
+<p>I often hear that Safari, and mobile Safari in particular, has significant bugs with both viewport units and <code>calc()</code> expressions. However, more often than not, specific problems are not mentioned, so I thought I would do my own testing.</p>
+<p>I tested <code>calc()</code> expressions and viewport units on their own, as well as the advanced fluid typography techniques that combine viewport units and <code>calc()</code>. I didn’t find any problems that would stop me from using these techniques today.</p>
+<p>I found that both <code>calc()</code> and viewport units work fine in modern browsers. However, in versions of Safari below 8 and in Internet Explorer below version 11, viewport units when used in a <code>calc()</code> expression are not re-evaluated when the browser window is resized.</p>
+<p>You can force an expression to be re-evaluated with additional media queries:</p>
+<pre><code class="language-css">  /* Older browsers */
+  html { font-size: 16px; }
+  
+  /* Modern browsers only need this one */
+  
+  @media screen and (min-width: 25em){
+    html { font-size: calc( 16px + (24 - 16) * (100vw - 400px) / (800 - 400) ); }
+  }
+  
+  /* Safari &lt;8 and IE &lt;11 */
+  @media screen and (min-width: 25em){
+    html { font-size: calc( 16px + (24 - 16) * (100vw - 400px) / (800 - 400) ); }
+  }
+  @media screen and (min-width: 50em){
+    html { font-size: calc( 16px + (24 - 16) * (100vw - 400px) / (800 - 400) ); }
+  }
+</code></pre>
+<p>This technique forces Safari below version 8 and Internet Explorer below version 11 to recalculate the font size at set breakpoints.</p>
+<p>Forcing old browsers to recalculate the layout with a window resizing event in JavaScript might be possible, but I could not find a reliable method of doing so, and it could impair performance. In most cases, forcing a recalculation at set breakpoints should be an acceptable fallback for these browsers.</p>
+<p>For legacy browsers that <a href="http://caniuse.com/#feat=viewport-units">don’t support viewport units</a><sup class="po" id="note-22"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#22">22</a></sup> or <a href="http://caniuse.com/#feat=calc">calc() expressions</a><sup class="po" id="note-23"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#23">23</a></sup>, the fluid technique will simply be ignored. If sensible defaults are set, this technique can be applied with progressive enhancement.</p>
+<h3 id="using-fluid-typography-today">Using Fluid Typography Today <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#using-fluid-typography-today" aria-label="Link to section 'Using Fluid Typography Today'" class="sr hsl">Link</a></h3>
+<p>If you plan on implementing fluid typography today, first decide on the approach you are going to take.</p>
+<p>If the entire design is going to be fluid, then you will probably want to consider making the root em fluid, by declaring a font size with a fluid unit on the <code>html</code> element. You can then use <code>em</code> and <code>rem</code> units throughout the rest of the design.</p>
+<p>Choose your minimum and maximum font size carefully. At this point, you’ll need to decide whether to use viewport units directly or to exert more precise control over the rate of scale. If the latter, then the mixin for <a href="http://www.sassmeister.com/gist/7f22e44ace49b5124eec">Sass</a><sup class="po" id="note-24"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#24">24</a></sup><sup class="po" id="note-7"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#7">7</a></sup> or <a href="http://codepen.io/MadeByMike/pen/RWJyML">LESS</a><sup class="po" id="note-25"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#25">25</a></sup><sup class="po" id="note-8"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#8">8</a></sup> or the <a href="https://www.npmjs.com/package/postcss-responsive-type">PostCSS</a><sup class="po" id="note-26"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#26">26</a></sup><sup class="po" id="note-9"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#9">9</a></sup> plugin will make things easier.</p>
+<p>Make sure to get the minimum and maximum font size right. This is the most important decision. Once you change the root em, the font size for all other components will be relative to this. Changing this late in a project could mean that you have to adjust everything.</p>
+<p>Don’t forget to declare a default font size before implementing a fluid technique. This default will be used in browsers that don’t support fluid units, and it does not need to be the same as your minimum font size.</p>
+<p>Finally, consider the constraints of your design and how you are going to approach things like heading levels and line length. Look at the techniques in this article. If you have components other than headings that you want to scale at a different rate from the regular text, consider readability and the maintenance of style sheets carefully before adding many <code>calc()</code> expressions.</p>
+<p>I hope you feel encouraged to think about where fluid typography might fit in your next project.</p>
+<h4 id="essential-reading">Essential Reading <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#essential-reading" aria-label="Link to section 'Essential Reading'" class="sr hsl">Link</a></h4>
+
+
+
+<h4 id="further-reading">Further Reading <a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#further-reading" aria-label="Link to section 'Further Reading'" class="sr hsl">Link</a></h4>
+
+<p><em property="editor">(rb, vf, il, al)</em></p>
+<p><em>Front page image credits: “<a href="http://trentwalton.com/2012/06/19/fluid-type/">Fluid Type</a><sup class="po" id="note-37"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#37">37</a></sup><sup class="po" id="note-28"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#28">28</a></sup>” by Trent Walton</em></p>
+<ol class="po"><li id="#1"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-1">1 https://www.smashingmagazine.com/2015/06/responsive-typography-with-sass-maps/</a></li><li id="#2"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-2">2 https://www.smashingmagazine.com/2014/07/breakpoints-and-the-future-websites/</a></li><li id="#3"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-3">3 https://www.smashingmagazine.com/2015/12/getting-started-css-calc-techniques/</a></li><li id="#4"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-4">4 https://www.smashingmagazine.com/wp-content/uploads/2016/05/advanced-calc-800-opt.png</a></li><li id="#5"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-5">5 https://www.smashingmagazine.com/wp-content/uploads/2016/05/advanced-calc-800-opt.png</a></li><li id="#6"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-6">6 https://www.w3.org/TR/css3-values/</a></li><li id="#7"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-7">7 http://www.sassmeister.com/gist/7f22e44ace49b5124eec</a></li><li id="#8"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-8">8 http://codepen.io/MadeByMike/pen/RWJyML</a></li><li id="#9"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-9">9 https://www.npmjs.com/package/postcss-responsive-type</a></li><li id="#10"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-10">10 https://www.smashingmagazine.com/wp-content/uploads/2016/05/what-is-ms-800-opt.png</a></li><li id="#11"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-11">11 https://www.smashingmagazine.com/wp-content/uploads/2016/05/what-is-ms-800-opt.png</a></li><li id="#12"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-12">12 https://www.smashingmagazine.com/wp-content/uploads/2016/05/different-scales-800-opt.png</a></li><li id="#13"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-13">13 https://www.smashingmagazine.com/wp-content/uploads/2016/05/different-scales-800-opt.png</a></li><li id="#14"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-14">14 http://codepen.io/MadeByMike/pen/VvwqvW</a></li><li id="#15"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-15">15 http://alistapart.com/article/more-meaningful-typography</a></li><li id="#16"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-16">16 http://type-scale.com/</a></li><li id="#17"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-17">17 http://www.modularscale.com/</a></li><li id="#18"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-18">18 https://www.smashingmagazine.com/2012/12/css-baseline-the-good-the-bad-and-the-ugly/</a></li><li id="#19"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-19">19 http://codepen.io/MadeByMike/pen/0dbc9b82769c3e2a0cbfc3192bcaabd3?editors%3D0100</a></li><li id="#20"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-20">20 https://www.smashingmagazine.com/wp-content/uploads/2016/05/component-example-full-opt.png</a></li><li id="#21"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-21">21 https://www.smashingmagazine.com/wp-content/uploads/2016/05/component-example-full-opt.png</a></li><li id="#22"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-22">22 http://caniuse.com/#feat=viewport-units</a></li><li id="#23"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-23">23 http://caniuse.com/#feat=calc</a></li><li id="#24"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-24">24 http://www.sassmeister.com/gist/7f22e44ace49b5124eec</a></li><li id="#25"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-25">25 http://codepen.io/MadeByMike/pen/RWJyML</a></li><li id="#26"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-26">26 https://www.npmjs.com/package/postcss-responsive-type</a></li><li id="#27"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-27">27 http://trentwalton.com/2011/05/10/fit-to-scale/</a></li><li id="#28"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-28">28 http://trentwalton.com/2012/06/19/fluid-type/</a></li><li id="#29"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-29">29 https://css-tricks.com/viewport-sized-typography/</a></li><li id="#30"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-30">30 https://www.smashingmagazine.com/2015/06/responsive-typography-with-sass-maps/</a></li><li id="#31"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-31">31 https://www.smashingmagazine.com/2015/05/benton-modern-typography-case-study/</a></li><li id="#32"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-32">32 http://www.elliotjaystocks.com/blog/responsive-web-typography/</a></li><li id="#33"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-33">33 http://www.zell-weekeat.com/responsive-typography/</a></li><li id="#34"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-34">34 http://blog.bugsnag.com/responsive-typography-with-rems</a></li><li id="#35"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-35">35 http://academy.bindtuning.com/fluid-type-for-responsive-websites/</a></li><li id="#36"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-36">36 https://responsivedesign.is/design/responsive-typography</a></li><li id="#37"><a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#note-37">37 http://trentwalton.com/2012/06/19/fluid-type/</a></li></ol>
+	
+	
+	
+<p>
+	<a href="https://www.smashingmagazine.com/2016/05/fluid-typography/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-215&amp;utm_medium=email#top" class="top">↑ Back to top</a>
+
+	<a onclick="clicky.log('#sharelink-clicked');" class="sot single" href="https://twitter.com/intent/tweet?original_referer=https://www.smashingmagazine.com/2016/05/fluid-typography/&amp;source=tweetbutton&amp;text=Truly%20Fluid%20Typography%20With%20vh%20And%20vw%20Units&amp;url=https://www.smashingmagazine.com/2016/05/fluid-typography/&amp;via=smashingmag">Tweet it</a><a onclick="clicky.log('#sharelink-clicked');" class="sot single" href="http://www.facebook.com/sharer/sharer.php?u=https://www.smashingmagazine.com/2016/05/fluid-typography/">Share on Facebook</a></p>
+	
+
+</article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

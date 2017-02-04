@@ -1,0 +1,142 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>D3 and React 3 ways – mike.williamson</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>D3 and React 3 ways – mike.williamson</h1>
+                <div class="entry-content"><span>
+		</span><p>D3 and React are two of the most popular libraries out there and a fair bit has been written about using them together.<br>The reason this has been worth writing about is the potential for conflict between them. With D3 adding and removing DOM elements to represent data and React tracking and diffing of DOM elements, either library could end up with <a href="http://stackoverflow.com/questions/23530716/react-how-much-can-i-manipulate-the-dom-react-has-rendered/23572967#23572967">elements being deleted</a> out from under it or operations <a href="https://github.com/facebook/react/pull/5190#issuecomment-148800183">returning unexpected elements</a> (their apparent approach when finding such an element is “<a href="https://github.com/facebook/react/pull/5190#issuecomment-148805658">kill it with fire</a>“).</p><span>
+</span><p>One way of avoiding this situation is simply <a href="http://stackoverflow.com/questions/21903604/is-there-any-proper-way-to-integrate-d3-js-graphics-into-facebook-react-applicat/21943949#21943949">telling a React component not to update</a> it’s children via <code>shouldComponentUpdate(){ return false }</code>. While effective, having React manage all the DOM except for some designated area doesn’t feel like the cleanest solution. A little digging shows that there are some better options out there.</p><span>
+</span><p>To explore these, I’ve taken D3 creator Mike Bostock’s letter frequency <a href="http://bl.ocks.org/mbostock/3885304">bar chart example</a> and used it as the example for all three cases. I’ve updated it to ES6, D3 version 4 and&nbsp;implemented it as a React component.</p><span>
+</span><figure data-shortcode="caption" id="attachment_3743" class="wp-caption alignnone"><img data-attachment-id="3743" data-permalink="https://mikewilliamson.wordpress.com/2016/06/03/d3-and-react-3-ways/letter_frequency/" data-orig-file="https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=840" data-orig-size="960,500" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="letter_frequency" data-image-description="" data-medium-file="https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=840?w=300" data-large-file="https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=840?w=840" class="alignnone size-full wp-image-3743" src="https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=840" alt="letter_frequency" srcset="https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=840 840w, https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=150 150w, https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=300 300w, https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png?w=768 768w, https://mikewilliamson.files.wordpress.com/2016/05/letter_frequency.png 960w" sizes="(max-width: 709px) 85vw, (max-width: 909px) 67vw, (max-width: 1362px) 62vw, 840px"><figcaption class="wp-caption-text">Mike Bostock’s letter frequency chart</figcaption></figure><span>
+</span><h3>Option 1: Use Canvas</h3><span>
+</span><p>One nice option is to use HTML5’s canvas element. Draw what you need and let React render the one element into the DOM. Mike Bostock has <a href="https://bl.ocks.org/mbostock/946ddf8a32b3b660ffd8">an example</a> of the letter frequency chart done with canvas. His code can be transplanted into React without much fuss.</p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">class CanvasChart extends React.Component {
+
+  componentDidMount() {
+    //All Mike's code
+  }
+
+  render() {
+    return &lt;canvas width={this.props.width} height={this.props.height} ref={(el) =&gt; { this.canvas = el }} /&gt;
+  }
+}
+</pre><span>
+</span><p>I’ve created a working demo of the code on <a href="https://plnkr.co/fWtnsX">Plunkr</a>.<br>The canvas approach is something to consider if you are drawing or animating a large amount of data. Speed is also <a href="http://codepen.io/chris-creditdesign/details/BIADJ">in it’s favour</a>, but React probably narrows the speed gap a bit.</p><span>
+</span><p>A single element is produced since the charts are drawn with Javascript no other elements need be created or destroyed, avoiding the conflict with React entirely.</p><span>
+</span><h3>Option 2: Use react-faux-dom</h3><span>
+</span><p>Oliver Caldwell’s <a href="https://github.com/Olical/react-faux-dom">react-faux-dom</a> project creates a Javascript object that passes for a DOM element. D3 can do it’s DOM operations on that and when it’s done you just call <code>toReact()</code> to return React elements. Updating Mike Bostock’s <a href="http://bl.ocks.org/mbostock/3885304">original bar chart demo</a> gives us this: </p><span>
+</span><pre class="brush: jscript; title: ; notranslate" title="">import React from 'react'
+import ReactFauxDOM from 'react-faux-dom'
+import d3 from 'd3'
+
+class SVGChart extends React.Component {
+
+  render() {
+    let data = this.props.data
+
+    let margin = {top: 20, right: 20, bottom: 30, left: 40},
+      width = this.props.width - margin.left - margin.right,
+      height = this.props.height - margin.top - margin.bottom;
+
+    let x = d3.scaleBand()
+      .rangeRound([0, width])
+
+    let y = d3.scaleLinear()
+      .range([height, 0])
+
+    let xAxis = d3.axisBottom()
+      .scale(x)
+
+    let yAxis = d3.axisLeft()
+      .scale(y)
+      .ticks(10, "%");
+
+    //Create the element
+    const div = new ReactFauxDOM.Element('div')
+    
+    //Pass it to d3.select and proceed as normal
+    let svg = d3.select(div).append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      x.domain(data.map((d) =&gt; d.letter));
+      y.domain([0, d3.max(data, (d) =&gt; d.frequency)]);
+
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
+
+    svg.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) =&gt; x(d.letter))
+      .attr("width", 20)
+      .attr("y", (d) =&gt; y(d.frequency))
+      .attr("height", (d) =&gt; {return height - y(d.frequency)});
+
+    //DOM manipulations done, convert to React
+    return div.toReact()
+  }
+
+}
+</pre><span>
+</span><p>This approach has a number of advantages, and as Oliver <a href="http://oli.me.uk/2015/09/09/d3-within-react-the-right-way/">points out</a>, one of the big ones is being able to use this with Server Side Rendering. Another bonus is that existing D3 visualizations hardly need to be modified at all to get them working with React. If you look back at the original bar chart example, you can see that it’s basically the same code. </p><span>
+</span><h3>Option 3: D3 for math, React for DOM</h3><span>
+</span><p>The final option is a full embrace of React, both the idea of components and it’s dominion over the DOM. In this scenario D3 is used strictly for it’s math and formatting functions. Colin Megill put this nicely <a href="http://formidable.com/blog/2015/05/21/react-d3-layouts/">stating</a> “D3’s core contribution is not its DOM model but the math it brings to the client”.</p><span>
+</span><p>I’ve <a href="https://plnkr.co/WjmCzZ">re-implemented the letter frequency chart</a> following this approach. D3 is only used to do a few calculations and format numbers. No DOM operations at all. Creating the SVG elements is all done with React by iterating over the data and the arrays generated by D3.</p><span>
+</span><figure data-shortcode="caption" id="attachment_3820" class="wp-caption alignnone"><img data-attachment-id="3820" data-permalink="https://mikewilliamson.wordpress.com/2016/06/03/d3-and-react-3-ways/screenshot-from-2016-06-02-09-24-34/" data-orig-file="https://mikewilliamson.files.wordpress.com/2016/06/screenshot-from-2016-06-02-09-24-34.png?w=840" data-orig-size="725,479" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Screenshot from 2016-06-02 09-24-34" data-image-description="" data-medium-file="https://mikewilliamson.files.wordpress.com/2016/06/screenshot-from-2016-06-02-09-24-34.png?w=840?w=300" data-large-file="https://mikewilliamson.files.wordpress.com/2016/06/screenshot-from-2016-06-02-09-24-34.png?w=840?w=725" class="alignnone size-full wp-image-3820" src="https://mikewilliamson.files.wordpress.com/2016/06/screenshot-from-2016-06-02-09-24-34.png?w=840" alt="Screenshot from 2016-06-02 09-24-34" srcset="https://mikewilliamson.files.wordpress.com/2016/06/screenshot-from-2016-06-02-09-24-34.png 725w, https://mikewilliamson.files.wordpress.com/2016/06/screenshot-from-2016-06-02-09-24-34.png?w=150 150w, https://mikewilliamson.files.wordpress.com/2016/06/screenshot-from-2016-06-02-09-24-34.png?w=300 300w" sizes="(max-width: 709px) 85vw, (max-width: 909px) 67vw, (max-width: 984px) 61vw, (max-width: 1362px) 45vw, 600px"><figcaption class="wp-caption-text">My pure React re-implementation of Mike Bostock’s letter frequency bar chart. D3 for math, React for DOM. No cheating.</figcaption></figure><span>
+</span><p>What I learned from doing this, is that D3 does a lot of work for you, especially when generating axes. You can see <a href="https://plnkr.co/edit/WjmCzZ?p=preview">in the code</a> there is a fair number of “magic values”, a little +5 here or a -4 there to get everything aligned right. Probably all that stuff can be cleaned up into props like “margin” or “padding”, but it’ll take a few more iterations (and possibly actual reuse of these components) to get that stuff all cleaned up. D3 has already got that stuff figured out.</p><span>
+</span><p>This approach is a lot of work in the short term, but has some real benefits. First, I like this approach for it’s consistency with the React way of doing things. Second, long term, after good boundaries between components are established you can really see lots of possibilities for reuse. The modular nature of D3 version 4 probably also means this approach will lead to some reduced file sizes since you can be very selective about what functions you include.<br>If you can see yourself doing a lot of D3 and React in the future, the price paid for this purity would be worth it.</p><span>
+</span><h3>Where to go from here</h3><span>
+</span><p>It’s probably worth pointing out that D3 isn’t a charting library, it’s a generic data visualisation framework. So while the examples above might be useful for showing how to integrate D3 and React, they aren’t trying to suggest that this is a great use of D3 (though it’s not an unreasonable use either). If all you need is a bar chart there are libraries like <a href="http://www.chartjs.org/">Chart.js</a> and <a href="https://github.com/jhudson8/react-chartjs">react-chartjs</a> aimed directly at that.</p><span>
+</span><p>In my particular case I had and existing D3 visualization, and <code>react-faux-dom</code> was the option I used. It’s a perfect balance between purity and pragmatism and probably the right choice for most cases. </p><span>
+</span><p>Hopefully this will save people some digging.</p><span>
+		</span><div class="wpcnt"><span>
+			</span><div class="wpa wpmrec"><span>
+				</span><a class="wpa-about" href="https://en.support.wordpress.com/about-these-ads/" rel="nofollow"></a><span>
+				        </span><span>
+        </span><script type="text/javascript">
+        var o = document.getElementById('crt-772068007');
+        if ("undefined"!=typeof Criteo) {
+            var p = o.parentNode;
+            p.style.setProperty('display', 'inline-block', 'important');
+            o.style.setProperty('display', 'block', 'important');
+            Criteo.DisplayAcceptableAdIfAdblocked({zoneid:388248,containerid:"crt-772068007",collapseContainerIfNotAdblocked:true,"callifnotadblocked": function () {var o = document.getElementById('crt-772068007'); o.style.setProperty('display','none','important');o.style.setProperty('visbility','hidden','important'); }
+        });
+        } else {
+            o.style.setProperty('display', 'none', 'important');
+            o.style.setProperty('visibility', 'hidden', 'important');
+        }
+        </script><span>
+				</span><p>
+					<script type="text/javascript">
+					(function(g){if("undefined"!=typeof g.__ATA){g.__ATA.initAd({sectionId:26942, width:300, height:250});}})(window);
+					</script>
+				</p><span>
+			</span></div><span>
+		</span></div><div id="jp-post-flair" class="sharedaddy sd-like-enabled"><div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-356197-3742-5895b025b4a3b" data-src="//widgets.wp.com/likes/#blog_id=356197&amp;post_id=3742&amp;origin=mikewilliamson.wordpress.com&amp;obj_id=356197-3742-5895b025b4a3b" data-name="like-post-frame-356197-3742-5895b025b4a3b"><h3 class="sd-title">Like this:</h3><p><span class="button"><span>Like</span></span> <span class="loading">Loading...</span></p><span class="sd-text-color"></span><a class="sd-link-color"></a></div></div><span>	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

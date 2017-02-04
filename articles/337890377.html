@@ -1,0 +1,176 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>shame.css – CSS Wizardry – CSS, OOCSS, front-end architecture, performance and more, by Harry Roberts</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>shame.css – CSS Wizardry – CSS, OOCSS, front-end architecture, performance and more, by Harry Roberts</h1>
+                <section class="layout__item  desk-three-fifths  s-post" data-ui-component="Main content" itemscope="" itemtype="http://schema.org/Article">
+
+            <time class="post__date" datetime="2013-04-17" itemprop="datePublished">17 April, 2013</time>
+
+            <h1 itemprop="name  headline">shame.css</h1>
+
+            <p class="hide">Written by <b itemprop="author">Harry Roberts</b> on <b itemprop="publisher">CSS Wizardry</b>.</p>
+
+            <p><strong>Update:</strong> I did <a href="http://csswizardry.com/2013/04/shame-css-full-net-interview">a short interview about shame.css</a>
+with .net magazine.</p>
+
+<p>Something <a href="https://twitter.com/chriscoyier">Chris Coyier</a>,
+<a href="https://twitter.com/davatron5000">Dave Rupert</a> and I
+<a href="http://shoptalkshow.com/episodes/045-with-harry-roberts/">joked about recently</a>
+was the idea of a stylesheet dedicated to housing your nasty, hacky, quick-fix
+CSS. I’ve been thinking a lot more about it lately and I reckon it’s actually a
+pretty  good idea; here’s why…</p>
+
+<h2 id="the-problem">The problem</h2>
+
+<p>We all know that, no matter how hard we may try, sometimes we <em>do</em> need to use
+quick fixes, hacks and questionable techniques in our code. It happens, whether
+we like to admit it or not.</p>
+
+<p>From using a quick <code class="highlighter-rouge">overflow: hidden;</code> instead of working out what’s actually
+broken our layout, to the odd <code class="highlighter-rouge">!important</code> to override some poor CSS, there are
+often times where we need to use less than ideal CSS in order to meet deadlines,
+to get something working, or to fix pressing—or even live—bugs.</p>
+
+<p>Whilst this isn’t ideal, we <em>have</em> to do it from time to time; <strong>all of us</strong>.</p>
+
+<p>The real problem, though, is that we rarely go back and tidy these things up.
+They slip through the cracks, get ignored, go unnoticed, and stay for good. This
+we do <em>not</em> have to do.</p>
+
+<p>The problem with leaving hacks and nasty code is obvious; it’s hacky and nasty.
+However, other problems with leaving this code can arise… I think the most
+important and severe is the fact that, as soon as another developer sees that
+someone used <code class="highlighter-rouge">!important</code>, they feel less bad about doing the same; the next
+developer who comes along and sees that someone bodged something doesn’t feel
+too guilty about hacking something else. The first bits of bad code set a
+precedent and make subsequent developers feel less bad about using poor code
+themselves. <q>It was like that when I got here!</q> Give developers a clean
+slate and they’ll really think twice about messing it all up.</p>
+
+<p>What is needed is a way of allowing these hacks <em>when necessary</em>, but making
+sure that they don’t go unnoticed and unresolved. Enter <code class="highlighter-rouge">shame.css</code>.</p>
+
+<h2 id="the-solution">The solution</h2>
+
+<p>The idea of <code class="highlighter-rouge">shame.css</code> is that you have a totally new stylesheet reserved
+<em>just</em> for your hacky code. The code you <em>have</em> to write to get the release out
+on time, but the code that makes you ashamed.</p>
+
+<article class="[ box  box--highlight ]  flag  mb" data-ui-component="Cross-sell promo">
+    
+    <div class="flag__body"><span>
+        </span><h1 class="heading-sub">Featured case study: NHS</h1><span>
+        </span><p class="mb0">How I helped the NHS rapidly build a brand new product.</p><span>
+        </span><p><a href="https://csswizardry.com/case-studies/nhs-nhsx-elearning-platform/">Read case study…</a></p><span>
+    </span></div>
+</article>
+
+<p>By putting your bodges, hacks and quick-fixes in their own file you do a few
+things:</p>
+
+<ol>
+  <li>You make them stick out like a sore thumb.</li>
+  <li>You keep your ‘main’ codebase clean.</li>
+  <li>You make developers aware that their hacks are made very visible.</li>
+  <li>You make them easier to isolate and fix.</li>
+  <li><code class="highlighter-rouge">$ git blame shame.css</code>.</li>
+</ol>
+
+<p>If anyone has to add a quick hack, they add it to <code class="highlighter-rouge">shame.css</code>, this means that
+they’re putting their hacks out there in the open; it means that they are aware
+that what they’re doing is hacky, it forces them to document what the problem
+was, how the hack fixes it, and how they might fix it for real given more time.</p>
+
+<p>It means that other developers can see what hacks are being introduced, and why;
+it means that all the hacky bits of CSS are self contained, and it creates a
+self-fulfilling todo list.</p>
+
+<p>It also means that you can run a <code class="highlighter-rouge">$ git blame shame.css</code> to see what was added
+when, and by who.</p>
+
+<h2 id="not-a-blame-game">Not a blame game</h2>
+
+<p>You’d be forgiven for thinking the point of this whole exercise is to shame the
+developers (you can always pick a name other than <code class="highlighter-rouge">shame.css</code>) but it’s really
+not. I am well aware of (and responsible for) hacks and quick fixes; your
+product owner doesn’t care if you used an <code class="highlighter-rouge">!important</code>, they just want the new
+feature out of the door. Hacks happen, <strong>fact</strong>.</p>
+
+<p><code class="highlighter-rouge">shame.css</code> is jokingly titled to make it a little light-hearted whilst also
+indicating that anything in there is a bit of a shame; a shame to have to have
+done, a shame to pollute the codebase with and so on…</p>
+
+<p>By isolating all your hacks and bodge-jobs in their own file you can really
+easily keep tabs on them; isolating them isn’t to shame the developers, not at
+all, it’s merely to make the team aware of them and make them painfully,
+unmissably obvious.</p>
+
+<h2 id="the-rules">The rules</h2>
+
+<p>Obviously you need some kind of rules and criteria:</p>
+
+<ol>
+  <li>If it’s a hack, it goes in <code class="highlighter-rouge">shame.css</code>.</li>
+  <li>Document all hacks <em>fully</em>:
+    <ol>
+      <li>What part of the codebase does it relate to?</li>
+      <li>Why was this needed?</li>
+      <li>How does this fix it?</li>
+      <li>How might you fix it properly, given more time?</li>
+    </ol>
+  </li>
+  <li>Do not blame the developer; if they explained why they had to do it then
+their reasons are probably (hopefully) valid.</li>
+  <li>Try and clean <code class="highlighter-rouge">shame.css</code> up when you have some down time.
+    <ol>
+      <li>Even better, get a tech-debt story in which you can dedicate actual sprint
+time to it.</li>
+    </ol>
+  </li>
+</ol>
+
+<h3 id="example">Example</h3>
+
+<pre><code>
+.site-nav a {
+    color: #BADA55 !important;
+}</code></pre>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>Obviously, the simplest way to implement <code class="highlighter-rouge">shame.css</code> is with a preprocessor that
+would simply import that file. If you aren’t using a preprocessor then you’ll
+need to have a build process which concatenates all your stylesheets for you.
+The idea isn’t to make <code class="highlighter-rouge">shame.css</code> publicly viewable, so you definitely don’t
+want two <code class="highlighter-rouge">&lt;link /&gt;</code> elements for two stylesheets; <code class="highlighter-rouge">shame.css</code> simply needs
+incorporating into your concatenated and minified stylesheet.</p>
+
+<h2 id="keep-track-of-your-hacks">Keep track of your hacks!</h2>
+
+<p>I really think I’m going to implement this; if not on my current project then
+<em>definitely</em> on my next one. I’d love to know if anyone else uses it, or what
+you think to the idea.</p>
+
+
+            
+
+                <hr>
+
+                <p>
+                    <a href="https://csswizardry.com/services/" class="btn  btn--full">Did you enjoy this? <strong>Hire me!</strong></a>
+                </p>
+            
+
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

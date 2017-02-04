@@ -1,0 +1,85 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Socket 与 WebSocket</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Socket 与 WebSocket</h1>
+                <div class="entry-content"><span>
+		</span><span>
+</span><hr><span>
+
+</span><p><strong>2016-09-15 更新：</strong> 加入 PDF 版本网络协议图</p><span>
+</span><hr><span>
+</span><p>去年光棍节的时候，我写过一篇 <a href="http://zengrong.net/post/1965.htm">quick-cocos2d-x 中的 socket 技术选择：LuaSocket 和 WebSocket</a> 。这篇文章介绍了我为何决定在项目中使用 LuaSocket 。</p><span>
+</span><p>现在想起来，当时对 WebSocket 是很感兴趣的，但由于服务端的限制，最终依然选择了 LuaSocket。我后来对 <a href="http://zengrong.net/post/1980.htm">LuaSocket 进行了封装</a>，使其更好用。</p><span>
+</span><p>现在，面对一个全新的项目，我自然而然地选择了 WebSocket。</p><span>
+</span><p>因此，我需要了解下面这些问题：</p><span>
+</span><ol>
+<li>Socket 和 WebSocket 有哪些区别和联系？</li>
+<li>WebSocket 和 HTML5 是什么关系？</li>
+<li>必须在浏览器中才能使用 WebSocket 吗？</li>
+<li>WebSocket 能和 Socket 一样传输 raw 数据么？</li>
+<li>WebSocket 和 Socket 相比会多耗费流量么？</li>
+</ol><span>
+</span><p>但是，目前网上全面介绍这两种协议的中文文章并不多，或者说不够全面。我无法找到一篇文章能解决上面的所有问题。因此，我写了本文，把找到的 Socket 和 WebSocket 的相关资料做一个梳理，以方便理解。</p><span>
+</span><p>本文并不能直接完整回答上面提出的几个问题，但读完本文，要理解上面的那些问题，是很容易的事。</p><span>
+</span><p>由于能力有限，本文不可能很长。而且，技术细节并非所有人都愿意仔细了解。本文包含了大量的外部链接，跟随这些链接，可以找到足够多的细节，满足你/我的求知欲。</p><span>
+</span><hr><span>
+</span><h1 id="1">1. 概述</h1><span>
+</span><p>选择了 WebSocket 技术之后，不可避免的，我要将它和其他协议以及技术做一下比较。最常见的，就是需要比较 WebSocket 与 HTTP、Socket 技术的异同。</p><span>
+</span><p>WebSocket 是为了满足基于 Web 的日益增长的实时通信需求而产生的。在传统的 Web 中，要实现实时通信，通用的方式是采用 HTTP 协议不断发送请求。但这种方式即浪费带宽（HTTP HEAD 是比较大的），又消耗服务器 CPU 占用（没有信息也要接受请求）。（下图来自 <a href="http://www.websocket.org/quantum.html">WebSocket.org</a>）</p><span>
+</span><p><img alt="Latency comparison between the polling and WebSocket applications" src="http://zengrong.net/wp-content/uploads/2014/12/latency-comparison.gif"></p><span>
+</span><p>而是用 WebSocket 技术，则会大幅降低上面提到的消耗：（下图来自 <a href="http://www.websocket.org/quantum.html">websocket.org</a>）</p><span>
+</span><p><img alt="Comparison of the unnecessary network throughput overhead between the polling and the WebSocket applications" src="http://zengrong.net/wp-content/uploads/2014/12/poll-ws-compare.gif"></p><span>
+</span><p>关于更详细的描述，尹立的这篇文章讲得非常好：<a href="http://blog.csdn.net/yl02520/article/details/7298309">WebSocket（2）–为什么引入WebSocket协议</a> 。</p><span>
+</span><p>那么，WebSocket 到底与 HTTP 协议到底是一个什么样的关系呢？它和 Socket 又有什么联系？这就要讲到 OSI 模型和 TCP/IP 协议族。<span id="more-2199"></span></p><span>
+</span><h1 id="2-osi-tcpip">2. OSI 模型与 TCP/IP</h1><span>
+</span><p>以下是 <a href="http://zh.wikipedia.org/wiki/OSI%E6%A8%A1%E5%9E%8B">维基百科</a> 中关于OSI 模型的说明：</p><span>
+</span><blockquote>
+<p>开放式系统互联通信参考模型（英语：Open System Interconnection Reference Model，ISO/IEC 7498-1），简称为OSI模型（OSI model），一种概念模型，由国际标准化组织（ISO）提出，一个试图使各种计算机在世界范围内互连为网络的标准框架。</p>
+</blockquote><span>
+</span><p>而 TCP/IP 协议可以看做是对 OSI 模型的一种简化（以下内容来自 <a href="http://zh.wikipedia.org/wiki/TCP/IP%E5%8D%8F%E8%AE%AE%E6%97%8F">维基百科</a>）：</p><span>
+</span><blockquote>
+<p>它将软件通信过程抽象化为四个抽象层，采取协议堆叠的方式，分别实作出不同通信协议。协议套组下的各种协议，依其功能不同，被分别归属到这四个阶层之中<a href="http://blog.csdn.net/yaopeng_2005/article/details/7064869">7</a>，常被视为是简化的七层OSI模型。</p>
+</blockquote><span>
+</span><p>这里有一张图详细介绍了 TCP/IP 协议族中的各个协议在 OSI模型 中的分布，一图胜千言（下图来自 <a href="http://www.colasoft.com.cn/download/protocols_map.php">科来</a>）：</p><span>
+</span><p><img alt="TCP/IP 和 OSI 模型" src="http://zengrong.net/wp-content/uploads/2014/12/TCP-IP.gif"></p><span>
+</span><p>这里是 PDF 版：</p><span>
+</span><p><img src="http://zengrong.net/wp-content/plugins/wp-downloadmanager/images/ext/pdf.gif" alt="" title="">&nbsp;&nbsp;<strong><a href="http://zengrong.net/download/140/">科来网络通讯协议图2016版</a></strong> (585.6 KiB, 611 hits)<br></p><span>
+</span><p>TCP/IP 协议和 OSI 模型的内容，在互联网上有很多。我没有必要再次介绍它们。在这里，我们只需要知道，HTTP、WebSocket 等协议都是处于 OSI 模型的最高层： <strong>应用层</strong> 。而 IP 协议工作在网络层（第3层），TCP 协议工作在传输层（第4层）。</p><span>
+</span><p>至于 OSI 模型的各个层次都有什么系统和它们对应，这里有篇很好的文章可以满足大家的求知欲：<a href="http://blog.csdn.net/yaopeng_2005/article/details/7064869">OSI七层模型详解</a> 。</p><span>
+</span><h1 id="3-websockethttp-tcp">3. WebSocket、HTTP 与 TCP</h1><span>
+</span><p>从上面的图中可以看出，HTTP、WebSocket 等应用层协议，都是基于 TCP 协议来传输数据的。我们可以把这些高级协议理解成对 TCP 的封装。</p><span>
+</span><p>既然大家都使用 TCP 协议，那么大家的连接和断开，都要遵循 <a href="http://blog.csdn.net/whuslei/article/details/6667471">TCP 协议中的三次握手和四次握手</a> ，只是在连接之后发送的内容不同，或者是断开的时间不同。</p><span>
+</span><p>更详细内容可阅读：<a href="http://www.seanyxie.com/wireshark%E6%8A%93%E5%8C%85%E5%9B%BE%E8%A7%A3-tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%E8%AF%A6%E8%A7%A3/">wireshark抓包图解 TCP三次握手/四次挥手详解</a></p><span>
+</span><p>对于 WebSocket 来说，它必须依赖 <a href="http://tools.ietf.org/html/rfc6455#section-4">HTTP 协议进行一次握手</a> ，握手成功后，数据就直接从 TCP 通道传输，与 HTTP 无关了。</p><span>
+</span><h1 id="4-socket-webscoket">4. Socket 与 WebScoket</h1><span>
+</span><p><a href="http://en.wikipedia.org/wiki/Network_socket">Socket</a> 其实并不是一个协议。它工作在 OSI 模型会话层（第5层），是为了方便大家直接使用更底层协议（一般是 <a href="http://en.wikipedia.org/wiki/Transmission_Control_Protocol">TCP</a> 或 <a href="http://en.wikipedia.org/wiki/User_Datagram_Protocol">UDP</a> ）而存在的一个抽象层。</p><span>
+</span><p>最早的一套 Socket API 是 <a href="http://en.wikipedia.org/wiki/Berkeley_sockets">Berkeley sockets</a> ，采用 C 语言实现。它是 Socket 的事实标准，POSIX sockets 是基于它构建的，多种编程语言都遵循这套 API，在 JAVA、Python 中都能看到这套 API 的影子。</p><span>
+</span><p>下面摘录一段更容易理解的文字（来自 <a href="http://www.a8z8.com/html/2012/tech_1214/133.html">http和socket之长连接和短连接区别</a>）：</p><span>
+</span><blockquote>
+<p>Socket是应用层与TCP/IP协议族通信的中间软件抽象层，它是一组接口。在设计模式中，Socket其实就是一个门面模式，它把复杂的TCP/IP协议族隐藏在Socket接口后面，对用户来说，一组简单的接口就是全部，让Socket去组织数据，以符合指定的协议。</p>
+</blockquote><span>
+</span><p><img alt="Socket是什么" src="http://zengrong.net/wp-content/uploads/2014/12/socket.gif"></p><span>
+</span><p><img alt="Socket通信过程" src="http://zengrong.net/wp-content/uploads/2014/12/socket-traffic.gif"></p><span>
+</span><blockquote>
+<p>主机 A 的应用程序要能和主机 B 的应用程序通信，必须通过 Socket 建立连接，而建立 Socket 连接必须需要底层 TCP/IP 协议来建立 TCP 连接。建立 TCP 连接需要底层 IP 协议来寻址网络中的主机。我们知道网络层使用的 IP 协议可以帮助我们根据 IP 地址来找到目标主机，但是一台主机上可能运行着多个应用程序，如何才能与指定的应用程序通信就要通过 TCP 或 UPD 的地址也就是端口号来指定。这样就可以通过一个 Socket 实例唯一代表一个主机上的一个应用程序的通信链路了。</p>
+</blockquote><span>
+</span><p>而 <a href="http://www.websocket.org/">WebSocket</a> 则不同，它是一个完整的 <a href="http://datatracker.ietf.org/doc/rfc6455/">应用层协议</a>，包含一套标准的 <a href="http://dev.w3.org/html5/websockets/">API</a> 。</p><span>
+</span><p>所以，从使用上来说，WebSocket 更易用，而 Socket 更灵活。</p><span>
+</span><h1 id="5-html5-websocket">5. HTML5 与 WebSocket</h1><span>
+</span><p><a href="http://dev.w3.org/html5/websockets/">WebSocket API</a> 是 <a href="http://en.wikipedia.org/wiki/HTML5">HTML5</a> 标准的一部分， 但这并不代表 WebSocket 一定要用在 HTML 中，或者只能在基于浏览器的应用程序中使用。</p><span>
+</span><p>实际上，许多语言、框架和服务器都提供了 WebSocket 支持，例如：</p><span>
+</span><span>
+</span><span>
+	</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

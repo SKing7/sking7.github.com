@@ -1,0 +1,193 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Improving Perceived Performance with Multiple Background Images – CSS Wizardry – CSS, OOCSS, front-end architecture, performance and more, by Harry Roberts</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Improving Perceived Performance with Multiple Background Images – CSS Wizardry – CSS, OOCSS, front-end architecture, performance and more, by Harry Roberts</h1>
+                <section class="layout__item  desk-three-fifths  s-post" data-ui-component="Main content" itemscope="" itemtype="http://schema.org/Article">
+
+            <time class="post__date" datetime="2016-10-23" itemprop="datePublished">23 October, 2016</time>
+
+            
+
+            <p class="hide">Written by <b itemprop="author">Harry Roberts</b> on <b itemprop="publisher">CSS Wizardry</b>.</p>
+
+            <p>I’m on a train right now, which means the wifi is awful. A lot of sites are
+refusing to load at all, and those that do have lots of images missing, leaving
+big blank holes in their web pages. Most of the images, thankfully, aren’t
+critical to understanding the content I’m looking for, but their absence does
+remind me that I’m waiting for something else to arrive, and in many cases it is
+perceived performance that is more important than the actual performance itself.
+This gave me a little idea.</p>
+
+<p>A while back, I was consulting on a very high profile and very highly trafficked
+campaign website for a client that I’m, unfortunately, not allowed to name. I
+was brought in mid way through development to help make  things <em>fast</em>.</p>
+
+<p>The site featured a very large masthead image that, even when optimised, took a
+little while to load. I did a bunch of stuff in order to prefetch the image,
+fire off its request earlier, etc., but one of the simplest techniques I
+employed was to apply the image’s average colour as a <code class="highlighter-rouge">background-color</code>, so
+that the user wasn’t looking at a huge white space whilst the image loaded. This
+improved perceived performance dramatically, and was and incredibly low-effort
+implementation:</p>
+
+<ol>
+  <li>Open the image in Photoshop</li>
+  <li>Filter » Blur » Average</li>
+  <li>Use the Eyedropper to sample the block of colour that is left</li>
+  <li>
+    <p>Apply that colour as a <code class="highlighter-rouge">background-color</code>:</p>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code>.masthead {
+  background-image: url(/img/masthead.jpg);
+  background-color: #3d332b;
+}
+</code></pre><span>
+    </span></div>
+  </li>
+</ol>
+
+<p>This is a technique that I also use on this site’s homepage, on my very own
+masthead: if the image is taking too long to load, show the user a solid colour.
+However, just now on the train, I visited my own site and saw this:</p>
+
+<figure>
+  <img src="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-missing-image.png" alt="">
+  <figcaption><a href="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-missing-image-full.png">View full size/quality (104KB)</a></figcaption>
+</figure>
+
+<p>The image isn’t actually content-critical, so it doesn’t matter that it hasn’t
+loaded, but—whilst probably better looking than my face—it’s still pretty
+jarring: it’s just a big, flat, soulless lump of colour. How can we improve it?</p>
+
+<h2 id="css-gradients-and-multiple-backgrounds">CSS Gradients and Multiple Backgrounds</h2>
+
+<p>Very simply put, I wanted to make a rough approximation of the photograph in a
+CSS gradient. I can’t stress the words <em>rough approximation</em> enough here: we’re
+literally talking about a few blobs of similar average colours. I was then going
+to apply this as a <code class="highlighter-rouge">background-image</code> on the image itself, only: oh no! This
+image already <em>is</em> a background image. Not to worry, we’ve been able to define
+multiple backgrounds on the same element <a href="http://caniuse.com/#feat=multibackgrounds">since
+IE9</a>. We can define the actual image
+and its gradient approximation in one go, in one declaration.</p>
+
+<p>This means that, if the browser has the CSS,</p>
+
+<ol>
+  <li>it can paint the CSS approximation;</li>
+  <li>it can make the request for the actual image, which can make its way over the
+network in its own time.</li>
+</ol>
+
+<p>Read more about <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Background_and_Borders/Using_CSS_multiple_backgrounds">multiple backgrounds on
+MDN</a>.</p>
+
+<h2 id="making-the-approximation">Making the Approximation</h2>
+
+<p>To get my CSS-blob version of my masthead, I opened it up in Photoshop and
+divided it up into regions of colour. Because most of the objects in this image
+run top to bottom, I made vertical slices. Very conveniently for me, those
+regions all occurred at 25% intervals:</p>
+
+<figure>
+  <img src="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-slices-before.jpg" alt="">
+  <figcaption><a href="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-slices-before-full.jpg">View full size/quality (140KB)</a></figcaption>
+</figure>
+
+<p>I then selected each section individually and ran Filter » Blur » Average, which
+left me with this:</p>
+
+<figure>
+  <img src="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-slices-after.png" alt="">
+  <figcaption><a href="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-slices-after-full.png">View full size/quality (2KB)</a></figcaption>
+</figure>
+
+<p>The next step was to sample each colour and plug them into a CSS gradient:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>linear-gradient(to right, #807363 0%, #251d16 50%, #3f302b 75%, #100b09 100%)
+</code></pre><span>
+</span></div>
+
+<p>That looks like this:</p>
+
+
+
+<p>All I need to do now is apply this as a second value of my <code class="highlighter-rouge">background-image</code>
+property:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>.page-head--masthead {
+  background-image: url(/img/css/masthead-large.jpg),
+                    linear-gradient(to right, #807363 0%, #251d16 50%, #3f302b 75%, #100b09 100%);
+}
+</code></pre><span>
+</span></div>
+
+<p>The stacking order of multiple backgrounds is such that the first value (in this
+case, an actual image) is the topmost image, then the next sits underneath that,
+and so on.</p>
+
+<p>This means that, if this image ever fails to load again, we see this:</p>
+
+<figure>
+  <img src="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-missing-image-after.png" alt="">
+  <figcaption><a href="https://csswizardry.com/wp-content/uploads/2016/10/screenshot-missing-image-after-full.png">View full size/quality (144KB)</a></figcaption>
+</figure>
+
+<p>Not a huge difference, but certainly less blunt than a completely flat image:
+it’s enough to add a little bit of texture and hint at the general composition
+of the missing images.</p>
+
+<h2 id="practicality">Practicality</h2>
+
+<p>There is, as you can see, quite a lot of manual work involved in implementing
+this technique. Unless/until there’s a way to reliably automate this, I think
+it’s a technique best used in use cases just like mine: a very specific image
+with a very low rate of change.</p>
+
+<p>The next level down from this would be just taking the average colour of the
+image and applying that as a <code class="highlighter-rouge">background-color</code>. There’s no need for gradients
+and multiple backgrounds with that, but it does still require per-image
+intervention.</p>
+
+<p>However, I’m actually really happy with this as a way to provide something a
+little more substantial to users on poor network conditions. If your site has
+similar static images, I’d recommend experimenting with this technique yourself.</p>
+
+<h2 id="update-2016-11-11">Update 2016-11-11</h2>
+
+<p>Since publishing this post, a couple of people have produced ways of (semi)
+automating this process.</p>
+
+<p><a href="https://twitter.com/louisbourque">Louis Bourque</a> has a <a href="http://www.louisbourque.ca/Color-Extractor/">Color Extractor
+tool</a> which will give you back the
+relevant gradient without having to fire up Photoshop.</p>
+
+<p><a href="https://twitter.com/ben_eb">Ben Briggs</a> built
+<a href="https://github.com/ben-eb/postcss-resemble-image">postcss-resemble-image</a> which
+will: <q>Provide a gradient fallback for an image that loosely resembles the
+original.</q></p>
+
+<p>Pretty neat! Thanks, gentlemen.</p>
+
+
+            
+
+                <hr>
+
+                <p>
+                    <a href="https://csswizardry.com/services/" class="btn  btn--full">Did you enjoy this? <strong>Hire me!</strong></a>
+                </p>
+            
+
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

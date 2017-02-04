@@ -1,0 +1,220 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>A Javascript journey with only six characters</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>A Javascript journey with only six characters</h1>
+                <section class="post-content">
+            <p>Javascript is a weird and wonderful language that lets us write some crazy code that's still valid. It tries to help us out by converting things to particular types based on how we treat them.</p>
+
+<p>If we add a string to something, it'll assume we want it in text form, so it'll convert it to a string for us. </p>
+
+<p>If we add a plus or minus prefix to something, it'll assume we want its numerical representation, and will convert the string to a number for us, if possible.</p>
+
+<p>If we negate something it will convert it to a boolean.</p>
+
+<p>We can exploit Javascript's help and use it to do some magical things using only the characters: <code>[</code>,<code>]</code>,<code>(</code>,<code>)</code>,<code>!</code> and <code>+</code>. If you're not on mobile, you can pop open your browser's JS console to follow along. You can just paste any of the code examples into the console and they should evaluate to true.</p>
+
+<p>Let's start with the basics.  Some golden rules to remember:</p>
+
+<ol>
+<li>Preceding with <code>!</code> converts to Boolean  </li>
+<li>Preceding with <code>+</code> converts to Number  </li>
+<li>Adding <code>[]</code> converts to String</li>
+</ol>
+
+<p>Here they are in action:</p>
+
+<pre><code class="language-javascript">![] === false
++[] === 0
+[]+[] === ""
+</code></pre>
+
+<p>Another thing you should know is that it's possible to retrieve specific letters from strings using square brackets like so:</p>
+
+<pre><code class="language-javascript">"hello"[0] === "h"
+</code></pre>
+
+<p>Also remember it's possible to make multiple digit numbers by adding the string representations together, then converting the whole thing back to a number:</p>
+
+<pre><code class="language-javascript">+("1" + "1") === 11
+</code></pre>
+
+<p>Right, so let's go ahead and combine some stuff together to get the letter <code>a</code>.  </p>
+
+<pre><code class="language-javascript">![] === false
+![]+[] === "false"
++!![] === 1
+------------------------
+(![]+[])[+!![]] === "a"  // same as "false"[1]
+</code></pre>
+
+<p>Neat!</p>
+
+<p>So, with some relatively simple combinations we can get out all the letters from the words <code>true</code> and <code>false</code>. <code>a</code>,<code>e</code>,<code>f</code>,<code>l</code>,<code>r</code>,<code>s</code>,<code>t</code>,<code>u</code>. Ok, can we get letters from anywhere else?</p>
+
+<p>Well, there's <code>undefined</code>, which we can get by doing something silly like <code>[][[]]</code>. Converting it to a string using our golden rule gives us the extra letters <code>d</code>,<code>i</code> and <code>n</code>.</p>
+
+<pre><code>[][[]] + [] === "undefined"
+</code></pre>
+
+<p>With all the letters we have so far, we can spell <code>fill</code>, <code>filter</code> and <code>find</code>. Sure there are some other words we can spell too, but what's important about these words is that they're all <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array#Mutator_methods">Array methods</a>. This means they are part of the <code>Array</code> object and can be called directly on array instances. E.g. <code>[2,1].sort()</code>.</p>
+
+<p>Now, another important thing to know about Javascript is that an object's properties can be accessed with <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Operators/Property_accessors">dot notation <em>or</em> square bracket notation</a>. As the array methods above are all properties of the Array object itself, we can call those methods using the square bracket notation instead of dot notation. </p>
+
+<p>So <code>[2,1]["sort"]()</code> is the same as <code>[2,1].sort()</code>.</p>
+
+<p>Let's go ahead and see what happens when we try to use one of our array methods, that we can spell using our collection of letters so far, but without invoking it.</p>
+
+<pre><code class="language-javascript">[]["fill"]
+</code></pre>
+
+<p>This produces <code>function fill() { [native code] }</code>. We can convert this method header to a string using our golden rule again:  </p>
+
+<pre><code class="language-javascript">[]["fill"]+[] === "function fill() { [native code] }"
+</code></pre>
+
+<p>So now we have acquired the following extra characters: <code>c</code>,<code>o</code>,<code>v</code>,<code>(</code>,<code>)</code>,<code>{</code>,<code>[</code>,<code>]</code>,<code>}</code>,<code> </code>. </p>
+
+<p>With our newly found <code>c</code> and <code>o</code> we can now form the word <code>constructor</code>. <code>constructor</code> is a method that all JS objects have which simply returns their constructor function. </p>
+
+<p>Let's get the string representation of the constructor functions for all the objects we've dealt with so far:</p>
+
+<pre><code class="language-javascript">true["constructor"] + [] === "function Boolean() { [native code] }"  
+0["constructor"] + []    === "function Number() { [native code] }"  
+""["constructor"] + []   === "function String() { [native code] }"
+[]["constructor"] + []   === "function Array() { [native code] }"
+</code></pre>
+
+<p>From these, we can add the following characters to our arsenal: <code>B</code>,<code>N</code>,<code>S</code>,<code>A</code>,<code>m</code>,<code>g</code>,<code>y</code>.</p>
+
+<p>We can now craft <code>"toString"</code>, which is a function we  can use with the square bracket notation. Except this time we're going to actually invoke it.</p>
+
+<pre><code class="language-javascript">(10)["toString"]() === "10"
+</code></pre>
+
+<p>But we can already convert anything we want to a string using our golden rule anyway, so how can this be useful?</p>
+
+<p>Well, what if I told you that the <code>toString</code> method of the <code>Number</code> type has a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toString">secret argument</a> called <code>radix</code> that changes the <a href="https://en.wikipedia.org/wiki/Radix">base</a> of the returned number before converting it to a string. Watch this:</p>
+
+<pre><code class="language-javascript">(12)["toString"](10) === "12" // base 10 - normal to us
+(12)["toString"](2) === "1100" // base 2, or binary, for 12
+(12)["toString"](8) === "14" // base 8 (octonary) for 12
+(12)["toString"](16) === "c" // hex for 12
+</code></pre>
+
+<p>But why stop at 16? The maximum is 36, which encompasses all characters from <code>0</code>-<code>9</code> and <code>a</code>-<code>z</code>. So now we can get any alphanumeric character we want:</p>
+
+<pre><code class="language-javascript">(10)["toString"](36) === "a"
+(35)["toString"](36) === "z"
+</code></pre>
+
+<p>Awesome! But what about other characters like punctuation and capital letters? Further down the rabbit hole we go!</p>
+
+<p>Depending on where your JS is executing, it may or may not have access to particular pre-defined objects or data. If you're running it in the browser, chances are you can access some legacy <a href="https://developer.mozilla.org/en-US/docs/tag/HTML%20wrapper%20methods">HTML wrapper methods</a>.</p>
+
+<p>For example, <code>bold</code> is a String method that wraps a string in <code>&lt;b&gt;</code> tags.  </p>
+
+<pre><code class="language-javascript">"test"["bold"]() === "&lt;b&gt;test&lt;/b&gt;"
+</code></pre>
+
+<p>This gets us the characters <code>&lt;</code>, <code>&gt;</code> and <code>/</code>.</p>
+
+<p>You may have heard of the <code>escape</code> function. It basically converts a string into a URI-friendly format that simple browsers can interpret. This function is a vital part of our quest, so we need access to it. We can spell it, but how can we actually execute it? It's not a function that belongs to any of the types we've dealt with so far, it's a global level function.</p>
+
+<p>What's the constructor of any function?</p>
+
+<p>The answer is <code>function Function() { [native code] }</code>, the actual Function object itself.</p>
+
+<pre><code class="language-javascript">[]["fill"]["constructor"] === Function
+</code></pre>
+
+<p>Using this, we can pass a string of code to actually create a function.</p>
+
+<pre><code class="language-javascript">Function("alert('test')");  
+</code></pre>
+
+<p>Produces:  </p>
+
+<pre><code class="language-javascript">Function anonymous() {  
+    alert('test')
+}
+</code></pre>
+
+<p>Which we can invoke immediately to execute the alert by just popping <code>()</code> on the end. Yep, that's right, we can actually execute strings of code now!</p>
+
+<p>So, now we use our escape function like this:</p>
+
+<pre><code class="language-javascript">[]["fill"]["constructor"]("return escape(' ')")() === "%20"
+</code></pre>
+
+<p>If we pass our <code>&lt;</code> from earlier to the escape function, we get <code>%3C</code>. That capital <code>C</code> is very important if we want to get the rest of the characters that we're missing.</p>
+
+<pre><code class="language-javascript">[]["fill"]["constructor"]("return escape('&lt;')")()[2] === "C"
+</code></pre>
+
+<p>Using it, we can now write the <code>fromCharCode</code> function, which returns a Unicode character from a given decimal representation. It is part of the String object, which we can get by calling any string's constructor like we did before.</p>
+
+<pre><code class="language-javascript">""["constructor"]["fromCharCode"](65) === "A"
+""["constructor"]["fromCharCode"](46) === "."
+</code></pre>
+
+<p>We can use a <a href="http://unicodelookup.com/">Unicode lookup</a> to easily find the decimal representation for any character.</p>
+
+<p>PHEW. We're done!</p>
+
+<p>We now have access to any and every character, can concatenate them together to form code, and can execute it too. That means we're <a href="https://en.wikipedia.org/wiki/Turing_completeness">Turing complete</a> in Javascript using only the six characters <code>[</code>,<code>]</code>,<code>(</code>,<code>)</code>,<code>+</code> and <code>!</code>.</p>
+
+<p>Want proof? Run this code in your console:</p>
+
+
+
+<p><em>If you're on mobile, the above code is <code>alert("wtf")</code> that executes.</em></p>
+
+<p><a href="http://www.jsfuck.com/">Here's a tool</a> that can automate the conversion for you, and <a href="https://raw.githubusercontent.com/aemkei/jsfuck/master/jsfuck.js">here's</a> how it translates each character.</p>
+
+
+
+<p>It isn't. eBay did some <a href="http://arstechnica.co.uk/security/2016/02/ebay-has-no-plans-to-fix-severe-bug-that-allows-malware-distribution/">bad things</a> not long ago which allowed sellers to embed executing JS into their pages using only these characters, but it's a rather uncommon attack vector. Some people mention obfuscation, but in truth, there are better ways to obfuscate.</p>
+
+<p>Sorry.</p>
+
+<p>Hope you enjoyed the ride though!</p>
+
+<hr>
+
+<p>Sources:</p>
+
+
+            
+            <script>
+
+            /**
+             *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+             *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables */
+            /*
+            var disqus_config = function () {
+                this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+                this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+            };
+            */
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document, s = d.createElement('script');
+                s.src = '//jazcash-com.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                                
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

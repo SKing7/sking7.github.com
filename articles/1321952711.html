@@ -1,0 +1,623 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Understanding JavaScript Execution Context</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Understanding JavaScript Execution Context</h1>
+                <div class="content"><span>
+</span><span>
+</span><span>
+
+</span><script>
+    function imgError(img){
+        if (typeof img.hasReplaceSrc != 'undefined'){
+            var refer = $('div.author a:last').attr('href');
+            img.src = '/imgr?src=' + encodeURIComponent(img.src) + '&r=' + encodeURIComponent(refer);
+        } else {
+            var urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
+            for (var i=0;i<img.attributes.length;i++){
+                var attrName = img.attributes[i].nodeName;
+                var attrVal = img.attributes[i].nodeValue;
+                if(attrName.toLowerCase() != 'src' && urlPattern.test(attrVal)){
+                    img.src = attrVal;
+                    img.hasReplaceSrc=true;
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+</script><span>
+</span><h3>
+ Execution Context的概念
+</h3><span>
+</span><img alt="Understanding JavaScript Execution Context" src="http://novtopro.qiniudn.com/content/images/8/5c/57528f65c4aa06124e55788e75a3a.jpeg" onerror="return imgError(this)"><span>
+</span><p>
+ 在JavaScript中，当前代码运行的环境被称为
+ <strong>
+  执行上下文（Execution Context）
+ </strong>
+ ，或者
+ <strong>
+  作用域（Scope）
+ </strong>
+ 。在客户端中，JavaScript是以单线程的方式运行的，所以某个时间点它只能在下面三个Execution Context中的一个中运行：
+</p><span>
+</span><ol>
+ <li>
+  Global Execution Context
+ </li>
+ <li>
+  Functional Execution Context
+ </li>
+ <li>
+  Eval Execution Context
+ </li>
+</ol><span>
+</span><p>
+ <img alt="Understanding JavaScript Execution Context" src="http://novtopro.qiniudn.com/content/images/4/19/03ef5170da04d304d21fc2be5d227.png" onerror="return imgError(this)">
+</p><span>
+</span><p>
+ Functional Execution Context是当执行流程进入函数体内时代码执行环境，Eval Execution Context是通过
+ <code>
+  eval()
+ </code>
+ 函数执行代码时的代码执行环境。
+</p><span>
+</span><p>
+ 每次调用函数时都会创建一个Functional Execution Context，而Global Execution Context只有一个。
+</p><span>
+</span><h3>
+ Execution Context Stack
+</h3><span>
+</span><p>
+ 在客户端中，JavaScript是以单线程的方式运行的，所以某个时间点它只能做一件事情，其他的操作或者事件只能排队等待。
+</p><span>
+</span><p>
+ 比如下面的脚本
+</p><span>
+</span><pre><code>function first() {  
+    console.log('Welcome to the first room ...');
+
+    second();
+    function second() {
+        console.log('Welcome to the second room ...');
+
+        third();
+        function third() {
+            console.log('Welcome to the third room ...');
+        }
+    }
+}
+
+first();  
+</code></pre><span>
+</span><p>
+ 当在Global Execution Context中执行
+ <code>
+  first();
+ </code>
+ 这句时，会依次调用三个嵌套的函数：
+ <code>
+  first()
+ </code>
+ 、
+ <code>
+  second()
+ </code>
+ 和
+ <code>
+  third()
+ </code>
+</p><span>
+</span><p>
+ <strong>
+  函数调用的过程
+ </strong>
+ ：
+</p><span>
+</span><p>
+ <img alt="Understanding JavaScript Execution Context" src="http://novtopro.qiniudn.com/content/images/d/95/15a6340761bf0fef58dd461c028fa.gif" onerror="return imgError(this)">
+</p><span>
+</span><p>
+ 函数调用的过程其实是一个入栈的过程，每次调用一个函数就会创建一个Functional Execution Context，然后加入到Execution Context Stack的顶部。
+</p><span>
+</span><p>
+ <strong>
+  函数执行返回的过程
+ </strong>
+ ：
+</p><span>
+</span><p>
+ <img alt="Understanding JavaScript Execution Context" src="http://novtopro.qiniudn.com/content/images/c/fa/38be01c9a416e5670519d4c3edb0a.gif" onerror="return imgError(this)">
+</p><span>
+</span><p>
+ 函数执行返回的过程其实是一个出栈的过程，一旦一个Execution Context完成了执行，它就会被推出栈顶并且将控制权返回给它下面的Execution Context，直到Global Execution Context。
+</p><span>
+</span><blockquote>
+ <p>
+  <strong>
+   函数执行返回、函数执行、函数调用
+  </strong>
+ </p>
+ <p>
+  <strong>
+   函数执行返回
+  </strong>
+  ：是指函数内的语句（包括调用其他函数/方法）全部执行完成，并且返回调用该函数的地方
+ </p>
+ <p>
+  <strong>
+   函数执行
+  </strong>
+  ：包括执行该函数内部普通语句（即
+  <strong>
+   代码执行
+  </strong>
+  ），也包括调用其他函数/方法（即
+  <strong>
+   函数调用
+  </strong>
+  ）
+ </p>
+</blockquote><span>
+</span><p>
+ 可以看出，Execution Context Stack具有如下的特点：
+</p><span>
+</span><ol>
+ <li>
+  单线程
+ </li>
+ <li>
+  同步执行
+ </li>
+ <li>
+  只有一个Global Execution Context
+ </li>
+ <li>
+  可以有多个Functional Execution Context，每次调用一个函数都会创建一个Functional Execution Context
+ </li>
+</ol><span>
+</span><h3>
+ JavaScript解释器（JavaScript Interpreter）内部如何操作Execution Context
+</h3><span>
+</span><p>
+ 在JavaScript解释器的内部，每一个Execution Context的执行都会经历以下两个阶段：
+</p><span>
+</span><ol>
+ <li>
+  创建阶段（Creation Stage）
+ </li>
+ <li>
+  激活/运行阶段（Activation Stage / Code Execution Stage）
+ </li>
+</ol><span>
+</span><h6>
+ 创建阶段
+</h6><span>
+</span><p>
+ 主要是指，函数被调用了，但是还没有开始执行函数内部的代码。在Execution Context的创建阶段，解释器会做如下的一些工作：
+</p><span>
+</span><ol>
+ <li>
+  创建作用域链（Scope Chain）
+ </li>
+ <li>
+  创建Activation Object / Variable Object
+ </li>
+ <li>
+  确定
+  <code>
+   this
+  </code>
+  的值，即Context
+ </li>
+</ol><span>
+</span><p>
+ 如以下代码
+</p><span>
+</span><pre><code>function add(num1, num2){  
+    return num1 + num2;
+}
+
+var result = add(5, 10);  
+</code></pre><span>
+</span><p>
+ 调用函数
+ <code>
+  add()
+ </code>
+ 将创建一个Execution Context，如图所示：
+</p><span>
+</span><p>
+ <img alt="Understanding JavaScript Execution Context" src="http://novtopro.qiniudn.com/content/images/e/9e/917caf8fffd388f7bd30c3c64a1aa.png" onerror="return imgError(this)">
+</p><span>
+</span><p>
+ 在Execution Context的创建阶段，JavaScript解释器（JavaScript Interpreter）会扫描传入函数的参数、函数内的变量声明和函数声明，从而在Execution Context中创建一个与之关联的Variable Object。被扫描到的变量、参数和函数将作为Variable Object的属性存在（见图）。
+</p><span>
+</span><p>
+ 创建Execution Context的大致的过程可以描述为：
+</p><span>
+</span><ol>
+ <li>
+  调用函数（Invoke function）
+ </li>
+ <li>
+  在执行函数内的代码之前，创建Execution Context
+  <br><ol>
+   <li>
+    初始化作用域链
+   </li>
+   <li>
+    创建Variable Object，按顺序执行：
+    <ul>
+     <li>
+      创建
+      <code>
+       arguments
+      </code>
+      对象，并且检查该函数的参数，完成对形式参数的赋值
+     </li>
+     <li>
+      在该函数内扫描函数声明，在Variable Object中创建或覆盖相应的属性
+     </li>
+     <li>
+      在该函数内扫描变量声明，在Variable Object中创建响应的属性，
+      <strong>
+       并且将值初始化为
+       <code>
+        undefined
+       </code>
+      </strong>
+      。如果在Variable Object中已经存在与声明的变量同名的属性，则什么都不做，继续扫描下一个变量声明。
+     </li>
+    </ul>
+   </li>
+  </ol>
+ </li>
+ <li>
+  确定
+  <code>
+   this
+  </code>
+  的值，即Context
+ </li>
+</ol><span>
+</span><p>
+ 比如
+</p><span>
+</span><pre><code>function foo(name) {  
+    var a = 'hello';
+    var b = function f2() {};
+    function f3() {}
+}
+
+foo('River He');  
+</code></pre><span>
+</span><p>
+ 调用
+ <code>
+  fn('River He')
+ </code>
+ ，创建如下所示的Execution Context：
+</p><span>
+</span><pre><code>fooExecutionContext = {  
+    scopeChain: {...},
+    variableObject: {
+        arguments: {
+: 'River He',
+            length: 1
+        },
+        name: 'River He',
+        f3: pointer to function f3(),
+        a: undefined,
+        b: undefined
+    },
+}
+</code></pre><span>
+</span><p>
+ 可见，在这一阶段除了函数的参数会进行赋值外，对于该函数内部的变量则只会在Variable Object中定义属性名。
+</p><span>
+</span><h6>
+ 激活/运行阶段
+</h6><span>
+</span><p>
+ 对VariableObject中的属性进行赋值，解释执行函数内的代码。到这一阶段，上述例子中的Execution Context会变成：
+</p><span>
+</span><pre><code>fooExecutionContext = {  
+    scopeChain: {...},
+    variableObject: {
+        arguments: {
+: 'River He',
+            length: 1
+        },
+        name: 'River He',
+        f3: pointer to function f3(),
+        a: 'hello',
+        b: pinter to function f2()
+    },
+}
+</code></pre><span>
+</span><h3>
+ Scope Chain
+</h3><span>
+</span><p>
+ 在代码运行期间，标识符解析（即变量名和函数名的查找）是通过当前Execution Context的Scope Chain进行的。
+</p><span>
+</span><p>
+ 对于当前的Execution Context：
+</p><span>
+</span><ol>
+ <li>
+  它本身的Variable Object就是Scope Chain的第一个元素
+ </li>
+ <li>
+  在Execution Context Stack中仅次于
+  <code>
+   当前Execution Context
+  </code>
+  的那个Execution Context的Variable Object为它的Scope Chain中的第二个元素，依次类推，直到Global Execution Context的Variable Object。
+ </li>
+</ol><span>
+</span><h3>
+ About Hoisting
+</h3><span>
+</span><p>
+ 对于如下的代码，会发生ReferenceError
+</p><span>
+</span><pre><code>(function() {
+    // ReferenceError: Can't find variable: name
+    console.log(name);
+}());
+</code></pre><span>
+</span><p>
+ 而对于一下代码，虽然变量
+ <code>
+  name
+ </code>
+ 是在
+ <code>
+  console.log(name)
+ </code>
+ 后声明的，但却不会发生ReferenceError：
+</p><span>
+</span><pre><code>(function() {
+    // undefined
+    console.log(name);
+
+    // declare variable 'name'
+    var name = 'River He';
+}());
+</code></pre><span>
+</span><p>
+ 表面看起来好像是变量声明
+ <code>
+  提前（hoisted）
+ </code>
+ 了，类似这样：
+</p><span>
+</span><pre><code>(function() {
+    var name;
+
+    // undefined
+    console.log(name);
+
+    name = 'River He';
+}());
+</code></pre><span>
+</span><p>
+ 其实不然，这是因为：
+</p><span>
+</span><ol>
+ <li>
+  在JavaScript解释器解释执行函数内的代码之前：需要创建Execution Context，在创建Execution Context的时候对于函数内的变量声明
+  <code>
+   var name = 'River He';
+  </code>
+  进行了扫描，并且在Variable Object中创建了相应的属性。
+ </li>
+ <li>
+  在JavaScript解释器解释执行函数内的代码的时候：需要对遇到的变量做解析，解析的过程就是依次查找当前Execution Context的Scope Chain中的各个Variable Object的属性。根据第1步，可以找到相应的属性，因而不会发生ReferenceError。
+ </li>
+</ol><span>
+</span><p>
+ 至于为什么是
+ <code>
+  undefined
+ </code>
+ ，则是因为在Execution Context的创建阶段，对于函数内的变量声明，JavaScript解释器会在Variable Object中创建相应的属性，并且初始化为undefined.
+</p><span>
+</span><p>
+ 同理，以下的惯用法中，即便变量
+ <code>
+  name
+ </code>
+ 没有事先声明，也不会发生ReferenceError
+</p><span>
+</span><pre><code>var name = name || 'River He';  
+</code></pre><span>
+</span><p>
+ 对于如下代码
+</p><span>
+</span><pre><code>(function() {
+    console.log(typeof foo);
+
+    var foo = 'bar';
+    function foo() {}
+}())
+</code></pre><span>
+</span><p>
+ 它的输出是
+ <code>
+  function
+ </code>
+ 而不是
+ <code>
+  undefined
+ </code>
+ ，这是因为Execution Context创建阶段，函数内的函数声明是优先于变量声明被JavaScript解释器扫描并且在Variable Object中创建相应的属性的。
+</p><span>
+</span><p>
+ 因此Variable Object中首先有个名为
+ <code>
+  foo
+ </code>
+ 的属性，并且它的值是一个Function类型对象的引用。在扫描完函数声明后，JavaScript解释器接着扫描变量声明，扫描到
+ <code>
+  var foo = 'bar';
+ </code>
+ 的时候，因为Variable Object中已经存在了名为
+ <code>
+  foo
+ </code>
+ 的属性，因此JavaScript会什么都不做，继续往下扫描。
+</p><span>
+</span><h3>
+ Global Variable
+</h3><span>
+</span><p>
+ 在Global Execution Context中的全局对象就是Global Execution Context中的Variable Object，并且为
+ <code>
+  this
+ </code>
+ 所引用。
+</p><span>
+</span><h6>
+ 显式声明
+</h6><span>
+</span><p>
+ 在Global Execution Context中使用了
+ <code>
+  var
+ </code>
+ 声明的变量就是显式声明的全局变量。显式声明的全局变量本质上是Global Execution Context中Variable Object的一个属性，并且这个属性不能被删除。
+</p><span>
+</span><pre><code>// 显式声明全局变量
+var name;
+
+// 删除全局对象中的"name"属性，false
+console.log(delete this.name);  
+</code></pre><span>
+</span><p>
+ 这是因为如果一个全局变量能够删除，那么可能会给整个JavaScript程序造成影响。通过将全局对象中与显式声明的全局变量同名的属性的configurable属性设置为false，让显式声明的全局变量不可删除。
+</p><span>
+</span><pre><code>var name = 'River He';  
+console.log(Object.getOwnPropertyDescriptor(this, 'name'));  
+</code></pre><span>
+</span><p>
+ 输出
+</p><span>
+</span><p>
+ <img alt="Understanding JavaScript Execution Context" src="http://novtopro.qiniudn.com/content/images/b/fd/e16a06faf6aed387ce2fb980222df.png" onerror="return imgError(this)">
+</p><span>
+</span><h6>
+ 隐式声明的全局变量
+</h6><span>
+</span><p>
+ 无论在Global Execution Context中还是在Functional Execution Context中，没有使用
+ <code>
+  var
+ </code>
+ 声明的变量都是全局变量。
+</p><span>
+</span><p>
+ 如
+</p><span>
+</span><pre><code>name = 'River He';  
+</code></pre><span>
+</span><p>
+ 或者
+</p><span>
+</span><pre><code>function fn() {  
+    name = 'River He';
+}
+</code></pre><span>
+</span><p>
+ 在Execution Context的创建阶段，这甚至不会被认为是变量声明，而是变量赋值。事实上也确实如此。也就是说，在创建Excution Context的Variable Object，JavaScript解释器扫描函数内的变量声明的时候，并不会为上述例子中的
+ <code>
+  name
+ </code>
+ 变量在Variable Object中创建相应的属性。
+</p><span>
+</span><p>
+ 因此，当开始执行Execution Context中的代码，对变量
+ <code>
+  name
+ </code>
+ 进行解析，查找Scope Chain的时候会一直查找到Global Execution Context。当在Global Execution Context中依然无法查找到时，此时就会在Global Execution Context中的Variable Object中创建相应的属性。
+</p><span>
+</span><p>
+ 虽然这看起来确实是一个全局变量，但是严格说起来它不是，因为全局对象从设计的角度就不应该是可删除的，而这里的"全局变量"是可以被删除的：
+</p><span>
+</span><pre><code>name = 'River He';
+
+// true
+console.log(delete this.name);  
+</code></pre><span>
+</span><p>
+ 查看全局对象中相应属性的
+ <code>
+  configurable
+ </code>
+ 属性：
+</p><span>
+</span><pre><code>name = 'River He';  
+console.log(Object.getOwnPropertyDescriptor(this, 'name'));  
+</code></pre><span>
+</span><p>
+ 输出
+</p><span>
+</span><p>
+ <img alt="Understanding JavaScript Execution Context" src="http://novtopro.qiniudn.com/content/images/e/b6/d42b32520fa667d84fa17a1ec8dbe.png" onerror="return imgError(this)">
+</p><span>
+</span><p>
+ 在ECMAScript 5的
+ <code>
+  strict mode
+ </code>
+ 中，通过这样的方式声明全局变量是不合法的。从性能的角度来说，也不应该使用这种方式。
+</p><span>
+</span><span>
+</span><span>
+
+</span><div class="author"><span>
+    </span><span class="name">作者：<a href="http://ju.outofmemory.cn/feed/3244/" title="Novtopro Tracker">Novtopro Tracker</a></span><span>
+    </span><div class="authorAvatar"><span>
+        </span><a href="http://ju.outofmemory.cn/feed/3244/">
+            <img width="128" align="center" valign="absmiddle" src="http://ju.outofmemory.cn/flogos/4/3244.png" alt="Novtopro Tracker">
+        </a><span>
+    </span></div><span>
+    </span><p>
+        When the problem is complexity, the cure might just be simplicity.
+    </p><span>
+    </span><span>
+</span></div><span>
+
+</span><span>
+</span><p>
+<script type="text/javascript">
+
+var cpro_id = "u2080713"
+</script>
+<script src="http://cpro.baidustatic.com/cpro/ui/cm.js" type="text/javascript"></script>
+</p><span>
+
+</span><span>
+
+
+</span><span>
+
+
+
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

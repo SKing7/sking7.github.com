@@ -1,0 +1,77 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>JavaScript Internationalization API</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>JavaScript Internationalization API</h1>
+                <div class="bodycopy"><span>
+                </span><p>I’m excited to announce that — as of <a href="https://trac.webkit.org/changeset/197261">r197261</a> — WebKit fully supports the ECMA-402 API for internationalization in JavaScript.</p><span>
+</span><p>Previously, internationalization was only available through multi-megabyte libraries. Now, it’s built into the browser, saving time and bandwidth.</p><span>
+</span><h2>What is Internationalization?</h2><span>
+</span><p>Internationalization adapts data presentation to fit a user’s language and country.</p><span>
+</span><p>Consider the following workout summary:</p><span>
+</span><blockquote><p>
+  You biked for 1.2 hours, starting at 2:45 PM on 09/25/2016.
+</p></blockquote><span>
+</span><p>You might think that this summary works for any English speaker. But it’s inappropriate outside the US.</p><span>
+</span><p>The best text in the UK is:</p><span>
+</span><blockquote><p>
+  You biked for 1.2 hours, starting at 14:45 on 25/09/2016.
+</p></blockquote><span>
+</span><p>The best text in South Africa is:</p><span>
+</span><blockquote><p>
+  You biked for 1,2 hours, starting at 2:45 PM on 2016/09/25.
+</p></blockquote><span>
+</span><p>These details differ between languages, and sometimes between countries that speak the same language.</p><span>
+</span><p>If we have all our content ahead of time we can pre-translate it by hand. But we’ll generate workout data dynamically, so we need an API to change data presentation on the fly. The JavaScript Internationalization API addresses this need.</p><span>
+</span><p>We call a combination of language and country — such as “English as spoken in the UK” — a “locale”.</p><span>
+</span><p>Some kinds of data that change presentation based on locale include times, dates, numbers, currency, and alphabetized words.</p><span>
+</span><h2>Internationalization in Practice</h2><span>
+</span><p>There are two pieces to the Internationalization API: convenience functions and explicit constructors. The convenience functions encapsulate the explicit constructors, taking care of some details automatically.</p><span>
+</span><p>Convenience functions exist for common data types that might need internationalization:</p><span>
+</span><pre><code class="js"><span class="identifier">String</span>.<span class="keyword">prototype</span>.<span class="identifier">localeCompare</span>()
+
+<span class="identifier">Number</span>.<span class="keyword">prototype</span>.<span class="identifier">toLocaleString</span>()
+
+<span class="identifier">Date</span>.<span class="keyword">prototype</span>.<span class="identifier">toLocaleString</span>()
+<span class="identifier">Date</span>.<span class="keyword">prototype</span>.<span class="identifier">toLocaleDateString</span>()
+<span class="identifier">Date</span>.<span class="keyword">prototype</span>.<span class="identifier">toLocaleTimeString</span>()
+</code></pre><span>
+</span><p>You can use the Date.prototype.toLocaleTimeString convenience function to produce a locale-aware variant of our time above:</p><span>
+</span><pre><code class="js"><span class="keyword type">var</span> <span class="identifier">date</span> <span class="operator">=</span> <span class="keyword operator">new</span> <span class="identifier">Date</span>(<span class="number">2016</span>, <span class="number">9</span>, <span class="number">25</span>, <span class="number">14</span>, <span class="number">45</span>);
+<span class="keyword type">var</span> <span class="identifier">timeString</span> <span class="operator">=</span> <span class="identifier">date</span>.<span class="identifier">toLocaleTimeString</span>(); </code></pre><span>
+</span><p>With more options, you can achieve the exact display above, removing the seconds field:</p><span>
+</span><pre><code class="js"><span class="keyword type">var</span> <span class="identifier">date</span> <span class="operator">=</span> <span class="keyword operator">new</span> <span class="identifier">Date</span>(<span class="number">2016</span>, <span class="number">9</span>, <span class="number">25</span>, <span class="number">14</span>, <span class="number">45</span>);
+<span class="keyword type">var</span> <span class="identifier">timeString</span> <span class="operator">=</span> <span class="identifier">date</span>.<span class="identifier">toLocaleTimeString</span>(
+    <span class="keyword literal">undefined</span>, { <span class="identifier">hour</span><span class="operator">:</span> <span class="string">"2-digit"</span>, <span class="identifier">minute</span><span class="operator">:</span><span class="string">"2-digit"</span> }); </code></pre><span>
+</span><p>Explicit constructors provide a persistent way to reference a set of internationalization rules:</p><span>
+</span><pre><code class="js"><span class="identifier">Intl</span>.<span class="identifier">Collator</span>
+<span class="identifier">Intl</span>.<span class="identifier">NumberFormat</span>
+<span class="identifier">Intl</span>.<span class="identifier">DateTimeFormat</span>
+</code></pre><span>
+</span><p>If we planned to display lots of dates, we would save a date formatter and reuse it:</p><span>
+</span><pre><code class="js"><span class="keyword type">var</span> <span class="identifier">formatter</span> <span class="operator">=</span> <span class="identifier">Intl</span>.<span class="identifier">DateTimeFormat</span>(
+    <span class="keyword literal">undefined</span>, { <span class="identifier">hour</span><span class="operator">:</span> <span class="string">"2-digit"</span>, <span class="identifier">minute</span><span class="operator">:</span><span class="string">"2-digit"</span> }); 
+<span class="keyword type">var</span> <span class="identifier">date</span> <span class="operator">=</span> <span class="keyword operator">new</span> <span class="identifier">Date</span>(<span class="number">2016</span>, <span class="number">9</span>, <span class="number">25</span>, <span class="number">14</span>, <span class="number">45</span>);
+<span class="keyword type">var</span> <span class="identifier">timeString</span> <span class="operator">=</span> <span class="identifier">formatter</span>.<span class="identifier">format</span>(<span class="identifier">date</span>); </code></pre><span>
+</span><h2>Locale Codes</h2><span>
+</span><p>By default, the APIs above honor the user’s locale according to System Preferences.</p><span>
+</span><p>You might prefer to specify locale. For example, if you’ve served a locale-specific variant of your web content, you’ll want your data presentation to match.</p><span>
+</span><p>If we override the default, we can specify the South African variant of our hour count:</p><span>
+</span><pre><code class="js"><span class="keyword type">var</span> <span class="identifier">hours</span> <span class="operator">=</span> <span class="number">1.2</span>;
+<span class="identifier">hours</span>.<span class="identifier">toLocaleString</span>(<span class="string">"en-za"</span>); </code></pre><span>
+</span><p>The string code “en-za” specifies “English as spoken in South Africa”. This code  is an <a href="ftp://ftp.isi.edu/in-notes/bcp/bcp47.txt">IETF BCP-47 tag</a>. Each of the APIs above accepts, as an optional first argument, a locale tag.</p><span>
+</span><h2>Resources</h2><span>
+</span><p>The <a href="http://www.ecma-international.org/ecma-402/2.0/">ECMA-402 specification</a> is available on the web. You can also follow <a href="https://github.com/tc39/ecma402">future developments in the specification</a>.</p><span>
+
+                            </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

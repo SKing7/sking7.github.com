@@ -1,0 +1,446 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>How to build a URL Shortener with NodeJS and Hapi (with frontend)</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>How to build a URL Shortener with NodeJS and Hapi (with frontend)</h1>
+                <section class="post-content">
+            <!-- AMAZON AFFILIATE BANNERS -->
+            <p>Amazon AD Banner</p>
+            <!-- END OF AMAZON AFFILIATE BANNERS -->
+            <p>Have you ever wonder how URL shorteners like <em>bit.ly</em> or <em>goo.gl</em> work? Well, we're going to actually <strong>build a simple shortener</strong> so you can learn how it's done and get accustomed to technologies like <a href="http://hapijs.com/">Hapi.js</a> (API Framework made by Walmart) and MongoLab (MongoDB database as a service) because I'll deploy it to Heroku but <strong>you can use your own MongoDB database</strong> installed on your local machine or wire a relational database (I recommend <a href="http://blog.modulus.io/nodejs-and-sqlite">SQLite</a>) or any other that you know of or suits your needs instead (<strong>for this project, <a href="https://www.sitepoint.com/using-redis-node-js/">using Redis</a> may also be a good idea</strong> because of efficiency and scaling).</p>
+
+<blockquote>
+  <p>I will use Axios as the request library and Bluebird for the Promise implementation in older browsers. But, <strong>you can use jQuery's $.ajax() instead</strong> or another request library called "<a href="https://davidwalsh.name/fetch">fetch</a>" which uses the native implementation of fetch(), this also needs a <a href="https://cdn.polyfill.io/v2/polyfill.min.js?features=Promise,fetch">polyfill</a> for fetch and Promise.</p>
+</blockquote>
+
+<p>One more thing! The backend code will be <strong>written in ES6</strong> (ES2015, EcmaScript 6), which means, you will see a lot of arrow functions, <em>const</em> declarations, and template literals. I skipped the new module importing and exporting syntax in favor of legacy but you can use that if you want; for the ES6 syntax to work you need to either deploy it to a server (<a href="https://heroku.com/">Heroku</a>, <a href="https://hyperdev.com/">HyperDev</a>) that has <strong>NodeJS 4.4 or higher</strong> (that's the version I battle-tested it) or if you'll follow this tutorial on your local machine; make sure you have the <strong>latest stable version of NodeJS</strong>.</p>
+
+<h2 id="whatwewillbebuilding">What we will be building</h2>
+
+<p>The following is front-end of the API, I enabled CORS so anyone can make use of it. In hapi.js, it's super easy to enable CORS but more on that when we get to the good stuff. The main goal is to let the user write or paste a long URL (can be short too) in the input textbox and when he clicks on the "SHORTEN!" button, a DIV will appear on the page with the link shortened that he can copy and start using right away.</p>
+
+<p><img class="screenshot" src="https://cdn.codetuts.tech/2016/Aug/shortioscreenshot-1471069033509.jpg" title="Shortio"></p>
+
+<p><a target="_blank" class="post-btn" href="https://shortio.herokuapp.com/">Demo</a> <a target="_blank" class="post-btn" href="https://github.com/luishendrix92/shortio">Github Repository</a></p>
+
+<p>I know the design isn't the greatest but this isn't a web design tutorial (and I don't have great design skills), there are things that are lacking from the app and I leave them up to you if you want to keep learning and improving :).</p>
+
+<h2 id="requirementstofollow">Requirements to follow</h2>
+
+<p>There are some things that you have to make sure are installed on your machine or server before doing all of this. If you don't, you need to go ahead and download them, install the tools and now you can start following this tutorial.</p>
+
+<ul>
+<li><strong>NodeJS</strong>: Indispensable, the entire app depends on this, make sure your version is stable and that you can run ES6 syntax without any issue (you may need to add <code>"use strict";</code> at the top of every JS file that has ES6 syntax if your NodeJS version is a bit old).</li>
+<li><strong>MongoDB</strong>: Depends, if you're going to test this on your local machine or remote server, you need to have MongoDB installed and running (for Windows, you need to run <code>mongod</code> on your command line). But if you're going to deploy it to Heroku, work with it on HyperDev or have the app running inside an environment that can't run MongoDB, you will need to <a href="https://mlab.com/">create an MLab (formerly MongoLab) account</a> now and create a sandbox (free tier) database.</li>
+</ul>
+
+<blockquote>
+  <p>If you aren't sure how on earth to connect MongoLab (MLab) to NodeJS and Mongoose, <a href="http://blog.mlab.com/2014/04/mongodb-driver-mongoose/">this article</a> may be of use.</p>
+</blockquote>
+
+<p>That's all, a <a href="https://codetuts.tech/text-editor-or-ide-to-code/">code editor</a> and a lot of patience is a must. We won't be using Gulp or any other build tool since this is a very small project.</p>
+
+<h2 id="step1thebackend">Step 1: The Backend</h2>
+
+<p>It's time to start getting things done, I'm going to set up the backend and boilerplate code first, then the API (hapi + mongo) to make a POST request and save new shortened URLs, enable static file serving and lastly, the front-end or page design.</p>
+
+<p>Create a folder somewhere in your system and inside that folder, create the following subfolders and files:</p>
+
+<pre><code>/ Root folder of the project
+  - [Folder] Public
+    - 404.css
+    - scripts.js
+    - styles.css
+  - [Folder] Views
+    - 404.html
+    - index.html
+  - createhash.js
+  - package.json
+  - routes.js
+  - shortener.js
+</code></pre>
+
+<p>Doesn't matter if the files are empty, we will be filling them step by step; the first file that we need to fill is <mark><strong>package.json</strong></mark>, this file contains the list of packages (dependencies) that our app depends on. It also contains information about the project and the author, info that you can replace (<strong>author, tags, license, description, name, version</strong>):</p>
+
+<pre><code class="language-json">{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "A simple url shortener with hapi.js",
+  "main": "shortener.js",
+  "scripts": {
+    "start": "node shortener.js"
+  },
+  "keywords": [
+    "url",
+    "shortener",
+    "app",
+    "hapi"
+  ],
+  "author": "codetuts",
+  "license": "ISC",
+  "dependencies": {
+    "hapi": "^14.1.0",
+    "inert": "^4.0.1",
+    "joi": "^9.0.4",
+    "mongoose": "^4.5.8"
+  }
+}
+</code></pre>
+
+<p>The dependencies that are listed there are needed for our project to run flawlessly. Once you are ready to run the app, it's imperative that you install those dependencies (<mark>actually, let's do it now, as in NOW!</mark>) by running the following command in your terminal (once you have navigated to your project folder):</p>
+
+<pre><code class="language-bash">npm install  
+</code></pre>
+
+<p>Simple, huh? This way, NPM sees all the dependencies in your <em>package.json</em> file and installs them, creating a new folder called <strong>node_modules</strong> in the process.</p>
+
+<blockquote>
+  <p><strong>NOTE</strong>: When deploying to Github and then to Heroku, you SHOULD NOT include the node_modules folder, Heroku automatically runs the package installer command in the shadows and lets you know everything is ready. To avoid this, you can create a <code>.gitignore</code> file in your project folder and add <code>node_modules/</code> to it.</p>
+</blockquote>
+
+<h3 id="themainentrypointshortenerjs">The main entry point (shortener.js)</h3>
+
+<p>This is the file that NodeJS will run to start the server, the MongoDB connection and start listening to connections.</p>
+
+<pre><code class="language-javascript">const Hapi     = require('hapi');  
+const server   = new Hapi.Server();  
+const routes   = require('./routes');  
+const mongoose = require('mongoose');  
+const mongoUri = process.env.MONGOURI || 'mongodb://localhost/shortio';  
+// If you're testing this locally, change mongoUri to:
+// 'mongodb://localhost:27017/shortio'
+
+/* MONGOOSE AND MONGOLAB
+ * ----------------------------------------------------------------------------
+ * Mongoose by default sets the auto_reconnect option to true.
+ * We recommend setting socket options at both the server and replica set level.
+ * We recommend a 30 second connection timeout because it allows for 
+ * plenty of time in most operating environments.
+ =============================================================================*/
+
+const options = {  
+  server: {
+    socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 }
+  }, 
+  replset: {
+    socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 }
+  }
+};
+
+mongoose.connect(mongoUri, options);
+
+const db = mongoose.connection;  
+</code></pre>
+
+<p>The first part is the set of const declarations; we're declaring constants that will hold the <strong>modules</strong> installed by NPM. The last constant, <em>mongoUri</em> has a curious value, doesn't it? <code>process.env.MONGOURI</code> means that I don't want to expose my MLab credentials (the MONGOURI looks like this: <code>'mongodb://username:password@host:port/db'</code>) to the world and I'd rather set it as an <strong>environment variable</strong> (Heroku has this as "config variables" and HyperDev has a .env file). <strong>If you are following this tutorial on your local machine</strong>, replace <code>process.env.MONGOURI</code> with <code>'mongodb://localhost/shortio'</code> or <code>'mongodb://127.0.0.1:27017/shortio'</code> if it fails.</p>
+
+<p>Now, the options object literal contains some settings you can provide to the Mongoose driver, <strong>these options can be omitted</strong> (and not pass the object to <code>mongoose.connect</code>) but <strong><a href="https://gist.github.com/mongolab-org/9959376">MLab recommends</a> those settings</strong> for it to work properly. As you may know, <strong>Mongoose</strong> is one of the most popular MongoDB clients/drivers for NodeJS, it has Schemas and a nice Promise implementation.</p>
+
+<p>Next, it's time to actually connecting to the database and start the server with Hapi, add the following lines below the aforementioned code:</p>
+
+<pre><code class="language-javascript">/* SERVER INITIALIZATION
+ * -----------------------------------------------------------------------
+ * We initialize the server once the connection to the database was set
+ * with no errors; we also need to set CORS to true if we want this
+ * API to be accessible in other domains. In order to serve static files
+ * I used the Hapi plugin called 'inert', hence the call to 'require'.
+ =======================================================================*/
+
+server.connection({  
+  port: process.env.PORT || 3000,
+  routes: { cors: true }
+});
+
+server.register(require('inert'), (err) =&gt; {  
+  db.on('error', console.error.bind(console, 'connection error:'))
+    .once('open', () =&gt; {
+      server.route(routes);
+
+      server.start(err =&gt; {
+        if (err) throw err;
+
+        console.log(`Server running at port ${server.info.port}`);
+      });
+    });
+});
+</code></pre>
+
+<p>The code may seem complicated but it's not. The first piece is the configuration of the connection that Hapi will create to start the server; the server will run on <strong>port 3000</strong> if <code>process.env.PORT</code> is not set and all the routes will have <strong>CORS enabled</strong>, you can <mark>disable this by setting <code>cors: true</code> to <em>false</em> if you're not comfortable with others using the API in other domains</mark> (although they could use crossorigin.me); you could also implement JSONP but that's beyond the scope of this tutorial.</p>
+
+<p>Next, as the <a href="http://hapijs.com/tutorials/serving-files">official Hapi.js documentation</a> states, if you want to <strong>serve static files</strong> (it also supports templating engines like Handlebars or Jade/Pug) for rendering views, scripts, CSS and images, you need a plugin for Hapi called <strong>inert</strong>; we already installed it with the <em>package.json</em> file so don't worry. I wrapped the database and server initialization inside the <code>server.register()</code> statement in order to let Hapi know I'm using the <strong>inert plugin</strong>, otherwise it'd throw an error saying there's no such thing as a "file handler."</p>
+
+<p>Lastly, we start the connection with MongoDB and pass a bound callback (console.error) to <code>db.on('error', callback)</code> for it to handle connection errors and using the Promise syntax <code>.once</code>, we tell Mongoose what to do <strong>once the connection was opened</strong>. In this scope, we're telling Hapi to use our <strong>routes.js module</strong> (that we haven't even filled yet, patience, patience) and then <strong>start the server</strong> watching for errors with the <code>if (err) throw err;</code> expression. Hapi provides an object called <code>server.info</code>, here I can found the port that Hapi is currently using and console.log it.</p>
+
+<h3 id="theroutesandschemamoduleroutesjs">The Routes and Schema module (routes.js)</h3>
+
+<p>Open up the <em>routes.js</em> file and in here, we'll be working with the Mongoose Schema and the routes, the code seems long but it's because there's a lot of object literals that take up lines.</p>
+
+<pre><code class="language-javascript">const Joi        = require('joi');  
+const mongoose   = require('mongoose');  
+const Schema     = mongoose.Schema;  
+const createHash = require('./createhash');  
+const hashLen    = 8; /* 8 chars long */  
+// Local machine? Set baseUrl to 'http://localhost:3000'
+// It's important that you don't add the slash at the end
+// or else, it will conflict with one of the routes
+const baseUrl    = process.env.BASE_URL || 'http://your-domain.com';
+
+/* CREATING MONGOOSE SCHEMAS
+ ================================================*/
+
+const redirSchema = new Schema({  
+  shortUrl: String,
+  url: String,
+  createdAt: Date
+});
+
+const Redir = mongoose.model('Redir', redirSchema);  
+</code></pre>
+
+<p>Again, we require mongoose because we need it to set the Schema, <mark>a schema the structure that our MongoDB documents</mark> (objects, entries, records) will follow and we're inserting "redirections" into our database, that's why I named my schema "Redir". The <strong>Joi plugin</strong> was also installed with <em>package.json</em> and it's useful to validate input data that is sent to us by the user (in this case, to validate that the provided POST request is valid).</p>
+
+<p>We're also requiring another module that we're yet to create, <em>createHash</em>, which is there to generate a <strong>"n" characters long hash</strong> or randomized string for our shortened URLs and attach it to your base URL (your-domain.com for example), it will generate something like <code>http://your-domain.com/xH83dUp1</code> and if we then go to <code>http://your-domain.com/xH83dUp1</code>, it will redirect you to the original URL sent with the POST request. Also, we store <strong>how long we want those hashes</strong> in a constant, I liked it 8 characters long but you can make it larger or shorter. Lastly, it's important to set <strong>the base URL</strong>, heroku subdomain or your own domain, if you're working on localhost, set it to localhost with the corresponding port and the HTTP at the beginning (<mark>it's important that you don't add a slash at the end</mark>).</p>
+
+<p>The schema consists of three keys: <strong>the shortened URL</strong> that is going to be generated by a simple algorithm once we receive a POST request, the <strong>original URL</strong> passed to us and the date when it was created (optional); I'm never going to use the Date again in this example but I like to place it there just in case (<strong>it's highly, highly optional</strong>). From now on, when we want to perform searches and insertions on that model or collection, we use a Schema method <code>Redir.someMethod(...)</code> like <code>.findOne</code> or <code>.save</code>.</p>
+
+<blockquote>
+  <p>If you feel comfortable with more modularization, move all the Schema logic to a separate file and require it from routes.js.</p>
+</blockquote>
+
+<p>The final part of the <em>routes.js</em> file is of course, the routes themselves! This is the array that we are going to export for it to be used in the entry point file. Add the following code below the schema declarations:</p>
+
+<pre><code class="language-javascript">/* EXPORTING THE ROUTES
+ ======================================================*/
+
+module.exports = [  
+  // The array of routes goes here
+];
+</code></pre>
+
+<p>Nope, that's not the whole file, I will add route by route and ask you to <strong>insert them one by one right inside the array</strong>, I do this because the expanded array looks rather large and I want to exaplain each route one by one.</p>
+
+<p>The first route that we need to add to the array is the root directory <code>/</code>, what will happen when the visitor enters the page, we'd normally <strong>serve an index.html</strong> file right? This is going to be the frontend view where users are going to land. Add the following code inside the array:</p>
+
+<pre><code class="language-javascript">{
+  method: 'GET',
+  path: '/',
+  handler(request, reply) {
+    reply.file('views/index.html');
+  }
+},
+</code></pre>
+
+<p>That right there is how Hapi.js declares routes, first, the GET method is decided because we're requesting data not sending it; the path is the forward slash that represents the root path. A <strong>handler</strong> is needed for each route, this is the method that will execute when a user enters the path or sends the request; it takes two parameters: <strong>request and reply</strong>. Similar to <em>req and res</em> in Express, request and reply work similarly, with request we can view information about the request, in this tutorial we'll only cover <code>request.params</code> and <code>request.payload</code> (for POST requests). What I put inside that handler was simple a <code>.file()</code> method (added by the <strong>Inert plugin</strong>) which sends HTML to the requester, in this case, the browser renders the file.</p>
+
+<p>The next route is for <strong>serving images, css and javascript files to our frontend</strong> html files in the views folder; it follows the same logic as the previous route:</p>
+
+<pre><code class="language-javascript">{
+  method: 'GET',
+  path: '/public/{file}',
+  handler(request, reply) {
+    reply.file(`public/${request.params.file}`);
+  }
+}
+</code></pre>
+
+<p>The only difference is that we're serving whatever filename is requested in the <em>public path</em>, that's what <code>{file}</code> is there for, that's a parameter extractor (<a href="http://hapijs.com/api#path-parameters">more about parameters here</a>) and it's telling the handler that the first and only parameter is called "file." We then reply with the concatenation of the public folder and the filename requested as a parameter. So, when someone asks for <code>http://your-domain.com/public/myfile.ext</code>, it will serve it back to the requester.</p>
+
+<p><strong>Pay attention to the following route</strong>, it's the most important and the core of our little experiment:</p>
+
+<pre><code class="language-javascript">{
+  method: 'POST',
+  path: '/new',
+  handler(request, reply) {
+    const uniqueID = createHash(hashLen);
+    const newRedir = new Redir({
+      shortUrl: `${baseUrl}/${uniqueID}`,
+      url: request.payload.url,
+      createdAt: new Date()
+    });
+
+    newRedir.save((err, redir) =&gt; {
+      if (err) { reply(err); } else { reply(redir); }
+    });
+  },
+  config: {
+    validate: {
+      payload: {
+        url: Joi.string()
+                .regex(/^https?:\/\/([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/)
+                .required()
+      }
+    }
+  }
+},
+</code></pre>
+
+<p>We will make use of a super simple <strong>HTML form</strong> (using AJAX) to send a <strong>POST request</strong> to our server, that's why I set up a POST request handler routed to the <code>/new</code> path (it can be whatever you want, <code>/shorten</code> for example). First, we need to add an extra property to the route object, the <strong>config object</strong>.</p>
+
+<p>This configuration object will have another object as a property, the validate object will, in turn, have a payload property with an object literal holding the <strong>validation for each parameter</strong>; we're only receiving one (the original URL) and it uses Joi to check if it's a string, if it matches the given pattern (this one is a piss poor URL validation, there are <a href="http://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url">better ones</a>) and says that it's required, if not provided, give an error back.</p>
+
+<p>Now, in the handler, we declare a <strong>new <em>Redir</em></strong> instance with our keys (properties), the shortUrl is going to be generated by the function imported from the module in the first lines of the file, the original URL is subtracted from the <strong>payload</strong> (data sent via POST request) and the date is generated by JavaScript's native Date constructor. Once the <strong>instance is saved</strong>, it's time to save it to the database; we need to pass it a callback to handle the error if something happened with the database or return the newly created object (the Redir instance) that's going to be sent back to the requester as <strong>JSON</strong> if everything went well. Said JSON object will be used by the front-end (the app) to tell the user the new shortened URL or let him know of any error that happened.</p>
+
+<p>The <strong>last route</strong> is, you guessed, the <strong>redirection route</strong>, we're going to catch a parameter in the root path and find that parameter (should be a hash/ID) in the database and if it finds it, redirect the user to the original URL (not the shortened one):</p>
+
+<pre><code class="language-javascript">{
+  method: 'GET',
+  path:'/{hash}',
+  handler(request, reply) {
+    const query = {
+      'shortUrl': `${baseUrl}/${request.params.hash}`
+    };
+
+    Redir.findOne(query, (err, redir) =&gt; {
+      if (err) { return reply(err); }
+      else if (redir) { reply().redirect(redir.url); }
+      else { reply.file('views/404.html').code(404); }
+    });
+  }
+}
+</code></pre>
+
+<p>This one is rather simple, we caught any parameter introduced in the root path (examples: <code>my-domain.com/cheese</code>, <code>my-domain.com/12345678</code>, <code>my-domain.com/p4r4m3t3r</code>) and it's gonna <strong>find it in the Redirs collection</strong> (database), it's only going to retrieve the first match. We pass the query to Mongoose's <em>findOne</em> method saying <mark>"find redirections that in the shortened URL, have a hash the same as the one requested in the URL"</mark>, then, if it found one, redirect to the original URL before being shortened, if it didn't find one, send the <strong>404.html view</strong> with the status code of <em>404</em> (overriding the default <em>200</em> which means success). Of course, not forgetting to handle a possible database error first.</p>
+
+<p>In the end, the routes.js file should look something <strong><a href="https://github.com/luishendrix92/shortio/blob/master/routes.js">like this</a></strong>.</p>
+
+<h3 id="generatingthehashincreatehashjs">Generating the hash in createhash.js</h3>
+
+<p>We're almost done in the backend, just open the <em>createhash.js</em> file and fill it with the following code:</p>
+
+<pre><code class="language-javascript">/* FUNCTIONS TO GENERATE THE RANDOM HASH
+ * ---------------------------------------------------------------------
+ * I'm only using numbers, letters from A-Z both lowercase &amp; uppercase,
+ * however, you can add other characters to increase the randomness.
+ =====================================================================*/
+
+function randomChar() {  
+  var n = Math.floor(Math.random() * 62);
+  if(n &lt; 10) return n; // 0-9
+  if(n &lt; 36) return String.fromCharCode(n + 55); // A-Z
+  return String.fromCharCode(n+61); // a-z
+}
+
+function createHash(len) {  
+  var str = '';
+  while(str.length &lt; len) str += randomChar();
+  return str;
+}
+
+module.exports = createHash;  
+</code></pre>
+
+<p>There's not much to explain here, the first function generates a random character string which can include numbers or letters (both lowercase and uppercase). The second function assembles a string consisting of <strong>len</strong> random characters long. The <code>module.exports</code> expression makes it available for routes.js to use.</p>
+
+<blockquote>
+  <p><strong>IMPORTANT</strong>: This will create a <mark>random ID but not a unique one</mark>, you can hard code a recursive workaround by checking if the hash exists in the database but that'd require extra DB queries, highly inefficient. You can use <strong><a href="https://www.npmjs.com/package/shortid">this NPM package</a> to generate unique hashes</strong> recommended by a user on Reddit. If you guessed correctly, implementing this code at a larger scale may cause some shortened URLs to be overridden, I had this in mind but I didn't think it was that big of a deal for a small sample project.</p>
+</blockquote>
+
+
+
+<p>Front what? The design, the client-side JavaScript, and the CSS/HTML files to be displayed. We have our API to POST into the database new shortened URLs but how do we send them? You can start testing it by using the <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop">Postman app</a> and sending a form or www-urlencoded POST request with the "url" parameter and a valid URL as its value. If it returns an object containing the Schema data (shortenedUrl, createdAt and URL), you will know the backend is usable.</p>
+
+<p>Start with the <mark><strong>index.html</strong></mark> file located in the <em>views folder</em>, I won't paste the whole thing here because it's a bit long but you can copy <strong><a href="https://github.com/luishendrix92/shortio/blob/master/views/index.html">the contents of this file</a></strong> into the one you created.</p>
+
+<p>In this file, I'm invoking the Roboto font, Miligram.css (a small CSS framework), font-awesome for the icons and then your own CSS file for that particular view. At the bottom go the JavaScript files, I invoked Bluebird first, <strong>Bluebird</strong> allows older browsers (and not so modern ones) to have <em>Promises</em>, <strong>Axios</strong> requires Promises to work so, if I didn't include this library it wouldn't work in IE and older versions of popular browsers. Axios is required before our <em>scripts.js</em> file and it's basically an <strong>HTTP request library</strong> (like jQuery's <code>$.ajax</code>) to send the POST request to the backend.</p>
+
+<blockquote>
+  <p><strong>IMPORTANT</strong>: You should not do this in production, always minify and bundle your scripts and CSS files into a single file. Axios and Bluebird make up for more Kilobytes than jQuery alone so you may want to consider <strong>using jQuery's Ajax implementation</strong> instead.</p>
+</blockquote>
+
+<p>For the main CSS, copy the <strong><a href="https://github.com/luishendrix92/shortio/blob/master/public/styles.css">contents of this CSS file</a></strong> into your <mark><strong>styles.css</strong></mark> file located in the <em>public folder</em> (this file is also kinda long).</p>
+
+<p>To finish with the front page, we need <mark><strong>scripts.js</strong></mark> and I'm going to explain step by step what it does. Open the file (located in the <em>public folder</em>) and fill it with:</p>
+
+<pre><code class="language-javascript">// Cache DOM elements in memory
+var form   = document.getElementById('shorten-form');  
+var urlBox = form.elements[0];  
+var link   = document.getElementById('link');  
+var shrBox = document.getElementById('shortened');
+
+// Callback function passed to Axios' .post().then()
+function displayShortenedUrl(response) {  
+  link.textContent = response.data.shortUrl;
+  link.setAttribute(
+    'href', response.data.shortUrl
+  ); // Set the link's href attribute
+  shrBox.style.opacity = '1';
+  urlBox.value = ''; // Reset input
+} // End of function to update the view
+
+// Callback function passed to Axios' error handler
+function alertError(error) {  
+  // Handle server or validation errors
+  alert('Are you sure the URL is correct? Make sure it has http:// at the beginning.');
+} // End of function to display errors on the page
+
+form.addEventListener('submit', function(event) {  
+  event.preventDefault();
+
+  // Send the POST request to the backend  
+  axios.post('/new', { url: urlBox.value })
+       .then(displayShortenedUrl)
+       .catch(alertError);
+});
+</code></pre>
+
+<p>The first thing we have to do is cache some HTML elements for later access, we need the input box where we paste the original URL, the link that gets displayed with the shortened URL, the div that contains the shortened URL (<strong>hidden by default</strong>), and the form that contains the input box to send the original URL and the "Shorten!" button.</p>
+
+<p>We need the form to attach an event listener to it, the 'submit' event. This means that we can execute a function when we press ENTER after pasting or writing the URL or when we click the submit button. The <code>event.preventDefault();</code> prevents the browser from reloading when we submit the URL, then we have the <strong>POST request with Axios</strong>, we send the request to the <code>/new</code> path as stated in the backend's <em>routes.js</em> file. With promises, we can use the <code>.then</code> and <code>.catch</code> methods; if the insertion and creating of the shortened URL in the database was successful, we pass a <strong>callback function that receives the response</strong> from the server and if the server returned an error, we do a <strong>not recommended JavaScript alert</strong> telling the user what went wrong.</p>
+
+<p>The way we implement the callback function is by accepting a response object from Axios as its only parameter and then use the link HTML element updating its <strong>href attribute</strong> (with the shortened URL) and the <strong>textContent</strong> (also with the shortenedUrl) to let the user know about the now shortened URL. After we do this, we <strong>show the hidden DIV that contains this information</strong> by setting its opacity to 0 (you can change the opacity transition to a <code>display: block;</code> with no transition and changing that element's CSS to <code>display: none;</code> and remove the <code>opacity: 0;</code> declaration and transition). And before finishing the function, clear the contents of the input box.</p>
+
+<h3 id="the404view">The 404 View</h3>
+
+<p><img src="https://cdn.codetuts.tech/2016/Aug/shortio404-1471069072730.jpg" alt="404 Template"></p>
+
+<p>We also need the view that we sent in the backend when the shortened URL doesn't exist, here's both the HTMl and the CSS for their corresponding <code>views/404.html</code> and <code>public/404.css</code> files.</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;  
+&lt;html&gt;  
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;404 - This is awkward...&lt;/title&gt;
+    &lt;link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"&gt;
+    &lt;link rel="stylesheet" href="public/404.css"&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div class="overlay"&gt;&lt;/div&gt;
+    &lt;div class="on-top"&gt;
+      &lt;h1&gt;That shortened URL doesn't exist...&lt;/h1&gt;
+      &lt;p&gt;
+        It doesn't exist for now, double check what you got the correct URL, remember that these shortened URLs are case sensitve. Sorry for the inconvenience.
+      &lt;/p&gt;
+      &lt;a href="/" class="back"&gt;Back to Shortio&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;  
+</code></pre>
+
+<p>That's the HTML for the view, as you see, there is a message and a button to go back to the app.</p>
+
+<p>As for the CSS, since it's a long file and I don't think it's a good idea to put it here; you can go ahead and <strong><a href="https://github.com/luishendrix92/shortio/blob/master/public/404.css">copy the contents of this CSS file</a></strong> into your <code>public/404.css</code> file. Please don't use the Travolta image in production, I'm not sure how well it fares with copyright issues and it's silly to use it professionally.</p>
+
+<h2 id="conclusionandachallenge">Conclusion and a challenge</h2>
+
+<p>That's all, to run the app, if you're working on your local machine, go to the terminal, navigate to the project folder and run the following command:</p>
+
+<pre><code class="language-bash">npm start  
+</code></pre>
+
+<p>This will invoke the entry point with NodeJS and start the connections that we established in <em>shortener.js</em>. If it gives you any error, let me know in the comment section and I'll see what happened. Since I deployed the project to Heroku, all I had to do was move every file (<mark>except the <em>node_modules</em> folder</mark>) to a <strong>Github repository</strong> (which I added below the screenshot, besides the demo link) and deploy it from <strong>Heroku</strong>, no <em>procfile</em> needed, no hassle, just a manual deploy within the web app.</p>
+
+<p>Try using it and finding bugs, improve it, make some extra functionality happen like revealing shortened URLs using an endpoint like <code>/reveal/{hash}</code>, or you can double check if the hash already exists before inserting the new one and avoid duplicated shortened URLs; I'm thinking maybe you can instead of storing the full shortened URL, store the pure hash and assemble the shortened URL in the frontend with the <em>scripts.js</em> file. <strong>Make any improvement that would make you learn more.</strong></p>
+
+<p>I also want to thank the Reddit community for giving me feedback, no offense taken, we're here to learn and improve and everything I can possibly add or remove from this tutorial is well received. Cheers!</p>
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
