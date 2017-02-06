@@ -1,0 +1,153 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Exif Orientation Page</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Exif Orientation Page</h1>
+                <blockquote>
+The <a href="http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html">Exif specification</a> defines an Orientation Tag to indicate the
+orientation of the camera relative to the captured scene. This can be
+used by the camera either to indicate the orientation automatically by
+an orientation sensor, or to allow the user to indicate the orientation
+manually by a menu switch, without actually transforming the image data
+itself.
+<p>
+Here is an explanation given by TsuruZoh Tachibanaya
+in his description of the Exif file format:
+</p><p>
+The orientation of the camera relative to the scene, when the image was
+captured. The relation of the '0th row' and '0th column' to visual
+position is shown as below.
+</p><center><table border="1">
+<tbody><tr><td>Value</td><td>0th Row</td><td>0th Column</td></tr>
+<tr><td>1</td><td>top</td><td>left side</td></tr>
+<tr><td>2</td><td>top</td><td>right side</td></tr>
+<tr><td>3</td><td>bottom</td><td>right side</td></tr>
+<tr><td>4</td><td>bottom</td><td>left side</td></tr>
+<tr><td>5</td><td>left side</td><td>top</td></tr>
+<tr><td>6</td><td>right side</td><td>top</td></tr>
+<tr><td>7</td><td>right side</td><td>bottom</td></tr>
+<tr><td>8</td><td>left side</td><td>bottom</td></tr>
+</tbody></table></center>
+Read this table as follows (thanks to Peter Nielsen for clarifying this -
+see also below):<br>Entry #6 in the table says that the 0th row <i>in the stored image</i>
+is the right side <i>of the captured scene</i>, and the 0th column <i>in
+the stored image</i> is the top side <i>of the captured scene</i>.
+<p>
+Here is another description given by Adam M. Costello:
+</p><p>
+For convenience, here is what the letter F would look like if it were
+tagged correctly and displayed by a program that ignores the orientation
+tag (thus showing the stored image):
+</p><blockquote><pre>  1        2       3      4         5            6           7          8
+
+888888  888888      88  88      8888888888  88                  88  8888888888
+88          88      88  88      88  88      88  88          88  88      88  88
+8888      8888    8888  8888    88          8888888888  8888888888          88
+88          88      88  88
+88          88  888888  888888
+</pre></blockquote>
+jpegtran does <b>not</b> change the Orientation Tag when performing lossless
+transformations. The reason is that it cannot rely on the validity of the stated
+information, and it could potentially confuse other applications if it would
+mistakenly rely on the information and change it appropriately.
+<p>
+Furthermore, if you want automatic correction, then you must examine the field
+first to decide whether to call jpegtran at all and if yes with which
+transformation option.
+</p><p>
+Therefore, it has been found that the best solution to the problem would be
+to handle the examination and manipulation of the Exif Orientation field by
+separate utilities, not jpegtran.
+</p><p>
+To solve the task of automatic image orientation correction, we therefore provide
+two utility programs.
+</p><p>
+The first utility program is called <font color="#cc0000">jpegexiforient</font>
+and is written in simple C. It only can read or write the Orientation Tag.
+It writes it out as ASCII character to stdout when called from the commandline.<br>Here is the usage screen:
+</p><blockquote><pre>jpegexiforient reads or writes the Exif Orientation Tag in a JPEG Exif file.
+Usage: jpegexiforient [switches] jpegfile
+Switches:
+  --help     display this help and exit
+  --version  output version information and exit
+  -n         Do not output the trailing newline
+  -1 .. -8   Set orientation value 1 .. 8
+</pre></blockquote>
+The second utility is a simple shell script called
+<font color="#cc0000">exifautotran</font>
+which transforms Exif files so that Orientation becomes 1.
+It first calls jpegexiforient to examine the Orientation
+field, and then decides whether and how to call jpegtran so
+that Orientation becomes 1.  It then calls jpegexiforient
+again to set the Orientation field accordingly to keep the
+information consistent.
+<p>
+So if you run "exifautotran *.jpg" in a directory of JPEG
+files, all images will be automatically transformed.  If all
+worked well and you would call it again, nothing more would
+happen because all Orientation values would have been set to
+1 in the first run. This is exactly the desired behaviour.
+The script was tested on Linux and worked properly:
+</p><blockquote><pre># exifautotran [list of files]
+#
+# Transforms Exif files so that Orientation becomes 1
+#
+for i
+do
+ case `jpegexiforient -n "$i"` in
+ 1) transform="";;
+ 2) transform="-flip horizontal";;
+ 3) transform="-rotate 180";;
+ 4) transform="-flip vertical";;
+ 5) transform="-transpose";;
+ 6) transform="-rotate 90";;
+ 7) transform="-transverse";;
+ 8) transform="-rotate 270";;
+ *) transform="";;
+ esac
+ if test -n "$transform"; then
+  echo Executing: jpegtran -copy all $transform $i
+  jpegtran -copy all $transform "$i" &gt; tempfile
+  if test $? -ne 0; then
+   echo Error while transforming $i - skipped.
+  else
+   rm "$i"
+   mv tempfile "$i"
+   jpegexiforient -1 "$i" &gt; /dev/null
+  fi
+ fi
+done
+</pre></blockquote>
+This <a href="http://sylvana.net/jpegcrop/exifautotran.txt">shell script as file here</a>.<br>The <a href="http://sylvana.net/jpegcrop/jpegexiforient.c">jpegexiforient.c source file here</a>.<br>Compile straightforward with "gcc -o jpegexiforient jpegexiforient.c".
+<p>
+Thanks to Adam M. Costello and Peter Nielsen.
+</p></blockquote><p>
+It turns out that orientations #6 and #8 are 4-phase in contrast to all
+other orientations that are 2-phase. (In retrospective this should have
+been obvious because of the 90 degree rotation done in these orientations).
+</p><p>
+The 2-phase orientaions are of course bi-directional. The 4-phase ones are
+not.
+</p><p>
+Applying a 2-phase orientation on the viewed image gives the stored image
+and vice versa. However, this is NOT true for the 4-phase orientations.
+</p><p>
+(I did not realize this until now, and that's why I made the mistake of
+thinking that your page was wrong. I incorrectly assumed that all the
+transformations are 2-phase).
+</p><p>
+I have attached an illustration that shows this. I start off by the case
+you picture on your site as phase #0. Notice the interesting phase #3
+where orientations #6 and #8 are 180 degrees off.
+</p>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

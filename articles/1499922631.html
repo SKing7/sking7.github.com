@@ -1,0 +1,93 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>PortSwigger Web Security Blog: Bypassing CSP using polyglot JPEGs</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>PortSwigger Web Security Blog: Bypassing CSP using polyglot JPEGs</h1>
+                <div class="post hentry uncustomized-post-template" itemprop="blogPost" itemscope="itemscope" itemtype="http://schema.org/BlogPosting"><span>
+</span><meta content="8503755746105415394" itemprop="blogId"><span>
+</span><meta content="8854836264253983266" itemprop="postId"><span>
+</span><a name="8854836264253983266"></a><span>
+</span><h3 class="post-title entry-title" itemprop="name">
+Bypassing CSP using polyglot JPEGs
+</h3><span>
+</span><span>
+</span><div class="post-body entry-content" id="post-body-8854836264253983266" itemprop="description articleBody"><span>
+</span><a href="http://twitter.com/albinowax">James</a><span> challenged me to see if it was possible to create a polyglot JavaScript/JPEG. Doing so would allow me to bypass CSP on almost any website that hosts user-uploaded images on the same domain. I gleefully took up the challenge and begun dissecting the format. The first four bytes are a valid non-ASCII JavaScript variable </span><b><span>0xFF 0xD8 0xFF 0xE0</span></b><span>. Then the next two bytes specify the length of the JPEG header. If we make that length of the header </span><b><span>0x2F2A</span></b><span> using the bytes </span><b><span>0x2F 0x2A</span></b><span> as you might guess we have a non-ASCII variable followed by a multi-line JavaScript comment. We then have to pad out the JPEG header to the length of </span><b><span>0x2F2A</span></b><span> with nulls. Here's what it looks like:</span><br><span>
+</span><br><span>
+</span><p>
+<b><span>FF D8 FF E0</span></b> <b><span>2F 2A</span></b> 4A 46 49 46 00 01 01 01 00 48 00 48 00 00 00 00 00 00 00 00 00 00....</p><span>
+</span><br><span>
+Inside a JPEG comment we can close the JavaScript comment and create an assignment for our non-ASCII JavaScript variable followed by our payload, then create another multi-line comment at the end of the JPEG comment.</span><br><span>
+</span><br><span>
+</span><p>
+<span><b><span>FF FE</span></b> </span><b><span>00 1C</span></b> <b><span>2A 2F 3D 61 6C 65 72 74 28 22 42 75 72 70 20 72 6F 63 6B 73 2E 22 29 3B 2F 2A</span></b></p><span>
+</span><br><span>
+</span><b><span>0xFF 0xFE</span></b><span> is the comment header </span><b><span>0x00 0x1C</span></b><span> specifies the length of the comment then the rest is our JavaScript payload which is of course </span><b><span>*/=alert("Burp rocks.")/*</span></b><br><span>
+</span><br><span>
+Next we need to close the JavaScript comment, I edited the last four bytes of the image data before the end of image marker. Here's what the end of the file looks like:</span><br><span>
+</span><br><span>
+</span><p>
+2A 2F 2F 2F <b><span>FF D9</span></b></p><span>
+</span><br><span>
+</span><br><span>
+</span><b><span>0xFF 0xD9</span></b><span> is the end of image marker. Great so there is our polyglot JPEG, well not quite yet. It works great if you don't specify a charset but on Firefox when using a UTF-8 character set for the document it corrupts our polyglot when included as an script! On MDN it doesn't state that the script supports the charset attribute but it does. So to get the script to work you need to specify the ISO-8859-1 charset on the script tag and it executes fine.</span><br><span>
+</span><br><span>
+It's worth noting that the polyglot JPEG works on Safari, Firefox, Edge and IE11. Chrome sensibly does not execute the image as JavaScript. </span><br><span>
+</span><br><span>
+Here is the polyglot JPEG:</span><br><span>
+</span><span>
+</span><a href="http://portswigger-labs.net/polyglot/jpeg/xss.jpg">Polyglot JPEG</a><br><span>
+&nbsp;
+</span><br><span>
+The code to execute the image as JavaScript is as follows:
+</span><br><span>
+</span><p>
+&lt;script charset="ISO-8859-1" src="http://portswigger-labs.net/polyglot/jpeg/xss.jpg"&gt;&lt;/script&gt;</p><span>
+</span><h3>
+File size restrictions&nbsp;</h3><span>
+I attempted to upload this graphic as a phpBB profile picture but it has restrictions in place. There is a 6k file size limit and maximum dimensions of 90x90. I reduced the size of the logo by cropping and thought about how I could reduce the JPEG data. In the JPEG header I use /* which in hex is 0x2F and 0x2A, combined 0x2F2A which results in a length of 12074 which is a lot of padding and will result in a graphic far too big to fit as a profile picture. Looking at the ASCII table I tried to find a combination of characters that would be valid JavaScript and reduce the amount of padding required in the JPEG header whilst still being recognised as a valid JPEG file.</span><br><span>
+</span><br><span>
+The smallest starting byte I could find was 0x9 (a tab character) followed by 0x3A (a colon) which results in a combined hex value of </span><b><span>0x093A</span></b><span> (2362) that shaves a lot of bytes from our file and creates a valid non-ASCII JavaScript label statement, followed by a variable using the JFIF identifier. Then I place a forward slash 0x2F instead of the NULL character at the end of the JFIF identifier and an asterisk as the version number. Here's what the hex looks like:</span><br><span>
+</span><br><span>
+</span><p>
+FF D8 FF E0 <b><span>09 3A</span></b> 4A 46 49 46 2F 2A</p><span>
+&nbsp; </span><br><span>
+Now we continue the rest of the JPEG header then pad with NULLs and inject our JavaScript payload:</span><br><span>
+</span><br><span>
+</span><p>
+FF D8 FF E0 09 3A 4A 46 49 46 2F 2A 01 01 00 48 00 48 00 00 00 00 00 00 00 ... (padding more nulls) 2A 2F 3D 61 6C 65 72 74 28 22 42 75 72 70 20 72 6F 63 6B 73 2E 22 29 3B 2F 2A</p><span>
+</span><br><span>
+Here is the smaller graphic:</span><br><span>
+</span><a href="http://portswigger-labs.net/polyglot/jpeg/xss_within_header_compressed_small_logo.jpg">Polyglot JPEG smaller</a><span>
+</span><br><span>
+</span><h3>
+Impact</h3><span>
+If you allow users to upload JPEGs, these uploads are on the same domain as your app, and your CSP allows script from "self", you can bypass the CSP using a polyglot JPEG by injecting a script and pointing it to that image.
+</span><br><span>
+</span><h3>
+Conclusion</h3><span>
+In conclusion if you allow JPEG uploads on your site or indeed any type of file, it's worth placing these assets on a separate domain. When validating a JPEG, you should rewrite the JPEG header to ensure no code is sneaked in there and remove all JPEG comments. Obviously it's also essential that your CSP does not whitelist your image assets domain for script.</span><br><span>
+</span><br><span>
+This post wouldn't be possible without the excellent work of </span><a href="https://twitter.com/angealbertini">Ange Albertini</a><span>. I used his </span><a href="https://raw.githubusercontent.com/corkami/pics/master/JPG.png">JPEG format graphic</a><span> extensively to create the polygot JPEG. </span><a href="https://twitter.com/jasvir/">Jasvir Nagra</a><span> also inspired me with his blog post about </span><a href="http://www.thinkfu.com/blog/gifjavascript-polyglots">polyglot GIFs</a><span>.</span><br><span>
+</span><br><span>
+</span><a href="http://portswigger-labs.net/csp/csp.php?x=%3Cscript%20charset=%22ISO-8859-1%22%20src=%22http://portswigger-labs.net/polyglot/jpeg/xss.jpg%22%3E%3C/script%3E">PoC </a><br><span>
+</span><h4>
+Update... </h4><span>
+Mozilla are </span><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1288361">fixing this in Firefox 51 </a><br><span>
+</span><br><span>
+Enjoy - </span><a href="https://twitter.com/garethheyes">@garethheyes</a><span> 
+</span><span>
+</span></div><span>
+</span><span>
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
