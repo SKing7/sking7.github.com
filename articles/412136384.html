@@ -1,0 +1,371 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Watch how the apply runs a digest</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Watch how the apply runs a digest</h1>
+                <div class="blogpost"><span>
+              </span><p><strong>UPDATE</strong>: This post is meant for beginners, for those that just started to learn Angular and want to know how data-binding works. If you already know how to use Angular properly, I highly suggest you go to the source code instead.</p><span>
+
+</span><p>Angular users want to know how data-binding works. There is a lot of vocabulary around this: <code>$watch</code>, <code>$apply</code>, <code>$digest</code>, <code>dirty-checking</code>… What are they and how do they work? Here I want to address all those questions, which are well addressed in the documentation, but I want to glue some pieces together to address everything in here, but keep in mind that I want to do that in a simple way. For more technical issues, check the source.</p><span>
+
+</span><p>Let’s start from the beginning.
+</p><span>
+
+</span><h2 id="the-browser-events-loop-and-the-angular-js-extension">The browser events-loop and the Angular.js extension</h2><span>
+
+</span><p>Our browser is waiting for events, for example the user interactions. If you click on a button or write into an input, the event’s callback will run inside Javascript and there you can do any DOM manipulation, so when the callback is done, the browser will make the appropiate changes in the DOM.</p><span>
+
+</span><p>Angular extends this events-loop creating something called <code>angular context</code> (remember this, it is an important concept). To explain what this context is and how it works we will need to explain more concepts.</p><span>
+
+</span><h2 id="the-watch-list">The $watch list</h2><span>
+
+</span><p>Every time you bind something in the UI you insert a <code>$watch</code> in a <code>$watch list</code>. Imagine the <code>$watch</code> as something that is able to detect changes in the model it is watching (bear with me, this will be clear soon). Imagine you have this:</p><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">User: &lt;input type="text" ng-model="user" /&gt;
+Password: &lt;input type="password" ng-model="pass" /&gt;
+</code></pre><span>
+
+</span><p>Here we have <code>$scope.user</code>, which is bound to the first input, and we have <code>$scope.pass</code>, which is bound to the second one. Doing this we add two <code>$watch</code> to the <code>$watch list</code>.</p><span>
+
+</span><p>File: <code>controllers.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.controller('MainCtrl', function($scope) {
+  $scope.foo = "Foo";
+  $scope.world = "World";
+});
+</code></pre><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">Hello, {{ World }}
+</code></pre><span>
+
+</span><p>Here, even though we have two things attached to the <code>$scope</code>, only one is bound. So in this case we only created one <code>$watch</code>.</p><span>
+
+</span><p>File: <code>controllers.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.controller('MainCtrl', function($scope) {
+  $scope.people = [...];
+});
+</code></pre><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">&lt;ul&gt;
+  &lt;li ng-repeat="person in people"&gt;
+    {{person.name}} - {{person.age}}
+  &lt;/li&gt;
+&lt;/ul&gt;
+</code></pre><span>
+
+</span><p>How many <code>$watch</code> are created here? Two for each person (for name and age) in people plus one for the <code>ng-repeat</code>. If we have 10 people in the list it will be <code>(2 * 10) + 1</code>, AKA <code>21</code> <code>$watch</code>.</p><span>
+
+</span><p>So, everything that is bound in our UI using directives creates a <code>$watch</code>. Right, but when are those <code>$watch</code> created?</p><span>
+
+</span><p>When our template is loaded, AKA in the <code>linking phase</code>, the compiler will look for every directive and creates all the <code>$watch</code> that are needed. This sounds good, but… now what?</p><span>
+
+</span><h2 id="digest-loop">$digest loop</h2><span>
+
+</span><p>Remember the extended <code>event-loop</code> I talked about? When the browser receives an event that can be managed by the <code>angular context</code> the <code>$digest</code> loop will be fired. This loop is made from two smaller loops. One processes the <code>$evalAsync</code> queue and the other one processes the <code>$watch</code> list, which is the subject of this article.</p><span>
+
+</span><p>What is that process about? The <code>$digest</code> will loop through the list of <code>$watch</code> that we have, asking this:</p><span>
+
+</span><ul>
+<li>Hey <code>$watch</code>, what is your value?
+
+</li>
+<li>Alright, has it changed?
+
+</li>
+<li>(nothing happens with this one, so it moves to the next)</li>
+<li>You, what is your value?
+
+</li>
+<li>Has it changed?
+
+</li>
+<li>(good, we have a DOM to be updated)</li>
+<li>This continues until every <code>$watch</code> has been checked.</li>
+</ul><span>
+
+</span><p>This is the <code>dirty-checking</code>. Now that all the <code>$watch</code> have been checked there is something else to ask: Is there any <code>$watch</code> that has been updated? If there is at least one of them that has changed, the loop will fire again until all of the <code>$watch</code> report no changes. This is to ensure that every model is clean. Have in mind that if the loop runs more than 10 times, it will throw an exception to prevent infinite loops.</p><span>
+
+</span><p>When the <code>$digest loop</code> finishes, the DOM makes the changes.</p><span>
+
+</span><p>Example:</p><span>
+
+</span><p>File: <code>controllers.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.controller('MainCtrl', function() {
+  $scope.name = "Foo";
+
+  $scope.changeFoo = function() {
+    $scope.name = "Bar";
+  }
+});
+</code></pre><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">{{ name }}
+&lt;button ng-click="changeFoo()"&gt;Change the name&lt;/button&gt;
+</code></pre><span>
+
+</span><p>Here we have only one <code>$watch</code> because ng-click doesn’t create any watches (the function is not going to change :P).</p><span>
+
+</span><ul>
+<li>We press the button.</li>
+<li>The browser receives an event which will enter the <code>angular context</code> (I will explain why, later in this article).</li>
+<li>The <code>$digest loop</code> will run and will ask every <code>$watch</code> for changes.</li>
+<li>Since the <code>$watch</code> which was watching for changes in <code>$scope.name</code> reports a change, if will force another $digest loop.</li>
+<li>The new loop reports nothing.</li>
+<li>The browser gets the control back and it will update the DOM reflecting the new value of <code>$scope.name</code></li>
+</ul><span>
+
+</span><p>The important thing here (which is seen as a pain-point by many people) is that EVERY event that enters the <code>angular context</code> will run a <code>$digest loop</code>. That means that every time we write a letter in an input, the loop will run checking every <code>$watch</code> in this page.</p><span>
+
+</span><h2 id="entering-the-angular-context-with-apply">Entering the angular context with $apply</h2><span>
+
+</span><p>What says which events enter the angular context and which ones do not? <code>$apply</code></p><span>
+
+</span><p>If you call <code>$apply</code> when an event is fired, it will go through the <code>angular-context</code>, but if you don’t call it, it will run outside it. It is as easy as that. So you may now ask… That last example does work and I haven’t called <code>$apply</code>, why? Angular will do it for you. So if you click on an element with <code>ng-click</code>, the event will be wrapped inside an <code>$apply</code> call. If you have an input with <code>ng-model="foo"</code> and you write an <code>f</code>, the event will be called like this: <code>$apply("foo = 'f';")</code>, in other words, wrapped in an <code>$apply</code> call.</p><span>
+
+</span><h2 id="when-angular-doesn-t-use-apply-for-us">When angular doesn’t use $apply for us</h2><span>
+
+</span><p>This is the common pain-point for newcomers to Angular. Why is my jQuery not updating my bindings? Because jQuery doesn’t call <code>$apply</code> and then the events never enter the <code>angular context</code> and then the <code>$digest loop</code> is never fired.</p><span>
+
+</span><p>Let’s see an interesting example:</p><span>
+
+</span><p>Imagine we have the following directive and controller:</p><span>
+
+</span><p>File: <code>app.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.directive('clickable', function() {
+
+return {
+  restrict: "E",
+  scope: {
+    foo: '=',
+    bar: '='
+  },
+  template: '&lt;ul style="background-color: lightblue"&gt;&lt;li&gt;{{foo}}&lt;/li&gt;&lt;li&gt;{{bar}}&lt;/li&gt;&lt;/ul&gt;',
+  link: function(scope, element, attrs) {
+    element.bind('click', function() {
+      scope.foo++;
+      scope.bar++;
+    });
+  }
+}
+
+});
+
+app.controller('MainCtrl', function($scope) {
+  $scope.foo = 0;
+  $scope.bar = 0;
+});
+</code></pre><span>
+
+</span><p>It binds <code>foo</code> and <code>bar</code> from the controller to show them in a list, then every time we click on the element, both <code>foo</code> and <code>bar</code> values are incremented by one.</p><span>
+
+</span><p>What will happen if we click on the element? Are we going to see the updates? The answer is no. No, because the <code>click</code> event is a common event that is not wrapped into an <code>$apply</code> call. So that means that we are going to lose our count? No.</p><span>
+
+</span><p>What is happening is that the <code>$scope</code> is indeed changing but since that is not forcing a <code>$digest loop</code>, the <code>$watch</code> for <code>foo</code> and the one for <code>bar</code> are not running, so they are not aware of the changes. This also means that if we do something else that does run an <code>$apply</code>, then all the <code>$watch</code> we have will see that they have changed and then update the DOM as needed.</p><span>
+
+</span><h2 id="try-it">Try it</h2><span>
+
+</span><p><a class="jsbin-embed" href="http://jsbin.com/opimat/2/embed?live">Directive example</a><script src="http://static.jsbin.com/js/embed.js"></script></p><span>
+
+</span><hr><span>
+
+</span><p>If we click on the directive (the blue zone) we won’t see any changes, but if we click on the button to update the string next to it, we suddenly see how many times we clicked on the directive. Just what I said, the clicks on the directive won’t trigger any <code>$digest loop</code> but when the button is clicked on, the <code>ng-click</code> will call <code>$apply</code> and it will run the <code>$digest loop</code>, so all the <code>$watch</code> we have are going to be checked for changes, and that includes the one for <code>foo</code> and the one for <code>bar</code>.</p><span>
+
+</span><p>Now you are thinking that this is not what you want, you want to update the bindings as soon as you click on the directive. That is easy, we just need to call <code>$apply</code> like this:</p><span>
+
+</span><pre><code class="language-javascript">element.bind('click', function() {
+  scope.foo++;
+  scope.bar++;
+
+  scope.$apply();
+});
+</code></pre><span>
+
+</span><p><code>$apply</code> is a function of our <code>$scope</code> (or <code>scope</code> inside a directive’s link function) so calling it will force a <code>$digest loop</code> (except if there is a loop in course, in that case it will throw an exception, which is a sign that we don’t need to call <code>$apply</code> there).</p><span>
+
+</span><h2 id="try-it-1">Try it</h2><span>
+
+</span><p><a class="jsbin-embed" href="http://jsbin.com/opimat/3/embed?live">Directive example</a><script src="http://static.jsbin.com/js/embed.js"></script></p><span>
+
+</span><hr><span>
+
+</span><p>It works! But there is a better way for using <code>$apply</code>:</p><span>
+
+</span><pre><code class="language-javascript">element.bind('click', function() {
+  scope.$apply(function() {
+    scope.foo++;
+    scope.bar++;
+  });
+})
+</code></pre><span>
+
+</span><p>What’s the difference? The difference is that in the first version, we are updating the values outside the <code>angular context</code> so if that throws an error, Angular will never know. Obviously in this tiny toy example it won’t make much difference, but imagine that we have an alert box to show errors to our users and we have a 3rd party library that does a network call and it fails. If we don’t wrap it inside an <code>$apply</code>, Angular will never know about the failure and the alert box won’t be there.</p><span>
+
+</span><p>So if you want to use a jQuery plugin, be sure you call <code>$apply</code> if you need to run a <code>$digest loop</code> to update your DOM.</p><span>
+
+</span><p>Something I want to add is that some people “feel bad” having to call <code>$apply</code> because they think that they are doing something wrong. That is not true. It is just Angular that is not a magician and it doesn’t know when a 3rd party library wants to update the bindings.</p><span>
+
+</span><h2 id="using-watch-for-our-own-stuff">Using $watch for our own stuff</h2><span>
+
+</span><p>You already know that every binding we set has its own <code>$watch</code> to update the DOM when is needed, but what if we want our own watches for our purposes? Easy.</p><span>
+
+</span><p>Let’s see some examples:</p><span>
+
+</span><p>File: <code>app.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.controller('MainCtrl', function($scope) {
+  $scope.name = "Angular";
+  
+  $scope.updated = -1;
+  
+  $scope.$watch('name', function() {
+    $scope.updated++;
+  });
+});
+</code></pre><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">&lt;body ng-controller="MainCtrl"&gt;
+  &lt;input ng-model="name" /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><span>
+
+</span><p>That is how we create a new <code>$watch</code>. The first parameter can be a string or a function. In this case it is just a string with the name of what we want to <code>$watch</code>, in this case, <code>$scope.name</code> (notice how we just need to use <code>name</code>). The second parameter is what is going to happen when <code>$watch</code> says that our watched expression has changed. The first thing we have to know is that when the controller is executed and finds the <code>$watch</code>, it will immediately fire.</p><span>
+
+</span><h2 id="try-it-2">Try it</h2><span>
+
+</span><p><a class="jsbin-embed" href="http://jsbin.com/ucaxan/1/embed?live">JS Bin</a><script src="http://static.jsbin.com/js/embed.js"></script></p><span>
+
+</span><hr><span>
+
+</span><p>I initialized the <code>$scope.updated</code> to <code>-1</code> because as I said, the <code>$watch</code> will run once when it is processed and it will put the <code>$scope.updated</code> to 0.</p><span>
+
+</span><p>Example 2:</p><span>
+
+</span><p>File: <code>app.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.controller('MainCtrl', function($scope) {
+  $scope.name = "Angular";
+  
+  $scope.updated = 0;
+  
+  $scope.$watch('name', function(newValue, oldValue) {
+    if (newValue === oldValue) { return; } // AKA first run
+    $scope.updated++;
+  });
+});
+</code></pre><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">&lt;body ng-controller="MainCtrl"&gt;
+  &lt;input ng-model="name" /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><span>
+
+</span><p>The second parameter of <code>$watch</code> receives two parameters. The new value and the old value. We can use them to skip the first run that every <code>$watch</code> does. Normally you don’t need to skip the first run, but in the rare cases where you need it (like this one), this trick comes in handy.</p><span>
+
+</span><p>Example 3:</p><span>
+
+</span><p>File: <code>app.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.controller('MainCtrl', function($scope) {
+  $scope.user = { name: "Fox" };
+  
+  $scope.updated = 0;
+  
+  $scope.$watch('user', function(newValue, oldValue) {
+    if (newValue === oldValue) { return; }
+    $scope.updated++;
+  });
+});
+</code></pre><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">&lt;body ng-controller="MainCtrl"&gt;
+  &lt;input ng-model="user.name" /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><span>
+
+</span><p>We want to <code>$watch</code> any changes in our <code>$scope.user</code> object. Same as before but using an object instead of a primitive.</p><span>
+
+</span><h2 id="try-it-3">Try it</h2><span>
+
+</span><p><a class="jsbin-embed" href="http://jsbin.com/ucaxan/3/embed?live">JS Bin</a><script src="http://static.jsbin.com/js/embed.js"></script></p><span>
+
+</span><hr><span>
+
+</span><p>Uhm? It doesn’t work. Why? Because the <code>$watch</code> by default compares the reference of the objects. In example 1 and 2, every time we modify <code>$scope.name</code> it will create a new primitive, so the <code>$watch</code> will fire because the reference of the object is new and that is our change. In this new case, since we are watching <code>$scope.user</code> and then we are changing <code>$scope.user.name</code>, the reference of <code>$scope.user</code> is never changing because we are creating a new <code>$scope.user.name</code> every time we change the input, but the <code>$scope.user</code> will be always the same.</p><span>
+
+</span><p>That is obviously not the desired case in this example.</p><span>
+
+</span><p>Example 4:</p><span>
+
+</span><p>File: <code>app.js</code></p><span>
+
+</span><pre><code class="language-javascript">app.controller('MainCtrl', function($scope) {
+  $scope.user = { name: "Fox" };
+  
+  $scope.updated = 0;
+  
+  $scope.$watch('user', function(newValue, oldValue) {
+    if (newValue === oldValue) { return; }
+    $scope.updated++;
+  }, true);
+});
+</code></pre><span>
+
+</span><p>File: <code>index.html</code></p><span>
+
+</span><pre><code class="language-html">&lt;body ng-controller="MainCtrl"&gt;
+  &lt;input ng-model="user.name" /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><span>
+
+</span><h2 id="try-it-4">Try it</h2><span>
+
+</span><p><a class="jsbin-embed" href="http://jsbin.com/ucaxan/4/embed?live">JS Bin</a><script src="http://static.jsbin.com/js/embed.js"></script></p><span>
+
+</span><hr><span>
+
+</span><p>Now it is working! How? We added a third parameter to the <code>$watch</code> which is a <code>bool</code> to indicate that we want to compare the value of the objects instead of the reference. And since the value of <code>$scope.user</code> is changing when we update the <code>$scope.user.name</code> the <code>$watch</code> will fire appropriately.</p><span>
+
+</span><p>There are more tips &amp; tricks with <code>$watch</code> but these are the basics.</p><span>
+
+</span><h3 id="conclusion">Conclusion</h3><span>
+
+</span><p>Well, I hope you have learnt how data-binding works in Angular. I guess that your first impression is that this <code>dirty-checking</code> is slow; well, that is not true. It is fast as lightning. But yes, if you have something like 2000-3000 <code>$watch</code> in a template, it will become laggy. But I think that if you reach that, it would be time to ask an UX expert :P.</p><span>
+
+</span><p>Anyway, in a future version of Angular and with the release of EcmaScript 6, we will have <code>Object.observe</code> which will improve the <code>$digest loop</code> a lot. Meanwhile there are some tips &amp; tricks that I am going to cover in a future article.</p><span>
+
+</span><p>On the other hand, this topic is not easy and if you find that I missed something important or there is anything completely wrong, please fill an issue at Github or write a pull request :).</p><span>
+              </span><hr><span>
+              </span><span>
+            </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,531 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>JavaScript Errors and Stack Traces in Depth</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>JavaScript Errors and Stack Traces in Depth</h1>
+                <article class="post-content">
+    
+
+<p>Hi, everyone! After a few weeks without writing about JavaScript, it’s about time we talk about it again!</p>
+
+<p>This time we’re going to talk about errors and stack traces and how to manipulate them.</p>
+
+<p>Sometimes people don’t pay attention to these details but this knowledge will certainly be useful if you’re writing any library related to testing or errors, of course. This week in Chai, for example, we had <a href="https://github.com/chaijs/chai/pull/922">this great Pull Request which greatly improved the way we handle stack traces</a> in order for our users to have more information when their assertions fail.</p>
+
+<p>Manipulating stack traces lets you clean up unuseful data and focus on what matters. Also, when understanding what exactly are Errors and their properties you will feel much more confident taking advantage of it.</p>
+
+<p><strong>This blog post may seem too obvious in its beginning but when we get to start manipulating stack traces it gets pretty complicated, so make sure you have a good understanding of the previous content before moving to that section</strong>.</p>
+
+
+
+<h2 id="how-the-call-stack-works"><strong>How The Call Stack Works</strong></h2>
+
+<p>Before talking about errors we must understand how the call stack works. It’s really simple, but it is essential to know this before going any further. If you already know this, feel free to skip this section.</p>
+
+<p><strong>Whenever there’s a function call it gets pushed to the top of the stack. After it finishes running it is removed from the top of the stack.</strong></p>
+
+<p>The interesting thing about this data structure is that the <strong>last item to come in will be the first one to come out</strong>. This is known as the LIFO (last in, first out) property.</p>
+
+<p>This means that when calling a function <code class="highlighter-rouge">y</code> from inside a function <code class="highlighter-rouge">x</code>, for example, we will have a stack with <code class="highlighter-rouge">x</code> and <code class="highlighter-rouge">y</code>, in this order.</p>
+
+<p>Let me give you another example, let’s say you’ve got this code:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">c</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'c'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">b</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'b'</span><span class="p">);</span>
+    <span class="nx">c</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">a</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span>
+    <span class="nx">b</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nx">a</span><span class="p">();</span>
+</code></pre><span>
+</span></div>
+
+<p>In the example above, when running <code class="highlighter-rouge">a</code> it will get added to the top of our stack. Then, when <code class="highlighter-rouge">b</code> gets called from inside of <code class="highlighter-rouge">a</code>, it gets pushed to the top of the stack. The same happens to <code class="highlighter-rouge">c</code> when it is called from <code class="highlighter-rouge">b</code>.</p>
+
+<p>When running <code class="highlighter-rouge">c</code> our stack trace will contain <code class="highlighter-rouge">a</code>, <code class="highlighter-rouge">b</code> and <code class="highlighter-rouge">c</code>, in this order.</p>
+
+<p>As soon as <code class="highlighter-rouge">c</code> finishes running it gets removed from the top of the stack and then the control flow gets back to <code class="highlighter-rouge">b</code>. When <code class="highlighter-rouge">b</code> finishes it gets removed from the stack too and now we get the control back to <code class="highlighter-rouge">a</code>. Finally, when <code class="highlighter-rouge">a</code> finishes running it also gets removed from the stack.</p>
+
+<p>In order to better demonstrate this behavior, we will use <code class="highlighter-rouge">console.trace()</code>, which prints the current stack trace to the console. Also, you should usually read stack traces from top to bottom. Think of each line as what has been called from inside the line below it.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">c</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'c'</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">trace</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">b</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'b'</span><span class="p">);</span>
+    <span class="nx">c</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">a</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span>
+    <span class="nx">b</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nx">a</span><span class="p">();</span>
+</code></pre><span>
+</span></div>
+
+<p>When running this in the Node REPL server this is what we get back:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Trace</span>
+    <span class="nx">at</span> <span class="nx">c</span> <span class="p">(</span><span class="nx">repl</span><span class="err">:</span><span class="mi">3</span><span class="err">:</span><span class="mi">9</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">b</span> <span class="p">(</span><span class="nx">repl</span><span class="err">:</span><span class="mi">3</span><span class="err">:</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">a</span> <span class="p">(</span><span class="nx">repl</span><span class="err">:</span><span class="mi">3</span><span class="err">:</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">repl</span><span class="err">:</span><span class="mi">1</span><span class="err">:</span><span class="mi">1</span> <span class="c1">// &lt;-- For now feel free to ignore anything below this point, these are Node's internals</span>
+    <span class="nx">at</span> <span class="nx">realRunInThisContextScript</span> <span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">22</span><span class="err">:</span><span class="mi">35</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">sigintHandlersWrap</span> <span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">98</span><span class="err">:</span><span class="mi">12</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">ContextifyScript</span><span class="p">.</span><span class="nx">Script</span><span class="p">.</span><span class="nx">runInThisContext</span> <span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">24</span><span class="err">:</span><span class="mi">12</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">REPLServer</span><span class="p">.</span><span class="nx">defaultEval</span> <span class="p">(</span><span class="nx">repl</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">313</span><span class="err">:</span><span class="mi">29</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">bound</span> <span class="p">(</span><span class="nx">domain</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">280</span><span class="err">:</span><span class="mi">14</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">REPLServer</span><span class="p">.</span><span class="nx">runBound</span> <span class="p">[</span><span class="nx">as</span> <span class="nb">eval</span><span class="p">]</span> <span class="p">(</span><span class="nx">domain</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">293</span><span class="err">:</span><span class="mi">12</span><span class="p">)</span>
+</code></pre><span>
+</span></div>
+
+<p>As we can see here we have <code class="highlighter-rouge">a</code>, <code class="highlighter-rouge">b</code> and <code class="highlighter-rouge">c</code> when the stack gets printed from inside <code class="highlighter-rouge">c</code>.</p>
+
+<p>Now, if we print the stack trace from inside <code class="highlighter-rouge">b</code> after <code class="highlighter-rouge">c</code> finishes running we will be able to see it was already removed from the top of the stack, so we will only have <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code>.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">c</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'c'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">b</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'b'</span><span class="p">);</span>
+    <span class="nx">c</span><span class="p">();</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">trace</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">a</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span>
+    <span class="nx">b</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nx">a</span><span class="p">();</span>
+</code></pre><span>
+</span></div>
+
+<p>As you can see, we no longer have <code class="highlighter-rouge">c</code> in our stack since it has already finished running and has been popped out of it.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Trace</span>
+    <span class="nx">at</span> <span class="nx">b</span> <span class="p">(</span><span class="nx">repl</span><span class="err">:</span><span class="mi">4</span><span class="err">:</span><span class="mi">9</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">a</span> <span class="p">(</span><span class="nx">repl</span><span class="err">:</span><span class="mi">3</span><span class="err">:</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">repl</span><span class="err">:</span><span class="mi">1</span><span class="err">:</span><span class="mi">1</span>  <span class="c1">// &lt;-- For now feel free to ignore anything below this point, these are Node's internals</span>
+    <span class="nx">at</span> <span class="nx">realRunInThisContextScript</span> <span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">22</span><span class="err">:</span><span class="mi">35</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">sigintHandlersWrap</span> <span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">98</span><span class="err">:</span><span class="mi">12</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">ContextifyScript</span><span class="p">.</span><span class="nx">Script</span><span class="p">.</span><span class="nx">runInThisContext</span> <span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">24</span><span class="err">:</span><span class="mi">12</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">REPLServer</span><span class="p">.</span><span class="nx">defaultEval</span> <span class="p">(</span><span class="nx">repl</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">313</span><span class="err">:</span><span class="mi">29</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">bound</span> <span class="p">(</span><span class="nx">domain</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">280</span><span class="err">:</span><span class="mi">14</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">REPLServer</span><span class="p">.</span><span class="nx">runBound</span> <span class="p">[</span><span class="nx">as</span> <span class="nb">eval</span><span class="p">]</span> <span class="p">(</span><span class="nx">domain</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">293</span><span class="err">:</span><span class="mi">12</span><span class="p">)</span>
+    <span class="nx">at</span> <span class="nx">REPLServer</span><span class="p">.</span><span class="nx">onLine</span> <span class="p">(</span><span class="nx">repl</span><span class="p">.</span><span class="nx">js</span><span class="err">:</span><span class="mi">513</span><span class="err">:</span><span class="mi">10</span><span class="p">)</span>
+</code></pre><span>
+</span></div>
+
+<p>In a nutshell: you call things and they get pushed to the top of the stack. When they finish running they get popped out of it. Simple as that.</p>
+
+
+
+<h2 id="the-error-object-and-error-handling"><strong>The Error Object and Error Handling</strong></h2>
+
+<p>When errors happen, usually an <code class="highlighter-rouge">Error</code> object is thrown. <code class="highlighter-rouge">Error</code> objects can also be used as prototypes for users wanting to extend it and create their own errors.</p>
+
+<p>The <code class="highlighter-rouge">Error.prototype</code> object usually has the following properties:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">constructor</code> - The constructor function responsible for this instance’s prototype.</li>
+  <li><code class="highlighter-rouge">message</code> - An error message.</li>
+  <li><code class="highlighter-rouge">name</code> - The error’s name.</li>
+</ul>
+
+<p>These are standard properties and sometimes each environment has its own specific properties. In some environments, such as Node, Firefox, Chrome, Edge, IE 10+, Opera and Safari 6+, we even have the <code class="highlighter-rouge">stack</code> property, which contains an error’s stack trace. <strong>An error’s stack trace contains all the stack frames until its own constructor function.</strong></p>
+
+<p>If you want to read more about specific properties of <code class="highlighter-rouge">Error</code> objects I highly recommend you to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/prototype">read this article on MDN</a>.</p>
+
+<p>To throw an error you must use the <code class="highlighter-rouge">throw</code> keyword. In order to <code class="highlighter-rouge">catch</code> an error thrown, you must wrap the code that may throw an error into a <code class="highlighter-rouge">try</code> block followed by a <code class="highlighter-rouge">catch</code> block. Catch also takes an argument which is the error being thrown.</p>
+
+<p>As it happens in Java, JavaScript also allows you to have a <code class="highlighter-rouge">finally</code> block which runs after your <code class="highlighter-rouge">try/catch</code> blocks regardless of whether your <code class="highlighter-rouge">try</code> block threw an error or not. It is good to use <code class="highlighter-rouge">finally</code> to clean up stuff after you’re finished dealing with it, doesn’t matter if your operations have worked or not.</p>
+
+<p>Everything until now has been quite obvious for most people so let’s get to some non-trivial details.</p>
+
+<p>You can have <code class="highlighter-rouge">try</code> blocks that are not followed by <code class="highlighter-rouge">catch</code>, but they must be followed by <code class="highlighter-rouge">finally</code>. This means that we can use three different forms of <code class="highlighter-rouge">try</code> statements:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">try...catch</code></li>
+  <li><code class="highlighter-rouge">try...finally</code></li>
+  <li><code class="highlighter-rouge">try...catch...finally</code></li>
+</ul>
+
+<p>Try statements can be nested inside other <code class="highlighter-rouge">try</code> statements, such as:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">try</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Nested error.'</span><span class="p">);</span> <span class="c1">// The error thrown here will be caught by its own `catch` clause</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">nestedErr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Nested catch'</span><span class="p">);</span> <span class="c1">// This runs</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'This will not run.'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div>
+
+<p>You can also nest <code class="highlighter-rouge">try</code> statements into <code class="highlighter-rouge">catch</code> and <code class="highlighter-rouge">finally</code> blocks:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">try</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'First error'</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'First catch running'</span><span class="p">);</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Second error'</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">nestedErr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Second catch running.'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">try</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'The try block is running...'</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Error inside finally.'</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Caught an error inside the finally block.'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div>
+
+<p>It’s also important to notice that <strong>you can also throw values that are not <code class="highlighter-rouge">Error</code> objects</strong>. Although this may seem cool and permissive it’s actually not that great, especially for developers that work with libraries that have to deal with other people’s code, because then there’s no standard and you never know what to expect from your users. You cannot trust them to throw <code class="highlighter-rouge">Error</code> objects simply because they may choose not to do so and just throw a string or a number instead. This also makes it harder if you need to handle stack traces and other meaningful metadata.</p>
+
+<p>Let’s say you’ve got this code:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">runWithoutThrowing</span><span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="nx">func</span><span class="p">();</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'There was an error, but I will not throw it.'</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'The error\'s message was: '</span> <span class="o">+</span> <span class="nx">e</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">funcThatThrowsError</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s1">'I am a TypeError.'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">runWithoutThrowing</span><span class="p">(</span><span class="nx">funcThatThrowsError</span><span class="p">);</span>
+</code></pre><span>
+</span></div>
+
+<p>This will work great if your users are passing functions that throw <code class="highlighter-rouge">Error</code> objects to your <code class="highlighter-rouge">runWithoutThrowing</code> function. However, if they end up throwing a <code class="highlighter-rouge">String</code> instead you may be in trouble:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">runWithoutThrowing</span><span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="nx">func</span><span class="p">();</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'There was an error, but I will not throw it.'</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'The error\'s message was: '</span> <span class="o">+</span> <span class="nx">e</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">funcThatThrowsString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="s1">'I am a String.'</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">runWithoutThrowing</span><span class="p">(</span><span class="nx">funcThatThrowsString</span><span class="p">);</span>
+</code></pre><span>
+</span></div>
+
+<p>Now your second <code class="highlighter-rouge">console.log</code> will show you that the error’s message is <code class="highlighter-rouge">undefined</code>. This may seem unimportant now, but if you needed to ensure certain properties exist on an <code class="highlighter-rouge">Error</code> object or deal with <code class="highlighter-rouge">Error</code> specific properties in another way (such as <a href="https://github.com/chaijs/chai/blob/a7e1200db4c144263599e5dd7a3f7d1893467160/lib/chai/core/assertions.js#L1506">Chai’s <code class="highlighter-rouge">throws</code> assertion</a> does) you’d need a lot more work to make sure it would work right.</p>
+
+<p>Also, when throwing values that aren’t <code class="highlighter-rouge">Error</code> objects you don’t have access to other important data such as it’s <code class="highlighter-rouge">stack</code>, which is a property <code class="highlighter-rouge">Error</code> objects have in some environments.</p>
+
+<p>Errors can also be used as any other objects, you don’t necessarily need to throw them, that’s why they’re used as the first argument to callback functions many times, as it happens with the <code class="highlighter-rouge">fs.readdir</code> function, for example.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">);</span>
+
+<span class="nx">fs</span><span class="p">.</span><span class="nx">readdir</span><span class="p">(</span><span class="s1">'/example/i-do-not-exist'</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">dirs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nb">Error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// `readdir` will throw an error because that directory does not exist</span>
+        <span class="c1">// We will now be able to use the error object passed by it in our callback function</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Error Message: '</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'See? We can use Errors without using try statements.'</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">dirs</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div>
+
+<p>At last, but not least, <code class="highlighter-rouge">Error</code> objects can also be used when rejecting promises. This makes it easier to handle promise rejections:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="nx">Promise</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">reject</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'The promise was rejected.'</span><span class="p">));</span>
+<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'I am an error.'</span><span class="p">);</span>
+<span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nb">Error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'The promise was rejected with an error.'</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Error Message: '</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div>
+
+
+
+<h2 id="manipulating-stack-traces"><strong>Manipulating Stack Traces</strong></h2>
+
+<p>And now the part you all have been waiting for: how to manipulate stack traces.</p>
+
+<p>This chapter is dedicated specifically for environments that support <a href="https://nodejs.org/api/errors.html#errors_error_capturestacktrace_targetobject_constructoropt"><code class="highlighter-rouge">Error.captureStackTrace</code></a>, such as NodeJS.</p>
+
+<p>The <code class="highlighter-rouge">Error.captureStackTrace</code> function takes an <code class="highlighter-rouge">object</code> as first argument and, optionally, a <code class="highlighter-rouge">function</code> as the second one. What capture stack trace does is capturing the current stack trace (obviously) and creating a <code class="highlighter-rouge">stack</code> property in the target object to store it. If the second argument is provided, the function passed will be considered the ending point of the call stack and therefore the stack trace will only display the calls that happened before this function was called.</p>
+
+<p>Let’s use some examples to make this more clear. First, we will just capture the current stack trace and store it in a common object.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">myObj</span> <span class="o">=</span> <span class="p">{};</span>
+
+<span class="kd">function</span> <span class="nx">c</span><span class="p">()</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">b</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Here we will store the current stack trace into myObj</span>
+    <span class="nb">Error</span><span class="p">.</span><span class="nx">captureStackTrace</span><span class="p">(</span><span class="nx">myObj</span><span class="p">);</span>
+    <span class="nx">c</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">a</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">b</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// First we will call these functions</span>
+<span class="nx">a</span><span class="p">();</span>
+
+<span class="c1">// Now let's see what is the stack trace stored into myObj.stack</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myObj</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span>
+
+<span class="c1">// This will print the following stack to the console:</span>
+<span class="c1">//    at b (repl:3:7) &lt;-- Since it was called inside B, the B call is the last entry in the stack</span>
+<span class="c1">//    at a (repl:2:1)</span>
+<span class="c1">//    at repl:1:1 &lt;-- Node internals below this line</span>
+<span class="c1">//    at realRunInThisContextScript (vm.js:22:35)</span>
+<span class="c1">//    at sigintHandlersWrap (vm.js:98:12)</span>
+<span class="c1">//    at ContextifyScript.Script.runInThisContext (vm.js:24:12)</span>
+<span class="c1">//    at REPLServer.defaultEval (repl.js:313:29)</span>
+<span class="c1">//    at bound (domain.js:280:14)</span>
+<span class="c1">//    at REPLServer.runBound [as eval] (domain.js:293:12)</span>
+<span class="c1">//    at REPLServer.onLine (repl.js:513:10)</span>
+</code></pre><span>
+</span></div>
+
+<p>As you can notice in the example above, we first called <code class="highlighter-rouge">a</code> (which got pushed into the stack) and then called <code class="highlighter-rouge">b</code> from inside <code class="highlighter-rouge">a</code> (which pushed it on top of <code class="highlighter-rouge">a</code>). Then, inside <code class="highlighter-rouge">b</code>, we captured the current stack trace and stored it into <code class="highlighter-rouge">myObj</code>. This is why we get only <code class="highlighter-rouge">a</code> and then <code class="highlighter-rouge">b</code> on the stack we printed to the console.</p>
+
+<p>Now let’s pass a function as the second argument to the <code class="highlighter-rouge">Error.captureStackTrace</code> function and see what happens:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">myObj</span> <span class="o">=</span> <span class="p">{};</span>
+
+<span class="kd">function</span> <span class="nx">d</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Here we will store the current stack trace into myObj</span>
+    <span class="c1">// This time we will hide all the frames after `b` and `b` itself</span>
+    <span class="nb">Error</span><span class="p">.</span><span class="nx">captureStackTrace</span><span class="p">(</span><span class="nx">myObj</span><span class="p">,</span> <span class="nx">b</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">c</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">d</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">b</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">c</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">a</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">b</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// First we will call these functions</span>
+<span class="nx">a</span><span class="p">();</span>
+
+<span class="c1">// Now let's see what is the stack trace stored into myObj.stack</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myObj</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span>
+
+<span class="c1">// This will print the following stack to the console:</span>
+<span class="c1">//    at a (repl:2:1) &lt;-- As you can see here we only get frames before `b` was called</span>
+<span class="c1">//    at repl:1:1 &lt;-- Node internals below this line</span>
+<span class="c1">//    at realRunInThisContextScript (vm.js:22:35)</span>
+<span class="c1">//    at sigintHandlersWrap (vm.js:98:12)</span>
+<span class="c1">//    at ContextifyScript.Script.runInThisContext (vm.js:24:12)</span>
+<span class="c1">//    at REPLServer.defaultEval (repl.js:313:29)</span>
+<span class="c1">//    at bound (domain.js:280:14)</span>
+<span class="c1">//    at REPLServer.runBound [as eval] (domain.js:293:12)</span>
+<span class="c1">//    at REPLServer.onLine (repl.js:513:10)</span>
+<span class="c1">//    at emitOne (events.js:101:20)</span>
+</code></pre><span>
+</span></div>
+
+<p>When we passed <code class="highlighter-rouge">b</code> to the <code class="highlighter-rouge">Error.captureStackTraceFunction</code> it hid <code class="highlighter-rouge">b</code> itself and all the frames above it. This is why we only have <code class="highlighter-rouge">a</code> in our stack trace.</p>
+
+<p>Now you may be asking yourself: “why is this useful?”. This is useful because you can use it to hide internal implementation details that are not relevant to your users. In Chai, for example, we use it to avoid showing our users irrelevant details about the way we implement checks and assertions themselves.</p>
+
+
+
+<h2 id="stack-trace-manipulation-in-the-real-world"><strong>Stack Trace Manipulation in The Real World</strong></h2>
+
+<p>As I’ve mentioned in the last section, Chai uses stack manipulations technique to make stack traces more relevant to our users. Here is how we do it.</p>
+
+<p>First, let’s take a look at the <code class="highlighter-rouge">AssertionError</code> constructor thrown when an assertion fails:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// `ssfi` stands for "start stack function". It is the reference to the</span>
+<span class="c1">// starting point for removing irrelevant frames from the stack trace</span>
+<span class="kd">function</span> <span class="nx">AssertionError</span> <span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="nx">_props</span><span class="p">,</span> <span class="nx">ssf</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">extend</span> <span class="o">=</span> <span class="nx">exclude</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'message'</span><span class="p">,</span> <span class="s1">'stack'</span><span class="p">,</span> <span class="s1">'constructor'</span><span class="p">,</span> <span class="s1">'toJSON'</span><span class="p">)</span>
+    <span class="p">,</span> <span class="nx">props</span> <span class="o">=</span> <span class="nx">extend</span><span class="p">(</span><span class="nx">_props</span> <span class="o">||</span> <span class="p">{});</span>
+
+  <span class="c1">// Default values</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="nx">message</span> <span class="o">||</span> <span class="s1">'Unspecified AssertionError'</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">showDiff</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+  <span class="c1">// Copy from properties</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">props</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Here is what is relevant for us:</span>
+  <span class="c1">// If a start stack function was provided we capture the current stack trace and pass</span>
+  <span class="c1">// it to the `captureStackTrace` function so we can remove frames that come after it</span>
+  <span class="nx">ssf</span> <span class="o">=</span> <span class="nx">ssf</span> <span class="o">||</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">callee</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">ssf</span> <span class="o">&amp;&amp;</span> <span class="nb">Error</span><span class="p">.</span><span class="nx">captureStackTrace</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">Error</span><span class="p">.</span><span class="nx">captureStackTrace</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">ssf</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// If no start stack function was provided we just use the original stack property</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">();</span>
+    <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">stack</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">stack</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div>
+
+<p>As you can see above we are using <code class="highlighter-rouge">Error.captureStackTrace</code> to capture the stack trace and store it into the instance of <code class="highlighter-rouge">AssertionError</code> we are building and (when it exists) we’re passing a start stack function to it in order to remove irrelevant frames from the stack trace, which only show Chai’s internal implementation details and end up making the stack “dirty”.</p>
+
+<p>Now let’s take a look at a recent code written by <a href="https://github.com/meeber">@meeber</a> in <a href="https://github.com/chaijs/chai/pull/922">this awesome PR</a>.</p>
+
+<p>Before looking at the code below I must tell you what <code class="highlighter-rouge">addChainableMethod</code> does. It adds the chainable method passed to it to the assertion and it also flags the assertion itself with the method that wraps the assertion. This is stored with the name <code class="highlighter-rouge">ssfi</code> (which stands for start stack function indicator). This basically means that the current assertion will be the last frame in the stack and so we won’t show any further internal methods from Chai in the stack. I avoided adding the whole code for that because it does lots of things and is kind of tricky, but if you do wanna read it, <a href="https://github.com/meeber/chai/blob/42ff3c012b8a5978e7381b17d712521299ced341/lib/chai/utils/addChainableMethod.js">here goes the link to it</a>.</p>
+
+<p>In the piece of code below, we have the logic for the <code class="highlighter-rouge">lengthOf</code> assertion, which checks if an object has a certain <code class="highlighter-rouge">length</code>. We expect our users to use it like this: <code class="highlighter-rouge">expect(['foo', 'bar']).to.have.lengthOf(2)</code>.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">assertLength</span> <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'message'</span><span class="p">,</span> <span class="nx">msg</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'object'</span><span class="p">)</span>
+        <span class="p">,</span> <span class="nx">ssfi</span> <span class="o">=</span> <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'ssfi'</span><span class="p">);</span>
+
+    <span class="c1">// Pay close attention to this line</span>
+    <span class="k">new</span> <span class="nx">Assertion</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">msg</span><span class="p">,</span> <span class="nx">ssfi</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">have</span><span class="p">.</span><span class="nx">property</span><span class="p">(</span><span class="s1">'length'</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+
+    <span class="c1">// This line is also relevant</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">assert</span><span class="p">(</span>
+            <span class="nx">len</span> <span class="o">==</span> <span class="nx">n</span>
+        <span class="p">,</span> <span class="s1">'expected #{this} to have a length of #{exp} but got #{act}'</span>
+        <span class="p">,</span> <span class="s1">'expected #{this} to not have a length of #{act}'</span>
+        <span class="p">,</span> <span class="nx">n</span>
+        <span class="p">,</span> <span class="nx">len</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Assertion</span><span class="p">.</span><span class="nx">addChainableMethod</span><span class="p">(</span><span class="s1">'lengthOf'</span><span class="p">,</span> <span class="nx">assertLength</span><span class="p">,</span> <span class="nx">assertLengthChain</span><span class="p">);</span>
+</code></pre><span>
+</span></div>
+
+<p>In the code above I have highlighted the lines which are relevant to us right now. Let’s start with the call to <code class="highlighter-rouge">this.assert</code>.</p>
+
+<p>This is the code for the <code class="highlighter-rouge">this.assert</code> method:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Assertion</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">assert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">msg</span><span class="p">,</span> <span class="nx">negateMsg</span><span class="p">,</span> <span class="nx">expected</span><span class="p">,</span> <span class="nx">_actual</span><span class="p">,</span> <span class="nx">showDiff</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">ok</span> <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="kc">false</span> <span class="o">!==</span> <span class="nx">showDiff</span><span class="p">)</span> <span class="nx">showDiff</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="kc">undefined</span> <span class="o">===</span> <span class="nx">expected</span> <span class="o">&amp;&amp;</span> <span class="kc">undefined</span> <span class="o">===</span> <span class="nx">_actual</span><span class="p">)</span> <span class="nx">showDiff</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="kc">true</span> <span class="o">!==</span> <span class="nx">config</span><span class="p">.</span><span class="nx">showDiff</span><span class="p">)</span> <span class="nx">showDiff</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">msg</span> <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">getMessage</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">actual</span> <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">getActual</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+
+        <span class="c1">// This is the relevant line for us</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">AssertionError</span><span class="p">(</span><span class="nx">msg</span><span class="p">,</span> <span class="p">{</span>
+                <span class="na">actual</span><span class="p">:</span> <span class="nx">actual</span>
+            <span class="p">,</span> <span class="na">expected</span><span class="p">:</span> <span class="nx">expected</span>
+            <span class="p">,</span> <span class="na">showDiff</span><span class="p">:</span> <span class="nx">showDiff</span>
+        <span class="p">},</span> <span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">includeStack</span><span class="p">)</span> <span class="p">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">assert</span> <span class="p">:</span> <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'ssfi'</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre><span>
+</span></div>
+
+<p>Basically, the <code class="highlighter-rouge">assert</code> method is responsible for checking if the assertion boolean expression passed or not. If it didn’t we must instantiate an <code class="highlighter-rouge">AssertionError</code>. Notice that when instantiating this new <code class="highlighter-rouge">AssertionError</code> we’re also passing a stack trace function indicator (<code class="highlighter-rouge">ssfi</code>) to it. If the configuration flag <code class="highlighter-rouge">includeStack</code> is turned on we show the user the whole stack trace by passing the <code class="highlighter-rouge">this.assert</code> itself to it, which is really the last frame in the stack. However, if the <code class="highlighter-rouge">includeStack</code> configuration flag is turned of we must hide more internal implementation details from the stack trace, so we use what is stored into the <code class="highlighter-rouge">ssfi</code> flag.</p>
+
+<p>Now, let’s talk about the other relevant line for us:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>new Assertion(obj, msg, ssfi, true).to.have.property('length');
+</code></pre><span>
+</span></div>
+
+<p>As you can see here we are passing the content we’ve got from the <code class="highlighter-rouge">ssfi</code> flag when creating our nested assertion. This means that when the new assertion gets created it will use this function as the starting point for removing unuseful frames from the stack trace. By the way, this is the <code class="highlighter-rouge">Assertion</code> constructor:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Assertion</span> <span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">msg</span><span class="p">,</span> <span class="nx">ssfi</span><span class="p">,</span> <span class="nx">lockSsfi</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This is the line that matters to us</span>
+    <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'ssfi'</span><span class="p">,</span> <span class="nx">ssfi</span> <span class="o">||</span> <span class="nx">Assertion</span><span class="p">);</span>
+    <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'lockSsfi'</span><span class="p">,</span> <span class="nx">lockSsfi</span><span class="p">);</span>
+    <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'object'</span><span class="p">,</span> <span class="nx">obj</span><span class="p">);</span>
+    <span class="nx">flag</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'message'</span><span class="p">,</span> <span class="nx">msg</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">util</span><span class="p">.</span><span class="nx">proxify</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div>
+
+<p>As you can remember from what I’ve said about <code class="highlighter-rouge">addChainableMethod</code>, it sets the <code class="highlighter-rouge">ssfi</code> flag with its own wrapper method, which means this is the lowest internal frame in the stack trace so we can just remove all frames above it.</p>
+
+<p>By passing <code class="highlighter-rouge">ssfi</code> to the nested assertion which only checks if our object has the property length we avoid resetting the frame we’re going to use as the starting point indicator and then having the previous <code class="highlighter-rouge">addChainableMethod</code> visible in the stack.</p>
+
+<p>This may seem a bit complicated, so let’s review what happens inside Chai we want to remove unuseful frames from the stack:</p>
+
+<ol>
+  <li>When we run an assertion we set its own method as the reference to removing the next frames in the stack</li>
+  <li>The assertion runs and if it fails we remove all the internal frames after the reference we have stored</li>
+  <li>If we have nested assertions we must still use the current assertion wrapper method as the reference point for removing the next frames in the stack, so we pass the current <code class="highlighter-rouge">ssfi</code> (start stack function indicator) to the assertion we are creating so it can preserve it</li>
+</ol>
+
+<p><strong>I also highly recommend you to read <a href="https://github.com/chaijs/chai/pull/922/files#r100704209">this comment by @meeber</a> in order to understand it.</strong></p>
+
+
+
+<h2 id="get-in-touch">Get in touch!</h2>
+
+<p><strong>If you have any doubts, thoughts or if you disagree with anything I’ve written, please share it with me in the comments below or reach me at <a href="https://twitter.com/lfernandescosta">@lfernandescosta on twitter</a></strong>. I’d love to hear what you have to say and do any corrections if I made any mistakes.</p>
+
+<p><strong>Thanks for reading this!</strong></p>
+
+  </article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

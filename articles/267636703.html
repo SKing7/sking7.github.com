@@ -1,0 +1,188 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>AngularJS and scope.$apply</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>AngularJS and scope.$apply</h1>
+                <article>
+        <header>
+          
+        </header>
+        
+        <p>If you’ve written a non-trivial amount of code in AngularJS, you may
+have come across the <code>$scope.$apply()</code> method. On the surface, it may
+seem like just a method you call to get your bindings to update. But
+why does it exist? And when do you need to use it?</p>
+
+<p>To really understand <strong>when</strong> to use <code>$apply</code>, it’s good to know exactly <strong>why</strong>
+we need to use it, so let’s dive in!</p>
+
+<h2 id="javascript-is-turn-based">JavaScript is Turn Based</h2>
+
+<p>The JavaScript code we write doesn’t all run in one go, instead it
+executes in turns. Each of these turns runs uninterupted from start to
+finish, and when a turn is running, nothing else happens in our
+browser. No other JavaScript code runs, and our web page interface is
+completely frozen. This is why poorly coded JavaScript can freeze a
+web page.</p>
+
+<p>Instead, whenever there is a task that takes some amount of time, such
+as an Ajax request, waiting for a click event, or setting a timeout, we
+set up a callback function and finish our current turn. Later, when the Ajax
+request completes, a click is detected, or the timer completes, a new
+JavaScript turn is created and the callback is run to completion.</p>
+
+<p>Let’s look at an example JavaScript file:</p>
+
+<pre><code>var button = document.getElementById('clickMe');
+
+function buttonClicked () {
+  alert('the button was clicked');
+}
+
+button.addEventListener('click', buttonClicked);
+
+function timerComplete () {
+  alert('timer complete');
+}
+
+setTimeout(timerComplete, 2000);
+</code></pre>
+
+<p>When the JavaScript code is loaded, that is a single turn. It finds a
+button, adds a click listener, and sets a timeout. Then the turn is
+complete, and the browser will update the web page if necessary, and
+begin accepting user input.</p>
+
+<p>If the browser detects a click on <code>#clickMe</code>, it creates a new turn,
+which executes the <code>buttonClicked</code> function. When that function returns,
+that turn is complete.</p>
+
+<p>After 2000 milliseconds, the browser creates a new turn which calls
+<code>timerComplete</code>. </p>
+
+<p>Our JavaScript code is run in turns, and in between the turns is when
+the page is repainted, and input is accepted.</p>
+
+<h2 id="how-do-we-update-bindings">How do we update bindings?</h2>
+
+<p>So Angular lets us bind parts of our interface to data in our JavaScript
+code, but how does it know when data changes, and the page needs
+updating?</p>
+
+<p>There are a few solutions. The code needs to know when a value has
+changed. Right now there is no way for our code to be directly 
+notified of changes on an object <sup id="fnref:1"></sup>. Instead there are two main
+strategies.</p>
+
+<p>One strategy is to use special objects, where data is set via methods,
+not property assignments. Then changes can then be noted, and the page can be
+updated. This has the downside in that we must extend some special
+object. Also, for assigning, we must use a more verbose form
+<code>obj.set('key', 'value')</code> instead of  <code>obj.key = 'value'</code>. Frameworks
+like <a href="http://emberjs.com/">EmberJS</a> and
+<a href="http://knockoutjs.com/">KnockoutJS</a> use this strategy.</p>
+
+<p>AngularJS takes a different approach: allow any value to be used as
+a binding target. Then at the end of any JavaScript code turn, check to
+see if the value has changed. This may seem inneficient at first, but
+there are some clever strategies to reduce the performance hit. The big
+benefit is we can use normal objects and update our data however we
+want, and the changes will be noticed and reflected in our bindings.</p>
+
+<p>For this strategy to work, we need to know when data has possibly
+changed, and this is where <code>$scope.$apply</code> comes into play.</p>
+
+<h2 id="apply-and-digest">$apply and $digest</h2>
+
+<p>That step that checks to see if  any binding values have changed actually
+has a method, <code>$scope.$digest()</code>. That’s actually where the magic
+happens, but we almost never call it directly, instead we use
+<code>$scope.$apply()</code> which will call <code>$scope.$digest()</code> for you.</p>
+
+<p><code>$scope.$apply()</code> takes a function or an Angular expression string, and
+executes it, then calls <code>$scope.$digest()</code> to update any bindings or
+watchers. </p>
+
+<p>So, when do you need to call <code>$apply()</code>? Very rarely, actually.
+AngularJS actually calls almost all of your code within an $apply call.
+Events like <code>ng-click</code>, controller initialization, <code>$http</code> callbacks are
+all wrapped in <code>$scope.$apply()</code>. So you don’t need to call it yourself,
+in fact you can’t. Calling $apply inside $apply will throw an error.</p>
+
+<p>You do need to use it if you are going to run code in a new turn. And
+only if that turn isn’t being created from a method in the AngularJS
+library.
+Inside that new turn, you should wrap your code in <code>$scope.$apply()</code>.
+Here is an example. We are using <code>setTimeout</code>, which will execute a
+function in a new turn after a delay. Since Angular doesn’t know about
+that new turn, the update will not be reflected.</p>
+
+
+
+<p>But, if we wrap the code for that turn in <code>$scope.$apply()</code>, the change
+will be noticed, and the page is updated.</p>
+
+
+
+<p><em>As a convenience, AngularJS provides
+<a href="http://docs.angularjs.org/api/ng.$timeout">$timeout</a>, which is like
+<code>setTimeout</code>, but automatically wraps your code in $apply by default. Use that,
+not this</em></p>
+
+<p>If you write any code that uses Ajax without <code>$http</code>, or listens for
+events without using Angular’s <code>ng-*</code> listeners, or sets a timeout
+without <code>$timeout</code>, you should wrap your code in <code>$scope.$apply</code></p>
+
+<h2 id="scopeapply-vs-scopeapplyfn">$scope.$apply() vs $scope.$apply(fn)</h2>
+
+<p>Sometimes I see examples where data is updated, and then
+<code>$scope.$apply()</code> is called with no arguments. This achieves the desired
+result, but misses some opportunities.</p>
+
+<p>If your code isn’t wrapped in a function passed to $apply, and it throws
+an error, that error is thrown outside of AngularJS, which means any error
+handling being used in your application is going to miss it. $apply not
+only runs your code, but it runs it in a <code>try/catch</code> so your error is
+always caught, and the $digest call is in a <code>finally</code> clause, meaning it will
+run regardless of an error being thrown. That’s pretty nice.</p>
+
+<p>Hopefully now you understand what <code>$apply</code> is and when to use it. If you
+only use what AngularJS provides you, you shouldn’t need to use it often. But
+if you begin writing directives where you are observing DOM elements
+directly, it is going to become necessary.</p>
+
+<p>experimentally implemented now</p>
+
+
+
+        
+          <footer>
+            
+<script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'jimhoskins'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+   var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+   dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by </a>
+
+          </footer>
+        
+      </article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

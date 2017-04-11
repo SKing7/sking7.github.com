@@ -1,0 +1,115 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>不要只因為性能考量而選擇 React.js</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>不要只因為性能考量而選擇 React.js</h1>
+                <section class="post-content">
+            <p>React 的軟肋：大量的 Real DOM 操作。</p>
+
+<h2 id="tldr">TL;DR</h2>
+
+<p>先說結論：如果大量的 Real DOM 操作無法避免，那麼 React 效能可能會令你非常失望。</p>
+
+<h2 id="reactjs">為什麼會有 React.js 很快的錯覺？</h2>
+
+<p>原因是因為在現今複雜的網路環境底下，我們很少有完全用純 Javascript 寫的 Web App，而既然用了框架，難免會引入額外的 Overhead，而跟其他的框架比起來，在 DOM 的數量不多、改動又少的情況下，React.js 勝出的可能性極高；加上官網上不斷地強調了 Virtual DOM 特性，自然容易產生這種誤會。各種框架有著不同的實作，各自擅長的領域都有所不同，並沒有任何框架可以號稱它們在任何的使用情境下性能都是最好的。</p>
+
+
+
+<h2 id="reconciliation">單一資料流的實作：Reconciliation</h2>
+
+<p><a href="http://reactkungfu.com/2015/10/the-difference-between-virtual-dom-and-dom/">Virtual DOM 跟 Real DOM 的差異</a>這裡直接引用別人文章中的描述：</p>
+
+<ul>
+<li><strong>DOM</strong>: DOM stands for Document Object Model and is an abstraction of a structured text. For web developers, this text is an HTML code, and the DOM is simply called HTML DOM. Elements of HTML become nodes in the DOM.</li>
+<li><strong>Virtual DOM</strong>: The Virtual DOM is an abstraction of the HTML DOM. It is lightweight and detached from the browser-specific implementation details. Since the DOM itself was already an abstraction, the virtual DOM is, in fact, an abstraction of an abstraction.</li>
+</ul>
+
+<p>而 <strong>Reconciliation</strong> 指的用 <code>setState</code> 前後的 Virtual DOM 差異進而算出真實的 DOM 要如何改變的過程。</p>
+
+<p>React 之所以可以容易地開發複雜的網路應用就是因為它與其他的框架不同，採用的是單一資料流。而單一資料流不是免費的午餐，效能會嚴重受影響。因此 Virtual DOM 的存在讓我們可以將實際的 DOM 操作數量降到最低，之所以要特別強調就是因為如果沒有 Virtual DOM 的話，React 根本就不可用。Virtual DOM 就是為了無腦地處理資料流，一旦碰到真的 DOM 那成本就很高了（其實 render() 被呼叫也不代表最終會碰觸到 Real DOM）。</p>
+
+<p>在分析 React 在什麼情境下會性能不好前，我們必須先來看一下 React 實作的方式：React 會在記憶體中完整的複製一份 DOM Tree，然後透過標記 Dirty Nodes 來找到真正會重繪的 Nodes。如下圖，如果某個 DOM 被標記說要更新了，那麼它以下的所有 Subtree 都會依序被問 <code>shouldComponentUpdate</code>，如果沒有特別實作此函數，就會繼續地往它的 Subtree 問下去。關鍵就在於為了要能夠夠無腦，所以從觸發 <code>setState</code> 其自身節點開始到其全部子節點全部都會被呼叫到 <code>shouldComponentUpdate</code>，導致遍歷所有節點的時間成本非常的高（花很多時間在 React 的 Call Tree 上面）。所有的 DOM 操作都是同步的，而這會堵塞瀏覽器。只要有其中一個操作費時太久，整個網頁就會無法響應，瀏覽器重繪網頁的頻率是 60FPS 如果不能在 16ms 完成 DOM 操作，就會產生跳幀。視覺上感受到的卡頓就來源於此。（同理可推，24 FPS 不可讓  DOM 操作的 RTT 超過 41ms）</p>
+
+<p><img src="https://facebook.github.io/react/img/docs/should-component-update.png" alt=""></p>
+
+<h2 id="reactjsvuejs">React.js 與 Vue.js 的比較分析</h2>
+
+<p>我們可以透過一個<a href="https://github.com/hitripod/react-vue-dom-perf-comparison">簡單的頁面來測試</a> Checkbox 的 Select/Deselect All 操作：</p>
+
+<pre><code>git clone https://github.com/hitripod/react-vue-dom-perf-comparison  
+cd react-vue-dom-perf-comparison  
+npm install  
+npm run watch  
+open http://localhost:3000  
+</code></pre>
+
+<p>當畫面上有五千個 checkbox 時，我們可以發現 Select All 在 React.js 的實作中延遲非常嚴重，原因是因為這種情況下，<code>shouldComponentUpdate</code> 也不可避免對於 Native DOM 的遍歷與修改。如果在這種情景下，我們可以明顯體會到，React.js 相較於 Vue.js 慢了不少。</p>
+
+<p>當然，除了肉眼的感覺之外，我們可以透過 <a href="http://benchling.engineering/performance-engineering-with-react/">React.addons.Perf</a> 或是透過 Chrome 的瀏覽器開發者工具的 Timeline 錄製來更精準地分析性能瓶頸：</p>
+
+<ul>
+<li>React.addons.Perf.start()</li>
+<li>React.addons.Perf.stop()</li>
+<li>React.addons.Perf.printWastedTime()</li>
+</ul>
+
+<p>有興趣的可以參考其他人做過的類似<a href="https://aerotwist.com/blog/react-plus-performance-equals-what/">實驗1</a>、<a href="https://objectpartners.com/2015/11/19/comparing-react-js-performance-vs-native-dom/">實驗2</a>。</p>
+
+<p>至於 Vue.js 為什麼這麼快？這完全取決於兩者的設計哲學不同（Vue.js 透過 Watcher 來做 two-way binding），以下節錄自<a href="https://vuejs.org/guide/reactivity.html#Inside-Computed-Properties">官方說明</a>：</p>
+
+<blockquote>
+  <p>data-bindings are still dependency-driven. When you bind to a computed property in the template as {{example}}, the DOM will only be updated when a reactive dependency has changed.</p>
+</blockquote>
+
+<h2 id="reactjsfacebook">那麼 React.js 還值得用嗎？Facebook 的建議是？</h2>
+
+<p>我們前段所做的這種測試其實早已有人做過。如 <a href="https://news.ycombinator.com/item?id=9824884">YC 上的留言討論</a>，這種測試對於實際上的產品意義不大：</p>
+
+<blockquote>
+  <p>Obviously diffing is going to have some overhead.
+  But this overhead is minimal in most use-cases. The benchmark in this article is not a real use-case. If you wanna show 1200 images in a web page, or 1200 elements of any kind in one web page, then you should only create DOM elements for those of them that should actually be visible by the user. You read the scroll position and calculate which ones would be visible in the viewport, create DOM elements for those, and disregard the rest. In most real-world applications, this technique would suffice. Your DOM and vDOM would be small, and you'd only be diffing maybe 5-10 elements at a time. Although, I can think of use-cases where this technique, and React's style of coding may not be sufficient. One example is iOS's Photos app. Sometimes it animates hundreds of elements at a time (where you're viewing photos by year or location). I guess diffing might not be a fast enough solution for this use-case.</p>
+  
+  <p>Completely agree. I had to implement something like this when I worked at Stipple in the past, and the biggest problem became optimizing the DOM interactions (adding and removing images from a masonry feed as the user scrolled). Vanilla JS or React, you can't have 1200 images sitting on a web page all at once without optimizing for what the user is actually looking at and interacting with.</p>
+</blockquote>
+
+<p>當我們真的遇到這種需求的時候，我們可以善用視覺上的設計來繞過這問題，像是 Facebook 官方提供的 <a href="http://facebook.github.io/fixed-data-table/example-filter.html">Fixed-Data-Table</a> 就可以很好的解決特別長的 List 效能問題，大家可以到網站上玩玩看它的範例。</p>
+
+<p>除此之外，以下技巧也可以<a href="https://facebook.github.io/react/docs/advanced-performance.html">提高 React.js 的效能</a>：</p>
+
+<ul>
+<li>採用最新的 React.js 版本</li>
+<li>透過 <code>NODE_ENV=production</code> 切換至 Production Build</li>
+<li>如果是 redux 的話，可以斟酌使用 <a href="https://github.com/omnidan/redux-ignore">redux-ignore</a></li>
+<li>如果跟 UI 互動少的話，可以參考 Flipboard 提出的 <a href="https://github.com/Flipboard/react-canvas">react-canvas</a> 方案，號稱可以提昇到 60 FPS</li>
+<li>盡可能地減少 setState 次數，並且實作各個 <code>shouldComponentUpdate</code> 來避免大型子樹的重繪</li>
+<li>不要用到 <a href="https://medium.com/@esamatti/react-js-pure-render-performance-anti-pattern-fb88c101332f#.o0n9wdqb6">anti-pattern</a>，避免重新 render</li>
+</ul>
+
+<p>其中最重要的關鍵就是 <code>shouldComponentUpdate</code>，這篇文章描述了<a href="https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-b453c597b191#.a43gjid2l">如何把 shouldComponentUpdate 寫好</a>。</p>
+
+<h2 id="">結論</h2>
+
+<p>千萬不要因為性能而選擇 React.js，因為在特定情境下，React.js 的性能可能很差。以下的優點才是我們真正應該關注的：</p>
+
+<ul>
+<li><strong>組件化的設計</strong>：提高了程式碼的複用性、並且很好地隔離了不同組件的程式碼</li>
+<li><strong>單向資料流</strong>：將資料與業務邏輯很好的分離</li>
+<li><strong>聲明式</strong>風格：可讀性高，可以很直覺地透過 Render() 函數的內容來想像頁面是如何被組成的</li>
+<li>讓 <strong>Server-Side Rendering</strong> 這件事變成可能：Isomorphic Web Design, SEO</li>
+<li><strong>React Native</strong> 統一了行動開發，同時保有原生 APP 的體驗</li>
+</ul>
+
+<p>沒有任何框架是完美的，如果決定選用 React.js，很多元件都可能需要重新打造，<code>shouldComponentUpdate</code> 性能上的調整可能也會花掉你不少時間，這些都是事先就要考慮進去的。各種不同框架都有其優勢，應該針對專案的需求來做技術選型。</p>
+        </section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,117 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>draw Image base64 vs url vs blob · jsPerf</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>draw Image base64 vs url vs blob · jsPerf</h1>
+                <section>
+      <h2>Preparation code output</h2>
+      <p>
+        &lt;img id="img" src="https://lh3.googleusercontent.com/-v9Hd_uz3oDA/VGn7n0Ox5gI/AAAAAAAAAD8/RiMsgsj3_1o/w600-h800-no/07f5ffe6ca7eb5d3c2b8d3bc8c.jpg"/&gt;
+
+      </p>
+    </section><section id="runner">
+  <h2>Test runner</h2>
+  <p id="firebug"><strong>Warning! For accurate results, please disable Firebug before running the tests. <a href="https://jsperf.com/faq#firebug-warning">(Why?)</a></strong></p>
+  <p id="java"><strong>Java applet disabled.</strong></p>
+  <p id="status"><noscript><strong>To run the tests, please <a href="http://www.enable-javascript.com/">enable JavaScript</a> and reload the page.</strong></noscript></p>
+  
+  <table id="test-table">
+  <caption>Testing in Other 0.0.0 / Other 0.0.0</caption>
+    <thead>
+      <tr>
+        <th colspan="2">Test</th>
+        <th title="Operations per second (higher is better)">Ops/sec</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <th scope="row" id="title-1">
+            <p>
+              image from url
+            </p>
+          </th>
+          <td class="code">
+            <pre><code><strong class="col1">// async test</strong><pre><code class="js"><span class="hljs-keyword">var</span> img = <span class="hljs-keyword">new</span> Image();
+img.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  deferred.resolve();
+}
+img.src = image_url;</code></pre></code></pre>
+          </td>
+          <td id="results-1" class="results">pending…</td>
+        </tr>
+        <tr>
+          <th scope="row" id="title-2">
+            <p>
+              image from base64 jpeg
+            </p>
+          </th>
+          <td class="code">
+            <pre><code><strong class="col1">// async test</strong><pre><code class="js"><span class="hljs-keyword">var</span> img = <span class="hljs-keyword">new</span> Image();
+img.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  deferred.resolve();
+}
+img.src = base64_jpeg;</code></pre></code></pre>
+          </td>
+          <td id="results-2" class="results">pending…</td>
+        </tr>
+        <tr>
+          <th scope="row" id="title-3">
+            <p>
+              image from base64 png
+            </p>
+          </th>
+          <td class="code">
+            <pre><code><strong class="col1">// async test</strong><pre><code class="js"><span class="hljs-keyword">var</span> img = <span class="hljs-keyword">new</span> Image();
+img.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  deferred.resolve();
+}
+img.src = base64_png;</code></pre></code></pre>
+          </td>
+          <td id="results-3" class="results">pending…</td>
+        </tr>
+        <tr>
+          <th scope="row" id="title-4">
+            <p>
+              image from blob_url
+            </p>
+          </th>
+          <td class="code">
+            <pre><code><strong class="col1">// async test</strong><pre><code class="js"><span class="hljs-keyword">var</span> img = <span class="hljs-keyword">new</span> Image();
+img.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  deferred.resolve();
+}
+img.src = blob_url;</code></pre></code></pre>
+          </td>
+          <td id="results-4" class="results">pending…</td>
+        </tr>
+        <tr>
+          <th scope="row" id="title-5">
+            <p>
+              image from blob
+            </p>
+          </th>
+          <td class="code">
+            <pre><code><strong class="col1">// async test</strong><pre><code class="js"><span class="hljs-keyword">var</span> img = <span class="hljs-keyword">new</span> Image();
+img.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  deferred.resolve();
+}
+<span class="hljs-keyword">var</span> urlCreator = <span class="hljs-built_in">window</span>.URL || <span class="hljs-built_in">window</span>.webkitURL;
+img.src = urlCreator.createObjectURL(blob);</code></pre></code></pre>
+          </td>
+          <td id="results-5" class="results">pending…</td>
+        </tr>
+    </tbody>
+  </table>
+
+</section>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

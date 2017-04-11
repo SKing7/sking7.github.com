@@ -1,0 +1,189 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Progress Nav</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Progress Nav</h1>
+                <article class="contents">
+			<section id="intro">
+				<h2>Progress Nav</h2>
+				<p>
+					This page demonstrates an idea for how progress can be visualized inside of a standard page nav. Scroll the page and note how the marker animates to highlight all of the sections that are currently on screen.
+				</p>
+				<p>
+					The rest of the content below is taken from <a href="https://slides.com/developers" target="_top">slides.com/developers</a>. Take a look at that to see how the progress nav looks on a real page.
+				</p>
+				<p>
+					Created by Hakim El Hattab | <a href="http://hakim.se/" target="_top">hakim.se</a> | <a href="http://twitter.com/hakimel" target="_top">@hakimel</a> 
+				</p>
+				<h2>Slides for Developers</h2>
+				<p>
+					We strive to make Slides a great and flexible tool for developers. Presentations created on Slides are HTML documents under the hood, so generally anything that HTML can do, Slides can do. We make it easy to access and edit the underlying HTML and CSS through the <a href="http://lab.hakim.se/progress-nav/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-249&amp;utm_medium=email#dev">Developer Mode</a>.
+				</p>
+				<p>
+					There's also an API for creating new presentations with preset content and we're aiming to add additional APIs in the future.
+				</p>
+			</section>
+
+			<section>
+				<div id="dev"><span>
+					</span><h2>Developer Mode</h2><span>
+					</span><p>
+						The Slides editor has a developer mode which is useful if you know a bit of HTML and CSS. With this mode active you will be able to modify the underlying HTML of your deck, allowing you to make adjustments that the Slides editor does not provide interface options for.
+					</p><span>
+					</span><p>
+						To enable the developer mode open the editor settings in the bottom left corner:
+					</p><span>
+
+					</span><img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-developer-mode-1.png"><span>
+				</span></div>
+
+				<div id="dev-edit-html"><span>
+					</span><h3>Editing HTML</h3><span>
+					</span><p>
+						The per-slide HTML editor can be accessed from the slide options area. It gives you raw access to the current slide's HTML, allowing you to change anything you like. Note that some elements, such as &lt;script&gt; and &lt;link&gt;, are not allowed for security reasons.﻿
+					</p><span>
+
+					</span><img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-developer-mode-2.png"><span>
+				</span></div>
+
+				<div id="dev-element-classes"><span>
+					</span><h3>Element Classes </h3><span>
+					</span><p>
+						As a paying Slides customer you have access to the <a href="http://lab.hakim.se/progress-nav/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-249&amp;utm_medium=email#css">CSS editor</a> which allows you to add custom styles to your deck. By turning on the developer mode a new "class name" field will appear for any block that you focus. This allows you to easily target a specific element with your CSS.
+					</p><span>
+					</span><p>
+						Here's an example that defines an "upside-down" class using custom CSS and applies it to a text block.
+					</p><span>
+					</span><pre class="code-block" data-highlight-theme="github-gist"><code class="hljs css">.upside-down {
+		transform: scale( 1, -1 );
+}</code></pre><span>
+
+					</span><img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-developer-mode-3.png"><span>
+				</span></div>
+
+				<div id="dev-slide-classes"><span>
+					</span><h3>Slide Classes </h3><span>
+					</span><p>
+						Just like you can add custom classes to individual elements it's also possible to add custom classes at the slide level. This can used to apply broader changes to the whole slide like inverting text and icon colors or changing the slide transition.
+					</p><span>
+					</span><img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-developer-mode-4.png"><span>
+					</span><p>
+						Under the hood the slide background element is separate from the slide itself. Here are two examples showing how you'd target the slide contents or slide background using a custom class called "night-sky":
+					</p><span>
+
+					</span><pre class="code-block" data-highlight-theme="github-gist"><code class="hljs css">// Targets the slide contents
+.slides .night-sky svg path {
+		fill: yellow;
+}
+
+// Target the slide background
+.backgrounds .night-sky {
+		background: linear-gradient(0deg, #141528, #0b1bb2);
+}</code></pre><span>
+
+					</span><img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-developer-mode-5.png"><span>
+				</span></div>
+
+				<div id="dev-export-html"><span>
+					</span><h3>Export HTML</h3><span>
+					</span><p>
+						You can access the complete HTML for all slides in your deck ﻿inside of the export panel, under "Export to reveal.js"﻿. This provides a way of exporting your deck markup and the core Slides styles to reveal.js. There are a few limitations with exporting this way but it should provide a good starting point.
+					</p><span>
+
+					</span><img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-developer-mode-6.png"><span>
+				</span></div>
+
+			</section>
+
+			<section>
+				<div id="css"><span>
+					</span><h2>CSS Editor </h2><span>
+					</span><p>
+						The CSS editor lets you author custom styles for your presentation with a real-time preview of the result. It's available as an option inside of the Style panel of the presentation editor.
+					</p><span>
+					</span><p>
+						The editor preprocesses styles using <a href="http://lesscss.org/">LESS</a>, though you're free to write plain CSS as well. We apply the styles in real-time as you type so there's no need to leave the editor or even press a refresh button to see what you're getting. Note that when your styles are saved they will be automatically wrapped in a ".reveal {}" selector to avoid conflicts with other page styles.
+					</p><span>
+				</span></div>
+				<div id="css-fonts"><span>
+					</span><h3>Custom Fonts</h3><span>
+					</span><p>
+						You can load custom fonts from Typekit and Google fonts and apply them using custom CSS. <a href="http://help.slides.com/knowledgebase/articles/1077976-custom-fonts-pro">Find out more</a>.
+					</p><span>
+				</span></div>
+				<div id="css-developer-mode"><span>
+					</span><h3>Developer Mode</h3><span>
+					</span><p>
+						If you turn on the <a href="http://lab.hakim.se/progress-nav/?utm_source=CSS-Weekly&amp;utm_campaign=Issue-249&amp;utm_medium=email#dev">developer mode</a> you can also add custom classes to any focused element. This is a convenient way to easily apply your CSS to specific elements.
+					</p><span>
+				</span></div>
+
+				<div id="css-examples"><span>
+					</span><h3>Examples</h3><span>
+					</span><pre class="code-block" data-highlight-theme="github-gist"><code class="hljs css">// Change presentation background
+&amp; {
+		background: #a83239;
+}
+
+// Change color of body text
+.slides {
+		color: #009999;
+}
+
+// Turn text white if the slide has a dark background
+.has-dark-background {
+		color: #fff;
+}
+
+// Add a blue border to all slides (each slide is a &lt;section&gt;)
+.slides section {
+		outline: 1px solid blue;
+}
+
+// Add a red border to all vertical stacks of slides
+.slides section.stack {
+		outline: 1px solid red;
+}<br>// Include a custom font<br>@font-face {<br>font-family: "Cabin Sketch";<br>src: url("https://s3.amazonaws.com/static.slid.es/fonts/cabinsketch/cabinsketch-regular.woff") format("woff"),<br>url("https://s3.amazonaws.com/static.slid.es/fonts/cabinsketch/cabinsketch-regular.ttf") format("truetype");<br>}
+<br>.slides h1, .slides h2, .slides h3 {<br>font-family: "Cabin Sketch";<br>}
+
+
+// Change color of controls and progress bar
+﻿@interactiveColor: rgb(200,105,119);
+
+.progress span {
+		background: @interactiveColor !important;
+}
+
+.controls .navigate-left {
+		border-right-color: @interactiveColor !important;
+}
+.controls .navigate-right {
+		border-left-color: @interactiveColor !important;
+}
+.controls .navigate-up {
+		border-bottom-color: @interactiveColor !important;
+}
+.controls .navigate-down {
+		border-top-color: @interactiveColor !important;
+}</code></pre><span>
+				</span></div>
+
+				<p>Here's where you can access the CSS editor from inside of the Style panel:</p>
+				<img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-css-editor-1.png">
+
+				<p>A screenshot of the editor:</p>
+				﻿<img class="developer-image" src="http://static.slid.es.s3.amazonaws.com/site/developers/slides-css-editor-2.png">
+
+			</section>
+		</article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

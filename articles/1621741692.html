@@ -1,0 +1,117 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>The Unexpected Power of Viewport Units in CSS</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>The Unexpected Power of Viewport Units in CSS</h1>
+                <div class="rich-text__content"><span>
+</span><p>Viewport units control attributes for elements on the page based on the size of the screen whereas percentages inherit their size from the parent element. For example, <code>height: 100%;</code> applied to an element is relative to the size of its parent. In contrast, <code>height: 100vh</code> will be 100% of the viewport height regardless of where the element resides in the DOM.</p><span>
+
+</span><p>Let’s take a look at the syntax:</p><span>
+
+</span></div><div class="rich-text__content"><span>
+
+</span><p>Now that we have the basic terminology laid out let’s look at an example.</p><span>
+
+</span><h2>Fixed-ratio cards</h2><span>
+
+</span><p>In this example, we will also leverage <a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a> to layout the width of our elements. Percentages fail us as it’s not possible to calculate the height of the items dynamically when the number of items in the list effects the height of their container. It is worth noting a similar result can also be achieved with <a href="http://alistapart.com/article/creating-intrinsic-ratios-for-video">intrinsic ratios</a>. But by leveraging viewport units, we get the same effect with less code and without having to use absolute positioning.</p><span>
+
+</span><div class="code"><pre><code>
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.stack__element {
+  flex: 50vw;
+  height: 50vw;
+}
+</code></pre></div><span>
+
+</span><p><a href="http://codepen.io/tlattimore/full/rLRwyg">See on codepen</a>. Try changing the <code>height</code> from 50vw to 50%, and observe the results.</p><span>
+
+</span><h2>Full-height elements</h2><span>
+
+</span><p>Viewport units shine when an image must scale to the height of the user’s screen. Without viewport units, we would need all the container elements of <code>.image</code> to have <code>height: 100%;</code> on them. Get the same result with less code:</p><span>
+
+</span><div class="code"><pre><code>
+.image {
+  height: 100vh;
+  width: auto;
+}
+</code></pre></div><span>
+
+</span><p><a href="http://codepen.io/tlattimore/full/EgYQaj/">See on codepen</a>. Again, replace <code>100vh</code> with <code>100%</code> and see what happens.</p><span>
+
+</span><h2>Keeping an element shorter than the screen</h2><span>
+
+</span><p>In a similar manner vein, what if we want to force an element's height to be <em>shorter</em> than the viewport? This technique can be useful if you want to explicitly control the height of an element relative to the viewport size so that it will always remain in view.</p><span>
+
+</span><div class="code"><pre><code>
+.shorten-me {
+  max-height: 90vh;
+}
+</code></pre></div><span>
+
+</span><p><a href="http://codepen.io/tlattimore/details/ZpEyKL/">See on codepen</a>. To play with this, try reducing the width of the screen in codepen so that you have an extremely narrow viewport. Note the behavior of the text box.</p><span>
+
+</span><h2>Scaling text</h2><span>
+
+</span><p><a href="https://www.lullabot.com/articles/scaling-css-components-with-bem-rems-ems">Rem and Em</a> give developers great flexibility when adjusting font sizes, but they do not scale dynamically with the viewport size. Though we can leverage the way rem inherits base font size from the root element, use a viewport unit on the root element's font size, and scale with that.</p><span>
+
+</span><p>Use this method carefully. Text could potentially become illegible as it scales with the viewport. In practice, <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries">media queries</a> combine nicely with vh units to ensure readability across screen sizes. If you are going to implement something like this in your design, I highly recommend Zell Liew’s in-depth write up on <a href="http://zellwk.com/blog/viewport-based-typography/">viewport-based typography</a>.</p><span>
+
+</span><div class="code"><pre><code>
+html {
+  font-size: 16px;
+}
+
+h1 {
+  font-size: calc(100% + 5vw); 
+}
+</code></pre></div><span>
+
+</span><p><a href="http://codepen.io/tlattimore/full/wzwyrx/">See on codepen</a>.</p><span>
+
+</span><h2>Breaking out of the container</h2><span>
+
+</span><p>Viewport units make it possible to break outside of a containing element or elements.  In scenarios where the CMS makes it difficult or impossible to alter our markup in an HTML template, using viewport units can achieve the desired result regardless of the markup. This technique won't work in every scenario, but it’s a nice trick in some instances.</p><span>
+
+</span><div class="code"><pre><code>
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.breakout { 
+  position: relative;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 100vw; 
+}
+</code></pre></div><span>
+
+</span><p><a href="http://codepen.io/tlattimore/full/rLXPvx/">See on codepen</a>.</p><span>
+
+</span><h2>Browser support and gotchas</h2><span>
+
+</span><p>Though there is solid support for viewport units across all major web browsers, you can still come across bugs including:</p><span>
+
+</span><ul><li><a href="https://github.com/scottjehl/Device-Bugs/issues/36">Safari</a>. One of the major problems you need to look out for is lack of support for viewport units inside <code>calc()</code> in Safari 8 and below. </li>
+<li>Some versions of Internet Explorer and Edge do not have complete support including no support for <code>vmax</code> yet.</li>
+<li>Platforms, especially Windows, are inconsistent about how they count the width of the scrollbar across browsers.</li>
+<li>Chrome at this time does not evaluate viewport units <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=382313">when printing</a>. </li>
+</ul><span>
+
+</span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

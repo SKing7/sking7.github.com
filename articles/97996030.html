@@ -1,0 +1,143 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Stacked Paper Effect</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Stacked Paper Effect</h1>
+                <div class="article-content"><span>
+
+      </span><p>A popular design technique is to create a content container that looks like a sheet of paper and to stack other sheets of paper below it, adding a layered or three-dimensional style. We can create this effect using straight up CSS, but there are multiple types of stacked paper designs we can consider. We'll provide snippets for four in particular.</p><span>
+</span><h3>Vertical Stack of Paper on Bottom</h3><span>
+</span><p>The idea here is that our content container is the top sheet of paper and more sheets are stacked beneath it with their edges displayed at the bottom of the top sheet.</p><span>
+</span><p data-height="215" data-theme-id="1" data-slug-hash="dNQKXv" data-default-tab="result" data-user="css-tricks" data-embed-version="2" data-pen-title="Stacked Paper Effect - Vertical" class="codepen">See the Pen <a href="http://codepen.io/team/css-tricks/pen/dNQKXv/">Stacked Paper Effect - Vertical</a> by CSS-Tricks (<a href="http://codepen.io/css-tricks">@css-tricks</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><pre rel="HTML"><code>&lt;div class="paper"&gt;&lt;/div&gt;</code></pre><span>
+</span><pre rel="CSS"><code>.paper {
+  background: #fff;
+  box-shadow:
+    /* The top layer shadow */
+    0 1px 1px rgba(0,0,0,0.15),
+    /* The second layer */
+    0 10px 0 -5px #eee,
+    /* The second layer shadow */
+    0 10px 1px -4px rgba(0,0,0,0.15),
+     /* The third layer */
+    0 20px 0 -10px #eee,
+    /* The third layer shadow */
+    0 20px 1px -9px rgba(0,0,0,0.15);
+    /* Padding for demo purposes */
+    padding: 30px;
+}</code></pre><span>
+</span><h3>Vertical Stack of Paper on Top</h3><span>
+</span><p>This is the same concept as the last one, but with the stack of papers revealed on the top of the container instead of the bottom. The only difference here is that we have repositioned the the <code>box-shadoow</code> property on the <code>.paper</code> element using negative numbers.</p><span>
+</span><p data-height="215" data-theme-id="1" data-slug-hash="ygQEaW" data-default-tab="result" data-user="css-tricks" data-embed-version="2" data-pen-title="Stacked Paper Effect - Vertical Top" class="codepen">See the Pen <a href="http://codepen.io/team/css-tricks/pen/ygQEaW/">Stacked Paper Effect - Vertical Top</a> by CSS-Tricks (<a href="http://codepen.io/css-tricks">@css-tricks</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><pre rel="HTML"><code>&lt;div class="paper"&gt;&lt;/div&gt;</code></pre><span>
+</span><pre rel="CSS"><code>.paper {
+  background: #fff;
+  box-shadow:
+    /* The top layer shadow */
+    0 -1px 1px rgba(0,0,0,0.15),
+    /* The second layer */
+    0 -10px 0 -5px #eee,
+    /* The second layer shadow */
+    0 -10px 1px -4px rgba(0,0,0,0.15),
+     /* The third layer */
+    0 -20px 0 -10px #eee,
+    /* The third layer shadow */
+    0 -20px 1px -9px rgba(0,0,0,0.15);
+    /* Padding for demo purposes */
+    padding: 30px;
+}</code></pre><span>
+</span><h3>Diagonal Stack of Paper</h3><span>
+</span><p>This is a slightly different method, where we use the <code>::before</code> and <code>::after</code> pseudo-elements to create the additional sheets of paper, rather than the <code>box-shadow</code> technique used in the previous examples.</p><span>
+</span><p data-height="215" data-theme-id="1" data-slug-hash="rjQKYO" data-default-tab="result" data-user="css-tricks" data-embed-version="2" data-pen-title="Stacked Paper Effect - Diagonal" class="codepen">See the Pen <a href="http://codepen.io/team/css-tricks/pen/rjQKYO/">Stacked Paper Effect - Diagonal</a> by CSS-Tricks (<a href="http://codepen.io/css-tricks">@css-tricks</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><pre rel="HTML"><code>&lt;div class="paper"&gt;&lt;/div&gt;</code></pre><span>
+</span><pre rel="CSS"><code>/* Diagonal stacked paper effect */
+.paper {
+  background-color: #fff;
+  /* Need position to allow stacking of pseudo-elements */
+  position: relative;
+  /* Padding for demo purposes */
+  padding: 30px;
+}
+
+.paper,
+.paper::before,
+.paper::after {
+  /* Add shadow to distinguish sheets from one another */
+  box-shadow: 2px 1px 1px rgba(0,0,0,0.15);
+}
+
+.paper::before,
+.paper::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #eee;
+}
+
+/* Second sheet of paper */
+.paper::before {
+  left: 7px;
+  top: 5px;
+  z-index: -1;
+}
+
+/* Third sheet of paper */
+.paper::after {
+  left: 12px;
+  top: 10px;
+  z-index: -2;
+}</code></pre><span>
+</span><h3>Disorganized Paper Stack</h3><span>
+</span><p>We can stagger the sheets of paper to create an intentionally messy look using the same sort of technique with pseudo-elements as the last example, though using the <code>transform</code> property to rotate the underlying sheets of paper. This example assumes the use of Autoprefixer or that orefixes are used for the <code>transform</code> property where browser support may wane.</p><span>
+</span><p data-height="215" data-theme-id="1" data-slug-hash="ygQEQN" data-default-tab="result" data-user="css-tricks" data-embed-version="2" data-pen-title="Stacked Paper Effect - Messy" class="codepen">See the Pen <a href="http://codepen.io/team/css-tricks/pen/ygQEQN/">Stacked Paper Effect - Messy</a> by CSS-Tricks (<a href="http://codepen.io/css-tricks">@css-tricks</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><pre rel="HTML"><code>&lt;div class="paper"&gt;&lt;/div&gt;</code></pre><span>
+</span><pre rel="CSS"><code>.paper {
+  background: #fff;
+  padding: 30px;
+  position: relative;
+}
+
+.paper,
+.paper::before,
+.paper::after {
+  /* Styles to distinguish sheets from one another */
+  box-shadow: 1px 1px 1px rgba(0,0,0,0.25);
+  border: 1px solid #bbb;
+}
+
+.paper::before,
+.paper::after {
+  content: "";
+  position: absolute;
+  height: 95%;
+  width: 99%;
+  background-color: #eee;
+}
+
+.paper::before {
+  right: 15px;
+  top: 0;
+  transform: rotate(-1deg);
+  z-index: -1;
+}
+
+.paper::after {
+  top: 5px;
+  right: -5px;
+  transform: rotate(1deg);
+  z-index: -2;
+}</code></pre><span>
+
+    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

@@ -1,0 +1,165 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>7 Things You Should Know About WebAssembly</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>7 Things You Should Know About WebAssembly</h1>
+                <div class="entry-content js-entry-content" itemprop="articleBody"><span>
+              </span><p>In this post we will explore seven key facts about <em>WebAssembly</em>, one of the biggest changes the web will experience in the coming years. Will it meet our expectations? Read on!</p><span>
+
+</span><hr><span>
+
+</span><h2>Introduction</h2><span>
+
+</span><p>If you are not familiar with the concepts behind WebAssembly, read this excellent <a href="http://arstechnica.com/information-technology/2015/06/the-web-is-getting-its-bytecode-webassembly/">post by Peter Bright from ArsTechnica</a> or the <a href="https://brendaneich.com/2015/06/from-asm-js-to-webassembly/">announcement post from Brendan Eich in his personal blog</a>.</p><span>
+
+</span><p>For the purposes of this post, here is a short glossary:</p><span>
+
+</span><ul>
+<li><strong>Source code:</strong> What a developer writes.</li>
+<li><strong>Compiler:</strong> An application that turns source code into assembly, bytecode or machine code (what other apps or hardware run).</li>
+<li><strong>Assembly:</strong> A low-level source-like language specific to a machine or an application.</li>
+<li><strong>Bytecode:</strong> A low-level binary representation of code that can be run by other applications.</li>
+<li><strong>Machine code:</strong> A binary representation of code that can be run directly by hardware.</li>
+</ul><span>
+
+
+</span><p>WebAssembly aims to be the <em>bytecode</em> for the web. Here is how a developer would use WebAssembly in the future:</p><span>
+
+</span><ol>
+<li>Develop an app (write the <em>source code</em> in any language that can be compiled to WebAssembly).</li>
+<li>Use a <em>compiler</em> to turn the <em>source code</em> into WebAssembly <em>bytecode</em> (and potentially into <em>assembly-code</em> if required).</li>
+<li>Load the <em>bytecode</em> in a browser and run it.</li>
+</ol><span>
+
+
+</span><p><img src="https://cdn.auth0.com/blog/webassembly/webassembly-2.png" alt="WebAssembly development flow"></p><span>
+
+</span><h2>Fact 1: WebAssembly is not the end of JavaScript</h2><span>
+
+</span><p>It's been said before and it will be said again: <strong>JavaScript is here to stay</strong>. Thanks to the growth of the web, JavaScript has become a <strong>lingua franca</strong> among developers and tool vendors. WebAssembly will not change this. WebAssembly is meant to fill a place that JavaScript has been forced to occupy up to now: a <strong>low-level code representation that can serve as a compiler target</strong>. As more and more languages and platforms begin to target the web, more stress is put on JavaScript and browser vendors to provide missing features that are much needed. Some of these features <strong>do not play well</strong> with the already complex semantics of JavaScript. WebAssembly is the right answer:</p><span>
+
+</span><ul>
+<li>It was designed as a compiler target from the beginning.</li>
+<li>It is supported by all major browser vendors.</li>
+<li>It can diverge from JavaScript semantics as much as needed.</li>
+</ul><span>
+
+
+</span><span>
+
+
+
+
+</span><script>
+    $(function() {
+        $('.tweet-quote').on('click', function() {
+            metricsLib.track('blog:share:twitter_quote');
+        });
+    });
+</script><span>
+
+
+</span><p>WebAssembly is the much needed <strong>complement</strong> to JavaScript for the web.</p><span>
+
+</span><h2>Fact 2: WebAssembly is being developed by the teams behind asm.js and (P)NaCl</h2><span>
+
+</span><p>If you have been following the development of the web over the last few years you know that WebAssembly is aiming at a difficult goal: providing a unified compilation target for languages that do not map easily to JavaScript. Not only is this goal <strong>difficult to achieve from a technical point of view</strong>, but it is also <strong>hard to attain from a standards point of view</strong>. The web is not controlled by any single vendor, so every change must be a <strong>joint effort</strong>. Fortunately, the teams behind WebAssembly know this. At Mozilla, a group of hardcore developers tried to provide an answer in the form of <strong>asm.js</strong>: a subset of JavaScript meant to serve as a compiler target. On the other side, Google worked on <strong>Native Client (NaCl)</strong> and <strong>Portable Native Client (PNaCl)</strong>, a binary format for the web based on LLVM. Although each of these solutions worked to some degree, they <strong>did not provide a satisfactory answer</strong> to all the problems. It is from this experience that Web Assembly was born: a <strong>joint effort aimed at providing a cross-browser compiler target</strong>. The future looks bright for WebAssembly.</p><span>
+
+</span><h2>Fact 3: WebAssembly is backwards compatible</h2><span>
+
+</span><p>Backwards-compatibility is an essential feature of the web. WebAssembly will not be an exception: a <strong>polyfill</strong> will be available for old-browsers. In fact, a prototype is <a href="https://github.com/WebAssembly/polyfill-prototype-1">already available</a>. You can see it working <a href="http://lukewagner.github.io/AngryBotsPacked/">here</a> or <a href="http://lukewagner.github.io/PlatformerGamePacked/">here</a>.</p><span>
+
+</span><h2>Fact 4: WebAssembly does not look like CPU assembly</h2><span>
+
+</span><p>When reading the word "assembly" you might immediately hear "unreadable" in your head. Fortunately, that is not the case for WebAssembly. In contrast to other low-level code representations, or most bytecodes, WebAssembly describes an <strong>abstract syntax tree (AST)</strong>. That's right, WebAssembly provides higher level constructs such as <strong>loops and branches</strong>. This means that it is actually possible to <strong>write WebAssembly directly</strong>, or decompile existing binary files into something that is much more readable than opcodes or instructions. You might be thinking "what about variable names?". WebAssembly will support adding <strong>debugging information</strong> to the compiled files.</p><span>
+
+</span><p>This is a sample of what a text representation of WebAssembly might look like. This example uses s-expressions (a lightweight representation of ASTs):</p><span>
+
+</span><pre><code class="none">  ;; Iterative factorial named
+  (func $fac-iter (param $n i64) (result i64)
+    (local $i i64)
+    (local $res i64)
+    (set_local $i (get_local $n))
+    (set_local $res (i64.const 1))
+    (label $done
+      (loop
+        (if
+          (i64.eq (get_local $i) (i64.const 0))
+          (break $done)
+          (block
+            (set_local $res (i64.mul (get_local $i) (get_local $res)))
+            (set_local $i (i64.sub (get_local $i) (i64.const 1)))
+          )
+        )
+      )
+    )
+    (return (get_local $res))
+  )
+</code></pre><span>
+
+</span><p>See the full example <a href="https://github.com/WebAssembly/spec/blob/master/ml-proto/test/fac.wast">here</a>.</p><span>
+
+</span><p>Wait, are s-expressions the final format? No, no text representation of WebAssembly has been officially adopted yet. Here is another example, using a totally different syntax that you might find more familiar:</p><span>
+
+</span><pre><code class="none">export func main() i32 {
+  storeI32(temp, 0);
+  var i i32 = 0;
+  done: while (i &lt; 10) {
+    i = i + 1;
+    if (i &gt;= 7) {
+      break done;
+    }
+  }
+  return (i + ifelse(0, 1, 2) * 2) * loadI32(temp) + loadI32(scale);
+}
+</code></pre><span>
+
+</span><p>You can find this example <a href="https://github.com/ncbray/wassembler/blob/master/demos/simple.wasm">here</a>.</p><span>
+
+</span><h2>Fact 5: WebAssembly will extend beyond the features required by JavaScript</h2><span>
+
+</span><p>The initial implementations of WebAssembly aim at <strong>feature parity with asm.js</strong>. In other words, what you can do today with asm.js, you will be able to do (better) with WebAssembly once it becomes available. One of the improvements you can expect in the initial versions are <strong>better load times</strong>. The binary format behind WebAssembly is much faster to parse than the text representation of asm.js. So even in its initial version, WebAssembly will result in improvements. This is what the current documents for WebAssembly call the <a href="https://github.com/WebAssembly/design/blob/master/MVP.md">minimum viable product (MVP)</a>. For future versions, some of the improvements we can expect are:</p><span>
+
+</span><ul>
+<li>Full threading support</li>
+<li>SIMD types and intrinsics</li>
+<li>Zero-cost exceptions (stack inspection and unwinding)</li>
+<li>Coroutines</li>
+<li>Dynamic linking</li>
+<li>DOM integration</li>
+<li>Integrated garbage collection</li>
+<li>Tail-call optimization</li>
+<li>Multi-process support</li>
+</ul><span>
+
+
+</span><p>Some of these things would be really <strong>hard to implement using JavaScript</strong> or even plain asm.js. WebAssembly is being developed with these things in mind and will serve as a <strong>great platform</strong> for languages that support these (and other) features.</p><span>
+
+</span><h2>Fact 6: Source-maps will allow you to easily debug compiled code in the browser</h2><span>
+
+</span><p>One of the downsides of a compiled target-language is that debugging usually gets harder. If you have played with any language that currently translates to JavaScript, you might have experienced debugging hell when trying to mentally <strong>map the resulting code to your original code</strong>. WebAssembly aims to be a great platform for other languages, so a solution for this is already being developed. Much like current native compilers, WebAssembly will allow for <strong>debugging information</strong> in its binary format along with <strong>source maps</strong>. Source maps will tell browsers and debuggers how to map the generated code to its original source representation. <strong>Easy debugging</strong> is part of the WebAssembly spec.</p><span>
+
+</span><h2>Fact 7: You do not need to wait for WebAssembly to be ready</h2><span>
+
+</span><p>Although WebAssembly is still in its infancy, you can already take advantage of many of the benefits that WebAssembly will provide in the future. As we mentioned in fact 2, WebAssembly is the result of <strong>years of experience</strong> implementing asm.js and NaCl, and all the benefits provided by these two implementations will be available in WebAssembly. If you want to use some of these benefits right now, <strong>asm.js is an excellent solution</strong>. For instance, <a href="https://github.com/kripken/emscripten">Emscripten</a> allows you to compile your code to asm.js <em>today</em>. If you think committing to asm.js today is a bad idea, keep in mind, again, that WebAssembly is still in its <strong>infancy</strong>. And even so, WebAssembly aims at feature parity with asm.js as its first goal. So don't be afraid to bet on asm.js. WebAssembly is being developed as an <strong>upgrade path</strong> from current solutions, so, even though it might be a good idea to start thinking about the future, this in no way means that asm.js is not receiving support today. Hack away!</p><span>
+
+</span><h2>Aside: WebAssembly and existing libraries</h2><span>
+
+</span><p>At Auth0 we have a full body of work written in JavaScript. The cool thing about WebAssembly is that calls to JavaScript libraries (and vice versa) will be possible. So, for instance, you could make calls to the Auth0 JavaScript library directly from C++. How cool is that? For more on Auth0 (and our extensive use of JavaScript), <a href="javascript:signup()">signup and start hacking</a>.</p><span>
+
+</span><h2>Conclusion</h2><span>
+
+</span><p>During the last few years, we have seen an explosion of frameworks, compilers and other types of solutions that aim to take your existing code and make it <em>web-compatible</em>. This has caused a lot of <strong>frustration in the community</strong>. On one hand, features that do not fit well with JavaScript semantics or ideology have started showing up in implementors' forums and have raised <strong>serious questions</strong> among JavaScript developers. On the other hand, developers who want to use their existing code, or who want to use their favorite language or framework, have found themselves <strong>locked out of the web</strong>, or facing serious debugging challenges (among other problems). Even though existing solutions such as asm.js or PNaCl have done a lot to reduce these concerns, up to now there hasn't been a <strong>proper, cross-vendor solution</strong>. WebAssembly aims to solve that. A proper, cross-vendor, cross-language target for compilers, aiming at supporting all necessary features for making <strong>a great all-around platform</strong>. The stakes are high, but so are the rewards. And the people working on this know their stuff. WebAssembly is the evolution of an idea that has been requested by developers for a long time. WebAssembly is the future.</p><span>
+
+            </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

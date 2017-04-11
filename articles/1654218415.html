@@ -1,0 +1,239 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Scrolling on the web: A primer</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Scrolling on the web: A primer</h1>
+                <article role="article" class="post-19760 post type-post status-publish format-standard has-post-thumbnail hentry category-mobile category-pc category-tablet tag-independent-rendering tag-passive-event-listeners tag-performance tag-pointer-events tag-scrolling">
+				
+								
+				
+				<p>Scrolling is one of the oldest interactions on the web. Long before we had pull-to-refresh or infinite-loading lists, the humble scrollbar solved the web’s original scaling problem: how can we interact with content that’s stretched beyond the available viewport?</p>
+
+<p>Today, scrolling is still the most fundamental interaction on the web, and perhaps the most misunderstood. For instance, do you know the difference between the following scenarios?</p>
+<ul>
+<li>User scrolls with two fingers on a touch pad</li>
+<li>User scrolls with one finger on a touch screen</li>
+<li>User scrolls with a mouse wheel on a physical mouse</li>
+<li>User clicks the sidebar and drags it up and down</li>
+<li>User presses up, down, PageUp, PageDown, or spacebar keys on a keyboard</li>
+</ul>
+<p>If you ask the average web user (or even the average web developer!) they might tell you that these interactions are all equivalent. The truth is far more interesting.</p>
+<p>As it turns out, all five of these input methods have vastly different characteristics, especially when it comes to performance and cross-browser behavior. Some of them (such as touch screen scrolling) are likely to be smooth even on a page with heavy JavaScript usage, whereas others (such as keyboard scrolling) will make the same page feel laggy and unresponsive. Furthermore, some kinds of scrolling can be slowed down by DOM event handlers, whereas others won’t. What’s going on here?</p>
+<p>To answer that question, and to understand how to unlock the smoothest-possible scrolling on your website, let’s take a step back and understand how browsers deal with multithreading and input.</p>
+
+<p>Conceptually, the web is a single-threaded environment. JavaScript blocks the DOM, and the DOM blocks JavaScript, because both are fighting over the same thread – frequently referred to as the “main thread” or “UI thread.”</p>
+<p>For instance, if you were to add this (horrible) JavaScript snippet to your page, you’d immediately see jankiness across the entire user experience:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">setInterval(() =&gt; {
+  var start = Date.now();
+  while (Date.now() - start &lt; 500) {/* wheeeee! */}
+}, 1000);
+</pre>
+<p>While this JavaScript is spinning in a useless loop, buttons don’t work, form elements are unresponsive, and even animated GIFs grind to a halt – for all intents and purposes, the page is frozen. You can see this in action in <a href="http://bl.ocks.org/nolanlawson/raw/053d34c55b4f56abdf87b49946a8a2c9/">a simple demo</a>.</p>
+
+<p>Furthermore, if you try to scroll with the keyboard up/down arrows, the page remains predictably stuck until the JavaScript stops running. All of this is strong evidence for our view of the web as a single-threaded environment.</p>
+<p>There’s a curious anomaly, though: if you try to scroll using touch screen scrolling, the page happily moves up and down, even while JavaScript is blocking nearly everything else on the page. This also works for touch pad scrolling, mouse wheel scrolling, and click-and-drag scrolling (depending on your browser).</p>
+<p>Somehow, certain scroll actions can manipulate the page state, even while everything else – buttons, input, GIFs – are totally frozen. How can we square this with our theory of the single-threaded web?</p>
+
+<h1>A tale of two threads</h1>
+<p>As it turns out, the whole “browsers are single-threaded” story is largely true, but there are important exceptions. Scrolling, in all its various flavors, is one of those exceptions.</p>
+<p>Over the years, browser vendors have recognized that offloading work to background threads can yield enormous improvements to smoothness and responsiveness. Scrolling, being so important to the core user experience of every browser, was quickly identified as a ripe target for such optimizations. Nowadays, every major browser engine (Blink, EdgeHTML, Gecko, WebKit) supports off-main-thread scrolling to one degree or another (with Firefox being the most recent member of the club, <a href="https://hacks.mozilla.org/2016/02/smoother-scrolling-in-firefox-46-with-apz/">as of Firefox 46</a>).</p>
+<p>With off-thread scrolling, even a noisy page will appear smooth as you scroll through it, because all scrolling is handled on a separate thread. It’s only when you try to interact with the page through some non-scrolling mechanism – tapping a button, typing into an input, clicking a link – that the façade fades away and the parlor trick is revealed for what it is. (Considering how well it works, though, it’s a great trick!)</p>
+<p>There is a tradeoff with asynchronous scrolling, however, which is a common effect called <a href="http://www.masonchang.com/blog/2014/3/2/wow-such-checkerboard">checkerboarding</a>, so named because of the way it originally appeared on Safari for iOS (as gray-and-white checkers). In most modern browsers, it manifests as a blank space that appears when you’ve scrolled faster than the browser can paint. This isn’t perfect, but it’s a worthy tradeoff compared to blocked, jerky, or unresponsive scrolling.</p>
+
+<p>Unfortunately, it’s not always easy to move scrolling to a background thread. Browsers can only do this if the host operating system allows for concurrent input, and it can vary from device to device. In particular, keyboard input is not as optimized as input from mouse or touch devices, ultimately leading to laggier keyboard scrolling across browsers.</p>
+<p>A little history is instructive here. When operating systems like Windows and macOS were first designed, one thread was all you got, and so there was little foresight to allow for concurrent input. It was only when multi-core machines started to appear that OSes began to retro-fit concurrency into their design.</p>
+<p>So, in the same way that vestigial organs can reveal an animal’s evolutionary history, the single-threaded origin of operating systems starts to peek through the seams when you look at scrolling input across the web. It’s only if the host operating system allows for concurrent input – from a mouse, keyboard, or other device – that browsers can efficiently optimize scrolling to be unaffected by long-running JavaScript operations that hog the main thread.</p>
+<p>On the Microsoft Edge team, though, we’ve been making strides to ensure that scrolling remains smooth and responsive, regardless of the scrolling method you prefer. As of EdgeHTML 14 (which shipped in the Windows 10 Anniversary Update), we support off-thread scrolling for the following input methods:</p>
+<ul>
+<li>Single-finger, touchscreen</li>
+<li>Two-finger, touchpad</li>
+<li>Mouse wheel</li>
+<li>Sidebar</li>
+</ul>
+<p>If you compare Edge to other desktop browsers, you’ll find that it’s the only one to support asynchronous sidebar scrolling &nbsp;– i.e. clicking-and-dragging the scroll handle, or clicking on the trackbar or arrows. (In fact, this is a feature we quietly introduced in the Anniversary Update!)</p>
+<p>Testing on Windows 10 (14393, Surface Book) and macOS Sierra (10.12, MacBook Air), we can derive the following results:</p>
+<table width="624">
+<tbody>
+<tr>
+<td width="104"></td>
+<td width="104">Two-finger trackpad</td>
+<td width="104">Touch</td>
+<td width="104">Mouse wheel</td>
+<td width="104">Sidebar</td>
+<td width="104">Keyboard</td>
+</tr>
+<tr>
+<td width="104">Edge 14 (Windows)</td>
+<td width="104">Y</td>
+<td width="104">Y</td>
+<td width="104">Y</td>
+<td width="104">Y</td>
+<td width="104">N</td>
+</tr>
+<tr>
+<td width="104">Chrome 56 (Windows)</td>
+<td width="104">Y</td>
+<td width="104">Y</td>
+<td width="104">Y</td>
+<td width="104">N</td>
+<td width="104">N</td>
+</tr>
+<tr>
+<td width="104">Firefox 51 (Windows)</td>
+<td width="104">N</td>
+<td width="104">N</td>
+<td width="104">N</td>
+<td width="104">N</td>
+<td width="104">N</td>
+</tr>
+<tr>
+<td width="104">Chrome 56 (MacOS)</td>
+<td width="104">Y</td>
+<td width="104">N/A</td>
+<td width="104">Y</td>
+<td width="104">N</td>
+<td width="104">N</td>
+</tr>
+<tr>
+<td width="104">Firefox 51 (MacOS)</td>
+<td width="104">Y</td>
+<td width="104">N/A</td>
+<td width="104">Y</td>
+<td width="104">N</td>
+<td width="104">N</td>
+</tr>
+<tr>
+<td width="104">Safari 10.1 (MacOS)</td>
+<td width="104">Y</td>
+<td width="104">N/A</td>
+<td width="104">Y</td>
+<td width="104">N</td>
+<td width="104">N</td>
+</tr>
+</tbody>
+</table>
+<p>As this table demonstrates*, scrolling performance can vary dramatically from browser to browser, and even from OS to OS. If you’re only testing on one browser with one scrolling method, then you might be getting a very narrow view of your site’s performance as it’s actually experienced by users!</p>
+<p>Overall, though, it should be clear that scrolling has a special place on the web, and browsers have worked very hard to make sure that scrolling is snappy and responsive. However, there are subtle ways that a web developer can inadvertently disable a browser’s built-in optimizations. Let’s take a look at how web developers can influence browser scrolling, for good and bad.</p>
+
+<h1>How event listeners interfere with scrolling</h1>
+<p>Off-thread scrolling represents a great gain in efficiency – scrolling and JavaScript are completely decoupled, allowing them to work in parallel without blocking each other.</p>
+<p>Anyone who’s been building web pages for a while, though, probably knows how to introduce a choke point between JavaScript and scrolling:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">window.addEventListener(“wheel”, function (e) {
+  e.preventDefault(); // oh no you don’t!
+});</pre>
+<p>When we attach a “wheel” listener that calls <code>event.preventDefault()</code>, it will 100% block scrolling, for both wheel and touch pad scrolling. And obviously, if scrolling is blocked, then off-thread scrolling is also blocked.</p>
+<p>What’s less obvious, though, is the impact in this case:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">window.addEventListener(“wheel”, function (e) {
+  console.log(‘wheel!’);
+  // innocent listener, not calling preventDefault()
+});</pre>
+<p>You might naïvely think that a function that doesn’t call <code>preventDefault()</code> can’t block scrolling at all, or that, at the very worst, it can only block for the duration of the function itself. The truth, however, is that even an empty listener will totally block scrolling until <em>any</em> JavaScript operation on the page has finished, which you can verify with <a href="http://bl.ocks.org/nolanlawson/raw/dc026a93b91cb448401bb0f1cb3ebad2/">this demo</a>.</p>
+<p>Even though the wheel listener has nothing to do with our big blocking JavaScript operation, they share the same JavaScript event loop, and so the background thread must wait for the longer JavaScript operation to finish before it can get a response from the listener function.</p>
+<p>Why does it have to wait? Well, JavaScript is a dynamic language, and the browser can’t know for sure that <code>preventDefault()</code> will never get called. Even if it’s obvious to the developer that the function is just doing a simple <code>console.log()</code>, browser vendors have opted not to take any chances. In fact, even an empty <code>function() {}</code> will exhibit this behavior.</p>
+<p>Note that this applies to more than just “wheel” events: on touchscreen devices, scrolling can also be blocked by “touchstart” or “touchmove” listeners. One should be very careful when adding listeners to a page, because of this impact on performance!</p>
+<p>There are a few scroll-related JavaScript APIs, however, that don’t block scrolling. The “scroll” event, somewhat counterintuitively, can’t block scrolling because it fires <em>after</em> the scroll event, and thus it isn’t cancelable. Also, the new <a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events">Pointer Events API</a>, which was pioneered in IE and Microsoft Edge and has recently started to appear in <a href="https://groups.google.com/a/chromium.org/forum/#!msg/blink-dev/UY1EfjaGF_E/OU7W_s3PAgAJ">Chrome</a> and <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=822898">Firefox</a>, has an explicit design goal to avoid unintentional scroll-blocking.</p>
+<p>Even in cases where we absolutely need to listen to “wheel” or “touchstart” events, there are certain tricks that web developers can employ to ensure that scrolling remains on the fast path. Let’s take a look at a few of these tricks.</p>
+
+<h1>Global vs local event listeners</h1>
+<p>In the example above, we covered the case of global listeners (i.e. listeners attached to the “window” or “document”). But what about listeners on individually scrolling elements?</p>
+<p>In other words, imagine a page that is scrollable, but there is also a subsection of the page that itself is independently scrollable. Will the browser block the entire page’s scrolling if you only attach a listener to the scrollable subsection?</p>
+<pre class="brush: jscript; title: ; notranslate" title="">document.getElementById(‘scrollableDiv’)
+.addEventListener(“wheel”, function (e) {
+  // In theory, I can only block scrolling on the div itself!
+});</pre>
+<p>If you test this out using <a href="http://bl.ocks.org/nolanlawson/raw/4079c1b7dff33fddfb8cf4cbe2c79b98/">a simple demo page</a>, you’ll find that both Microsoft Edge and Safari will allow the document to scroll smoothly, even if there’s a scroll listener on the scrollable div, and the page has heavy JavaScript operations running.</p>
+<p>Here is a chart of the browsers and their behaviors:</p>
+<table width="677">
+<tbody>
+<tr>
+<td width="113"></td>
+<td width="113">Two-finger touchpad</td>
+<td width="113">Touch</td>
+<td width="113">Mouse wheel</td>
+<td width="113">Click-and-drag</td>
+<td width="113">Keyboard</td>
+</tr>
+<tr>
+<td width="113">Edge 14 Desktop (Windows)</td>
+<td width="113">Y</td>
+<td width="113">Y</td>
+<td width="113">Y</td>
+<td width="113">Y</td>
+<td width="113">N</td>
+</tr>
+<tr>
+<td width="113">Chrome 56 Desktop (Windows)</td>
+<td width="113">N</td>
+<td width="113">Y</td>
+<td width="113">N</td>
+<td width="113">N</td>
+<td width="113">N</td>
+</tr>
+<tr>
+<td width="113">Firefox 51 Desktop (Windows)</td>
+<td width="113">N</td>
+<td width="113">N</td>
+<td width="113">N</td>
+<td width="113">N</td>
+<td width="113">N</td>
+</tr>
+<tr>
+<td width="113">Chrome 56 Desktop (MacOS)</td>
+<td width="113">N</td>
+<td width="113">N/A</td>
+<td width="113">N</td>
+<td width="113">N</td>
+<td width="113">N</td>
+</tr>
+<tr>
+<td width="113">Firefox 51 Desktop (MacOS)</td>
+<td width="113">Y</td>
+<td width="113">N/A</td>
+<td width="113">Y</td>
+<td width="113">N</td>
+<td width="113">N</td>
+</tr>
+<tr>
+<td width="113">Safari 10.1 (MacOS)</td>
+<td width="113">Y</td>
+<td width="113">N/A</td>
+<td width="113">Y</td>
+<td width="113">N</td>
+<td width="113">N</td>
+</tr>
+</tbody>
+</table>
+
+<p>These results show* that there’s a potential optimization that web developers can employ to take advantage of these browser features. Instead of attaching wheel/touch listeners to the entire document, it’s preferable to add listeners to <em>a targeted subsection of the document</em>, so that scrolling can remain smooth for unaffected parts of the page. In other words, rather than delegating wheel/touchstart listeners to the highest-possible level, it’s best to keep them isolated to the element that needs the scroll event.</p>
+<p>Sadly, not all JavaScript frameworks follow this practice – in particular, React tends to add global listeners to the entire document even if it should only apply to a subsection of the page. However, there is <a href="https://github.com/facebook/react/issues/1254">an open issue </a>for this very problem, and the React folks have said they would be happy to accept a pull request. (Kudos to the React folks for being so receptive when we <a href="https://github.com/facebook/react/issues/1254#issuecomment-244137395">provided this feedback</a>!)</p>
+
+<h1>Passive event listeners</h1>
+<p>Avoiding global listeners for wheel/touchstart is a good practice, but sometimes it just isn’t possible, depending on the effect you’re trying to achieve. And in a way, it may feel silly that a simple event listener should force the browser to halt the world, just on the offchance that it might call <code>preventDefault()</code>.</p>
+<p>Luckily there is a new feature that is just starting to appear in browsers, where web developers can explicitly mark a listener as “passive” and thus avoid waiting:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">window.addEventListener(“wheel”, function (e) {
+  // Not calling preventDefault()!
+}, { passive: true } // I pinkie-swear I won't call preventDefault()
+);</pre>
+<p>With this fix in place, the browser will treat scrolling exactly as if the “wheel” listener had never been added. This feature is <a href="http://caniuse.com/#feat=passive-event-listener">already available</a> in the latest versions of Chrome, Firefox, and Safari, and <a href="https://developer.microsoft.com/microsoft-edge/platform/status/passiveeventlisteners/">should appear soon in an upcoming release of Microsoft Edge</a>. (Note: you will need to use <a href="https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection">feature detection</a> to support browsers that don’t have passive event listeners.)</p>
+<p>For some events (notably “touchstart,” and “touchmove”) Chrome has also opted for an intervention in version 56 to make them <a href="https://www.chromestatus.com/features/5093566007214080">passive by default</a>. Be aware of these subtle browser differences when you add event listeners!</p>
+
+<h1>Conclusion</h1>
+<p>As we’ve seen, scrolling on the web is a fantastically complicated process, and all the browsers are at various stages of improving their performance. In general, though, we can land on some solid pieces of advice for web developers.</p>
+<p>First off, it’s best to avoid attaching wheel or touch listeners to the global document or window objects, and instead add them to smaller scrollable elements. Developers should also use passive event listeners whenever possible, with <a href="https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection">feature detection</a> to avoid compatibility issues. Using Pointer Events (there is a <a href="https://github.com/jquery/PEP">polyfill</a>) and “scroll” listeners are also surefire ways to prevent unintentional scroll-blocking.</p>
+<p>Hopefully this post has provided some helpful guidance for web developers, as well as a peek into how browsers work under the covers. No doubt, as browsers evolve and the web continues to grow, scrolling mechanics will become even more complex and sophisticated.</p>
+<p>On the Microsoft Edge team, we’re excited to keep innovating in this space and to provide smoother scrolling for more websites and more users. Let’s hear it for the humble scrollbar, the oldest and most nuanced interaction on the web!</p>
+<p>― <a href="https://twitter.com/nolanlawson">Nolan Lawson</a>, Program Manager, Microsoft Edge</p>
+<p>* These results were collected using the latest version of each browser as of February 2017. Since then, Firefox 52 has updated their scrolling support, and now matches Edge 14’s behavior in all tests except those for sidebar scrolling. We look forward to all browsers improving their scrolling implementations and making the web faster and more responsive!</p>
+<p><span class="post-modified">Updated March 16, 2017 10:57 am</span></p>				
+			</article>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

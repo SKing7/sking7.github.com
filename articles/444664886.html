@@ -1,0 +1,112 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Better, Simpler Grid Systems</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Better, Simpler Grid Systems</h1>
+                <div class="Container"><p>Most grid systems today use one of two layout methods: <code>float</code> or <code>inline-block</code>. But neither of these methods were really intended to be used for layout and as a result have pretty significant problems and limitations.</p><p>Using floats requires clearing them which has a whole host of layout issues, most notoriously that clearing an element sometimes forces it below an unrelated part of the page (take this <a href="https://github.com/twbs/bootstrap/issues/295#issuecomment-2282969">Bootstrap issue</a> for example). In addition, clearing floats usually requires using both before and after pseudo-elements, preventing you from using them for something else.</p><p>Inline block layouts must address the problem of <a href="http://css-tricks.com/fighting-the-space-between-inline-block-elements/">white-space between inline-block items</a>, and all of the <a href="http://davidwalsh.name/remove-whitespace-inline-block">solutions</a> to that problem are <a href="https://github.com/suitcss/components-grid/blob/master/lib/grid.css#L30">hacky</a> and <a href="https://twitter.com/thierrykoblentz/status/305152267374428160">annoying</a>.</p><p>Flexbox not only eliminates these problems, it opens up an entirely new world of possibilities.</p><h2>Features of a Flexbox Grid System</h2><p>Grid systems usually come with a myriad of sizing options, but the vast majority of the time you just want two or three elements side-by-side. Given this, why should we be required to put sizing classes on every single cell?</p><p>Listed below are some of my criteria for an ideal grid system. Fortunately, with Flexbox we get most of these features for free.</p><ul><li>By default, each grid cell is the same width and height as every other cell in the row. Basically they all size to fit by default.</li><li>For finer control, you can add sizing classes to individual cells. Without these classes, the cells simply divide up the available space as usual.</li><li>For responsive grids, you can add media query-specific classes to the cells.</li><li>Individual cells can be aligned vertically to the top, bottom, or middle.</li><li>When you want all of the cells in a grid to have the same sizing, media, or alignment values, you should be able to just add a single class to the container to avoid unnecessary repetition.</li><li>Grids can be nested as many levels deep as needed.</li></ul><h3>Basic Grids</h3><p>The grid cells below do not specify any widths, they just naturally space themselves equally and expand to fit the entire row. They’re also equal height by default.</p><div class="Grid Grid--gutters Grid--flexCells"><div class="Grid-cell"><p>Full-height, even when my content doesn't fill the space.</p></div><div class="Grid-cell"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis velit non gravida venenatis. Praesent consequat lectus purus, ut scelerisque velit condimentum eu. Maecenas sagittis ante ut turpis varius interdum. Quisque tellus ipsum, eleifend non ipsum id, suscipit ultricies neque.</p></div></div><h3>Individual Sizing</h3><p>When equal widths aren’t what you want, you can add sizing classes to individual cells. Cells without sizing classes simply divide up the remaining space as normal.</p><p>The cells below labeled “auto” do not have sizing classes specified.</p><h3>Responsive</h3><p>Responsive Grids work by adding media classes to the Grid cells or containers. When those media values are met, the grids automatically adjust accordingly.</p><p>The cells below should be full width by default and scaled to fit above <code>48em</code>. Resize your browser to see them in action.</p><h3>Grid-ception</h3><p>Grid components are infinitely nestable inside of other grid components.</p><h2>Alignment Features</h2><h3>Top-aligned Grid Cells</h3><div class="Grid Grid--gutters Grid--top"><div class="Grid-cell"><p>This cell should be top-aligned.</p></div><div class="Grid-cell u-1of2"><p>Pellentesque sagittis vel erat ac laoreet. Phasellus ac aliquet enim, eu aliquet sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pulvinar porta leo, eu ultricies nunc sollicitudin vitae. Curabitur pulvinar dolor lectus, quis porta turpis ullamcorper nec. Quisque eget varius turpis, quis iaculis nibh.</p></div><div class="Grid-cell"><p>This cell should be top-aligned.</p></div></div><h3>Bottom-aligned Grid Cells</h3><div class="Grid Grid--gutters Grid--bottom"><div class="Grid-cell"><p>This cell should be bottom-aligned.</p></div><div class="Grid-cell"><p>Curabitur pulvinar dolor lectus, quis porta turpis ullamcorper nec. Quisque eget varius turpis, quis iaculis nibh. Ut interdum ligula id metus hendrerit cursus. Integer eu leo felis. Aenean commodo ultrices nunc, sit amet blandit elit gravida in.</p></div><div class="Grid-cell"><p>This cell should be bottom-aligned.</p></div></div><h3>Vertically Centered Grid Cells</h3><div class="Grid Grid--gutters Grid--center"><div class="Grid-cell"><p>This cell should be vertically-centered with the cell to its right.</p></div><div class="Grid-cell"><p>Curabitur pulvinar dolor lectus, quis porta turpis ullamcorper nec. Quisque eget varius turpis, quis iaculis nibh. Ut interdum ligula id metus hendrerit cursus. Integer eu leo felis. Aenean commodo ultrices nunc, sit amet blandit elit gravida in. Sed est ligula, ornare ac nisi adipiscing, iaculis facilisis tellus. Nullam vel facilisis libero. Duis semper lobortis elit, vitae dictum erat.</p></div></div><h3>Mixed Vertical Alignment</h3><div class="Grid Grid--gutters"><div class="Grid-cell Grid-cell--top"><p>This cell should be top aligned.</p></div><div class="Grid-cell"><p>Curabitur pulvinar dolor lectus, quis porta turpis ullamcorper nec. Quisque eget varius turpis, quis iaculis nibh. Ut interdum ligula id metus hendrerit cursus. Integer eu leo felis. Aenean commodo ultrices nunc, sit amet blandit elit gravida in. Sed est ligula, ornare ac nisi adipiscing, iaculis facilisis tellus.</p></div><div class="Grid-cell Grid-cell--center"><p>This cell should be center-aligned.</p></div><div class="Grid-cell Grid-cell--bottom"><p>This cell should be bottom-aligned.</p></div></div><h2>The HTML</h2><pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"Grid"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"Grid-cell"</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"Grid-cell"</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"Grid-cell"</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</code></pre><h2>The CSS</h2><h3>Basic Grid Styles</h3><pre><code class="language-css"><span class="hljs-selector-class">.Grid</span> {
+  <span class="hljs-attribute">display</span>: flex;
+}
+
+<span class="hljs-selector-class">.Grid-cell</span> {
+  <span class="hljs-attribute">flex</span>: <span class="hljs-number">1</span>;
+}
+</code></pre><h3>Grid Style Modifiers</h3><pre><code class="language-css">
+<span class="hljs-selector-class">.Grid--gutters</span> {
+  <span class="hljs-attribute">margin</span>: -<span class="hljs-number">1em</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> -<span class="hljs-number">1em</span>;
+}
+<span class="hljs-selector-class">.Grid--gutters</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">1em</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1em</span>;
+}
+
+
+<span class="hljs-selector-class">.Grid--top</span> {
+  <span class="hljs-attribute">align-items</span>: flex-start;
+}
+<span class="hljs-selector-class">.Grid--bottom</span> {
+  <span class="hljs-attribute">align-items</span>: flex-end;
+}
+<span class="hljs-selector-class">.Grid--center</span> {
+  <span class="hljs-attribute">align-items</span>: center;
+}
+
+
+<span class="hljs-selector-class">.Grid-cell--top</span> {
+  <span class="hljs-attribute">align-self</span>: flex-start;
+}
+<span class="hljs-selector-class">.Grid-cell--bottom</span> {
+  <span class="hljs-attribute">align-self</span>: flex-end;
+}
+<span class="hljs-selector-class">.Grid-cell--center</span> {
+  <span class="hljs-attribute">align-self</span>: center;
+}
+</code></pre><h3>Responsive Modifiers (a mobile-first approach)</h3><pre><code class="language-css">
+<span class="hljs-selector-class">.Grid--fit</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+  <span class="hljs-attribute">flex</span>: <span class="hljs-number">1</span>;
+}
+<span class="hljs-selector-class">.Grid--full</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+  <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">100%</span>;
+}
+<span class="hljs-selector-class">.Grid--1of2</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+  <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">50%</span>
+}
+<span class="hljs-selector-class">.Grid--1of3</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+  <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">33.3333%</span>
+}
+<span class="hljs-selector-class">.Grid--1of4</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+  <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">25%</span>
+}
+
+
+@<span class="hljs-keyword">media</span> (min-width: <span class="hljs-number">24em</span>) {
+  <span class="hljs-selector-class">.small-Grid--fit</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">1</span>;
+  }
+  <span class="hljs-selector-class">.small-Grid--full</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">100%</span>;
+  }
+  <span class="hljs-selector-class">.small-Grid--1of2</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">50%</span>
+  }
+  <span class="hljs-selector-class">.small-Grid--1of3</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">33.3333%</span>
+  }
+  <span class="hljs-selector-class">.small-Grid--1of4</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">25%</span>
+  }
+}
+
+
+@<span class="hljs-keyword">media</span> (min-width: <span class="hljs-number">48em</span>) {
+  <span class="hljs-selector-class">.large-Grid--fit</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">1</span>;
+  }
+  <span class="hljs-selector-class">.large-Grid--full</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">100%</span>;
+  }
+  <span class="hljs-selector-class">.large-Grid--1of2</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">50%</span>
+  }
+  <span class="hljs-selector-class">.large-Grid--1of3</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">33.3333%</span>
+  }
+  <span class="hljs-selector-class">.large-Grid--1of4</span> &gt; <span class="hljs-selector-class">.Grid-cell</span> {
+    <span class="hljs-attribute">flex</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">25%</span>
+  }
+}
+</code></pre><p>View the full <a href="https://github.com/philipwalton/solved-by-flexbox/blob/master/assets/css/components/grid.css">source</a> for the <code>Grid</code> component used in this demo on Github.</p></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
