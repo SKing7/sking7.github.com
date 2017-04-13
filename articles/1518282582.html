@@ -1,0 +1,393 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>You Wouldn't Base64 a Password! Cryptography Terms and Concepts for Developers</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>You Wouldn't Base64 a Password! Cryptography Terms and Concepts for Developers</h1>
+                <div class="body"><span>
+    </span><blockquote>
+<p>Originally published at: <a href="https://paragonie.com/blog/2015/08/you-wouldnt-base64-a-password-cryptography-decoded">You Wouldn't Base64 a Password! on the Paragon Initiative Enterprises blog</a></p>
+</blockquote><span>
+
+</span><p>There's a ton of bad programming and security advice on the Internet. Some of the advice is bad because the author is misinformed, some because it emphasizes precision over clarity and most people wind up lost in the jargon.</p><span>
+
+</span><p>If you feel that cryptography is a weird, complicated, and slightly intimidating subject for which your feelings might be best described as lukewarm (on a good day), we hope that by the time you finish reading this page, you will have a clear understanding of the terms and concepts people use when this topic comes up.</p><span>
+
+</span><blockquote>
+<p>Warning: The example snippets on this page are for illustrative purposes. Don't use them in your projects. If you want a real-world example to reference, check out <a href="https://stackoverflow.com/a/30189841/2224584">the snippets in our Chief Development Officer's StackOverflow answer</a> instead.</p>
+</blockquote><span>
+
+</span><h1>Basic Cryptography Concepts for Developers</h1><span>
+
+</span><p>Let's start with a basic question: <strong>What exactly is a cryptographic feature?</strong> In the simplest terms we can muster: <code>Cryptographic features use math to secure an application</code>.</p><span>
+
+</span><p>Digging a little deeper: there are a plethora of cryptography algorithms and they can generally be grouped together based on two criteria:</p><span>
+
+</span><ol>
+<li>How much information must be supplied by the developer?</li>
+<li>What is the intended goal?
+
+<ul>
+<li>Confidentiality?</li>
+<li>Integrity?</li>
+<li>Authenticity?</li>
+<li>Non-repudiation? Deniability? (These two are opposites.)</li>
+</ul>
+</li>
+</ol><span>
+
+</span><h2 id="overview">Overview of Cryptography Concepts
+</h2><span>
+
+</span><p><img class="img img-responsive" src="https://res.cloudinary.com/practicaldev/image/fetch/s--YT5TmSDb--/c_limit,f_auto,fl_progressive,q_auto,w_725/https://paragonie.com/files/blog/crypto-categories.png" alt="Categories of cryptographic and non-cryptographic concepts" title="Categories of cryptographic and non-cryptographic concepts"></p><span>
+
+</span><ul>
+<li>Keyless Cryptography (0 keys)
+
+
+</li>
+<li>Secret-Key Cryptography (1 key)
+
+<ul>
+<li>Secret-Key Message Authentication</li>
+<li>Secret-Key Encryption</li>
+<li>Authenticated Secret-Key Encryption</li>
+</ul>
+</li>
+<li>Public-Key Cryptography (2 keys)
+
+<ul>
+<li>Shared Secret Key Agreement</li>
+<li>Digital Signatures</li>
+</ul>
+</li>
+</ul><span>
+
+</span><h2>The First Rule of Cryptography: Don't Implement it Yourself</h2><span>
+
+</span><p>Developing cryptography features is best left to the experts. By all means, <a href="http://www.cryptofails.com/post/75204435608/write-crypto-code-dont-publish-it">do feel free to tinker</a>, but don't deploy your experiments in production or share them with other developers who might deploy them in production.</p><span>
+
+</span><p>Instead, use a high-level cryptography library that experts have already vetted. Follow the link to read our <a href="https://paragonie.com/blog/2015/11/choosing-right-cryptography-library-for-your-php-project-guide">PHP cryptography library recommendations</a>.</p><span>
+
+</span><h2 id="hash-functions">Keyless Cryptography</h2><span>
+
+</span><p>The simplest algorithm to consider is the <strong>cryptographic hash function</strong>, which accepts one input and returns a single deterministic fixed-size output.</p><span>
+</span><div class="highlight"><pre><span class="vg">hash</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">);</span>
+<span class="o">//</span><span class="w"> </span><span class="vg">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+
+<span class="vg">hash</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="w"> </span><span class="s2">"The quick brown fox jumps over the lazy dog"</span><span class="p">);</span>
+<span class="o">//</span><span class="w"> </span><span class="vg">d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592</span>
+</pre></div><span>
+</span><p>When using a well-designed cryptographic hash function, such as <strong>BLAKE2</strong> or SHA256, any change you make to the message will result in a drastically different hash output.</p><span>
+</span><div class="highlight"><pre><span class="vg">hash</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="w"> </span><span class="s2">"The quick brown fox jumps over the lazy cog"</span><span class="p">);</span>
+<span class="o">//</span><span class="w"> </span><span class="vg">e4c4d8f3bf76b692de791a173e05321150f7a345b46484fe427f6acc7ecc81be</span>
+</pre></div><span>
+</span><p>Simple hash functions are fast and deterministic; if you have any arbitrary message, you can calculate the hash output for that particular message. By themselves, they are mostly useful for error checking or as a building block for other cryptographic primitives, which most developers will not need to develop.</p><span>
+
+</span><p><strong>Cryptographic hash functions are one-way data transformations.</strong> Although you can easily calculate the hash output (often referred to as a message digest) for any arbitrary message, you cannot easily go from the hash output to the original message.</p><span>
+
+</span><p>Some hash functions (such as MD5) have weaker security guarantees and smaller output sizes. As a result, it's <a href="http://natmchugh.blogspot.fr/2015/02/create-your-own-md5-collisions.html">almost trivial to calculate two different messages that will produce the same MD5 hash</a>.</p><span>
+
+</span><h2 id="secret-key">Secret Key Cryptography</h2><span>
+
+</span><p>Most cryptography algorithms aren't as simple as hash functions. As a consequence, they are a lot more useful and can provide security guarantees beyond, "Yes, this output can be reproduced from this input."</p><span>
+
+</span><p>Consequently, they typically require two pieces of input: The message and a <strong>secret key</strong>. A secret key should be a unique string of random bytes that both the sender and intended recipient should know, and nobody else.</p><span>
+
+</span><h3 id="mac">Keyed Hash Functions - Message Authentication</h3><span>
+
+</span><p>A keyed hash function, such as <a href="https://en.wikipedia.org/wiki/Hash-based_message_authentication_code">HMAC</a>, is a special implementation of a hash function that accepts a message and a secret key and produces a Message Authentication Code (MAC).</p><span>
+</span><div class="highlight"><pre><span class="vg">hash_hmac</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="w"> </span><span class="s2">"The quick brown fox jumps over the lazy dog"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret key"</span><span class="p">);</span>
+<span class="o">//</span><span class="w"> </span><span class="il">4</span><span class="vg">a513ac60b4f0253d95c2687fa104691c77c9ed77e884453c6a822b7b010d36f</span>
+
+<span class="vg">hash_hmac</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="w"> </span><span class="s2">"The quick brown fox jumps over the lazy cog"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret key"</span><span class="p">);</span>
+<span class="o">//</span><span class="w"> </span><span class="vg">ed6b9bc9d64e4c923b2cc19c15fff329f343f30884935c10e617e0fe067adef1</span>
+
+<span class="vg">hash_hmac</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="w"> </span><span class="s2">"The quick brown fox jumps over the lazy dog"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret kez"</span><span class="p">);</span>
+<span class="o">//</span><span class="w"> </span><span class="il">291579</span><span class="vg">f3123c3126df04a57f78768b6290df93f979b86af25fecd98a9811da5a</span>
+
+<span class="vg">hash_hmac</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="w"> </span><span class="s2">"The quick brown fox jumps over the lazy cog"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret kez"</span><span class="p">);</span>
+<span class="o">//</span><span class="w"> </span><span class="il">298</span><span class="vg">bb0244ebc987810de3892384bb4663742a540db2b3a875f66b09d068d1f64</span>
+</pre></div><span>
+</span><p>Keyed hash functions are more useful than hash functions; only someone with the secret key can calculate a MAC for a given message. Therefore, if you transmit a message and a MAC for a given message, and never transmit the secret key, you can be reasonably sure that the message is authentic.</p><span>
+
+</span><h3 id="secret-key-encryption">Secret Key Encryption</h3><span>
+
+</span><blockquote>
+<p>Warning: Encryption without message authentication is vulnerable to chosen ciphertext attacks. Please read our whitepaper on <a href="https://paragonie.com/white-paper/2015-secure-php-data-encryption#symmetric-encryption">Secure Data Encryption in PHP</a>.</p>
+</blockquote><span>
+
+</span><p>Formally, encryption is the reversible process of transforming of a message (called the <code>plaintext</code>) and a <strong>secret key</strong> into a seemingly random string of bytes (called the <code>ciphertext</code>). i.e. <code>encrypt($message, $key)</code> should return a unique string of random bytes for a given pair of <code>$message</code> and <code>$key</code>.</p><span>
+
+</span><p>Unfortunately, <a href="https://filippo.io/the-ecb-penguin">simple secret-key encryption (also known as ECB mode) is not secure</a>. If you encrypt the same (16-byte, for the popular AES encryption algorithm) block within a message with the same key in ECB mode, the ciphertext will repeat.</p><span>
+
+</span><p>Modern secret-key encryption, therefore, actually accepts more than two pieces of information. Beyond the <code>plaintext</code> message and a <strong>secret key</strong>, they also require a unique <em>Initialization Vector</em> (IV, for CBC mode) or <em>nonce</em> (number to be used once, for CTR mode). <a href="https://paragonie.com/white-paper/2015-secure-php-data-encryption#block-cipher-mode">The difference between a nonce and IV is subtle</a>.</p><span>
+
+</span><blockquote>
+<p><strong>None of the code on this page is secure; neither are any of the encryption keys.</strong> </p>
+</blockquote><span>
+</span><div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm"> * This code is for example purposes only. DO NOT USE IT.</span>
+<span class="cm"> * Use https://github.com/defuse/php-encryption instead</span>
+<span class="cm"> * </span>
+<span class="cm"> * Demo: http://3v4l.org/ih8om</span>
+<span class="cm"> */</span>
+<span class="n">bin2hex</span><span class="p">(</span>
+    <span class="n">openssl_encrypt</span><span class="p">(</span>
+      <span class="cm">/* Message: */</span>
+        <span class="s">"The quick brown fox jumps over the lazy dog"</span><span class="p">,</span>
+      <span class="cm">/* Cipher algorithm and block mode: */</span>
+        <span class="p">'</span><span class="n">aes</span><span class="o">-</span><span class="mh">128</span><span class="o">-</span><span class="n">ctr</span><span class="p">',</span>
+      <span class="cm">/* Encryption key: (don't use weak keys like this ever, it's just an example!): */</span>
+        <span class="s">"</span><span class="se">\x01\x02\x03\x04</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x05\x06\x07\x08</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x09\x0a\x0b\x0c</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x0d\x0e\x0f\x10</span><span class="s">"</span><span class="p">,</span>
+      <span class="cm">/* Constant that means "don't encode": */</span>
+        <span class="no">OPENSSL_RAW_DATA</span><span class="p">,</span>
+      <span class="cm">/* Initialization Vector or Nonce -- don't ever actually use all NULL bytes: */</span>
+        <span class="n">str_repeat</span><span class="p">(</span><span class="s">"</span><span class="se">\0</span><span class="s">"</span><span class="p">,</span> <span class="mh">16</span><span class="p">)</span> <span class="c1">// This is a really bad way to generate a nonce or IV. </span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="c1">// 8f99e1315fcc7875325149dda085c504fc157e39c0b7f31c6c0b333136a7a8877c4971a5ce5688f94ae650</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * This code is for example purposes only. DO NOT USE IT.</span>
+<span class="cm"> * Use https://github.com/defuse/php-encryption instead</span>
+<span class="cm"> * </span>
+<span class="cm"> * Demo: http://3v4l.org/ZgW38</span>
+<span class="cm"> */</span>
+<span class="n">openssl_decrypt</span><span class="p">(</span>
+  <span class="cm">/* Message: */</span>
+    <span class="n">hex2bin</span><span class="p">(</span>
+        <span class="s">"8f99e1315fcc7875325149dda085c504fc157e39c0b7f31c6c0b333136a7a8877c4971a5ce5688f94ae650"</span>
+    <span class="p">),</span>
+  <span class="cm">/* Cipher algorithm and block mode: */</span>
+    <span class="p">'</span><span class="n">aes</span><span class="o">-</span><span class="mh">128</span><span class="o">-</span><span class="n">ctr</span><span class="p">',</span>
+  <span class="cm">/* Encryption key: (don't use weak keys like this ever, it's just an example!): */</span>
+    <span class="s">"</span><span class="se">\x01\x02\x03\x04</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x05\x06\x07\x08</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x09\x0a\x0b\x0c</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x0d\x0e\x0f\x10</span><span class="s">"</span><span class="p">,</span>
+  <span class="cm">/* Constant that means "don't encode": */</span>
+    <span class="no">OPENSSL_RAW_DATA</span><span class="p">,</span>
+  <span class="cm">/* Initialization Vector or Nonce -- don't ever actually use all NULL bytes: */</span>
+    <span class="n">str_repeat</span><span class="p">(</span><span class="s">"</span><span class="se">\0</span><span class="s">"</span><span class="p">,</span> <span class="mh">16</span><span class="p">)</span> <span class="c1">// This is a really bad way to generate a nonce or IV.</span>
+<span class="p">);</span>
+<span class="c1">// The quick brown fox jumps over the lazy dog</span>
+</pre></div><span>
+</span><p>A more in-depth and less illustrative example (which properly generates IVs) is available <a href="https://stackoverflow.com/a/30189841/2224584">here</a>.</p><span>
+
+</span><p>For a closer examination at symmetric-key encryption with OpenSSL, read <a href="https://paragonie.com/white-paper/2015-secure-php-data-encryption#symmetric-encryption">our white paper</a>.</p><span>
+
+</span><p>Decryption is only successful if the same IV/nonce and secret key are used. However, only the key must be kept secret; the IV and nonce can even be broadcast with your encrypted message.</p><span>
+
+</span><h3 id="authenticated-encryption">Authenticated Secret-Key Encryption
+</h3><span>
+
+</span><p>If you recall from our earlier blog post, <a href="https://paragonie.com/blog/2015/05/using-encryption-and-authentication-correctly"><em>Using Encryption and Authentication Correctly</em></a>, secret-key encryption itself is vulnerable to tampering unless you combine it with authentication.</p><span>
+
+</span><p>The only strategies proven to be secure are to <a href="https://paragonie.com/blog/2015/05/using-encryption-and-authentication-correctly#title.4.1">use an AEAD mode</a> or to always <strong>encrypt first then authenticate the encrypted data</strong> with a MAC.</p><span>
+
+</span><p>If you are following an Encrypt-Then-MAC construction, you want to use two separate secret keys: One for the encryption, the other for the MAC. In other words, apply the previous two sections together:</p><span>
+</span><div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm"> * This code is for example purposes only. DO NOT USE IT.</span>
+<span class="cm"> * Use https://github.com/defuse/php-encryption instead</span>
+<span class="cm"> */</span>
+<span class="err">$</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">random_bytes</span><span class="p">(</span><span class="mh">16</span><span class="p">);</span>
+<span class="err">$</span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">openssl_encrypt</span><span class="p">(</span>
+  <span class="cm">/* Message: */</span>
+    <span class="s">"The quick brown fox jumps over the lazy dog"</span><span class="p">,</span>
+  <span class="cm">/* Cipher algorithm and block mode: */</span>
+    <span class="p">'</span><span class="n">aes</span><span class="o">-</span><span class="mh">128</span><span class="o">-</span><span class="n">ctr</span><span class="p">',</span>
+  <span class="cm">/* Encryption key: (don't use weak keys like this ever, it's just an example!)</span>
+<span class="cm">   *    Instead, you want to generate 16, 24, or 32 random bytes (i.e. random_bytes(16))</span>
+<span class="cm">   *    on your own. It's generally a bad idea to copy and paste security code.</span>
+<span class="cm">   */</span>
+    <span class="s">"</span><span class="se">\x01\x02\x03\x04</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x05\x06\x07\x08</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x09\x0a\x0b\x0c</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\x0d\x0e\x0f\x10</span><span class="s">"</span><span class="p">,</span>
+  <span class="cm">/* Constants that mean "don't encode" and "we have no padding" to the OpenSSL API: */</span>
+    <span class="no">OPENSSL_RAW_DATA</span> <span class="o">+</span> <span class="no">OPENSSL_ZERO_PADDING</span><span class="p">,</span>
+  <span class="cm">/* Initialization Vector or Nonce: */</span>
+    <span class="err">$</span><span class="n">nonce</span>
+<span class="p">);</span>
+<span class="c1">// You should choose a better HMAC key than we did for this article:</span>
+<span class="err">$</span><span class="n">mac</span> <span class="o">=</span> <span class="n">hash_hmac</span><span class="p">(</span><span class="s">"sha256"</span><span class="p">,</span> <span class="err">$</span><span class="n">nonce</span><span class="p">.</span><span class="err">$</span><span class="n">ciphertext</span><span class="p">,</span> <span class="s">"</span><span class="se">\xff\xfe\xfd\xfc</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\xfb\xfa\xf9\xf8</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\xf7\xf6\xf5\xf4</span><span class="s">"</span> <span class="p">.</span> <span class="s">"</span><span class="se">\xf3\xf2\xf1\xf0</span><span class="s">"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+<span class="n">echo</span> <span class="n">bin2hex</span><span class="p">(</span><span class="err">$</span><span class="n">nonce</span><span class="p">.</span><span class="err">$</span><span class="n">ciphertext</span><span class="p">.</span><span class="err">$</span><span class="n">mac</span><span class="p">);</span>
+<span class="cm">/*</span>
+<span class="cm">   71b5546f 6cb857cd 0d8f8be3 f9312c74 &lt;- Nonce (randomly chosen)</span>
+<span class="cm">   356146df 274552c2 e98d3008 b1dfa35c &lt;- Ciphertext</span>
+<span class="cm">   60d6130d 9c9ca525 6c2f2f25 0b321176</span>
+<span class="cm">   06563174 c3b073a0 5ab263</span>
+<span class="cm">   4d1c7416 b086a316 a0474a05 84e3793c &lt;- MAC</span>
+<span class="cm">   a32fde09 0d82a5ef 213cb329 da3b5b06 </span>
+<span class="cm"> */</span>
+</pre></div><span>
+</span><p>It is important to exercise caution when combining cryptographic features. Our basic protocol as written above has no redundant features:</p><span>
+
+</span><ul>
+<li>Secret key encryption provides <strong>confidentiality</strong> such that it can only be read with the correct secret key. </li>
+<li>Keyed hash functions provide <strong>authentication</strong> (and consequently, <em>message integrity</em>) such that anyone possessing the correct secret key can recalculate the same MAC.</li>
+<li>A random IV/nonce is used to make each encrypted message unique, <em>even if the unencrypted message is the same</em>.</li>
+</ul><span>
+
+</span><p>It should go without saying, but double-encrypting or double-authenticating when you need authenticated encryption would just be silly.</p><span>
+
+</span><h2 id="public-key">Public Key Cryptography</h2><span>
+
+</span><p>Public key cryptography is challenging for nontechnical people to understand, and even more challenging for technical people to explain correctly without burying the reader in mathematics or missing critical points. The end result is usually a lot of confusion and occasionally a false sense of understanding. (A fauxreka moment, if you will.)</p><span>
+
+</span><p><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--xZ5eZa_e--/c_limit,f_auto,fl_progressive,q_auto,w_725/https://paragonie.com/files/blog/crypto_types.png" class="img-responsive" title="Secret Key Cryptography vs Public Key Cryptography" alt="Secret Key Cryptography vs Public Key Cryptography"></p><span>
+
+</span><p>Here's all you need to know right now: Unlike secret key encryption, which involves a single secret key that is held by both parties, in public key cryptography, each participant has <strong>two keys</strong>:</p><span>
+
+</span><ul>
+<li>Each participant has a <strong>private key</strong>, which they never share.</li>
+<li>Each participant also has a <strong>public key</strong>, which is mathematically related to their private key, which they share with everyone.</li>
+</ul><span>
+
+</span><p>It is unfortunate that the "key" terminology from secret key cryptography stuck when public key cryptography was discovered, as there aren't very many physical systems that are intuitively similar to what's going on here. Some people have attempted to <a href="https://www.youtube.com/watch?v=3QnD2c4Xovk">explain public key cryptography using colors</a> or <a href="http://crypto.stackexchange.com/q/292/24405">detailed explanations</a>. If you're interested in the intimate details, we recommend both of the links in the previous sentence.</p><span>
+
+</span><p>For everyone else, if you can accept these premises, understanding the rest isn't hard:</p><span>
+
+</span><ul>
+<li>To use public key cryptography, you generate a key-pair and share the public key, but keep the private key to yourself. (In most cases, every participant does this.)</li>
+<li>There is only one private key for any given public key.</li>
+<li>Both of the keys in a given key-pair are related to each other, mathematically.</li>
+<li>Given a public key, it is almost impossible to figure out what the private key is.</li>
+<li>Given a private key, you can near-instantly calculate the related public key.</li>
+</ul><span>
+
+</span><p>Got it? Let's build something with this understanding.</p><span>
+
+</span><h3 id="diffie-hellman">Shared Secret Key Agreement</h3><span>
+
+</span><p>Let's say you want to talk to a friend over the Internet using secret key cryptography (which is much faster than public key cryptography), but you don't want anyone else to read it. You and her haven't already agreed upon a secret key. How do you do it?</p><span>
+
+</span><p>Glossing over the finer details (the color video above explains it fairly well), this is what you do:</p><span>
+
+</span><ol>
+<li>You send her your public key (yellow).</li>
+<li>She sends you her public key (light blue).</li>
+<li>Combine your private key (green) and her public key (blue) to form a shared secret key.</li>
+<li>She will combine her private key (red) with your public key (yellow) to form <strong>the same exact shared key</strong>.</li>
+</ol><span>
+
+</span><p>How? <a href="https://www.khanacademy.org/computing/computer-science/cryptography/modern-crypt/v/diffie-hellman-key-exchange-part-2">Modular arithmetic</a> (classic Diffie Hellman) or <a href="https://www.youtube.com/watch?v=l6jTFxQaUJA">multiplication along elliptic curves over finite fields</a> (modern Elliptic Curve Diffie Hellman).</p><span>
+
+</span><h3 id="digital-signatures">Digital Signatures</h3><span>
+
+</span><p>Digital signature algorithms, such as <a href="https://en.wikipedia.org/wiki/EdDSA">EdDSA</a> (Edwards-curve Digital Signature Algorithm), are one of the most useful innovations to result from public key cryptography.</p><span>
+
+</span><p>A <strong>digital signature</strong> is calculated from a <strong>message</strong> and a <strong>private key</strong>. Earlier algorithms (such as ECDSA) also required you to generate a unique random nonce for each message, but this was proven to be <a href="http://psx-scene.com/forums/content/sony-s-ps3-security-epic-fail-videos-within-581/">error-prone</a> in the real world.</p><span>
+
+</span><p>Anyone else with a copy of your <strong>public key</strong> can verify that a particular message was signed by your private key. Unlike keyed hash functions, this verification takes place without requiring you to reveal your private key. </p><span>
+
+</span><h1>Common Misconceptions and Pitfalls</h1><span>
+
+</span><h2 id="passwords">Password Storage</h2><span>
+
+</span><p>Quick answer: <a href="https://paragonie.com/blog/2016/02/how-safely-store-password-in-2016">Just use bcrypt</a>. For PHP developers, this means <a href="https://secure.php.net/password_hash"><code>password_hash()</code></a> and <a href="https://secure.php.net/password_hash"><code>password_verify()</code></a> rather than <code>crypt()</code>.</p><span>
+
+</span><p>Many developers think passwords should be <em>encrypted</em>, but this is false. <strong>Passwords should be *hashed</strong>*, not encrypted. Furthermore, don't confuse password hashing algorithms with simple cryptographic hash functions. They're not the same thing:</p><span>
+
+</span><div class="table-responsive"><table class="table">
+<thead><tr>
+<th class="danger">Cryptographic Hashes</th>
+<th class="success">Password Hashes</th>
+</tr></thead>
+<tbody><tr>
+<td class="danger">
+<ul>
+<li>Fast</li>
+<li>Only one input: The message</li>
+</ul>
+</td>
+<td class="success"><ul>
+<li>Intentionally slow</li>
+<li>At least three inputs:<ol>
+<li>The password</li>
+<li>A per-user salt</li>
+<li>A cost factor (how expensive to make the computation)</li>
+</ol>
+</li>
+</ul></td>
+</tr></tbody>
+</table></div><span>
+
+</span><p>Unlike cryptographic hashes, password hashes require more than one input parameter. But unlike encryption algorithms, password hashes are one-way deterministic trap door calculations. Also unlike secret-key encryption, the salt does not need to remain secret; it merely needs to be unique per user. The purpose of a unique salt per user is to thwart pre-computation and to make brute-force guessing passwords from a list of hashes more expensive.</p><span>
+
+</span><p><strong>Can I encrypt my (bcrypt) password hashes?</strong></p><span>
+
+</span><p>Yes. If you run your web application and your database on separate hardware servers, this actually provides a substantial defense in depth. That's the reasoning behind our <a href="https://github.com/paragonie/password_lock">password_lock</a> library.</p><span>
+
+</span><h2 id="download-verification">File Verification</h2><span>
+
+</span><p>Digital signatures can prove authenticity, cryptographic hash functions can not.</p><span>
+
+</span><p>There is a nontrivial portion of technical users that will, upon downloading an executable from a website, recalculate the MD5 or SHA1 hash of the file and compare it to one displayed on the web page they downloaded the file from. If it matches, they will execute the file, fully trusting its contents to be genuine. </p><span>
+
+</span><p>If both the file and the hash value are stored on the same server, this is a completely ludicrous waste of time: <strong>Any attacker who can alter your download can replace the hashes on the web page too.</strong> (If the file and hash are on separate servers, the situation is a little different, but the improvement is not significant enough to warrant eschewing a better solution.)</p><span>
+
+</span><p>After all, as we said above, hash functions like MD5 and SHA1 produce a deterministic fixed-size output for a given input. There are no secrets involved. When a solution does not increase security but makes people feel more secure, we call them <a href="https://en.wikipedia.org/wiki/Security_theater">security theater</a>.</p><span>
+
+</span><p>Cryptographic hash functions are security theater in this situation. You want <strong>digital signatures</strong> instead.</p><span>
+
+</span><p>To improve security, instead of posting MD5/SHA1 hashes, the software vendor can instead sign their package with their EdDSA private key and share their EdDSA public key far and wide. When you download the file, you should also download the signature and, using the verified public key, check that it is authentic.</p><span>
+
+</span><p>For example: <a href="https://github.com/jedisct1/minisign">Minisign</a>.</p><span>
+
+</span><p>A keyed hash function won't work here either, as you would need to distribute the secret key in order for anyone to be able to verify the signature. If they have the secret key, they can forge their own signatures for maliciously altered message (in this case, executable file).</p><span>
+
+</span><p>Digital signatures are the best way to achieve assurance about the authenticity of a download. MD5/SHA1 hashes are almost always useless here.</p><span>
+
+</span><h2 id="encoding-compression">Encoding and Compression Aren't Cryptographic
+</h2><span>
+
+</span><p>A common beginner's mistake is to use an encoding function, such as <code>base64_encode()</code>, to attempt to obfuscate information. Consider the following code, which was offered in a LinkedIn discussion about how to properly store passwords in a PHP web application:</p><span>
+
+</span><blockquote>
+<img class="img-responsive" src="https://res.cloudinary.com/practicaldev/image/fetch/s--5dghVuSd--/c_limit,f_auto,fl_progressive,q_auto,w_725/https://paragonie.com/files/blog/base64_password.png" alt="The worst password 'hashing' function of all time." title="The worst password 'hashing' function of all time."><br>This may very well be <a href="http://3v4l.org/BZ7rC">the worst password storage function ever written</a>.</blockquote><span>
+
+</span><p>A lot of developers will either encode or compress information and assume their solution provides the same level of security as actual cryptographic features simply because the output is not human readable. It doesn't.</p><span>
+
+</span><p>Encoding and compression algorithms are both <strong>reversible, keyless transformations of information</strong>. Encoding specifies how information should be represented in human-readable text. Compression attempts to reduce an input to as little space as possible. Both are useful, but they are not cryptographic features.</p><span>
+
+</span><h1 id="recap">Recap</h1><span>
+
+</span><ul>
+<li>
+<strong>Cryptographic hash algorithms</strong> (e.g. SHA256) are deterministic one-way algorithms that require <code>zero</code> keys.</li>
+<li>
+<strong>Keyed hashing algorithms</strong> (e.g. HMAC) are used for authentication in secret-key cryptography; requires <code>one</code> key.</li>
+<li>
+<strong>Secret-key encryption algorithms</strong> (e.g. AES-CTR) are used to transform messages so only someone possessing the secret key can reverse; requires one <code>key</code>.</li>
+<li>
+<strong>Shared secret agreement algorithms</strong> (e.g. ECDH) are used to negotiate a shared secret key while only requiring the public transmission of both party's public keys. Requires <code>four</code> keys (two pairs of private/public) to generate a fifth.</li>
+<li>
+<strong>Digital signature algorithms</strong> (e.g. Ed25519) are used to sign messages (with one's private key) that anyone possessing the corresponding public key can validate. Requires <code>two</code> keys.</li>
+<li>
+<strong>Password hashing algorithms</strong> (e.g. bcrypt) are slow hashing algorithms designed specifically for being difficult to efficiently attack with a brute force search. Requires <code>one</code> secret input and a per-user salt.</li>
+<li>
+<strong>Encoding algorithms</strong> (e.g. Base64) are not cryptographic.</li>
+<li>
+<strong>Compression algorithms</strong> (e.g. gzip) are not cryptographic.</li>
+</ul><span>
+
+</span><h2>Keep in Mind</h2><span>
+
+</span><ul>
+<li>
+<strong>Don't encrypt passwords.</strong> Instead, hash them with a password hashing algorithm. (You may encrypt the hashes.) Hash functions like MD5, SHA1, and SHA256 are not encryption. Anyone who uses the phrase "password encryption" probably needs to read this entire page carefully, because they are deeply mistaken.</li>
+<li>Secret-key <a href="https://paragonie.com/blog/2015/05/using-encryption-and-authentication-correctly">encryption without message authentication</a> is insecure (it's vulnerable to chosen ciphertext attacks).</li>
+<li>For downloads: digital signatures prove authenticity, hashes do not. You want a Minsign or GPG signature, not an MD5 hash.</li>
+</ul><span>
+
+</span><hr><span>
+
+</span><p>We hope that this post serves as a good introduction to cryptography concepts. Our team publishes new posts about cryptography, application security, and web development in PHP anywhere from 2 to 5 times per month (usually on Friday). We also offer <a href="https://paragonie.com/service/code-review">code review</a> and <a href="https://paragonie.com/service/technology-consulting">technology consulting</a> services.</p><span>
+
+  </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
