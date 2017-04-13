@@ -1,0 +1,133 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>Debouncing and Throttling Explained Through Examples</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>Debouncing and Throttling Explained Through Examples</h1>
+                <div class="article-content"><span>
+
+                </span><span>
+      
+      </span><p><em class="explanation">The following is a guest post by <a href="https://twitter.com/dcorbacho">David Corbacho</a>, a front end engineer in London. We've <a href="https://css-tricks.com/the-difference-between-throttling-and-debouncing/">broached this topic before</a>, but this time, David is going to drive the concepts home through interactive demos that make things very clear.</em></p><span>
+</span><span>
+</span><p><strong>Debounce</strong> and <strong>throttle</strong> are two similar (but different!) techniques to control how many times we allow a function to be executed over time.</p><span>
+</span><p>Having a debounced or throttled version of our function is especially useful when we are attaching the function to a DOM event. Why? Because we are giving ourselves a layer of control between the event and the execution of the function. Remember, we don't control how often those DOM events are going to be emitted. It can vary.</p><span>
+</span><p>For example, let's talk about scroll events. See this example:</p><span>
+</span><p data-height="257" data-theme-id="1" data-slug-hash="PZOZgB" data-default-tab="result" data-user="dcorb" class="codepen">See the Pen <a href="http://codepen.io/dcorb/pen/PZOZgB/">Scroll events counter</a> by Corbacho (<a href="http://codepen.io/dcorb">@dcorb</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><p>When scrolling using a trackpad, scroll wheel, or just by dragging a scrollbar can trigger easily 30 events per second. But scrolling slowly (swapping) in a smartphone could trigger as much as 100 events per second during my tests. Is your scroll handler prepared for this rate of execution?</p><span>
+</span><p>In 2011, an issue popped up on the Twitter website: when you were scrolling down your Twitter feed, it became slow and unresponsive. John Resig published <a href="http://ejohn.org/blog/learning-from-twitter">a blog post about the problem</a> where it was explained how bad of an idea it is to directly attach expensive functions to the <code>scroll</code> event.</p><span>
+</span><p>The suggested solution by John (at that time, five years ago) was a loop running every 250ms, outside of the <code>onScroll event</code>. That way the handler is not coupled to the event. With this simple technique, we can avoid ruining the user experience. </p><span>
+</span><p>These days there are slightly more sophisticated ways of handling events. Let me introduce you to Debounce, Throttle, and requestAnimationFrame. We'll also look at the matching use cases.</p><span>
+</span><h3>Debounce</h3><span>
+</span><p>The Debounce technique allow us to "group" multiple sequential calls in a single one. </p><span>
+</span><figure id="post-240288" class="align-none media-240288"><img sizes="(min-width: 1850px) calc( (100vw - 555px) / 3 )
+       (min-width: 1251px) calc( (100vw - 530px) / 2 )
+       (min-width: 1086px) calc(100vw - 480px)
+       (min-width: 626px)  calc(100vw - 335px)
+                           calc(100vw - 30px)" srcset="https://cdn.css-tricks.com/wp-content/uploads/2016/04/debounce.png 661w, https://cdn.css-tricks.com/wp-content/uploads/2016/04/debounce-300x60.png 300w" src="https://cdn.css-tricks.com/wp-content/uploads/2016/04/debounce.png" alt=""></figure><span>
+</span><p>Imagine you are in an elevator. The doors begin to close, and suddenly another person tries to get on. The elevator doesn't begin its function to change floors, the doors open again. Now it happens again with another person. The elevator is delaying its function (moving floors), but optimizing its resources.</p><span>
+</span><p>Try it for yourself. Click or move the mouse on top of the button:</p><span>
+</span><p data-height="391" data-theme-id="1" data-slug-hash="KVxGqN" data-default-tab="result" data-user="dcorb" class="codepen">See the Pen <a href="http://codepen.io/dcorb/pen/KVxGqN/">Debounce. Trailing</a> by Corbacho (<a href="http://codepen.io/dcorb">@dcorb</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><p>You can see how sequential fast events are represented by a single debounced event. But if the events are triggered with big gaps, the debouncing doesn't happen. </p><span>
+</span><h4>Leading edge (or "immediate")</h4><span>
+</span><p>You may find it irritating that the debouncing event <em>waits</em> before triggering the function execution, until the events stop happening so rapidly. Why not trigger the function execution immediately, so it behaves exactly as the original non-debounced handler? But not fire again until there is a pause in the rapid calls.</p><span>
+</span><p>You can do this! Here's an example with the <code>leading</code> flag on:</p><span>
+</span><figure id="post-240291" class="align-none media-240291"><img sizes="(min-width: 1850px) calc( (100vw - 555px) / 3 )
+       (min-width: 1251px) calc( (100vw - 530px) / 2 )
+       (min-width: 1086px) calc(100vw - 480px)
+       (min-width: 626px)  calc(100vw - 335px)
+                           calc(100vw - 30px)" srcset="https://cdn.css-tricks.com/wp-content/uploads/2016/04/debounce-leading.png 710w, https://cdn.css-tricks.com/wp-content/uploads/2016/04/debounce-leading-300x82.png 300w" src="https://cdn.css-tricks.com/wp-content/uploads/2016/04/debounce-leading.png" alt=""><figcaption>Example of a "leading" debounce.</figcaption></figure><span>
+</span><p>In underscore.js, the option is called <code>immediate</code> instead of <code>leading</code></p><span>
+</span><p>Try it for yourself:</p><span>
+</span><p data-height="360" data-theme-id="1" data-slug-hash="GZWqNV" data-default-tab="result" data-user="dcorb" class="codepen">See the Pen <a href="http://codepen.io/dcorb/pen/GZWqNV/">Debounce. Leading</a> by Corbacho (<a href="http://codepen.io/dcorb">@dcorb</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><h4>Debounce Implementations</h4><span>
+</span><p>The first time I saw debounce implemented in JavaScript was in 2009 in <a href="http://unscriptable.com/2009/03/20/debouncing-javascript-methods/">this John Hann post</a> (who also coined the term).</p><span>
+</span><p>Soon after that, Ben Alman created <a href="http://benalman.com/projects/jquery-throttle-debounce-plugin/">a jQuery plugin</a> (no longer maintained), and a year after, Jeremy Ashkenas <a href="https://github.com/jashkenas/underscore/commit/9e3e067f5025dbe5e93ed784f93b233882ca0ffe">added it to underscore.js</a>. It was later added to Lodash, a drop-in alternative to underscore.</p><span>
+</span><p>The 3 implementations are a bit different internally, but their interface is almost identical.</p><span>
+</span><p>There was a time that underscore adopted the debounce/throttle implementation from Lodash, after <a href="http://drupalmotion.com/article/debounce-and-throttle-visual-explanation">I discovered a bug</a> in the <code>_.debounce</code> function in 2013. Since then, both implementations have grown apart. </p><span>
+</span><p>Lodash <a href="https://lodash.com/docs#debounce">has added</a> more features to its <code>_.debounce</code> and <code>_.throttle</code> functions. The original <code>immediate</code> flag was replaced with <code>leading</code> and <code>trailing</code> options. You can choose one, or both. By default, only the <code>trailing</code> edge is enabled.</p><span>
+</span><p>The new <code>maxWait</code> option (only in Lodash at the moment) is not covered in this article but it can be very useful. Actually, the throttle function is defined using <code>_.debounce</code> with <code>maxWait</code>, as you see in the lodash <a href="https://github.com/lodash/lodash/blob/4.8.0-npm/throttle.js">source code</a>.</p><span>
+</span><h4>Debounce Examples</h4><span>
+</span><h5>Resize Example</h5><span>
+</span><p>When resizing a (desktop) browser window, they can emit many <code>resize</code> events while dragging the resize handle.</p><span>
+</span><p>See for yourself in this demo:</p><span>
+</span><p data-height="257" data-theme-id="1" data-slug-hash="XXPjpd" data-default-tab="result" data-user="dcorb" class="codepen">See the Pen <a href="http://codepen.io/dcorb/pen/XXPjpd/">Debounce Resize Event Example</a> by Corbacho (<a href="http://codepen.io/dcorb">@dcorb</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><p>As you can see, we are using the default <code>trailing</code> option for the resize event, because we are only interested on the final value, after user stops resizing the browser.</p><span>
+</span><h5>keypress on autocomplete form with Ajax request</h5><span>
+</span><p>Why to send Ajax requests to the server every 50ms, when the user is still typing? <code>_.debounce</code> can help us, avoiding extra work, and only send the request when the user stops typing.</p><span>
+</span><p>Here, it wouldn't make sense to have the <code>leading</code> flag on. We want to wait to the last letter typed.</p><span>
+</span><p data-height="257" data-theme-id="1" data-slug-hash="mVGVOL" data-default-tab="result" data-user="dcorb" class="codepen">See the Pen <a href="http://codepen.io/dcorb/pen/mVGVOL/">Debouncing keystrokes Example</a> by Corbacho (<a href="http://codepen.io/dcorb">@dcorb</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><p>A similar use case would be to wait until user stops typing before validate its input. "Your password is too short" type of messages.</p><span>
+</span><h3>How to use debounce and throttle and common pitfalls</h3><span>
+</span><p>It can be tempting to build your own debounce/throttle function, or copy it from some random blog post. <strong>My recommendation is to use underscore or Lodash directly.</strong> If you only need the <code>_.debounce</code> and <code>_.throttle</code> functions, you can use Lodash custom builder to output a custom 2KB minified library. Build it with this simple command:</p><span>
+</span><pre rel="Command Line"><code>npm i -g lodash-cli
+lodash-cli include=debounce,throttle</code></pre><span>
+</span><p>That said, most use the modular form `lodash/throttle` and `lodash/debounce` or `lodash.throttle` and `lodash.debounce` packages with webpack/browserify/rollup.</p><span>
+</span><p>A common pitfall is to call the <code>_.debounce</code> function more than once:</p><span>
+</span><pre rel="jQuery"><code class="language-javascript">// WRONG
+$(window).on('scroll', function() {
+   _.debounce(doSomething, 300); 
+});
+
+// RIGHT
+$(window).on('scroll', _.debounce(doSomething, 200));</code></pre><span>
+</span><p>Creating a variable for the debounced function will allow us to call the private method <code>debounced_version.cancel()</code>, available in lodash and underscore.js, in case you need it.</p><span>
+</span><pre rel="jQuery"><code class="language-javascript">var debounced_version = _.debounce(doSomething, 200);
+$(window).on('scroll', debounced_version);
+
+// If you need it
+debounced_version.cancel();</code></pre><span>
+</span><h3>Throttle</h3><span>
+</span><p>By using <code>_.throttle</code>, we don't allow to our function to execute more than once every X milliseconds. </p><span>
+</span><p>The main difference between this and debouncing is that throttle guarantees the execution of the function regularly, at least every X milliseconds.</p><span>
+</span><p>The same way than debounce, throttle  technique is covered by Ben's plugin, underscore.js and lodash.</p><span>
+</span><h4>Throttling Examples</h4><span>
+</span><h5>Infinite scrolling</h5><span>
+</span><p>A quite common example. The user is scrolling down your infinite-scrolling page. You need to check how far from the bottom the user is. If the user is near the bottom, we should request via Ajax more content and append it to the page.</p><span>
+</span><p>Here our beloved <code>_.debounce</code> wouldn't be helpful. It only would trigger only when the user stops scrolling.. and we need to start fetching the content <em>before</em> the user reaches the bottom.<br>With <code>_.throttle</code> we can warranty that we are checking constantly how far we are from the bottom.</p><span>
+</span><p data-height="607" data-theme-id="1" data-slug-hash="eJLMxa" data-default-tab="result" data-user="dcorb" class="codepen">See the Pen <a href="http://codepen.io/dcorb/pen/eJLMxa/">Infinite scrolling throttled</a> by Corbacho (<a href="http://codepen.io/dcorb">@dcorb</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><h3>requestAnimationFrame (rAF)</h3><span>
+</span><p><code>requestAnimationFrame</code> is another way of rate-limiting the execution of a function.</p><span>
+</span><p>It can be thought as a <code>_.throttle(dosomething, 16)</code>. But with a much higher fidelity, since it's a browser native API that aims for better accuracy.</p><span>
+</span><p>We can use the rAF API, as an alternative to the throttle function, considering this pros/cons:</p><span>
+</span><h4>Pros</h4><span>
+</span><ul>
+<li>Aims for 60fps (frames of 16 ms) but internally will decide the best timing on how to schedule the rendering.</li>
+<li>Fairly simple and standard API, not changing in the future. Less maintenance.</li>
+</ul><span>
+</span><h4>Cons</h4><span>
+</span><ul>
+<li>The start/cancelation of rAFs it's our responsibility, unlike <em>.debounce or `</em>.throttle`, where it's managed internally.</li>
+<li>If the browser tab is not active, it would not execute. Although for scroll, mouse or keyboard events this doesn't matter.</li>
+<li>Although all modern browsers offer rAF, still is not supported in IE9, Opera Mini and old Android. (A polyfill)[http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/] would <a href="http://caniuse.com/#feat=requestanimationframe">be needed</a> still today.</li>
+<li>rAF is not supported in node.js, so you can't use it on the server to throttle filesystem events.</li>
+</ul><span>
+</span><p>As a rule of thumb, I would use <code>requestAnimationFrame</code> if your JavaScript function is "painting" or animating directly properties, use it at everything that involves re-calculating element positions.</p><span>
+</span><p>To make Ajax requests, or deciding if adding/removing a class (that could trigger a CSS animation), I would consider <code>_.debounce</code> or <code>_.throttle</code>, where you can set up lower executing rates (200ms for example, instead of 16ms)</p><span>
+</span><p>If you think that rAF could be implemented inside underscore or lodash, they both have rejected the idea, since it's a specialized use case, and it's easy enough to be called directly.</p><span>
+</span><h4>Examples of rAF</h4><span>
+</span><p>I will cover only this example to use requestAnimation frame on scroll, inspired by <a href="http://www.html5rocks.com/en/tutorials/speed/animations/">Paul Lewis article</a>, where he explains step-by-step the logic of this example.</p><span>
+</span><p>I put it side by side to compare it to <code>_.throttle</code> at 16ms. Giving similar performance, but probably rAF will give you better results on more complex scenarios.</p><span>
+</span><p data-height="331" data-theme-id="1" data-slug-hash="pgOKKw" data-default-tab="result" data-user="dcorb" class="codepen">See the Pen <a href="http://codepen.io/dcorb/pen/pgOKKw/">Scroll comparison requestAnimationFrame vs throttle</a> by Corbacho (<a href="http://codepen.io/dcorb">@dcorb</a>) on <a href="http://codepen.io/">CodePen</a>.</p><span>
+</span><p>A more advanced example where I've seen this technique is in the library headroom.js, where the <a href="https://github.com/WickyNilliams/headroom.js/blob/3282c23bc69b14f21bfbaf66704fa37b58e3241d/src/Debouncer.js">logic is decoupled</a> and wrapped inside an object.</p><span>
+</span><h3>Conclusion</h3><span>
+</span><p>Use debounce, throttle and <code>requestAnimationFrame</code> to optimize your event handlers. Each technique is slightly different, but all three of them are useful and complement each other.</p><span>
+</span><p>In summary:</p><span>
+</span><ul>
+<li><strong>debounce:</strong> Grouping a sudden burst of events (like keystrokes) into a single one.</li>
+<li><strong>throttle:</strong> Guaranteeing a constant flow of executions every X milliseconds. Like checking every 200ms your scroll position to trigger a CSS animation.</li>
+<li><strong>requestAnimationFrame:</strong> a throttle alternative. When your function recalculates and renders elements on screen and you want to guarantee smooth changes or animations. Note: no IE9 support.</li>
+</ul><span>
+</span><span>
+      
+    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>

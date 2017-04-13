@@ -1,0 +1,187 @@
+
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>如何百倍加速 Lo-Dash？引入惰性计算</title>
+            <link rel="stylesheet" href="../css/article.css" />;
+        </head>
+        <body>
+            <div class="m-content">
+                <h1>如何百倍加速 Lo-Dash？引入惰性计算</h1>
+                <div id="article"><span>
+    </span><p>原文：<a href="http://filimanjaro.com/blog/2014/introducing-lazy-evaluation/">How to Speed Up Lo-Dash ×100? Introducing Lazy Evaluation.</a><br>作者: <a href="http://twitter.com/filip_zawada">Filip Zawada</a></p><span>
+
+</span><p>译文：<a href="http://justjavac.com/javascript/2015/12/15/introducing-lazy-evaluation.html">如何百倍加速 Lo-Dash？引入惰性计算</a><br>译者：<a href="http://justjavac.com/">justjavac</a></p><span>
+
+</span><hr><span>
+
+</span><p>我一直以为像 Lo-Dash 这样的库已经不能再快了，毕竟它们已经足够快了。
+Lo-Dash 几乎完全混合了各种 <a href="https://www.youtube.com/watch?v=NthmeLEhDDM">JavaScript 奇技淫巧</a>（YouTube）来压榨出最好的性能。</p><span>
+
+</span><h2 id="惰性计算">惰性计算</h2><span>
+
+</span><p>但似乎我错了 - 其实 Lo-Dash 可以运行的更快。
+你需要做的是，停止思考那些细微的优化，并开始找出更加适用的算法。
+例如，在一个典型的循环中，我们往往倾向于去优化单次迭代的时间：</p><span>
+
+</span><div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">getLength</span><span class="p">();</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">operation</span><span class="p">();</span> <span class="c1">// &lt;- 10毫秒 - 如何优化到9毫秒?!</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div><span>
+
+</span><p>代码说明：取得数组的长度，然后重复执行 N 遍 <code class="highlighter-rouge">operation()</code> 函数。译注 by @justjavac</p><span>
+
+</span><p>但是，这（优化 <code class="highlighter-rouge">operation()</code> 执行时间）往往很难，而且对性能提升也非常有限。
+相反，在某些情况下，我们可以优化 <code class="highlighter-rouge">getLength()</code> 函数。
+它返回的数字越小，则每个 10 毫秒循环的执行次数就越少。</p><span>
+
+</span><p>这就是 Lo-Dash 使用惰性计算的思想。
+这是减少周期数，而不是减少每个周期的执行时间。
+让我们看看下面的例子：</p><span>
+
+</span><div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">priceLt</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">price</span> <span class="o">&lt;</span> <span class="nx">x</span><span class="p">;</span> <span class="p">};</span>
+<span class="p">}</span>
+<span class="kd">var</span> <span class="nx">gems</span> <span class="o">=</span> <span class="p">[</span>
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Sunstone'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">4</span>  <span class="p">},</span>
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Amethyst'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">15</span> <span class="p">},</span>
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Prehnite'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">20</span> <span class="p">},</span>
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Sugilite'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">7</span>  <span class="p">},</span>
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Diopside'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">3</span>  <span class="p">},</span> 
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Feldspar'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">13</span> <span class="p">},</span>
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Dioptase'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">2</span>  <span class="p">},</span> 
+   <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Sapphire'</span><span class="p">,</span> <span class="na">price</span><span class="p">:</span> <span class="mi">20</span> <span class="p">}</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">chosen</span> <span class="o">=</span> <span class="nx">_</span><span class="p">(</span><span class="nx">gems</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">priceLt</span><span class="p">(</span><span class="mi">10</span><span class="p">)).</span><span class="nx">take</span><span class="p">(</span><span class="mi">3</span><span class="p">).</span><span class="nx">value</span><span class="p">();</span>
+</code></pre><span>
+</span></div><span>
+
+</span><p>代码说明：<code class="highlighter-rouge">gems</code> 保存了 8 个对象，名字和价格。<code class="highlighter-rouge">priceLt(x)</code> 函数返回价格低于 <code class="highlighter-rouge">x</code> 的所有元素。译注 by @justjavac</p><span>
+
+</span><p>我们把价格低于 10 美元的前 3 个 <code class="highlighter-rouge">gems</code> 找出来。
+常规 Lo-Dash 方法（严格计算）是过滤所有 8 个 <code class="highlighter-rouge">gems</code>，然后返回过滤结果的前 3 个。</p><span>
+
+</span><p><img src="http://justjavac.com/assets/images/lodash-naive.gif" alt="Lodash naïve approach"></p><span>
+
+</span><p>不难看出来，这种算法是不明智的。
+它处理了所有的 8 个元素，而实际上我们只需要读取其中的 5 个元素就能得到我们想要的结果。
+与此相反，使用惰性计算算法，只需要处理能得到结果的最少数量就可以了。
+如图所示：</p><span>
+
+</span><p><img src="http://justjavac.com/assets/images/grafika.gif" alt="Lo-Dash regular approach"></p><span>
+
+</span><p>我们轻而易举就获得了 37.5％ 的性能提升。
+但是这还不是全部，其实很容易找到能获得 1000 倍以上性能提升的例子。
+让我们一起来看看：</p><span>
+
+</span><div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="c1">// 99,999 张照片</span>
+<span class="kd">var</span> <span class="nx">phoneNumbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5554445555</span><span class="p">,</span> <span class="mi">1424445656</span><span class="p">,</span> <span class="mi">5554443333</span><span class="p">,</span> <span class="err">…</span> <span class="err">×</span><span class="mi">99</span><span class="p">,</span><span class="mi">999</span><span class="p">];</span>
+
+<span class="c1">// 返回包含 "55" 的照片</span>
+<span class="kd">function</span> <span class="nx">contains55</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">str</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="s2">"55"</span><span class="p">);</span> 
+<span class="p">};</span>
+
+<span class="c1">// 取 100 张包含 "55" 的照片</span>
+<span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">_</span><span class="p">(</span><span class="nx">phoneNumbers</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nb">String</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">contains55</span><span class="p">).</span><span class="nx">take</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+</code></pre><span>
+</span></div><span>
+
+</span><p>在这个例子中，<code class="highlighter-rouge">map</code> 和 <code class="highlighter-rouge">filter</code> 用来处理 <code class="highlighter-rouge">99,999</code> 个元素。
+不过我们只需要它的一个子集就可以得到想要的结果了，例如 <code class="highlighter-rouge">10,000</code> 个，
+性能提升也是非常大的（<a href="http://jsperf.com/lazy-demo">基准测试</a>）：</p><span>
+
+</span><p><img src="http://justjavac.com/assets/images/benchmark.jpg" alt="benchmark"></p><span>
+
+</span><h2 id="pipelining">Pipelining</h2><span>
+
+</span><p>惰性计算带来了另一个好处，我称之为 “Pipelining”。
+它可以避免链式方法执行期间创建中间数组。
+取而代之，我们在单个元素上执行所有操作。
+所以，下面的代码：</p><span>
+
+</span><div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">_</span><span class="p">(</span><span class="nx">source</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">func1</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">func2</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">func3</span><span class="p">).</span><span class="nx">value</span><span class="p">();</span>
+</code></pre><span>
+</span></div><span>
+
+</span><p>将大致翻译为如下的常规 Lo-Dash（严格计算）</p><span>
+
+</span><div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">temp1</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">temp2</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">temp3</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">source</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nx">temp1</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func1</span><span class="p">(</span><span class="nx">source</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">source</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nx">temp2</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func2</span><span class="p">(</span><span class="nx">temp1</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">source</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nx">temp3</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func3</span><span class="p">(</span><span class="nx">temp2</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+<span class="p">}</span>
+<span class="nx">result</span> <span class="o">=</span> <span class="nx">temp3</span><span class="p">;</span>
+</code></pre><span>
+</span></div><span>
+
+</span><p>如果我们使用惰性计算，它会像下面这样执行：</p><span>
+
+</span><div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">source</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func3</span><span class="p">(</span><span class="nx">func2</span><span class="p">(</span><span class="nx">func1</span><span class="p">(</span><span class="nx">source</span><span class="p">[</span><span class="nx">i</span><span class="p">])));</span>
+<span class="p">}</span>
+</code></pre><span>
+</span></div><span>
+
+</span><p>不使用临时数组可以给我们带来非常显著的性能提升，特别是当源数组非常大时，内存访问是昂贵的资源。</p><span>
+
+</span><h2 id="延迟执行">延迟执行</h2><span>
+
+</span><p>和惰性计算一起使用的是延迟执行。
+当你创建一个链，我们并不立即计算它的值，直到 <code class="highlighter-rouge">.value()</code> 被显式或者隐式地调用。
+这种方法有助于先准备一个查询，随后我们使用最新的数据来执行它。</p><span>
+
+</span><div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">wallet</span> <span class="o">=</span> <span class="nx">_</span><span class="p">(</span><span class="nx">assets</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">ownedBy</span><span class="p">(</span><span class="s1">'me'</span><span class="p">))</span>
+                      <span class="p">.</span><span class="nx">pluck</span><span class="p">(</span><span class="s1">'value'</span><span class="p">)</span>
+                      <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
+
+<span class="nx">$json</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"/new/assets"</span><span class="p">).</span><span class="nx">success</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">assets</span><span class="p">.</span><span class="nx">push</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">assets</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span> <span class="c1">// 更新我的资金</span>
+    <span class="nx">wallet</span><span class="p">.</span><span class="nx">value</span><span class="p">();</span> <span class="c1">// 返回我钱包的最新的总额</span>
+<span class="p">});</span>
+</code></pre><span>
+</span></div><span>
+
+</span><p>在某些情况下，这样做也可以加速执行时间。我们可以在前期创建复杂的查询，然后当时机成熟时再执行它。</p><span>
+
+</span><h2 id="wrap-up">Wrap up</h2><span>
+
+</span><p>懒惰计算并不是行业里的新理念。它已经包含在了许多库里面，例如 <a href="http://en.wikipedia.org/wiki/Language_Integrated_Query">LINQ</a>、<a href="http://danieltao.com/lazy.js/">Lazy.js</a> 等等。我相信 Lo-Dash 和这些库最主要的区别是，你可以在一个更新的、更强大的引擎里面使用原有的 Underscore API。不需要学习新的库，不需要修改代码，只是简单升级。</p><span>
+
+</span><p>但是，即使你不打算使用 Lo-Dash，我希望这篇文章启发了你。
+现在，当你发现你的应用程序存在性能瓶颈，不要仅仅是去 jsperf.com 以 try/fail 风格优化它。
+而是去喝杯咖啡，并开始考虑算法。
+最重要的是创意，但良好的数学背景会让你如鱼得水（<a href="http://mitpress.mit.edu/books/introduction-algorithms">book</a>）。祝你好运！</p><span>
+
+    </span><p>继续阅读关于
+    
+    
+    
+       
+      	<a href="http://justjavac.com/tags.html#javascript-ref" rel="tag">javascript</a>
+       
+      	<a href="http://justjavac.com/tags.html#Lo-Dash-ref" rel="tag">Lo-Dash</a>
+      
+    
+    
+    
+    的文章</p><span>
+    </span></div>
+            </div>
+            <script>var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-34802167-1']); _gaq.push(['_setDomainName', 'liuzhe.co']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+        </body>
+        </html>
